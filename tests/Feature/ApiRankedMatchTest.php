@@ -8,6 +8,10 @@ use App\Models\RankedQueueEntry;
 use App\Models\User;
 use App\Support\RankedMatchPresenceStore;
 use App\Support\RankedMatchService;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Testing\TestResponse;
+use Tests\TestCase;
 
 test('matched player can inspect ranked match details without seeing correct answers before finish', function () {
     [$firstUser, $secondUser, $match] = createRankedMatchFixture($this);
@@ -579,7 +583,7 @@ test('events endpoint returns queue and opponent progress events for the current
     $payloadEvents = $events->json('data.events');
     $startedEvent = $payloadEvents[2];
     $opponentAnsweredEvent = $payloadEvents[3];
-    $expectedRevealAt = \Illuminate\Support\Carbon::parse($startedEvent['data']['started_at'])
+    $expectedRevealAt = Carbon::parse($startedEvent['data']['started_at'])
         ->copy()
         ->addSeconds(2)
         ->toIso8601String();
@@ -759,9 +763,9 @@ test('realtime stream emits overview sync and match events for authenticated pla
 });
 
 /**
- * @return array{0: User, 1: User, 2: RankedMatch, 3: \Illuminate\Support\Collection<int, Question>}
+ * @return array{0: User, 1: User, 2: RankedMatch, 3: Collection<int, Question>}
  */
-function createRankedMatchFixture(\Tests\TestCase $testCase): array
+function createRankedMatchFixture(TestCase $testCase): array
 {
     $category = LicenseCategory::factory()->create([
         'code' => 'B',
@@ -803,12 +807,12 @@ function createRankedMatchFixture(\Tests\TestCase $testCase): array
 }
 
 function finishRankedMatchFixture(
-    \Tests\TestCase $testCase,
+    TestCase $testCase,
     RankedMatch $match,
-    \Illuminate\Support\Collection $questions,
+    Collection $questions,
     User $firstUser,
     User $secondUser,
-): \Illuminate\Testing\TestResponse {
+): TestResponse {
     startRankedMatchFixture($testCase, $match, $firstUser, $secondUser);
 
     foreach ($questions as $question) {
@@ -848,7 +852,7 @@ function finishRankedMatchFixture(
 }
 
 function readyRankedMatchFixture(
-    \Tests\TestCase $testCase,
+    TestCase $testCase,
     RankedMatch $match,
     User $firstUser,
     User $secondUser,
@@ -866,7 +870,7 @@ function readyRankedMatchFixture(
 }
 
 function startRankedMatchFixture(
-    \Tests\TestCase $testCase,
+    TestCase $testCase,
     RankedMatch $match,
     User $firstUser,
     User $secondUser,

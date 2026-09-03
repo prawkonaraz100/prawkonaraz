@@ -5,7 +5,7 @@ namespace App\Support;
 class PolishTramSignContentBuilder
 {
     /**
-     * @param array<string, mixed> $signData
+     * @param  array<string, mixed>  $signData
      * @return array<string, mixed>
      */
     public function build(array $signData, int $index): array
@@ -18,16 +18,16 @@ class PolishTramSignContentBuilder
         $placement = 'Znaki dla kierujących tramwajami są najczęściej umieszczane bezpośrednio nad torowiskiem (np. na zawieszeniu sieci trakcyjnej) lub na słupach trakcyjnych w bezpośrednim sąsiedztwie torów.';
         $driverBehavior = 'Kierujący pojazdem cywilnym (samochód osobowy, ciężarowy, motocykl) musi całkowicie zignorować ten znak. Nie jest on skierowany do kierowców pojazdów kołowych i nie wpływa na ich zasady poruszania się.';
         $legalSummary = 'Zgodnie z przepisami, znaki grupy AT i BT dotyczą wyłącznie kierujących tramwajami. Nie mają one żadnej mocy wiążącej dla pojazdów poruszających się po jezdni (nawet jeśli jezdnia pokrywa się z torowiskiem).';
-        
+
         $legalReferenceLabel = 'Rozporządzenie ws. znaków i sygnałów drogowych - Znaki tramwajowe';
         $legalReferenceUrl = 'https://isap.sejm.gov.pl';
-        
+
         $fineSummary = 'Kierowca cywilny nie otrzyma mandatu za zignorowanie znaku tramwajowego. Przykładowo: zignorowanie tramwajowego ograniczenia prędkości (BT-1) przez kierowcę auta jadącego po torowisku wbudowanym w jezdnię nie grozi mandatem z fotoradaru.';
         $commonMistakes = 'Błędne odczytywanie kwadratowych tabliczek ograniczenia prędkości tramwaju (BT-1) przez kursantów prawa jazdy na kategorię B jako ograniczeń dla samochodów jadących po torowisku wbudowanym w jezdnię.';
         $editorialNotes = 'Warto w pytaniach testowych podkreślać, że to "wewnętrzne" oznakowanie przedsiębiorstw komunikacyjnych usankcjonowane państwowym rozporządzeniem, którego zadaniem jest ochrona sieci trakcyjnej i taboru, a nie regulacja ruchu aut.';
-        
+
         $faqItems = $this->getFaqItems($code);
-        
+
         $metaTitle = "Znak tramwajowy {$code} - znaczenie";
         $metaDescription = "Sprawdź, co oznacza znak tramwajowy {$code} ({$name}). Dowiedz się, czy znaki wieszane nad torowiskiem obowiązują kierowców samochodów osobowych.";
 

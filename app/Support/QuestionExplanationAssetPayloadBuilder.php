@@ -28,7 +28,7 @@ class QuestionExplanationAssetPayloadBuilder
             return [
                 'id' => $asset->getKey(),
                 'kind' => $asset->kind,
-                'title' => 'Znak ' . $asset->trafficSign->name,
+                'title' => 'Znak '.$asset->trafficSign->name,
                 'body' => null, // Intentionally null per user request
                 'caption' => null,
                 'alt_text' => $asset->trafficSign->image_alt ?? 'Znak drogowy',

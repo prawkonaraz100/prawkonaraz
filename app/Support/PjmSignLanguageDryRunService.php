@@ -41,6 +41,7 @@ class PjmSignLanguageDryRunService
 
             if ($parsed === null) {
                 $invalidFiles[] = $file->getRelativePathname();
+
                 continue;
             }
 

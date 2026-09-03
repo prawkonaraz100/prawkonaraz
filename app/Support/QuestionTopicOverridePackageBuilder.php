@@ -183,7 +183,6 @@ class QuestionTopicOverridePackageBuilder
     }
 
     /**
-     * @param  mixed  $value
      * @return array<int, string>
      */
     protected function normalizeStringList(mixed $value): array
@@ -200,7 +199,6 @@ class QuestionTopicOverridePackageBuilder
     }
 
     /**
-     * @param  mixed  $value
      * @return array<int, string>
      */
     protected function normalizeSearchList(mixed $value): array
@@ -213,7 +211,6 @@ class QuestionTopicOverridePackageBuilder
     }
 
     /**
-     * @param  mixed  $value
      * @return array<int, string>
      */
     protected function normalizeIdentityList(mixed $value): array

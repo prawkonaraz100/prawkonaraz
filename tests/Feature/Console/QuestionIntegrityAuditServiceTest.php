@@ -100,6 +100,7 @@ test('manifest series import stores integrity audit summary after a successful f
 
     $this->artisan('catalog:import-manifest-series', [
         'path' => $seriesDirectory,
+        '--skip-sitemap' => true,
         '--report' => $seriesDirectory.'/series-import-report.json',
     ])->assertSuccessful();
 

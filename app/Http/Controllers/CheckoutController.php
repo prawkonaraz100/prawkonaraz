@@ -42,8 +42,7 @@ class CheckoutController extends Controller
         Request $request,
         PurchaseOrder $order,
         PaymentRequirementService $paymentRequirementService,
-    ): Response|RedirectResponse
-    {
+    ): Response|RedirectResponse {
         $this->ensureOwner($request, $order);
 
         if ($order->isPaid()) {

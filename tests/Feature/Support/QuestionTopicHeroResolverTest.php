@@ -103,4 +103,3 @@ test('question topic category heroes are unique per category and topic', functio
         'hero_image_path' => 'study/topic-heroes/b/second.webp',
     ]))->toThrow(QueryException::class);
 });
-

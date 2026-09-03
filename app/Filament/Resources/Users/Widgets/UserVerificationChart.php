@@ -4,15 +4,15 @@ namespace App\Filament\Resources\Users\Widgets;
 
 use App\Models\User;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\HtmlString;
 
 class UserVerificationChart extends ChartWidget
 {
     protected static bool $isLazy = false;
 
-    protected int | string | array $columnSpan = [
+    protected int|string|array $columnSpan = [
         'md' => 1,
         'xl' => 1,
     ];
@@ -21,7 +21,7 @@ class UserVerificationChart extends ChartWidget
 
     protected ?string $maxHeight = '15rem';
 
-    public function getHeading(): string | Htmlable | null
+    public function getHeading(): string|Htmlable|null
     {
         return new HtmlString(
             '<span class="adm-users-chart-heading"><span class="adm-users-chart-heading__eyebrow">Status kont</span><span class="adm-users-chart-heading__title">Zweryfikowani vs nieweryfikowani</span></span>',

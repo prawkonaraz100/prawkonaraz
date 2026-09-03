@@ -77,7 +77,7 @@ class RegisteredUserController extends Controller
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'target_category_id' => ['required', 'integer'],
-            'preferred_learning_track' => ['nullable', 'string', Rule::in([UserProfile::LEARNING_TRACK_CLASSIC])],
+            'preferred_learning_track' => ['nullable', 'string', Rule::in($this->availableLearningTracks())],
         ]);
 
         $targetCategory = $studyContextService->activeCategories()
@@ -123,7 +123,7 @@ class RegisteredUserController extends Controller
     ): RedirectResponse {
         $validated = $request->validate([
             'target_category_id' => ['required', 'integer'],
-            'preferred_learning_track' => ['nullable', 'string', Rule::in([UserProfile::LEARNING_TRACK_CLASSIC])],
+            'preferred_learning_track' => ['nullable', 'string', Rule::in($this->availableLearningTracks())],
         ]);
 
         $user = $socialAccountService->resolveForLogin(
@@ -141,5 +141,15 @@ class RegisteredUserController extends Controller
         $googleIdentityRegistrationSession->forget($request);
 
         return redirect(route('dashboard', absolute: false));
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function availableLearningTracks(): array
+    {
+        return config('study.pjm_module_enabled', false)
+            ? [UserProfile::LEARNING_TRACK_CLASSIC, UserProfile::LEARNING_TRACK_PJM]
+            : [UserProfile::LEARNING_TRACK_CLASSIC];
     }
 }

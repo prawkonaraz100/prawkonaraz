@@ -27,7 +27,7 @@ test('service worker keeps private learning and api traffic out of runtime cache
     $serviceWorker = (string) file_get_contents(public_path('service-worker.js'));
 
     expect($serviceWorker)
-        ->toContain("const PRIVATE_PATH_PREFIXES")
+        ->toContain('const PRIVATE_PATH_PREFIXES')
         ->toContain("'/api/'")
         ->toContain("'/auth/'")
         ->toContain("'/nauka'")

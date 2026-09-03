@@ -15,7 +15,7 @@ class UserAcquisitionVsActivityChart extends ChartWidget
 
     protected string $view = 'filament.resources.users.widgets.user-acquisition-vs-activity-chart';
 
-    protected int | string | array $columnSpan = [
+    protected int|string|array $columnSpan = [
         'md' => 4,
         'xl' => 3,
     ];
@@ -24,7 +24,7 @@ class UserAcquisitionVsActivityChart extends ChartWidget
 
     protected ?string $maxHeight = '15rem';
 
-    public function getHeading(): string | Htmlable | null
+    public function getHeading(): string|Htmlable|null
     {
         return new HtmlString(
             '<span class="adm-users-chart-heading"><span class="adm-users-chart-heading__eyebrow">Aktywacja</span><span class="adm-users-chart-heading__title">Nowi użytkownicy vs aktywność</span></span>',

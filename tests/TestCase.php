@@ -12,7 +12,8 @@ abstract class TestCase extends BaseTestCase
 
     public function createApplication()
     {
-        $testingDatabasePath = __DIR__.'/../database/testing-'.bin2hex(random_bytes(8)).'.sqlite';
+        $testingDatabasePath = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR)
+            .DIRECTORY_SEPARATOR.'prawkonaraz-testing-'.bin2hex(random_bytes(8)).'.sqlite';
 
         touch($testingDatabasePath);
         $this->testingDatabasePath = $testingDatabasePath;
@@ -43,6 +44,7 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
 
         $this->app['config']->set('database.connections.sqlite.database', $this->testingDatabasePath);
+        $this->app['config']->set('study.pjm_module_enabled', true);
         $this->app['db']->purge('sqlite');
         $this->artisan('migrate', ['--force' => true]);
         $this->withoutMiddleware(ValidateCsrfToken::class);

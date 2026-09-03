@@ -72,8 +72,8 @@ class PolishProhibitionSignContentBuilder
             'meaning' => "Od miejsca ustawienia znaku dalej nie mogą wjechać {$config['scope']}, chyba że tabliczka pod znakiem przewiduje wyjątek. Kierowca nie może tego znaku interpretować uznaniowo ani zakładać, że skoro droga jest pusta, zakaz go nie dotyczy.",
             'placement' => $config['placement'],
             'driver_behavior' => $config['behavior'],
-            'legal_summary' => "To klasyczny znak zakazu wjazdu. Trzeba czytać go razem z organizacją ruchu oraz ewentualną tabliczką pod znakiem, bo to właśnie tam mogą znajdować się wyjątki dla wybranych pojazdów, służb albo dojazdu do posesji.",
-            'fine_summary' => "Zignorowanie tego znaku może skończyć się mandatem, ale praktyczny problem jest szerszy: kierowca wjeżdża wtedy w strefę, w której dany rodzaj ruchu został wyłączony ze względów bezpieczeństwa, organizacyjnych albo technicznych.",
+            'legal_summary' => 'To klasyczny znak zakazu wjazdu. Trzeba czytać go razem z organizacją ruchu oraz ewentualną tabliczką pod znakiem, bo to właśnie tam mogą znajdować się wyjątki dla wybranych pojazdów, służb albo dojazdu do posesji.',
+            'fine_summary' => 'Zignorowanie tego znaku może skończyć się mandatem, ale praktyczny problem jest szerszy: kierowca wjeżdża wtedy w strefę, w której dany rodzaj ruchu został wyłączony ze względów bezpieczeństwa, organizacyjnych albo technicznych.',
             'common_mistakes' => $config['mistake'],
             'faq_items' => [
                 [
@@ -98,7 +98,7 @@ class PolishProhibitionSignContentBuilder
     {
         return [
             'intro_definition' => "Znak {$sign['code']} oznacza {$this->lcfirst($sign['name'])}. Ogranicza wjazd pojazdów przewożących szczególnie wrażliwe lub niebezpieczne ładunki.",
-            'meaning' => "Zakaz ma chronić infrastrukturę i otoczenie przed skutkami ewentualnego wycieku, zapłonu albo eksplozji. Od miejsca ustawienia znaku nie wolno kontynuować jazdy pojazdem objętym zakazem, chyba że organizacja ruchu przewiduje wyraźny wyjątek.",
+            'meaning' => 'Zakaz ma chronić infrastrukturę i otoczenie przed skutkami ewentualnego wycieku, zapłonu albo eksplozji. Od miejsca ustawienia znaku nie wolno kontynuować jazdy pojazdem objętym zakazem, chyba że organizacja ruchu przewiduje wyraźny wyjątek.',
             'placement' => $config['placement'],
             'driver_behavior' => $config['behavior'],
             'legal_summary' => 'To znak zakazu stosowany w miejscach o podwyższonej wrażliwości infrastrukturalnej lub środowiskowej. Kierowca wykonujący przewóz niebezpieczny ma obowiązek czytać go łącznie z oznakowaniem objazdu, tabliczkami dodatkowymi i lokalną organizacją ruchu.',

@@ -14,15 +14,23 @@ class QuestionAudioAsset extends Model
     public const CONTENT_SCOPE_QUESTION = 'question';
 
     public const TYPE_QUESTION = 'question';
+
     public const TYPE_CORRECT_ANSWER = 'correct_answer';
+
     public const TYPE_EXPLANATION = 'explanation';
+
     public const TYPE_EXAM_TRAP = 'exam_trap';
 
     public const STATUS_PENDING = 'pending';
+
     public const STATUS_GENERATING = 'generating';
+
     public const STATUS_GENERATED = 'generated';
+
     public const STATUS_FAILED = 'failed';
+
     public const STATUS_OUTDATED = 'outdated';
+
     public const STATUS_DISABLED = 'disabled';
 
     protected $fillable = [

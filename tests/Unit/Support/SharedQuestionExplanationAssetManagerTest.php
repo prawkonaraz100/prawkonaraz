@@ -5,8 +5,9 @@ use App\Models\QuestionExplanationAsset;
 use App\Models\SharedQuestionExplanationAsset;
 use App\Support\SharedQuestionExplanationAssetManager;
 use Illuminate\Support\Facades\Storage;
+use Tests\TestCase;
 
-uses(Tests\TestCase::class);
+uses(TestCase::class);
 
 test('shared explanation asset copies file instead of moving it when the file is referenced by a local question asset', function () {
     Storage::fake('media_local');

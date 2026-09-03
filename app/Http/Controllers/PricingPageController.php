@@ -174,8 +174,7 @@ class PricingPageController extends Controller
         string $canonicalUrl,
         string $title,
         string $description,
-    ): array
-    {
+    ): array {
         $schemas = [
             [
                 '@context' => 'https://schema.org',

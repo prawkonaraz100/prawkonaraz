@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\RankedMatch;
 use App\Models\RankedQueueEntry;
 use App\Support\RankedRealtimeConnectionState;
 use App\Support\RankedRealtimeEventStreamPublisher;
@@ -54,7 +53,7 @@ class ApiRankedStreamController extends Controller
             @ob_flush();
             @flush();
 
-            $state = new RankedRealtimeConnectionState();
+            $state = new RankedRealtimeConnectionState;
 
             $emit('stream.ready', $publisher->streamReadyPayload());
 

@@ -63,6 +63,7 @@ test('question catalog import command imports categories, questions and media an
 
     $this->artisan('catalog:import-json', [
         'path' => $catalogPath,
+        '--skip-sitemap' => true,
         '--report' => $reportPath,
     ])->assertSuccessful();
 
@@ -75,7 +76,7 @@ test('question catalog import command imports categories, questions and media an
     expect($question)->not->toBeNull();
     expect($question->licenseCategory->code)->toBe('B');
     expect($question->questionTopic)->toBeInstanceOf(QuestionTopic::class);
-    expect($question->questionTopic?->key)->toBe('vehicle_operation_and_safety');
+    expect($question->questionTopic?->key)->toBe('safety_equipment_and_restraints');
     expect($question->media)->toHaveCount(1);
     expect($question->media->first()->disk)->toBe('r2');
     expect($question->media->first()->path)->toBe('questions/b/b-001.webp');

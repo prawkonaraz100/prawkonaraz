@@ -6,7 +6,7 @@ require __DIR__.'/../vendor/autoload.php';
 
 use App\Support\PolishWarningSignCatalog;
 
-$catalog = new PolishWarningSignCatalog();
+$catalog = new PolishWarningSignCatalog;
 $baseDir = dirname(__DIR__).'/public/traffic-signs/placeholders/warnings';
 $ogDir = dirname(__DIR__).'/public/traffic-signs/placeholders/og/warnings';
 

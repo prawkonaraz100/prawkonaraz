@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Questions\Schemas;
 
 use App\Models\Question;
 use App\Models\TrafficSign;
+use App\Support\MediaUrlResolver;
 use App\Support\QuestionExplanationAnnotationPayloadBuilder;
 use App\Support\QuestionExplanationSignReferencePayloadBuilder;
 use App\Support\QuestionMediaPayloadBuilder;
@@ -18,10 +19,10 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\View;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Components\View;
+use Filament\Schemas\Schema;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class QuestionForm
@@ -124,14 +125,14 @@ class QuestionForm
                             ->helperText('To główny tekst na karcie odpowiedzi. Użyj **tekst** (pogrubienie), [green]tekst[/green] (zielony), [red]tekst[/red] (czerwony).')
                             ->rows(5)
                             ->columnSpanFull(),
-                        \Filament\Forms\Components\Select::make('explanation_asset.traffic_sign_id')
+                        Select::make('explanation_asset.traffic_sign_id')
                             ->label('Znak drogowy z bazy')
                             ->helperText('Jeśli wybierzesz znak z bazy, system automatycznie wyświetli jego grafikę (bez tekstu). Ręczne pola zostaną ukryte.')
-                            ->options(fn () => \App\Models\TrafficSign::query()->orderBy('name')->pluck('name', 'id'))
+                            ->options(fn () => TrafficSign::query()->orderBy('name')->pluck('name', 'id'))
                             ->searchable()
                             ->preload()
                             ->live()
-                            ->afterStateUpdated(function (\Filament\Schemas\Components\Utilities\Set $set, $state) {
+                            ->afterStateUpdated(function (Set $set, $state) {
                                 if ($state) {
                                     $set('explanation_asset.file_path', null);
                                     $set('explanation_asset.title', null);
@@ -139,9 +140,9 @@ class QuestionForm
                                     $set('explanation_asset.caption', null);
                                     $set('explanation_asset.alt_text', null);
 
-                                    $sign = \App\Models\TrafficSign::find($state);
+                                    $sign = TrafficSign::find($state);
                                     if ($sign?->image_path) {
-                                        $set('explanation_asset.traffic_sign_image_url', app(\App\Support\MediaUrlResolver::class)->resolve($sign->image_path, 'public'));
+                                        $set('explanation_asset.traffic_sign_image_url', app(MediaUrlResolver::class)->resolve($sign->image_path, 'public'));
                                     } else {
                                         $set('explanation_asset.traffic_sign_image_url', null);
                                     }
@@ -164,7 +165,7 @@ class QuestionForm
                             ->afterStateUpdated(function (Set $set, mixed $state): void {
                                 $set('explanation_asset.preview_url', self::resolveUploadedExplanationAssetPreviewUrl($state));
                             })
-                            ->visible(fn (\Filament\Schemas\Components\Utilities\Get $get) => ! $get('explanation_asset.traffic_sign_id'))
+                            ->visible(fn (Get $get) => ! $get('explanation_asset.traffic_sign_id'))
                             ->columnSpanFull(),
                         Select::make('explanation_asset_apply_scope')
                             ->label('Zakres zapisu grafiki')
@@ -200,12 +201,12 @@ class QuestionForm
                                 ->label('Alt text')
                                 ->helperText('Wymagany, gdy zapisujesz grafikę.')
                                 ->maxLength(255),
-                        ])->visible(fn (\Filament\Schemas\Components\Utilities\Get $get) => ! $get('explanation_asset.traffic_sign_id')),
+                        ])->visible(fn (Get $get) => ! $get('explanation_asset.traffic_sign_id')),
                         Textarea::make('explanation_asset.body')
                             ->label('Tekst zapasowy')
                             ->helperText('Opcjonalny fallback. Użyjemy go tylko wtedy, gdy pole Wyjaśnienie jest puste. Obsługuje **pogrubienie**.')
                             ->rows(4)
-                            ->visible(fn (\Filament\Schemas\Components\Utilities\Get $get) => ! $get('explanation_asset.traffic_sign_id'))
+                            ->visible(fn (Get $get) => ! $get('explanation_asset.traffic_sign_id'))
                             ->columnSpanFull(),
                         Toggle::make('explanation_asset.is_active')
                             ->label('Grafika aktywna')
@@ -305,203 +306,203 @@ class QuestionForm
                 Section::make('Adnotacje do medium')
                     ->description('Najpierw pracuj na podgladzie obrazu albo kadru filmu. Precyzyjne pola nizej zostaja tylko do wyjatkow i recznych poprawek.')
                     ->schema([
-                                View::make('filament.resources.questions.partials.annotation-editor')
-                                    ->viewData(function (?Question $record): array {
-                                        if (! $record instanceof Question) {
-                                            return [
-                                                'image' => null,
-                                                'video' => null,
-                                                'savedAnnotations' => [],
-                                            ];
-                                        }
+                        View::make('filament.resources.questions.partials.annotation-editor')
+                            ->viewData(function (?Question $record): array {
+                                if (! $record instanceof Question) {
+                                    return [
+                                        'image' => null,
+                                        'video' => null,
+                                        'savedAnnotations' => [],
+                                    ];
+                                }
 
-                                        $record->loadMissing('media', 'explanationAnnotations');
+                                $record->loadMissing('media', 'explanationAnnotations');
 
-                                        $media = collect(app(QuestionMediaPayloadBuilder::class)->forQuestion($record->media));
-                                        $image = $media
-                                            ->first(fn (array $media): bool => ($media['kind'] ?? null) === 'image');
-                                        $video = $media
-                                            ->first(fn (array $media): bool => ($media['kind'] ?? null) === 'video');
+                                $media = collect(app(QuestionMediaPayloadBuilder::class)->forQuestion($record->media));
+                                $image = $media
+                                    ->first(fn (array $media): bool => ($media['kind'] ?? null) === 'image');
+                                $video = $media
+                                    ->first(fn (array $media): bool => ($media['kind'] ?? null) === 'video');
 
-                                        return [
-                                            'image' => $image,
-                                            'video' => $video,
-                                            'savedAnnotations' => app(QuestionExplanationAnnotationPayloadBuilder::class)
-                                                ->forRuntime($record->explanationAnnotations),
-                                        ];
-                                    })
-                                    ->columnSpanFull(),
-                                Select::make('explanation_annotations_apply_scope')
-                                    ->label('Zakres zapisu adnotacji')
-                                    ->options([
-                                        'single' => 'Tylko to pytanie',
-                                        'shared_external_id' => 'Wszystkie pytania z tym samym numerem źródłowym',
-                                    ])
-                                    ->default('shared_external_id')
-                                    ->helperText(function (?Question $record): string {
-                                        if (! filled($record?->external_id)) {
-                                            return 'To pytanie nie ma numeru źródłowego, więc adnotacje mogą zostać zapisane tylko lokalnie.';
-                                        }
+                                return [
+                                    'image' => $image,
+                                    'video' => $video,
+                                    'savedAnnotations' => app(QuestionExplanationAnnotationPayloadBuilder::class)
+                                        ->forRuntime($record->explanationAnnotations),
+                                ];
+                            })
+                            ->columnSpanFull(),
+                        Select::make('explanation_annotations_apply_scope')
+                            ->label('Zakres zapisu adnotacji')
+                            ->options([
+                                'single' => 'Tylko to pytanie',
+                                'shared_external_id' => 'Wszystkie pytania z tym samym numerem źródłowym',
+                            ])
+                            ->default('shared_external_id')
+                            ->helperText(function (?Question $record): string {
+                                if (! filled($record?->external_id)) {
+                                    return 'To pytanie nie ma numeru źródłowego, więc adnotacje mogą zostać zapisane tylko lokalnie.';
+                                }
 
-                                        return 'Wspólny zapis powieli powyższe markery i skopiuje je na wszystkie pytania z tej samej grupy, nadpisując ich dotychczasowe adnotacje.';
-                                    })
-                                    ->visible(fn (?Question $record): bool => filled($record?->external_id))
-                                    ->columnSpanFull(),
-                                Section::make('Tryb zaawansowany')
-                                    ->description('Uzyj tylko wtedy, gdy chcesz recznie poprawic wartosci procentowe albo ustawienia kadru filmu.')
+                                return 'Wspólny zapis powieli powyższe markery i skopiuje je na wszystkie pytania z tej samej grupy, nadpisując ich dotychczasowe adnotacje.';
+                            })
+                            ->visible(fn (?Question $record): bool => filled($record?->external_id))
+                            ->columnSpanFull(),
+                        Section::make('Tryb zaawansowany')
+                            ->description('Uzyj tylko wtedy, gdy chcesz recznie poprawic wartosci procentowe albo ustawienia kadru filmu.')
+                            ->collapsible()
+                            ->collapsed()
+                            ->schema([
+                                Repeater::make('explanation_annotations')
+                                    ->label('Zaawansowane pola adnotacji')
+                                    ->addActionLabel('Dodaj adnotację')
+                                    ->defaultItems(0)
                                     ->collapsible()
                                     ->collapsed()
-                                    ->schema([
-                                        Repeater::make('explanation_annotations')
-                                            ->label('Zaawansowane pola adnotacji')
-                                            ->addActionLabel('Dodaj adnotację')
-                                            ->defaultItems(0)
-                                            ->collapsible()
-                                            ->collapsed()
-                                            ->itemLabel(function (array $state): ?string {
-                                                $type = filled($state['annotation_type'] ?? null)
-                                                    ? mb_strtoupper((string) $state['annotation_type'])
-                                                    : 'NOWA';
-                                                $label = trim((string) ($state['label'] ?? ''));
+                                    ->itemLabel(function (array $state): ?string {
+                                        $type = filled($state['annotation_type'] ?? null)
+                                            ? mb_strtoupper((string) $state['annotation_type'])
+                                            : 'NOWA';
+                                        $label = trim((string) ($state['label'] ?? ''));
 
-                                                return $label !== '' ? "{$type} · {$label}" : $type;
-                                            })
-                                            ->schema([
-                                                Grid::make([
-                                                    'lg' => 2,
-                                                ])->schema([
-                                                    Select::make('target_kind')
-                                                        ->label('Obszar')
-                                                        ->options([
-                                                            'question_image' => 'Obraz pytania',
-                                                            'video_frame' => 'Stopklatka wideo',
-                                                        ])
-                                                        ->default('question_image')
-                                                        ->required(),
-                                                    Select::make('annotation_type')
-                                                        ->label('Typ')
-                                                        ->options([
-                                                            'label' => 'Etykieta',
-                                                            'text' => 'Tekst',
-                                                            'circle' => 'Okrag',
-                                                            'arrow' => 'Strzalka',
-                                                        ])
-                                                        ->default('label')
-                                                        ->required(),
-                                                    Select::make('tone')
-                                                        ->label('Ton')
-                                                        ->options([
-                                                            'info' => 'Info',
-                                                            'warning' => 'Warning',
-                                                            'danger' => 'Danger',
-                                                        ])
-                                                        ->default('info'),
-                                                ]),
-                                                TextInput::make('label')
-                                                    ->label('Tekst markera')
-                                                    ->helperText('Wymagane dla typu label i text.')
-                                                    ->maxLength(120),
-                                                Grid::make([
-                                                    'lg' => 5,
-                                                ])->schema([
-                                                    TextInput::make('frame_time_seconds')
-                                                        ->label('Sekunda stopklatki')
-                                                        ->helperText('Wymagane dla obszaru stopklatki wideo.')
-                                                        ->numeric()
-                                                        ->minValue(0),
-                                                    TextInput::make('x_percent')
-                                                        ->label('X %')
-                                                        ->numeric()
-                                                        ->minValue(0)
-                                                        ->maxValue(100)
-                                                        ->required(),
-                                                    TextInput::make('y_percent')
-                                                        ->label('Y %')
-                                                        ->numeric()
-                                                        ->minValue(0)
-                                                        ->maxValue(100)
-                                                        ->required(),
-                                                    TextInput::make('width_percent')
-                                                        ->label('Szer. %')
-                                                        ->numeric()
-                                                        ->minValue(0)
-                                                        ->maxValue(100),
-                                                    TextInput::make('height_percent')
-                                                        ->label('Wys. %')
-                                                        ->numeric()
-                                                        ->minValue(0)
-                                                        ->maxValue(100),
-                                                ]),
-                                                Grid::make([
-                                                    'lg' => 4,
-                                                ])->schema([
-                                                    TextInput::make('arrow_length_percent')
-                                                        ->label('Dlugosc strz. %')
-                                                        ->helperText('Dla typu arrow: 1-100.')
-                                                        ->numeric()
-                                                        ->minValue(1)
-                                                        ->maxValue(100)
-                                                        ->step(0.01),
-                                                    TextInput::make('arrow_angle_degrees')
-                                                        ->label('Kat strz. °')
-                                                        ->helperText('Dla typu arrow: 0-359.')
-                                                        ->numeric()
-                                                        ->minValue(0)
-                                                        ->maxValue(359)
-                                                        ->step(1),
-                                                    TextInput::make('arrow_stroke_percent')
-                                                        ->label('Grubosc strz. %')
-                                                        ->helperText('Dla typu arrow: 0.5-8.')
-                                                        ->numeric()
-                                                        ->minValue(0.5)
-                                                        ->maxValue(8)
-                                                        ->step(0.01),
-                                                    TextInput::make('arrow_head_percent')
-                                                        ->label('Grot strz. %')
-                                                        ->helperText('Dla typu arrow: 2-30.')
-                                                        ->numeric()
-                                                        ->minValue(2)
-                                                        ->maxValue(30)
-                                                        ->step(0.01),
-                                                ]),
-                                                Grid::make([
-                                                    'lg' => 2,
-                                                ])->schema([
-                                                    TextInput::make('position')
-                                                        ->label('Pozycja')
-                                                        ->numeric()
-                                                        ->default(1)
-                                                        ->minValue(1),
-                                                    Toggle::make('is_active')
-                                                        ->label('Aktywna')
-                                                        ->inline(false)
-                                                        ->default(true),
-                                                ]),
-                                            ])
-                                            ->columnSpanFull(),
+                                        return $label !== '' ? "{$type} · {$label}" : $type;
+                                    })
+                                    ->schema([
+                                        Grid::make([
+                                            'lg' => 2,
+                                        ])->schema([
+                                            Select::make('target_kind')
+                                                ->label('Obszar')
+                                                ->options([
+                                                    'question_image' => 'Obraz pytania',
+                                                    'video_frame' => 'Stopklatka wideo',
+                                                ])
+                                                ->default('question_image')
+                                                ->required(),
+                                            Select::make('annotation_type')
+                                                ->label('Typ')
+                                                ->options([
+                                                    'label' => 'Etykieta',
+                                                    'text' => 'Tekst',
+                                                    'circle' => 'Okrag',
+                                                    'arrow' => 'Strzalka',
+                                                ])
+                                                ->default('label')
+                                                ->required(),
+                                            Select::make('tone')
+                                                ->label('Ton')
+                                                ->options([
+                                                    'info' => 'Info',
+                                                    'warning' => 'Warning',
+                                                    'danger' => 'Danger',
+                                                ])
+                                                ->default('info'),
+                                        ]),
+                                        TextInput::make('label')
+                                            ->label('Tekst markera')
+                                            ->helperText('Wymagane dla typu label i text.')
+                                            ->maxLength(120),
+                                        Grid::make([
+                                            'lg' => 5,
+                                        ])->schema([
+                                            TextInput::make('frame_time_seconds')
+                                                ->label('Sekunda stopklatki')
+                                                ->helperText('Wymagane dla obszaru stopklatki wideo.')
+                                                ->numeric()
+                                                ->minValue(0),
+                                            TextInput::make('x_percent')
+                                                ->label('X %')
+                                                ->numeric()
+                                                ->minValue(0)
+                                                ->maxValue(100)
+                                                ->required(),
+                                            TextInput::make('y_percent')
+                                                ->label('Y %')
+                                                ->numeric()
+                                                ->minValue(0)
+                                                ->maxValue(100)
+                                                ->required(),
+                                            TextInput::make('width_percent')
+                                                ->label('Szer. %')
+                                                ->numeric()
+                                                ->minValue(0)
+                                                ->maxValue(100),
+                                            TextInput::make('height_percent')
+                                                ->label('Wys. %')
+                                                ->numeric()
+                                                ->minValue(0)
+                                                ->maxValue(100),
+                                        ]),
+                                        Grid::make([
+                                            'lg' => 4,
+                                        ])->schema([
+                                            TextInput::make('arrow_length_percent')
+                                                ->label('Dlugosc strz. %')
+                                                ->helperText('Dla typu arrow: 1-100.')
+                                                ->numeric()
+                                                ->minValue(1)
+                                                ->maxValue(100)
+                                                ->step(0.01),
+                                            TextInput::make('arrow_angle_degrees')
+                                                ->label('Kat strz. °')
+                                                ->helperText('Dla typu arrow: 0-359.')
+                                                ->numeric()
+                                                ->minValue(0)
+                                                ->maxValue(359)
+                                                ->step(1),
+                                            TextInput::make('arrow_stroke_percent')
+                                                ->label('Grubosc strz. %')
+                                                ->helperText('Dla typu arrow: 0.5-8.')
+                                                ->numeric()
+                                                ->minValue(0.5)
+                                                ->maxValue(8)
+                                                ->step(0.01),
+                                            TextInput::make('arrow_head_percent')
+                                                ->label('Grot strz. %')
+                                                ->helperText('Dla typu arrow: 2-30.')
+                                                ->numeric()
+                                                ->minValue(2)
+                                                ->maxValue(30)
+                                                ->step(0.01),
+                                        ]),
+                                        Grid::make([
+                                            'lg' => 2,
+                                        ])->schema([
+                                            TextInput::make('position')
+                                                ->label('Pozycja')
+                                                ->numeric()
+                                                ->default(1)
+                                                ->minValue(1),
+                                            Toggle::make('is_active')
+                                                ->label('Aktywna')
+                                                ->inline(false)
+                                                ->default(true),
+                                        ]),
                                     ])
                                     ->columnSpanFull(),
+                            ])
+                            ->columnSpanFull(),
                     ]),
                 Section::make('Odpowiedzi')
                     ->description('Ułóż warianty odpowiedzi i wskaż poprawny wariant w prawej kolumnie u góry.')
                     ->schema([
-                                Grid::make([
-                                    'lg' => 3,
-                                ])->schema([
-                                    Textarea::make('option_a')
-                                        ->label('Odpowiedź A')
-                                        ->rows(4)
-                                        ->required(),
-                                    Textarea::make('option_b')
-                                        ->label('Odpowiedź B')
-                                        ->rows(4)
-                                        ->required(),
-                                    Textarea::make('option_c')
-                                        ->label('Odpowiedź C')
-                                        ->rows(4)
-                                        ->placeholder('Opcjonalna przy pytaniach jednokrotnego wyboru.'),
-                                ]),
-                            ]),
+                        Grid::make([
+                            'lg' => 3,
+                        ])->schema([
+                            Textarea::make('option_a')
+                                ->label('Odpowiedź A')
+                                ->rows(4)
+                                ->required(),
+                            Textarea::make('option_b')
+                                ->label('Odpowiedź B')
+                                ->rows(4)
+                                ->required(),
+                            Textarea::make('option_c')
+                                ->label('Odpowiedź C')
+                                ->rows(4)
+                                ->placeholder('Opcjonalna przy pytaniach jednokrotnego wyboru.'),
+                        ]),
+                    ]),
             ]);
     }
 

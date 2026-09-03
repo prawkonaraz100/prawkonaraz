@@ -11,9 +11,9 @@ use Illuminate\Contracts\Support\Htmlable;
 
 class GovImportGuide extends Page
 {
-    protected static string | BackedEnum | null $navigationIcon = Heroicon::ArrowDownTray;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::ArrowDownTray;
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Operacje';
+    protected static string|\UnitEnum|null $navigationGroup = 'Operacje';
 
     protected static ?int $navigationSort = 10;
 
@@ -28,19 +28,19 @@ class GovImportGuide extends Page
         return 'Import gov.pl';
     }
 
-    public static function getNavigationIcon(): string | BackedEnum | Htmlable | null
+    public static function getNavigationIcon(): string|BackedEnum|Htmlable|null
     {
         return static::$navigationIcon
             ?? FilamentIcon::resolve(PanelsIconAlias::PAGES_DASHBOARD_NAVIGATION_ITEM)
             ?? Heroicon::ArrowDownTray;
     }
 
-    public function getHeading(): string | Htmlable
+    public function getHeading(): string|Htmlable
     {
         return 'Import gov.pl';
     }
 
-    public function getSubheading(): string | Htmlable | null
+    public function getSubheading(): string|Htmlable|null
     {
         return 'Dedykowana instrukcja operacyjna do przygotowania stagingu, dry-runu i pełnego importu pytań oraz mediów.';
     }

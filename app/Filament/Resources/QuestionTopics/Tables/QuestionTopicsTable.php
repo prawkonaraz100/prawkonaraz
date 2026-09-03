@@ -76,4 +76,3 @@ class QuestionTopicsTable
             ->defaultSort('sort_order');
     }
 }
-

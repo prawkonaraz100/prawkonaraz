@@ -396,7 +396,7 @@ class QuestionIntegrityAuditService
         arsort($fieldChanges);
 
         return [
-                'summary' => [
+            'summary' => [
                 'previous_generated_at' => $previousSnapshotMeta['generated_at'] ?? null,
                 'current_total' => count($currentSnapshot),
                 'previous_total' => (int) ($previousSnapshotMeta['questions_total'] ?? 0),
@@ -453,7 +453,6 @@ class QuestionIntegrityAuditService
     }
 
     /**
-     * @param  mixed  $categoriesOriginal
      * @return array<int, string>
      */
     protected function normalizeCategoriesOriginal(mixed $categoriesOriginal): array

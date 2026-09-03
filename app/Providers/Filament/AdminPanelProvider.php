@@ -5,17 +5,18 @@ namespace App\Providers\Filament;
 use App\Filament\Admin\Pages\Dashboard;
 use App\Filament\Widgets\LatestQuestionIntegrityAuditOverview;
 use App\Filament\Widgets\PlatformOverview;
+use Filament\Enums\ThemeMode;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Enums\ThemeMode;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
+use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -38,11 +39,11 @@ class AdminPanelProvider extends PanelProvider
             ->theme(asset('css/filament/admin/theme.css?v=20260416-admin-questions-search-layout'))
             ->renderHook(
                 PanelsRenderHook::TOPBAR_END,
-                fn (): \Illuminate\Contracts\View\View => view('filament.partials.return-home-button'),
+                fn (): View => view('filament.partials.return-home-button'),
             )
             ->renderHook(
                 PanelsRenderHook::AUTH_LOGIN_FORM_AFTER,
-                fn (): \Illuminate\Contracts\View\View => view('filament.partials.return-home-login-link'),
+                fn (): View => view('filament.partials.return-home-login-link'),
             )
             ->colors([
                 'primary' => Color::Sky,

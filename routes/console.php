@@ -431,7 +431,7 @@ Artisan::command('catalog:import-manifest {path : Sciezka do manifestu importu} 
     return self::SUCCESS;
 })->purpose('Import a staged manifest batch with ready media assets into storage and the catalog.');
 
-Artisan::command('catalog:import-manifest-series {path : Sciezka do katalogu serii chunkow albo series-report.json} {--dry-run : Zweryfikuj serie bez uploadu i bez zapisu do bazy} {--from-chunk= : Zacznij import od wskazanego numeru chunku} {--to-chunk= : Zakoncz import na wskazanym numerze chunku} {--continue-on-error : Kontynuuj kolejne chunki mimo bledu w jednym z nich} {--resume-from-report= : Pomin chunki oznaczone jako poprawne w poprzednim raporcie series importu} {--report= : Sciezka do pliku raportu JSON}', function (CatalogManifestSeriesImportService $catalogManifestSeriesImportService, ContentImportRunRecorder $contentImportRunRecorder, QuestionIntegrityAuditService $questionIntegrityAuditService) {
+Artisan::command('catalog:import-manifest-series {path : Sciezka do katalogu serii chunkow albo series-report.json} {--dry-run : Zweryfikuj serie bez uploadu i bez zapisu do bazy} {--skip-sitemap : Pomin odswiezanie sitemap po niepublicznym lub lokalnym imporcie} {--from-chunk= : Zacznij import od wskazanego numeru chunku} {--to-chunk= : Zakoncz import na wskazanym numerze chunku} {--continue-on-error : Kontynuuj kolejne chunki mimo bledu w jednym z nich} {--resume-from-report= : Pomin chunki oznaczone jako poprawne w poprzednim raporcie series importu} {--report= : Sciezka do pliku raportu JSON}', function (CatalogManifestSeriesImportService $catalogManifestSeriesImportService, ContentImportRunRecorder $contentImportRunRecorder, QuestionIntegrityAuditService $questionIntegrityAuditService) {
     $fromChunkOption = $this->option('from-chunk');
     $toChunkOption = $this->option('to-chunk');
     $fromChunk = null;
@@ -542,7 +542,7 @@ Artisan::command('catalog:import-manifest-series {path : Sciezka do katalogu ser
         return self::FAILURE;
     }
 
-    if (! (bool) $this->option('dry-run')) {
+    if (! (bool) $this->option('dry-run') && ! (bool) $this->option('skip-sitemap')) {
         $this->line('Odswiezam statyczne sitemap SEO po imporcie serii manifestow...');
         $sitemapStatus = Artisan::call('seo:refresh-sitemaps');
         $sitemapOutput = trim((string) Artisan::output());

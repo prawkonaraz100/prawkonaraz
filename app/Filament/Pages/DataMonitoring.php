@@ -13,9 +13,9 @@ use Throwable;
 
 class DataMonitoring extends Page
 {
-    protected static string | BackedEnum | null $navigationIcon = Heroicon::ChartBarSquare;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::ChartBarSquare;
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Operacje';
+    protected static string|\UnitEnum|null $navigationGroup = 'Operacje';
 
     protected static ?int $navigationSort = 15;
 
@@ -30,19 +30,19 @@ class DataMonitoring extends Page
         return 'Monitoring danych';
     }
 
-    public static function getNavigationIcon(): string | BackedEnum | Htmlable | null
+    public static function getNavigationIcon(): string|BackedEnum|Htmlable|null
     {
         return static::$navigationIcon
             ?? FilamentIcon::resolve(PanelsIconAlias::PAGES_DASHBOARD_NAVIGATION_ITEM)
             ?? Heroicon::ChartBarSquare;
     }
 
-    public function getHeading(): string | Htmlable
+    public function getHeading(): string|Htmlable
     {
         return 'Monitoring danych';
     }
 
-    public function getSubheading(): string | Htmlable | null
+    public function getSubheading(): string|Htmlable|null
     {
         return 'Operacyjny podgląd retencji, miesięcznego rollupu i zadań utrzymujących bazę w ryzach.';
     }

@@ -14,14 +14,14 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
-$app = require __DIR__ . '/../bootstrap/app.php';
+$app = require __DIR__.'/../bootstrap/app.php';
 $app->make(Kernel::class)->bootstrap();
 
-$outputDir = __DIR__ . '/../output/session-stress-backend';
-$jsonPath = $outputDir . '/report.json';
-$markdownPath = $outputDir . '/report.md';
+$outputDir = __DIR__.'/../output/session-stress-backend';
+$jsonPath = $outputDir.'/report.json';
+$markdownPath = $outputDir.'/report.md';
 
 if (! is_dir($outputDir)) {
     mkdir($outputDir, 0777, true);
@@ -169,7 +169,7 @@ foreach ($categories as $category) {
                 $report['summary']['skipped']++;
             }
 
-            file_put_contents($jsonPath, json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . PHP_EOL);
+            file_put_contents($jsonPath, json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE).PHP_EOL);
             file_put_contents($markdownPath, buildMarkdownReport($report));
         }
 
@@ -182,7 +182,7 @@ foreach ($categories as $category) {
 $report['finished_at'] = now()->toIso8601String();
 $report['status'] = 'ok';
 
-file_put_contents($jsonPath, json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . PHP_EOL);
+file_put_contents($jsonPath, json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE).PHP_EOL);
 file_put_contents($markdownPath, buildMarkdownReport($report));
 
 echo "[backend-stress] done\n";
@@ -384,6 +384,7 @@ function seedStatusBaseline(
     foreach ($questions as $question) {
         if ($status === 'incorrect') {
             $questionProgressManager->recordAnswer($user, $question, false, 25000);
+
             continue;
         }
 
@@ -445,19 +446,19 @@ function buildMarkdownReport(array $report): string
     $lines = [
         '# Backend Session Stress Report',
         '',
-        '- Started: ' . ($report['started_at'] ?? '-'),
-        '- Finished: ' . ($report['finished_at'] ?? '-'),
-        '- Status: ' . ($report['status'] ?? 'running'),
+        '- Started: '.($report['started_at'] ?? '-'),
+        '- Finished: '.($report['finished_at'] ?? '-'),
+        '- Status: '.($report['status'] ?? 'running'),
         '',
         '## Summary',
         '',
-        '- Categories: ' . $report['summary']['categories'],
-        '- Groups: ' . $report['summary']['groups'],
-        '- Runs: ' . $report['summary']['runs'],
-        '- Completed: ' . $report['summary']['completed'],
-        '- Failed: ' . $report['summary']['failed'],
-        '- Skipped: ' . $report['summary']['skipped'],
-        '- Questions traversed: ' . $report['summary']['questions_traversed'],
+        '- Categories: '.$report['summary']['categories'],
+        '- Groups: '.$report['summary']['groups'],
+        '- Runs: '.$report['summary']['runs'],
+        '- Completed: '.$report['summary']['completed'],
+        '- Failed: '.$report['summary']['failed'],
+        '- Skipped: '.$report['summary']['skipped'],
+        '- Questions traversed: '.$report['summary']['questions_traversed'],
         '',
         '## Failures',
         '',
@@ -477,5 +478,5 @@ function buildMarkdownReport(array $report): string
         }
     }
 
-    return implode(PHP_EOL, $lines) . PHP_EOL;
+    return implode(PHP_EOL, $lines).PHP_EOL;
 }

@@ -5,7 +5,7 @@ namespace App\Support;
 class PolishTramSignalContentBuilder
 {
     /**
-     * @param array<string, mixed> $signData
+     * @param  array<string, mixed>  $signData
      * @return array<string, mixed>
      */
     public function build(array $signData, int $index): array
@@ -18,16 +18,16 @@ class PolishTramSignalContentBuilder
         $placement = 'Sygnalizatory dla tramwajów (ST) umieszczane są na skrzyżowaniach i węzłach przesiadkowych, najczęściej obok lub nad torowiskiem. Ich światła mają barwę białą.';
         $driverBehavior = $this->getDriverBehavior($code);
         $legalSummary = 'Sygnały świetlne kierujące ruchem (w tym tramwajowe) odwołują pierwszeństwo wynikające ze znaków drogowych. Jeśli kierowca ma zielone światło ogólne na wprost (S-1), a skręcający tramwaj ma sygnał zakazujący (poziomą kreskę), tramwaj musi ustąpić.';
-        
+
         $legalReferenceLabel = 'Rozporządzenie w sprawie znaków i sygnałów drogowych - Sygnały świetlne ST';
         $legalReferenceUrl = 'https://isap.sejm.gov.pl';
-        
+
         $fineSummary = 'Kierowcy pojazdów cywilnych nie podlegają sygnałom ST, ale ich znajomość jest testowana na egzaminach teoretycznych, ponieważ pozwala przewidzieć zachowanie motorniczego na skomplikowanym skrzyżowaniu.';
         $commonMistakes = $this->getCommonMistakes($code);
         $editorialNotes = 'To kluczowe zagadnienie na egzamin. Kursanci często ulegają złudzeniu, że "tramwaj ma zawsze pierwszeństwo". To nieprawda na skrzyżowaniu z sygnalizacją świetlną. Znajomość światła tramwaju rozwiązuje ten dylemat.';
-        
+
         $faqItems = $this->getFaqItems($code);
-        
+
         $metaTitle = "Sygnał tramwajowy {$name} - znaczenie i zasady";
         $metaDescription = "Sprawdź, co oznacza białe światło dla tramwaju: {$name}. Dowiedz się, kto ma pierwszeństwo na skrzyżowaniu i jak odczytywać sygnalizatory ST.";
 

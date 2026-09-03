@@ -11,7 +11,7 @@ test('auth mail notifications use polish copy', function () {
 
     $user = User::factory()->unverified()->create();
 
-    $verifyMail = (new VerifyEmail())->toMail($user);
+    $verifyMail = (new VerifyEmail)->toMail($user);
     $resetMail = (new ResetPassword('test-token'))->toMail($user);
 
     expect($verifyMail->subject)
@@ -40,4 +40,3 @@ test('auth status and validation messages are translated', function () {
         ->and(trans('validation.current_password', ['attribute' => 'obecne hasło']))
         ->toBe('Podane obecne hasło jest nieprawidłowe.');
 });
-

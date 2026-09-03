@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 class QuestionTopicClassifier
 {
     protected const BASIC_BUCKET = 'Pytania podstawowe';
+
     protected const SPECIALIST_BUCKET = 'Pytania specjalistyczne';
 
     /**
@@ -494,24 +495,24 @@ class QuestionTopicClassifier
         ]) && $this->containsAny($text, [
             'zmiana pasa',
             'zmienic pas',
-                'zmienic zajmowany pas',
-                'zajmowany pas ruchu',
-                'zajmowanego pasa ruchu',
-                'zajmowanego przez ciebie pasa ruchu',
-                'zajmowanego obecnie pasa ruchu',
-                'na pas ruchu',
-                'pasa ruchu',
-                'lewy pas',
-                'prawy pas',
-                'wlasciwy pas ruchu',
-                'lewym pasie ruchu',
-                'prawym pasie ruchu',
-                'z lewego pasa',
-                'z prawego pasa',
-                'z tego pasa',
-                'pozostalych pasach ruchu',
-                'dowolnym pasem',
-                'pas przeznaczony',
+            'zmienic zajmowany pas',
+            'zajmowany pas ruchu',
+            'zajmowanego pasa ruchu',
+            'zajmowanego przez ciebie pasa ruchu',
+            'zajmowanego obecnie pasa ruchu',
+            'na pas ruchu',
+            'pasa ruchu',
+            'lewy pas',
+            'prawy pas',
+            'wlasciwy pas ruchu',
+            'lewym pasie ruchu',
+            'prawym pasie ruchu',
+            'z lewego pasa',
+            'z prawego pasa',
+            'z tego pasa',
+            'pozostalych pasach ruchu',
+            'dowolnym pasem',
+            'pas przeznaczony',
             'zmieniajac pas',
             'po zmianie pasa',
             'kontynuowac jazde lewym pasem',
@@ -1196,7 +1197,7 @@ class QuestionTopicClassifier
             return ['key' => 'vehicle_load_and_passenger_safety', 'matched_by' => 'keyword:transported_people'];
         }
 
-        if ($this->containsAny($text, ['pasy bezpieczenstwa', 'pas bezpieczenstwa', 'pasow bezpieczenstwa', 'pasy sa zapiete', 'zapiac pas', 'zapiete pasy', 'zaglowek', 'fotelik', 'poduszka powietrzna', 'gasnic', 'trojkat ostrzegawczy', 'trojkat odblaskowy', 'obowiazkowe wyposazenie', 'wyposazenie kazdego samochodu', 'urzadzen przytrzymujacych', 'urzadzeniach przytrzymujacych'])) {
+        if ($this->containsAny($text, ['pasy bezpieczenstwa', 'pas bezpieczenstwa', 'pasow bezpieczenstwa', 'pasy sa zapiete', 'zapiac pas', 'zapinac pas', 'zapiete pasy', 'zaglowek', 'fotelik', 'poduszka powietrzna', 'gasnic', 'trojkat ostrzegawczy', 'trojkat odblaskowy', 'obowiazkowe wyposazenie', 'wyposazenie kazdego samochodu', 'urzadzen przytrzymujacych', 'urzadzeniach przytrzymujacych'])) {
             return ['key' => 'safety_equipment_and_restraints', 'matched_by' => 'keyword:safety_equipment'];
         }
 

@@ -220,8 +220,7 @@ class RankedMatchEventPayloadBuilder
         RankedMatchEvent $event,
         User $currentUser,
         string $eventName,
-    ): array
-    {
+    ): array {
         $playersBySlot = $match->players->keyBy('slot');
         $playerOne = $playersBySlot->get('player1');
         $playerTwo = $playersBySlot->get('player2');

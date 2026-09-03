@@ -255,10 +255,10 @@ class LegalContentSchemaService
     }
 
     /**
-     * @param  list<array{@id: string}>  $about
-     * @param  list<array{@id: string}>  $citations
-     * @param  list<array{@id: string}>  $mentions
-     * @param  list<array{@id: string}>  $hasPart
+     * @param  list<array{@id : string}>  $about
+     * @param  list<array{@id : string}>  $citations
+     * @param  list<array{@id : string}>  $mentions
+     * @param  list<array{@id : string}>  $hasPart
      * @return array<string, mixed>
      */
     protected function legalContentArticleSchema(

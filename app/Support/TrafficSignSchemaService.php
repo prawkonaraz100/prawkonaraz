@@ -460,7 +460,7 @@ class TrafficSignSchemaService
     }
 
     /**
-     * @param  list<array{@id: string}>  $hasDefinedTerm
+     * @param  list<array{@id : string}>  $hasDefinedTerm
      * @return array<string, mixed>
      */
     protected function trafficSignTermSetSchema(string $termSetId, string $organizationId, array $hasDefinedTerm = []): array
@@ -585,7 +585,7 @@ class TrafficSignSchemaService
     }
 
     /**
-     * @param  list<array{@id: string}>  $imageReferences
+     * @param  list<array{@id : string}>  $imageReferences
      * @return array<string, mixed>
      */
     protected function trafficSignArticleSchema(

@@ -6,7 +6,9 @@ use App\Models\Question;
 use App\Models\QuestionExplanationAnnotation;
 use App\Models\QuestionExplanationAsset;
 use App\Models\SharedQuestionExplanationAsset;
+use App\Models\TrafficSign;
 use App\Support\AuditLogService;
+use App\Support\MediaUrlResolver;
 use App\Support\QuestionExplanationAnnotationManager;
 use App\Support\QuestionExplanationAssetManager;
 use App\Support\SharedQuestionExplanationAssetManager;
@@ -81,9 +83,9 @@ trait InteractsWithQuestionExplanationAsset
 
         $trafficSignImageUrl = null;
         if ($asset?->traffic_sign_id) {
-            $sign = $asset->trafficSign ?? \App\Models\TrafficSign::find($asset->traffic_sign_id);
+            $sign = $asset->trafficSign ?? TrafficSign::find($asset->traffic_sign_id);
             if ($sign?->image_path) {
-                $trafficSignImageUrl = app(\App\Support\MediaUrlResolver::class)->resolve($sign->image_path, 'public');
+                $trafficSignImageUrl = app(MediaUrlResolver::class)->resolve($sign->image_path, 'public');
             }
         }
 
@@ -541,15 +543,13 @@ trait InteractsWithQuestionExplanationAsset
 
     /**
      * @param  array<string, mixed>|null  $attributes
-     * @param  QuestionExplanationAsset|SharedQuestionExplanationAsset|null  $existingAsset
      * @return array<string, mixed>|null
      */
     protected function prepareQuestionExplanationAssetDataForSync(
         Question $question,
         ?array $attributes,
         QuestionExplanationAsset|SharedQuestionExplanationAsset|null $existingAsset = null,
-    ): ?array
-    {
+    ): ?array {
         if (! is_array($attributes)) {
             return null;
         }

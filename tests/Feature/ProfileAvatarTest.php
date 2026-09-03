@@ -131,4 +131,3 @@ test('profile page shares avatar data through inertia auth props', function () {
             ->where('auth.user.avatar_url', fn (?string $url): bool => $url !== null && str_contains($url, 'profile-avatars/9/avatar-local.webp'))
         );
 });
-

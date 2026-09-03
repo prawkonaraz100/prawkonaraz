@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\PublicUrlResolver;
 use App\Support\TrafficSignBreadcrumbs;
 use App\Support\TrafficSignSchemaService;
 use App\Support\TrafficSignSeoService;
-use App\Support\PublicUrlResolver;
 use Illuminate\View\View;
 
 class AboutOrganizationController extends Controller
@@ -15,8 +15,7 @@ class AboutOrganizationController extends Controller
         TrafficSignSchemaService $trafficSignSchemaService,
         TrafficSignBreadcrumbs $trafficSignBreadcrumbs,
         PublicUrlResolver $publicUrlResolver,
-    ): View
-    {
+    ): View {
         $breadcrumbs = $trafficSignBreadcrumbs->organization();
         $organization = (array) config('content.organization');
         $organization['public_url'] = $publicUrlResolver->currentRoot();

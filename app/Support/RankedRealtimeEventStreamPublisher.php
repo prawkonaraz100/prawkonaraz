@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\RankedMatch;
+use App\Models\RankedPlayerRating;
 use App\Models\RankedQueueEntry;
 use App\Models\User;
 use Illuminate\Support\Carbon;
@@ -191,7 +192,7 @@ class RankedRealtimeEventStreamPublisher
     }
 
     /**
-     * @param  array{rating: \App\Models\RankedPlayerRating, queue: \App\Models\RankedQueueEntry|null, active_match: RankedMatch|null, capacity: array<string, mixed>}  $overview
+     * @param  array{rating: RankedPlayerRating, queue: RankedQueueEntry|null, active_match: RankedMatch|null, capacity: array<string, mixed>}  $overview
      * @return array<string, mixed>
      */
     public function overviewPayload(array $overview, ?RankedMatch $recentMatch, User $user): array

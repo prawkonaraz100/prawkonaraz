@@ -21,12 +21,12 @@ class PolishMandatorySignContentBuilder
             'meaning' => $config['meaning'],
             'placement' => $config['placement'],
             'driver_behavior' => $config['behavior'],
-            'legal_summary' => "Znaki nakazu z grupy C porządkują ruch przez wskazanie jedynego dopuszczalnego kierunku, toru jazdy lub sposobu korzystania z odcinka drogi. W praktyce trzeba je czytać razem z geometrią skrzyżowania, układem pasa ruchu, oznakowaniem poziomym i ewentualnymi tabliczkami, bo właśnie ten komplet określa, jak kierowca ma przejechać dane miejsce zgodnie z prawem.",
+            'legal_summary' => 'Znaki nakazu z grupy C porządkują ruch przez wskazanie jedynego dopuszczalnego kierunku, toru jazdy lub sposobu korzystania z odcinka drogi. W praktyce trzeba je czytać razem z geometrią skrzyżowania, układem pasa ruchu, oznakowaniem poziomym i ewentualnymi tabliczkami, bo właśnie ten komplet określa, jak kierowca ma przejechać dane miejsce zgodnie z prawem.',
             'fine_summary' => "Największe ryzyko przy {$sign['code']} nie wynika z samego minięcia znaku, tylko z wykonania manewru sprzecznego z nakazem. To zwykle prowadzi do przecięcia toru ruchu innych pojazdów, błędnego wjazdu na pas albo wejścia w strefę przeznaczoną dla innego uczestnika ruchu.",
             'common_mistakes' => $config['mistake'],
             'editorial_notes' => $config['editorial_notes'],
             'review_notes' => "Szkic przygotowany dla pełnego pierwszego rollout'u znaków nakazu. Przy kolejnych passach dopisać przykłady sytuacyjne, relacje do oznakowania poziomego i porównania z najbardziej podobnymi znakami z grupy C.",
-            'source_notes' => "Treść bazowa przygotowana na podstawie urzędowego wykazu znaków nakazu i praktyki szkolenia kierowców. Przed dalszą rozbudową sprawdzić przykłady egzaminacyjne, częste błędy kursantów i lokalne warianty ustawienia znaku względem pasa ruchu.",
+            'source_notes' => 'Treść bazowa przygotowana na podstawie urzędowego wykazu znaków nakazu i praktyki szkolenia kierowców. Przed dalszą rozbudową sprawdzić przykłady egzaminacyjne, częste błędy kursantów i lokalne warianty ustawienia znaku względem pasa ruchu.',
             'faq_items' => [
                 [
                     'question' => "Jaki obowiązek wprowadza znak {$sign['code']}?",

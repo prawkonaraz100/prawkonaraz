@@ -1,6 +1,8 @@
 <?php
 
-uses(Tests\TestCase::class);
+use Tests\TestCase;
+
+uses(TestCase::class);
 
 test('media local disk uses a writable unix style root when enabled in linux environments', function () {
     if (PHP_OS_FAMILY === 'Windows') {

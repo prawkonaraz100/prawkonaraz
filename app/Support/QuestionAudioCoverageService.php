@@ -78,12 +78,14 @@ class QuestionAudioCoverageService
                 if ($asset->status === QuestionAudioAsset::STATUS_DISABLED) {
                     $stats['disabled']++;
                     $this->pushSample($samples['disabled'], $this->sample($item, $asset), $sampleLimit);
+
                     continue;
                 }
 
                 if ($asset->status === QuestionAudioAsset::STATUS_FAILED) {
                     $stats['failed']++;
                     $this->pushSample($samples['failed'], $this->sample($item, $asset), $sampleLimit);
+
                     continue;
                 }
 
@@ -102,6 +104,7 @@ class QuestionAudioCoverageService
             if ($this->hasGeneratedDifferentHash($groupAssets, (string) ($item['source_text_hash'] ?? ''))) {
                 $stats['outdated_hash']++;
                 $this->pushSample($samples['outdated_hash'], $this->sample($item), $sampleLimit);
+
                 continue;
             }
 

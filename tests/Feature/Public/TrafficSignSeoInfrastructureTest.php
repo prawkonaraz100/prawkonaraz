@@ -25,11 +25,11 @@ test('traffic sign page renders canonical meta and structured data', function ()
         'code' => 'A-7',
         'slug' => 'a-7-ustap-pierwszenstwa',
         'name' => 'Ustąp pierwszeństwa',
-        'image_path' => 'traffic-signs/a-7.svg',
+        'image_path' => 'traffic-signs/signs/prohibitions/znak-b-20-stop.webp',
         'image_alt' => 'Znak A-7 Ustąp pierwszeństwa',
         'image_width' => 320,
         'image_height' => 320,
-        'og_image_path' => 'traffic-signs/og/a-7.png',
+        'og_image_path' => 'traffic-signs/signs/mandatory/znak-c-1-nakaz-jazdy-w-prawo.webp',
         'og_image_alt' => 'Grafika OG dla znaku A-7 Ustąp pierwszeństwa',
         'og_image_width' => 320,
         'og_image_height' => 320,
@@ -50,7 +50,8 @@ test('traffic sign page renders canonical meta and structured data', function ()
         ->assertSee('meta property="og:image:alt" content="Grafika OG dla znaku A-7 Ustąp pierwszeństwa"', false)
         ->assertSee('meta property="og:image:width" content="320"', false)
         ->assertSee('meta property="og:image:height" content="320"', false)
-        ->assertSee('rel="preload" href="http://localhost:8000/storage/traffic-signs/a-7.svg" as="image"', false);
+        ->assertSee('meta property="og:image" content="http://localhost:8000/traffic-signs/signs/mandatory/znak-c-1-nakaz-jazdy-w-prawo.webp?v=', false)
+        ->assertSee('rel="preload" href="http://localhost:8000/traffic-signs/signs/prohibitions/znak-b-20-stop.webp?v=', false);
 });
 
 test('public seo urls respect trusted proxy host and scheme', function () {
@@ -72,8 +73,8 @@ test('public seo urls respect trusted proxy host and scheme', function () {
         'code' => 'A-7',
         'slug' => 'a-7-proxy-check',
         'name' => 'Ustąp pierwszeństwa',
-        'image_path' => 'traffic-signs/a-7.svg',
-        'og_image_path' => 'traffic-signs/og/a-7.png',
+        'image_path' => 'traffic-signs/signs/prohibitions/znak-b-20-stop.webp',
+        'og_image_path' => 'traffic-signs/signs/mandatory/znak-c-1-nakaz-jazdy-w-prawo.webp',
         'og_image_alt' => 'Grafika OG dla testu proxy',
         'og_image_width' => 320,
         'og_image_height' => 320,
@@ -90,9 +91,9 @@ test('public seo urls respect trusted proxy host and scheme', function () {
         ->get(route('traffic-signs.show', $sign->slug))
         ->assertOk()
         ->assertSee('rel="canonical" href="https://seo.example.test/znaki-drogowe/a-7-proxy-check"', false)
-        ->assertSee('meta property="og:image" content="https://seo.example.test/storage/traffic-signs/og/a-7.png"', false)
+        ->assertSee('meta property="og:image" content="https://seo.example.test/traffic-signs/signs/mandatory/znak-c-1-nakaz-jazdy-w-prawo.webp?v=', false)
         ->assertSee('meta property="og:image:alt" content="Grafika OG dla testu proxy"', false)
-        ->assertSee('rel="preload" href="https://seo.example.test/storage/traffic-signs/a-7.svg" as="image"', false)
+        ->assertSee('rel="preload" href="https://seo.example.test/traffic-signs/signs/prohibitions/znak-b-20-stop.webp?v=', false)
         ->assertSee('"url":"https://seo.example.test"', false)
         ->assertDontSee('http://localhost:8000', false);
 });
@@ -130,7 +131,7 @@ test('author and trust pages render schema-backed trust layer', function () {
     $this->get(route('about.methodology'))
         ->assertOk()
         ->assertSee('"@type":"WebPage"', false)
-        ->assertSeeText('Proces redakcyjny');
+        ->assertSeeText('Jak uczymy teorii i pytań na prawo jazdy?');
 });
 
 test('supporting comparison page renders article schema and canonical meta', function () {
@@ -197,8 +198,8 @@ test('robots and sitemaps expose crawlable seo infrastructure', function () {
         'content_author_id' => $author->getKey(),
         'traffic_sign_category_id' => $category->getKey(),
         'slug' => 'd-6-przejscie-dla-pieszych',
-        'image_path' => 'traffic-signs/d-6.svg',
-        'og_image_path' => 'traffic-signs/og/d-6.png',
+        'image_path' => 'traffic-signs/signs/prohibitions/znak-b-20-stop.webp',
+        'og_image_path' => 'traffic-signs/signs/mandatory/znak-c-1-nakaz-jazdy-w-prawo.webp',
     ]);
 
     $this->get('/robots.txt')
@@ -250,8 +251,8 @@ test('robots and sitemaps expose crawlable seo infrastructure', function () {
     $this->get(route('sitemap.signs'))
         ->assertOk()
         ->assertSee('<loc>'.route('traffic-signs.show', $sign->slug).'</loc>', false)
-        ->assertSee('<image:loc>http://localhost:8000/storage/traffic-signs/d-6.svg</image:loc>', false)
-        ->assertSee('<image:loc>http://localhost:8000/storage/traffic-signs/og/d-6.png</image:loc>', false);
+        ->assertSee('<image:loc>http://localhost:8000/traffic-signs/signs/prohibitions/znak-b-20-stop.webp?v=', false)
+        ->assertSee('<image:loc>http://localhost:8000/traffic-signs/signs/mandatory/znak-c-1-nakaz-jazdy-w-prawo.webp?v=', false);
 
     $this->get(route('sitemap.categories'))
         ->assertOk()

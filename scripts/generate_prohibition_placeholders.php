@@ -6,7 +6,7 @@ require __DIR__.'/../vendor/autoload.php';
 
 use App\Support\PolishProhibitionSignCatalog;
 
-$catalog = new PolishProhibitionSignCatalog();
+$catalog = new PolishProhibitionSignCatalog;
 $baseDir = dirname(__DIR__).'/public/traffic-signs/placeholders';
 $ogDir = $baseDir.'/og';
 

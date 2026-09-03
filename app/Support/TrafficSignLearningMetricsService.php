@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Models\TrafficSignLearningAnswer;
 use App\Models\TrafficSignLearningSession;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
 class TrafficSignLearningMetricsService
@@ -137,13 +138,13 @@ class TrafficSignLearningMetricsService
             ->all();
     }
 
-    protected function sessionQuery(?Carbon $since): \Illuminate\Database\Eloquent\Builder
+    protected function sessionQuery(?Carbon $since): Builder
     {
         return TrafficSignLearningSession::query()
             ->when($since !== null, fn ($query) => $query->where('created_at', '>=', $since));
     }
 
-    protected function answerQuery(?Carbon $since): \Illuminate\Database\Eloquent\Builder
+    protected function answerQuery(?Carbon $since): Builder
     {
         return TrafficSignLearningAnswer::query()
             ->when($since !== null, fn ($query) => $query->where('traffic_sign_learning_answers.answered_at', '>=', $since));

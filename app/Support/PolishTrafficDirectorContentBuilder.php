@@ -5,7 +5,7 @@ namespace App\Support;
 class PolishTrafficDirectorContentBuilder
 {
     /**
-     * @param array<string, mixed> $signData
+     * @param  array<string, mixed>  $signData
      * @return array<string, mixed>
      */
     public function build(array $signData, int $index): array
@@ -18,16 +18,16 @@ class PolishTrafficDirectorContentBuilder
         $placement = 'Osoba kierująca ruchem (najczęściej umundurowany policjant, ale też strażak, żołnierz czy pracownik drogowy) znajduje się zazwyczaj na środku skrzyżowania, w miejscu o najlepszej widoczności dla wszystkich wlotów.';
         $driverBehavior = $this->getDriverBehavior($code);
         $legalSummary = 'Zgodnie z Prawem o ruchu drogowym, polecenia i sygnały dawane przez osobę kierującą ruchem mają absolutne pierwszeństwo przed sygnałami świetlnymi, znakami drogowymi oraz ogólnymi zasadami ruchu. Niestosowanie się do nich to jedno z najcięższych wykroczeń drogowych.';
-        
+
         $legalReferenceLabel = 'Prawo o ruchu drogowym - Hierarchia ważności (Art. 5)';
         $legalReferenceUrl = 'https://isap.sejm.gov.pl';
-        
+
         $fineSummary = 'Niezastosowanie się do sygnałów dawanych przez osobę kierującą ruchem wiąże się z bardzo wysokim mandatem karnym, a nierzadko również z utratą prawa jazdy (szczególnie w przypadku stworzenia zagrożenia w ruchu lądowym lub zignorowania nakazu zatrzymania).';
         $commonMistakes = $this->getCommonMistakes($code);
         $editorialNotes = 'To kluczowy element edukacyjny dla kursantów. Często na egzaminie państwowym kursanci widząc zielone światło próbują wjechać na skrzyżowanie, ignorując fakt, że policjant stoi do nich przodem lub tyłem.';
-        
+
         $faqItems = $this->getFaqItems($code);
-        
+
         $metaTitle = "Sygnał {$code} - {$name} - znaczenie";
         $metaDescription = "Sprawdź, co oznacza postawa policjanta {$name} na skrzyżowaniu. Dowiedz się, do jakiego światła na sygnalizatorze można porównać ten gest.";
 

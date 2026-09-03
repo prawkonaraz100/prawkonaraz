@@ -3,6 +3,18 @@
 return [
     /*
     |--------------------------------------------------------------------------
+    | PJM module rollout
+    |--------------------------------------------------------------------------
+    |
+    | The recovered production baseline keeps the unfinished PJM module
+    | suspended. Tests can enable it explicitly so its dormant access rules
+    | remain covered without exposing the module in production.
+    |
+    */
+    'pjm_module_enabled' => filter_var(env('PJM_MODULE_ENABLED', false), FILTER_VALIDATE_BOOL),
+
+    /*
+    |--------------------------------------------------------------------------
     | Study history retention
     |--------------------------------------------------------------------------
     |

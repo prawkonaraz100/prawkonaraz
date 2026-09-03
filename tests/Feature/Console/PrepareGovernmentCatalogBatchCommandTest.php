@@ -320,6 +320,7 @@ test('catalog manifest import persists metadata_json into questions metadata', f
 
     $this->artisan('catalog:import-manifest', [
         'path' => $directory.'/manifest.json',
+        '--skip-sitemap' => true,
     ])->assertSuccessful();
 
     $question = Question::query()->firstOrFail();
@@ -330,6 +331,7 @@ test('catalog manifest import persists metadata_json into questions metadata', f
     expect($question->metadata)->toBe([
         'government_question_id' => '99',
         'sheet' => 'katalog',
+        'structure_scope' => 'PODSTAWOWY',
     ]);
 });
 

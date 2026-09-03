@@ -1,6 +1,8 @@
 <?php
 
-uses(Tests\TestCase::class);
+use Tests\TestCase;
+
+uses(TestCase::class);
 
 test('php upload limits support configured explanation image uploads', function () {
     $toBytes = static function (string $value): int {

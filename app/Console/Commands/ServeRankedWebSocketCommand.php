@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\User;
 use App\Support\RankedRealtimeConnectionState;
 use App\Support\RankedRealtimeEventStreamPublisher;
 use App\Support\RankedWebSocketTicketService;
@@ -23,7 +24,7 @@ class ServeRankedWebSocketCommand extends Command
      *     id: int,
      *     read_buffer: string,
      *     handshake_complete: bool,
-     *     user: \App\Models\User|null,
+     *     user: User|null,
      *     state: RankedRealtimeConnectionState,
      *     next_publish_at: float
      * }>
@@ -77,6 +78,7 @@ class ServeRankedWebSocketCommand extends Command
             foreach ($readStreams as $stream) {
                 if ($stream === $server) {
                     $this->acceptClient($server);
+
                     continue;
                 }
 
@@ -106,7 +108,7 @@ class ServeRankedWebSocketCommand extends Command
             'read_buffer' => '',
             'handshake_complete' => false,
             'user' => null,
-            'state' => new RankedRealtimeConnectionState(),
+            'state' => new RankedRealtimeConnectionState,
             'next_publish_at' => microtime(true),
         ];
     }
@@ -132,6 +134,7 @@ class ServeRankedWebSocketCommand extends Command
 
         if (($chunk === false || $chunk === '') && feof($stream)) {
             $this->disconnectClient($clientId);
+
             return;
         }
 
@@ -143,11 +146,13 @@ class ServeRankedWebSocketCommand extends Command
 
         if ($clientState['handshake_complete']) {
             $this->clients[$clientId] = $clientState;
+
             return;
         }
 
         if (! str_contains($clientState['read_buffer'], "\r\n\r\n")) {
             $this->clients[$clientId] = $clientState;
+
             return;
         }
 
@@ -159,6 +164,7 @@ class ServeRankedWebSocketCommand extends Command
             || ($headers['path'] ?? null) !== $path
         ) {
             $this->disconnectClient($clientId);
+
             return;
         }
 
@@ -167,6 +173,7 @@ class ServeRankedWebSocketCommand extends Command
 
         if (! $user) {
             $this->disconnectClient($clientId);
+
             return;
         }
 
@@ -225,6 +232,7 @@ class ServeRankedWebSocketCommand extends Command
 
                 if (! $success) {
                     $this->disconnectClient($clientId);
+
                     continue 2;
                 }
             }
