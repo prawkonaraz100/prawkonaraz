@@ -2,6 +2,14 @@
 
 Ten katalog jest edytowalna kopia robocza utworzona z aktywnego wydania produkcyjnego pobranego 2 wrzesnia 2026 r. To tutaj wykonujemy dalsze zmiany i testy lokalne.
 
+## Główny plan dalszych prac
+
+Aktualny stan odzyskania, ustalone decyzje oraz lista wykonanych i oczekujących
+zadań znajdują się w [głównym planie odtworzenia i wdrożeń](docs/RECOVERY-AND-DEPLOYMENT-MASTER-PLAN.md).
+
+Każdy kolejny agent powinien rozpocząć od tego planu i aktualizować jego listę
+kontrolną po zakończeniu kolejnego etapu.
+
 ## Najwazniejsze lokalizacje
 
 - Kod roboczy: `F:\serwistestyprawojazdy\workspace`
