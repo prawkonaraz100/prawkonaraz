@@ -1,0 +1,56 @@
+# Batch 019 - editorial review
+
+Status: draft, pending owner review.
+
+| # | ID | Kategoria | Czas | Proponowany opis |
+|---:|---:|:---:|---:|---|
+| 1 | 7254 | A | 8s | Skrzyżowanie z czerwonym sygnałem, torowiskiem i tramwajem w pobliżu pokazuje przygotowanie do skrętu w prawo. Kadr skupia uwagę na położeniu pojazdu szynowego, sygnalizacji i wolnej przestrzeni przed autem. |
+| 2 | 7256 | A | 10s | Miejska ulica z pojazdami przed kamerą, bocznym wlotem i pieszym przy chodniku pokazuje przygotowanie do lewego skrętu. Ujęcie pomaga obserwować jednoślady, ruch z naprzeciwka i ustawienie auta. |
+| 3 | 7257 | A | 4s | Podmiejska droga z tablicą ostrzegawczą i bocznym wlotem w oddali pokazuje zbliżanie się do skrzyżowania. Materiał koncentruje uwagę na znakach przy poboczu, widoczności i geometrii drogi podporządkowanej. |
+| 4 | 7258 | A | 6s | Szosa z podwójną linią ciągłą, busem przed kamerą i zielonym znakiem miejscowości pokazuje odcinek o zmieniającej się szerokości. Kadr zwraca uwagę na prawą krawędź jezdni, pobocze i tor przejazdu. |
+| 5 | 7259 | A | 3s | Zacieniona droga między zabudową a drzewami pokazuje odcinek, na którym krawędź jezdni stopniowo zmienia przebieg. Ujęcie akcentuje lewą stronę drogi, widoczność zakrętu i zachowanie pasa. |
+| 6 | 7260 | A | 3s | Mostowy odcinek z barierami, liniami ciągłymi i łukiem jezdni pokazuje sekwencję zmian kierunku trasy. Materiał pomaga zauważyć oznakowanie ostrzegawcze, przebieg pasa i ograniczoną przestrzeń manewru. |
+| 7 | 7261 | A | 10s | Leśna droga z czerwonym autem przed kamerą i znakiem z dodatkową tabliczką pokazuje zapowiedź nietypowego przebiegu trasy. Kadr skupia uwagę na tabliczce, łuku drogi oraz widoczności między drzewami. |
+| 8 | 7262 | A | 8s | Otwarta droga z widocznym znakiem kolejowym, słupami energetycznymi i wzniesieniem przed autem pokazuje dojazd do torów. Ujęcie akcentuje liczbę torów, oznakowanie i przestrzeń przed przejazdem. |
+| 9 | 7264 | A | 6s | Aleja z drzewami, mokrą nawierzchnią i znakiem z tabliczką przy poboczu pokazuje zmianę przebiegu ruchu. Kadr pomaga odczytać dodatkowe oznaczenie oraz przygotować się do dalszego łuku drogi. |
+| 10 | 7265 | A | 4s | Droga przy wiadukcie i stacji paliw z oznaczeniem skrzyżowania po prawej stronie pokazuje układ bocznych wlotów. Materiał kieruje uwagę na znak ostrzegawczy, prawą stronę jezdni i ruch lokalny. |
+| 11 | 7266 | A | 5s | Jezdnia z samochodami przed kamerą, podwójną linią i znakiem ostrzegawczym przy poboczu pokazuje kilka następujących po sobie łuków. Ujęcie skupia uwagę na pierwszym kierunku zakrętu i widoczności. |
+| 12 | 7267 | A | 4s | Wjazd na drogę przy węźle, barierach i niebieskim oznaczeniu kierunku pokazuje zmianę organizacji ruchu. Kadr akcentuje początek odcinka z ruchem w dwóch kierunkach oraz linie rozdzielające pasy. |
+| 13 | 7270 | A | 4s | Łuk drogi z barierami, wyspą kanalizującą i niebieskim znakiem kierunku pokazuje wybór toru na rozdzielonej jezdni. Materiał pomaga odczytać przebieg pasa oraz ograniczenia wynikające z wyspy. |
+| 14 | 7271 | A | 8s | Skrzyżowanie na otwartym terenie z niebieskim znakiem kierunkowym i wlotem po prawej stronie pokazuje ustalony przebieg ruchu. Ujęcie koncentruje uwagę na wskazanym kierunku oraz możliwościach manewru. |
+| 15 | 7272 | A | 4s | Droga z tablicą robót, zwężeniem i pachołkiem na prawym pasie pokazuje odcinek przed znakiem w miejscu utrudnień. Kadr zwraca uwagę na przestrzeń do postoju, ograniczenia toru jazdy i ruch za pojazdem. |
+| 16 | 7273 | A | 4s | Skrzyżowanie z sygnalizatorem kierunkowym, przejściem dla pieszych i autem przed linią pokazuje analizę manewru zawracania. Ujęcie pomaga odczytać kształt sygnału oraz relację z oznakowaniem poziomym. |
+| 17 | 7274 | A | 4s | Szeroka miejska ulica z torowiskiem, światłami i pasami w stronę najbliższego skrzyżowania pokazuje przygotowanie do zawracania. Materiał skupia uwagę na sygnalizacji, pasach oraz przestrzeni manewru. |
+| 18 | 7276 | A | 7s | Wjazd w pobliże stacji paliw, przejście dla pieszych i osoba przy chodniku pokazują moment dojazdu do pasów. Kadr akcentuje położenie pieszego, sygnały świetlne i linię zatrzymania przed przejściem. |
+| 19 | 7277 | A | 6s | Skrzyżowanie przy stacji paliw z ciężarówką, autem osobowym i szeroką jezdnią pokazuje możliwy manewr zawracania. Ujęcie pomaga ocenić oznakowanie, ruch poprzeczny oraz wolną przestrzeń na skrzyżowaniu. |
+| 20 | 7279 | A | 6s | Dwupasmowa jezdnia z zielonym pasem po lewej stronie i znakiem przy przeciwnej krawędzi pokazuje ograniczenia dotyczące zawracania. Kadr kieruje uwagę na położenie znaku, pasy i najbliższe skrzyżowanie. |
+| 21 | 7280 | A | 6s | Osiedlowa ulica z przejściem dla pieszych, krawężnikiem i wlotem po prawej stronie pokazuje przygotowanie do skrętu. Materiał skupia uwagę na miejscu zatrzymania, widoczności chodnika i ruchu bocznym. |
+| 22 | 7281 | A | 7s | Zacieniona jezdnia przy blokach, łuk drogi i boczne wloty pokazują sytuację pierwszeństwa w układzie osiedlowym. Ujęcie pomaga obserwować pojazdy z różnych stron oraz rozpoznać oznaczenia przy skrzyżowaniu. |
+| 23 | 7282 | A | 5s | Szeroka ulica z oznaczeniami na jezdni, ruchem w kilku pasach i rowerzystą w pobliżu przejazdu pokazuje punkt kolizyjny. Kadr akcentuje tor jednośladu, znaki oraz zachowanie pojazdów przy skrzyżowaniu. |
+| 24 | 7283 | A | 5s | Wąska ulica między domami z pionowym znakiem przy prawej stronie pokazuje zakres działania oznaczenia ustawionego przy krawędzi. Ujęcie zwraca uwagę na stronę drogi, pobocze i zaparkowane pojazdy. |
+| 25 | 7284 | A | 7s | Przejście dla pieszych na ulicy wśród zieleni i widoczna linia za pasami pokazują dwa bliskie elementy oznakowania poziomego. Kadr pomaga rozdzielić funkcję przejścia oraz linię na dalszym odcinku. |
+| 26 | 7285 | A | 9s | Droga z powierzchnią wyłączoną z ruchu i znakiem informującym o zmianie trasy z pierwszeństwem pokazuje koniec określonego odcinka. Materiał skupia uwagę na tablicy, wyspie i dalszym przebiegu jezdni. |
+| 27 | 7286 | A | 4s | Miejska ulica z tabliczką pod znakiem i łukiem jezdni pokazuje schemat przebiegu trasy przez skrzyżowanie. Ujęcie akcentuje dodatkową tablicę, położenie wlotów oraz relację z realnym układem drogi. |
+| 28 | 7287 | A | 5s | Ulica w zwartej zabudowie z pionowym znakiem informacyjnym i zaparkowanymi autami pokazuje lokalizację obiektu turystycznego. Kadr pozwala zwrócić uwagę na symbol znaku, otoczenie i czytelność informacji. |
+| 29 | 7288 | A | 4s | Wlot skrzyżowania z niebieską tablicą kierunkową po prawej stronie pokazuje organizację jazdy z poszczególnych pasów. Materiał koncentruje uwagę na strzałkach, liczbie pasów i wyborze dalszego toru. |
+| 30 | 7289 | A | 5s | Droga przy wiadukcie i znak ostrzegawczy z tabliczką odległości pokazują zapowiedź miejsca, które warto zauważyć wcześniej. Ujęcie pomaga odczytać liczbę na tabliczce oraz dystans do punktu zagrożenia. |
+| 31 | 7290 | A | 4s | Odcinek przed skrzyżowaniem z samochodami w kolejce i znakiem po prawej stronie pokazuje wybór pasa do skrętu w lewo. Kadr akcentuje oznakowanie, linię pojazdów i geometrię wlotu. |
+| 32 | 7291 | A | 4s | Droga szybkiego ruchu z tablicą informacyjną i pasem wyjazdowym pokazuje zbliżanie się do ważnego punktu na trasie. Materiał skupia uwagę na treści znaku, rozdzieleniu pasów i kierunku jazdy. |
+| 33 | 7292 | A | 5s | Szeroka arteria z wieloma pasami, znakami nad jezdnią i pojazdami po prawej stronie pokazuje przygotowanie do lewego skrętu. Ujęcie pomaga odczytać aktualny pas oraz oznaczenia przed skrzyżowaniem. |
+| 34 | 7293 | A | 7s | Zatłoczone skrzyżowanie z sygnalizacją, pasami kierunkowymi i samochodami przed kamerą pokazuje planowany skręt w prawo. Kadr kieruje uwagę na położenie auta względem strzałek oraz sąsiednie pasy. |
+| 35 | 7294 | A | 4s | Lokalna droga z samotnym znakiem przy poboczu, drzewem i pojazdem z przeciwnego kierunku pokazuje relację na wąskim odcinku. Materiał skupia uwagę na znaku, osi jezdni i nadjeżdżającym aucie. |
+| 36 | 7296 | A | 5s | Leśna droga z pionowym znakiem po prawej stronie i wyraźną linią ciągłą pokazuje miejsce przejazdu rowerzystów przez jezdnię. Ujęcie akcentuje symbol znaku, pobocze oraz widoczność przed autem. |
+| 37 | 7297 | A | 6s | Droga z zabudową usługową, słupkami przy krawędzi i znakiem informacyjnym pokazuje zapowiedź restauracji oraz hotelu. Kadr pomaga zauważyć symbolikę tablicy i jej znaczenie dla kierowcy. |
+| 38 | 7299 | A | 5s | Leśny odcinek z samochodem przed kamerą, podwójną linią i ograniczoną widocznością pokazuje temat rozpoczęcia wyprzedzania. Materiał koncentruje uwagę na oznakowaniu poziomym, pojeździe poprzedzającym i poboczu. |
+| 39 | 7300 | A | 7s | Droga dwujezdniowa z pustym prawym pasem, linią krawędziową i barierą przy poboczu pokazuje wybór miejsca na jezdni. Ujęcie pomaga przeanalizować układ pasów oraz płynność zmiany toru. |
+| 40 | 7301 | A | 4s | Mostowy odcinek z podwójną linią ciągłą, barierami i pojazdami jadącymi w przeciwnych kierunkach pokazuje granicę między pasami. Kadr skupia uwagę na oznakowaniu poziomym i stabilnym prowadzeniu auta. |
+| 41 | 7302 | A | 6s | Ulica z tablicą kierunkową, autem dostawczym i znakiem ostrzegawczym po lewej stronie pokazuje zmianę organizacji pasa. Materiał akcentuje oznaczenia na jezdni, pojazdy obok i dalszy kierunek ruchu. |
+| 42 | 7303 | A | 10s | Odcinek przy ekranach akustycznych z jednym pasem prowadzącym prosto pokazuje przejazd w kierunku skrzyżowania. Ujęcie kieruje uwagę na linie rozdzielające, oznaczenia i konsekwencję wybranego pasa. |
+| 43 | 7304 | A | 10s | Miejska trasa z busem przed kamerą, wieloma pojazdami i pasem do zmiany toru pokazuje komunikowanie manewru. Kadr skupia uwagę na położeniu auta, kierunkowskazach i odstępach między pojazdami. |
+| 44 | 7305 | A | 4s | Szeroka droga z wydzielonym lewym pasem i strzałkami przed skrzyżowaniem pokazuje możliwość zmiany pasa. Materiał pomaga ocenić oznakowanie poziome, wolną przestrzeń oraz przebieg pasów przy wlocie. |
+| 45 | 7307 | A | 4s | Odcinek z powierzchnią wyłączoną z ruchu, ukośnym kreskowaniem i pasem po prawej stronie pokazuje miejsce niedostępne dla normalnego przejazdu. Ujęcie akcentuje granice oznaczenia oraz ryzyko zatrzymania auta. |
+| 46 | 7308 | A | 6s | Ulica wśród kamienic z pasami ruchu, oznaczeniami kierunkowymi i pojazdami przed skrzyżowaniem pokazuje temat zawracania. Kadr koncentruje uwagę na zajmowanym pasie, strzałkach i geometrii skrzyżowania. |
+| 47 | 7309 | A | 5s | Leśna droga z podwójną linią i motocyklistą w oddali pokazuje układ ruchu na długim, prostym odcinku. Ujęcie pomaga rozpoznać kierunki jazdy, oznakowanie poziome i relację z pojazdem z przodu. |
+| 48 | 7310 | A | 6s | Osiedlowa ulica z jasną nawierzchnią, krawężnikami i skrzyżowaniem na końcu pokazuje wybór kierunku jazdy. Materiał skupia uwagę na znakach przy wlocie, położeniu auta i możliwych torach skrętu. |
+| 49 | 7311 | A | 9s | Droga przy zielonym poboczu, samochód przed kamerą i linie rozdzielające pasy pokazują przygotowanie do lewego skrętu. Kadr pomaga ocenić zajęty pas, ruch z przeciwka i oznaczenia poziome. |
+| 50 | 7312 | A | 9s | Podmiejski odcinek z pachołkami, pojazdem przed kamerą i ograniczoną szerokością jezdni pokazuje temat rozpoczęcia wyprzedzania. Ujęcie akcentuje roboty drogowe, widoczność i przestrzeń obok pojazdu poprzedzającego. |

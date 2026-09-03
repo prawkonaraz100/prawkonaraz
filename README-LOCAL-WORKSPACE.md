@@ -63,6 +63,7 @@ WebSocket: `localhost:8080`
 - Strona domyslnie korzysta z gotowych assetow `public\build` z produkcji; usluga Vite nalezy do opcjonalnego profilu `frontend-dev`.
 - Lokalne ustawienia w `.env` wylaczaja wysylke poczty i inne zewnetrzne integracje. Plik `.env` jest wykluczony z Git i nie wolno go publikowac.
 - Poprzedni projekt Docker z dysku G pozostaje zachowany, lecz zatrzymany.
+- Pelny snapshot starego katalogu dokumentacji znajduje sie w `docs\recovered-from-old-project-2026-09-03`; nie nadpisuje dokumentacji odzyskanej z produkcji.
 
 ## Repozytorium Git
 
