@@ -2,6 +2,8 @@ name: CI
 
 on:
   push:
+    branches:
+      - main
   pull_request:
   workflow_dispatch:
 
@@ -17,6 +19,7 @@ jobs:
       SESSION_DRIVER: file
       QUEUE_CONNECTION: sync
       MAIL_MAILER: log
+      MEDIA_LOCAL_ROOT: ${{ github.workspace }}/storage/app/public-media
 
     steps:
       - name: Checkout repository
@@ -49,7 +52,7 @@ jobs:
       - name: Prepare application environment
         run: |
           cp .env.example .env
-          mkdir -p database
+          mkdir -p database storage/app/public storage/app/public-media
           touch database/database.sqlite
           php artisan key:generate --force
           php artisan migrate --force

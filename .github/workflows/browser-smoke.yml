@@ -15,6 +15,7 @@ jobs:
       SESSION_DRIVER: file
       QUEUE_CONNECTION: sync
       MAIL_MAILER: log
+      MEDIA_LOCAL_ROOT: ${{ github.workspace }}/storage/app/public-media
 
     steps:
       - name: Checkout repository
@@ -45,7 +46,7 @@ jobs:
       - name: Prepare application environment
         run: |
           cp .env.example .env
-          mkdir -p database
+          mkdir -p database storage/app/public storage/app/public-media
           touch database/database.sqlite
           php artisan key:generate --force
           php artisan storage:link
@@ -60,3 +61,4 @@ jobs:
           name: browser-smoke-artifacts
           path: output/playwright
           if-no-files-found: warn
+          retention-days: 3
