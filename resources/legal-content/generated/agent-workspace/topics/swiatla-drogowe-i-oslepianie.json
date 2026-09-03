@@ -1,0 +1,2093 @@
+{
+    "generated_at": "2026-06-21T22:06:15+02:00",
+    "candidate": {
+        "slug": "swiatla-drogowe-i-oslepianie",
+        "title": "Światła drogowe i zakaz oślepiania",
+        "description": "Węższy temat artykułu wykryty na podstawie treści pytań.",
+        "level": "focused",
+        "status": "candidate",
+        "rule_version": "2026-06-19-prompt-v2",
+        "existing_article_slug": "swiatla-drogowe-i-oslepianie"
+    },
+    "workflow": {
+        "status": "published",
+        "next_action": "Przejrzyj relacje pytan i zdecyduj, czy artykul wymaga rozbudowy lub ponownego review.",
+        "public_relations_are_verified_only": true
+    },
+    "article": {
+        "slug": "swiatla-drogowe-i-oslepianie",
+        "title": "Światła drogowe: kiedy wolno ich używać i kiedy je wyłączyć",
+        "status": "published",
+        "published_at": "2026-06-21",
+        "last_reviewed_at": "2026-06-21",
+        "legal_units": [
+            {
+                "slug": "art-51-ust-3",
+                "label": "art. 51 ust. 3",
+                "title": "Warunki używania świateł drogowych",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-51-ust-4-pkt-1",
+                "label": "art. 51 ust. 4 pkt 1",
+                "title": "Zmiana świateł przy pojeździe jadącym z przeciwka",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-51-ust-4-pkt-2",
+                "label": "art. 51 ust. 4 pkt 2",
+                "title": "Zmiana świateł przy pojeździe poprzedzającym",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            }
+        ]
+    },
+    "summary": {
+        "canonical_questions": 11,
+        "question_rows": 85,
+        "categories": [
+            "A",
+            "A1",
+            "A2",
+            "AM",
+            "B",
+            "B1",
+            "C",
+            "C1",
+            "D",
+            "D1",
+            "T"
+        ],
+        "canonical_questions_with_verified_reference": 11,
+        "prompt_conflicts": [],
+        "answer_conflicts": [],
+        "correct_answer_conflicts": []
+    },
+    "questions": [
+        {
+            "external_id": "6213",
+            "prompt": "Czy w tej sytuacji masz prawo używać świateł drogowych?",
+            "prompt_variants": [
+                "Czy w tej sytuacji masz prawo używać świateł drogowych?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo oślepisz kierowcę jadącego z przeciwka."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a/6213/video/full.92b3b78f3fe8.mp4",
+                    "poster_path": "media/questions/a/6213/image/poster.7c5d05038f63.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/6213/video/full.92b3b78f3fe8.mp4",
+                    "poster_path": "media/questions/b/6213/image/poster.7c5d05038f63.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c/6213/video/full.92b3b78f3fe8.mp4",
+                    "poster_path": "media/questions/c/6213/image/poster.7c5d05038f63.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d/6213/video/full.92b3b78f3fe8.mp4",
+                    "poster_path": "media/questions/d/6213/image/poster.7c5d05038f63.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/t/6213/video/full.92b3b78f3fe8.mp4",
+                    "poster_path": "media/questions/t/6213/image/poster.7c5d05038f63.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/am/6213/video/full.92b3b78f3fe8.mp4",
+                    "poster_path": "media/questions/am/6213/image/poster.7c5d05038f63.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a1/6213/video/full.92b3b78f3fe8.mp4",
+                    "poster_path": "media/questions/a1/6213/image/poster.7c5d05038f63.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a2/6213/video/full.92b3b78f3fe8.mp4",
+                    "poster_path": "media/questions/a2/6213/image/poster.7c5d05038f63.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b1/6213/video/full.92b3b78f3fe8.mp4",
+                    "poster_path": "media/questions/b1/6213/image/poster.7c5d05038f63.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c1/6213/video/full.92b3b78f3fe8.mp4",
+                    "poster_path": "media/questions/c1/6213/image/poster.7c5d05038f63.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d1/6213/video/full.92b3b78f3fe8.mp4",
+                    "poster_path": "media/questions/d1/6213/image/poster.7c5d05038f63.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatel drogowych",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 33538,
+                    "question_external_id": "6213",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-51-ust-4-pkt-1",
+                    "legal_unit_label": "art. 51 ust. 4 pkt 1",
+                    "legal_unit_title": "Zmiana świateł przy pojeździe jadącym z przeciwka",
+                    "legal_topic_slug": "swiatla-drogowe-i-oslepianie",
+                    "article_slug": "swiatla-drogowe-i-oslepianie",
+                    "public_note": "W tej sytuacji z przeciwka zbliża się pojazd. Art. 51 ust. 4 pkt 1 wymaga przełączenia świateł drogowych na mijania, zanim jego kierujący zostanie oślepiony."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 33538,
+                    "external_id": "6213",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33635,
+                    "external_id": "6213",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33732,
+                    "external_id": "6213",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33829,
+                    "external_id": "6213",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33919,
+                    "external_id": "6213",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34011,
+                    "external_id": "6213",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34098,
+                    "external_id": "6213",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34185,
+                    "external_id": "6213",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34282,
+                    "external_id": "6213",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34379,
+                    "external_id": "6213",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34476,
+                    "external_id": "6213",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6222",
+            "prompt": "Czy w tej sytuacji masz prawo używać świateł drogowych?",
+            "prompt_variants": [
+                "Czy w tej sytuacji masz prawo używać świateł drogowych?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo oślepisz kierowcę wyprzedzającego."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a/6222/video/full.d7960bef3cb9.mp4",
+                    "poster_path": "media/questions/a/6222/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/6222/video/full.d7960bef3cb9.mp4",
+                    "poster_path": "media/questions/b/6222/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c/6222/video/full.d7960bef3cb9.mp4",
+                    "poster_path": "media/questions/c/6222/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d/6222/video/full.d7960bef3cb9.mp4",
+                    "poster_path": "media/questions/d/6222/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/t/6222/video/full.d7960bef3cb9.mp4",
+                    "poster_path": "media/questions/t/6222/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/am/6222/video/full.d7960bef3cb9.mp4",
+                    "poster_path": "media/questions/am/6222/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a1/6222/video/full.d7960bef3cb9.mp4",
+                    "poster_path": "media/questions/a1/6222/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a2/6222/video/full.d7960bef3cb9.mp4",
+                    "poster_path": "media/questions/a2/6222/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b1/6222/video/full.d7960bef3cb9.mp4",
+                    "poster_path": "media/questions/b1/6222/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c1/6222/video/full.d7960bef3cb9.mp4",
+                    "poster_path": "media/questions/c1/6222/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d1/6222/video/full.d7960bef3cb9.mp4",
+                    "poster_path": "media/questions/d1/6222/image/poster.653558c6499e.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatel drogowych",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 33541,
+                    "question_external_id": "6222",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-51-ust-4-pkt-2",
+                    "legal_unit_label": "art. 51 ust. 4 pkt 2",
+                    "legal_unit_title": "Zmiana świateł przy pojeździe poprzedzającym",
+                    "legal_topic_slug": "swiatla-drogowe-i-oslepianie",
+                    "article_slug": "swiatla-drogowe-i-oslepianie",
+                    "public_note": "Pojazd po wyprzedzeniu znajduje się przed nami i jego kierujący może zostać oślepiony przez lusterka. Art. 51 ust. 4 pkt 2 wymaga wtedy zmiany świateł drogowych na mijania."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 33541,
+                    "external_id": "6222",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33640,
+                    "external_id": "6222",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33737,
+                    "external_id": "6222",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33834,
+                    "external_id": "6222",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33923,
+                    "external_id": "6222",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34014,
+                    "external_id": "6222",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34101,
+                    "external_id": "6222",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34188,
+                    "external_id": "6222",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34287,
+                    "external_id": "6222",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34384,
+                    "external_id": "6222",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34481,
+                    "external_id": "6222",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6223",
+            "prompt": "Czy w tej sytuacji masz obowiązek zmienić światła drogowe na światła mijania?",
+            "prompt_variants": [
+                "Czy w tej sytuacji masz obowiązek zmienić światła drogowe na światła mijania?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak, bo w czasie od zmierzchu do świtu, na nieoświetlonych drogach, zamiast świateł mijania lub łącznie z nimi, kierujacy może używać świateł drogowych. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a/6223/video/full.3f209c71fc95.mp4",
+                    "poster_path": "media/questions/a/6223/image/poster.1734546ada8f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/6223/video/full.3f209c71fc95.mp4",
+                    "poster_path": "media/questions/b/6223/image/poster.1734546ada8f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c/6223/video/full.3f209c71fc95.mp4",
+                    "poster_path": "media/questions/c/6223/image/poster.1734546ada8f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d/6223/video/full.3f209c71fc95.mp4",
+                    "poster_path": "media/questions/d/6223/image/poster.1734546ada8f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/t/6223/video/full.3f209c71fc95.mp4",
+                    "poster_path": "media/questions/t/6223/image/poster.1734546ada8f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/am/6223/video/full.3f209c71fc95.mp4",
+                    "poster_path": "media/questions/am/6223/image/poster.1734546ada8f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a1/6223/video/full.3f209c71fc95.mp4",
+                    "poster_path": "media/questions/a1/6223/image/poster.1734546ada8f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a2/6223/video/full.3f209c71fc95.mp4",
+                    "poster_path": "media/questions/a2/6223/image/poster.1734546ada8f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b1/6223/video/full.3f209c71fc95.mp4",
+                    "poster_path": "media/questions/b1/6223/image/poster.1734546ada8f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c1/6223/video/full.3f209c71fc95.mp4",
+                    "poster_path": "media/questions/c1/6223/image/poster.1734546ada8f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d1/6223/video/full.3f209c71fc95.mp4",
+                    "poster_path": "media/questions/d1/6223/image/poster.1734546ada8f.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatla drogowe|zmienic swiatla drogowe na swiatla mijania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 33542,
+                    "question_external_id": "6223",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-51-ust-4-pkt-1",
+                    "legal_unit_label": "art. 51 ust. 4 pkt 1",
+                    "legal_unit_title": "Zmiana świateł przy pojeździe jadącym z przeciwka",
+                    "legal_topic_slug": "swiatla-drogowe-i-oslepianie",
+                    "article_slug": "swiatla-drogowe-i-oslepianie",
+                    "public_note": "W tej sytuacji z przeciwka zbliża się pojazd. Art. 51 ust. 4 pkt 1 wymaga przełączenia świateł drogowych na mijania, zanim jego kierujący zostanie oślepiony."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 33542,
+                    "external_id": "6223",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33641,
+                    "external_id": "6223",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33738,
+                    "external_id": "6223",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33835,
+                    "external_id": "6223",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33924,
+                    "external_id": "6223",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34015,
+                    "external_id": "6223",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34102,
+                    "external_id": "6223",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34189,
+                    "external_id": "6223",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34288,
+                    "external_id": "6223",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34385,
+                    "external_id": "6223",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34482,
+                    "external_id": "6223",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6225",
+            "prompt": "Czy w tej sytuacji masz obowiązek zmienić światła drogowe na światła mijania?",
+            "prompt_variants": [
+                "Czy w tej sytuacji masz obowiązek zmienić światła drogowe na światła mijania?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak. Jezeli jedziesz na swiatlach drogowych i inny pojazd Cie wyprzedza, masz obowiazek przelaczyc je na swiatla mijania. Chodzi o to, zeby nie oslepiac kierujacego jadacego przed Toba."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a/6225/video/full.df99411ce8cc.mp4",
+                    "poster_path": "media/questions/a/6225/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/6225/video/full.df99411ce8cc.mp4",
+                    "poster_path": "media/questions/b/6225/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c/6225/video/full.df99411ce8cc.mp4",
+                    "poster_path": "media/questions/c/6225/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d/6225/video/full.df99411ce8cc.mp4",
+                    "poster_path": "media/questions/d/6225/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/t/6225/video/full.df99411ce8cc.mp4",
+                    "poster_path": "media/questions/t/6225/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/am/6225/video/full.df99411ce8cc.mp4",
+                    "poster_path": "media/questions/am/6225/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a1/6225/video/full.df99411ce8cc.mp4",
+                    "poster_path": "media/questions/a1/6225/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a2/6225/video/full.df99411ce8cc.mp4",
+                    "poster_path": "media/questions/a2/6225/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b1/6225/video/full.df99411ce8cc.mp4",
+                    "poster_path": "media/questions/b1/6225/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c1/6225/video/full.df99411ce8cc.mp4",
+                    "poster_path": "media/questions/c1/6225/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d1/6225/video/full.df99411ce8cc.mp4",
+                    "poster_path": "media/questions/d1/6225/image/poster.653558c6499e.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatla drogowe|zmienic swiatla drogowe na swiatla mijania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 33543,
+                    "question_external_id": "6225",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-51-ust-4-pkt-2",
+                    "legal_unit_label": "art. 51 ust. 4 pkt 2",
+                    "legal_unit_title": "Zmiana świateł przy pojeździe poprzedzającym",
+                    "legal_topic_slug": "swiatla-drogowe-i-oslepianie",
+                    "article_slug": "swiatla-drogowe-i-oslepianie",
+                    "public_note": "Pojazd po wyprzedzeniu znajduje się przed nami i jego kierujący może zostać oślepiony przez lusterka. Art. 51 ust. 4 pkt 2 wymaga wtedy zmiany świateł drogowych na mijania."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 33543,
+                    "external_id": "6225",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33643,
+                    "external_id": "6225",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33740,
+                    "external_id": "6225",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33837,
+                    "external_id": "6225",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33926,
+                    "external_id": "6225",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34016,
+                    "external_id": "6225",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34103,
+                    "external_id": "6225",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34190,
+                    "external_id": "6225",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34290,
+                    "external_id": "6225",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34387,
+                    "external_id": "6225",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34484,
+                    "external_id": "6225",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7414",
+            "prompt": "Czy w przedstawionej sytuacji masz prawo używać świateł drogowych?",
+            "prompt_variants": [
+                "Czy w przedstawionej sytuacji masz prawo używać świateł drogowych?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "**Nie**, świateł drogowych (tzw. \"długich\") można używać w ściśle określonych warunkach: **Wyłącznie od zmierzchu do świtu.** Brak oślepiania: Najważniejszym warunkiem jest to, aby nie oślepiać innych uczestników ruchu."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a/7414/video/full.3bbb30530856.mp4",
+                    "poster_path": "media/questions/a/7414/image/poster.399cafe0eb6c.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/7414/video/full.3bbb30530856.mp4",
+                    "poster_path": "media/questions/b/7414/image/poster.399cafe0eb6c.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c/7414/video/full.3bbb30530856.mp4",
+                    "poster_path": "media/questions/c/7414/image/poster.399cafe0eb6c.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d/7414/video/full.3bbb30530856.mp4",
+                    "poster_path": "media/questions/d/7414/image/poster.399cafe0eb6c.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a1/7414/video/full.3bbb30530856.mp4",
+                    "poster_path": "media/questions/a1/7414/image/poster.399cafe0eb6c.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a2/7414/video/full.3bbb30530856.mp4",
+                    "poster_path": "media/questions/a2/7414/image/poster.399cafe0eb6c.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b1/7414/video/full.3bbb30530856.mp4",
+                    "poster_path": "media/questions/b1/7414/image/poster.399cafe0eb6c.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c1/7414/video/full.3bbb30530856.mp4",
+                    "poster_path": "media/questions/c1/7414/image/poster.399cafe0eb6c.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d1/7414/video/full.3bbb30530856.mp4",
+                    "poster_path": "media/questions/d1/7414/image/poster.399cafe0eb6c.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatel drogowych",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 40514,
+                    "question_external_id": "7414",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-51-ust-3",
+                    "legal_unit_label": "art. 51 ust. 3",
+                    "legal_unit_title": "Warunki używania świateł drogowych",
+                    "legal_topic_slug": "swiatla-drogowe-i-oslepianie",
+                    "article_slug": "swiatla-drogowe-i-oslepianie",
+                    "public_note": "To pytanie sprawdza podstawowe warunki używania świateł drogowych: porę od zmierzchu do świtu, nieoświetloną drogę oraz brak ryzyka oślepienia innych uczestników."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 40514,
+                    "external_id": "7414",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40592,
+                    "external_id": "7414",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40689,
+                    "external_id": "7414",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40767,
+                    "external_id": "7414",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40971,
+                    "external_id": "7414",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41047,
+                    "external_id": "7414",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41124,
+                    "external_id": "7414",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41218,
+                    "external_id": "7414",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41296,
+                    "external_id": "7414",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7416",
+            "prompt": "Czy w tej sytuacji masz prawo używać świateł drogowych?",
+            "prompt_variants": [
+                "Czy w tej sytuacji masz prawo używać świateł drogowych?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo w czasie od zmierzchu do świtu, na nieoświetlonych drogach, zamiast świateł mijania lub łącznie z nimi, kierujacy może używać świateł drogowych. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a/7416/video/full.fea8b73de363.mp4",
+                    "poster_path": "media/questions/a/7416/image/poster.12f4349ce8e1.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/7416/video/full.fea8b73de363.mp4",
+                    "poster_path": "media/questions/b/7416/image/poster.12f4349ce8e1.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c/7416/video/full.fea8b73de363.mp4",
+                    "poster_path": "media/questions/c/7416/image/poster.12f4349ce8e1.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d/7416/video/full.fea8b73de363.mp4",
+                    "poster_path": "media/questions/d/7416/image/poster.12f4349ce8e1.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a1/7416/video/full.fea8b73de363.mp4",
+                    "poster_path": "media/questions/a1/7416/image/poster.12f4349ce8e1.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a2/7416/video/full.fea8b73de363.mp4",
+                    "poster_path": "media/questions/a2/7416/image/poster.12f4349ce8e1.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b1/7416/video/full.fea8b73de363.mp4",
+                    "poster_path": "media/questions/b1/7416/image/poster.12f4349ce8e1.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c1/7416/video/full.fea8b73de363.mp4",
+                    "poster_path": "media/questions/c1/7416/image/poster.12f4349ce8e1.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d1/7416/video/full.fea8b73de363.mp4",
+                    "poster_path": "media/questions/d1/7416/image/poster.12f4349ce8e1.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatel drogowych",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 40515,
+                    "question_external_id": "7416",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-51-ust-3",
+                    "legal_unit_label": "art. 51 ust. 3",
+                    "legal_unit_title": "Warunki używania świateł drogowych",
+                    "legal_topic_slug": "swiatla-drogowe-i-oslepianie",
+                    "article_slug": "swiatla-drogowe-i-oslepianie",
+                    "public_note": "To pytanie sprawdza podstawowe warunki używania świateł drogowych: porę od zmierzchu do świtu, nieoświetloną drogę oraz brak ryzyka oślepienia innych uczestników."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 40515,
+                    "external_id": "7416",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40593,
+                    "external_id": "7416",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40690,
+                    "external_id": "7416",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40768,
+                    "external_id": "7416",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40972,
+                    "external_id": "7416",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41048,
+                    "external_id": "7416",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41125,
+                    "external_id": "7416",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41219,
+                    "external_id": "7416",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41297,
+                    "external_id": "7416",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7469",
+            "prompt": "Czy w tej sytuacji masz prawo używać świateł drogowych?",
+            "prompt_variants": [
+                "Czy w tej sytuacji masz prawo używać świateł drogowych?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo w czasie od zmierzchu do świtu, na nieoświetlonych drogach, zamiast świateł mijania lub łącznie z nimi, kierujacy może używać świateł drogowych. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a/7469/video/full.70b126580adf.mp4",
+                    "poster_path": "media/questions/a/7469/image/poster.b2a48886c8c1.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/7469/video/full.70b126580adf.mp4",
+                    "poster_path": "media/questions/b/7469/image/poster.b2a48886c8c1.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c/7469/video/full.70b126580adf.mp4",
+                    "poster_path": "media/questions/c/7469/image/poster.b2a48886c8c1.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d/7469/video/full.70b126580adf.mp4",
+                    "poster_path": "media/questions/d/7469/image/poster.b2a48886c8c1.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a1/7469/video/full.70b126580adf.mp4",
+                    "poster_path": "media/questions/a1/7469/image/poster.b2a48886c8c1.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a2/7469/video/full.70b126580adf.mp4",
+                    "poster_path": "media/questions/a2/7469/image/poster.b2a48886c8c1.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b1/7469/video/full.70b126580adf.mp4",
+                    "poster_path": "media/questions/b1/7469/image/poster.b2a48886c8c1.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c1/7469/video/full.70b126580adf.mp4",
+                    "poster_path": "media/questions/c1/7469/image/poster.b2a48886c8c1.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d1/7469/video/full.70b126580adf.mp4",
+                    "poster_path": "media/questions/d1/7469/image/poster.b2a48886c8c1.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatel drogowych",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 40538,
+                    "question_external_id": "7469",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-51-ust-3",
+                    "legal_unit_label": "art. 51 ust. 3",
+                    "legal_unit_title": "Warunki używania świateł drogowych",
+                    "legal_topic_slug": "swiatla-drogowe-i-oslepianie",
+                    "article_slug": "swiatla-drogowe-i-oslepianie",
+                    "public_note": "To pytanie sprawdza podstawowe warunki używania świateł drogowych: porę od zmierzchu do świtu, nieoświetloną drogę oraz brak ryzyka oślepienia innych uczestników."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 40538,
+                    "external_id": "7469",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40631,
+                    "external_id": "7469",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40716,
+                    "external_id": "7469",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40794,
+                    "external_id": "7469",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40994,
+                    "external_id": "7469",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41070,
+                    "external_id": "7469",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41160,
+                    "external_id": "7469",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41245,
+                    "external_id": "7469",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41323,
+                    "external_id": "7469",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10406",
+            "prompt": "Czy wolno Ci w tej sytuacji używać świateł drogowych?",
+            "prompt_variants": [
+                "Czy wolno Ci w tej sytuacji używać świateł drogowych?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo w tej sytuacji przepisy albo okolicznosci na to nie pozwalaja. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/10406/video/full.364c25671590.mp4",
+                    "poster_path": "media/questions/b/10406/image/poster.bed4122d4b63.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatel drogowych",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 44147,
+                    "question_external_id": "10406",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-51-ust-3",
+                    "legal_unit_label": "art. 51 ust. 3",
+                    "legal_unit_title": "Warunki używania świateł drogowych",
+                    "legal_topic_slug": "swiatla-drogowe-i-oslepianie",
+                    "article_slug": "swiatla-drogowe-i-oslepianie",
+                    "public_note": "To pytanie sprawdza podstawowe warunki używania świateł drogowych: porę od zmierzchu do świtu, nieoświetloną drogę oraz brak ryzyka oślepienia innych uczestników."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 44147,
+                    "external_id": "10406",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10779",
+            "prompt": "Czy w widocznej sytuacji kierujący może włączyć światła drogowe?",
+            "prompt_variants": [
+                "Czy w widocznej sytuacji kierujący może włączyć światła drogowe?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo kierujacy może używać świateł drogowych w czasie od zmierzchu do świtu, na nieoświetlonych drogach, o ile nie oślepi innych kierujacych albo pieszych. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/10779/image/full.dfc41a97b0df.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/10779/image/thumb.c941532a2f9e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/10779/image/full.dfc41a97b0df.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/10779/image/thumb.c941532a2f9e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/10779/image/full.dfc41a97b0df.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/10779/image/thumb.c941532a2f9e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/10779/image/full.dfc41a97b0df.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/10779/image/thumb.c941532a2f9e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/am/10779/image/full.dfc41a97b0df.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/am/10779/image/thumb.c941532a2f9e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/10779/image/full.dfc41a97b0df.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/10779/image/thumb.c941532a2f9e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/10779/image/full.dfc41a97b0df.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/10779/image/thumb.c941532a2f9e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/10779/image/full.dfc41a97b0df.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/10779/image/thumb.c941532a2f9e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/10779/image/full.dfc41a97b0df.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/10779/image/thumb.c941532a2f9e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/10779/image/full.dfc41a97b0df.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/10779/image/thumb.c941532a2f9e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/10779/image/full.dfc41a97b0df.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/10779/image/thumb.c941532a2f9e.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatla drogowe",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 44228,
+                    "question_external_id": "10779",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-51-ust-3",
+                    "legal_unit_label": "art. 51 ust. 3",
+                    "legal_unit_title": "Warunki używania świateł drogowych",
+                    "legal_topic_slug": "swiatla-drogowe-i-oslepianie",
+                    "article_slug": "swiatla-drogowe-i-oslepianie",
+                    "public_note": "To pytanie sprawdza podstawowe warunki używania świateł drogowych: porę od zmierzchu do świtu, nieoświetloną drogę oraz brak ryzyka oślepienia innych uczestników."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 44228,
+                    "external_id": "10779",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44262,
+                    "external_id": "10779",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44294,
+                    "external_id": "10779",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44331,
+                    "external_id": "10779",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44364,
+                    "external_id": "10779",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44398,
+                    "external_id": "10779",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44430,
+                    "external_id": "10779",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44463,
+                    "external_id": "10779",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44496,
+                    "external_id": "10779",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44529,
+                    "external_id": "10779",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44546,
+                    "external_id": "10779",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10980",
+            "prompt": "Czy na tym odcinku drogi, kierując czterokołowcem lekkim, możesz używać świateł drogowych?",
+            "prompt_variants": [
+                "Czy na tym odcinku drogi, kierując czterokołowcem lekkim, możesz używać świateł drogowych?"
+            ],
+            "categories": [
+                "AM"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo w tej sytuacji przepisy albo okolicznosci na to nie pozwalaja. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/am/10980/video/full.be3fbc35d9e8.mp4",
+                    "poster_path": "media/questions/am/10980/image/poster.0162ff923add.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatel drogowych",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 45193,
+                    "question_external_id": "10980",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-51-ust-3",
+                    "legal_unit_label": "art. 51 ust. 3",
+                    "legal_unit_title": "Warunki używania świateł drogowych",
+                    "legal_topic_slug": "swiatla-drogowe-i-oslepianie",
+                    "article_slug": "swiatla-drogowe-i-oslepianie",
+                    "public_note": "To pytanie sprawdza podstawowe warunki używania świateł drogowych: porę od zmierzchu do świtu, nieoświetloną drogę oraz brak ryzyka oślepienia innych uczestników."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 45193,
+                    "external_id": "10980",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "11027",
+            "prompt": "Czy w tych warunkach drogowych, kierujący motorowerem może używać świateł drogowych?",
+            "prompt_variants": [
+                "Czy w tych warunkach drogowych, kierujący motorowerem może używać świateł drogowych?"
+            ],
+            "categories": [
+                "AM"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo w tej sytuacji przepisy albo okolicznosci na to nie pozwalaja. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/am/11027/video/full.402830e5ef96.mp4",
+                    "poster_path": "media/questions/am/11027/image/poster.2488803b1c10.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatel drogowych",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 45198,
+                    "question_external_id": "11027",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-51-ust-3",
+                    "legal_unit_label": "art. 51 ust. 3",
+                    "legal_unit_title": "Warunki używania świateł drogowych",
+                    "legal_topic_slug": "swiatla-drogowe-i-oslepianie",
+                    "article_slug": "swiatla-drogowe-i-oslepianie",
+                    "public_note": "To pytanie sprawdza podstawowe warunki używania świateł drogowych: porę od zmierzchu do świtu, nieoświetloną drogę oraz brak ryzyka oślepienia innych uczestników."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 45198,
+                    "external_id": "11027",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        }
+    ]
+}

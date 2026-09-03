@@ -1,0 +1,1036 @@
+{
+    "generated_at": "2026-06-21T22:52:34+02:00",
+    "candidate": {
+        "slug": "opony-bieznik-i-cisnienie",
+        "title": "Opony, bieżnik i ciśnienie",
+        "description": "Węższy temat artykułu wykryty na podstawie treści pytań.",
+        "level": "focused",
+        "status": "candidate",
+        "rule_version": "2026-06-19-prompt-v2",
+        "existing_article_slug": "opony-bieznik-i-cisnienie"
+    },
+    "workflow": {
+        "status": "published",
+        "next_action": "Przejrzyj relacje pytan i zdecyduj, czy artykul wymaga rozbudowy lub ponownego review.",
+        "public_relations_are_verified_only": true
+    },
+    "article": {
+        "slug": "opony-bieznik-i-cisnienie",
+        "title": "Opony: minimalny bieżnik, ciśnienie i zgodność na osi",
+        "status": "published",
+        "published_at": "2026-06-21",
+        "last_reviewed_at": "2026-06-21",
+        "legal_units": [
+            {
+                "slug": "par-11-ust-5",
+                "label": "§ 11 ust. 5",
+                "title": "Ciśnienie w ogumieniu zgodne z zaleceniami",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "par-11-ust-7-pkt-1",
+                "label": "§ 11 ust. 7 pkt 1",
+                "title": "Jednakowa konstrukcja opon na jednej osi",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "par-11-ust-7-pkt-4",
+                "label": "§ 11 ust. 7 pkt 4",
+                "title": "Graniczne zużycie bieżnika i minimum 1,6 mm",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            }
+        ]
+    },
+    "summary": {
+        "canonical_questions": 11,
+        "question_rows": 23,
+        "categories": [
+            "A",
+            "A1",
+            "A2",
+            "AM",
+            "B",
+            "B1",
+            "C",
+            "C1",
+            "T"
+        ],
+        "canonical_questions_with_verified_reference": 7,
+        "prompt_conflicts": [],
+        "answer_conflicts": [],
+        "correct_answer_conflicts": []
+    },
+    "questions": [
+        {
+            "external_id": "3784",
+            "prompt": "Jaka jest dopuszczalna minimalna głębokość bieżnika w oponie niewyposażonej we wskaźnik granicznego jej zużycia?",
+            "prompt_variants": [
+                "Jaka jest dopuszczalna minimalna głębokość bieżnika w oponie niewyposażonej we wskaźnik granicznego jej zużycia?"
+            ],
+            "categories": [
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "mechanical_aspects_of_safety",
+                    "name": "Aspekty mechaniczne zwiazane z zachowaniem bezpieczenstwa na drodze"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "1,6 milimetra.",
+                    "option_b": "2,6 milimetra.",
+                    "option_c": "3 milimetry.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "1,6 milimetra."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo dopuszczalną minimalną głębokość bieżnika w oponie określa. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:opon|bieznik",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 27615,
+                    "question_external_id": "3784",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "par-11-ust-7-pkt-4",
+                    "legal_unit_label": "§ 11 ust. 7 pkt 4",
+                    "legal_unit_title": "Graniczne zużycie bieżnika i minimum 1,6 mm",
+                    "legal_topic_slug": "opony-bieznik-i-cisnienie",
+                    "article_slug": "opony-bieznik-i-cisnienie",
+                    "public_note": "To pytanie dotyczy zużycia bieżnika. § 11 ust. 7 pkt 4 zakazuje jazdy po osiągnięciu wskaźnika granicznego, a bez wskaźnika wymaga co najmniej 1,6 mm głębokości rzeźby."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 27615,
+                    "external_id": "3784",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 28095,
+                    "external_id": "3784",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "4481",
+            "prompt": "Który z wymienionych skutków może zostać wywołany przez kontynuowanie jazdy przy świecącej się na czerwono lampce kontrolnej ciśnienia oleju silnikowego?",
+            "prompt_variants": [
+                "Który z wymienionych skutków może zostać wywołany przez kontynuowanie jazdy przy świecącej się na czerwono lampce kontrolnej ciśnienia oleju silnikowego?"
+            ],
+            "categories": [
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "mechanical_aspects_of_safety",
+                    "name": "Aspekty mechaniczne zwiazane z zachowaniem bezpieczenstwa na drodze"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Poważne uszkodzenie silnika.",
+                    "option_b": "Uszkodzenie hamulców.",
+                    "option_c": "Uszkodzenie mechanizmów przeniesienia napędu.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Poważne uszkodzenie silnika."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo kontrolka wyświetlająca piktogram braku ciśnienia oleju silnikowego lub jego niskiego stanu - wskazuje na brak oleju silnikowego lub niewłaściwie. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/4481/image/full.bb153eeb5818.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/4481/image/thumb.3ece2d7ed85b.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/4481/image/full.bb153eeb5818.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/4481/image/thumb.3ece2d7ed85b.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:cisnieni",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 30008,
+                    "external_id": "4481",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 30322,
+                    "external_id": "4481",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "4593",
+            "prompt": "Które z wymienionych działań należy podjąć w pierwszej kolejności, gdy w czasie jazdy zaświeci się na czerwono lampka kontrolna ciśnienia oleju silnikowego?",
+            "prompt_variants": [
+                "Które z wymienionych działań należy podjąć w pierwszej kolejności, gdy w czasie jazdy zaświeci się na czerwono lampka kontrolna ciśnienia oleju silnikowego?"
+            ],
+            "categories": [
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "mechanical_aspects_of_safety",
+                    "name": "Aspekty mechaniczne zwiazane z zachowaniem bezpieczenstwa na drodze"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Kontynuować jazdę ze zmniejszoną prędkością.",
+                    "option_b": "Zwiększyć obroty silnika.",
+                    "option_c": "Zatrzymać pojazd i wyłączyć silnik.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Zatrzymać pojazd i wyłączyć silnik."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo kontrolka wyświetlająca piktogram braku ciśnienia oleju silnikowego lub jego niskiego stanu - wskazuje na brak oleju silnikowego lub niewłaściwie. W praktyce trzeba ocenic sytuacje zgodnie z zasadami ruchu drogowego, a nie tylko po pozorach. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:cisnieni",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 30021,
+                    "external_id": "4593",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 30331,
+                    "external_id": "4593",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6438",
+            "prompt": "Jakie mogą być konsekwencje użytkowania opon z nadmiernie zużytym bieżnikiem, podczas hamowania na mokrej nawierzchni?",
+            "prompt_variants": [
+                "Jakie mogą być konsekwencje użytkowania opon z nadmiernie zużytym bieżnikiem, podczas hamowania na mokrej nawierzchni?"
+            ],
+            "categories": [
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "mechanical_aspects_of_safety",
+                    "name": "Aspekty mechaniczne zwiazane z zachowaniem bezpieczenstwa na drodze"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Wzrost siły tarcia.",
+                    "option_b": "Skrócenie drogi hamowania.",
+                    "option_c": "Zmniejszenie siły tarcia i wydłużenie drogi hamowania.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Zmniejszenie siły tarcia i wydłużenie drogi hamowania."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo opona ze zużytym bieżnikiem podczas hamowania na mokrej nawierzchni to mniejsze siły tarcia i wydłużenie drogi hamowania oraz zwiększenie ryzyka poślizgu. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6438/image/full.90edc139b795.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6438/image/thumb.20a739d559d9.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/6438/image/full.90edc139b795.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/6438/image/thumb.20a739d559d9.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:opon|bieznik",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 35391,
+                    "question_external_id": "6438",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "par-11-ust-7-pkt-4",
+                    "legal_unit_label": "§ 11 ust. 7 pkt 4",
+                    "legal_unit_title": "Graniczne zużycie bieżnika i minimum 1,6 mm",
+                    "legal_topic_slug": "opony-bieznik-i-cisnienie",
+                    "article_slug": "opony-bieznik-i-cisnienie",
+                    "public_note": "To pytanie dotyczy zużycia bieżnika. § 11 ust. 7 pkt 4 zakazuje jazdy po osiągnięciu wskaźnika granicznego, a bez wskaźnika wymaga co najmniej 1,6 mm głębokości rzeźby."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 35391,
+                    "external_id": "6438",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35420,
+                    "external_id": "6438",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6624",
+            "prompt": "Jak postąpisz, jeżeli podczas jazdy motocyklem zaświeci się lampka kontrolna ciśnienia oleju?",
+            "prompt_variants": [
+                "Jak postąpisz, jeżeli podczas jazdy motocyklem zaświeci się lampka kontrolna ciśnienia oleju?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2"
+            ],
+            "question_topics": [
+                {
+                    "key": "mechanical_aspects_of_safety",
+                    "name": "Aspekty mechaniczne zwiazane z zachowaniem bezpieczenstwa na drodze"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Zatrzymasz motocykl w bezpiecznym miejscu i wyłączysz silnik.",
+                    "option_b": "Zatrzymasz motocykl i pozostawisz pracujący silnik na biegu jałowym.",
+                    "option_c": "Będziesz kontynuować jazdę nie przeciążając silnika.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Zatrzymasz motocykl w bezpiecznym miejscu i wyłączysz silnik."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/6624/image/full.fcd0d88ef5c9.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/6624/image/thumb.6624a0c5ada6.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/6624/image/full.fcd0d88ef5c9.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/6624/image/thumb.6624a0c5ada6.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/6624/image/full.fcd0d88ef5c9.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/6624/image/thumb.6624a0c5ada6.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:cisnieni",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 35815,
+                    "external_id": "6624",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35861,
+                    "external_id": "6624",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35907,
+                    "external_id": "6624",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6626",
+            "prompt": "Co może być skutkiem zbyt niskiego ciśnienia powietrza w oponach?",
+            "prompt_variants": [
+                "Co może być skutkiem zbyt niskiego ciśnienia powietrza w oponach?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2"
+            ],
+            "question_topics": [
+                {
+                    "key": "mechanical_aspects_of_safety",
+                    "name": "Aspekty mechaniczne zwiazane z zachowaniem bezpieczenstwa na drodze"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Poprawa prowadzenia pojazdu podczas pokonywania zakrętów.",
+                    "option_b": "Zwiększenie żywotności opony.",
+                    "option_c": "Pogorszenie przyczepności opony do nawierzchni drogi.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Pogorszenie przyczepności opony do nawierzchni drogi."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo pogorszenie przyczepności, wydłużenie drogi hamowania i spadek sterowności, a w skrajnych przypadkach można uszkodzić oponę lub spowodować utratę panowania nad pojazdem. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/6626/image/full.3f4b2c501950.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/6626/image/thumb.7ecfdbf89e6d.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/6626/image/full.3f4b2c501950.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/6626/image/thumb.7ecfdbf89e6d.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/6626/image/full.3f4b2c501950.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/6626/image/thumb.7ecfdbf89e6d.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:opon|cisnieni",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 35817,
+                    "question_external_id": "6626",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "par-11-ust-5",
+                    "legal_unit_label": "§ 11 ust. 5",
+                    "legal_unit_title": "Ciśnienie w ogumieniu zgodne z zaleceniami",
+                    "legal_topic_slug": "opony-bieznik-i-cisnienie",
+                    "article_slug": "opony-bieznik-i-cisnienie",
+                    "public_note": "To pytanie sprawdza znaczenie prawidłowego ciśnienia w ogumieniu. § 11 ust. 5 wymaga wartości zalecanej przez producenta dla danego obciążenia; odchylenie pogarsza pracę opony."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 35817,
+                    "external_id": "6626",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35863,
+                    "external_id": "6626",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35909,
+                    "external_id": "6626",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6629",
+            "prompt": "Co może być skutkiem zbyt niskiego ciśnienia powietrza w oponach?",
+            "prompt_variants": [
+                "Co może być skutkiem zbyt niskiego ciśnienia powietrza w oponach?"
+            ],
+            "categories": [
+                "AM"
+            ],
+            "question_topics": [
+                {
+                    "key": "mechanical_aspects_of_safety",
+                    "name": "Aspekty mechaniczne zwiazane z zachowaniem bezpieczenstwa na drodze"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Poprawa prowadzenia pojazdu podczas pokonywania zakrętów.",
+                    "option_b": "Zwiększenie żywotności opony.",
+                    "option_c": "Pogorszenie przyczepności opony do nawierzchni drogi.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Pogorszenie przyczepności opony do nawierzchni drogi."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo pogorszenie przyczepności, wydłużenie drogi hamowania i spadek sterowności, a w skrajnych przypadkach można uszkodzić oponę lub spowodować utratę panowania nad pojazdem. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/am/6629/image/full.0806d7cb629a.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/am/6629/image/thumb.d0df0c28c997.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:opon|cisnieni",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 35942,
+                    "question_external_id": "6629",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "par-11-ust-5",
+                    "legal_unit_label": "§ 11 ust. 5",
+                    "legal_unit_title": "Ciśnienie w ogumieniu zgodne z zaleceniami",
+                    "legal_topic_slug": "opony-bieznik-i-cisnienie",
+                    "article_slug": "opony-bieznik-i-cisnienie",
+                    "public_note": "To pytanie sprawdza znaczenie prawidłowego ciśnienia w ogumieniu. § 11 ust. 5 wymaga wartości zalecanej przez producenta dla danego obciążenia; odchylenie pogarsza pracę opony."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 35942,
+                    "external_id": "6629",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7553",
+            "prompt": "Co może być następstwem zbyt wysokiego ciśnienia w oponach motocykla?",
+            "prompt_variants": [
+                "Co może być następstwem zbyt wysokiego ciśnienia w oponach motocykla?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2"
+            ],
+            "question_topics": [
+                {
+                    "key": "mechanical_aspects_of_safety",
+                    "name": "Aspekty mechaniczne zwiazane z zachowaniem bezpieczenstwa na drodze"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Zmniejszona skuteczność hamowania.",
+                    "option_b": "Zwiększona skuteczność hamowania.",
+                    "option_c": "Istotne zmniejszenie oporu powietrza.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Zmniejszona skuteczność hamowania."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo zbyt wysokie ciśnienie w oponach motocykla to pogorszenie przyczepności, a tym samym zmniejszona skuteczność hamowania, ponadto wysokie ciśnienie. W praktyce trzeba ocenic sytuacje zgodnie z zasadami ruchu drogowego, a nie tylko po pozorach. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:opon|cisnieni",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 41733,
+                    "question_external_id": "7553",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "par-11-ust-5",
+                    "legal_unit_label": "§ 11 ust. 5",
+                    "legal_unit_title": "Ciśnienie w ogumieniu zgodne z zaleceniami",
+                    "legal_topic_slug": "opony-bieznik-i-cisnienie",
+                    "article_slug": "opony-bieznik-i-cisnienie",
+                    "public_note": "To pytanie sprawdza znaczenie prawidłowego ciśnienia w ogumieniu. § 11 ust. 5 wymaga wartości zalecanej przez producenta dla danego obciążenia; odchylenie pogarsza pracę opony."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 41733,
+                    "external_id": "7553",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41804,
+                    "external_id": "7553",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41842,
+                    "external_id": "7553",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7603",
+            "prompt": "Który z podanych wymogów powinny spełniać opony przyczepy rolniczej?",
+            "prompt_variants": [
+                "Który z podanych wymogów powinny spełniać opony przyczepy rolniczej?"
+            ],
+            "categories": [
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "safety_equipment_and_restraints",
+                    "name": "Wyposazenie pojazdu zwiazane z bezpieczenstwem, korzystanie z pasow, zaglowkow i fotelikow"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Głębokość rzeźby ich bieżnika powinna wynosić co najmniej 3 mm.",
+                    "option_b": "Znajdujące się na kołach jednej osi pojazdu opony powinny mieć taką samą konstrukcję, w tym rzeźbę bieżnika.",
+                    "option_c": "Powinny mieć bieżnik ułatwiający wyłącznie jazdę w terenie.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Znajdujące się na kołach jednej osi pojazdu opony powinny mieć taką samą konstrukcję, w tym rzeźbę bieżnika."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo opony przyczepy rolniczej muszą być dostosowane do jej konstrukcji, posiadać odpowiednią nośność, a przede wszystkim na jednej osi przyczepy muszą. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/7603/image/full.c818b20f4ecb.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/7603/image/thumb.761e80fbe253.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:opon",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 41691,
+                    "question_external_id": "7603",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "par-11-ust-7-pkt-1",
+                    "legal_unit_label": "§ 11 ust. 7 pkt 1",
+                    "legal_unit_title": "Jednakowa konstrukcja opon na jednej osi",
+                    "legal_topic_slug": "opony-bieznik-i-cisnienie",
+                    "article_slug": "opony-bieznik-i-cisnienie",
+                    "public_note": "To pytanie dotyczy opon na jednej osi przyczepy rolniczej. § 11 ust. 7 pkt 1 zabrania stosowania na tej samej osi opon o różnej konstrukcji, w tym rzeźbie bieżnika."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 41691,
+                    "external_id": "7603",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "11492",
+            "prompt": "Ile wynosi minimalna dozwolona głębokość rzeźby bieżnika opony samochodu ciężarowego?",
+            "prompt_variants": [
+                "Ile wynosi minimalna dozwolona głębokość rzeźby bieżnika opony samochodu ciężarowego?"
+            ],
+            "categories": [
+                "C",
+                "C1"
+            ],
+            "question_topics": [
+                {
+                    "key": "mechanical_aspects_of_safety",
+                    "name": "Aspekty mechaniczne zwiazane z zachowaniem bezpieczenstwa na drodze"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "3 mm.",
+                    "option_b": "1,6 mm.",
+                    "option_c": "2,6 mm.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "1,6 mm."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. W praktyce trzeba ocenic sytuacje zgodnie z zasadami ruchu drogowego, a nie tylko po pozorach. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:opon|bieznik",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 45988,
+                    "question_external_id": "11492",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "par-11-ust-7-pkt-4",
+                    "legal_unit_label": "§ 11 ust. 7 pkt 4",
+                    "legal_unit_title": "Graniczne zużycie bieżnika i minimum 1,6 mm",
+                    "legal_topic_slug": "opony-bieznik-i-cisnienie",
+                    "article_slug": "opony-bieznik-i-cisnienie",
+                    "public_note": "To pytanie dotyczy zużycia bieżnika. § 11 ust. 7 pkt 4 zakazuje jazdy po osiągnięciu wskaźnika granicznego, a bez wskaźnika wymaga co najmniej 1,6 mm głębokości rzeźby."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 45988,
+                    "external_id": "11492",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46173,
+                    "external_id": "11492",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "11494",
+            "prompt": "Które z wymienionych działań należy podjąć, gdy w czasie jazdy zaświeci się na czerwono lampka kontrolna ciśnienia oleju w silniku?",
+            "prompt_variants": [
+                "Które z wymienionych działań należy podjąć, gdy w czasie jazdy zaświeci się na czerwono lampka kontrolna ciśnienia oleju w silniku?"
+            ],
+            "categories": [
+                "C",
+                "C1"
+            ],
+            "question_topics": [
+                {
+                    "key": "mechanical_aspects_of_safety",
+                    "name": "Aspekty mechaniczne zwiazane z zachowaniem bezpieczenstwa na drodze"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Zatrzymać pojazd i wyłączyć silnik.",
+                    "option_b": "Zwolnić.",
+                    "option_c": "Zwiększyć obroty silnika.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Zatrzymać pojazd i wyłączyć silnik."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo trzeba niezwłocznie zjechać w bezpieczne miejsce, wyłączyć silnik, bo dalsza jazda grozi uszkodzeniem silnika. W praktyce trzeba ocenic sytuacje zgodnie z zasadami ruchu drogowego, a nie tylko po pozorach. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:cisnieni",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 45990,
+                    "external_id": "11494",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46175,
+                    "external_id": "11494",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        }
+    ]
+}

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" role="img" aria-labelledby="title desc">
+  <title id="title">Znak A-7 Ustap pierwszenstwa</title>
+  <desc id="desc">Bialy trojkat z czerwona obwodka symbolizujacy znak ustap pierwszenstwa.</desc>
+  <rect width="320" height="320" fill="#f8fafc" />
+  <polygon points="160,40 290,270 30,270" fill="#d92d20" />
+  <polygon points="160,78 258,248 62,248" fill="#ffffff" />
+  <polygon points="160,110 228,228 92,228" fill="#f1f5f9" />
+  <text x="160" y="292" font-family="Arial, sans-serif" font-size="24" font-weight="700" text-anchor="middle" fill="#0f172a">A-7</text>
+</svg>

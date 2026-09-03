@@ -1,0 +1,176 @@
+{
+  "generated_at": "2026-04-15T20:00:00+02:00",
+  "workflow": "pj360_c_manual_rebalance_wave6",
+  "category": "C",
+  "reason": "pj360_c_manual_rebalance_wave6",
+  "overrides": [
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "1121",
+      "question_topic_key": "intersections_with_priority_signs",
+      "reason": "pj360_c_manual_rebalance_wave6",
+      "metadata": {
+        "decision_basis": "delta_rebalance",
+        "source_topic_key": "joining_traffic_and_equal_intersections",
+        "target_topic_key": "intersections_with_priority_signs"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "1829",
+      "question_topic_key": "intersections_with_priority_signs",
+      "reason": "pj360_c_manual_rebalance_wave6",
+      "metadata": {
+        "decision_basis": "delta_rebalance",
+        "source_topic_key": "joining_traffic_and_equal_intersections",
+        "target_topic_key": "intersections_with_priority_signs"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "2922",
+      "question_topic_key": "intersections_with_priority_signs",
+      "reason": "pj360_c_manual_rebalance_wave6",
+      "metadata": {
+        "decision_basis": "delta_rebalance",
+        "source_topic_key": "joining_traffic_and_equal_intersections",
+        "target_topic_key": "intersections_with_priority_signs"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "3466",
+      "question_topic_key": "intersections_with_priority_signs",
+      "reason": "pj360_c_manual_rebalance_wave6",
+      "metadata": {
+        "decision_basis": "delta_rebalance",
+        "source_topic_key": "joining_traffic_and_equal_intersections",
+        "target_topic_key": "intersections_with_priority_signs"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "3547",
+      "question_topic_key": "intersections_with_priority_signs",
+      "reason": "pj360_c_manual_rebalance_wave6",
+      "metadata": {
+        "decision_basis": "delta_rebalance",
+        "source_topic_key": "joining_traffic_and_equal_intersections",
+        "target_topic_key": "intersections_with_priority_signs"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "3549",
+      "question_topic_key": "intersections_with_priority_signs",
+      "reason": "pj360_c_manual_rebalance_wave6",
+      "metadata": {
+        "decision_basis": "delta_rebalance",
+        "source_topic_key": "joining_traffic_and_equal_intersections",
+        "target_topic_key": "intersections_with_priority_signs"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "3828",
+      "question_topic_key": "intersections_with_priority_signs",
+      "reason": "pj360_c_manual_rebalance_wave6",
+      "metadata": {
+        "decision_basis": "delta_rebalance",
+        "source_topic_key": "joining_traffic_and_equal_intersections",
+        "target_topic_key": "intersections_with_priority_signs"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "4474",
+      "question_topic_key": "intersections_with_priority_signs",
+      "reason": "pj360_c_manual_rebalance_wave6",
+      "metadata": {
+        "decision_basis": "delta_rebalance",
+        "source_topic_key": "joining_traffic_and_equal_intersections",
+        "target_topic_key": "intersections_with_priority_signs"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "1172",
+      "question_topic_key": "intersections_with_priority_signs",
+      "reason": "pj360_c_manual_rebalance_wave6",
+      "metadata": {
+        "decision_basis": "delta_rebalance",
+        "source_topic_key": "intersections_with_traffic_lights",
+        "target_topic_key": "intersections_with_priority_signs"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "99",
+      "question_topic_key": "controlled_crossings_and_public_transport_stops",
+      "reason": "pj360_c_manual_rebalance_wave6",
+      "metadata": {
+        "decision_basis": "delta_rebalance",
+        "source_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+        "target_topic_key": "controlled_crossings_and_public_transport_stops"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "2319",
+      "question_topic_key": "special_caution_exiting_and_securing_vehicle",
+      "reason": "pj360_c_manual_rebalance_wave6",
+      "metadata": {
+        "decision_basis": "delta_rebalance",
+        "source_topic_key": "overtaking",
+        "target_topic_key": "special_caution_exiting_and_securing_vehicle"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "2325",
+      "question_topic_key": "special_caution_exiting_and_securing_vehicle",
+      "reason": "pj360_c_manual_rebalance_wave6",
+      "metadata": {
+        "decision_basis": "delta_rebalance",
+        "source_topic_key": "overtaking",
+        "target_topic_key": "special_caution_exiting_and_securing_vehicle"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "2326",
+      "question_topic_key": "special_caution_exiting_and_securing_vehicle",
+      "reason": "pj360_c_manual_rebalance_wave6",
+      "metadata": {
+        "decision_basis": "delta_rebalance",
+        "source_topic_key": "overtaking",
+        "target_topic_key": "special_caution_exiting_and_securing_vehicle"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "1691",
+      "question_topic_key": "lane_change_and_turning",
+      "reason": "pj360_c_manual_rebalance_wave6",
+      "metadata": {
+        "decision_basis": "delta_rebalance",
+        "source_topic_key": "traffic_lights_and_controller_signals",
+        "target_topic_key": "lane_change_and_turning"
+      }
+    }
+  ]
+}

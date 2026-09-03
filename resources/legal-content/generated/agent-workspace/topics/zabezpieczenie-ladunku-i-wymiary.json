@@ -1,0 +1,2543 @@
+{
+    "generated_at": "2026-06-21T11:11:08+02:00",
+    "candidate": {
+        "slug": "zabezpieczenie-ladunku-i-wymiary",
+        "title": "Zabezpieczenie ładunku, jego wymiary i oznakowanie",
+        "description": "Węższy temat artykułu wykryty na podstawie treści pytań.",
+        "level": "focused",
+        "status": "candidate",
+        "rule_version": "2026-06-19-prompt-v2",
+        "existing_article_slug": "zabezpieczenie-ladunku-i-wymiary"
+    },
+    "workflow": {
+        "status": "published",
+        "next_action": "Przejrzyj relacje pytan i zdecyduj, czy artykul wymaga rozbudowy lub ponownego review.",
+        "public_relations_are_verified_only": true
+    },
+    "article": {
+        "slug": "zabezpieczenie-ladunku-i-wymiary",
+        "title": "Zabezpieczenie ładunku: mocowanie, wymiary i oznakowanie",
+        "status": "published",
+        "published_at": "2026-06-21",
+        "last_reviewed_at": "2026-06-21",
+        "legal_units": [
+            {
+                "slug": "art-61-ust-1",
+                "label": "art. 61 ust. 1",
+                "title": "Zakaz przekraczania dopuszczalnej masy i ładowności",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-61-ust-2-pkt-2",
+                "label": "art. 61 ust. 2 pkt 2",
+                "title": "Stateczność i kierowanie pojazdem z ładunkiem",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-61-ust-2-pkt-4",
+                "label": "art. 61 ust. 2 pkt 4",
+                "title": "Widoczność, światła i tablice nie mogą być zasłonięte",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-61-ust-3",
+                "label": "art. 61 ust. 3",
+                "title": "Zabezpieczenie ładunku przed zmianą położenia",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-61-ust-4",
+                "label": "art. 61 ust. 4",
+                "title": "Zabezpieczenie urządzeń mocujących",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-61-ust-5",
+                "label": "art. 61 ust. 5",
+                "title": "Przewóz ładunku sypkiego",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-61-ust-6-pkt-2",
+                "label": "art. 61 ust. 6 pkt 2",
+                "title": "Maksymalne wystawanie ładunku z tyłu",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-61-ust-6-pkt-3",
+                "label": "art. 61 ust. 6 pkt 3",
+                "title": "Maksymalne wystawanie ładunku z przodu",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-61-ust-7",
+                "label": "art. 61 ust. 7",
+                "title": "Drewno długie na przyczepie kłonicowej",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-61-ust-9-pkt-3",
+                "label": "art. 61 ust. 9 pkt 3",
+                "title": "Oznakowanie ładunku wystającego z tyłu",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-61-ust-9-pkt-4",
+                "label": "art. 61 ust. 9 pkt 4",
+                "title": "Czerwona chorągiewka przy samochodzie osobowym",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            }
+        ]
+    },
+    "summary": {
+        "canonical_questions": 28,
+        "question_rows": 44,
+        "categories": [
+            "A",
+            "A1",
+            "A2",
+            "AM",
+            "B",
+            "B1",
+            "C",
+            "C1",
+            "T"
+        ],
+        "canonical_questions_with_verified_reference": 23,
+        "prompt_conflicts": [],
+        "answer_conflicts": [],
+        "correct_answer_conflicts": []
+    },
+    "questions": [
+        {
+            "external_id": "1877",
+            "prompt": "W jaki sposób wolno Ci przewozić ładunek w przyczepie ciągniętej przez samochód osobowy?",
+            "prompt_variants": [
+                "W jaki sposób wolno Ci przewozić ładunek w przyczepie ciągniętej przez samochód osobowy?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Ładunek może zasłaniać niektóre światła przyczepy.",
+                    "option_b": "Ładunek nie może naruszać stateczności pojazdu.",
+                    "option_c": "Ładunek nie musi być zabezpieczony przed zmianą położenia.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Ładunek nie może naruszać stateczności pojazdu."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo ładunek na pojeździe umieszcza się w taki sposób, aby nie naruszał stateczności pojazdu. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunek",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 21712,
+                    "question_external_id": "1877",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-2-pkt-2",
+                    "legal_unit_label": "art. 61 ust. 2 pkt 2",
+                    "legal_unit_title": "Stateczność i kierowanie pojazdem z ładunkiem",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie dotyczy rozmieszczenia ładunku w sposób zachowujący stateczność i możliwość kierowania pojazdem. Taki obowiązek wynika wprost z art. 61 ust. 2 pkt 2."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 21712,
+                    "external_id": "1877",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "1878",
+            "prompt": "W jaki sposób przewieziesz ładunek w przyczepie ciągniętej przez samochód osobowy?",
+            "prompt_variants": [
+                "W jaki sposób przewieziesz ładunek w przyczepie ciągniętej przez samochód osobowy?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Zabezpieczę go przed przemieszczaniem.",
+                    "option_b": "Umieszczę ładunek luźno na przyczepie.",
+                    "option_c": "Nie zabezpieczę ładunku przed przemieszczaniem, jeżeli będę jechał wolno.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Zabezpieczę go przed przemieszczaniem."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo ładunek umieszczony na pojeździe powinien być zabezpieczony przed zmianą położenia, przed przemieszczeniem. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunek",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 21713,
+                    "question_external_id": "1878",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-3",
+                    "legal_unit_label": "art. 61 ust. 3",
+                    "legal_unit_title": "Zabezpieczenie ładunku przed zmianą położenia",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie sprawdza obowiązek zabezpieczenia ładunku przed zmianą położenia podczas jazdy. Art. 61 ust. 3 wymaga takiego mocowania niezależnie od rodzaju pojazdu."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 21713,
+                    "external_id": "1878",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "1879",
+            "prompt": "Jak przewieziesz ładunek sypki w przyczepie ciągniętej przez samochód osobowy?",
+            "prompt_variants": [
+                "Jak przewieziesz ładunek sypki w przyczepie ciągniętej przez samochód osobowy?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Niezasłonięty - umieszczony poniżej wysokości burt.",
+                    "option_b": "Nie przekraczajac prędkości 30 km/h.",
+                    "option_c": "Zasłonięty w szczelnej skrzyni ładunkowej.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Zasłonięty w szczelnej skrzyni ładunkowej."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo ładunek sypki może być umieszczony tylko w szczelnej skrzyni ładunkowej, zabezpieczonej dodatkowo odpowiednimi zasłonami uniemożliwiającymi. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunek",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 21714,
+                    "question_external_id": "1879",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-5",
+                    "legal_unit_label": "art. 61 ust. 5",
+                    "legal_unit_title": "Przewóz ładunku sypkiego",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie sprawdza szczególną zasadę przewozu materiału sypkiego. Art. 61 ust. 5 wymaga szczelnej skrzyni ładunkowej i odpowiednich zasłon."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 21714,
+                    "external_id": "1879",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "1880",
+            "prompt": "Jak powinieneś zabezpieczyć urządzenie, którym zamocowałeś ładunek w przyczepie ciągniętej przez samochód osobowy?",
+            "prompt_variants": [
+                "Jak powinieneś zabezpieczyć urządzenie, którym zamocowałeś ładunek w przyczepie ciągniętej przez samochód osobowy?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak, żeby mocowanie nie rozluźniło się.",
+                    "option_b": "Może swobodnie zwisać z przyczepy.",
+                    "option_c": "Nie musi być zabezpieczone przed spadnięciem podczas jazdy.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak, żeby mocowanie nie rozluźniło się."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo urządzenia służące do mocowania ładunku powinny być zabezpieczone przed rozluźnieniem się, swobodnym zwisaniem lub spadnięciem podczas jazdy. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunek",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 21715,
+                    "question_external_id": "1880",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-4",
+                    "legal_unit_label": "art. 61 ust. 4",
+                    "legal_unit_title": "Zabezpieczenie urządzeń mocujących",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "Pytanie dotyczy samego urządzenia mocującego. Art. 61 ust. 4 wymaga zabezpieczenia go przed rozluźnieniem, swobodnym zwisaniem lub spadnięciem."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 21715,
+                    "external_id": "1880",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "1881",
+            "prompt": "W jaki sposób powinien być umieszczony ładunek na samochodzie osobowym?",
+            "prompt_variants": [
+                "W jaki sposób powinien być umieszczony ładunek na samochodzie osobowym?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Może nieznacznie zasłaniać tablice rejestracyjne.",
+                    "option_b": "Może zasłaniać tylne światło przeciwmgłowe.",
+                    "option_c": "Nie może ograniczać widoczności drogi.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Nie może ograniczać widoczności drogi."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo ładunek na pojeździe umieszcza się w taki sposób, aby nie ograniczał widoczności drogi lub nie zasłaniał świateł, urządzeń sygnalizacyjnych, tablic. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunek",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 21716,
+                    "question_external_id": "1881",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-2-pkt-4",
+                    "legal_unit_label": "art. 61 ust. 2 pkt 4",
+                    "legal_unit_title": "Widoczność, światła i tablice nie mogą być zasłonięte",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "Ładunek nie może ograniczać widoczności ani zasłaniać świateł, urządzeń sygnalizacyjnych lub tablic. To pytanie sprawdza właśnie zakaz określony w art. 61 ust. 2 pkt 4."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 21716,
+                    "external_id": "1881",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "1883",
+            "prompt": "W jaki sposób umieścisz ładunek na przyczepie samochodu osobowego?",
+            "prompt_variants": [
+                "W jaki sposób umieścisz ładunek na przyczepie samochodu osobowego?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak, aby nie zasłaniał świateł przyczepy.",
+                    "option_b": "Umieszczę go po jednej stronie przyczepy.",
+                    "option_c": "Umieszczę go zawsze w tylnej części przyczepy.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak, aby nie zasłaniał świateł przyczepy."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo ładunek na pojeździe umieszcza się w taki sposób, aby nie ograniczał widoczności drogi lub nie zasłaniał świateł, urządzeń sygnalizacyjnych, tablic. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunek",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 21718,
+                    "question_external_id": "1883",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-2-pkt-4",
+                    "legal_unit_label": "art. 61 ust. 2 pkt 4",
+                    "legal_unit_title": "Widoczność, światła i tablice nie mogą być zasłonięte",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "Ładunek nie może ograniczać widoczności ani zasłaniać świateł, urządzeń sygnalizacyjnych lub tablic. To pytanie sprawdza właśnie zakaz określony w art. 61 ust. 2 pkt 4."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 21718,
+                    "external_id": "1883",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6402",
+            "prompt": "Jaka jest maksymalna dopuszczalna odległość, licząc od tylnej płaszczyzny obrysu pojazdu, na którą może wystawać ładunek przewożony pojazdem samochodowym?",
+            "prompt_variants": [
+                "Jaka jest maksymalna dopuszczalna odległość, licząc od tylnej płaszczyzny obrysu pojazdu, na którą może wystawać ładunek przewożony pojazdem samochodowym?"
+            ],
+            "categories": [
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "2 m.",
+                    "option_b": "1 m.",
+                    "option_c": "0,5 m.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "2 m."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo ładunek nie może wystawać z tyłu pojazdu na odległość większą niż 2 m od tylnej płaszczyzny obrysu pojazdu lub zespołu pojazdów. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6402/image/full.8f4479301ce6.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6402/image/thumb.dd260474b06b.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/6402/image/full.8f4479301ce6.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/6402/image/thumb.dd260474b06b.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunek",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 34949,
+                    "question_external_id": "6402",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-6-pkt-2",
+                    "legal_unit_label": "art. 61 ust. 6 pkt 2",
+                    "legal_unit_title": "Maksymalne wystawanie ładunku z tyłu",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "Pytanie wymaga wskazania maksymalnego wystawania ładunku z tyłu. Art. 61 ust. 6 pkt 2 ustanawia co do zasady limit 2 m od tylnej płaszczyzny obrysu."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 34949,
+                    "external_id": "6402",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35126,
+                    "external_id": "6402",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6575",
+            "prompt": "W jaki sposób powinieneś umieścić ładunek, który chcesz przewieźć motorowerem?",
+            "prompt_variants": [
+                "W jaki sposób powinieneś umieścić ładunek, który chcesz przewieźć motorowerem?"
+            ],
+            "categories": [
+                "AM"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Zasłaniając częściowo tablicę rejestracyjną.",
+                    "option_b": "Zabezpieczając go przed zmianą położenia.",
+                    "option_c": "Zasłaniając tylne światło pozycyjne.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Zabezpieczając go przed zmianą położenia."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo ładunek umieszczony na pojeździe powinien być zabezpieczony przed zmianą położenia lub wywoływaniem nadmiernego hałasu oraz nie może mieć. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/am/6575/image/full.dfb526a9537c.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/am/6575/image/thumb.30fc4596d60b.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunek",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 35928,
+                    "question_external_id": "6575",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-3",
+                    "legal_unit_label": "art. 61 ust. 3",
+                    "legal_unit_title": "Zabezpieczenie ładunku przed zmianą położenia",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie sprawdza obowiązek zabezpieczenia ładunku przed zmianą położenia podczas jazdy. Art. 61 ust. 3 wymaga takiego mocowania niezależnie od rodzaju pojazdu."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 35928,
+                    "external_id": "6575",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6579",
+            "prompt": "W jaki sposób należy umieścić ładunek, który przewozisz motocyklem?",
+            "prompt_variants": [
+                "W jaki sposób należy umieścić ładunek, który przewozisz motocyklem?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Zasłaniając tablicę rejestracyjną.",
+                    "option_b": "Zabezpieczając go przed zmianą położenia.",
+                    "option_c": "Zasłaniając tylne światło pozycyjne.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Zabezpieczając go przed zmianą położenia."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo ładunek umieszczony na pojeździe, również motocyklu powinien być zabezpieczony przed zmianą położenia. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/6579/image/full.fa8dfe3bc223.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/6579/image/thumb.29ab1d23d2d7.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/6579/image/full.fa8dfe3bc223.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/6579/image/thumb.29ab1d23d2d7.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/6579/image/full.fa8dfe3bc223.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/6579/image/thumb.29ab1d23d2d7.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunek",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 35800,
+                    "question_external_id": "6579",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-3",
+                    "legal_unit_label": "art. 61 ust. 3",
+                    "legal_unit_title": "Zabezpieczenie ładunku przed zmianą położenia",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie sprawdza obowiązek zabezpieczenia ładunku przed zmianą położenia podczas jazdy. Art. 61 ust. 3 wymaga takiego mocowania niezależnie od rodzaju pojazdu."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 35800,
+                    "external_id": "6579",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35844,
+                    "external_id": "6579",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35890,
+                    "external_id": "6579",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6580",
+            "prompt": "Na co, przede wszystkim, musisz zwrócić uwagę podczas mocowania ładunku przewożonego motocyklem?",
+            "prompt_variants": [
+                "Na co, przede wszystkim, musisz zwrócić uwagę podczas mocowania ładunku przewożonego motocyklem?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Na zamocowanie go tak, aby nie naruszał stateczności motocykla.",
+                    "option_b": "Na zapewnienie łatwego dostępu do jego zawartości w czasie jazdy.",
+                    "option_c": "Na umocowanie go tak, aby zmniejszał opory powietrza.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Na zamocowanie go tak, aby nie naruszał stateczności motocykla."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo ładunek na pojeździe umieszcza się tak, aby nie naruszał stateczności pojazdu i dlatego przewożąc ładunek motocyklem trzeba zwrócić uwagę na jego. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/6580/image/full.44dced9d5b89.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/6580/image/thumb.054e5b89ad47.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/6580/image/full.44dced9d5b89.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/6580/image/thumb.054e5b89ad47.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/6580/image/full.44dced9d5b89.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/6580/image/thumb.054e5b89ad47.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunku",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 35801,
+                    "question_external_id": "6580",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-2-pkt-2",
+                    "legal_unit_label": "art. 61 ust. 2 pkt 2",
+                    "legal_unit_title": "Stateczność i kierowanie pojazdem z ładunkiem",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie dotyczy rozmieszczenia ładunku w sposób zachowujący stateczność i możliwość kierowania pojazdem. Taki obowiązek wynika wprost z art. 61 ust. 2 pkt 2."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 35801,
+                    "external_id": "6580",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35845,
+                    "external_id": "6580",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35891,
+                    "external_id": "6580",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6589",
+            "prompt": "Na co, przede wszystkim, musisz zwrócić uwagę podczas mocowania ładunku przewożonego motorowerem?",
+            "prompt_variants": [
+                "Na co, przede wszystkim, musisz zwrócić uwagę podczas mocowania ładunku przewożonego motorowerem?"
+            ],
+            "categories": [
+                "AM"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Na zamocowanie go tak, aby nie naruszał stateczności motoroweru.",
+                    "option_b": "Na zapewnienie łatwego dostępu do jego zawartości w czasie jazdy.",
+                    "option_c": "Na umocowanie go tak, aby zmniejszał opory powietrza.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Na zamocowanie go tak, aby nie naruszał stateczności motoroweru."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo ładunek na pojeździe umieszcza się w taki sposób, aby nie naruszał stateczności pojazdu, nie utrudniał kierowania pojazdem i nie ograniczał. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/am/6589/image/full.d34090ed9d2d.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/am/6589/image/thumb.fb828a379f33.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunku",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 35935,
+                    "question_external_id": "6589",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-2-pkt-2",
+                    "legal_unit_label": "art. 61 ust. 2 pkt 2",
+                    "legal_unit_title": "Stateczność i kierowanie pojazdem z ładunkiem",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie dotyczy rozmieszczenia ładunku w sposób zachowujący stateczność i możliwość kierowania pojazdem. Taki obowiązek wynika wprost z art. 61 ust. 2 pkt 2."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 35935,
+                    "external_id": "6589",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6694",
+            "prompt": "W jaki sposób należy przewozić ładunek sypki?",
+            "prompt_variants": [
+                "W jaki sposób należy przewozić ładunek sypki?"
+            ],
+            "categories": [
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "W szczelnej skrzyni ładunkowej z odpowiednimi zasłonami.",
+                    "option_b": "W dowolnej skrzyni ładunkowej.",
+                    "option_c": "W dowolnej skrzyni ładunkowej przykrytej plandeką.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "W szczelnej skrzyni ładunkowej z odpowiednimi zasłonami."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo ładunek sypki może być umieszczony tylko w szczelnej skrzyni ładunkowej, zabezpieczonej dodatkowo odpowiednimi zasłonami uniemożliwiającymi. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/6694/image/full.2aed333a76c7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/6694/image/thumb.b5290d879c5f.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunek",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 36148,
+                    "question_external_id": "6694",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-5",
+                    "legal_unit_label": "art. 61 ust. 5",
+                    "legal_unit_title": "Przewóz ładunku sypkiego",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie sprawdza szczególną zasadę przewozu materiału sypkiego. Art. 61 ust. 5 wymaga szczelnej skrzyni ładunkowej i odpowiednich zasłon."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 36148,
+                    "external_id": "6694",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6695",
+            "prompt": "Czy na przyczepie ciągnika rolniczego masz prawo przewozić ładunek powodujący przekroczenie jej dopuszczalnej ładowności?",
+            "prompt_variants": [
+                "Czy na przyczepie ciągnika rolniczego masz prawo przewozić ładunek powodujący przekroczenie jej dopuszczalnej ładowności?"
+            ],
+            "categories": [
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak.",
+                    "option_b": "Tak, ale tylko podczas jazdy po drogach publicznych gruntowych.",
+                    "option_c": "Nie.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Nie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo ładunek nie może powodować przekroczenia dopuszczalnej masy całkowitej lub dopuszczalnej ładowności pojazdu. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/6695/image/full.f441bf03f42b.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/6695/image/thumb.a204a93b9f76.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunek|ladownosc",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 36149,
+                    "question_external_id": "6695",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-1",
+                    "legal_unit_label": "art. 61 ust. 1",
+                    "legal_unit_title": "Zakaz przekraczania dopuszczalnej masy i ładowności",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie sprawdza zakaz przeciążenia pojazdu lub przyczepy. Art. 61 ust. 1 nie pozwala, aby ładunek powodował przekroczenie dopuszczalnej masy całkowitej albo dopuszczalnej ładowności."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 36149,
+                    "external_id": "6695",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7451",
+            "prompt": "Jakiej barwy chorągiewką wolno Ci oznaczyć ładunek wystający z tyłu samochodu osobowego?",
+            "prompt_variants": [
+                "Jakiej barwy chorągiewką wolno Ci oznaczyć ładunek wystający z tyłu samochodu osobowego?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Zieloną.",
+                    "option_b": "Żółtą.",
+                    "option_c": "Czerwoną.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Czerwoną."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo ładunek wystający z tyłu samochodu osobowego lub przyczepy ciągniętej przez samochód osobowy może być oznaczony chorągiewką barwy czerwonej. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunek",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 40616,
+                    "question_external_id": "7451",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-9-pkt-4",
+                    "legal_unit_label": "art. 61 ust. 9 pkt 4",
+                    "legal_unit_title": "Czerwona chorągiewka przy samochodzie osobowym",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie dotyczy uproszczonego oznaczenia ładunku wystającego z tyłu samochodu osobowego. Art. 61 ust. 9 pkt 4 pozwala zastosować czerwoną chorągiewkę."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 40616,
+                    "external_id": "7451",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7615",
+            "prompt": "Czy na drodze publicznej dozwolone jest przewożenie w przyczepie ciągniętej przez ciągnik rolniczy ładunku przekraczającego jej dopuszczalną ładowność?",
+            "prompt_variants": [
+                "Czy na drodze publicznej dozwolone jest przewożenie w przyczepie ciągniętej przez ciągnik rolniczy ładunku przekraczającego jej dopuszczalną ładowność?"
+            ],
+            "categories": [
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "driving_with_trailer",
+                    "name": "Kierowanie pojazdem z przyczepa"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak, o ile dopuszczalna ładowność przyczepy nie jest przekroczona o więcej niż 40% wielkości nominalnej.",
+                    "option_b": "Nie.",
+                    "option_c": "Tak, ale tylko na trasie nieprzekraczającej 5 km.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo ładunek nie może powodować przekroczenia dopuszczalnej masy całkowitej lub dopuszczalnej ładowności pojazdu, a więc również przyczepy ciągniętej przez ciągnik rolniczy. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/7615/image/full.b1911901c6a0.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/7615/image/thumb.ff82346b1e37.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunku|ladownosc",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 41701,
+                    "question_external_id": "7615",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-1",
+                    "legal_unit_label": "art. 61 ust. 1",
+                    "legal_unit_title": "Zakaz przekraczania dopuszczalnej masy i ładowności",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie sprawdza zakaz przeciążenia pojazdu lub przyczepy. Art. 61 ust. 1 nie pozwala, aby ładunek powodował przekroczenie dopuszczalnej masy całkowitej albo dopuszczalnej ładowności."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 41701,
+                    "external_id": "7615",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7725",
+            "prompt": "Na jaką odległość nie może z przodu wystawać przewożony ładunek?",
+            "prompt_variants": [
+                "Na jaką odległość nie może z przodu wystawać przewożony ładunek?"
+            ],
+            "categories": [
+                "C",
+                "C1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Większą niż 0,23 m od przedniej płaszczyzny jego obrysu i większą niż 1 m od siedzenia dla kierującego.",
+                    "option_b": "Większą niż 0,5 m od przedniej płaszczyzny jego obrysu i większą niż 1 m od siedzenia dla kierującego.",
+                    "option_c": "Większą niż 0,5 m od przedniej płaszczyzny jego obrysu i większą niż 1,5 m od siedzenia dla kierującego.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Większą niż 0,5 m od przedniej płaszczyzny jego obrysu i większą niż 1,5 m od siedzenia dla kierującego."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo przewożony ładunek nie może wystawać z przodu pojazdu na odległość większą niż 0,5 m od przedniej płaszczyzny obrysu i większą niż 1,5 m od siedzenia dla kierującego. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunek",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 42271,
+                    "question_external_id": "7725",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-6-pkt-3",
+                    "legal_unit_label": "art. 61 ust. 6 pkt 3",
+                    "legal_unit_title": "Maksymalne wystawanie ładunku z przodu",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "Pytanie dotyczy przedniej części ładunku. Art. 61 ust. 6 pkt 3 wyznacza jednocześnie limit 0,5 m od obrysu pojazdu i 1,5 m od siedzenia kierującego."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 42271,
+                    "external_id": "7725",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 42327,
+                    "external_id": "7725",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7746",
+            "prompt": "Które z podanych zasad należy stosować podczas rozmieszczania lub mocowania ładunku w samochodzie ciężarowym?",
+            "prompt_variants": [
+                "Które z podanych zasad należy stosować podczas rozmieszczania lub mocowania ładunku w samochodzie ciężarowym?"
+            ],
+            "categories": [
+                "C",
+                "C1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Środek ciężkości całego ładunku powinien znajdować się jak najbliżej osi wzdłużnej pojazdu.",
+                    "option_b": "Cięższe przedmioty powinny być umieszczone wyżej, a lżejsze niżej.",
+                    "option_c": "Metoda mocowania ładunku jest niezależna od charakterystyki ładunku.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Środek ciężkości całego ładunku powinien znajdować się jak najbliżej osi wzdłużnej pojazdu."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo przy mocowaniu ładunku trzeba stosować zasadę równomiernego rozłożenia ciężaru (nisko, blisko osi - środek ciężkości całego ładunku powinien. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunku",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 42276,
+                    "external_id": "7746",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 42332,
+                    "external_id": "7746",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7748",
+            "prompt": "Jak położenie środka ciężkości ładunku wpływa na sposób zabezpieczenia ładunku?",
+            "prompt_variants": [
+                "Jak położenie środka ciężkości ładunku wpływa na sposób zabezpieczenia ładunku?"
+            ],
+            "categories": [
+                "C",
+                "C1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Nie ma żadnego wpływu na sposób zabezpieczenia ładunku.",
+                    "option_b": "Wysokie położenie środka ciężkości ładunku może wymagać zastosowania dodatkowych technik jego zabezpieczania.",
+                    "option_c": "Niskie położenie środka ciężkości sprawia, że ładunek nie musi być zabezpieczony.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Wysokie położenie środka ciężkości ładunku może wymagać zastosowania dodatkowych technik jego zabezpieczania."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo położenie środka ciężkości ładunku bezpośrednio wpływa na stabilność pojazdu i konieczność zastosowania określonych technik zabezpieczenia - im wyżej. W praktyce trzeba ocenic sytuacje zgodnie z zasadami ruchu drogowego, a nie tylko po pozorach. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunku",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 42277,
+                    "external_id": "7748",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 42333,
+                    "external_id": "7748",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10085",
+            "prompt": "Który z wymienionych przypadków jest prawidłowym sposobem przewożenia ładunku na przyczepie ciągniętej przez samochód osobowy?",
+            "prompt_variants": [
+                "Który z wymienionych przypadków jest prawidłowym sposobem przewożenia ładunku na przyczepie ciągniętej przez samochód osobowy?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Ładunek jest zabezpieczony przed przesuwaniem się.",
+                    "option_b": "Ładunek nie jest zabezpieczony przed zmianą położenia.",
+                    "option_c": "Ładunek nie jest zabezpieczony przed zmianą położenia, jeżeli prędkość jazdy nie będzie większa niż 30 km/h.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Ładunek jest zabezpieczony przed przesuwaniem się."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo ładunek umieszczony na przyczepie ciągniętej przez samochód osobowy powinien być zabezpieczony przed zmianą położenia - przed przesuwaniem. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/10085/image/full.569e447517b8.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/10085/image/thumb.0de85edd0649.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunku",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 43628,
+                    "question_external_id": "10085",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-3",
+                    "legal_unit_label": "art. 61 ust. 3",
+                    "legal_unit_title": "Zabezpieczenie ładunku przed zmianą położenia",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie sprawdza obowiązek zabezpieczenia ładunku przed zmianą położenia podczas jazdy. Art. 61 ust. 3 wymaga takiego mocowania niezależnie od rodzaju pojazdu."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 43628,
+                    "external_id": "10085",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10086",
+            "prompt": "W jaki sposób powinieneś przewozić ładunek w przyczepie ciągniętej przez samochód osobowy?",
+            "prompt_variants": [
+                "W jaki sposób powinieneś przewozić ładunek w przyczepie ciągniętej przez samochód osobowy?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Ładunek nie powinien być zabezpieczony przed zmianą położenia.",
+                    "option_b": "Ładunek może zasłaniać niektóre światła przyczepy.",
+                    "option_c": "Ładunek nie może naruszać stateczności pojazdu.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Ładunek nie może naruszać stateczności pojazdu."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo ładunek na pojeździe umieszcza się w taki sposób, aby nie naruszał stateczności pojazdu. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/10086/image/full.98c7bbda646c.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/10086/image/thumb.f2beac9af99a.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunek",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 43629,
+                    "question_external_id": "10086",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-2-pkt-2",
+                    "legal_unit_label": "art. 61 ust. 2 pkt 2",
+                    "legal_unit_title": "Stateczność i kierowanie pojazdem z ładunkiem",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie dotyczy rozmieszczenia ładunku w sposób zachowujący stateczność i możliwość kierowania pojazdem. Taki obowiązek wynika wprost z art. 61 ust. 2 pkt 2."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 43629,
+                    "external_id": "10086",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "11474",
+            "prompt": "Czy ładunek przewożony samochodem ciężarowym może powodować przekroczenie dopuszczalnej ładowności?",
+            "prompt_variants": [
+                "Czy ładunek przewożony samochodem ciężarowym może powodować przekroczenie dopuszczalnej ładowności?"
+            ],
+            "categories": [
+                "C",
+                "C1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak, ale nie więcej niż o 20%.",
+                    "option_b": "Tak, o ile nie zostaną przekroczone dopuszczalne naciski osi na jezdnię.",
+                    "option_c": "Nie.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Nie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo ładunek nie może powodować przekroczenia dopuszczalnej masy całkowitej lub dopuszczalnej ładowności pojazdu. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/11474/image/full.ecc7a2fcd033.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/11474/image/thumb.06318a550bbe.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/11474/image/full.ecc7a2fcd033.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/11474/image/thumb.06318a550bbe.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunek|ladownosc",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 45975,
+                    "question_external_id": "11474",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-1",
+                    "legal_unit_label": "art. 61 ust. 1",
+                    "legal_unit_title": "Zakaz przekraczania dopuszczalnej masy i ładowności",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie sprawdza zakaz przeciążenia pojazdu lub przyczepy. Art. 61 ust. 1 nie pozwala, aby ładunek powodował przekroczenie dopuszczalnej masy całkowitej albo dopuszczalnej ładowności."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 45975,
+                    "external_id": "11474",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46160,
+                    "external_id": "11474",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "11475",
+            "prompt": "W jaki sposób należy umieścić ładunek w samochodzie ciężarowym?",
+            "prompt_variants": [
+                "W jaki sposób należy umieścić ładunek w samochodzie ciężarowym?"
+            ],
+            "categories": [
+                "C",
+                "C1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak, aby nie przekraczał całkowitej szerokości pojazdu.",
+                    "option_b": "Tak, aby nie wystawał z tyłu na odległość większą niż 1 metr od tylnej płaszczyzny obrysu pojazdu.",
+                    "option_c": "Tak, aby nie naruszał stateczności pojazdu i nie utrudniał kierowania.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Tak, aby nie naruszał stateczności pojazdu i nie utrudniał kierowania."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo ładunek na pojeździe umieszcza się w taki sposób, aby nie powodował przekroczenia dopuszczalnych nacisków osi pojazdu na drogę, nie naruszał. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/11475/image/full.a2531c60e5e2.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/11475/image/thumb.0ac065a873fb.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/11475/image/full.a2531c60e5e2.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/11475/image/thumb.0ac065a873fb.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunek",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 45976,
+                    "question_external_id": "11475",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-2-pkt-2",
+                    "legal_unit_label": "art. 61 ust. 2 pkt 2",
+                    "legal_unit_title": "Stateczność i kierowanie pojazdem z ładunkiem",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie dotyczy rozmieszczenia ładunku w sposób zachowujący stateczność i możliwość kierowania pojazdem. Taki obowiązek wynika wprost z art. 61 ust. 2 pkt 2."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 45976,
+                    "external_id": "11475",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46161,
+                    "external_id": "11475",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "11476",
+            "prompt": "Który sposób oznakowania ładunku wystającego ponad 0,5 m poza tylną płaszczyznę obrysu samochodu ciężarowego jest właściwy?",
+            "prompt_variants": [
+                "Który sposób oznakowania ładunku wystającego ponad 0,5 m poza tylną płaszczyznę obrysu samochodu ciężarowego jest właściwy?"
+            ],
+            "categories": [
+                "C",
+                "C1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Chorągiewka barwy czerwonej o wymiarach 30 cm x 30 cm.",
+                    "option_b": "Odblaskowy trójkąt ostrzegawczy.",
+                    "option_c": "Tarcza z pasami białymi i czerwonymi o łącznej powierzchni nie mniejszej niż 1000 cm2.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Tarcza z pasami białymi i czerwonymi o łącznej powierzchni nie mniejszej niż 1000 cm2."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo ładunek wystający z tyłu pojazdu oznacza się pasami białymi i czerwonymi umieszczonymi bezpośrednio na ładunku lub na tarczy na jego tylnej. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/11476/image/full.0f80ed0e2d6a.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/11476/image/thumb.ae4deecbab54.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/11476/image/full.0f80ed0e2d6a.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/11476/image/thumb.ae4deecbab54.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunku",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 45977,
+                    "question_external_id": "11476",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-9-pkt-3",
+                    "legal_unit_label": "art. 61 ust. 9 pkt 3",
+                    "legal_unit_title": "Oznakowanie ładunku wystającego z tyłu",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie sprawdza oznakowanie ładunku wystającego z tyłu samochodu ciężarowego. Art. 61 ust. 9 pkt 3 dopuszcza pasy białe i czerwone na ładunku, tarczy albo bryle geometrycznej o wymaganej powierzchni."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 45977,
+                    "external_id": "11476",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46162,
+                    "external_id": "11476",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "11480",
+            "prompt": "Czy położenie środka ciężkości ładunku przewożonego samochodem ciężarowym ma wpływ na stateczność pojazdu?",
+            "prompt_variants": [
+                "Czy położenie środka ciężkości ładunku przewożonego samochodem ciężarowym ma wpływ na stateczność pojazdu?"
+            ],
+            "categories": [
+                "C",
+                "C1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak, może zmniejszyć stateczność pojazdu.",
+                    "option_b": "Nie.",
+                    "option_c": "Tak, ale wyłącznie na ostrych zakrętach.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak, może zmniejszyć stateczność pojazdu."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo im wyżej jest położony środek ciężkości całego zestawu, tym pogorszona jest stateczność i większe ryzyko wywrotki, zwłaszcza na zakrętach i podczas. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/11480/image/full.8e919cff7a32.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/11480/image/thumb.5b4a872a718a.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/11480/image/full.8e919cff7a32.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/11480/image/thumb.5b4a872a718a.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunku",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 45979,
+                    "external_id": "11480",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46164,
+                    "external_id": "11480",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "11488",
+            "prompt": "W jakiej sytuacji, kierując samochodem ciężarowym, masz obowiązek upewnić się, że przewożony ładunek jest właściwie zabezpieczony?",
+            "prompt_variants": [
+                "W jakiej sytuacji, kierując samochodem ciężarowym, masz obowiązek upewnić się, że przewożony ładunek jest właściwie zabezpieczony?"
+            ],
+            "categories": [
+                "C",
+                "C1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Każdorazowo po przejechaniu 100 km.",
+                    "option_b": "Po gwałtownym hamowaniu.",
+                    "option_c": "Podczas każdej przerwy w prowadzeniu pojazdu.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Po gwałtownym hamowaniu."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo obowiązek upewnienia się przez Kierującego, że ładunek jest właściwie zabezpieczony każdorazowo przed rozpoczęciem jazdy, a także po każdej sytuacji. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/11488/image/full.4d55562adc52.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/11488/image/thumb.c11b48e0934a.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/11488/image/full.4d55562adc52.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/11488/image/thumb.c11b48e0934a.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunek",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 45984,
+                    "external_id": "11488",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46169,
+                    "external_id": "11488",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "11516",
+            "prompt": "Czy zamierzając kierować samochodem ciężarowym i wykonywać transport masz obowiązek upewnić się, że przewożony ładunek jest prawidłowo zabezpieczony?",
+            "prompt_variants": [
+                "Czy zamierzając kierować samochodem ciężarowym i wykonywać transport masz obowiązek upewnić się, że przewożony ładunek jest prawidłowo zabezpieczony?"
+            ],
+            "categories": [
+                "C",
+                "C1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak, musisz sprawdzić zabezpieczenie i prawidłowość rozmieszczenia ładunku.",
+                    "option_b": "Tak, ale tylko w razie wątpliwości co do bezpieczeństwa transportu ładunku.",
+                    "option_c": "Nie, kierujący nie odpowiada za załadunek, a jedynie za przewóz ładunku.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak, musisz sprawdzić zabezpieczenie i prawidłowość rozmieszczenia ładunku."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/11516/image/full.e8a8a01263f7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/11516/image/thumb.66fb2b2c5eef.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/11516/image/full.e8a8a01263f7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/11516/image/thumb.66fb2b2c5eef.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunek",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 46008,
+                    "external_id": "11516",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46193,
+                    "external_id": "11516",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "11517",
+            "prompt": "Który sposób oznakowania ładunku wystającego ponad 0,5 m poza tylną płaszczyznę obrysu samochodu ciężarowego jest właściwy?",
+            "prompt_variants": [
+                "Który sposób oznakowania ładunku wystającego ponad 0,5 m poza tylną płaszczyznę obrysu samochodu ciężarowego jest właściwy?"
+            ],
+            "categories": [
+                "C",
+                "C1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Chorągiewka barwy białej o wymiarach 33 cm x 34 cm.",
+                    "option_b": "Bryła geometryczna z pasami białymi i czerwonymi o łącznej powierzchni nie mniejszej niż 1000 cm2.",
+                    "option_c": "Światło stałe o barwie pomarańczowej.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Bryła geometryczna z pasami białymi i czerwonymi o łącznej powierzchni nie mniejszej niż 1000 cm2."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A. Ladunek wystajacy ponad 0,5 m poza tylna plaszczyzne obrysu samochodu ciezarowego trzeba oznakowac elementem z pasami bialymi i czerwonymi o lacznej powierzchni co najmniej 1000 cm2. Taki sposob oznakowania spelnia wymog widocznosci ladunku od tylu."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/11517/image/full.41c772e28852.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/11517/image/thumb.77ac1a69d07b.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/11517/image/full.41c772e28852.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/11517/image/thumb.77ac1a69d07b.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunku",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 46009,
+                    "question_external_id": "11517",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-9-pkt-3",
+                    "legal_unit_label": "art. 61 ust. 9 pkt 3",
+                    "legal_unit_title": "Oznakowanie ładunku wystającego z tyłu",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie sprawdza oznakowanie ładunku wystającego z tyłu samochodu ciężarowego. Art. 61 ust. 9 pkt 3 dopuszcza pasy białe i czerwone na ładunku, tarczy albo bryle geometrycznej o wymaganej powierzchni."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 46009,
+                    "external_id": "11517",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46194,
+                    "external_id": "11517",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "11518",
+            "prompt": "Który sposób oznakowania ładunku wystającego ponad 0,5 m poza tylną płaszczyznę obrysu samochodu ciężarowego jest właściwy?",
+            "prompt_variants": [
+                "Który sposób oznakowania ładunku wystającego ponad 0,5 m poza tylną płaszczyznę obrysu samochodu ciężarowego jest właściwy?"
+            ],
+            "categories": [
+                "C",
+                "C1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Pasy białe i czerwone o łącznej powierzchni co najmniej 1000 cm2 umieszczone bezpośrednio na ładunku.",
+                    "option_b": "Tarcza o wymiarach co najmniej 50x50 cm z pasami czarnymi i żółtymi.",
+                    "option_c": "Bryła geometryczna z pasami czarnymi i białymi.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Pasy białe i czerwone o łącznej powierzchni co najmniej 1000 cm2 umieszczone bezpośrednio na ładunku."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A. Ladunek wystajacy z tylu moze byc oznakowany pasami bialymi i czerwonymi o wymaganej powierzchni umieszczonymi bezposrednio na ladunku. Najwazniejsze jest poprawne oznaczenie wystajacej czesci zgodnie z wymaganymi barwami i powierzchnia."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/11518/image/full.5e7212771fd1.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/11518/image/thumb.cfbc246b532e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/11518/image/full.5e7212771fd1.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/11518/image/thumb.cfbc246b532e.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:ladunku",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 46010,
+                    "question_external_id": "11518",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-9-pkt-3",
+                    "legal_unit_label": "art. 61 ust. 9 pkt 3",
+                    "legal_unit_title": "Oznakowanie ładunku wystającego z tyłu",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie sprawdza oznakowanie ładunku wystającego z tyłu samochodu ciężarowego. Art. 61 ust. 9 pkt 3 dopuszcza pasy białe i czerwone na ładunku, tarczy albo bryle geometrycznej o wymaganej powierzchni."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 46010,
+                    "external_id": "11518",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46195,
+                    "external_id": "11518",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        }
+    ]
+}

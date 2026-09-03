@@ -1,0 +1,1161 @@
+{
+    "generated_at": "2026-06-21T18:56:53+02:00",
+    "candidate": {
+        "slug": "foteliki-i-przewoz-dzieci",
+        "title": "Foteliki i przewóz dzieci w samochodzie",
+        "description": "Węższy temat artykułu wykryty na podstawie treści pytań.",
+        "level": "focused",
+        "status": "candidate",
+        "rule_version": "2026-06-19-prompt-v2",
+        "existing_article_slug": "foteliki-i-przewoz-dzieci"
+    },
+    "workflow": {
+        "status": "published",
+        "next_action": "Przejrzyj relacje pytan i zdecyduj, czy artykul wymaga rozbudowy lub ponownego review.",
+        "public_relations_are_verified_only": true
+    },
+    "article": {
+        "slug": "foteliki-i-przewoz-dzieci",
+        "title": "Przewóz dzieci: fotelik, wzrost 150 cm i wyjątki",
+        "status": "published",
+        "published_at": "2026-06-21",
+        "last_reviewed_at": "2026-06-21",
+        "legal_units": [
+            {
+                "slug": "art-39-ust-3",
+                "label": "art. 39 ust. 3",
+                "title": "Dziecko poniżej 150 cm w urządzeniu przytrzymującym",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-39-ust-3a",
+                "label": "art. 39 ust. 3a",
+                "title": "Montaż fotelika zgodnie z zaleceniami producenta",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-39-ust-3b",
+                "label": "art. 39 ust. 3b",
+                "title": "Wyjątek od 135 cm wyłącznie na tylnym siedzeniu",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-39-ust-3c",
+                "label": "art. 39 ust. 3c",
+                "title": "Trzecie dziecko na tylnym siedzeniu",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-39-ust-4-pkt-4",
+                "label": "art. 39 ust. 4 pkt 4",
+                "title": "Zaświadczenie o przeciwwskazaniu do przewozu w foteliku",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-45-ust-2-pkt-4",
+                "label": "art. 45 ust. 2 pkt 4",
+                "title": "Fotelik tyłem do kierunku jazdy i aktywna poduszka",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-45-ust-2-pkt-5",
+                "label": "art. 45 ust. 2 pkt 5",
+                "title": "Dziecko poniżej 3 lat w pojeździe bez pasów",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-45-ust-2-pkt-6",
+                "label": "art. 45 ust. 2 pkt 6",
+                "title": "Dziecko poniżej 150 cm na przednim siedzeniu",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            }
+        ]
+    },
+    "summary": {
+        "canonical_questions": 14,
+        "question_rows": 23,
+        "categories": [
+            "B",
+            "B1",
+            "C",
+            "C1",
+            "D",
+            "D1"
+        ],
+        "canonical_questions_with_verified_reference": 14,
+        "prompt_conflicts": [],
+        "answer_conflicts": [],
+        "correct_answer_conflicts": []
+    },
+    "questions": [
+        {
+            "external_id": "10806",
+            "prompt": "Przewożenie dziecka w foteliku bezpieczeństwa zamontowanym tyłem do kierunku jazdy na przednim siedzeniu pojazdu samochodowego, wyposażonego w poduszkę powietrzną dla pasażera jest:",
+            "prompt_variants": [
+                "Przewożenie dziecka w foteliku bezpieczeństwa zamontowanym tyłem do kierunku jazdy na przednim siedzeniu pojazdu samochodowego, wyposażonego w poduszkę powietrzną dla pasażera jest:"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "dozwolone bez ograniczeń.",
+                    "option_b": "zabronione.",
+                    "option_c": "dozwolone, jeżeli poduszka powietrzna nie jest aktywna podczas przewożenia.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "dozwolone, jeżeli poduszka powietrzna nie jest aktywna podczas przewożenia."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:fotelik|przewozenie dziecka",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 44809,
+                    "question_external_id": "10806",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-45-ust-2-pkt-4",
+                    "legal_unit_label": "art. 45 ust. 2 pkt 4",
+                    "legal_unit_title": "Fotelik tyłem do kierunku jazdy i aktywna poduszka",
+                    "legal_topic_slug": "foteliki-i-przewoz-dzieci",
+                    "article_slug": "foteliki-i-przewoz-dzieci",
+                    "public_note": "To pytanie dotyczy fotelika ustawionego tyłem na przednim siedzeniu. Art. 45 ust. 2 pkt 4 zakazuje takiego przewozu przy aktywnej poduszce powietrznej pasażera."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 44809,
+                    "external_id": "10806",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10807",
+            "prompt": "Przewożenie dziecka siedzącego tyłem do kierunku jazdy w urządzeniu przytrzymującym dla dzieci, zamontowanym na przednim siedzeniu pojazdu samochodowego wyposażonego w poduszkę powietrzną jest:",
+            "prompt_variants": [
+                "Przewożenie dziecka siedzącego tyłem do kierunku jazdy w urządzeniu przytrzymującym dla dzieci, zamontowanym na przednim siedzeniu pojazdu samochodowego wyposażonego w poduszkę powietrzną jest:"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Dozwolone, jeżeli poduszka powietrzna nie jest aktywna podczas przewożenia.",
+                    "option_b": "Zawsze zabronione.",
+                    "option_c": "Dozwolone bez ograniczeń.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Dozwolone, jeżeli poduszka powietrzna nie jest aktywna podczas przewożenia."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo kierującemu pojazdem zabrania się przewożenia w foteliku bezpieczeństwa dla dziecka lub innym urządzeniu przytrzymującym dla dzieci dziecka. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przewozenie dziecka",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 44839,
+                    "question_external_id": "10807",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-45-ust-2-pkt-4",
+                    "legal_unit_label": "art. 45 ust. 2 pkt 4",
+                    "legal_unit_title": "Fotelik tyłem do kierunku jazdy i aktywna poduszka",
+                    "legal_topic_slug": "foteliki-i-przewoz-dzieci",
+                    "article_slug": "foteliki-i-przewoz-dzieci",
+                    "public_note": "To pytanie dotyczy fotelika ustawionego tyłem na przednim siedzeniu. Art. 45 ust. 2 pkt 4 zakazuje takiego przewozu przy aktywnej poduszce powietrznej pasażera."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 44839,
+                    "external_id": "10807",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44975,
+                    "external_id": "10807",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10809",
+            "prompt": "Przewożenie dziecka w wieku poniżej trzech lat samochodem osobowym, niewyposażonym w pasy bezpieczeństwa i fotelik bezpieczeństwa dla dziecka lub w pasy bezpieczeństwa i inne urządzenie przytrzymujące dla dzieci jest:",
+            "prompt_variants": [
+                "Przewożenie dziecka w wieku poniżej trzech lat samochodem osobowym, niewyposażonym w pasy bezpieczeństwa i fotelik bezpieczeństwa dla dziecka lub w pasy bezpieczeństwa i inne urządzenie przytrzymujące dla dzieci jest:"
+            ],
+            "categories": [
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Zabronione.",
+                    "option_b": "Dozwolone.",
+                    "option_c": "Dozwolone, jeżeli dziecko trzymane jest na rękach przez pełnoletniego pasażera.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Zabronione."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo Kierującemu pojazdem zabrania się przewożenia dziecka w wieku poniżej 3 lat w pojeździe kategorii. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:fotelik|przewozenie dziecka",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 44977,
+                    "question_external_id": "10809",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-45-ust-2-pkt-5",
+                    "legal_unit_label": "art. 45 ust. 2 pkt 5",
+                    "legal_unit_title": "Dziecko poniżej 3 lat w pojeździe bez pasów",
+                    "legal_topic_slug": "foteliki-i-przewoz-dzieci",
+                    "article_slug": "foteliki-i-przewoz-dzieci",
+                    "public_note": "To pytanie sprawdza zakaz przewozu dziecka poniżej 3 lat w pojeździe bez pasów bezpieczeństwa i odpowiedniego urządzenia przytrzymującego."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 44977,
+                    "external_id": "10809",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10810",
+            "prompt": "Przewożenie dziecka na przednim siedzeniu samochodu bez fotelika bezpieczeństwa dla dziecka jest:",
+            "prompt_variants": [
+                "Przewożenie dziecka na przednim siedzeniu samochodu bez fotelika bezpieczeństwa dla dziecka jest:"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Zabronione, jeżeli dziecko ma mniej niż 150 cm wzrostu.",
+                    "option_b": "Zawsze zabronione.",
+                    "option_c": "Dozwolone, jeżeli dziecko ma nie mniej niż 140 cm wzrostu.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Zabronione, jeżeli dziecko ma mniej niż 150 cm wzrostu."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo Kierującemu pojazdem zabrania się przewożenia na przednim siedzeniu pojazdu samochodowego, poza fotelikiem bezpieczeństwa dla dziecka lub innym. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:fotelik|przewozenie dziecka",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 44841,
+                    "question_external_id": "10810",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-45-ust-2-pkt-6",
+                    "legal_unit_label": "art. 45 ust. 2 pkt 6",
+                    "legal_unit_title": "Dziecko poniżej 150 cm na przednim siedzeniu",
+                    "legal_topic_slug": "foteliki-i-przewoz-dzieci",
+                    "article_slug": "foteliki-i-przewoz-dzieci",
+                    "public_note": "To pytanie dotyczy przedniego siedzenia. Art. 45 ust. 2 pkt 6 zabrania przewożenia na nim dziecka poniżej 150 cm poza fotelikiem lub innym urządzeniem przytrzymującym."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 44841,
+                    "external_id": "10810",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44978,
+                    "external_id": "10810",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10812",
+            "prompt": "Dziecko mające mniej niż 150 cm wzrostu, przewożone samochodem osobowym wyposażonym w pasy bezpieczeństwa, powinno znajdować się w foteliku bezpieczeństwa dla dziecka, zgodnym z:",
+            "prompt_variants": [
+                "Dziecko mające mniej niż 150 cm wzrostu, przewożone samochodem osobowym wyposażonym w pasy bezpieczeństwa, powinno znajdować się w foteliku bezpieczeństwa dla dziecka, zgodnym z:"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Masą i wzrostem dziecka oraz właściwymi warunkami technicznymi określonymi w przepisach Unii Europejskiej.",
+                    "option_b": "Masą i wzrostem dziecka.",
+                    "option_c": "Wiekiem dziecka.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Masą i wzrostem dziecka oraz właściwymi warunkami technicznymi określonymi w przepisach Unii Europejskiej."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo dziecko mające mniej niż 150 cm wzrostu jest przewożone samochodem osobowym w foteliku bezpieczeństwa dla dziecka lub innym urządzeniu. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:fotelik",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 44843,
+                    "question_external_id": "10812",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-39-ust-3",
+                    "legal_unit_label": "art. 39 ust. 3",
+                    "legal_unit_title": "Dziecko poniżej 150 cm w urządzeniu przytrzymującym",
+                    "legal_topic_slug": "foteliki-i-przewoz-dzieci",
+                    "article_slug": "foteliki-i-przewoz-dzieci",
+                    "public_note": "To pytanie sprawdza podstawową regułę przewozu dziecka poniżej 150 cm. Art. 39 ust. 3 wymaga urządzenia przytrzymującego dobranego do masy i wzrostu oraz zgodnego z wymaganiami technicznymi."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 44843,
+                    "external_id": "10812",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44980,
+                    "external_id": "10812",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10813",
+            "prompt": "Jeżeli w samochodzie osobowym na tylnym siedzeniu przewożonych jest dwoje dzieci w fotelikach bezpieczeństwa i nie ma możliwości zainstalowania trzeciego fotelika, to:",
+            "prompt_variants": [
+                "Jeżeli w samochodzie osobowym na tylnym siedzeniu przewożonych jest dwoje dzieci w fotelikach bezpieczeństwa i nie ma możliwości zainstalowania trzeciego fotelika, to:"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Nie można przewozić trzeciego dziecka.",
+                    "option_b": "Może być przewożone trzecie dziecko, jeżeli ma co najmniej 3 lata i jest przytrzymywane za pomocą pasów bezpieczeństwa.",
+                    "option_c": "Może być przewożone trzecie dziecko, jeżeli ma co najmniej 5 lat.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Może być przewożone trzecie dziecko, jeżeli ma co najmniej 3 lata i jest przytrzymywane za pomocą pasów bezpieczeństwa."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:fotelik",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 44844,
+                    "question_external_id": "10813",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-39-ust-3c",
+                    "legal_unit_label": "art. 39 ust. 3c",
+                    "legal_unit_title": "Trzecie dziecko na tylnym siedzeniu",
+                    "legal_topic_slug": "foteliki-i-przewoz-dzieci",
+                    "article_slug": "foteliki-i-przewoz-dzieci",
+                    "public_note": "To pytanie sprawdza wyjątek dla trzeciego dziecka na tylnym siedzeniu. Art. 39 ust. 3c wymaga wieku co najmniej 3 lat, dwóch już zamontowanych urządzeń, braku możliwości montażu trzeciego i zapięcia pasa."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 44844,
+                    "external_id": "10813",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44981,
+                    "external_id": "10813",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10815",
+            "prompt": "Foteliki bezpieczeństwa dla dzieci oraz inne urządzenia przytrzymujące dla dzieci należy instalować w pojeździe:",
+            "prompt_variants": [
+                "Foteliki bezpieczeństwa dla dzieci oraz inne urządzenia przytrzymujące dla dzieci należy instalować w pojeździe:"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "w sposób bezpieczny i estetyczny.",
+                    "option_b": "w sposób umożliwiający łatwy dostęp do dziecka.",
+                    "option_c": "zgodnie z zaleceniami producenta urządzenia.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "zgodnie z zaleceniami producenta urządzenia."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo foteliki bezpieczeństwa dla dziecka oraz inne urządzenia przytrzymujące dla dzieci są instalowane w pojeździe, zgodnie z zaleceniami producenta. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:fotelik",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 44810,
+                    "question_external_id": "10815",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-39-ust-3a",
+                    "legal_unit_label": "art. 39 ust. 3a",
+                    "legal_unit_title": "Montaż fotelika zgodnie z zaleceniami producenta",
+                    "legal_topic_slug": "foteliki-i-przewoz-dzieci",
+                    "article_slug": "foteliki-i-przewoz-dzieci",
+                    "public_note": "To pytanie dotyczy montażu fotelika lub innego urządzenia. Art. 39 ust. 3a wymaga instalacji zgodnej z zaleceniami producenta urządzenia."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 44810,
+                    "external_id": "10815",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10840",
+            "prompt": "W jaki sposób przewozisz dziecko o wzroście mniejszym niż 150 cm na przednim siedzeniu samochodu osobowego, który ma pięć miejsc siedzących?",
+            "prompt_variants": [
+                "W jaki sposób przewozisz dziecko o wzroście mniejszym niż 150 cm na przednim siedzeniu samochodu osobowego, który ma pięć miejsc siedzących?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Na kolanach pasażera.",
+                    "option_b": "W foteliku bezpieczeństwa lub innym urządzeniu przytrzymującym dziecko.",
+                    "option_c": "W foteliku bezpieczeństwa tyłem do kierunku jazdy, jeżeli pojazd ma aktywną poduszkę powietrzną dla pasażera.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "W foteliku bezpieczeństwa lub innym urządzeniu przytrzymującym dziecko."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo dziecko o wzroście mniejszym niż 150 cm na przednim siedzeniu samochodu osobowego może być przewożone w foteliku bezpieczeństwa dla dziecka lub innym. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przewozisz dziecko",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 44815,
+                    "question_external_id": "10840",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-45-ust-2-pkt-6",
+                    "legal_unit_label": "art. 45 ust. 2 pkt 6",
+                    "legal_unit_title": "Dziecko poniżej 150 cm na przednim siedzeniu",
+                    "legal_topic_slug": "foteliki-i-przewoz-dzieci",
+                    "article_slug": "foteliki-i-przewoz-dzieci",
+                    "public_note": "To pytanie dotyczy przedniego siedzenia. Art. 45 ust. 2 pkt 6 zabrania przewożenia na nim dziecka poniżej 150 cm poza fotelikiem lub innym urządzeniem przytrzymującym."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 44815,
+                    "external_id": "10840",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10869",
+            "prompt": "W jaki sposób przewozisz dziecko o wzroście mniejszym niż 150 cm samochodem osobowym, w którym jest pięć miejsc siedzących?",
+            "prompt_variants": [
+                "W jaki sposób przewozisz dziecko o wzroście mniejszym niż 150 cm samochodem osobowym, w którym jest pięć miejsc siedzących?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Na przednim siedzeniu bez fotelika lub innego urządzenia przytrzymującego dziecko.",
+                    "option_b": "Na przednim siedzeniu w innym niż fotelik urządzeniu przytrzymującym dziecko.",
+                    "option_c": "Na tylnym siedzeniu bez zapiętych pasów bezpieczeństwa.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Na przednim siedzeniu w innym niż fotelik urządzeniu przytrzymującym dziecko."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo dziecko o wzroście mniejszym niż 150 cm na przednim siedzeniu samochodu osobowego może być przewożone w foteliku bezpieczeństwa dla dziecka lub innym. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przewozisz dziecko",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 44816,
+                    "question_external_id": "10869",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-39-ust-3",
+                    "legal_unit_label": "art. 39 ust. 3",
+                    "legal_unit_title": "Dziecko poniżej 150 cm w urządzeniu przytrzymującym",
+                    "legal_topic_slug": "foteliki-i-przewoz-dzieci",
+                    "article_slug": "foteliki-i-przewoz-dzieci",
+                    "public_note": "To pytanie sprawdza podstawową regułę przewozu dziecka poniżej 150 cm. Art. 39 ust. 3 wymaga urządzenia przytrzymującego dobranego do masy i wzrostu oraz zgodnego z wymaganiami technicznymi."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 44816,
+                    "external_id": "10869",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10871",
+            "prompt": "W jaki sposób zainstalujesz w pojeździe fotelik bezpieczeństwa służący do przewozu dziecka?",
+            "prompt_variants": [
+                "W jaki sposób zainstalujesz w pojeździe fotelik bezpieczeństwa służący do przewozu dziecka?"
+            ],
+            "categories": [
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "W sposób wygodny dla dziecka.",
+                    "option_b": "W sposób wygodny dla siebie.",
+                    "option_c": "Zgodnie z zaleceniami producenta urządzenia.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Zgodnie z zaleceniami producenta urządzenia."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo foteliki bezpieczeństwa dla dziecka oraz inne urządzenia przytrzymujące dla dzieci są instalowane w pojeździe, zgodnie z zaleceniami producenta. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:fotelik",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 44788,
+                    "question_external_id": "10871",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-39-ust-3a",
+                    "legal_unit_label": "art. 39 ust. 3a",
+                    "legal_unit_title": "Montaż fotelika zgodnie z zaleceniami producenta",
+                    "legal_topic_slug": "foteliki-i-przewoz-dzieci",
+                    "article_slug": "foteliki-i-przewoz-dzieci",
+                    "public_note": "To pytanie dotyczy montażu fotelika lub innego urządzenia. Art. 39 ust. 3a wymaga instalacji zgodnej z zaleceniami producenta urządzenia."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 44788,
+                    "external_id": "10871",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44817,
+                    "external_id": "10871",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44864,
+                    "external_id": "10871",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44951,
+                    "external_id": "10871",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44963,
+                    "external_id": "10871",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 45001,
+                    "external_id": "10871",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10876",
+            "prompt": "Czym powinieneś się kierować wybierając fotelik lub urządzenie przytrzymujące służące do przewozu dziecka?",
+            "prompt_variants": [
+                "Czym powinieneś się kierować wybierając fotelik lub urządzenie przytrzymujące służące do przewozu dziecka?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Estetyką.",
+                    "option_b": "Właściwymi warunkami technicznymi dotyczącymi tych urządzeń.",
+                    "option_c": "Przede wszystkim wygodą.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Właściwymi warunkami technicznymi dotyczącymi tych urządzeń."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo dziecko może być przewożone w foteliku bezpieczeństwa dla dziecka lub innym urządzeniu przytrzymującym dla dzieci, zgodnym z masą i wzrostem dziecka. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:fotelik",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 44820,
+                    "question_external_id": "10876",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-39-ust-3",
+                    "legal_unit_label": "art. 39 ust. 3",
+                    "legal_unit_title": "Dziecko poniżej 150 cm w urządzeniu przytrzymującym",
+                    "legal_topic_slug": "foteliki-i-przewoz-dzieci",
+                    "article_slug": "foteliki-i-przewoz-dzieci",
+                    "public_note": "To pytanie sprawdza podstawową regułę przewozu dziecka poniżej 150 cm. Art. 39 ust. 3 wymaga urządzenia przytrzymującego dobranego do masy i wzrostu oraz zgodnego z wymaganiami technicznymi."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 44820,
+                    "external_id": "10876",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10882",
+            "prompt": "Co musisz zrobić, żeby przewieźć trzyletnie dziecko na tylnym siedzeniu samochodu osobowego, na którym w fotelikach już siedzi dwoje dzieci i nie ma możliwości zainstalowania trzeciego fotelika?",
+            "prompt_variants": [
+                "Co musisz zrobić, żeby przewieźć trzyletnie dziecko na tylnym siedzeniu samochodu osobowego, na którym w fotelikach już siedzi dwoje dzieci i nie ma możliwości zainstalowania trzeciego fotelika?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Musisz zabezpieczyć dziecko pasami bezpieczeństwa.",
+                    "option_b": "Powinieneś posadzić dziecko na kolanach osoby dorosłej.",
+                    "option_c": "Musisz zablokować tylne drzwi, uniemożliwiając ich otwarcie od zewnątrz.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Musisz zabezpieczyć dziecko pasami bezpieczeństwa."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo zezwala się na przewożenie w pojeździe na tylnym siedzeniu pojazdu, trzeciego dziecka w wieku co najmniej 3 lat, przytrzymywanego za pomocą pasów. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:fotelik",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 44823,
+                    "question_external_id": "10882",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-39-ust-3c",
+                    "legal_unit_label": "art. 39 ust. 3c",
+                    "legal_unit_title": "Trzecie dziecko na tylnym siedzeniu",
+                    "legal_topic_slug": "foteliki-i-przewoz-dzieci",
+                    "article_slug": "foteliki-i-przewoz-dzieci",
+                    "public_note": "To pytanie sprawdza wyjątek dla trzeciego dziecka na tylnym siedzeniu. Art. 39 ust. 3c wymaga wieku co najmniej 3 lat, dwóch już zamontowanych urządzeń, braku możliwości montażu trzeciego i zapięcia pasa."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 44823,
+                    "external_id": "10882",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10969",
+            "prompt": "Czy przewożenie na przednim siedzeniu pojazdu dziecka o wzroście co najmniej 135 cm, zabezpieczonego jedynie pasami bezpieczeństwa, jest dozwolone?",
+            "prompt_variants": [
+                "Czy przewożenie na przednim siedzeniu pojazdu dziecka o wzroście co najmniej 135 cm, zabezpieczonego jedynie pasami bezpieczeństwa, jest dozwolone?"
+            ],
+            "categories": [
+                "C"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak, ponieważ przepisy na to zezwalają, jeżeli ze względu na masę dziecka nie jest możliwe zapewnienie urządzenia przytrzymującego dla dziecka.",
+                    "option_b": "Nie, ponieważ przepisy dotyczące przewozu dzieci zezwalają na przewóz dzieci o wzroście co najmniej 135 cm bez fotelika lub innego urządzenia przytrzymującego dziecko tylko na tylnym siedzeniu pojazdu.",
+                    "option_c": "Tak, jeżeli pojazd nie jest wyposażony w tylne siedzenia.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie, ponieważ przepisy dotyczące przewozu dzieci zezwalają na przewóz dzieci o wzroście co najmniej 135 cm bez fotelika lub innego urządzenia przytrzymującego dziecko tylko na tylnym siedzeniu pojazdu."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:dziecka o wzroscie",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 45253,
+                    "question_external_id": "10969",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-45-ust-2-pkt-6",
+                    "legal_unit_label": "art. 45 ust. 2 pkt 6",
+                    "legal_unit_title": "Dziecko poniżej 150 cm na przednim siedzeniu",
+                    "legal_topic_slug": "foteliki-i-przewoz-dzieci",
+                    "article_slug": "foteliki-i-przewoz-dzieci",
+                    "public_note": "To pytanie dotyczy przedniego siedzenia. Art. 45 ust. 2 pkt 6 zabrania przewożenia na nim dziecka poniżej 150 cm poza fotelikiem lub innym urządzeniem przytrzymującym."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 45253,
+                    "external_id": "10969",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "13382",
+            "prompt": "Po spełnieniu, którego z wymienionych warunków można przewozić samochodem osobowym, poza fotelikiem bezpieczeństwa lub innym urządzeniem przytrzymującym, dziecko mające mniej niż 150 cm wzrostu?",
+            "prompt_variants": [
+                "Po spełnieniu, którego z wymienionych warunków można przewozić samochodem osobowym, poza fotelikiem bezpieczeństwa lub innym urządzeniem przytrzymującym, dziecko mające mniej niż 150 cm wzrostu?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Prędkość pojazdu nie przekroczy 40 km/h.",
+                    "option_b": "Dziecko posiada zaświadczenie lekarskie o przeciwwskazaniu do przewożenia w foteliku lub innym urządzeniu.",
+                    "option_c": "Pojazd posiada dodatkowe oznakowanie, które wskazuje, że jest nim przewożone dziecko.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Dziecko posiada zaświadczenie lekarskie o przeciwwskazaniu do przewożenia w foteliku lub innym urządzeniu."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo samochodem osobowym można przewozić dziecko poza fotelikiem bezpieczeństwa mające poniżej 150 cm wzrostu, gdy dziecko posiada zaświadczenie lekarskie. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:fotelik",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 47833,
+                    "question_external_id": "13382",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-39-ust-4-pkt-4",
+                    "legal_unit_label": "art. 39 ust. 4 pkt 4",
+                    "legal_unit_title": "Zaświadczenie o przeciwwskazaniu do przewozu w foteliku",
+                    "legal_topic_slug": "foteliki-i-przewoz-dzieci",
+                    "article_slug": "foteliki-i-przewoz-dzieci",
+                    "public_note": "To pytanie dotyczy wyjątku opartego na zaświadczeniu lekarskim. Art. 39 ust. 4 pkt 4 wyłącza obowiązek urządzenia przytrzymującego przy przeciwwskazaniu potwierdzonym takim dokumentem."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 47833,
+                    "external_id": "13382",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        }
+    ]
+}

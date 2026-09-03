@@ -1,0 +1,24 @@
+services:
+  app:
+    env_file:
+      - .env
+
+  scheduler:
+    env_file:
+      - .env
+
+  ranked-websocket:
+    env_file:
+      - .env
+
+  vite:
+    profiles:
+      - frontend-dev
+    restart: "no"
+    command: npm run dev -- --host 0.0.0.0
+    volumes:
+      - ./public:/app/public
+      - ./vendor/tightenco/ziggy:/app/vendor/tightenco/ziggy:ro
+    environment:
+      APP_URL: http://localhost:8000
+      VITE_HMR_HOST: localhost

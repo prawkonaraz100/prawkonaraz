@@ -1,0 +1,1541 @@
+{
+    "generated_at": "2026-06-22T15:40:04+02:00",
+    "candidate": {
+        "slug": "kategorie-prawa-jazdy-i-uprawnienia",
+        "title": "Kategorie prawa jazdy i zakres uprawnień",
+        "description": "Węższy temat artykułu wykryty na podstawie treści pytań.",
+        "level": "focused",
+        "status": "candidate",
+        "rule_version": "2026-06-19-prompt-v2",
+        "existing_article_slug": null
+    },
+    "workflow": {
+        "status": "ready",
+        "next_action": "Zweryfikuj klaster, oficjalna podstawe prawna i utworz artykul zgodnie z runbookiem.",
+        "public_relations_are_verified_only": true
+    },
+    "article": null,
+    "summary": {
+        "canonical_questions": 23,
+        "question_rows": 25,
+        "categories": [
+            "A",
+            "A1",
+            "A2",
+            "AM",
+            "B",
+            "B1",
+            "T"
+        ],
+        "canonical_questions_with_verified_reference": 0,
+        "prompt_conflicts": [],
+        "answer_conflicts": [],
+        "correct_answer_conflicts": []
+    },
+    "questions": [
+        {
+            "external_id": "6401",
+            "prompt": "Którym z wymienionych zespołów pojazdów możesz kierować mając prawo jazdy kategorii B?",
+            "prompt_variants": [
+                "Którym z wymienionych zespołów pojazdów możesz kierować mając prawo jazdy kategorii B?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Samochodem ciężarowym o dopuszczalnej masie całkowitej 2,5 t z przyczepą lekką.",
+                    "option_b": "Ciągnikiem rolniczym z dwiema przyczepami.",
+                    "option_c": "Samochodem osobowym z przyczepą, których łączna dopuszczalna masa całkowita wynosi 4,5 t.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Samochodem ciężarowym o dopuszczalnej masie całkowitej 2,5 t z przyczepą lekką."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6401/image/full.3ebbc9a463d1.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6401/image/thumb.132a7b20f7b4.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:prawo jazdy kategorii",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 34948,
+                    "external_id": "6401",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6414",
+            "prompt": "Czy masz prawo kierować samochodem osobowym, posiadając prawo jazdy, którego termin ważności upłynął?",
+            "prompt_variants": [
+                "Czy masz prawo kierować samochodem osobowym, posiadając prawo jazdy, którego termin ważności upłynął?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak, przez 7 dni po upływie terminu ważności.",
+                    "option_b": "Tak, przez 14 dni po upływie terminu ważności.",
+                    "option_c": "Nie.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Nie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo kierujacym pojazdem może być osoba, która osiągnęła wymagany wiek i jest sprawna pod względem fizycznym i psychicznym oraz posiada odpowiedni, ważny. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6414/image/full.9ee832434795.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6414/image/thumb.e03cdfb624a0.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:posiadajac prawo jazdy",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 34961,
+                    "external_id": "6414",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6422",
+            "prompt": "Czy masz prawo kierować czterokołowcem, posiadając nieważne prawo jazdy kategorii B1?",
+            "prompt_variants": [
+                "Czy masz prawo kierować czterokołowcem, posiadając nieważne prawo jazdy kategorii B1?"
+            ],
+            "categories": [
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak, przez 7 dni po upływie terminu ważności.",
+                    "option_b": "Tak, przez 14 dni po upływie terminu ważności.",
+                    "option_c": "Nie.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Nie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo kierujacym pojazdem może być osoba, która osiągnęła wymagany wiek i jest sprawna pod względem fizycznym i psychicznym oraz posiada umiejętność. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/6422/image/full.175fee6d5863.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/6422/image/thumb.18a192da650b.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:prawo jazdy kategorii",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 35130,
+                    "external_id": "6422",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6430",
+            "prompt": "Którym z pojazdów możesz kierować posiadając prawo jazdy kategorii B1?",
+            "prompt_variants": [
+                "Którym z pojazdów możesz kierować posiadając prawo jazdy kategorii B1?"
+            ],
+            "categories": [
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Motocyklem z wózkiem bocznym.",
+                    "option_b": "Czterokołowcem.",
+                    "option_c": "Każdym pojazdem samochodowym o masie własnej wynoszącej 650 kg.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Czterokołowcem."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedź B. Prawo jazdy kategorii B1 uprawnia do kierowania czterokołowcem. Motocykl z wózkiem bocznym ani dowolny pojazd samochodowy o masie własnej 650 kg nie mieszczą się w tym uprawnieniu."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/6430/image/full.e6cb5f839332.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/6430/image/thumb.7b3b25eab1f9.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:prawo jazdy kategorii|posiadajac prawo jazdy",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 35134,
+                    "external_id": "6430",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6431",
+            "prompt": "Którym z pojazdów możesz kierować posiadając prawo jazdy kategorii B1?",
+            "prompt_variants": [
+                "Którym z pojazdów możesz kierować posiadając prawo jazdy kategorii B1?"
+            ],
+            "categories": [
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Każdym samochodem osobowym.",
+                    "option_b": "Motorowerem.",
+                    "option_c": "Ciągnikiem rolniczym.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Motorowerem."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo prawo jazdy kategorii B1 uprawnia do kierowania czterokołowcem i pojazdami określonymi dla prawa jazdy kategorii AM ( motorower, czterokołowiec lekki). Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/6431/image/full.e3a824bdca5e.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/6431/image/thumb.7b3b25eab1f9.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:prawo jazdy kategorii|posiadajac prawo jazdy",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 35135,
+                    "external_id": "6431",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6599",
+            "prompt": "Którym z wymienionych pojazdów masz prawo kierować posiadając prawo jazdy kategorii A?",
+            "prompt_variants": [
+                "Którym z wymienionych pojazdów masz prawo kierować posiadając prawo jazdy kategorii A?"
+            ],
+            "categories": [
+                "A"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Motocyklem z bocznym wózkiem.",
+                    "option_b": "Czterokołowym pojazdem samochodowym o masie własnej nieprzekraczającej 550 kg.",
+                    "option_c": "Pojazdem wolnobieżnym.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Motocyklem z bocznym wózkiem."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/6599/image/full.87791f2b30bf.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/6599/image/thumb.7f298417f06b.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:prawo jazdy kategorii|posiadajac prawo jazdy",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 35810,
+                    "external_id": "6599",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6604",
+            "prompt": "Którym z wymienionych pojazdów masz prawo kierować posiadając prawo jazdy kategorii A1?",
+            "prompt_variants": [
+                "Którym z wymienionych pojazdów masz prawo kierować posiadając prawo jazdy kategorii A1?"
+            ],
+            "categories": [
+                "A1"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Motocyklem trójkołowym o mocy nieprzekraczającej 15 kW.",
+                    "option_b": "Czterokołowcem o masie własnej wynoszącej 550 kg.",
+                    "option_c": "Pojazdem wolnobieżnym.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Motocyklem trójkołowym o mocy nieprzekraczającej 15 kW."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A. Prawo jazdy kategorii A1 uprawnia miedzy innymi do kierowania motocyklem trojkolowym o mocy nieprzekraczajacej 15 kW. Nie sprowadza sie tylko do uprawnienia na motorower."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/6604/image/full.a2355bded907.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/6604/image/thumb.fc35bab5b428.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:prawo jazdy kategorii|posiadajac prawo jazdy",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 35854,
+                    "external_id": "6604",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6606",
+            "prompt": "Którym z wymienionych pojazdów masz prawo kierować posiadając prawo jazdy kategorii A1?",
+            "prompt_variants": [
+                "Którym z wymienionych pojazdów masz prawo kierować posiadając prawo jazdy kategorii A1?"
+            ],
+            "categories": [
+                "A1"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Pojazdem wolnobieżnym.",
+                    "option_b": "Każdym czterokołowcem.",
+                    "option_c": "Motorowerem.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Motorowerem."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo kategoria A1 prawa jazdy uprawnia do kierowania: motocyklem o pojemności skokowej silnika nieprzekraczającej 125 cm3, motocyklem trójkołowym o mocy. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/6606/image/full.379c1fc3c113.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/6606/image/thumb.fc35bab5b428.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:prawo jazdy kategorii|posiadajac prawo jazdy",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 35856,
+                    "external_id": "6606",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6608",
+            "prompt": "Którym z wymienionych pojazdów masz prawo kierować posiadając prawo jazdy kategorii A2?",
+            "prompt_variants": [
+                "Którym z wymienionych pojazdów masz prawo kierować posiadając prawo jazdy kategorii A2?"
+            ],
+            "categories": [
+                "A2"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Motocyklem trójkołowym o mocy nieprzekraczającej 15 kW.",
+                    "option_b": "Czterokołowcem o masie własnej wynoszącej 550 kg.",
+                    "option_c": "Pojazdem wolnobieżnym.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Motocyklem trójkołowym o mocy nieprzekraczającej 15 kW."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A. Prawo jazdy kategorii A2 obejmuje rowniez motocykl trojkolowy o mocy nieprzekraczajacej 15 kW. Dlatego w tym pytaniu nieprawidlowa jest odpowiedz ograniczajaca to uprawnienie jedynie do motoroweru."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/6608/image/full.2671649150b3.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/6608/image/thumb.0d6ef58fb872.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:prawo jazdy kategorii|posiadajac prawo jazdy",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 35900,
+                    "external_id": "6608",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6610",
+            "prompt": "Którym z wymienionych pojazdów masz prawo kierować posiadając prawo jazdy kategorii A2?",
+            "prompt_variants": [
+                "Którym z wymienionych pojazdów masz prawo kierować posiadając prawo jazdy kategorii A2?"
+            ],
+            "categories": [
+                "A2"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Pojazdem wolnobieżnym.",
+                    "option_b": "Każdym czterokołowcem.",
+                    "option_c": "Motorowerem.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Motorowerem."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/6610/image/full.593eb7fdd58a.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/6610/image/thumb.0d6ef58fb872.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:prawo jazdy kategorii|posiadajac prawo jazdy",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 35902,
+                    "external_id": "6610",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6613",
+            "prompt": "Którym z pojazdów masz prawo kierować posiadając prawo jazdy kategorii AM?",
+            "prompt_variants": [
+                "Którym z pojazdów masz prawo kierować posiadając prawo jazdy kategorii AM?"
+            ],
+            "categories": [
+                "AM"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Motocyklem trójkołowym.",
+                    "option_b": "Każdym czterokołowcem.",
+                    "option_c": "Czterokołowcem lekkim.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Czterokołowcem lekkim."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo prawo jazdy kategorii AM stwierdza posiadanie uprawnienia do kierowania motorowerem i czterokołowcem lekkim. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/am/6613/image/full.03dbcec222ea.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/am/6613/image/thumb.bd5eea01abd2.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:prawo jazdy kategorii|posiadajac prawo jazdy",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 35937,
+                    "external_id": "6613",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6617",
+            "prompt": "Którym z pojazdów masz prawo kierować posiadając prawo jazdy kategorii AM?",
+            "prompt_variants": [
+                "Którym z pojazdów masz prawo kierować posiadając prawo jazdy kategorii AM?"
+            ],
+            "categories": [
+                "AM"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Motocyklem trójkołowym.",
+                    "option_b": "Motorowerem.",
+                    "option_c": "Każdym czterokołowcem.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Motorowerem."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedź B. Prawo jazdy kategorii AM uprawnia do kierowania motorowerem oraz czterokołowcem lekkim. Spośród podanych odpowiedzi tylko motorower jest więc właściwą odpowiedzią."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/am/6617/image/full.f7542bcfab0e.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/am/6617/image/thumb.bd5eea01abd2.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:prawo jazdy kategorii|posiadajac prawo jazdy",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 35939,
+                    "external_id": "6617",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6618",
+            "prompt": "Którym z pojazdów masz prawo kierować posiadając prawo jazdy kategorii AM?",
+            "prompt_variants": [
+                "Którym z pojazdów masz prawo kierować posiadając prawo jazdy kategorii AM?"
+            ],
+            "categories": [
+                "AM"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Motocyklem trójkołowym.",
+                    "option_b": "Czterokołowcem lekkim.",
+                    "option_c": "Każdym skuterem.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Czterokołowcem lekkim."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo prawo jazdy kategorii AM stwierdza posiadanie uprawnienia do kierowania motorowerem i czterokołowcem lekkim. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/am/6618/image/full.bc2419a76321.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/am/6618/image/thumb.bd5eea01abd2.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:prawo jazdy kategorii|posiadajac prawo jazdy",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 35940,
+                    "external_id": "6618",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6708",
+            "prompt": "Którym z wymienionych pojazdów masz prawo kierować posiadając prawo jazdy kategorii T?",
+            "prompt_variants": [
+                "Którym z wymienionych pojazdów masz prawo kierować posiadając prawo jazdy kategorii T?"
+            ],
+            "categories": [
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Samochodem osobowym.",
+                    "option_b": "Motocyklem.",
+                    "option_c": "Ciągnikiem rolniczym.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Ciągnikiem rolniczym."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, czyli ciagnik rolniczy. W tym pytaniu trzeba wskazac pojazd, ktorym wolno kierowac na podstawie kategorii T, a nie zestaw pojazdow opisany dodatkowym warunkiem."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/6708/image/full.8f923955aa75.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/6708/image/thumb.30563428c98a.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:prawo jazdy kategorii|posiadajac prawo jazdy",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 36152,
+                    "external_id": "6708",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6709",
+            "prompt": "Którym z wymienionych pojazdów masz prawo kierować posiadając prawo jazdy kategorii T?",
+            "prompt_variants": [
+                "Którym z wymienionych pojazdów masz prawo kierować posiadając prawo jazdy kategorii T?"
+            ],
+            "categories": [
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Ciągnikiem rolniczym z przyczepą.",
+                    "option_b": "Ciągnikiem siodłowym.",
+                    "option_c": "Czterokołowcem.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Ciągnikiem rolniczym z przyczepą."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo prawo jazdy kategorii T uprawnia do kierowania ciągnikiem rolniczym, pojazdem wolnobieżnym. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/6709/image/full.b9f2a39bfe1b.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/6709/image/thumb.30563428c98a.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:prawo jazdy kategorii|posiadajac prawo jazdy",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 36153,
+                    "external_id": "6709",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7560",
+            "prompt": "Do kierowania którym z wymienionych pojazdów uprawnia Cię prawo jazdy kategorii A?",
+            "prompt_variants": [
+                "Do kierowania którym z wymienionych pojazdów uprawnia Cię prawo jazdy kategorii A?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Motocyklem z bocznym wózkiem.",
+                    "option_b": "Czterokołowym pojazdem samochodowym o masie własnej do 550 kg.",
+                    "option_c": "Pojazdem wolnobieżnym.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Motocyklem z bocznym wózkiem."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. W praktyce trzeba ocenic sytuacje zgodnie z zasadami ruchu drogowego, a nie tylko po pozorach. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:prawo jazdy kategorii",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 41737,
+                    "external_id": "7560",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41808,
+                    "external_id": "7560",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41846,
+                    "external_id": "7560",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7596",
+            "prompt": "Którym z wymienionych pojazdów wolno Ci kierować, jeśli masz prawo jazdy kategorii AM?",
+            "prompt_variants": [
+                "Którym z wymienionych pojazdów wolno Ci kierować, jeśli masz prawo jazdy kategorii AM?"
+            ],
+            "categories": [
+                "AM"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Motocyklem.",
+                    "option_b": "Motorowerem.",
+                    "option_c": "Każdym czterokołowcem.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Motorowerem."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo prawo jazdy kategorii AM stwierdza posiadanie uprawnienia do kierowania motorowerem i czterokołowcem lekkim. W praktyce trzeba ocenic sytuacje zgodnie z zasadami ruchu drogowego, a nie tylko po pozorach. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:prawo jazdy kategorii",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 41788,
+                    "external_id": "7596",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7625",
+            "prompt": "Do kierowania którym z pojazdów uprawnia prawo jazdy kategorii T?",
+            "prompt_variants": [
+                "Do kierowania którym z pojazdów uprawnia prawo jazdy kategorii T?"
+            ],
+            "categories": [
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Samochodem ciężarowym.",
+                    "option_b": "Ciągnikiem rolniczym lub pojazdem wolnobieżnym.",
+                    "option_c": "Pojazdem samochodowym o masie własnej do 550 kg, z wyjątkiem motocykla.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Ciągnikiem rolniczym lub pojazdem wolnobieżnym."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedź B. Prawo jazdy kategorii T uprawnia do kierowania ciągnikiem rolniczym lub pojazdem wolnobieżnym, a także odpowiednimi zespołami tych pojazdów z przyczepami. Samochód ciężarowy ani lekki pojazd samochodowy nie należą do tej kategorii."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:prawo jazdy kategorii",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 41705,
+                    "external_id": "7625",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7626",
+            "prompt": "Do kierowania którym z pojazdów uprawnia prawo jazdy kategorii T?",
+            "prompt_variants": [
+                "Do kierowania którym z pojazdów uprawnia prawo jazdy kategorii T?"
+            ],
+            "categories": [
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Ciągnikiem rolniczym z dwiema przyczepami.",
+                    "option_b": "Ciągnikiem balastowym.",
+                    "option_c": "Każdym motocyklem.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Ciągnikiem rolniczym z dwiema przyczepami."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo prawo jazdy kategorii T uprawnia do kierowania: - ciągnikiem rolniczym lub pojazdem wolnobieżnym, - zespołem pojazdów złożonym z ciągnika rolniczego. W praktyce trzeba ocenic sytuacje zgodnie z zasadami ruchu drogowego, a nie tylko po pozorach. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:prawo jazdy kategorii",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 41706,
+                    "external_id": "7626",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10090",
+            "prompt": "Czy posiadając prawo jazdy kat. B jesteś uprawniony do kierowania ciągnikiem rolniczym za granicami Państwa?",
+            "prompt_variants": [
+                "Czy posiadając prawo jazdy kat. B jesteś uprawniony do kierowania ciągnikiem rolniczym za granicami Państwa?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak.",
+                    "option_b": "Tak, ale tylko w terenie zabudowanym.",
+                    "option_c": "Nie.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Nie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/10090/image/full.0692329e0754.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/10090/image/thumb.22742741dae5.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:posiadajac prawo jazdy",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 43632,
+                    "external_id": "10090",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10091",
+            "prompt": "Czy posiadając prawo jazdy kat. B od co najmniej 3 lat, masz prawo kierować motocyklem o pojemności skokowej silnika nie większej niż 125 cm3?",
+            "prompt_variants": [
+                "Czy posiadając prawo jazdy kat. B od co najmniej 3 lat, masz prawo kierować motocyklem o pojemności skokowej silnika nie większej niż 125 cm3?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak.",
+                    "option_b": "Nie.",
+                    "option_c": "Tak, pod warunkiem jazdy z maksymalną prędkością 30 km/h.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/10091/image/full.6593d0eda137.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/10091/image/thumb.baf884f98127.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:posiadajac prawo jazdy",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 43633,
+                    "external_id": "10091",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "11060",
+            "prompt": "Do kierowania którym z wymienionych pojazdów uprawnia prawo jazdy kategorii A1?",
+            "prompt_variants": [
+                "Do kierowania którym z wymienionych pojazdów uprawnia prawo jazdy kategorii A1?"
+            ],
+            "categories": [
+                "A"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Pojazdem wolnobieżnym.",
+                    "option_b": "Motocyklem trójkołowym o mocy nieprzekraczającej 15 kW.",
+                    "option_c": "Czterokołowcem.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Motocyklem trójkołowym o mocy nieprzekraczającej 15 kW."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. W praktyce trzeba ocenic sytuacje zgodnie z zasadami ruchu drogowego, a nie tylko po pozorach. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:prawo jazdy kategorii",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 45229,
+                    "external_id": "11060",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "11070",
+            "prompt": "Osoba posiadająca prawo jazdy kategorii AM, A1, A2, A jest zobowiązana zawiadomić starostę o zniszczeniu tego dokumentu w stopniu powodującym nieczytelność w terminie:",
+            "prompt_variants": [
+                "Osoba posiadająca prawo jazdy kategorii AM, A1, A2, A jest zobowiązana zawiadomić starostę o zniszczeniu tego dokumentu w stopniu powodującym nieczytelność w terminie:"
+            ],
+            "categories": [
+                "A"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "30 dni od zaistnienia tego zdarzenia;",
+                    "option_b": "33 dni od zaistnienia tego zdarzenia;",
+                    "option_c": "14 dni od zaistnienia tego zdarzenia.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "30 dni od zaistnienia tego zdarzenia;"
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo osoba posiadająca prawo jazdy jest obowiązana zawiadomić starostę o utracie tego dokumentu, jego zniszczeniu w stopniu powodującym nieczytelność. W praktyce trzeba ocenic sytuacje zgodnie z zasadami ruchu drogowego, a nie tylko po pozorach. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:prawo jazdy kategorii",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 45231,
+                    "external_id": "11070",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        }
+    ]
+}

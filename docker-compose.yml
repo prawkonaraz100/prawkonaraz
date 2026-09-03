@@ -1,0 +1,307 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    restart: unless-stopped
+    working_dir: /var/www/html
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      APP_DEBUG: ${APP_DEBUG:-true}
+      APP_URL: ${APP_URL:-http://localhost:8000}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-}
+      GOOGLE_IDENTITY_ENABLED: ${GOOGLE_IDENTITY_ENABLED:-false}
+      GOOGLE_ONE_TAP_ENABLED: ${GOOGLE_ONE_TAP_ENABLED:-false}
+      DB_CONNECTION: ${DB_CONNECTION:-pgsql}
+      DB_DATABASE: ${DB_DATABASE:-prawkobit}
+      DB_HOST: ${DB_HOST:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USERNAME: ${DB_USERNAME:-prawkobit}
+      DB_PASSWORD: ${DB_PASSWORD:-prawkobit}
+      DB_SSLMODE: ${DB_SSLMODE:-prefer}
+      DB_BUSY_TIMEOUT: ${DB_BUSY_TIMEOUT:-10000}
+      DB_JOURNAL_MODE: ${DB_JOURNAL_MODE:-WAL}
+      DB_SYNCHRONOUS: ${DB_SYNCHRONOUS:-NORMAL}
+      SESSION_DRIVER: ${SESSION_DRIVER:-redis}
+      SESSION_CONNECTION: ${SESSION_CONNECTION:-default}
+      CACHE_STORE: ${CACHE_STORE:-redis}
+      QUEUE_CONNECTION: ${QUEUE_CONNECTION:-sync}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-null}
+      STUDY_COMPLETED_SESSION_RETENTION_DAYS: ${STUDY_COMPLETED_SESSION_RETENTION_DAYS:-365}
+      STUDY_ABANDONED_SESSION_RETENTION_DAYS: ${STUDY_ABANDONED_SESSION_RETENTION_DAYS:-7}
+      STUDY_ADMIN_ACTIVITY_WINDOW_DAYS: ${STUDY_ADMIN_ACTIVITY_WINDOW_DAYS:-90}
+      STUDY_QUESTION_ANALYTICS_WINDOW_DAYS: ${STUDY_QUESTION_ANALYTICS_WINDOW_DAYS:-365}
+      STUDY_QUESTION_DAILY_STATS_RETENTION_DAYS: ${STUDY_QUESTION_DAILY_STATS_RETENTION_DAYS:-400}
+      STUDY_EXPLANATION_SIGN_REFERENCES_ENABLED: ${STUDY_EXPLANATION_SIGN_REFERENCES_ENABLED:-false}
+      BACKUP_DISK: ${BACKUP_DISK:-backup_local}
+      BACKUP_SCHEDULE_FREQUENCY: ${BACKUP_SCHEDULE_FREQUENCY:-weekly}
+      BACKUP_SCHEDULE_DAY_OF_WEEK: ${BACKUP_SCHEDULE_DAY_OF_WEEK:-0}
+      BACKUP_SCHEDULE_AT: ${BACKUP_SCHEDULE_AT:-02:15}
+      HEALTH_BACKUP_MAX_AGE_HOURS: ${HEALTH_BACKUP_MAX_AGE_HOURS:-192}
+      BACKUP_LOCAL_ROOT: ${BACKUP_LOCAL_ROOT:-/srv/backups}
+      MEDIA_DISK: ${MEDIA_DISK:-media_local}
+      MEDIA_PUBLIC_DISK: ${MEDIA_PUBLIC_DISK:-media_local}
+      MEDIA_UPLOAD_DISK: ${MEDIA_UPLOAD_DISK:-media_local}
+      MEDIA_LOCAL_ROOT: /srv/media
+      MEDIA_LOCAL_URL: ${MEDIA_LOCAL_URL:-http://localhost:8081}
+      MEDIA_LOCAL_LINK: ${MEDIA_LOCAL_LINK:-storage-bulk}
+      MEDIA_PUBLIC_BASE_URL: ${MEDIA_PUBLIC_BASE_URL:-}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-}
+      R2_REGION: ${R2_REGION:-auto}
+      R2_BUCKET: ${R2_BUCKET:-}
+      R2_ENDPOINT: ${R2_ENDPOINT:-}
+      R2_URL: ${R2_URL:-}
+      R2_USE_PATH_STYLE_ENDPOINT: ${R2_USE_PATH_STYLE_ENDPOINT:-true}
+    command: >
+      sh -lc "mkdir -p storage/app/backup-local/backups/database storage/app/backup-local/backups/database-manifests
+      && mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views
+      && mkdir -p /srv/backups/backups/database /srv/backups/backups/database-manifests
+      && chmod -R 0777 storage bootstrap/cache || true
+      && chmod -R 0777 /srv/backups || true
+      && php artisan storage:link --relative --force >/dev/null 2>&1 || true
+      && php artisan optimize:clear >/dev/null 2>&1 || true
+      && php-fpm -F"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "php -r 'exit(@fsockopen(\"127.0.0.1\", 9000) ? 0 : 1);'",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    volumes:
+      - ./app:/var/www/html/app
+      - ./bootstrap:/var/www/html/bootstrap
+      - ./config:/var/www/html/config
+      - ./database:/var/www/html/database
+      - ./lang:/var/www/html/lang
+      - ./public:/var/www/html/public
+      - ./resources:/var/www/html/resources
+      - ./routes:/var/www/html/routes
+      - ./storage:/var/www/html/storage
+      - ./tests:/var/www/html/tests
+      - ./artisan:/var/www/html/artisan:ro
+      - ./composer.json:/var/www/html/composer.json:ro
+      - ./composer.lock:/var/www/html/composer.lock:ro
+      - "${AUDIO_GENERATOR_HOST_ROOT:-D:/audio-generator}:/audio-generator"
+      - backup-data:/srv/backups
+      - "${MEDIA_LOCAL_HOST_ROOT:-D:/datasets/mi-prawo-jazdy-2026/app-media}:/srv/media"
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    restart: unless-stopped
+    working_dir: /var/www/html
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      APP_ENV: ${APP_ENV:-production}
+      APP_DEBUG: ${APP_DEBUG:-false}
+      APP_URL: ${APP_URL:-http://localhost:8000}
+      DB_CONNECTION: ${DB_CONNECTION:-pgsql}
+      DB_DATABASE: ${DB_DATABASE:-prawkobit}
+      DB_HOST: ${DB_HOST:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USERNAME: ${DB_USERNAME:-prawkobit}
+      DB_PASSWORD: ${DB_PASSWORD:-prawkobit}
+      DB_SSLMODE: ${DB_SSLMODE:-prefer}
+      DB_BUSY_TIMEOUT: ${DB_BUSY_TIMEOUT:-10000}
+      DB_JOURNAL_MODE: ${DB_JOURNAL_MODE:-WAL}
+      DB_SYNCHRONOUS: ${DB_SYNCHRONOUS:-NORMAL}
+      SESSION_DRIVER: ${SESSION_DRIVER:-redis}
+      SESSION_CONNECTION: ${SESSION_CONNECTION:-default}
+      CACHE_STORE: ${CACHE_STORE:-redis}
+      QUEUE_CONNECTION: ${QUEUE_CONNECTION:-sync}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-null}
+      STUDY_COMPLETED_SESSION_RETENTION_DAYS: ${STUDY_COMPLETED_SESSION_RETENTION_DAYS:-365}
+      STUDY_ABANDONED_SESSION_RETENTION_DAYS: ${STUDY_ABANDONED_SESSION_RETENTION_DAYS:-7}
+      STUDY_ADMIN_ACTIVITY_WINDOW_DAYS: ${STUDY_ADMIN_ACTIVITY_WINDOW_DAYS:-90}
+      STUDY_QUESTION_ANALYTICS_WINDOW_DAYS: ${STUDY_QUESTION_ANALYTICS_WINDOW_DAYS:-365}
+      STUDY_QUESTION_DAILY_STATS_RETENTION_DAYS: ${STUDY_QUESTION_DAILY_STATS_RETENTION_DAYS:-400}
+      BACKUP_DISK: ${BACKUP_DISK:-backup_local}
+      BACKUP_SCHEDULE_FREQUENCY: ${BACKUP_SCHEDULE_FREQUENCY:-weekly}
+      BACKUP_SCHEDULE_DAY_OF_WEEK: ${BACKUP_SCHEDULE_DAY_OF_WEEK:-0}
+      BACKUP_SCHEDULE_AT: ${BACKUP_SCHEDULE_AT:-02:15}
+      HEALTH_BACKUP_MAX_AGE_HOURS: ${HEALTH_BACKUP_MAX_AGE_HOURS:-192}
+      BACKUP_LOCAL_ROOT: ${BACKUP_LOCAL_ROOT:-/srv/backups}
+      MEDIA_DISK: ${MEDIA_DISK:-media_local}
+      MEDIA_PUBLIC_DISK: ${MEDIA_PUBLIC_DISK:-media_local}
+      MEDIA_UPLOAD_DISK: ${MEDIA_UPLOAD_DISK:-media_local}
+      MEDIA_LOCAL_ROOT: /srv/media
+      MEDIA_LOCAL_URL: ${MEDIA_LOCAL_URL:-http://localhost:8081}
+      MEDIA_LOCAL_LINK: ${MEDIA_LOCAL_LINK:-storage-bulk}
+      MEDIA_PUBLIC_BASE_URL: ${MEDIA_PUBLIC_BASE_URL:-}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-}
+      R2_REGION: ${R2_REGION:-auto}
+      R2_BUCKET: ${R2_BUCKET:-}
+      R2_ENDPOINT: ${R2_ENDPOINT:-}
+      R2_URL: ${R2_URL:-}
+      R2_USE_PATH_STYLE_ENDPOINT: ${R2_USE_PATH_STYLE_ENDPOINT:-true}
+    command: >
+      sh -lc "mkdir -p storage/app/backup-local/backups/database storage/app/backup-local/backups/database-manifests
+      && mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views
+      && mkdir -p /srv/backups/backups/database /srv/backups/backups/database-manifests
+      && chmod -R 0777 storage bootstrap/cache || true
+      && chmod -R 0777 /srv/backups || true
+      && php artisan optimize:clear >/dev/null 2>&1 || true
+      && while true; do php artisan schedule:run --no-interaction --verbose; sleep 60; done"
+    volumes:
+      - ./app:/var/www/html/app
+      - ./bootstrap:/var/www/html/bootstrap
+      - ./config:/var/www/html/config
+      - ./database:/var/www/html/database
+      - ./lang:/var/www/html/lang
+      - ./public:/var/www/html/public
+      - ./resources:/var/www/html/resources
+      - ./routes:/var/www/html/routes
+      - ./storage:/var/www/html/storage
+      - ./tests:/var/www/html/tests
+      - ./artisan:/var/www/html/artisan:ro
+      - ./composer.json:/var/www/html/composer.json:ro
+      - ./composer.lock:/var/www/html/composer.lock:ro
+      - backup-data:/srv/backups
+      - "${MEDIA_LOCAL_HOST_ROOT:-D:/datasets/mi-prawo-jazdy-2026/app-media}:/srv/media"
+
+  ranked-websocket:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    restart: unless-stopped
+    working_dir: /var/www/html
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      APP_ENV: ${APP_ENV:-production}
+      APP_DEBUG: ${APP_DEBUG:-false}
+      APP_URL: ${APP_URL:-http://localhost:8000}
+      DB_CONNECTION: ${DB_CONNECTION:-pgsql}
+      DB_DATABASE: ${DB_DATABASE:-prawkobit}
+      DB_HOST: ${DB_HOST:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USERNAME: ${DB_USERNAME:-prawkobit}
+      DB_PASSWORD: ${DB_PASSWORD:-prawkobit}
+      DB_SSLMODE: ${DB_SSLMODE:-prefer}
+      SESSION_DRIVER: ${SESSION_DRIVER:-redis}
+      SESSION_CONNECTION: ${SESSION_CONNECTION:-default}
+      CACHE_STORE: ${CACHE_STORE:-redis}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-null}
+      RANKED_PRESENCE_STORE: ${RANKED_PRESENCE_STORE:-redis}
+      RANKED_PRESENCE_KEY_PREFIX: ${RANKED_PRESENCE_KEY_PREFIX:-ranked:presence}
+      RANKED_PRESENCE_TTL_SECONDS: ${RANKED_PRESENCE_TTL_SECONDS:-90}
+      RANKED_WEBSOCKET_HOST: ${RANKED_WEBSOCKET_HOST:-0.0.0.0}
+      RANKED_WEBSOCKET_PORT: ${RANKED_WEBSOCKET_PORT:-8080}
+      RANKED_WEBSOCKET_PATH: ${RANKED_WEBSOCKET_PATH:-/ranked}
+      RANKED_WEBSOCKET_PUBLISH_INTERVAL_MS: ${RANKED_WEBSOCKET_PUBLISH_INTERVAL_MS:-1000}
+      RANKED_WEBSOCKET_TICKET_STORE: ${RANKED_WEBSOCKET_TICKET_STORE:-}
+      RANKED_WEBSOCKET_TICKET_KEY_PREFIX: ${RANKED_WEBSOCKET_TICKET_KEY_PREFIX:-ranked:websocket-ticket}
+      RANKED_WEBSOCKET_TICKET_TTL_SECONDS: ${RANKED_WEBSOCKET_TICKET_TTL_SECONDS:-180}
+    command: >
+      sh -lc "php artisan ranked:websocket-serve
+      --host=${RANKED_WEBSOCKET_HOST:-0.0.0.0}
+      --port=${RANKED_WEBSOCKET_PORT:-8080}
+      --path=${RANKED_WEBSOCKET_PATH:-/ranked}
+      --publish-interval-ms=${RANKED_WEBSOCKET_PUBLISH_INTERVAL_MS:-1000}"
+    ports:
+      - "${RANKED_WEBSOCKET_PORT:-8080}:8080"
+    volumes:
+      - ./app:/var/www/html/app
+      - ./bootstrap:/var/www/html/bootstrap
+      - ./config:/var/www/html/config
+      - ./database:/var/www/html/database
+      - ./lang:/var/www/html/lang
+      - ./public:/var/www/html/public
+      - ./resources:/var/www/html/resources
+      - ./routes:/var/www/html/routes
+      - ./storage:/var/www/html/storage
+      - ./artisan:/var/www/html/artisan:ro
+      - ./composer.json:/var/www/html/composer.json:ro
+      - ./composer.lock:/var/www/html/composer.lock:ro
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+    ports:
+      - "8000:80"
+    volumes:
+      - ./public:/var/www/html/public:ro
+      - ./storage/app/public:/var/www/html/storage/app/public:ro
+
+  media:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    volumes:
+      - "${MEDIA_LOCAL_HOST_ROOT:-D:/datasets/mi-prawo-jazdy-2026/app-media}:/srv/media:ro"
+      - ./docker/nginx/media.conf:/etc/nginx/conf.d/default.conf:ro
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DOCKER_PG_DATABASE:-prawkobit}
+      POSTGRES_USER: ${DOCKER_PG_USERNAME:-prawkobit}
+      POSTGRES_PASSWORD: ${DOCKER_PG_PASSWORD:-prawkobit}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "no", "--save", ""]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    ports:
+      - "6379:6379"
+
+  vite:
+    build:
+      context: .
+      dockerfile: docker/node/Dockerfile
+    restart: unless-stopped
+    working_dir: /app
+    command: npm run dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./resources:/app/resources
+      - ./package.json:/app/package.json:ro
+      - ./package-lock.json:/app/package-lock.json:ro
+    environment:
+      - VITE_HOST=0.0.0.0
+
+volumes:
+  backup-data:
+  postgres-data:

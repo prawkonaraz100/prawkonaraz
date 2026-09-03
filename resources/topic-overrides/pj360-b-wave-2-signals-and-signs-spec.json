@@ -1,0 +1,91 @@
+{
+  "category": "B",
+  "scope": "active_ready",
+  "rules": [
+    {
+      "name": "b-wave2-prohibition-signs-exact",
+      "target_topic_key": "prohibition_and_mandatory_signs",
+      "reason": "PJ360 B wave 2: znaki zakazu i nakazu z curated external_id",
+      "current_topic_keys": [
+        "special_caution_exiting_and_securing_vehicle"
+      ],
+      "external_ids": [
+        "352",
+        "10394",
+        "8353",
+        "8363"
+      ]
+    },
+    {
+      "name": "b-wave2-warning-signs-exact",
+      "target_topic_key": "warning_signs",
+      "reason": "PJ360 B wave 2: znaki ostrzegawcze z curated external_id",
+      "current_topic_keys": [
+        "special_caution_exiting_and_securing_vehicle"
+      ],
+      "external_ids": [
+        "12714",
+        "13633"
+      ]
+    },
+    {
+      "name": "b-wave2-informational-signs-exact",
+      "target_topic_key": "informational_direction_and_supplementary_signs",
+      "reason": "PJ360 B wave 2: znaki informacyjne z curated external_id",
+      "current_topic_keys": [
+        "special_caution_exiting_and_securing_vehicle"
+      ],
+      "external_ids": [
+        "10161",
+        "10165"
+      ]
+    },
+    {
+      "name": "b-wave2-traffic-signals-exact",
+      "target_topic_key": "traffic_lights_and_controller_signals",
+      "reason": "PJ360 B wave 2: sygnaly swietlne i kierujacy ruchem z curated external_id",
+      "current_topic_keys": [
+        "special_caution_exiting_and_securing_vehicle"
+      ],
+      "external_ids": [
+        "10805",
+        "13155",
+        "3122",
+        "7450"
+      ]
+    },
+    {
+      "name": "b-wave2-signalized-intersections-exact",
+      "target_topic_key": "intersections_with_traffic_lights",
+      "reason": "PJ360 B wave 2: skrzyzowania z sygnalizacja z curated external_id",
+      "current_topic_keys": [
+        "special_caution_exiting_and_securing_vehicle"
+      ],
+      "external_ids": [
+        "6068"
+      ]
+    },
+    {
+      "name": "b-wave2-lane-change-exact",
+      "target_topic_key": "lane_change_and_turning",
+      "reason": "PJ360 B wave 2: zmiana pasa i kierunku jazdy z curated external_id",
+      "current_topic_keys": [
+        "special_caution_exiting_and_securing_vehicle"
+      ],
+      "external_ids": [
+        "9203"
+      ]
+    },
+    {
+      "name": "b-wave2-perception-exact",
+      "target_topic_key": "perception_decision_alcohol_fatigue",
+      "reason": "PJ360 B wave 2: percepcja i zmeczenie z curated external_id",
+      "current_topic_keys": [
+        "special_caution_exiting_and_securing_vehicle"
+      ],
+      "external_ids": [
+        "916"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" role="img" aria-labelledby="title desc">
+  <title id="title">Znak B-35 Zakaz postoju</title>
+  <desc id="desc">Niebieskie kolo z czerwona obwodka i pojedyncza przekatna symbolizujace zakaz postoju.</desc>
+  <rect width="320" height="320" fill="#f8fafc" />
+  <circle cx="160" cy="150" r="116" fill="#d92d20" />
+  <circle cx="160" cy="150" r="92" fill="#2563eb" />
+  <line x1="92" y1="218" x2="228" y2="82" stroke="#d92d20" stroke-width="24" stroke-linecap="round" />
+  <text x="160" y="308" font-family="Arial, sans-serif" font-size="24" font-weight="700" text-anchor="middle" fill="#0f172a">B-35</text>
+</svg>

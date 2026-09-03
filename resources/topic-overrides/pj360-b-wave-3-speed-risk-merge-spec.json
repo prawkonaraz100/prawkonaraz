@@ -1,0 +1,43 @@
+{
+  "category": "B",
+  "scope": "active_ready",
+  "rules": [
+    {
+      "name": "b-wave3-speed-limits-exact",
+      "target_topic_key": "speed_limits",
+      "reason": "PJ360 B wave 3: predkosci i ograniczenia z curated external_id",
+      "external_ids": [
+        "10420",
+        "12618",
+        "7248",
+        "8424",
+        "13452"
+      ]
+    },
+    {
+      "name": "b-wave3-risk-factors-exact",
+      "target_topic_key": "risk_factors_conditions_and_weather",
+      "reason": "PJ360 B wave 3: warunki, ryzyko i pogoda z curated external_id",
+      "external_ids": [
+        "10041",
+        "10061",
+        "10074",
+        "13306",
+        "13561",
+        "13580"
+      ]
+    },
+    {
+      "name": "b-wave3-lane-change-zipper-exact",
+      "target_topic_key": "lane_change_and_turning",
+      "reason": "PJ360 B wave 3: zmiana pasa i jazda na suwak z curated external_id",
+      "external_ids": [
+        "10702",
+        "10703",
+        "10704",
+        "10706",
+        "10737"
+      ]
+    }
+  ]
+}

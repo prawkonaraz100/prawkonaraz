@@ -1,0 +1,920 @@
+{
+  "generated_at": "2026-04-15T17:42:06.368524+00:00",
+  "workflow": "pj360_delta_aware_conflict_resolution",
+  "category": "C",
+  "source_conflicts_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-retopic-true-conflicts.json",
+  "source_diff_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-exact-vs-local-topic-membership-diff.json",
+  "exported_overrides_count": 12,
+  "manual_conflict_count": 9,
+  "skipped_existing_override_same_target_count": 0,
+  "skipped_existing_override_conflict_count": 0,
+  "summary": {
+    "recommended_target_topic_counts": {
+      "behaviour_towards_pedestrians_and_reduced_mobility": 5,
+      "traffic_lights_and_controller_signals": 3,
+      "rail_and_tram_crossings": 2,
+      "informational_direction_and_supplementary_signs": 1,
+      "lane_change_and_turning": 1
+    },
+    "recommended_source_topic_counts": {
+      "road_position_entry_exit_stopping": 5,
+      "intersections_with_priority_signs": 3,
+      "special_caution_exiting_and_securing_vehicle": 2,
+      "road_markings": 1,
+      "lane_change_and_turning": 1
+    },
+    "touched_topics_after": {
+      "behaviour_towards_pedestrians_and_reduced_mobility": {
+        "remaining_after": 1,
+        "remaining_before": 6,
+        "target": 87,
+        "local_before": 81,
+        "local_after": 86
+      },
+      "informational_direction_and_supplementary_signs": {
+        "remaining_after": 0,
+        "remaining_before": 1,
+        "target": 45,
+        "local_before": 44,
+        "local_after": 45
+      },
+      "intersections_with_priority_signs": {
+        "remaining_after": 8,
+        "remaining_before": 5,
+        "target": 90,
+        "local_before": 85,
+        "local_after": 82
+      },
+      "lane_change_and_turning": {
+        "remaining_after": 0,
+        "remaining_before": 0,
+        "target": 121,
+        "local_before": 121,
+        "local_after": 121
+      },
+      "rail_and_tram_crossings": {
+        "remaining_after": 0,
+        "remaining_before": 2,
+        "target": 73,
+        "local_before": 71,
+        "local_after": 73
+      },
+      "road_markings": {
+        "remaining_after": -1,
+        "remaining_before": -2,
+        "target": 84,
+        "local_before": 86,
+        "local_after": 85
+      },
+      "road_position_entry_exit_stopping": {
+        "remaining_after": -1,
+        "remaining_before": -6,
+        "target": 107,
+        "local_before": 113,
+        "local_after": 108
+      },
+      "special_caution_exiting_and_securing_vehicle": {
+        "remaining_after": 3,
+        "remaining_before": 1,
+        "target": 38,
+        "local_before": 37,
+        "local_after": 35
+      },
+      "traffic_lights_and_controller_signals": {
+        "remaining_after": 0,
+        "remaining_before": 3,
+        "target": 79,
+        "local_before": 76,
+        "local_after": 79
+      }
+    }
+  },
+  "overrides": [
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "99",
+      "question_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+      "reason": "PJ360 delta-aware conflict resolution dla C: Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+      "metadata": {
+        "workflow": "pj360_delta_aware_conflict_resolution",
+        "source_conflicts_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-retopic-true-conflicts.json",
+        "source_diff_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-exact-vs-local-topic-membership-diff.json",
+        "current_topic_key": "road_position_entry_exit_stopping",
+        "candidate_topics_before": [
+          {
+            "topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+            "remaining_before": 6
+          },
+          {
+            "topic_key": "controlled_crossings_and_public_transport_stops",
+            "remaining_before": 1
+          }
+        ],
+        "resolved_by": "highest_remaining_deficit_unique",
+        "question_ids": [
+          18185
+        ],
+        "record_count": 2,
+        "prompt_excerpt": "Czy w tej sytuacji masz obowiązek zatrzymać pojazd?",
+        "accepted_answer": "tak",
+        "question_media_kind": "video",
+        "main_media_originals": [
+          "AK_D05_06_org.wmv"
+        ]
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "2493",
+      "question_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+      "reason": "PJ360 delta-aware conflict resolution dla C: Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+      "metadata": {
+        "workflow": "pj360_delta_aware_conflict_resolution",
+        "source_conflicts_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-retopic-true-conflicts.json",
+        "source_diff_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-exact-vs-local-topic-membership-diff.json",
+        "current_topic_key": "road_position_entry_exit_stopping",
+        "candidate_topics_before": [
+          {
+            "topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+            "remaining_before": 5
+          },
+          {
+            "topic_key": "controlled_crossings_and_public_transport_stops",
+            "remaining_before": 1
+          }
+        ],
+        "resolved_by": "highest_remaining_deficit_unique",
+        "question_ids": [
+          23151
+        ],
+        "record_count": 2,
+        "prompt_excerpt": "Czy w tej sytuacji masz obowiązek zatrzymać pojazd?",
+        "accepted_answer": "tak",
+        "question_media_kind": "video",
+        "main_media_originals": [
+          "D41_15org.wmv"
+        ]
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "2492",
+      "question_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+      "reason": "PJ360 delta-aware conflict resolution dla C: Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+      "metadata": {
+        "workflow": "pj360_delta_aware_conflict_resolution",
+        "source_conflicts_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-retopic-true-conflicts.json",
+        "source_diff_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-exact-vs-local-topic-membership-diff.json",
+        "current_topic_key": "road_position_entry_exit_stopping",
+        "candidate_topics_before": [
+          {
+            "topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+            "remaining_before": 4
+          },
+          {
+            "topic_key": "controlled_crossings_and_public_transport_stops",
+            "remaining_before": 1
+          }
+        ],
+        "resolved_by": "highest_remaining_deficit_unique",
+        "question_ids": [
+          23150
+        ],
+        "record_count": 2,
+        "prompt_excerpt": "Czy w tej sytuacji masz obowiązek zatrzymać pojazd?",
+        "accepted_answer": "tak",
+        "question_media_kind": "video",
+        "main_media_originals": [
+          "D41_1org.wmv"
+        ]
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "2387",
+      "question_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+      "reason": "PJ360 delta-aware conflict resolution dla C: Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+      "metadata": {
+        "workflow": "pj360_delta_aware_conflict_resolution",
+        "source_conflicts_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-retopic-true-conflicts.json",
+        "source_diff_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-exact-vs-local-topic-membership-diff.json",
+        "current_topic_key": "road_position_entry_exit_stopping",
+        "candidate_topics_before": [
+          {
+            "topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+            "remaining_before": 3
+          },
+          {
+            "topic_key": "controlled_crossings_and_public_transport_stops",
+            "remaining_before": 1
+          }
+        ],
+        "resolved_by": "highest_remaining_deficit_unique",
+        "question_ids": [
+          23119
+        ],
+        "record_count": 2,
+        "prompt_excerpt": "Czy w tej sytuacji masz obowiązek zatrzymać pojazd?",
+        "accepted_answer": "tak",
+        "question_media_kind": "video",
+        "main_media_originals": [
+          "D24_6org.wmv"
+        ]
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "2345",
+      "question_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+      "reason": "PJ360 delta-aware conflict resolution dla C: Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+      "metadata": {
+        "workflow": "pj360_delta_aware_conflict_resolution",
+        "source_conflicts_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-retopic-true-conflicts.json",
+        "source_diff_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-exact-vs-local-topic-membership-diff.json",
+        "current_topic_key": "road_position_entry_exit_stopping",
+        "candidate_topics_before": [
+          {
+            "topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+            "remaining_before": 2
+          },
+          {
+            "topic_key": "controlled_crossings_and_public_transport_stops",
+            "remaining_before": 1
+          }
+        ],
+        "resolved_by": "highest_remaining_deficit_unique",
+        "question_ids": [
+          23110
+        ],
+        "record_count": 2,
+        "prompt_excerpt": "Czy w tej sytuacji masz obowiązek zatrzymać pojazd?",
+        "accepted_answer": "tak",
+        "question_media_kind": "video",
+        "main_media_originals": [
+          "W15(21)org.wmv"
+        ]
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "13152",
+      "question_topic_key": "traffic_lights_and_controller_signals",
+      "reason": "PJ360 delta-aware conflict resolution dla C: Sygnały świetlne, sygnały dawane przez kierującego ruchem",
+      "metadata": {
+        "workflow": "pj360_delta_aware_conflict_resolution",
+        "source_conflicts_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-retopic-true-conflicts.json",
+        "source_diff_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-exact-vs-local-topic-membership-diff.json",
+        "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+        "candidate_topics_before": [
+          {
+            "topic_key": "traffic_lights_and_controller_signals",
+            "remaining_before": 3
+          },
+          {
+            "topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+            "remaining_before": 1
+          }
+        ],
+        "resolved_by": "highest_remaining_deficit_unique",
+        "question_ids": [
+          46964
+        ],
+        "record_count": 2,
+        "prompt_excerpt": "Czy w tej sytuacji możesz kontynuować jazdę?",
+        "accepted_answer": "nie",
+        "question_media_kind": "video",
+        "main_media_originals": [
+          "GM_W9-1.wmv"
+        ]
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "13109",
+      "question_topic_key": "traffic_lights_and_controller_signals",
+      "reason": "PJ360 delta-aware conflict resolution dla C: Sygnały świetlne, sygnały dawane przez kierującego ruchem",
+      "metadata": {
+        "workflow": "pj360_delta_aware_conflict_resolution",
+        "source_conflicts_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-retopic-true-conflicts.json",
+        "source_diff_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-exact-vs-local-topic-membership-diff.json",
+        "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+        "candidate_topics_before": [
+          {
+            "topic_key": "traffic_lights_and_controller_signals",
+            "remaining_before": 2
+          },
+          {
+            "topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+            "remaining_before": 1
+          }
+        ],
+        "resolved_by": "highest_remaining_deficit_unique",
+        "question_ids": [
+          46949
+        ],
+        "record_count": 2,
+        "prompt_excerpt": "Czy w tej sytuacji możesz kontynuować jazdę?",
+        "accepted_answer": "nie",
+        "question_media_kind": "video",
+        "main_media_originals": [
+          "GM_W16(318,319)NN.wmv"
+        ]
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "2902",
+      "question_topic_key": "traffic_lights_and_controller_signals",
+      "reason": "PJ360 delta-aware conflict resolution dla C: Sygnały świetlne, sygnały dawane przez kierującego ruchem",
+      "metadata": {
+        "workflow": "pj360_delta_aware_conflict_resolution",
+        "source_conflicts_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-retopic-true-conflicts.json",
+        "source_diff_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-exact-vs-local-topic-membership-diff.json",
+        "current_topic_key": "road_markings",
+        "candidate_topics_before": [
+          {
+            "topic_key": "traffic_lights_and_controller_signals",
+            "remaining_before": 1
+          },
+          {
+            "topic_key": "lane_change_and_turning",
+            "remaining_before": 0
+          }
+        ],
+        "resolved_by": "highest_remaining_deficit_unique",
+        "question_ids": [
+          24574
+        ],
+        "record_count": 2,
+        "prompt_excerpt": "Czy w tej sytuacji wolno Ci zawrócić na widocznym skrzyżowaniu?",
+        "accepted_answer": "tak",
+        "question_media_kind": "image",
+        "main_media_originals": [
+          "IMG_0303d5_orgbezmaski.jpg"
+        ]
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "7302",
+      "question_topic_key": "informational_direction_and_supplementary_signs",
+      "reason": "PJ360 delta-aware conflict resolution dla C: Znaki informacyjne, kierunku i miejscowości, uzupełniające",
+      "metadata": {
+        "workflow": "pj360_delta_aware_conflict_resolution",
+        "source_conflicts_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-retopic-true-conflicts.json",
+        "source_diff_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-exact-vs-local-topic-membership-diff.json",
+        "current_topic_key": "lane_change_and_turning",
+        "candidate_topics_before": [
+          {
+            "topic_key": "informational_direction_and_supplementary_signs",
+            "remaining_before": 1
+          },
+          {
+            "topic_key": "road_markings",
+            "remaining_before": -1
+          }
+        ],
+        "resolved_by": "highest_remaining_deficit_unique",
+        "question_ids": [
+          39116
+        ],
+        "record_count": 2,
+        "prompt_excerpt": "Czy w tej sytuacji masz obowiązek zmienić obecnie zajmowany pas ruchu?",
+        "accepted_answer": "tak",
+        "question_media_kind": "video",
+        "main_media_originals": [
+          "3720.wmv"
+        ]
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "7141",
+      "question_topic_key": "rail_and_tram_crossings",
+      "reason": "PJ360 delta-aware conflict resolution dla C: Zachowanie na przejazdach kolejowych i tramwajowych",
+      "metadata": {
+        "workflow": "pj360_delta_aware_conflict_resolution",
+        "source_conflicts_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-retopic-true-conflicts.json",
+        "source_diff_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-exact-vs-local-topic-membership-diff.json",
+        "current_topic_key": "intersections_with_priority_signs",
+        "candidate_topics_before": [
+          {
+            "topic_key": "rail_and_tram_crossings",
+            "remaining_before": 2
+          },
+          {
+            "topic_key": "intersections_with_traffic_lights",
+            "remaining_before": 0
+          }
+        ],
+        "resolved_by": "highest_remaining_deficit_unique",
+        "question_ids": [
+          37338
+        ],
+        "record_count": 2,
+        "prompt_excerpt": "Czy w tej sytuacji masz obowiązek ustąpić pierwszeństwa tramwajowi?",
+        "accepted_answer": "tak",
+        "question_media_kind": "video",
+        "main_media_originals": [
+          "1A4225.wmv"
+        ]
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "3384",
+      "question_topic_key": "rail_and_tram_crossings",
+      "reason": "PJ360 delta-aware conflict resolution dla C: Zachowanie na przejazdach kolejowych i tramwajowych",
+      "metadata": {
+        "workflow": "pj360_delta_aware_conflict_resolution",
+        "source_conflicts_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-retopic-true-conflicts.json",
+        "source_diff_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-exact-vs-local-topic-membership-diff.json",
+        "current_topic_key": "intersections_with_priority_signs",
+        "candidate_topics_before": [
+          {
+            "topic_key": "rail_and_tram_crossings",
+            "remaining_before": 1
+          },
+          {
+            "topic_key": "intersections_with_traffic_lights",
+            "remaining_before": 0
+          }
+        ],
+        "resolved_by": "highest_remaining_deficit_unique",
+        "question_ids": [
+          26105
+        ],
+        "record_count": 2,
+        "prompt_excerpt": "Czy w tej sytuacji masz obowiązek ustąpić pierwszeństwa tramwajowi?",
+        "accepted_answer": "tak",
+        "question_media_kind": "video",
+        "main_media_originals": [
+          "D23MMX_20org.wmv"
+        ]
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "7371",
+      "question_topic_key": "lane_change_and_turning",
+      "reason": "PJ360 delta-aware conflict resolution dla C: Zmiana pasa ruchu, zmiana kierunku jazdy",
+      "metadata": {
+        "workflow": "pj360_delta_aware_conflict_resolution",
+        "source_conflicts_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-retopic-true-conflicts.json",
+        "source_diff_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-exact-vs-local-topic-membership-diff.json",
+        "current_topic_key": "intersections_with_priority_signs",
+        "candidate_topics_before": [
+          {
+            "topic_key": "lane_change_and_turning",
+            "remaining_before": 1
+          },
+          {
+            "topic_key": "intersections_with_traffic_lights",
+            "remaining_before": 0
+          }
+        ],
+        "resolved_by": "highest_remaining_deficit_unique",
+        "question_ids": [
+          40653
+        ],
+        "record_count": 2,
+        "prompt_excerpt": "Czy w tej sytuacji wolno Ci zawrócić na skrzyżowaniu?",
+        "accepted_answer": "nie",
+        "question_media_kind": "video",
+        "main_media_originals": [
+          "L4T2_012_b_1.wmv"
+        ]
+      }
+    }
+  ],
+  "manual_conflicts": [
+    {
+      "stable_identity": {
+        "license_category_code": "C",
+        "source": "gov.pl-mi",
+        "external_id": "13108"
+      },
+      "current_topic_keys": [
+        "road_position_entry_exit_stopping"
+      ],
+      "candidate_topics": [
+        {
+          "topic_key": "controlled_crossings_and_public_transport_stops",
+          "remaining_before": 1
+        },
+        {
+          "topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+          "remaining_before": 1
+        }
+      ],
+      "records": [
+        {
+          "question_id": 46948,
+          "external_id": "13108",
+          "source": "gov.pl-mi",
+          "current_topic_key": "road_position_entry_exit_stopping",
+          "target_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+          "target_topic_label": "Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+          "main_media_original": "GM_W16(318,319).wmv",
+          "prompt": "Czy w tej sytuacji masz obowiązek zatrzymać pojazd?",
+          "accepted_answer": "tak",
+          "question_media_kind": "video"
+        },
+        {
+          "question_id": 46948,
+          "external_id": "13108",
+          "source": "gov.pl-mi",
+          "current_topic_key": "road_position_entry_exit_stopping",
+          "target_topic_key": "controlled_crossings_and_public_transport_stops",
+          "target_topic_label": "Skrzyżowania lub przejścia dla pieszych z kierującym ruchem, miejsca przystanków komunikacji publicz...",
+          "main_media_original": "GM_W16(318,319).wmv",
+          "prompt": "Czy w tej sytuacji masz obowiązek zatrzymać pojazd?",
+          "accepted_answer": "tak",
+          "question_media_kind": "video"
+        }
+      ]
+    },
+    {
+      "stable_identity": {
+        "license_category_code": "C",
+        "source": "gov.pl-mi",
+        "external_id": "100"
+      },
+      "current_topic_keys": [
+        "road_position_entry_exit_stopping"
+      ],
+      "candidate_topics": [
+        {
+          "topic_key": "controlled_crossings_and_public_transport_stops",
+          "remaining_before": 1
+        },
+        {
+          "topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+          "remaining_before": 1
+        }
+      ],
+      "records": [
+        {
+          "question_id": 18186,
+          "external_id": "100",
+          "source": "gov.pl-mi",
+          "current_topic_key": "road_position_entry_exit_stopping",
+          "target_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+          "target_topic_label": "Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+          "main_media_original": "AK_D10_30_org.wmv",
+          "prompt": "Czy w tej sytuacji masz obowiązek zatrzymać pojazd?",
+          "accepted_answer": "tak",
+          "question_media_kind": "video"
+        },
+        {
+          "question_id": 18186,
+          "external_id": "100",
+          "source": "gov.pl-mi",
+          "current_topic_key": "road_position_entry_exit_stopping",
+          "target_topic_key": "controlled_crossings_and_public_transport_stops",
+          "target_topic_label": "Skrzyżowania lub przejścia dla pieszych z kierującym ruchem, miejsca przystanków komunikacji publicz...",
+          "main_media_original": "AK_D10_30_org.wmv",
+          "prompt": "Czy w tej sytuacji masz obowiązek zatrzymać pojazd?",
+          "accepted_answer": "tak",
+          "question_media_kind": "video"
+        }
+      ]
+    },
+    {
+      "stable_identity": {
+        "license_category_code": "C",
+        "source": "gov.pl-mi",
+        "external_id": "2243"
+      },
+      "current_topic_keys": [
+        "special_caution_exiting_and_securing_vehicle"
+      ],
+      "candidate_topics": [
+        {
+          "topic_key": "traffic_lights_and_controller_signals",
+          "remaining_before": 0
+        },
+        {
+          "topic_key": "lane_change_and_turning",
+          "remaining_before": 0
+        }
+      ],
+      "records": [
+        {
+          "question_id": 21808,
+          "external_id": "2243",
+          "source": "gov.pl-mi",
+          "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+          "target_topic_key": "lane_change_and_turning",
+          "target_topic_label": "Zmiana pasa ruchu, zmiana kierunku jazdy",
+          "main_media_original": "022D11orgbm.jpg",
+          "prompt": "Czy w przedstawionej sytuacji wolno Ci skręcić w prawo?",
+          "accepted_answer": "nie",
+          "question_media_kind": "image"
+        },
+        {
+          "question_id": 21808,
+          "external_id": "2243",
+          "source": "gov.pl-mi",
+          "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+          "target_topic_key": "traffic_lights_and_controller_signals",
+          "target_topic_label": "Sygnały świetlne, sygnały dawane przez kierującego ruchem",
+          "main_media_original": "022D11orgbm.jpg",
+          "prompt": "Czy w przedstawionej sytuacji wolno Ci skręcić w prawo?",
+          "accepted_answer": "nie",
+          "question_media_kind": "image"
+        }
+      ]
+    },
+    {
+      "stable_identity": {
+        "license_category_code": "C",
+        "source": "gov.pl-mi",
+        "external_id": "1691"
+      },
+      "current_topic_keys": [
+        "road_markings"
+      ],
+      "candidate_topics": [
+        {
+          "topic_key": "traffic_lights_and_controller_signals",
+          "remaining_before": 0
+        },
+        {
+          "topic_key": "lane_change_and_turning",
+          "remaining_before": 0
+        }
+      ],
+      "records": [
+        {
+          "question_id": 21775,
+          "external_id": "1691",
+          "source": "gov.pl-mi",
+          "current_topic_key": "road_markings",
+          "target_topic_key": "lane_change_and_turning",
+          "target_topic_label": "Zmiana pasa ruchu, zmiana kierunku jazdy",
+          "main_media_original": "3935D15org.jpg",
+          "prompt": "Czy w tej sytuacji wolno Ci zawrócić na widocznym skrzyżowaniu?",
+          "accepted_answer": "tak",
+          "question_media_kind": "image"
+        },
+        {
+          "question_id": 21775,
+          "external_id": "1691",
+          "source": "gov.pl-mi",
+          "current_topic_key": "road_markings",
+          "target_topic_key": "traffic_lights_and_controller_signals",
+          "target_topic_label": "Sygnały świetlne, sygnały dawane przez kierującego ruchem",
+          "main_media_original": "3935D15org.jpg",
+          "prompt": "Czy w tej sytuacji wolno Ci zawrócić na widocznym skrzyżowaniu?",
+          "accepted_answer": "tak",
+          "question_media_kind": "image"
+        }
+      ]
+    },
+    {
+      "stable_identity": {
+        "license_category_code": "C",
+        "source": "gov.pl-mi",
+        "external_id": "1369"
+      },
+      "current_topic_keys": [
+        "special_caution_exiting_and_securing_vehicle"
+      ],
+      "candidate_topics": [
+        {
+          "topic_key": "traffic_lights_and_controller_signals",
+          "remaining_before": 0
+        },
+        {
+          "topic_key": "lane_change_and_turning",
+          "remaining_before": 0
+        }
+      ],
+      "records": [
+        {
+          "question_id": 20313,
+          "external_id": "1369",
+          "source": "gov.pl-mi",
+          "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+          "target_topic_key": "lane_change_and_turning",
+          "target_topic_label": "Zmiana pasa ruchu, zmiana kierunku jazdy",
+          "main_media_original": "IMG_0486d5org.jpg",
+          "prompt": "Czy w przedstawionej sytuacji wolno Ci skręcić w prawo?",
+          "accepted_answer": "nie",
+          "question_media_kind": "image"
+        },
+        {
+          "question_id": 20313,
+          "external_id": "1369",
+          "source": "gov.pl-mi",
+          "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+          "target_topic_key": "traffic_lights_and_controller_signals",
+          "target_topic_label": "Sygnały świetlne, sygnały dawane przez kierującego ruchem",
+          "main_media_original": "IMG_0486d5org.jpg",
+          "prompt": "Czy w przedstawionej sytuacji wolno Ci skręcić w prawo?",
+          "accepted_answer": "nie",
+          "question_media_kind": "image"
+        }
+      ]
+    },
+    {
+      "stable_identity": {
+        "license_category_code": "C",
+        "source": "gov.pl-mi",
+        "external_id": "7300"
+      },
+      "current_topic_keys": [
+        "lane_change_and_turning"
+      ],
+      "candidate_topics": [
+        {
+          "topic_key": "informational_direction_and_supplementary_signs",
+          "remaining_before": 0
+        },
+        {
+          "topic_key": "road_markings",
+          "remaining_before": -1
+        }
+      ],
+      "records": [
+        {
+          "question_id": 39114,
+          "external_id": "7300",
+          "source": "gov.pl-mi",
+          "current_topic_key": "lane_change_and_turning",
+          "target_topic_key": "informational_direction_and_supplementary_signs",
+          "target_topic_label": "Znaki informacyjne, kierunku i miejscowości, uzupełniające",
+          "main_media_original": "3949.wmv",
+          "prompt": "Czy w tej sytuacji masz obowiązek zmienić obecnie zajmowany pas ruchu?",
+          "accepted_answer": "tak",
+          "question_media_kind": "video"
+        },
+        {
+          "question_id": 39114,
+          "external_id": "7300",
+          "source": "gov.pl-mi",
+          "current_topic_key": "lane_change_and_turning",
+          "target_topic_key": "road_markings",
+          "target_topic_label": "Znaki drogowe poziome",
+          "main_media_original": "3949.wmv",
+          "prompt": "Czy w tej sytuacji masz obowiązek zmienić obecnie zajmowany pas ruchu?",
+          "accepted_answer": "tak",
+          "question_media_kind": "video"
+        }
+      ]
+    },
+    {
+      "stable_identity": {
+        "license_category_code": "C",
+        "source": "gov.pl-mi",
+        "external_id": "7731"
+      },
+      "current_topic_keys": [
+        "risk_factors_conditions_and_weather"
+      ],
+      "candidate_topics": [
+        {
+          "topic_key": "vehicle_load_and_passenger_safety",
+          "remaining_before": 1
+        },
+        {
+          "topic_key": "distances_and_braking",
+          "remaining_before": 1
+        }
+      ],
+      "records": [
+        {
+          "question_id": 42275,
+          "external_id": "7731",
+          "source": "gov.pl-mi",
+          "current_topic_key": "risk_factors_conditions_and_weather",
+          "target_topic_key": "distances_and_braking",
+          "target_topic_label": "Odstępy i hamowanie pojazdu",
+          "main_media_original": "",
+          "prompt": "Który czynnik ma największy wpływ na przyczepność opony samochodu ciężarowego do podłoża?",
+          "accepted_answer": "rodzaj i stan nawierzchni jezdni.",
+          "question_media_kind": "none"
+        },
+        {
+          "question_id": 42275,
+          "external_id": "7731",
+          "source": "gov.pl-mi",
+          "current_topic_key": "risk_factors_conditions_and_weather",
+          "target_topic_key": "vehicle_load_and_passenger_safety",
+          "target_topic_label": "Czynniki bezpieczeństwa odnoszące się do pojazdu, ładunku i przewożonych osób",
+          "main_media_original": "",
+          "prompt": "Który czynnik ma największy wpływ na przyczepność opony samochodu ciężarowego do podłoża?",
+          "accepted_answer": "rodzaj i stan nawierzchni jezdni.",
+          "question_media_kind": "none"
+        }
+      ]
+    },
+    {
+      "stable_identity": {
+        "license_category_code": "C",
+        "source": "gov.pl-mi",
+        "external_id": "11450"
+      },
+      "current_topic_keys": [
+        "risk_factors_conditions_and_weather"
+      ],
+      "candidate_topics": [
+        {
+          "topic_key": "vehicle_load_and_passenger_safety",
+          "remaining_before": 1
+        },
+        {
+          "topic_key": "distances_and_braking",
+          "remaining_before": 1
+        }
+      ],
+      "records": [
+        {
+          "question_id": 45965,
+          "external_id": "11450",
+          "source": "gov.pl-mi",
+          "current_topic_key": "risk_factors_conditions_and_weather",
+          "target_topic_key": "distances_and_braking",
+          "target_topic_label": "Odstępy i hamowanie pojazdu",
+          "main_media_original": "",
+          "prompt": "Który czynnik ma największy wpływ na przyczepność opony samochodu ciężarowego do podłoża?",
+          "accepted_answer": "rodzaj i stan nawierzchni jezdni.",
+          "question_media_kind": "none"
+        },
+        {
+          "question_id": 45965,
+          "external_id": "11450",
+          "source": "gov.pl-mi",
+          "current_topic_key": "risk_factors_conditions_and_weather",
+          "target_topic_key": "vehicle_load_and_passenger_safety",
+          "target_topic_label": "Czynniki bezpieczeństwa odnoszące się do pojazdu, ładunku i przewożonych osób",
+          "main_media_original": "",
+          "prompt": "Który czynnik ma największy wpływ na przyczepność opony samochodu ciężarowego do podłoża?",
+          "accepted_answer": "rodzaj i stan nawierzchni jezdni.",
+          "question_media_kind": "none"
+        }
+      ]
+    },
+    {
+      "stable_identity": {
+        "license_category_code": "C",
+        "source": "gov.pl-mi",
+        "external_id": "7124"
+      },
+      "current_topic_keys": [
+        "intersections_with_priority_signs"
+      ],
+      "candidate_topics": [
+        {
+          "topic_key": "lane_change_and_turning",
+          "remaining_before": 0
+        },
+        {
+          "topic_key": "intersections_with_traffic_lights",
+          "remaining_before": 0
+        }
+      ],
+      "records": [
+        {
+          "question_id": 37327,
+          "external_id": "7124",
+          "source": "gov.pl-mi",
+          "current_topic_key": "intersections_with_priority_signs",
+          "target_topic_key": "intersections_with_traffic_lights",
+          "target_topic_label": "Skrzyżowania z sygnalizacją świetlną",
+          "main_media_original": "1A303.wmv",
+          "prompt": "Czy w tej sytuacji wolno Ci zawrócić na skrzyżowaniu?",
+          "accepted_answer": "nie",
+          "question_media_kind": "video"
+        },
+        {
+          "question_id": 37327,
+          "external_id": "7124",
+          "source": "gov.pl-mi",
+          "current_topic_key": "intersections_with_priority_signs",
+          "target_topic_key": "lane_change_and_turning",
+          "target_topic_label": "Zmiana pasa ruchu, zmiana kierunku jazdy",
+          "main_media_original": "1A303.wmv",
+          "prompt": "Czy w tej sytuacji wolno Ci zawrócić na skrzyżowaniu?",
+          "accepted_answer": "nie",
+          "question_media_kind": "video"
+        }
+      ]
+    }
+  ],
+  "skipped_existing_override_same_target": [],
+  "skipped_existing_override_conflicts": []
+}

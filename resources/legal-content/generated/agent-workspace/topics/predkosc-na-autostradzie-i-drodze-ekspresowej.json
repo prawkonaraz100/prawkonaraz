@@ -1,0 +1,899 @@
+{
+    "generated_at": "2026-06-20T00:39:04+02:00",
+    "candidate": {
+        "slug": "predkosc-na-autostradzie-i-drodze-ekspresowej",
+        "title": "Prędkość na autostradzie i drodze ekspresowej",
+        "description": "Węższy temat artykułu wykryty na podstawie treści pytań.",
+        "level": "focused",
+        "status": "candidate",
+        "rule_version": "2026-06-19-prompt-v2",
+        "existing_article_slug": "predkosc-odstep-i-hamowanie"
+    },
+    "workflow": {
+        "status": "published",
+        "next_action": "Przejrzyj relacje pytan i zdecyduj, czy artykul wymaga rozbudowy lub ponownego review.",
+        "public_relations_are_verified_only": true
+    },
+    "article": {
+        "slug": "predkosc-odstep-i-hamowanie",
+        "title": "Prędkość, odstęp i hamowanie pojazdu",
+        "status": "published",
+        "published_at": "2026-06-13",
+        "last_reviewed_at": "2026-06-20",
+        "legal_units": [
+            {
+                "slug": "art-19-ust-1",
+                "label": "art. 19 ust. 1",
+                "title": "Prędkość zapewniająca panowanie nad pojazdem",
+                "status": "verified",
+                "last_checked_at": "2026-06-20"
+            },
+            {
+                "slug": "art-19-ust-2-pkt-2",
+                "label": "art. 19 ust. 2 pkt 2",
+                "title": "Hamowanie bez tworzenia zagrożenia",
+                "status": "verified",
+                "last_checked_at": "2026-06-20"
+            },
+            {
+                "slug": "art-19-ust-2-pkt-3",
+                "label": "art. 19 ust. 2 pkt 3",
+                "title": "Odstęp pozwalający uniknąć zderzenia",
+                "status": "verified",
+                "last_checked_at": "2026-06-20"
+            },
+            {
+                "slug": "art-19-ust-3a",
+                "label": "art. 19 ust. 3a",
+                "title": "Minimalny odstęp na autostradzie i drodze ekspresowej",
+                "status": "verified",
+                "last_checked_at": "2026-06-20"
+            },
+            {
+                "slug": "art-20-ust-2",
+                "label": "art. 20 ust. 2",
+                "title": "Prędkość w strefie zamieszkania",
+                "status": "verified",
+                "last_checked_at": "2026-06-20"
+            },
+            {
+                "slug": "art-20-ust-3-pkt-1-lit-a",
+                "label": "art. 20 ust. 3 pkt 1 lit. a",
+                "title": "Prędkość samochodu osobowego na autostradzie",
+                "status": "verified",
+                "last_checked_at": "2026-06-20"
+            }
+        ]
+    },
+    "summary": {
+        "canonical_questions": 10,
+        "question_rows": 17,
+        "categories": [
+            "A",
+            "A1",
+            "A2",
+            "B",
+            "C",
+            "C1",
+            "D",
+            "D1"
+        ],
+        "canonical_questions_with_verified_reference": 1,
+        "prompt_conflicts": [],
+        "answer_conflicts": [],
+        "correct_answer_conflicts": []
+    },
+    "questions": [
+        {
+            "external_id": "2484",
+            "prompt": "Na których pasach ruchu na autostradzie możesz jechać z prędkością 140 km/h?",
+            "prompt_variants": [
+                "Na których pasach ruchu na autostradzie możesz jechać z prędkością 140 km/h?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "speed_limits",
+                    "name": "Dopuszczalne predkosci pojazdu, ograniczenia"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "na wszystkich.",
+                    "option_b": "tylko na lewym skrajnym.",
+                    "option_c": "na wszystkich ale tylko w godzinach od 23.00 do 5.00.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "na wszystkich."
+                }
+            ],
+            "explanations": [
+                "\"B\" - na drodze oznaczonej znakiem D-9 - autostrada prędkość dopuszczalna dla samochodu osobowego wynosi 140 km/h i obowiązuje na wszystkich pasach ruchu"
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "imports/pj360/b/2484/full.jpg",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:na autostradzie|predkosc|km h",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 51057,
+                    "question_external_id": "pj360:2484",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-20",
+                    "legal_unit_slug": "art-20-ust-3-pkt-1-lit-a",
+                    "legal_unit_label": "art. 20 ust. 3 pkt 1 lit. a",
+                    "legal_unit_title": "Prędkość samochodu osobowego na autostradzie",
+                    "legal_topic_slug": "predkosc-odstep-i-hamowanie",
+                    "article_slug": "predkosc-odstep-i-hamowanie",
+                    "public_note": "To pytanie sprawdza limit samochodu osobowego na autostradzie, a nie odrębny limit dla konkretnego pasa. Art. 20 ust. 3 pkt 1 lit. a ustala 140 km/h na autostradzie; wybór pasa nadal podlega osobnym zasadom ruchu prawostronnego."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 51057,
+                    "external_id": "pj360:2484",
+                    "category": "B",
+                    "source": "pj360",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "4613",
+            "prompt": "Z jaką prędkością masz obowiązek jechać na autostradzie?",
+            "prompt_variants": [
+                "Z jaką prędkością masz obowiązek jechać na autostradzie?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "speed_limits",
+                    "name": "Dopuszczalne predkosci pojazdu, ograniczenia"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Co najmniej 40 km/h.",
+                    "option_b": "Co najmniej 60 km/h.",
+                    "option_c": "Bezpieczną, nieutrudniającą jazdy innym kierującym, jednak nie większą niż dopuszczalna.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Bezpieczną, nieutrudniającą jazdy innym kierującym, jednak nie większą niż dopuszczalna."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe jest poprawne odczytanie oznakowania i jego znaczenia. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/4613/image/full.1e93a51c5f5c.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/4613/image/thumb.fa4a7f910512.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:na autostradzie|predkosc",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 30027,
+                    "external_id": "4613",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6472",
+            "prompt": "Z jaką prędkością masz prawo kierować motocyklem po drodze ekspresowej dwujezdniowej?",
+            "prompt_variants": [
+                "Z jaką prędkością masz prawo kierować motocyklem po drodze ekspresowej dwujezdniowej?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2"
+            ],
+            "question_topics": [
+                {
+                    "key": "speed_limits",
+                    "name": "Dopuszczalne predkosci pojazdu, ograniczenia"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "105 km/h.",
+                    "option_b": "125 km/h.",
+                    "option_c": "145 km/h.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "105 km/h."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe jest poprawne odczytanie oznakowania i jego znaczenia. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/6472/image/full.4a4b3ed22919.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/6472/image/thumb.e1946be0d47b.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/6472/image/full.4a4b3ed22919.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/6472/image/thumb.e1946be0d47b.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/6472/image/full.4a4b3ed22919.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/6472/image/thumb.e1946be0d47b.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:drodze ekspresowej|predkosc",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 35447,
+                    "external_id": "6472",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35485,
+                    "external_id": "6472",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35523,
+                    "external_id": "6472",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6742",
+            "prompt": "Z jaką maksymalną dopuszczalną prędkością możesz jechać, kierując samochodem ciężarowym o dopuszczalnej masie całkowitej powyżej 3,5 t, na drodze ekspresowej?",
+            "prompt_variants": [
+                "Z jaką maksymalną dopuszczalną prędkością możesz jechać, kierując samochodem ciężarowym o dopuszczalnej masie całkowitej powyżej 3,5 t, na drodze ekspresowej?"
+            ],
+            "categories": [
+                "C",
+                "C1"
+            ],
+            "question_topics": [
+                {
+                    "key": "speed_limits",
+                    "name": "Dopuszczalne predkosci pojazdu, ograniczenia"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "80 km/h.",
+                    "option_b": "70 km/h.",
+                    "option_c": "60 km/h.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "80 km/h."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe jest poprawne odczytanie oznakowania i jego znaczenia. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/6742/image/full.2fb9e8dc9c67.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/6742/image/thumb.2be7112b4a6e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/6742/image/full.2fb9e8dc9c67.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/6742/image/thumb.2be7112b4a6e.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:drodze ekspresowej|predkosc",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 36183,
+                    "external_id": "6742",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 36235,
+                    "external_id": "6742",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6748",
+            "prompt": "Z jaką maksymalną dopuszczalną prędkością możesz jechać kierując samochodem ciężarowym o dopuszczalnej masie całkowitej powyżej 3,5 t na autostradzie?",
+            "prompt_variants": [
+                "Z jaką maksymalną dopuszczalną prędkością możesz jechać kierując samochodem ciężarowym o dopuszczalnej masie całkowitej powyżej 3,5 t na autostradzie?"
+            ],
+            "categories": [
+                "C",
+                "C1"
+            ],
+            "question_topics": [
+                {
+                    "key": "speed_limits",
+                    "name": "Dopuszczalne predkosci pojazdu, ograniczenia"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "70 km/h.",
+                    "option_b": "80 km/h.",
+                    "option_c": "90 km/h.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "80 km/h."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe jest poprawne odczytanie oznakowania i jego znaczenia. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/6748/image/full.9dcce49035b5.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/6748/image/thumb.d7a71ee67432.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/6748/image/full.9dcce49035b5.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/6748/image/thumb.d7a71ee67432.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:na autostradzie|predkosc",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 36185,
+                    "external_id": "6748",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 36237,
+                    "external_id": "6748",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6848",
+            "prompt": "Z jaką maksymalną dopuszczalną prędkością możesz jechać na autostradzie, kierując autobusem spełniającym dodatkowe warunki techniczne określone w przepisach?",
+            "prompt_variants": [
+                "Z jaką maksymalną dopuszczalną prędkością możesz jechać na autostradzie, kierując autobusem spełniającym dodatkowe warunki techniczne określone w przepisach?"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "speed_limits",
+                    "name": "Dopuszczalne predkosci pojazdu, ograniczenia"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "100 km/h.",
+                    "option_b": "120 km/h.",
+                    "option_c": "140 km/h.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "100 km/h."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo dopuszczalna prędkość autobusu spełniającego dodatkowe warunki techniczne na autostradzie za znakiem. Na obrazie kluczowe jest poprawne odczytanie oznakowania i jego znaczenia. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/6848/image/full.61305a9806a9.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/6848/image/thumb.4fd8680833ab.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/6848/image/full.61305a9806a9.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/6848/image/thumb.4fd8680833ab.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:na autostradzie|predkosc",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 36471,
+                    "external_id": "6848",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 36546,
+                    "external_id": "6848",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6852",
+            "prompt": "Jaka jest maksymalna dopuszczalna prędkość, z którą masz prawo jechać na autostradzie, gdy kierujesz autobusem o nie większej niż 15 liczbie miejsc?",
+            "prompt_variants": [
+                "Jaka jest maksymalna dopuszczalna prędkość, z którą masz prawo jechać na autostradzie, gdy kierujesz autobusem o nie większej niż 15 liczbie miejsc?"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "speed_limits",
+                    "name": "Dopuszczalne predkosci pojazdu, ograniczenia"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "60 km/h.",
+                    "option_b": "70 km/h.",
+                    "option_c": "80 km/h.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "80 km/h."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo prędkość dopuszczalna poza obszarem zabudowanym autobusu (który nie spełnia dodatkowych warunków technicznych) wynosi na autostradzie, drodze. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/6852/image/full.0acdc1e80b30.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/6852/image/thumb.4fd8680833ab.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/6852/image/full.0acdc1e80b30.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/6852/image/thumb.4fd8680833ab.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:na autostradzie|predkosc",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 36474,
+                    "external_id": "6852",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 36549,
+                    "external_id": "6852",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7249",
+            "prompt": "Z jaką maksymalną dopuszczalną prędkością możesz jechać, kierując samochodem osobowym o dopuszczalnej masie całkowitej 3 t, na drodze ekspresowej jednojezdniowej?",
+            "prompt_variants": [
+                "Z jaką maksymalną dopuszczalną prędkością możesz jechać, kierując samochodem osobowym o dopuszczalnej masie całkowitej 3 t, na drodze ekspresowej jednojezdniowej?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "speed_limits",
+                    "name": "Dopuszczalne predkosci pojazdu, ograniczenia"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "120 km/h.",
+                    "option_b": "100 km/h.",
+                    "option_c": "90 km/h.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "100 km/h."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe jest poprawne odczytanie oznakowania i jego znaczenia. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/7249/image/full.ed357b889269.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/7249/image/thumb.6360db3b9909.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:drodze ekspresowej|predkosc",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 38984,
+                    "external_id": "7249",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "8898",
+            "prompt": "Z jaką dopuszczalną prędkością wolno Ci się poruszać kierując samochodem osobowym ciągnącym przyczepę lekką na autostradzie?",
+            "prompt_variants": [
+                "Z jaką dopuszczalną prędkością wolno Ci się poruszać kierując samochodem osobowym ciągnącym przyczepę lekką na autostradzie?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "speed_limits",
+                    "name": "Dopuszczalne predkosci pojazdu, ograniczenia"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "80 km/h.",
+                    "option_b": "100 km/h.",
+                    "option_c": "140 km/h.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "80 km/h."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/8898/image/full.5e1642b8c150.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/8898/image/thumb.97770f5eddde.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:na autostradzie|predkosc",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 42699,
+                    "external_id": "8898",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "13059",
+            "prompt": "Jaka jest maksymalna dopuszczalna prędkość autobusu na autostradzie?",
+            "prompt_variants": [
+                "Jaka jest maksymalna dopuszczalna prędkość autobusu na autostradzie?"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "speed_limits",
+                    "name": "Dopuszczalne predkosci pojazdu, ograniczenia"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "100 km/h, jeżeli spełnia dodatkowe warunki techniczne określone w przepisach.",
+                    "option_b": "80 km/h każdego autobusu.",
+                    "option_c": "70 km/h, jeżeli ciągnie przyczepę.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "100 km/h, jeżeli spełnia dodatkowe warunki techniczne określone w przepisach."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:na autostradzie|predkosc",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 47010,
+                    "external_id": "13059",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 47048,
+                    "external_id": "13059",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        }
+    ]
+}

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">B-2 Zakaz wjazdu</title>
+  <desc id="desc">Grafika Open Graph dla znaku B-2 Zakaz wjazdu.</desc>
+  <rect width="1200" height="630" fill="#f8fafc" />
+  <rect x="48" y="48" width="1104" height="534" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="4" />
+  <circle cx="280" cy="280" r="148" fill="#d92d20" />
+  <rect x="152" y="252" width="256" height="56" rx="12" fill="#ffffff" />
+  <text x="520" y="228" font-family="Arial, sans-serif" font-size="46" font-weight="700" fill="#0f172a">B-2 Zakaz wjazdu</text>
+  <text x="520" y="300" font-family="Arial, sans-serif" font-size="30" fill="#334155">Czytelny zakaz, wysoka intencja i prosty CTR edukacyjny</text>
+  <text x="520" y="370" font-family="Arial, sans-serif" font-size="24" fill="#475569">Batch publikacyjny gotowy do kontroli jakosci</text>
+  <text x="520" y="446" font-family="Arial, sans-serif" font-size="22" fill="#0d47a1">prawkonaraz.pl / znaki-drogowe</text>
+</svg>

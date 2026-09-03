@@ -1,0 +1,262 @@
+{
+    "generated_at": "2026-04-14T23:55:37+02:00",
+    "category": "B",
+    "scope": "active_ready",
+    "rules_count": 8,
+    "exported_candidates": 14,
+    "rule_summaries": [
+        {
+            "name": "b-wave4-signalized-intersection-exact",
+            "target_topic_key": "intersections_with_traffic_lights",
+            "matched_questions": 1
+        },
+        {
+            "name": "b-wave4-lane-change-signaling-exact",
+            "target_topic_key": "lane_change_and_turning",
+            "matched_questions": 1
+        },
+        {
+            "name": "b-wave4-road-markings-yellow-line-exact",
+            "target_topic_key": "road_markings",
+            "matched_questions": 1
+        },
+        {
+            "name": "b-wave4-pedestrians-vulnerable-exact",
+            "target_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+            "matched_questions": 2
+        },
+        {
+            "name": "b-wave4-children-school-bus-exact",
+            "target_topic_key": "behaviour_towards_cyclists_and_children",
+            "matched_questions": 1
+        },
+        {
+            "name": "b-wave4-controlled-crossings-public-transport-exact",
+            "target_topic_key": "controlled_crossings_and_public_transport_stops",
+            "matched_questions": 1
+        },
+        {
+            "name": "b-wave4-rescue-actions-exact",
+            "target_topic_key": "rescue_actions",
+            "matched_questions": 5
+        },
+        {
+            "name": "b-wave4-breakdown-first-aid-exact",
+            "target_topic_key": "breakdown_accident_and_first_aid",
+            "matched_questions": 2
+        }
+    ],
+    "overrides": [
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "8633",
+            "question_topic_key": "intersections_with_traffic_lights",
+            "reason": "PJ360 B wave 4: skrzyzowania z sygnalizacja z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave4-signalized-intersection-exact",
+                "current_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_matched_by": "keyword:generic_intersection",
+                "prompt_excerpt": "Czy w tej sytuacji masz prawo wjechać na skrzyżowanie przed zapaleniem się sygnału czerwonego?",
+                "main_media_original": "PNS-10-14-0008_Censored_1024x576.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "10243",
+            "question_topic_key": "lane_change_and_turning",
+            "reason": "PJ360 B wave 4: sygnalizowanie manewru z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave4-lane-change-signaling-exact",
+                "current_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_matched_by": "keyword:generic_intersection",
+                "prompt_excerpt": "Czy zamierzając skręcić w lewo na najbliższym skrzyżowaniu musisz sygnalizować ten manewr kierunkowskazem?",
+                "main_media_original": "1_1524ztV.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "10488",
+            "question_topic_key": "road_markings",
+            "reason": "PJ360 B wave 4: oznakowanie poziome z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave4-road-markings-yellow-line-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy w tej sytuacji wolno Ci się zatrzymać przy żółtej linii po prawej?",
+                "main_media_original": "1694ztV_2.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "13402",
+            "question_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+            "reason": "PJ360 B wave 4: piesi i ograniczona mobilnosc z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave4-pedestrians-vulnerable-exact",
+                "current_topic_key": "driving_technique",
+                "classifier_topic_key": "driving_technique",
+                "classifier_matched_by": "keyword:driving_technique",
+                "prompt_excerpt": "Widząc osobę z białą laską przechodzącą przez jezdnię należy:",
+                "main_media_original": ""
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "13528",
+            "question_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+            "reason": "PJ360 B wave 4: piesi i ograniczona mobilnosc z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave4-pedestrians-vulnerable-exact",
+                "current_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_matched_by": "keyword:joining_traffic",
+                "prompt_excerpt": "Czy skręcając pojazdem w drogę poprzeczną, jesteś obowiązany ustąpić pierwszeństwa osobie poruszającej się w wózku inwalidzkim przejeżdżającej na skrzyżowaniu jezdnię drogi, na któ...",
+                "main_media_original": "GNI08.jpg.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "6242",
+            "question_topic_key": "behaviour_towards_cyclists_and_children",
+            "reason": "PJ360 B wave 4: dzieci i autobus szkolny z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave4-children-school-bus-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "keyword:szczegolna ostroznosc",
+                "prompt_excerpt": "Czy zawsze masz obowiązek zachowywać szczególną ostrożność, gdy przejeżdżasz obok autobusu szkolnego?",
+                "main_media_original": "1B123.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "7377",
+            "question_topic_key": "controlled_crossings_and_public_transport_stops",
+            "reason": "PJ360 B wave 4: przystanki komunikacji publicznej z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave4-controlled-crossings-public-transport-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy w tej sytuacji masz obowiązek zatrzymać się i zaczekać na wyjazd autobusu z zatoki?",
+                "main_media_original": "3903.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "10698",
+            "question_topic_key": "rescue_actions",
+            "reason": "PJ360 B wave 4: akcje ratunkowe z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave4-rescue-actions-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy w przedstawionej sytuacji kierujący pojazdami koloru czerwonego i zielonego zgodnie z przepisami umożliwiają przejazd pojazdu uprzywilejowanego tworząc tzw. \"korytarz życia\" ?",
+                "main_media_original": "W11 korytarz  z 005.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "10700",
+            "question_topic_key": "rescue_actions",
+            "reason": "PJ360 B wave 4: akcje ratunkowe z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave4-rescue-actions-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy w przedstawionej sytuacji kierujący pojazdami zgodnie z przepisami umożliwili swobodny przejazd pojazdu uprzywilejowanego, tworząc tzw. \"korytarz życia\" ?",
+                "main_media_original": "W11 korytarz  z 001.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "10709",
+            "question_topic_key": "rescue_actions",
+            "reason": "PJ360 B wave 4: akcje ratunkowe z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave4-rescue-actions-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy kierujący pojazdami w sposób właściwy umożliwili swobodny przejazd pojazdu uprzywilejowanego?",
+                "main_media_original": "W10_korytarz_204.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "10720",
+            "question_topic_key": "rescue_actions",
+            "reason": "PJ360 B wave 4: akcje ratunkowe z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave4-rescue-actions-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy pokazana sytuacja przedstawia poprawnie utworzony \"korytarz życia\"?",
+                "main_media_original": "w11korytarz zycia 002.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "10732",
+            "question_topic_key": "rescue_actions",
+            "reason": "PJ360 B wave 4: akcje ratunkowe z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave4-rescue-actions-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy kierujący pojazdami w sposób zgodny z obowiązującymi przepisami usunęli się z drogi przejazdu pojazdu uprzywilejowanego ?",
+                "main_media_original": "w10_korytarz_210.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "2457",
+            "question_topic_key": "breakdown_accident_and_first_aid",
+            "reason": "PJ360 B wave 4: awaria, wypadek i pierwsza pomoc z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave4-breakdown-first-aid-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy w tej sytuacji masz obowiązek zatrzymać się, udzielić niezbędnej pomocy i powiadomić służby ratunkowe?",
+                "main_media_original": "R_3org.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "7646",
+            "question_topic_key": "breakdown_accident_and_first_aid",
+            "reason": "PJ360 B wave 4: awaria, wypadek i pierwsza pomoc z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave4-breakdown-first-aid-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy zgłaszając wypadek drogowy na numer alarmowy służb ratunkowych powinieneś udostępnić swoje dane identyfikacyjne?",
+                "main_media_original": "1C182_.jpg"
+            }
+        }
+    ],
+    "source_spec_path": "/var/www/html/resources/topic-overrides/pj360-b-wave-4-vulnerable-and-rescue-spec.json"
+}

@@ -1,0 +1,1936 @@
+{
+    "generated_at": "2026-06-20T00:39:37+02:00",
+    "candidate": {
+        "slug": "droga-hamowania-a-predkosc-i-nawierzchnia",
+        "title": "Droga hamowania a prędkość i stan nawierzchni",
+        "description": "Węższy temat artykułu wykryty na podstawie treści pytań.",
+        "level": "focused",
+        "status": "candidate",
+        "rule_version": "2026-06-19-prompt-v2",
+        "existing_article_slug": "predkosc-odstep-i-hamowanie"
+    },
+    "workflow": {
+        "status": "published",
+        "next_action": "Przejrzyj relacje pytan i zdecyduj, czy artykul wymaga rozbudowy lub ponownego review.",
+        "public_relations_are_verified_only": true
+    },
+    "article": {
+        "slug": "predkosc-odstep-i-hamowanie",
+        "title": "Prędkość, odstęp i hamowanie pojazdu",
+        "status": "published",
+        "published_at": "2026-06-13",
+        "last_reviewed_at": "2026-06-20",
+        "legal_units": [
+            {
+                "slug": "art-19-ust-1",
+                "label": "art. 19 ust. 1",
+                "title": "Prędkość zapewniająca panowanie nad pojazdem",
+                "status": "verified",
+                "last_checked_at": "2026-06-20"
+            },
+            {
+                "slug": "art-19-ust-2-pkt-2",
+                "label": "art. 19 ust. 2 pkt 2",
+                "title": "Hamowanie bez tworzenia zagrożenia",
+                "status": "verified",
+                "last_checked_at": "2026-06-20"
+            },
+            {
+                "slug": "art-19-ust-2-pkt-3",
+                "label": "art. 19 ust. 2 pkt 3",
+                "title": "Odstęp pozwalający uniknąć zderzenia",
+                "status": "verified",
+                "last_checked_at": "2026-06-20"
+            },
+            {
+                "slug": "art-19-ust-3a",
+                "label": "art. 19 ust. 3a",
+                "title": "Minimalny odstęp na autostradzie i drodze ekspresowej",
+                "status": "verified",
+                "last_checked_at": "2026-06-20"
+            },
+            {
+                "slug": "art-20-ust-2",
+                "label": "art. 20 ust. 2",
+                "title": "Prędkość w strefie zamieszkania",
+                "status": "verified",
+                "last_checked_at": "2026-06-20"
+            },
+            {
+                "slug": "art-20-ust-3-pkt-1-lit-a",
+                "label": "art. 20 ust. 3 pkt 1 lit. a",
+                "title": "Prędkość samochodu osobowego na autostradzie",
+                "status": "verified",
+                "last_checked_at": "2026-06-20"
+            }
+        ]
+    },
+    "summary": {
+        "canonical_questions": 25,
+        "question_rows": 45,
+        "categories": [
+            "A",
+            "A1",
+            "A2",
+            "AM",
+            "B",
+            "B1",
+            "C",
+            "C1",
+            "D",
+            "D1",
+            "T"
+        ],
+        "canonical_questions_with_verified_reference": 0,
+        "prompt_conflicts": [],
+        "answer_conflicts": [],
+        "correct_answer_conflicts": []
+    },
+    "questions": [
+        {
+            "external_id": "3634",
+            "prompt": "Jak dwukrotne zwiększenie prędkości samochodu osobowego wpływa na długość jego drogi hamowania?",
+            "prompt_variants": [
+                "Jak dwukrotne zwiększenie prędkości samochodu osobowego wpływa na długość jego drogi hamowania?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Zwiększa dwukrotnie długość drogi hamowania.",
+                    "option_b": "Zwiększa czterokrotnie długość drogi hamowania.",
+                    "option_c": "Nie powoduje zmiany długości drogi hamowania.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Zwiększa czterokrotnie długość drogi hamowania."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo Droga hamowania (jako element drogi zatrzymania) zależy m.in. W praktyce trzeba ocenic sytuacje zgodnie z zasadami ruchu drogowego, a nie tylko po pozorach. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:drogi hamowania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 27572,
+                    "external_id": "3634",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6338",
+            "prompt": "Jak osiągnąć najkrótszą drogę hamowania pojazdem wyposażonym w układ przeciwblokujący (ABS)?",
+            "prompt_variants": [
+                "Jak osiągnąć najkrótszą drogę hamowania pojazdem wyposażonym w układ przeciwblokujący (ABS)?"
+            ],
+            "categories": [
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Hamując pulsacyjnie.",
+                    "option_b": "Delikatnie wciskając pedał hamulca.",
+                    "option_c": "Maksymalnie wciskając pedał hamulca.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Maksymalnie wciskając pedał hamulca."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo układ ABS to system stosowany w pojazdach w celu zapobiegania blokowaniu kół podczas hamowania, który ma istotny wpływ na bezpieczeństwo podczas hamowania. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6338/image/full.8480cf1a0146.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6338/image/thumb.ae295152a3cd.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/6338/image/full.8480cf1a0146.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/6338/image/thumb.ae295152a3cd.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:droge hamowania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 34904,
+                    "external_id": "6338",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35094,
+                    "external_id": "6338",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6346",
+            "prompt": "Jak, w przybliżeniu, wzrasta długość drogi hamowania pojazdu przy dwukrotnie większej prędkości?",
+            "prompt_variants": [
+                "Jak, w przybliżeniu, wzrasta długość drogi hamowania pojazdu przy dwukrotnie większej prędkości?"
+            ],
+            "categories": [
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Czterokrotnie.",
+                    "option_b": "Trzykrotnie.",
+                    "option_c": "Dwukrotnie.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Czterokrotnie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo droga hamowania (jako element drogi zatrzymania) zależy m.in. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6346/image/full.d859383f7c6c.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6346/image/thumb.c9ccaec4f9cd.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/6346/image/full.d859383f7c6c.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/6346/image/thumb.c9ccaec4f9cd.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:drogi hamowania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 34908,
+                    "external_id": "6346",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35098,
+                    "external_id": "6346",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6515",
+            "prompt": "Co w zasadniczy sposób decyduje o długości drogi hamowania motocykla?",
+            "prompt_variants": [
+                "Co w zasadniczy sposób decyduje o długości drogi hamowania motocykla?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Czas reakcji kierującego.",
+                    "option_b": "System kontroli trakcji.",
+                    "option_c": "Rodzaj nawierzchni, po której porusza się pojazd.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Rodzaj nawierzchni, po której porusza się pojazd."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo o długości drogi hamowania motocykla w zasadniczy sposób decyduje prędkość początkowa, a także stan i rodzaj nawierzchni. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/6515/image/full.810a9afea1a3.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/6515/image/thumb.1db8c054edd2.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/6515/image/full.810a9afea1a3.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/6515/image/thumb.1db8c054edd2.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/6515/image/full.810a9afea1a3.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/6515/image/thumb.1db8c054edd2.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:drogi hamowania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 35468,
+                    "external_id": "6515",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35506,
+                    "external_id": "6515",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35544,
+                    "external_id": "6515",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6516",
+            "prompt": "Jak, w przybliżeniu, wzrasta długość drogi hamowania motocykla przy dwukrotnie większej prędkości?",
+            "prompt_variants": [
+                "Jak, w przybliżeniu, wzrasta długość drogi hamowania motocykla przy dwukrotnie większej prędkości?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Dwukrotnie.",
+                    "option_b": "Trzykrotnie.",
+                    "option_c": "Czterokrotnie.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Czterokrotnie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo dwukrotne zwiększenie prędkości motocykla czterokrotnie wydłuża jego drogę hamowania, bo droga hamowania jest proporcjonalna do kwadratu prędkości. W praktyce trzeba ocenic sytuacje zgodnie z zasadami ruchu drogowego, a nie tylko po pozorach. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:drogi hamowania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 35469,
+                    "external_id": "6516",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35507,
+                    "external_id": "6516",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35545,
+                    "external_id": "6516",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6527",
+            "prompt": "Co w zasadniczy sposób decyduje o długości drogi hamowania motoroweru?",
+            "prompt_variants": [
+                "Co w zasadniczy sposób decyduje o długości drogi hamowania motoroweru?"
+            ],
+            "categories": [
+                "AM"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Ilość paliwa w zbiorniku.",
+                    "option_b": "Wielkość pojazdu.",
+                    "option_c": "Rodzaj nawierzchni, po której porusza się pojazd.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Rodzaj nawierzchni, po której porusza się pojazd."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo o długości drogi hamowania motoroweru w zasadniczy sposób decyduje prędkość pojazdu (droga rośnie z kwadratem prędkości) oraz rodzaj nawierzchni. W praktyce trzeba ocenic sytuacje zgodnie z zasadami ruchu drogowego, a nie tylko po pozorach. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:drogi hamowania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 35577,
+                    "external_id": "6527",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6528",
+            "prompt": "Jak, w przybliżeniu, wzrasta długość drogi hamowania motoroweru przy dwukrotnie większej prędkości?",
+            "prompt_variants": [
+                "Jak, w przybliżeniu, wzrasta długość drogi hamowania motoroweru przy dwukrotnie większej prędkości?"
+            ],
+            "categories": [
+                "AM"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Dwukrotnie.",
+                    "option_b": "Trzykrotnie.",
+                    "option_c": "Czterokrotnie.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Czterokrotnie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo dwukrotne zwiększenie prędkości motoroweru powoduje czterokrotne wydłużenie drogi hamowania, bo droga hamowania jest proporcjonalna do kwadratu prędkości. W praktyce trzeba ocenic sytuacje zgodnie z zasadami ruchu drogowego, a nie tylko po pozorach. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:drogi hamowania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 35578,
+                    "external_id": "6528",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6775",
+            "prompt": "Jak, w przybliżeniu, wzrasta długość drogi hamowania samochodu ciężarowego przy dwukrotnym zwiększeniu prędkości?",
+            "prompt_variants": [
+                "Jak, w przybliżeniu, wzrasta długość drogi hamowania samochodu ciężarowego przy dwukrotnym zwiększeniu prędkości?"
+            ],
+            "categories": [
+                "C",
+                "C1"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Dwukrotnie.",
+                    "option_b": "Trzykrotnie.",
+                    "option_c": "Czterokrotnie.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Czterokrotnie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo przy dwukrotnym zwiększeniu prędkości droga hamowania samochodu ciężarowego wydłuża się czterokrotnie, bo długość drogi hamowania jest proporcjonalna. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/6775/image/full.15cd1baa0aad.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/6775/image/thumb.41124f3175ec.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/6775/image/full.15cd1baa0aad.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/6775/image/thumb.41124f3175ec.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:drogi hamowania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 36205,
+                    "external_id": "6775",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 36257,
+                    "external_id": "6775",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6830",
+            "prompt": "Czym może być spowodowana wydłużona droga hamowania samochodu ciężarowego?",
+            "prompt_variants": [
+                "Czym może być spowodowana wydłużona droga hamowania samochodu ciężarowego?"
+            ],
+            "categories": [
+                "C",
+                "C1"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Nadmiernym naciskiem na pedał hamulca.",
+                    "option_b": "Wysokim ciśnieniem w układzie pneumatycznym.",
+                    "option_c": "Zanieczyszczeniem elementów ciernych układu hamulcowego olejem lub smarem.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Zanieczyszczeniem elementów ciernych układu hamulcowego olejem lub smarem."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/6830/image/full.6ed928331f5e.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/6830/image/thumb.1fbde9b8e6d6.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/6830/image/full.6ed928331f5e.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/6830/image/thumb.1fbde9b8e6d6.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:droga hamowania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 36232,
+                    "external_id": "6830",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 36284,
+                    "external_id": "6830",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6879",
+            "prompt": "Jak, w przybliżeniu, wzrasta długość drogi hamowania autobusu przy dwukrotnie większej prędkości?",
+            "prompt_variants": [
+                "Jak, w przybliżeniu, wzrasta długość drogi hamowania autobusu przy dwukrotnie większej prędkości?"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Dwukrotnie.",
+                    "option_b": "Trzykrotnie.",
+                    "option_c": "Czterokrotnie.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Czterokrotnie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo przy dwukrotnie większej prędkości, długość drogi hamowania autobusu (i każdego pojazdu) wzrasta w przybliżeniu czterokrotnie, bo droga hamowania. W praktyce trzeba ocenic sytuacje zgodnie z zasadami ruchu drogowego, a nie tylko po pozorach. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:drogi hamowania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 36496,
+                    "external_id": "6879",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 36571,
+                    "external_id": "6879",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7179",
+            "prompt": "Jak, w przybliżeniu, wzrasta długość drogi hamowania pojazdu przy dwukrotnie większej prędkości?",
+            "prompt_variants": [
+                "Jak, w przybliżeniu, wzrasta długość drogi hamowania pojazdu przy dwukrotnie większej prędkości?"
+            ],
+            "categories": [
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Czterokrotnie.",
+                    "option_b": "Trzykrotnie.",
+                    "option_c": "Dwukrotnie.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Czterokrotnie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo droga hamowania (jako element drogi zatrzymania) zależy m.in. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/7179/image/full.44e227050b85.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/7179/image/thumb.fbb9688c1513.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:drogi hamowania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 37421,
+                    "external_id": "7179",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7461",
+            "prompt": "W jakich warunkach droga hamowania jest najdłuższa?",
+            "prompt_variants": [
+                "W jakich warunkach droga hamowania jest najdłuższa?"
+            ],
+            "categories": [
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Na drodze suchej.",
+                    "option_b": "Na drodze mokrej.",
+                    "option_c": "Na drodze oblodzonej.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Na drodze oblodzonej."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo Droga hamowania na lodzie jest najdłuższa, bowiem współczynnik przyczepności opon do podłoża - jezdni jest najmniejszy. W praktyce trzeba ocenic sytuacje zgodnie z zasadami ruchu drogowego, a nie tylko po pozorach. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:droga hamowania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 40623,
+                    "external_id": "7461",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41152,
+                    "external_id": "7461",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7585",
+            "prompt": "Który z wymienionych czynników ma największy wpływ na długość drogi hamowania motocykla, gdy jedziesz w dobrych warunkach atmosferycznych?",
+            "prompt_variants": [
+                "Który z wymienionych czynników ma największy wpływ na długość drogi hamowania motocykla, gdy jedziesz w dobrych warunkach atmosferycznych?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Czas reakcji kierowcy.",
+                    "option_b": "Prędkość, z jaką porusza się motocykl.",
+                    "option_c": "Ubiór używany przez motocyklistę.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Prędkość, z jaką porusza się motocykl."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo największy wpływ na długość drogi hamowania motocykla ma prędkość, z jaką się porusza motocykl. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/7585/image/full.b59ca9a5953f.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/7585/image/thumb.62f7d0c680bb.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/7585/image/full.b59ca9a5953f.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/7585/image/thumb.62f7d0c680bb.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/7585/image/full.b59ca9a5953f.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/7585/image/thumb.62f7d0c680bb.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:drogi hamowania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 41750,
+                    "external_id": "7585",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41821,
+                    "external_id": "7585",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41859,
+                    "external_id": "7585",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7599",
+            "prompt": "Jeżeli długość drogi hamowania motocykla, którym kierujesz z prędkością 30 km/h, wynosi około 6 metrów, to zwiększenie prędkości do 60 km/h spowoduje:",
+            "prompt_variants": [
+                "Jeżeli długość drogi hamowania motocykla, którym kierujesz z prędkością 30 km/h, wynosi około 6 metrów, to zwiększenie prędkości do 60 km/h spowoduje:"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "wydłużenie drogi hamowania do około 12 metrów.",
+                    "option_b": "wydłużenie drogi hamowania do około 24 metrów.",
+                    "option_c": "wydłużenie drogi hamowania do około 36 metrów.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "wydłużenie drogi hamowania do około 24 metrów."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo dwukrotne zwiększenie prędkości motocykla czterokrotnie wydłuża jego drogę hamowania, bo droga hamowania jest proporcjonalna do kwadratu prędkości. W praktyce trzeba ocenic sytuacje zgodnie z zasadami ruchu drogowego, a nie tylko po pozorach. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:drogi hamowania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 41755,
+                    "external_id": "7599",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41826,
+                    "external_id": "7599",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41864,
+                    "external_id": "7599",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7631",
+            "prompt": "Który z wymienionych czynników, wpływa na wydłużenie drogi hamowania ciągnika rolniczego?",
+            "prompt_variants": [
+                "Który z wymienionych czynników, wpływa na wydłużenie drogi hamowania ciągnika rolniczego?"
+            ],
+            "categories": [
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Zmniejszenie przyczepności opon do jezdni.",
+                    "option_b": "Zwiększenie przyczepności opon do jezdni.",
+                    "option_c": "Jazda pod górę.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Zmniejszenie przyczepności opon do jezdni."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo głównymi czynnikami wpływającymi na wydłużenie drogi hamowania ciągnika rolniczego są: zwiększenie prędkości (droga rośnie z kwadratem prędkości). Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/7631/image/full.95bab943f25c.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/7631/image/thumb.352de4945d83.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:drogi hamowania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 41711,
+                    "external_id": "7631",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7632",
+            "prompt": "Jaki wpływ na długość drogi hamowania, ma zawilgocenie jezdni spowodowane deszczem?",
+            "prompt_variants": [
+                "Jaki wpływ na długość drogi hamowania, ma zawilgocenie jezdni spowodowane deszczem?"
+            ],
+            "categories": [
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Skraca drogę hamowania.",
+                    "option_b": "Wydłuża drogę hamowania.",
+                    "option_c": "Droga hamowania jest niezależna od stanu jezdni.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Wydłuża drogę hamowania."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo droga hamowania (jako element drogi zatrzymania) zależy m.in. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/7632/image/full.012ceab58999.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/7632/image/thumb.c5757a035a4c.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:drogi hamowania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 41712,
+                    "external_id": "7632",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7671",
+            "prompt": "O ile razy wydłuży się droga hamowania, jeżeli dwukrotnie zwiększysz prędkość autobusu, którym kierujesz?",
+            "prompt_variants": [
+                "O ile razy wydłuży się droga hamowania, jeżeli dwukrotnie zwiększysz prędkość autobusu, którym kierujesz?"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "O dwa razy.",
+                    "option_b": "O cztery razy.",
+                    "option_c": "O sześć razy.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "O cztery razy."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo droga hamowania wydłuży się czterokrotnie, bo rośnie ona proporcjonalnie do kwadratu prędkości, co oznacza, że podwojenie prędkości skutkuje jej poczwórnym wydłużeniem. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/7671/image/full.8ba82975b5df.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/7671/image/thumb.1eee23ae4691.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/7671/image/full.8ba82975b5df.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/7671/image/thumb.1eee23ae4691.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:droga hamowania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 41664,
+                    "external_id": "7671",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41686,
+                    "external_id": "7671",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7717",
+            "prompt": "W jaki sposób, dwukrotne zwiększenie prędkości motocykla, wpływa na długość jego drogi hamowania?",
+            "prompt_variants": [
+                "W jaki sposób, dwukrotne zwiększenie prędkości motocykla, wpływa na długość jego drogi hamowania?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Zwiększa dwukrotnie długość drogi hamowania.",
+                    "option_b": "Zwiększa czterokrotnie długość drogi hamowania.",
+                    "option_c": "Nie powoduje zmiany długości drogi hamowania.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Zwiększa czterokrotnie długość drogi hamowania."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo dwukrotne zwiększenie prędkości motocykla czterokrotnie wydłuża jego drogę hamowania, bo droga hamowania jest proporcjonalna do kwadratu prędkości. W praktyce trzeba ocenic sytuacje zgodnie z zasadami ruchu drogowego, a nie tylko po pozorach. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:drogi hamowania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 42258,
+                    "external_id": "7717",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 42293,
+                    "external_id": "7717",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 42305,
+                    "external_id": "7717",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "8957",
+            "prompt": "Który z wymienionych czynników ma bezpośredni wpływ na drogę hamowania?",
+            "prompt_variants": [
+                "Który z wymienionych czynników ma bezpośredni wpływ na drogę hamowania?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Prędkość jazdy.",
+                    "option_b": "Oznakowanie poziome.",
+                    "option_c": "Widoczność na drodze.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Prędkość jazdy."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo droga hamowania (jako element drogi zatrzymania) zależy m.in. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/8957/image/full.f0b12949394d.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/8957/image/thumb.c023d335d7db.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:droge hamowania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 42702,
+                    "external_id": "8957",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "8961",
+            "prompt": "Który z wymienionych czynników ma bezpośredni wpływ na drogę hamowania?",
+            "prompt_variants": [
+                "Który z wymienionych czynników ma bezpośredni wpływ na drogę hamowania?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Oznakowanie poziome.",
+                    "option_b": "Stan hamulców.",
+                    "option_c": "Oznakowanie pionowe.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Stan hamulców."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedź B. Na drogę hamowania bezpośrednio wpływa stan hamulców, bo od sprawności układu hamulcowego zależy skuteczność wytracania prędkości. Oznakowanie poziome ani pionowe nie decyduje o długości drogi hamowania pojazdu."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/8961/image/full.17f95410b192.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/8961/image/thumb.f4edfb325974.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:droge hamowania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 42703,
+                    "external_id": "8961",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "8995",
+            "prompt": "Jak zmienia się droga hamowania pojazdu zależnie od wzrostu prędkości?",
+            "prompt_variants": [
+                "Jak zmienia się droga hamowania pojazdu zależnie od wzrostu prędkości?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Droga hamowania wydłuża się wraz ze wzrostem prędkości.",
+                    "option_b": "Droga hamowania ulega skróceniu wraz ze wzrostem prędkości.",
+                    "option_c": "Prędkość jazdy nie ma wpływu na drogę hamowania.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Droga hamowania wydłuża się wraz ze wzrostem prędkości."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo kierujacy ma obowiazek utrzymywać odstęp niezbędny do uniknięcia zderzenia w razie hamowania lub zatrzymania się poprzedzającego pojazdu kierujacy. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/8995/image/full.2165b4ae702c.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/8995/image/thumb.206acfd05bcb.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:droga hamowania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 42711,
+                    "external_id": "8995",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10059",
+            "prompt": "O ile wzrośnie droga hamowania, jeżeli zwiększysz prędkość 2-krotnie?",
+            "prompt_variants": [
+                "O ile wzrośnie droga hamowania, jeżeli zwiększysz prędkość 2-krotnie?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "2-krotnie.",
+                    "option_b": "3-krotnie.",
+                    "option_c": "4-krotnie.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "4-krotnie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo droga hamowania (jako element drogi zatrzymania) zależy m.in. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/10059/image/full.fd243173077e.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/10059/image/thumb.062cc8698c5c.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:droga hamowania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 43232,
+                    "external_id": "10059",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "11453",
+            "prompt": "Jaki wpływ na drogę hamowania ma zbyt duże ciśnienie w ogumieniu samochodu ciężarowego?",
+            "prompt_variants": [
+                "Jaki wpływ na drogę hamowania ma zbyt duże ciśnienie w ogumieniu samochodu ciężarowego?"
+            ],
+            "categories": [
+                "C",
+                "C1"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Może skrócić drogę hamowania.",
+                    "option_b": "Może wydłużyć drogę hamowania.",
+                    "option_c": "Nie zmienia długości drogi hamowania.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Może wydłużyć drogę hamowania."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo zbyt duże ciśnienie w oponach samochodu ciężarowego wydłuża drogę hamowania, bo zmniejsza powierzchnię styku opony z nawierzchnią (gorsza. W praktyce trzeba ocenic sytuacje zgodnie z zasadami ruchu drogowego, a nie tylko po pozorach. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:droge hamowania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 45967,
+                    "external_id": "11453",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46152,
+                    "external_id": "11453",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "11521",
+            "prompt": "W jaki sposób dwukrotne zwiększenie prędkości samochodu ciężarowego wpływa na długość jego drogi hamowania?",
+            "prompt_variants": [
+                "W jaki sposób dwukrotne zwiększenie prędkości samochodu ciężarowego wpływa na długość jego drogi hamowania?"
+            ],
+            "categories": [
+                "C",
+                "C1"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Zwiększa dwukrotnie długość drogi hamowania.",
+                    "option_b": "Zwiększa czterokrotnie długość drogi hamowania.",
+                    "option_c": "Nie powoduje zmiany długości drogi hamowania.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Zwiększa czterokrotnie długość drogi hamowania."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo przy dwukrotnym zwiększeniu prędkości droga hamowania samochodu ciężarowego wydłuża się czterokrotnie, bo długość drogi hamowania jest proporcjonalna. W praktyce trzeba ocenic sytuacje zgodnie z zasadami ruchu drogowego, a nie tylko po pozorach. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:drogi hamowania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 46013,
+                    "external_id": "11521",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46198,
+                    "external_id": "11521",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "11524",
+            "prompt": "Czy fakt, że jedziesz we mgle, ma wpływ na długość drogi hamowania?",
+            "prompt_variants": [
+                "Czy fakt, że jedziesz we mgle, ma wpływ na długość drogi hamowania?"
+            ],
+            "categories": [
+                "C",
+                "C1"
+            ],
+            "question_topics": [
+                {
+                    "key": "risk_factors_conditions_and_weather",
+                    "name": "Czynniki ryzyka zwiazane z roznymi warunkami drogowymi, w szczegolnosci ze zmiana tych warunkow w zaleznosci od pogody i pory dnia lub nocy, wlasciwosci roznych typow drog i zwiazane z tym obowiazujace wymagania"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak, może się ona zwiększyć ze względu na zawilgocenie jezdni.",
+                    "option_b": "Tak, może się ona zmniejszyć ze względu na zwiększoną przyczepność opony do nawierzchni jezdni.",
+                    "option_c": "Nie, nie zwiększa się ani nie zmniejsza, bo mgła i wilgotność nie ma na nią wpływu.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak, może się ona zwiększyć ze względu na zawilgocenie jezdni."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo w warunkach mgły występuje zawilgocenie jezdni, co powoduje zmianę - zmniejszenie - współczynnika przyczepności opon i w konsekwencji może powodować. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:drogi hamowania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 46014,
+                    "external_id": "11524",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46199,
+                    "external_id": "11524",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        }
+    ]
+}

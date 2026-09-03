@@ -1,0 +1,60 @@
+{
+  "category": "B",
+  "scope": "active_ready",
+  "rules": [
+    {
+      "name": "b-wave5-signalized-intersections-entry-exact",
+      "target_topic_key": "intersections_with_traffic_lights",
+      "reason": "PJ360 B wave 5: skrzyzowania z sygnalizacja z curated external_id",
+      "current_topic_keys": [
+        "joining_traffic_and_equal_intersections"
+      ],
+      "external_ids": [
+        "2509",
+        "3415",
+        "4612",
+        "6074",
+        "6075",
+        "6081",
+        "6082",
+        "7334"
+      ]
+    },
+    {
+      "name": "b-wave5-lane-change-on-intersection-exact",
+      "target_topic_key": "lane_change_and_turning",
+      "reason": "PJ360 B wave 5: zmiana pasa i kierunku jazdy z curated external_id",
+      "current_topic_keys": [
+        "joining_traffic_and_equal_intersections"
+      ],
+      "external_ids": [
+        "1448",
+        "1707",
+        "1729",
+        "11499"
+      ]
+    },
+    {
+      "name": "b-wave5-overtaking-on-intersection-exact",
+      "target_topic_key": "overtaking",
+      "reason": "PJ360 B wave 5: wyprzedzanie z curated external_id",
+      "current_topic_keys": [
+        "joining_traffic_and_equal_intersections"
+      ],
+      "external_ids": [
+        "13144"
+      ]
+    },
+    {
+      "name": "b-wave5-mandatory-turn-sign-exact",
+      "target_topic_key": "prohibition_and_mandatory_signs",
+      "reason": "PJ360 B wave 5: znak nakazu z curated external_id",
+      "current_topic_keys": [
+        "joining_traffic_and_equal_intersections"
+      ],
+      "external_ids": [
+        "3907"
+      ]
+    }
+  ]
+}

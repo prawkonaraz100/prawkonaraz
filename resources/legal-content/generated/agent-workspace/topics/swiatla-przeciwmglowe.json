@@ -1,0 +1,1496 @@
+{
+    "generated_at": "2026-06-21T16:21:59+02:00",
+    "candidate": {
+        "slug": "swiatla-przeciwmglowe",
+        "title": "Światła przeciwmgłowe",
+        "description": "Węższy temat artykułu wykryty na podstawie treści pytań.",
+        "level": "focused",
+        "status": "candidate",
+        "rule_version": "2026-06-19-prompt-v2",
+        "existing_article_slug": "swiatla-przeciwmglowe"
+    },
+    "workflow": {
+        "status": "published",
+        "next_action": "Przejrzyj relacje pytan i zdecyduj, czy artykul wymaga rozbudowy lub ponownego review.",
+        "public_relations_are_verified_only": true
+    },
+    "article": {
+        "slug": "swiatla-przeciwmglowe",
+        "title": "Światła przeciwmgłowe: przednie, tylne i granica 50 metrów",
+        "status": "published",
+        "published_at": "2026-06-21",
+        "last_reviewed_at": "2026-06-21",
+        "legal_units": [
+            {
+                "slug": "art-30-ust-1-pkt-1-lit-a",
+                "label": "art. 30 ust. 1 pkt 1 lit. a",
+                "title": "Światła podczas zmniejszonej przejrzystości powietrza",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-30-ust-3",
+                "label": "art. 30 ust. 3",
+                "title": "Tylne światła przeciwmgłowe i granica 50 metrów",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-51-ust-5",
+                "label": "art. 51 ust. 5",
+                "title": "Przednie światła przeciwmgłowe na drodze krętej",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            }
+        ]
+    },
+    "summary": {
+        "canonical_questions": 12,
+        "question_rows": 38,
+        "categories": [
+            "A",
+            "A1",
+            "A2",
+            "B",
+            "B1",
+            "C",
+            "C1",
+            "D",
+            "D1",
+            "PT"
+        ],
+        "canonical_questions_with_verified_reference": 10,
+        "prompt_conflicts": [],
+        "answer_conflicts": [],
+        "correct_answer_conflicts": []
+    },
+    "questions": [
+        {
+            "external_id": "1558",
+            "prompt": "Czy w tej sytuacji wolno Ci jechać pojazdem z włączonymi światłami przeciwmgłowymi?",
+            "prompt_variants": [
+                "Czy w tej sytuacji wolno Ci jechać pojazdem z włączonymi światłami przeciwmgłowymi?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo w tej sytuacji przepisy albo okolicznosci na to nie pozwalaja. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d/1558/video/full.9e1997802717.mp4",
+                    "poster_path": "media/questions/d/1558/image/poster.bbb8a7a9967d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d1/1558/video/full.9e1997802717.mp4",
+                    "poster_path": "media/questions/d1/1558/image/poster.bbb8a7a9967d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a/1558/video/full.9e1997802717.mp4",
+                    "poster_path": "media/questions/a/1558/image/poster.bbb8a7a9967d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/1558/video/full.9e1997802717.mp4",
+                    "poster_path": "media/questions/b/1558/image/poster.bbb8a7a9967d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c/1558/video/full.9e1997802717.mp4",
+                    "poster_path": "media/questions/c/1558/image/poster.bbb8a7a9967d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a1/1558/video/full.9e1997802717.mp4",
+                    "poster_path": "media/questions/a1/1558/image/poster.bbb8a7a9967d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a2/1558/video/full.9e1997802717.mp4",
+                    "poster_path": "media/questions/a2/1558/image/poster.bbb8a7a9967d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b1/1558/video/full.9e1997802717.mp4",
+                    "poster_path": "media/questions/b1/1558/image/poster.bbb8a7a9967d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c1/1558/video/full.9e1997802717.mp4",
+                    "poster_path": "media/questions/c1/1558/image/poster.bbb8a7a9967d.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przeciwmglow",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 20023,
+                    "external_id": "1558",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 20108,
+                    "external_id": "1558",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 20197,
+                    "external_id": "1558",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 20285,
+                    "external_id": "1558",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 20368,
+                    "external_id": "1558",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 20605,
+                    "external_id": "1558",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 20694,
+                    "external_id": "1558",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 20773,
+                    "external_id": "1558",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 20855,
+                    "external_id": "1558",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "2072",
+            "prompt": "Czy możesz używać świateł przeciwmgłowych przednich na oznaczonej znakami krętej drodze w czasie pogodnej nocy?",
+            "prompt_variants": [
+                "Czy możesz używać świateł przeciwmgłowych przednich na oznaczonej znakami krętej drodze w czasie pogodnej nocy?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "\"TAK\" - bowiem, Kierujący pojazdem jest obowiązany używać świateł mijania podczas jazdy w warunkach normalnej przejrzystości powietrza, gdzie na drodze krętej, oznaczonej odpowiednimi znakami drogowymi, kierujący pojazdem może używać przednich świateł przeciwmgłowych od zmierzchu do świtu - noc, również w warunkach normalnej przejrzystości powietrza"
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "imports/pj360/b/2072/full.jpg",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przeciwmglow",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 51061,
+                    "question_external_id": "pj360:2072",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-51-ust-5",
+                    "legal_unit_label": "art. 51 ust. 5",
+                    "legal_unit_title": "Przednie światła przeciwmgłowe na drodze krętej",
+                    "legal_topic_slug": "swiatla-przeciwmglowe",
+                    "article_slug": "swiatla-przeciwmglowe",
+                    "public_note": "To pytanie dotyczy nocnej jazdy po oznakowanej drodze krętej. Art. 51 ust. 5 pozwala wtedy używać przednich świateł przeciwmgłowych również przy normalnej przejrzystości powietrza."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 51061,
+                    "external_id": "pj360:2072",
+                    "category": "B",
+                    "source": "pj360",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "3655",
+            "prompt": "Czy w przedstawionej sytuacji wolno Ci poruszać się z włączonymi przednimi światłami przeciwmgłowymi?",
+            "prompt_variants": [
+                "Czy w przedstawionej sytuacji wolno Ci poruszać się z włączonymi przednimi światłami przeciwmgłowymi?"
+            ],
+            "categories": [
+                "B",
+                "C",
+                "C1",
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo kierujacy ma obowiazek używać świateł mijania podczas jazdy w warunkach normalnej przejrzystości powietrza i na drodze krętej, oznaczonej. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/3655/image/full.2447f6e60323.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/3655/image/thumb.85b477b67a15.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/3655/image/full.2447f6e60323.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/3655/image/thumb.85b477b67a15.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/3655/image/full.2447f6e60323.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/3655/image/thumb.85b477b67a15.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/3655/image/full.2447f6e60323.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/3655/image/thumb.85b477b67a15.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/3655/image/full.2447f6e60323.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/3655/image/thumb.85b477b67a15.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przeciwmglow",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 27581,
+                    "external_id": "3655",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 27713,
+                    "external_id": "3655",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 27775,
+                    "external_id": "3655",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 28132,
+                    "external_id": "3655",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 28194,
+                    "external_id": "3655",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6216",
+            "prompt": "Czy jadąc z włączonymi światłami mijania, w intensywnym deszczu ograniczającym widoczność, masz prawo używać świateł przeciwmgłowych przednich?",
+            "prompt_variants": [
+                "Czy jadąc z włączonymi światłami mijania, w intensywnym deszczu ograniczającym widoczność, masz prawo używać świateł przeciwmgłowych przednich?"
+            ],
+            "categories": [
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak, bo kierujacy ma obowiazek zachować szczególną ostrożność w czasie jazdy w warunkach zmniejszonej przejrzystości powietrza, spowodowanej opadami."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6216/image/full.9bf33373bd3d.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6216/image/thumb.5d3fb70ef1c7.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/6216/image/full.9bf33373bd3d.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/6216/image/thumb.5d3fb70ef1c7.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/6216/image/full.9bf33373bd3d.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/6216/image/thumb.5d3fb70ef1c7.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/6216/image/full.9bf33373bd3d.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/6216/image/thumb.5d3fb70ef1c7.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/6216/image/full.9bf33373bd3d.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/6216/image/thumb.5d3fb70ef1c7.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/6216/image/full.9bf33373bd3d.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/6216/image/thumb.5d3fb70ef1c7.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przeciwmglow",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 33637,
+                    "question_external_id": "6216",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-30-ust-1-pkt-1-lit-a",
+                    "legal_unit_label": "art. 30 ust. 1 pkt 1 lit. a",
+                    "legal_unit_title": "Światła podczas zmniejszonej przejrzystości powietrza",
+                    "legal_topic_slug": "swiatla-przeciwmglowe",
+                    "article_slug": "swiatla-przeciwmglowe",
+                    "public_note": "To pytanie dotyczy przednich świateł przeciwmgłowych przy zmniejszonej przejrzystości. Art. 30 ust. 1 pkt 1 lit. a pozwala używać ich zamiast świateł mijania albo razem z nimi."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 33637,
+                    "external_id": "6216",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33734,
+                    "external_id": "6216",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33831,
+                    "external_id": "6216",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34284,
+                    "external_id": "6216",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34381,
+                    "external_id": "6216",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34478,
+                    "external_id": "6216",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6363",
+            "prompt": "Kiedy masz obowiązek wyłączyć tylne światła przeciwmgłowe?",
+            "prompt_variants": [
+                "Kiedy masz obowiązek wyłączyć tylne światła przeciwmgłowe?"
+            ],
+            "categories": [
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "risk_factors_conditions_and_weather",
+                    "name": "Czynniki ryzyka zwiazane z roznymi warunkami drogowymi, w szczegolnosci ze zmiana tych warunkow w zaleznosci od pogody i pory dnia lub nocy, wlasciwosci roznych typow drog i zwiazane z tym obowiazujace wymagania"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Gdy widoczność wzrośnie do 30 m.",
+                    "option_b": "Gdy widoczność wzrośnie do 40 m.",
+                    "option_c": "Gdy widoczność wzrośnie powyżej 50 m.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Gdy widoczność wzrośnie powyżej 50 m."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6363/image/full.ee7a0c6a242e.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6363/image/thumb.73dee6c5b64f.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/6363/image/full.ee7a0c6a242e.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/6363/image/thumb.73dee6c5b64f.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przeciwmglow",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 34922,
+                    "question_external_id": "6363",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-30-ust-3",
+                    "legal_unit_label": "art. 30 ust. 3",
+                    "legal_unit_title": "Tylne światła przeciwmgłowe i granica 50 metrów",
+                    "legal_topic_slug": "swiatla-przeciwmglowe",
+                    "article_slug": "swiatla-przeciwmglowe",
+                    "public_note": "To pytanie sprawdza próg dla tylnych świateł przeciwmgłowych. Art. 30 ust. 3 pozwala ich używać przy widoczności mniejszej niż 50 m i wymaga niezwłocznego wyłączenia po poprawie warunków."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 34922,
+                    "external_id": "6363",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35111,
+                    "external_id": "6363",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7464",
+            "prompt": "Czy w tych warunkach atmosferycznych masz prawo używać jednocześnie świateł mijania i przeciwmgłowych przednich?",
+            "prompt_variants": [
+                "Czy w tych warunkach atmosferycznych masz prawo używać jednocześnie świateł mijania i przeciwmgłowych przednich?"
+            ],
+            "categories": [
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak, bo kierujacy ma obowiazek w czasie jazdy w warunkach zmniejszonej przejrzystości powietrza, spowodowanej mgłą, opadami atmosferycznymi włączyć światła. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/7464/image/full.a3db3d18b406.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/7464/image/thumb.6b08f79f6bf0.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/7464/image/full.a3db3d18b406.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/7464/image/thumb.6b08f79f6bf0.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/7464/image/full.a3db3d18b406.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/7464/image/thumb.6b08f79f6bf0.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/7464/image/full.a3db3d18b406.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/7464/image/thumb.6b08f79f6bf0.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/7464/image/full.a3db3d18b406.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/7464/image/thumb.6b08f79f6bf0.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/7464/image/full.a3db3d18b406.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/7464/image/thumb.6b08f79f6bf0.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przeciwmglow",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 40626,
+                    "question_external_id": "7464",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-30-ust-1-pkt-1-lit-a",
+                    "legal_unit_label": "art. 30 ust. 1 pkt 1 lit. a",
+                    "legal_unit_title": "Światła podczas zmniejszonej przejrzystości powietrza",
+                    "legal_topic_slug": "swiatla-przeciwmglowe",
+                    "article_slug": "swiatla-przeciwmglowe",
+                    "public_note": "To pytanie dotyczy przednich świateł przeciwmgłowych przy zmniejszonej przejrzystości. Art. 30 ust. 1 pkt 1 lit. a pozwala używać ich zamiast świateł mijania albo razem z nimi."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 40626,
+                    "external_id": "7464",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40711,
+                    "external_id": "7464",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40789,
+                    "external_id": "7464",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41155,
+                    "external_id": "7464",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41240,
+                    "external_id": "7464",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41318,
+                    "external_id": "7464",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7675",
+            "prompt": "W jakiej sytuacji masz prawo używać tylnych świateł przeciwmgłowych, gdy kierujesz autobusem?",
+            "prompt_variants": [
+                "W jakiej sytuacji masz prawo używać tylnych świateł przeciwmgłowych, gdy kierujesz autobusem?"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "risk_factors_conditions_and_weather",
+                    "name": "Czynniki ryzyka zwiazane z roznymi warunkami drogowymi, w szczegolnosci ze zmiana tych warunkow w zaleznosci od pogody i pory dnia lub nocy, wlasciwosci roznych typow drog i zwiazane z tym obowiazujace wymagania"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "W deszczu, niezależnie od tego, na jaką odległość ograniczona jest widoczność.",
+                    "option_b": "We mgle ograniczającej widoczność na odległość mniejszą niż 50 metrów.",
+                    "option_c": "Przy opadach śniegu ograniczających widoczność na odległość 100 metrów.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "We mgle ograniczającej widoczność na odległość mniejszą niż 50 metrów."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przeciwmglow",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 42113,
+                    "question_external_id": "7675",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-30-ust-3",
+                    "legal_unit_label": "art. 30 ust. 3",
+                    "legal_unit_title": "Tylne światła przeciwmgłowe i granica 50 metrów",
+                    "legal_topic_slug": "swiatla-przeciwmglowe",
+                    "article_slug": "swiatla-przeciwmglowe",
+                    "public_note": "To pytanie sprawdza próg dla tylnych świateł przeciwmgłowych. Art. 30 ust. 3 pozwala ich używać przy widoczności mniejszej niż 50 m i wymaga niezwłocznego wyłączenia po poprawie warunków."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 42113,
+                    "external_id": "7675",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 42154,
+                    "external_id": "7675",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "8238",
+            "prompt": "Czy masz prawo używać świateł przeciwmgłowych tylnych, jeżeli mgła ogranicza widoczność na odległość 100 m?",
+            "prompt_variants": [
+                "Czy masz prawo używać świateł przeciwmgłowych tylnych, jeżeli mgła ogranicza widoczność na odległość 100 m?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo w tej sytuacji przepisy albo okolicznosci na to nie pozwalaja. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/8238/image/full.6324db0b312f.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/8238/image/thumb.c676b583cb8a.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przeciwmglow",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 42452,
+                    "question_external_id": "8238",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-30-ust-3",
+                    "legal_unit_label": "art. 30 ust. 3",
+                    "legal_unit_title": "Tylne światła przeciwmgłowe i granica 50 metrów",
+                    "legal_topic_slug": "swiatla-przeciwmglowe",
+                    "article_slug": "swiatla-przeciwmglowe",
+                    "public_note": "To pytanie sprawdza próg dla tylnych świateł przeciwmgłowych. Art. 30 ust. 3 pozwala ich używać przy widoczności mniejszej niż 50 m i wymaga niezwłocznego wyłączenia po poprawie warunków."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 42452,
+                    "external_id": "8238",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "8245",
+            "prompt": "Czy masz prawo używać świateł przeciwmgłowych tylnych, jeżeli mgła ogranicza widoczność na odległość mniejszą niż 50 m?",
+            "prompt_variants": [
+                "Czy masz prawo używać świateł przeciwmgłowych tylnych, jeżeli mgła ogranicza widoczność na odległość mniejszą niż 50 m?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak, bo w tej sytuacji warunki rzeczywiscie pozwalaja na takie zachowanie. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/8245/image/full.6324db0b312f.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/8245/image/thumb.c676b583cb8a.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przeciwmglow",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 42453,
+                    "question_external_id": "8245",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-30-ust-3",
+                    "legal_unit_label": "art. 30 ust. 3",
+                    "legal_unit_title": "Tylne światła przeciwmgłowe i granica 50 metrów",
+                    "legal_topic_slug": "swiatla-przeciwmglowe",
+                    "article_slug": "swiatla-przeciwmglowe",
+                    "public_note": "To pytanie sprawdza próg dla tylnych świateł przeciwmgłowych. Art. 30 ust. 3 pozwala ich używać przy widoczności mniejszej niż 50 m i wymaga niezwłocznego wyłączenia po poprawie warunków."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 42453,
+                    "external_id": "8245",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "11457",
+            "prompt": "Kiedy kierując samochodem ciężarowym masz obowiązek wyłączyć tylne światła przeciwmgłowe?",
+            "prompt_variants": [
+                "Kiedy kierując samochodem ciężarowym masz obowiązek wyłączyć tylne światła przeciwmgłowe?"
+            ],
+            "categories": [
+                "C",
+                "C1"
+            ],
+            "question_topics": [
+                {
+                    "key": "risk_factors_conditions_and_weather",
+                    "name": "Czynniki ryzyka zwiazane z roznymi warunkami drogowymi, w szczegolnosci ze zmiana tych warunkow w zaleznosci od pogody i pory dnia lub nocy, wlasciwosci roznych typow drog i zwiazane z tym obowiazujace wymagania"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Gdy widoczność wzrośnie do 30 m.",
+                    "option_b": "Gdy widoczność wzrośnie do 40 m.",
+                    "option_c": "Gdy widoczność wzrośnie do 60 m.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Gdy widoczność wzrośnie do 60 m."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/11457/image/full.b67c7c4d20e2.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/11457/image/thumb.8874d7d36e32.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/11457/image/full.b67c7c4d20e2.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/11457/image/thumb.8874d7d36e32.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przeciwmglow",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 45968,
+                    "question_external_id": "11457",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-30-ust-3",
+                    "legal_unit_label": "art. 30 ust. 3",
+                    "legal_unit_title": "Tylne światła przeciwmgłowe i granica 50 metrów",
+                    "legal_topic_slug": "swiatla-przeciwmglowe",
+                    "article_slug": "swiatla-przeciwmglowe",
+                    "public_note": "To pytanie sprawdza próg dla tylnych świateł przeciwmgłowych. Art. 30 ust. 3 pozwala ich używać przy widoczności mniejszej niż 50 m i wymaga niezwłocznego wyłączenia po poprawie warunków."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 45968,
+                    "external_id": "11457",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46153,
+                    "external_id": "11457",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "13105",
+            "prompt": "Czy masz obowiązek wyłączyć światła przeciwmgłowe tylne, jeżeli widoczność jest większa niż 50 m?",
+            "prompt_variants": [
+                "Czy masz obowiązek wyłączyć światła przeciwmgłowe tylne, jeżeli widoczność jest większa niż 50 m?"
+            ],
+            "categories": [
+                "PT"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedź Tak. Tylne światła przeciwmgłowe wolno stosować tylko wtedy, gdy widoczność jest ograniczona do 50 metrów lub mniej. Jeśli widoczność jest większa, trzeba je wyłączyć, żeby nie oślepiać innych uczestników ruchu."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/pt/13105/image/full.51eeaf8bea8a.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/pt/13105/image/thumb.ca2e5288c2c6.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przeciwmglow",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 47116,
+                    "question_external_id": "13105",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-30-ust-3",
+                    "legal_unit_label": "art. 30 ust. 3",
+                    "legal_unit_title": "Tylne światła przeciwmgłowe i granica 50 metrów",
+                    "legal_topic_slug": "swiatla-przeciwmglowe",
+                    "article_slug": "swiatla-przeciwmglowe",
+                    "public_note": "To pytanie sprawdza próg dla tylnych świateł przeciwmgłowych. Art. 30 ust. 3 pozwala ich używać przy widoczności mniejszej niż 50 m i wymaga niezwłocznego wyłączenia po poprawie warunków."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 47116,
+                    "external_id": "13105",
+                    "category": "PT",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "13444",
+            "prompt": "W jakich warunkach masz prawo włączyć tylne światła przeciwmgłowe?",
+            "prompt_variants": [
+                "W jakich warunkach masz prawo włączyć tylne światła przeciwmgłowe?"
+            ],
+            "categories": [
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "risk_factors_conditions_and_weather",
+                    "name": "Czynniki ryzyka zwiazane z roznymi warunkami drogowymi, w szczegolnosci ze zmiana tych warunkow w zaleznosci od pogody i pory dnia lub nocy, wlasciwosci roznych typow drog i zwiazane z tym obowiazujace wymagania"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Gdy widoczność w obfitym deszczu jest ograniczona do 60 m.",
+                    "option_b": "Gdy widoczność w gęstej mgle jest ograniczona do 100 m.",
+                    "option_c": "Gdy widoczność podczas opadów śniegu jest mniejsza niż 50 m.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Gdy widoczność podczas opadów śniegu jest mniejsza niż 50 m."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/13444/image/full.ee7a0c6a242e.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/13444/image/thumb.73dee6c5b64f.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/13444/image/full.ee7a0c6a242e.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/13444/image/thumb.73dee6c5b64f.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przeciwmglow",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 47862,
+                    "question_external_id": "13444",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-30-ust-3",
+                    "legal_unit_label": "art. 30 ust. 3",
+                    "legal_unit_title": "Tylne światła przeciwmgłowe i granica 50 metrów",
+                    "legal_topic_slug": "swiatla-przeciwmglowe",
+                    "article_slug": "swiatla-przeciwmglowe",
+                    "public_note": "To pytanie sprawdza próg dla tylnych świateł przeciwmgłowych. Art. 30 ust. 3 pozwala ich używać przy widoczności mniejszej niż 50 m i wymaga niezwłocznego wyłączenia po poprawie warunków."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 47862,
+                    "external_id": "13444",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48337,
+                    "external_id": "13444",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        }
+    ]
+}

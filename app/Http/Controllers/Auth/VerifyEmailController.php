@@ -1,0 +1,31 @@
+<?php
+
+namespace App\Http\Controllers\Auth;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Auth\Events\Verified;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\RedirectResponse;
+
+class VerifyEmailController extends Controller
+{
+    /**
+     * Mark the authenticated user's email address as verified.
+     */
+    public function __invoke(EmailVerificationRequest $request): RedirectResponse
+    {
+        $redirectTarget = $request->session()->has('friend_invitation.pending_id')
+            ? route('friend-invitations.pending.show', absolute: false)
+            : route('dashboard', absolute: false).'?verified=1';
+
+        if ($request->user()->hasVerifiedEmail()) {
+            return redirect()->intended($redirectTarget);
+        }
+
+        if ($request->user()->markEmailAsVerified()) {
+            event(new Verified($request->user()));
+        }
+
+        return redirect()->intended($redirectTarget);
+    }
+}

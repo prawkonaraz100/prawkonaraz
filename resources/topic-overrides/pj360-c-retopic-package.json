@@ -1,0 +1,107 @@
+{
+  "generated_at": "2026-04-15T18:06:43.301219+00:00",
+  "workflow": "pj360_exact_retopic",
+  "category": "C",
+  "source_shortlist_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\c-retopic-candidate-shortlist.json",
+  "exported_overrides_count": 0,
+  "skipped_conflict_count": 2,
+  "skipped_same_topic_count": 0,
+  "skipped_existing_override_same_target_count": 0,
+  "skipped_existing_override_conflict_count": 0,
+  "summary": {
+    "target_topic_counts": {},
+    "source_topic_counts": {}
+  },
+  "overrides": [],
+  "skipped_conflicts": [
+    {
+      "stable_identity": {
+        "license_category_code": "C",
+        "source": "gov.pl-mi",
+        "external_id": "1369"
+      },
+      "target_topic_keys": [
+        "lane_change_and_turning",
+        "traffic_lights_and_controller_signals"
+      ],
+      "current_topic_keys": [
+        "special_caution_exiting_and_securing_vehicle"
+      ],
+      "question_ids": [
+        20313
+      ],
+      "records": [
+        {
+          "question_id": 20313,
+          "external_id": "1369",
+          "source": "gov.pl-mi",
+          "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+          "target_topic_key": "lane_change_and_turning",
+          "target_topic_label": "Zmiana pasa ruchu, zmiana kierunku jazdy",
+          "main_media_original": "IMG_0486d5org.jpg",
+          "prompt": "Czy w przedstawionej sytuacji wolno Ci skręcić w prawo?",
+          "accepted_answer": "nie",
+          "question_media_kind": "image"
+        },
+        {
+          "question_id": 20313,
+          "external_id": "1369",
+          "source": "gov.pl-mi",
+          "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+          "target_topic_key": "traffic_lights_and_controller_signals",
+          "target_topic_label": "Sygnały świetlne, sygnały dawane przez kierującego ruchem",
+          "main_media_original": "IMG_0486d5org.jpg",
+          "prompt": "Czy w przedstawionej sytuacji wolno Ci skręcić w prawo?",
+          "accepted_answer": "nie",
+          "question_media_kind": "image"
+        }
+      ]
+    },
+    {
+      "stable_identity": {
+        "license_category_code": "C",
+        "source": "gov.pl-mi",
+        "external_id": "2243"
+      },
+      "target_topic_keys": [
+        "lane_change_and_turning",
+        "traffic_lights_and_controller_signals"
+      ],
+      "current_topic_keys": [
+        "special_caution_exiting_and_securing_vehicle"
+      ],
+      "question_ids": [
+        21808
+      ],
+      "records": [
+        {
+          "question_id": 21808,
+          "external_id": "2243",
+          "source": "gov.pl-mi",
+          "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+          "target_topic_key": "lane_change_and_turning",
+          "target_topic_label": "Zmiana pasa ruchu, zmiana kierunku jazdy",
+          "main_media_original": "022D11orgbm.jpg",
+          "prompt": "Czy w przedstawionej sytuacji wolno Ci skręcić w prawo?",
+          "accepted_answer": "nie",
+          "question_media_kind": "image"
+        },
+        {
+          "question_id": 21808,
+          "external_id": "2243",
+          "source": "gov.pl-mi",
+          "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+          "target_topic_key": "traffic_lights_and_controller_signals",
+          "target_topic_label": "Sygnały świetlne, sygnały dawane przez kierującego ruchem",
+          "main_media_original": "022D11orgbm.jpg",
+          "prompt": "Czy w przedstawionej sytuacji wolno Ci skręcić w prawo?",
+          "accepted_answer": "nie",
+          "question_media_kind": "image"
+        }
+      ]
+    }
+  ],
+  "skipped_same_topic": [],
+  "skipped_existing_override_same_target": [],
+  "skipped_existing_override_conflicts": []
+}

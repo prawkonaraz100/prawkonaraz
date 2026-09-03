@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">B-20 STOP</title>
+  <desc id="desc">Grafika Open Graph dla znaku B-20 STOP.</desc>
+  <rect width="1200" height="630" fill="#fff7ed" />
+  <rect x="48" y="48" width="1104" height="534" rx="28" fill="#ffffff" stroke="#fed7aa" stroke-width="4" />
+  <polygon points="250,110 380,110 486,216 486,346 380,452 250,452 144,346 144,216" fill="#d92d20" stroke="#ffffff" stroke-width="14" />
+  <text x="315" y="305" font-family="Arial, sans-serif" font-size="82" font-weight="700" text-anchor="middle" fill="#ffffff">STOP</text>
+  <text x="560" y="228" font-family="Arial, sans-serif" font-size="46" font-weight="700" fill="#0f172a">B-20 STOP</text>
+  <text x="560" y="300" font-family="Arial, sans-serif" font-size="30" fill="#334155">Bezwzgledne zatrzymanie i ponowna obserwacja</text>
+  <text x="560" y="370" font-family="Arial, sans-serif" font-size="24" fill="#475569">Material do QA rich results, breadcrumbs i byline</text>
+  <text x="560" y="446" font-family="Arial, sans-serif" font-size="22" fill="#9a3412">prawkonaraz.pl / znaki-drogowe</text>
+</svg>

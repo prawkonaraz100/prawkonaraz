@@ -1,0 +1,2574 @@
+{
+    "generated_at": "2026-06-21T18:57:17+02:00",
+    "candidate": {
+        "slug": "obowiazki-uczestnika-wypadku",
+        "title": "Obowiązki uczestnika wypadku drogowego",
+        "description": "Węższy temat artykułu wykryty na podstawie treści pytań.",
+        "level": "focused",
+        "status": "candidate",
+        "rule_version": "2026-06-19-prompt-v2",
+        "existing_article_slug": "obowiazki-uczestnika-wypadku"
+    },
+    "workflow": {
+        "status": "published",
+        "next_action": "Przejrzyj relacje pytan i zdecyduj, czy artykul wymaga rozbudowy lub ponownego review.",
+        "public_relations_are_verified_only": true
+    },
+    "article": {
+        "slug": "obowiazki-uczestnika-wypadku",
+        "title": "Wypadek drogowy: obowiązki uczestnika krok po kroku",
+        "status": "published",
+        "published_at": "2026-06-21",
+        "last_reviewed_at": "2026-06-21",
+        "legal_units": [
+            {
+                "slug": "art-44-ust-1-pkt-1",
+                "label": "art. 44 ust. 1 pkt 1",
+                "title": "Zatrzymanie pojazdu bez powodowania nowego zagrożenia",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-44-ust-1-pkt-2",
+                "label": "art. 44 ust. 1 pkt 2",
+                "title": "Zapewnienie bezpieczeństwa w miejscu wypadku",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-44-ust-1-pkt-3",
+                "label": "art. 44 ust. 1 pkt 3",
+                "title": "Usunięcie pojazdu, gdy nie ma rannych",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-44-ust-1-pkt-4",
+                "label": "art. 44 ust. 1 pkt 4",
+                "title": "Dane uczestników, właścicieli i ubezpieczyciela",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-44-ust-2-pkt-1",
+                "label": "art. 44 ust. 2 pkt 1",
+                "title": "Pomoc poszkodowanym i wezwanie służb",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-44-ust-2-pkt-2",
+                "label": "art. 44 ust. 2 pkt 2",
+                "title": "Zakaz działań utrudniających ustalenie przebiegu wypadku",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-44-ust-2-pkt-3",
+                "label": "art. 44 ust. 2 pkt 3",
+                "title": "Pozostanie na miejscu wypadku z rannymi",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-44-ust-3",
+                "label": "art. 44 ust. 3",
+                "title": "Obowiązki innych uczestników wypadku",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            }
+        ]
+    },
+    "summary": {
+        "canonical_questions": 11,
+        "question_rows": 92,
+        "categories": [
+            "A",
+            "A1",
+            "A2",
+            "AM",
+            "B",
+            "B1",
+            "C",
+            "C1",
+            "D",
+            "D1",
+            "PT",
+            "T"
+        ],
+        "canonical_questions_with_verified_reference": 11,
+        "prompt_conflicts": [],
+        "answer_conflicts": [],
+        "correct_answer_conflicts": []
+    },
+    "questions": [
+        {
+            "external_id": "2621",
+            "prompt": "Czy jako uczestnik wypadku drogowego masz obowiązek podjąć działania służące zapewnieniu bezpieczeństwa w miejscu zdarzenia?",
+            "prompt_variants": [
+                "Czy jako uczestnik wypadku drogowego masz obowiązek podjąć działania służące zapewnieniu bezpieczeństwa w miejscu zdarzenia?"
+            ],
+            "categories": [
+                "PT"
+            ],
+            "question_topics": [
+                {
+                    "key": "breakdown_accident_and_first_aid",
+                    "name": "Ogolne zasady okreslajace zachowanie kierowcy w momencie awarii lub wypadku, udzielanie pierwszej pomocy przedmedycznej"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedź Tak. Jako uczestnik wypadku masz obowiązek podjąć działania służące zapewnieniu bezpieczeństwa w miejscu zdarzenia, aby ograniczyć dalsze zagrożenie dla ludzi i ruchu. To podstawowy obowiązek po wypadku."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:uczestnik wypadku",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 23605,
+                    "question_external_id": "2621",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-44-ust-1-pkt-2",
+                    "legal_unit_label": "art. 44 ust. 1 pkt 2",
+                    "legal_unit_title": "Zapewnienie bezpieczeństwa w miejscu wypadku",
+                    "legal_topic_slug": "obowiazki-uczestnika-wypadku",
+                    "article_slug": "obowiazki-uczestnika-wypadku",
+                    "public_note": "To pytanie sprawdza zabezpieczenie miejsca zdarzenia. Art. 44 ust. 1 pkt 2 wymaga podjęcia odpowiednich działań dla zapewnienia bezpieczeństwa ruchu."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 23605,
+                    "external_id": "2621",
+                    "category": "PT",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "3658",
+            "prompt": "Czy będąc uczestnikiem wypadku drogowego, masz obowiązek udzielenia pomocy rannym nawet, jeśli nie masz kwalifikacji medycznych?",
+            "prompt_variants": [
+                "Czy będąc uczestnikiem wypadku drogowego, masz obowiązek udzielenia pomocy rannym nawet, jeśli nie masz kwalifikacji medycznych?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "breakdown_accident_and_first_aid",
+                    "name": "Ogolne zasady okreslajace zachowanie kierowcy w momencie awarii lub wypadku, udzielanie pierwszej pomocy przedmedycznej"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak, bo w tej sytuacji warunki rzeczywiscie pozwalaja na takie zachowanie. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:uczestnikiem wypadku",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 27583,
+                    "question_external_id": "3658",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-44-ust-2-pkt-1",
+                    "legal_unit_label": "art. 44 ust. 2 pkt 1",
+                    "legal_unit_title": "Pomoc poszkodowanym i wezwanie służb",
+                    "legal_topic_slug": "obowiazki-uczestnika-wypadku",
+                    "article_slug": "obowiazki-uczestnika-wypadku",
+                    "public_note": "W zdarzeniu są osoby ranne. Art. 44 ust. 2 pkt 1 wymaga udzielenia niezbędnej pomocy oraz wezwania zespołu ratownictwa medycznego i Policji."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 27583,
+                    "external_id": "3658",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 27653,
+                    "external_id": "3658",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 27715,
+                    "external_id": "3658",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 27777,
+                    "external_id": "3658",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 27833,
+                    "external_id": "3658",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 27889,
+                    "external_id": "3658",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 27948,
+                    "external_id": "3658",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 28008,
+                    "external_id": "3658",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 28072,
+                    "external_id": "3658",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 28134,
+                    "external_id": "3658",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 28196,
+                    "external_id": "3658",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6292",
+            "prompt": "Czy jako uczestnik wypadku drogowego, w którym są ranni, po wezwaniu służb ratunkowych masz prawo oddalić się z miejsca zdarzenia?",
+            "prompt_variants": [
+                "Czy jako uczestnik wypadku drogowego, w którym są ranni, po wezwaniu służb ratunkowych masz prawo oddalić się z miejsca zdarzenia?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "breakdown_accident_and_first_aid",
+                    "name": "Ogolne zasady okreslajace zachowanie kierowcy w momencie awarii lub wypadku, udzielanie pierwszej pomocy przedmedycznej"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo jeżeli w wypadku jest zabity lub ranny, kierujacy ma obowiazek pozostać na miejscu wypadku, a jeżeli wezwanie zespołu ratownictwa medycznego. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/6292/image/full.c7b93b294ab7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/6292/image/thumb.8cecd828249e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6292/image/full.c7b93b294ab7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6292/image/thumb.8cecd828249e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/6292/image/full.c7b93b294ab7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/6292/image/thumb.8cecd828249e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/6292/image/full.c7b93b294ab7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/6292/image/thumb.8cecd828249e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/6292/image/full.c7b93b294ab7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/6292/image/thumb.8cecd828249e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/am/6292/image/full.c7b93b294ab7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/am/6292/image/thumb.8cecd828249e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/6292/image/full.c7b93b294ab7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/6292/image/thumb.8cecd828249e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/6292/image/full.c7b93b294ab7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/6292/image/thumb.8cecd828249e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/6292/image/full.c7b93b294ab7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/6292/image/thumb.8cecd828249e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/6292/image/full.c7b93b294ab7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/6292/image/thumb.8cecd828249e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/6292/image/full.c7b93b294ab7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/6292/image/thumb.8cecd828249e.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:uczestnik wypadku",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 33589,
+                    "question_external_id": "6292",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-44-ust-2-pkt-3",
+                    "legal_unit_label": "art. 44 ust. 2 pkt 3",
+                    "legal_unit_title": "Pozostanie na miejscu wypadku z rannymi",
+                    "legal_topic_slug": "obowiazki-uczestnika-wypadku",
+                    "article_slug": "obowiazki-uczestnika-wypadku",
+                    "public_note": "To pytanie dotyczy pozostania na miejscu. Art. 44 ust. 2 pkt 3 pozwala oddalić się tylko w celu wezwania służb i wymaga niezwłocznego powrotu."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 33589,
+                    "external_id": "6292",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33689,
+                    "external_id": "6292",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33786,
+                    "external_id": "6292",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33883,
+                    "external_id": "6292",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33972,
+                    "external_id": "6292",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34062,
+                    "external_id": "6292",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34149,
+                    "external_id": "6292",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34236,
+                    "external_id": "6292",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34336,
+                    "external_id": "6292",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34433,
+                    "external_id": "6292",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34530,
+                    "external_id": "6292",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6294",
+            "prompt": "Czy jako uczestnik wypadku drogowego, w którym są ranni, masz prawo usunąć pojazd z miejsca zdarzenia, aby nie tamować ruchu?",
+            "prompt_variants": [
+                "Czy jako uczestnik wypadku drogowego, w którym są ranni, masz prawo usunąć pojazd z miejsca zdarzenia, aby nie tamować ruchu?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "breakdown_accident_and_first_aid",
+                    "name": "Ogolne zasady okreslajace zachowanie kierowcy w momencie awarii lub wypadku, udzielanie pierwszej pomocy przedmedycznej"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo w tej sytuacji przepisy albo okolicznosci na to nie pozwalaja. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/6294/image/full.de40ce644795.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/6294/image/thumb.dbef7cd195b8.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6294/image/full.de40ce644795.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6294/image/thumb.dbef7cd195b8.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/6294/image/full.de40ce644795.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/6294/image/thumb.dbef7cd195b8.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/6294/image/full.de40ce644795.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/6294/image/thumb.dbef7cd195b8.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/6294/image/full.de40ce644795.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/6294/image/thumb.dbef7cd195b8.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/am/6294/image/full.de40ce644795.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/am/6294/image/thumb.dbef7cd195b8.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/6294/image/full.de40ce644795.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/6294/image/thumb.dbef7cd195b8.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/6294/image/full.de40ce644795.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/6294/image/thumb.dbef7cd195b8.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/6294/image/full.de40ce644795.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/6294/image/thumb.dbef7cd195b8.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/6294/image/full.de40ce644795.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/6294/image/thumb.dbef7cd195b8.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/6294/image/full.de40ce644795.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/6294/image/thumb.dbef7cd195b8.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:uczestnik wypadku",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 33591,
+                    "question_external_id": "6294",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-44-ust-2-pkt-2",
+                    "legal_unit_label": "art. 44 ust. 2 pkt 2",
+                    "legal_unit_title": "Zakaz działań utrudniających ustalenie przebiegu wypadku",
+                    "legal_topic_slug": "obowiazki-uczestnika-wypadku",
+                    "article_slug": "obowiazki-uczestnika-wypadku",
+                    "public_note": "W zdarzeniu są osoby ranne. Art. 44 ust. 2 pkt 2 zabrania działań, które mogłyby utrudnić ustalenie przebiegu wypadku, dlatego pojazdu nie usuwa się wyłącznie dla udrożnienia ruchu."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 33591,
+                    "external_id": "6294",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33691,
+                    "external_id": "6294",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33788,
+                    "external_id": "6294",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33885,
+                    "external_id": "6294",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33974,
+                    "external_id": "6294",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34064,
+                    "external_id": "6294",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34151,
+                    "external_id": "6294",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34238,
+                    "external_id": "6294",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34338,
+                    "external_id": "6294",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34435,
+                    "external_id": "6294",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34532,
+                    "external_id": "6294",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6295",
+            "prompt": "Czy jako uczestnik wypadku drogowego, w którym są ranni, masz obowiązek pozostawić pojazd w miejscu zdarzenia?",
+            "prompt_variants": [
+                "Czy jako uczestnik wypadku drogowego, w którym są ranni, masz obowiązek pozostawić pojazd w miejscu zdarzenia?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "breakdown_accident_and_first_aid",
+                    "name": "Ogolne zasady okreslajace zachowanie kierowcy w momencie awarii lub wypadku, udzielanie pierwszej pomocy przedmedycznej"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak, bo w tej sytuacji warunki rzeczywiscie pozwalaja na takie zachowanie. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/6295/image/full.7c100c4c28a7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/6295/image/thumb.8cecd828249e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6295/image/full.7c100c4c28a7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6295/image/thumb.8cecd828249e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/6295/image/full.7c100c4c28a7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/6295/image/thumb.8cecd828249e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/6295/image/full.7c100c4c28a7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/6295/image/thumb.8cecd828249e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/6295/image/full.7c100c4c28a7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/6295/image/thumb.8cecd828249e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/am/6295/image/full.7c100c4c28a7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/am/6295/image/thumb.8cecd828249e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/6295/image/full.7c100c4c28a7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/6295/image/thumb.8cecd828249e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/6295/image/full.7c100c4c28a7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/6295/image/thumb.8cecd828249e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/6295/image/full.7c100c4c28a7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/6295/image/thumb.8cecd828249e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/6295/image/full.7c100c4c28a7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/6295/image/thumb.8cecd828249e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/6295/image/full.7c100c4c28a7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/6295/image/thumb.8cecd828249e.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:uczestnik wypadku",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 33592,
+                    "question_external_id": "6295",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-44-ust-2-pkt-2",
+                    "legal_unit_label": "art. 44 ust. 2 pkt 2",
+                    "legal_unit_title": "Zakaz działań utrudniających ustalenie przebiegu wypadku",
+                    "legal_topic_slug": "obowiazki-uczestnika-wypadku",
+                    "article_slug": "obowiazki-uczestnika-wypadku",
+                    "public_note": "W zdarzeniu są osoby ranne. Art. 44 ust. 2 pkt 2 zabrania działań, które mogłyby utrudnić ustalenie przebiegu wypadku, dlatego pojazdu nie usuwa się wyłącznie dla udrożnienia ruchu."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 33592,
+                    "external_id": "6295",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33692,
+                    "external_id": "6295",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33789,
+                    "external_id": "6295",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33886,
+                    "external_id": "6295",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33975,
+                    "external_id": "6295",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34065,
+                    "external_id": "6295",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34152,
+                    "external_id": "6295",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34239,
+                    "external_id": "6295",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34339,
+                    "external_id": "6295",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34436,
+                    "external_id": "6295",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34533,
+                    "external_id": "6295",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6296",
+            "prompt": "Czy jako uczestnik wypadku drogowego, w którym nie ma zabitych lub rannych, masz obowiązek wezwać Policję?",
+            "prompt_variants": [
+                "Czy jako uczestnik wypadku drogowego, w którym nie ma zabitych lub rannych, masz obowiązek wezwać Policję?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "breakdown_accident_and_first_aid",
+                    "name": "Ogolne zasady okreslajace zachowanie kierowcy w momencie awarii lub wypadku, udzielanie pierwszej pomocy przedmedycznej"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo w tej sytuacji przepisy albo okolicznosci na to nie pozwalaja. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/6296/image/full.a784ad6c51d1.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/6296/image/thumb.b7af206b9c29.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6296/image/full.a784ad6c51d1.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6296/image/thumb.b7af206b9c29.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/6296/image/full.a784ad6c51d1.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/6296/image/thumb.b7af206b9c29.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/6296/image/full.a784ad6c51d1.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/6296/image/thumb.b7af206b9c29.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/6296/image/full.a784ad6c51d1.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/6296/image/thumb.b7af206b9c29.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/am/6296/image/full.a784ad6c51d1.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/am/6296/image/thumb.b7af206b9c29.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/6296/image/full.a784ad6c51d1.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/6296/image/thumb.b7af206b9c29.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/6296/image/full.a784ad6c51d1.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/6296/image/thumb.b7af206b9c29.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/6296/image/full.a784ad6c51d1.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/6296/image/thumb.b7af206b9c29.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/6296/image/full.a784ad6c51d1.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/6296/image/thumb.b7af206b9c29.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/6296/image/full.a784ad6c51d1.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/6296/image/thumb.b7af206b9c29.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:uczestnik wypadku",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 33593,
+                    "question_external_id": "6296",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-44-ust-2-pkt-1",
+                    "legal_unit_label": "art. 44 ust. 2 pkt 1",
+                    "legal_unit_title": "Pomoc poszkodowanym i wezwanie służb",
+                    "legal_topic_slug": "obowiazki-uczestnika-wypadku",
+                    "article_slug": "obowiazki-uczestnika-wypadku",
+                    "public_note": "To pytanie sprawdza granicę obowiązku wezwania Policji. Szczególny obowiązek z art. 44 ust. 2 pkt 1 powstaje, gdy w wypadku jest osoba zabita lub ranna, a opis wyklucza takie ofiary."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 33593,
+                    "external_id": "6296",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33693,
+                    "external_id": "6296",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33790,
+                    "external_id": "6296",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33887,
+                    "external_id": "6296",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33976,
+                    "external_id": "6296",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34066,
+                    "external_id": "6296",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34153,
+                    "external_id": "6296",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34240,
+                    "external_id": "6296",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34340,
+                    "external_id": "6296",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34437,
+                    "external_id": "6296",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34534,
+                    "external_id": "6296",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6297",
+            "prompt": "Czy jako uczestnik wypadku drogowego, w którym nie ma zabitych lub rannych, masz obowiązek niezwłocznie usunąć pojazd z miejsca zdarzenia?",
+            "prompt_variants": [
+                "Czy jako uczestnik wypadku drogowego, w którym nie ma zabitych lub rannych, masz obowiązek niezwłocznie usunąć pojazd z miejsca zdarzenia?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "breakdown_accident_and_first_aid",
+                    "name": "Ogolne zasady okreslajace zachowanie kierowcy w momencie awarii lub wypadku, udzielanie pierwszej pomocy przedmedycznej"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak, bo w tej sytuacji warunki rzeczywiscie pozwalaja na takie zachowanie. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/6297/image/full.9744b3dd7361.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/6297/image/thumb.a75338611ec3.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6297/image/full.9744b3dd7361.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6297/image/thumb.a75338611ec3.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/6297/image/full.9744b3dd7361.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/6297/image/thumb.a75338611ec3.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/6297/image/full.9744b3dd7361.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/6297/image/thumb.a75338611ec3.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/6297/image/full.9744b3dd7361.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/6297/image/thumb.a75338611ec3.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/am/6297/image/full.9744b3dd7361.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/am/6297/image/thumb.a75338611ec3.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/6297/image/full.9744b3dd7361.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/6297/image/thumb.a75338611ec3.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/6297/image/full.9744b3dd7361.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/6297/image/thumb.a75338611ec3.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/6297/image/full.9744b3dd7361.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/6297/image/thumb.a75338611ec3.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/6297/image/full.9744b3dd7361.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/6297/image/thumb.a75338611ec3.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/6297/image/full.9744b3dd7361.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/6297/image/thumb.a75338611ec3.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:uczestnik wypadku",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 33594,
+                    "question_external_id": "6297",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-44-ust-1-pkt-3",
+                    "legal_unit_label": "art. 44 ust. 1 pkt 3",
+                    "legal_unit_title": "Usunięcie pojazdu, gdy nie ma rannych",
+                    "legal_topic_slug": "obowiazki-uczestnika-wypadku",
+                    "article_slug": "obowiazki-uczestnika-wypadku",
+                    "public_note": "W zdarzeniu nie ma zabitych ani rannych. Art. 44 ust. 1 pkt 3 nakazuje niezwłocznie usunąć pojazd, jeżeli powodowałby zagrożenie lub tamował ruch."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 33594,
+                    "external_id": "6297",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33694,
+                    "external_id": "6297",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33791,
+                    "external_id": "6297",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33888,
+                    "external_id": "6297",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33977,
+                    "external_id": "6297",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34067,
+                    "external_id": "6297",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34154,
+                    "external_id": "6297",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34241,
+                    "external_id": "6297",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34341,
+                    "external_id": "6297",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34438,
+                    "external_id": "6297",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34535,
+                    "external_id": "6297",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6298",
+            "prompt": "Czy jako uczestnik wypadku drogowego, w którym są ranni, masz obowiązek wezwać służby ratunkowe oraz udzielić niezbędnej pomocy poszkodowanym?",
+            "prompt_variants": [
+                "Czy jako uczestnik wypadku drogowego, w którym są ranni, masz obowiązek wezwać służby ratunkowe oraz udzielić niezbędnej pomocy poszkodowanym?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "breakdown_accident_and_first_aid",
+                    "name": "Ogolne zasady okreslajace zachowanie kierowcy w momencie awarii lub wypadku, udzielanie pierwszej pomocy przedmedycznej"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak, bo jeżeli w wypadku jest zabity lub ranny, kierujacy ma obowiazek udzielić niezbędnej pomocy ofiarom wypadku oraz wezwać zespół ratownictwa medycznego. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/6298/image/full.6085736b7a51.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/6298/image/thumb.be98a49b7c55.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6298/image/full.6085736b7a51.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6298/image/thumb.be98a49b7c55.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/6298/image/full.6085736b7a51.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/6298/image/thumb.be98a49b7c55.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/6298/image/full.6085736b7a51.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/6298/image/thumb.be98a49b7c55.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/6298/image/full.6085736b7a51.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/6298/image/thumb.be98a49b7c55.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/am/6298/image/full.6085736b7a51.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/am/6298/image/thumb.be98a49b7c55.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/6298/image/full.6085736b7a51.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/6298/image/thumb.be98a49b7c55.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/6298/image/full.6085736b7a51.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/6298/image/thumb.be98a49b7c55.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/6298/image/full.6085736b7a51.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/6298/image/thumb.be98a49b7c55.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/6298/image/full.6085736b7a51.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/6298/image/thumb.be98a49b7c55.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/6298/image/full.6085736b7a51.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/6298/image/thumb.be98a49b7c55.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:uczestnik wypadku",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 34860,
+                    "question_external_id": "6298",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-44-ust-2-pkt-1",
+                    "legal_unit_label": "art. 44 ust. 2 pkt 1",
+                    "legal_unit_title": "Pomoc poszkodowanym i wezwanie służb",
+                    "legal_topic_slug": "obowiazki-uczestnika-wypadku",
+                    "article_slug": "obowiazki-uczestnika-wypadku",
+                    "public_note": "W zdarzeniu są osoby ranne. Art. 44 ust. 2 pkt 1 wymaga udzielenia niezbędnej pomocy oraz wezwania zespołu ratownictwa medycznego i Policji."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 34860,
+                    "external_id": "6298",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34876,
+                    "external_id": "6298",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34965,
+                    "external_id": "6298",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34989,
+                    "external_id": "6298",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35013,
+                    "external_id": "6298",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35027,
+                    "external_id": "6298",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35041,
+                    "external_id": "6298",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35057,
+                    "external_id": "6298",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35073,
+                    "external_id": "6298",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35136,
+                    "external_id": "6298",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35160,
+                    "external_id": "6298",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6299",
+            "prompt": "Czy jako uczestnik wypadku drogowego masz obowiązek podać swoje dane personalne na żądanie innej osoby, która brała w nim udział?",
+            "prompt_variants": [
+                "Czy jako uczestnik wypadku drogowego masz obowiązek podać swoje dane personalne na żądanie innej osoby, która brała w nim udział?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "breakdown_accident_and_first_aid",
+                    "name": "Ogolne zasady okreslajace zachowanie kierowcy w momencie awarii lub wypadku, udzielanie pierwszej pomocy przedmedycznej"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak, bo w tej sytuacji warunki rzeczywiscie pozwalaja na takie zachowanie. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/6299/image/full.80b71e5bcd16.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/6299/image/thumb.1b5b787c2fa5.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6299/image/full.80b71e5bcd16.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6299/image/thumb.1b5b787c2fa5.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/6299/image/full.80b71e5bcd16.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/6299/image/thumb.1b5b787c2fa5.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/6299/image/full.80b71e5bcd16.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/6299/image/thumb.1b5b787c2fa5.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/6299/image/full.80b71e5bcd16.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/6299/image/thumb.1b5b787c2fa5.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/am/6299/image/full.80b71e5bcd16.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/am/6299/image/thumb.1b5b787c2fa5.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/6299/image/full.80b71e5bcd16.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/6299/image/thumb.1b5b787c2fa5.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/6299/image/full.80b71e5bcd16.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/6299/image/thumb.1b5b787c2fa5.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/6299/image/full.80b71e5bcd16.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/6299/image/thumb.1b5b787c2fa5.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/6299/image/full.80b71e5bcd16.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/6299/image/thumb.1b5b787c2fa5.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/6299/image/full.80b71e5bcd16.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/6299/image/thumb.1b5b787c2fa5.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:uczestnik wypadku",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 34861,
+                    "question_external_id": "6299",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-44-ust-1-pkt-4",
+                    "legal_unit_label": "art. 44 ust. 1 pkt 4",
+                    "legal_unit_title": "Dane uczestników, właścicieli i ubezpieczyciela",
+                    "legal_topic_slug": "obowiazki-uczestnika-wypadku",
+                    "article_slug": "obowiazki-uczestnika-wypadku",
+                    "public_note": "To pytanie sprawdza wymianę danych. Art. 44 ust. 1 pkt 4 wymaga podania na żądanie uczestnika danych swoich, właściciela lub posiadacza pojazdu oraz ubezpieczenia OC."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 34861,
+                    "external_id": "6299",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34877,
+                    "external_id": "6299",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34966,
+                    "external_id": "6299",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34990,
+                    "external_id": "6299",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35014,
+                    "external_id": "6299",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35028,
+                    "external_id": "6299",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35042,
+                    "external_id": "6299",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35058,
+                    "external_id": "6299",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35074,
+                    "external_id": "6299",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35137,
+                    "external_id": "6299",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35161,
+                    "external_id": "6299",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6404",
+            "prompt": "Którą z tych czynności ma obowiązek wykonać uczestnik wypadku drogowego, w którym są ranni?",
+            "prompt_variants": [
+                "Którą z tych czynności ma obowiązek wykonać uczestnik wypadku drogowego, w którym są ranni?"
+            ],
+            "categories": [
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "rescue_actions",
+                    "name": "Akcje ratunkowe"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Niezwłocznie usunąć pojazd z drogi, aby nie utrudniał ruchu.",
+                    "option_b": "Niezwłocznie pozbierać uszkodzone części pojazdu z jezdni, aby nie utrudniały ruchu.",
+                    "option_c": "Udzielić niezbędnej pomocy ofiarom wypadku oraz wezwać zespół ratownictwa medycznego i Policję.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Udzielić niezbędnej pomocy ofiarom wypadku oraz wezwać zespół ratownictwa medycznego i Policję."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo kierujacy w razie uczestniczenia w wypadku drogowym, w którym jest zabity lub ranny ma obowiazek. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6404/image/full.889616a2a844.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6404/image/thumb.be98a49b7c55.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/6404/image/full.889616a2a844.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/6404/image/thumb.be98a49b7c55.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:uczestnik wypadku",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 34951,
+                    "question_external_id": "6404",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-44-ust-2-pkt-1",
+                    "legal_unit_label": "art. 44 ust. 2 pkt 1",
+                    "legal_unit_title": "Pomoc poszkodowanym i wezwanie służb",
+                    "legal_topic_slug": "obowiazki-uczestnika-wypadku",
+                    "article_slug": "obowiazki-uczestnika-wypadku",
+                    "public_note": "W zdarzeniu są osoby ranne. Art. 44 ust. 2 pkt 1 wymaga udzielenia niezbędnej pomocy oraz wezwania zespołu ratownictwa medycznego i Policji."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 34951,
+                    "external_id": "6404",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35127,
+                    "external_id": "6404",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "11250",
+            "prompt": "Czy będąc uczestnikiem wypadku drogowego masz obowiązek udzielić poszkodowanemu pierwszej pomocy?",
+            "prompt_variants": [
+                "Czy będąc uczestnikiem wypadku drogowego masz obowiązek udzielić poszkodowanemu pierwszej pomocy?"
+            ],
+            "categories": [
+                "AM"
+            ],
+            "question_topics": [
+                {
+                    "key": "breakdown_accident_and_first_aid",
+                    "name": "Ogolne zasady okreslajace zachowanie kierowcy w momencie awarii lub wypadku, udzielanie pierwszej pomocy przedmedycznej"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak, bo jeżeli w wypadku jest zabity lub ranny, kierujacy ma obowiazek udzielić niezbędnej pomocy ofiarom wypadku oraz wezwać zespół ratownictwa medycznego. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/am/11250/image/full.39741cb16c1c.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/am/11250/image/thumb.ab0af56ff1a3.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:uczestnikiem wypadku",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 45476,
+                    "question_external_id": "11250",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-44-ust-2-pkt-1",
+                    "legal_unit_label": "art. 44 ust. 2 pkt 1",
+                    "legal_unit_title": "Pomoc poszkodowanym i wezwanie służb",
+                    "legal_topic_slug": "obowiazki-uczestnika-wypadku",
+                    "article_slug": "obowiazki-uczestnika-wypadku",
+                    "public_note": "W zdarzeniu są osoby ranne. Art. 44 ust. 2 pkt 1 wymaga udzielenia niezbędnej pomocy oraz wezwania zespołu ratownictwa medycznego i Policji."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 45476,
+                    "external_id": "11250",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        }
+    ]
+}

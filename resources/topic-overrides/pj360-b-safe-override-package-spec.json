@@ -1,0 +1,55 @@
+{
+  "category": "B",
+  "scope": "active_ready",
+  "rules": [
+    {
+      "name": "b-road-markings-reflectors",
+      "target_topic_key": "road_markings",
+      "reason": "PJ360 B: oznakowanie poziome i elementy odblaskowe",
+      "classifier_matched_by": [
+        "keyword:road_markings_reflectors"
+      ]
+    },
+    {
+      "name": "b-traffic-signals",
+      "target_topic_key": "traffic_lights_and_controller_signals",
+      "reason": "PJ360 B: sygnaly swietlne i kierujacy ruchem",
+      "classifier_matched_by": [
+        "keyword:traffic_signal"
+      ]
+    },
+    {
+      "name": "b-public-transport-stops",
+      "target_topic_key": "controlled_crossings_and_public_transport_stops",
+      "reason": "PJ360 B: przystanki komunikacji publicznej i przejscia kontrolowane",
+      "classifier_matched_by": [
+        "keyword:public_transport_stop"
+      ]
+    },
+    {
+      "name": "b-pedestrians",
+      "target_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+      "reason": "PJ360 B: zachowanie wobec pieszych i osob o ograniczonej mobilnosci",
+      "classifier_matched_by": [
+        "keyword:pedestrians"
+      ]
+    },
+    {
+      "name": "b-transported-people",
+      "target_topic_key": "vehicle_load_and_passenger_safety",
+      "reason": "PJ360 B: przewoz osob i bezpieczenstwo pasazerow",
+      "classifier_matched_by": [
+        "keyword:transported_people"
+      ]
+    },
+    {
+      "name": "b-lane-change-turning",
+      "target_topic_key": "lane_change_and_turning",
+      "reason": "PJ360 B: zmiana pasa ruchu i zmiana kierunku jazdy",
+      "classifier_matched_by": [
+        "keyword:lane_change_turning",
+        "keyword:lane_change_signal_usage"
+      ]
+    }
+  ]
+}

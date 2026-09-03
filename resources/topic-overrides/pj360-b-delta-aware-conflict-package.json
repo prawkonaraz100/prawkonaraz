@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-04-15T13:30:46.606094+00:00",
+  "workflow": "pj360_delta_aware_conflict_resolution",
+  "category": "B",
+  "source_conflicts_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\b-retopic-true-conflicts.json",
+  "source_diff_path": "C:\\Users\\xxx\\Desktop\\serwistestyprawojazdy\\output\\analysis\\pj360-exact-topic-membership\\b-exact-vs-local-topic-membership-diff.json",
+  "exported_overrides_count": 0,
+  "manual_conflict_count": 0,
+  "skipped_existing_override_same_target_count": 0,
+  "skipped_existing_override_conflict_count": 0,
+  "summary": {
+    "recommended_target_topic_counts": {},
+    "recommended_source_topic_counts": {},
+    "touched_topics_after": {}
+  },
+  "overrides": [],
+  "manual_conflicts": [],
+  "skipped_existing_override_same_target": [],
+  "skipped_existing_override_conflicts": []
+}

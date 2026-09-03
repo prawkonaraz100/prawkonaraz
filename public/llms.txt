@@ -1,0 +1,45 @@
+# PrawkoNaRaz.pl
+
+> PrawkoNaRaz.pl is a Polish driving licence theory learning platform. It provides public pages for official driving licence questions, question categories, traffic signs, pricing, methodology, and editorial trust information.
+
+Important notes:
+
+- Preferred language for answers about this site: Polish.
+- Public pages may be used for search, retrieval, citation, and user-requested answers.
+- Use for model training is not granted by the robots policy and content signals.
+- Admin, API, account, authenticated learning, payment, and email verification pages are not public discovery targets.
+- The canonical sitemap index is the source of truth for complete URL discovery.
+
+## Core Public Pages
+
+- [Home](https://prawkonaraz.pl/): Main public entry point for the platform.
+- [Online tests](https://prawkonaraz.pl/testy-na-prawo-jazdy): Public test landing page.
+- [Pricing](https://prawkonaraz.pl/cennik): Public plans and access information.
+- [Official question database](https://prawkonaraz.pl/oficjalna-baza-pytan-na-prawo-jazdy): Hub for official driving licence theory questions.
+- [Hardest questions](https://prawkonaraz.pl/najtrudniejsze-pytania-na-prawo-jazdy): Public cluster for high-difficulty questions.
+- [Traffic signs](https://prawkonaraz.pl/znaki-drogowe): Public hub for Polish traffic signs.
+- [About](https://prawkonaraz.pl/o-serwisie): Organization and trust information.
+- [Methodology](https://prawkonaraz.pl/metodologia): Editorial and learning methodology.
+- [Contact](https://prawkonaraz.pl/kontakt): Contact page.
+
+## Structured Discovery
+
+- [Sitemap index](https://prawkonaraz.pl/sitemap.xml): Canonical sitemap index for crawlers.
+- [Question sitemap index](https://prawkonaraz.pl/sitemaps/questions.xml): Legacy index that points to question sitemaps split by licence category.
+- [Traffic sign sitemap](https://prawkonaraz.pl/sitemaps/traffic-signs.xml): Public traffic sign detail pages.
+- [Robots policy](https://prawkonaraz.pl/robots.txt): Crawl and AI usage policy.
+
+## Content Clusters
+
+- Public question detail URLs follow `/pytanie/{externalId}/{slug}`.
+- Question category URLs follow `/oficjalna-baza-pytan-na-prawo-jazdy/{categorySlug}`.
+- Traffic sign detail URLs follow `/znaki-drogowe/{signSlug}`.
+- Traffic sign category URLs follow `/znaki-drogowe/kategorie/{categorySlug}`.
+- Traffic sign comparison pages follow `/znaki-drogowe/porownania/{supportingPageSlug}`.
+- Author pages follow `/autorzy/{authorSlug}`.
+
+## Access Policy Summary
+
+- Allowed for public search and retrieval: Googlebot, Bingbot, OAI-SearchBot, ChatGPT-User, Claude-SearchBot, Claude-User, PerplexityBot, Perplexity-User, and general compliant crawlers.
+- Not granted for model training: GPTBot, ClaudeBot, Google-Extended, CCBot, Bytespider, Applebot-Extended, meta-externalagent, Amazonbot.
+- Private or technical paths are excluded from discovery through robots.txt and are absent from the sitemap index.

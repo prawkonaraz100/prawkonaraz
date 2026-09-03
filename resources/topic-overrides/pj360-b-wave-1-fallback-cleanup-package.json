@@ -1,0 +1,307 @@
+{
+    "generated_at": "2026-04-14T22:43:23+02:00",
+    "category": "B",
+    "scope": "active_ready",
+    "rules_count": 5,
+    "exported_candidates": 18,
+    "rule_summaries": [
+        {
+            "name": "b-wave1-pedestrians-from-basic-fallback",
+            "target_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+            "matched_questions": 9
+        },
+        {
+            "name": "b-wave1-rail-crossings-from-basic-fallback",
+            "target_topic_key": "rail_and_tram_crossings",
+            "matched_questions": 6
+        },
+        {
+            "name": "b-wave1-safety-equipment-from-specialist-fallback",
+            "target_topic_key": "safety_equipment_and_restraints",
+            "matched_questions": 0
+        },
+        {
+            "name": "b-wave1-vehicle-load-from-specialist-fallback",
+            "target_topic_key": "vehicle_load_and_passenger_safety",
+            "matched_questions": 0
+        },
+        {
+            "name": "b-wave1-rescue-actions-from-specialist-fallback",
+            "target_topic_key": "rescue_actions",
+            "matched_questions": 3
+        }
+    ],
+    "overrides": [
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "2391",
+            "question_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+            "reason": "PJ360 B wave 1: piesi i ograniczona mobilnosc z fallback:basic",
+            "metadata": {
+                "package_rule": "b-wave1-pedestrians-from-basic-fallback",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy w tej sytuacji masz obowiązek umożliwić pieszemu przejście przez jezdnię?",
+                "main_media_original": "D24_18org.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "3542",
+            "question_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+            "reason": "PJ360 B wave 1: piesi i ograniczona mobilnosc z fallback:basic",
+            "metadata": {
+                "package_rule": "b-wave1-pedestrians-from-basic-fallback",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy w tej sytuacji należy zwiększyć uwagę i być przygotowanym na możliwość pojawienia się pieszego z lewej strony jezdni?",
+                "main_media_original": "AK_D10_39_org_2.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "6250",
+            "question_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+            "reason": "PJ360 B wave 1: piesi i ograniczona mobilnosc z fallback:basic",
+            "metadata": {
+                "package_rule": "b-wave1-pedestrians-from-basic-fallback",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy w tej sytuacji powinieneś uważnie obserwować zachowanie pieszej?",
+                "main_media_original": "1B201.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "6259",
+            "question_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+            "reason": "PJ360 B wave 1: piesi i ograniczona mobilnosc z fallback:basic",
+            "metadata": {
+                "package_rule": "b-wave1-pedestrians-from-basic-fallback",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy w tej sytuacji możesz spodziewać się wtargnięcia pieszego na jezdnię?",
+                "main_media_original": "1B221.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "6260",
+            "question_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+            "reason": "PJ360 B wave 1: piesi i ograniczona mobilnosc z fallback:basic",
+            "metadata": {
+                "package_rule": "b-wave1-pedestrians-from-basic-fallback",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy w tej sytuacji masz obowiązek umożliwić pieszemu przejście przez jezdnię?",
+                "main_media_original": "1B222.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "13112",
+            "question_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+            "reason": "PJ360 B wave 1: piesi i ograniczona mobilnosc z fallback:basic",
+            "metadata": {
+                "package_rule": "b-wave1-pedestrians-from-basic-fallback",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy w tej sytuacji musisz ograniczyć zaufanie do pieszego?",
+                "main_media_original": "GM_W16_(322)N.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "13541",
+            "question_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+            "reason": "PJ360 B wave 1: piesi i ograniczona mobilnosc z fallback:basic",
+            "metadata": {
+                "package_rule": "b-wave1-pedestrians-from-basic-fallback",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy kierujący pojazdem zbliżając się do przejścia sugerowanego jest o tym informowany odpowiednimi znakami drogowymi?",
+                "main_media_original": "Przejście sugerowane.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "13770",
+            "question_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+            "reason": "PJ360 B wave 1: piesi i ograniczona mobilnosc z fallback:basic",
+            "metadata": {
+                "package_rule": "b-wave1-pedestrians-from-basic-fallback",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy w tej sytuacji omijając pieszego powinieneś zwiększyć odstęp ?",
+                "main_media_original": "PW12b-2025-14.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "13774",
+            "question_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+            "reason": "PJ360 B wave 1: piesi i ograniczona mobilnosc z fallback:basic",
+            "metadata": {
+                "package_rule": "b-wave1-pedestrians-from-basic-fallback",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy w tej sytuacji masz obowiązek nie utrudnienia ruchu widocznemu po lewej stronie pieszemu?",
+                "main_media_original": "PW12b-2025-18.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "2465",
+            "question_topic_key": "rail_and_tram_crossings",
+            "reason": "PJ360 B wave 1: przejazdy kolejowe z fallback:basic",
+            "metadata": {
+                "package_rule": "b-wave1-rail-crossings-from-basic-fallback",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy wolno Ci wjechać na widoczny przejazd bezpośrednio po przejechaniu pociągu, niezależnie od wyświetlanego sygnału?",
+                "main_media_original": "D26JS_1org.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "3370",
+            "question_topic_key": "rail_and_tram_crossings",
+            "reason": "PJ360 B wave 1: przejazdy kolejowe z fallback:basic",
+            "metadata": {
+                "package_rule": "b-wave1-rail-crossings-from-basic-fallback",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy możesz przejechać przed pojazdem szynowym?",
+                "main_media_original": "D23MMX_15org.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "8316",
+            "question_topic_key": "rail_and_tram_crossings",
+            "reason": "PJ360 B wave 1: przejazdy kolejowe z fallback:basic",
+            "metadata": {
+                "package_rule": "b-wave1-rail-crossings-from-basic-fallback",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Po przejechaniu pojazdu szynowego półzapory unoszą się do góry. Czy w tej sytuacji masz prawo rozpocząć jazdę i wjechać na tory kolejowe?",
+                "main_media_original": "239_1024x576.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "8323",
+            "question_topic_key": "rail_and_tram_crossings",
+            "reason": "PJ360 B wave 1: przejazdy kolejowe z fallback:basic",
+            "metadata": {
+                "package_rule": "b-wave1-rail-crossings-from-basic-fallback",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy w razie unieruchomienia pojazdu na przejeździe kolejowym masz obowiązek ostrzec kierującego pojazdem szynowym, jeżeli nie jest możliwie usunięcie pojazdu z tego przejazdu?",
+                "main_media_original": "Slajd205_cen_1024x576.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "8528",
+            "question_topic_key": "rail_and_tram_crossings",
+            "reason": "PJ360 B wave 1: przejazdy kolejowe z fallback:basic",
+            "metadata": {
+                "package_rule": "b-wave1-rail-crossings-from-basic-fallback",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy kierując pojazdem silnikowym masz obowiązek stosować się do poleceń i sygnałów wydawanych w nocy poza obszarem zabudowanym przez pracownika kolejowego na przejeździe kolejowym?",
+                "main_media_original": "brak_zdjecia_1024x576.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "13461",
+            "question_topic_key": "rail_and_tram_crossings",
+            "reason": "PJ360 B wave 1: przejazdy kolejowe z fallback:basic",
+            "metadata": {
+                "package_rule": "b-wave1-rail-crossings-from-basic-fallback",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy w razie unieruchomienia pojazdu na przejeździe kolejowym masz obowiązek w pierwszej kolejności ostrzec o niebezpieczeństwie kierującego pojazdem szynowym?",
+                "main_media_original": ""
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "6453",
+            "question_topic_key": "rescue_actions",
+            "reason": "PJ360 B wave 1: akcje ratunkowe z fallback:specialist",
+            "metadata": {
+                "package_rule": "b-wave1-rescue-actions-from-specialist-fallback",
+                "current_topic_key": "driving_technique",
+                "classifier_topic_key": "driving_technique",
+                "classifier_matched_by": "fallback:specialist",
+                "prompt_excerpt": "Które z wymienionych zachowań wobec rannego w wypadku, może skutkować odpowiedzialnością karną?",
+                "main_media_original": "2D103.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "10046",
+            "question_topic_key": "rescue_actions",
+            "reason": "PJ360 B wave 1: akcje ratunkowe z fallback:specialist",
+            "metadata": {
+                "package_rule": "b-wave1-rescue-actions-from-specialist-fallback",
+                "current_topic_key": "driving_technique",
+                "classifier_topic_key": "driving_technique",
+                "classifier_matched_by": "fallback:specialist",
+                "prompt_excerpt": "Czego nie możesz robić uczestnicząc w wypadku, w którym są zabici?",
+                "main_media_original": "Slajd6049_cen_1024x576.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "13570",
+            "question_topic_key": "rescue_actions",
+            "reason": "PJ360 B wave 1: akcje ratunkowe z fallback:specialist",
+            "metadata": {
+                "package_rule": "b-wave1-rescue-actions-from-specialist-fallback",
+                "current_topic_key": "driving_technique",
+                "classifier_topic_key": "driving_technique",
+                "classifier_matched_by": "fallback:specialist",
+                "prompt_excerpt": "Czy prędkość przy jakiej doszło do wypadku ma wpływ na jego skutki ?",
+                "main_media_original": ""
+            }
+        }
+    ],
+    "source_spec_path": "resources/topic-overrides/pj360-b-wave-1-fallback-cleanup-spec.json"
+}

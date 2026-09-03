@@ -1,0 +1,67 @@
+{
+  "generated_at": "2026-04-15T19:43:00+02:00",
+  "category": "C",
+  "reason": "pj360_c_manual_conflict_resolution_wave4",
+  "overrides": [
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "13108",
+      "question_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+      "reason": "pj360_c_manual_conflict_resolution_wave4",
+      "metadata": {
+        "decision_basis": "delta_optimization",
+        "current_topic_key": "road_position_entry_exit_stopping",
+        "source_conflict_package": "pj360-c-delta-aware-conflict-package.json"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "100",
+      "question_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+      "reason": "pj360_c_manual_conflict_resolution_wave4",
+      "metadata": {
+        "decision_basis": "delta_optimization",
+        "current_topic_key": "road_position_entry_exit_stopping",
+        "source_conflict_package": "pj360-c-delta-aware-conflict-package.json"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "1691",
+      "question_topic_key": "traffic_lights_and_controller_signals",
+      "reason": "pj360_c_manual_conflict_resolution_wave4",
+      "metadata": {
+        "decision_basis": "delta_optimization",
+        "current_topic_key": "road_markings",
+        "source_conflict_package": "pj360-c-delta-aware-conflict-package.json"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "7731",
+      "question_topic_key": "distances_and_braking",
+      "reason": "pj360_c_manual_conflict_resolution_wave4",
+      "metadata": {
+        "decision_basis": "delta_optimization",
+        "current_topic_key": "risk_factors_conditions_and_weather",
+        "source_conflict_package": "pj360-c-delta-aware-conflict-package.json"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "11450",
+      "question_topic_key": "vehicle_load_and_passenger_safety",
+      "reason": "pj360_c_manual_conflict_resolution_wave4",
+      "metadata": {
+        "decision_basis": "delta_optimization",
+        "current_topic_key": "risk_factors_conditions_and_weather",
+        "source_conflict_package": "pj360-c-delta-aware-conflict-package.json"
+      }
+    }
+  ]
+}

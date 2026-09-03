@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" role="img" aria-labelledby="title desc">
+  <title id="title">Znak A-17 Dzieci</title>
+  <desc id="desc">Bialy trojkat z czerwona obwodka i sylwetkami dzieci.</desc>
+  <rect width="320" height="320" fill="#f8fafc" />
+  <polygon points="160,40 290,270 30,270" fill="#d92d20" />
+  <polygon points="160,78 258,248 62,248" fill="#ffffff" />
+  <circle cx="130" cy="150" r="16" fill="#0f172a" />
+  <circle cx="190" cy="160" r="16" fill="#0f172a" />
+  <path d="M118 170 L98 212 L126 212 L138 184 L154 212 L182 212 L158 166 Z" fill="#0f172a" />
+  <path d="M178 178 L160 222 L188 222 L198 198 L214 224 L238 224 L214 172 Z" fill="#0f172a" />
+  <text x="160" y="292" font-family="Arial, sans-serif" font-size="24" font-weight="700" text-anchor="middle" fill="#0f172a">A-17</text>
+</svg>

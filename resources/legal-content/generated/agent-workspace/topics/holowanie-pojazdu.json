@@ -1,0 +1,2193 @@
+{
+    "generated_at": "2026-06-21T11:41:38+02:00",
+    "candidate": {
+        "slug": "holowanie-pojazdu",
+        "title": "Holowanie pojazdu",
+        "description": "Węższy temat artykułu wykryty na podstawie treści pytań.",
+        "level": "focused",
+        "status": "candidate",
+        "rule_version": "2026-06-19-prompt-v2",
+        "existing_article_slug": "holowanie-pojazdu"
+    },
+    "workflow": {
+        "status": "published",
+        "next_action": "Przejrzyj relacje pytan i zdecyduj, czy artykul wymaga rozbudowy lub ponownego review.",
+        "public_relations_are_verified_only": true
+    },
+    "article": {
+        "slug": "holowanie-pojazdu",
+        "title": "Holowanie pojazdu: prędkość, oznakowanie i zakazy",
+        "status": "published",
+        "published_at": "2026-06-21",
+        "last_reviewed_at": "2026-06-21",
+        "legal_units": [
+            {
+                "slug": "art-31-ust-1-pkt-1",
+                "label": "art. 31 ust. 1 pkt 1",
+                "title": "Prędkość podczas holowania",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-31-ust-1-pkt-2",
+                "label": "art. 31 ust. 1 pkt 2",
+                "title": "Światła mijania pojazdu holującego",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-31-ust-1-pkt-3",
+                "label": "art. 31 ust. 1 pkt 3",
+                "title": "Kierujący w pojeździe holowanym",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-31-ust-1-pkt-4",
+                "label": "art. 31 ust. 1 pkt 4",
+                "title": "Holowanie motocykla",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-31-ust-1-pkt-5",
+                "label": "art. 31 ust. 1 pkt 5",
+                "title": "Oznakowanie pojazdu holowanego",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-31-ust-1-pkt-6",
+                "label": "art. 31 ust. 1 pkt 6",
+                "title": "Sprawność układów hamulcowych",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-31-ust-1-pkt-7",
+                "label": "art. 31 ust. 1 pkt 7",
+                "title": "Odległość i oznaczenie połączenia",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-31-ust-2-pkt-1",
+                "label": "art. 31 ust. 2 pkt 1",
+                "title": "Zakaz holowania przy niesprawnym układzie kierowniczym lub hamulcach",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-31-ust-2-pkt-3",
+                "label": "art. 31 ust. 2 pkt 3",
+                "title": "Zakaz holowania więcej niż jednego pojazdu",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-31-ust-2-pkt-4",
+                "label": "art. 31 ust. 2 pkt 4",
+                "title": "Zakaz holowania pojazdem z przyczepą",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-31-ust-2-pkt-5",
+                "label": "art. 31 ust. 2 pkt 5",
+                "title": "Zakaz holowania na autostradzie",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-45-ust-1-pkt-2",
+                "label": "art. 45 ust. 1 pkt 2",
+                "title": "Zakaz holowania pojazdu kierowanego przez osobę po alkoholu",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            }
+        ]
+    },
+    "summary": {
+        "canonical_questions": 20,
+        "question_rows": 53,
+        "categories": [
+            "A",
+            "A1",
+            "A2",
+            "AM",
+            "B",
+            "B1",
+            "C",
+            "C1",
+            "D",
+            "D1",
+            "PT",
+            "T"
+        ],
+        "canonical_questions_with_verified_reference": 14,
+        "prompt_conflicts": [],
+        "answer_conflicts": [],
+        "correct_answer_conflicts": []
+    },
+    "questions": [
+        {
+            "external_id": "3110",
+            "prompt": "Czy uczestnicząc w wypadku, w którym są zabici lub ranni, masz prawo zacząć samodzielnie usuwać jego skutki - sprzątać, przygotowywać tramwaj do holowania itp.?",
+            "prompt_variants": [
+                "Czy uczestnicząc w wypadku, w którym są zabici lub ranni, masz prawo zacząć samodzielnie usuwać jego skutki - sprzątać, przygotowywać tramwaj do holowania itp.?"
+            ],
+            "categories": [
+                "PT"
+            ],
+            "question_topics": [
+                {
+                    "key": "breakdown_accident_and_first_aid",
+                    "name": "Ogolne zasady okreslajace zachowanie kierowcy w momencie awarii lub wypadku, udzielanie pierwszej pomocy przedmedycznej"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedź Nie. Przy wypadku z zabitymi lub rannymi nie wolno samodzielnie usuwać skutków zdarzenia, sprzątać miejsca ani przygotowywać tramwaju do holowania bez odpowiedniej decyzji. Najpierw należy zabezpieczyć miejsce i umożliwić działania służbom."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:holowan",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 26812,
+                    "external_id": "3110",
+                    "category": "PT",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "4043",
+            "prompt": "Co należy zrobić aby zwolnić (zluzować) hamulce postojowe do holowania uszkodzonego tramwaju?",
+            "prompt_variants": [
+                "Co należy zrobić aby zwolnić (zluzować) hamulce postojowe do holowania uszkodzonego tramwaju?"
+            ],
+            "categories": [
+                "PT"
+            ],
+            "question_topics": [
+                {
+                    "key": "driving_technique",
+                    "name": "Technika kierowania pojazdem"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Wyłączyć wagon, po jego wyłączeniu hamulce są automatycznie zluzowane.",
+                    "option_b": "Odpiąć mechanicznie lub elektrycznie luzowniki.",
+                    "option_c": "Ustawić nawrotnik w położenie neutralne.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Odpiąć mechanicznie lub elektrycznie luzowniki."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedź B. Aby zluzować hamulce postojowe do holowania uszkodzonego tramwaju, trzeba odpiąć mechanicznie lub elektrycznie luzowniki. Samo wyłączenie wagonu albo ustawienie nawrotnika w położenie neutralne nie wystarczy."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:holowan",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 28767,
+                    "external_id": "4043",
+                    "category": "PT",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6314",
+            "prompt": "Czy podczas holowania pojazdu wolno Ci używać świateł awaryjnych?",
+            "prompt_variants": [
+                "Czy podczas holowania pojazdu wolno Ci używać świateł awaryjnych?"
+            ],
+            "categories": [
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "breakdown_accident_and_first_aid",
+                    "name": "Ogolne zasady okreslajace zachowanie kierowcy w momencie awarii lub wypadku, udzielanie pierwszej pomocy przedmedycznej"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo kierujacy może holować pojazd silnikowy tylko pod warunkiem, że pojazd holujący ma włączone światła mijania również w okresie dostatecznej widoczności. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6314/image/full.1c11cb272254.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6314/image/thumb.4d8c908d6b4e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/6314/image/full.1c11cb272254.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/6314/image/thumb.4d8c908d6b4e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/6314/image/full.1c11cb272254.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/6314/image/thumb.4d8c908d6b4e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/6314/image/full.1c11cb272254.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/6314/image/thumb.4d8c908d6b4e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/6314/image/full.1c11cb272254.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/6314/image/thumb.4d8c908d6b4e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/6314/image/full.1c11cb272254.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/6314/image/thumb.4d8c908d6b4e.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:holowan",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 34891,
+                    "external_id": "6314",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34980,
+                    "external_id": "6314",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35004,
+                    "external_id": "6314",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35084,
+                    "external_id": "6314",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35151,
+                    "external_id": "6314",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35175,
+                    "external_id": "6314",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6581",
+            "prompt": "Czy masz prawo holować motocyklem inny motocykl?",
+            "prompt_variants": [
+                "Czy masz prawo holować motocyklem inny motocykl?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2"
+            ],
+            "question_topics": [
+                {
+                    "key": "driving_technique",
+                    "name": "Technika kierowania pojazdem"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak, za pomocą połączenia giętkiego umożliwiającego łatwe odczepienie.",
+                    "option_b": "Tak, za pomocą połączenia giętkiego wykluczającego możliwość odczepienia.",
+                    "option_c": "Tak, za pomocą połączenia sztywnego umożliwiającego łatwe odczepienie.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak, za pomocą połączenia giętkiego umożliwiającego łatwe odczepienie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo kierujacy motocyklem może holować inny motocykl, który powinien być połączony z pojazdem holującym połączeniem giętkim w sposób umożliwiający łatwe odczepienie. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/6581/image/full.c090e412c82d.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/6581/image/thumb.a290de4cef2a.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/6581/image/full.c090e412c82d.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/6581/image/thumb.a290de4cef2a.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/6581/image/full.c090e412c82d.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/6581/image/thumb.a290de4cef2a.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:holowac",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 35802,
+                    "question_external_id": "6581",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-31-ust-1-pkt-4",
+                    "legal_unit_label": "art. 31 ust. 1 pkt 4",
+                    "legal_unit_title": "Holowanie motocykla",
+                    "legal_topic_slug": "holowanie-pojazdu",
+                    "article_slug": "holowanie-pojazdu",
+                    "public_note": "To pytanie sprawdza szczególną zasadę holowania motocykla. Art. 31 ust. 1 pkt 4 wymaga połączenia giętkiego umożliwiającego łatwe odczepienie."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 35802,
+                    "external_id": "6581",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35846,
+                    "external_id": "6581",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35892,
+                    "external_id": "6581",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6582",
+            "prompt": "Czy dopuszczalne  jest holowanie motocykla?",
+            "prompt_variants": [
+                "Czy dopuszczalne  jest holowanie motocykla?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2"
+            ],
+            "question_topics": [
+                {
+                    "key": "driving_technique",
+                    "name": "Technika kierowania pojazdem"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak, przy użyciu połączenia sztywnego, które uniemożliwi odczepienie w czasie jazdy.",
+                    "option_b": "Nie.",
+                    "option_c": "Tak, przy użyciu połączenia giętkiego umożliwiającego łatwe odczepienie.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Tak, przy użyciu połączenia giętkiego umożliwiającego łatwe odczepienie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo kierujacy może holować motocykl, który powinien być połączony z pojazdem holującym połączeniem giętkim w sposób umożliwiający łatwe odczepienie. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/6582/image/full.74dca85d20cb.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/6582/image/thumb.97ce3fc6c4e0.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/6582/image/full.74dca85d20cb.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/6582/image/thumb.97ce3fc6c4e0.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/6582/image/full.74dca85d20cb.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/6582/image/thumb.97ce3fc6c4e0.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:holowan",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 35803,
+                    "question_external_id": "6582",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-31-ust-1-pkt-4",
+                    "legal_unit_label": "art. 31 ust. 1 pkt 4",
+                    "legal_unit_title": "Holowanie motocykla",
+                    "legal_topic_slug": "holowanie-pojazdu",
+                    "article_slug": "holowanie-pojazdu",
+                    "public_note": "To pytanie sprawdza szczególną zasadę holowania motocykla. Art. 31 ust. 1 pkt 4 wymaga połączenia giętkiego umożliwiającego łatwe odczepienie."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 35803,
+                    "external_id": "6582",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35847,
+                    "external_id": "6582",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35893,
+                    "external_id": "6582",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6657",
+            "prompt": "Który z wymienionych pojazdów, masz prawo holować ciągnikiem rolniczym?",
+            "prompt_variants": [
+                "Który z wymienionych pojazdów, masz prawo holować ciągnikiem rolniczym?"
+            ],
+            "categories": [
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Inny ciągnik rolniczy z przyczepą.",
+                    "option_b": "Samochód osobowy na połączeniu giętkim z dwoma niesprawnymi układami hamulcowymi.",
+                    "option_c": "Motocykl na połączeniu giętkim z możliwością łatwego odczepienia.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Motocykl na połączeniu giętkim z możliwością łatwego odczepienia."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo kierujacy może holować pojazd silnikowy - motocykl, który będzie połączony z pojazdem holującym połączeniem giętkim w sposób umożliwiający łatwe odczepienie. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/6657/image/full.c5471129a1d9.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/6657/image/thumb.895dd0292f68.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:holowac",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 35963,
+                    "question_external_id": "6657",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-31-ust-1-pkt-4",
+                    "legal_unit_label": "art. 31 ust. 1 pkt 4",
+                    "legal_unit_title": "Holowanie motocykla",
+                    "legal_topic_slug": "holowanie-pojazdu",
+                    "article_slug": "holowanie-pojazdu",
+                    "public_note": "To pytanie sprawdza szczególną zasadę holowania motocykla. Art. 31 ust. 1 pkt 4 wymaga połączenia giętkiego umożliwiającego łatwe odczepienie."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 35963,
+                    "external_id": "6657",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7117",
+            "prompt": "O czym należy pamiętać przed rozpoczęciem holowania  składu tramwajów, uszkodzonego w wyniku kolizji?",
+            "prompt_variants": [
+                "O czym należy pamiętać przed rozpoczęciem holowania  składu tramwajów, uszkodzonego w wyniku kolizji?"
+            ],
+            "categories": [
+                "PT"
+            ],
+            "question_topics": [
+                {
+                    "key": "driving_technique",
+                    "name": "Technika kierowania pojazdem"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "O umieszczeniu trójkąta ostrzegawczego z tyłu drugiego wagonu.",
+                    "option_b": "O umieszczeniu żółtego sygnału błyskowego.",
+                    "option_c": "O połączeniu w sposób wykluczający odczepienie się w czasie jazdy.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "O połączeniu w sposób wykluczający odczepienie się w czasie jazdy."
+                }
+            ],
+            "explanations": [],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/pt/7117/image/full.4445a4252ea3.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/pt/7117/image/thumb.7a498def3606.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:holowan",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 37261,
+                    "external_id": "7117",
+                    "category": "PT",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7171",
+            "prompt": "Czy masz prawo kierować holowanym motocyklem, jeśli nie posiadasz prawa jazdy uprawniającego do kierowania nim?",
+            "prompt_variants": [
+                "Czy masz prawo kierować holowanym motocyklem, jeśli nie posiadasz prawa jazdy uprawniającego do kierowania nim?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Nie.",
+                    "option_b": "Tak, jeśli motocykl jest holowany na połączeniu sztywnym.",
+                    "option_c": "Tak, niezależnie od rodzaju połączenia.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Nie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/7171/image/full.cceea0932094.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/7171/image/thumb.052c39cbdedd.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/7171/image/full.cceea0932094.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/7171/image/thumb.052c39cbdedd.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/7171/image/full.cceea0932094.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/7171/image/thumb.052c39cbdedd.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:holowan",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 37294,
+                    "question_external_id": "7171",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-31-ust-1-pkt-3",
+                    "legal_unit_label": "art. 31 ust. 1 pkt 3",
+                    "legal_unit_title": "Kierujący w pojeździe holowanym",
+                    "legal_topic_slug": "holowanie-pojazdu",
+                    "article_slug": "holowanie-pojazdu",
+                    "public_note": "To pytanie dotyczy osoby kierującej holowanym motocyklem. Art. 31 ust. 1 pkt 3 wymaga posiadania uprawnienia do kierowania tym pojazdem, jeżeli sposób holowania nie wyklucza potrzeby kierowania."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 37294,
+                    "external_id": "7171",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 37482,
+                    "external_id": "7171",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 37510,
+                    "external_id": "7171",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7454",
+            "prompt": "Na której z tych dróg nie masz prawa holować samochodem osobowym innego pojazdu?",
+            "prompt_variants": [
+                "Na której z tych dróg nie masz prawa holować samochodem osobowym innego pojazdu?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Na autostradzie.",
+                    "option_b": "Na drodze ekspresowej.",
+                    "option_c": "W strefie zamieszkania.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Na autostradzie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo zabrania się holowania na autostradzie, z wyjątkiem holowania przez pojazdy przeznaczone do holowania do najbliższego wyjazdu. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:holowac",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 40618,
+                    "question_external_id": "7454",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-31-ust-2-pkt-5",
+                    "legal_unit_label": "art. 31 ust. 2 pkt 5",
+                    "legal_unit_title": "Zakaz holowania na autostradzie",
+                    "legal_topic_slug": "holowanie-pojazdu",
+                    "article_slug": "holowanie-pojazdu",
+                    "public_note": "To pytanie dotyczy autostrady. Art. 31 ust. 2 pkt 5 dopuszcza tam holowanie wyłącznie przez pojazd przeznaczony do holowania i tylko do najbliższego wyjazdu lub miejsca obsługi podróżnych."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 40618,
+                    "external_id": "7454",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7459",
+            "prompt": "Czy masz prawo włączyć światła awaryjne, gdy kierujesz holowanym pojazdem?",
+            "prompt_variants": [
+                "Czy masz prawo włączyć światła awaryjne, gdy kierujesz holowanym pojazdem?"
+            ],
+            "categories": [
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "breakdown_accident_and_first_aid",
+                    "name": "Ogolne zasady okreslajace zachowanie kierowcy w momencie awarii lub wypadku, udzielanie pierwszej pomocy przedmedycznej"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo kierujacy może holować pojazd silnikowy tylko pod warunkiem, że pojazd holujący ma włączone światła mijania również w okresie dostatecznej widoczności. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/7459/image/full.538ff7d9b130.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/7459/image/thumb.f8c4902a8b78.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/7459/image/full.538ff7d9b130.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/7459/image/thumb.f8c4902a8b78.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/7459/image/full.538ff7d9b130.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/7459/image/thumb.f8c4902a8b78.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/7459/image/full.538ff7d9b130.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/7459/image/thumb.f8c4902a8b78.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/7459/image/full.538ff7d9b130.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/7459/image/thumb.f8c4902a8b78.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/7459/image/full.538ff7d9b130.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/7459/image/thumb.f8c4902a8b78.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/7459/image/full.538ff7d9b130.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/7459/image/thumb.f8c4902a8b78.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:holowan",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 40622,
+                    "external_id": "7459",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40709,
+                    "external_id": "7459",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40787,
+                    "external_id": "7459",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40855,
+                    "external_id": "7459",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41151,
+                    "external_id": "7459",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41238,
+                    "external_id": "7459",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41316,
+                    "external_id": "7459",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7510",
+            "prompt": "Zamierzasz holować motocyklem inny motocykl. W jaki sposób oba pojazdy powinny być ze sobą połączone?",
+            "prompt_variants": [
+                "Zamierzasz holować motocyklem inny motocykl. W jaki sposób oba pojazdy powinny być ze sobą połączone?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2"
+            ],
+            "question_topics": [
+                {
+                    "key": "driving_technique",
+                    "name": "Technika kierowania pojazdem"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Połączeniem giętkim, w sposób wykluczający możliwość odczepienia.",
+                    "option_b": "Połączeniem giętkim, w sposób umożliwiający łatwe odczepienie.",
+                    "option_c": "Połączeniem sztywnym.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Połączeniem giętkim, w sposób umożliwiający łatwe odczepienie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo kierujacy motocyklem może holować inny motocykl, który powinien być połączony z pojazdem holującym połączeniem giętkim w sposób umożliwiający łatwe odczepienie. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:holowac",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 40542,
+                    "question_external_id": "7510",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-31-ust-1-pkt-4",
+                    "legal_unit_label": "art. 31 ust. 1 pkt 4",
+                    "legal_unit_title": "Holowanie motocykla",
+                    "legal_topic_slug": "holowanie-pojazdu",
+                    "article_slug": "holowanie-pojazdu",
+                    "public_note": "To pytanie sprawdza szczególną zasadę holowania motocykla. Art. 31 ust. 1 pkt 4 wymaga połączenia giętkiego umożliwiającego łatwe odczepienie."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 40542,
+                    "external_id": "7510",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40998,
+                    "external_id": "7510",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41074,
+                    "external_id": "7510",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7512",
+            "prompt": "Jak masz obowiązek oznakować holowany samochód osobowy?",
+            "prompt_variants": [
+                "Jak masz obowiązek oznakować holowany samochód osobowy?"
+            ],
+            "categories": [
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Włączyć światła awaryjne.",
+                    "option_b": "Umieścić z tyłu po lewej stronie ostrzegawczy trójkąt odblaskowy.",
+                    "option_c": "Włączyć tylne światło przeciwmgłowe.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Umieścić z tyłu po lewej stronie ostrzegawczy trójkąt odblaskowy."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo kierujacy może holować pojazd silnikowy, który jest oznaczony z tyłu po lewej stronie ostrzegawczym trójkątem odblaskowym, a w okresie. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:holowan",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 40634,
+                    "question_external_id": "7512",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-31-ust-1-pkt-5",
+                    "legal_unit_label": "art. 31 ust. 1 pkt 5",
+                    "legal_unit_title": "Oznakowanie pojazdu holowanego",
+                    "legal_topic_slug": "holowanie-pojazdu",
+                    "article_slug": "holowanie-pojazdu",
+                    "public_note": "To pytanie dotyczy oznakowania pojazdu holowanego. Art. 31 ust. 1 pkt 5 wymaga umieszczenia trójkąta ostrzegawczego z tyłu po lewej stronie."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 40634,
+                    "external_id": "7512",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41163,
+                    "external_id": "7512",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7539",
+            "prompt": "Jakiego pojazdu nie wolno Ci holować?",
+            "prompt_variants": [
+                "Jakiego pojazdu nie wolno Ci holować?"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "driving_with_trailer",
+                    "name": "Kierowanie pojazdem z przyczepa"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Autobusu z bagażnikiem zewnętrznym.",
+                    "option_b": "Autobusu z przyczepą.",
+                    "option_c": "Autobusu przegubowego.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Autobusu z przyczepą."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo zabrania się holowania więcej niż jednego pojazdu, z wyjątkiem pojazdu członowego. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:holowac",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 41644,
+                    "question_external_id": "7539",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-31-ust-2-pkt-3",
+                    "legal_unit_label": "art. 31 ust. 2 pkt 3",
+                    "legal_unit_title": "Zakaz holowania więcej niż jednego pojazdu",
+                    "legal_topic_slug": "holowanie-pojazdu",
+                    "article_slug": "holowanie-pojazdu",
+                    "public_note": "To pytanie sprawdza zakaz holowania więcej niż jednego pojazdu. Pojazd z przyczepą tworzy zespół, którego nie wolno w ten sposób holować, poza wyjątkiem dla pojazdu członowego."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 41644,
+                    "external_id": "7539",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41669,
+                    "external_id": "7539",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7540",
+            "prompt": "Czy wolno Ci holować autobusem samochód ciężarowy z przyczepą?",
+            "prompt_variants": [
+                "Czy wolno Ci holować autobusem samochód ciężarowy z przyczepą?"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "driving_with_trailer",
+                    "name": "Kierowanie pojazdem z przyczepa"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak, ale tylko poza autostradą.",
+                    "option_b": "Tak, bez ograniczeń.",
+                    "option_c": "Nie.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Nie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo zabrania się holowania więcej niż jednego pojazdu, z wyjątkiem pojazdu członowego. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:holowac",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 41645,
+                    "question_external_id": "7540",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-31-ust-2-pkt-3",
+                    "legal_unit_label": "art. 31 ust. 2 pkt 3",
+                    "legal_unit_title": "Zakaz holowania więcej niż jednego pojazdu",
+                    "legal_topic_slug": "holowanie-pojazdu",
+                    "article_slug": "holowanie-pojazdu",
+                    "public_note": "To pytanie sprawdza zakaz holowania więcej niż jednego pojazdu. Pojazd z przyczepą tworzy zespół, którego nie wolno w ten sposób holować, poza wyjątkiem dla pojazdu członowego."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 41645,
+                    "external_id": "7540",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41670,
+                    "external_id": "7540",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10067",
+            "prompt": "Czy holowany pojazd ma wpływ na pole widzenia kierowcy?",
+            "prompt_variants": [
+                "Czy holowany pojazd ma wpływ na pole widzenia kierowcy?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "driver_field_of_view",
+                    "name": "Rozne pola widzenia kierowcow"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Nie ma żadnego wpływu na ograniczenie pola widzenia.",
+                    "option_b": "Tylko podczas wykonywania manewru zawracania na skrzyżowaniu.",
+                    "option_c": "Ma wpływ na ograniczenie pola widzenia.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Ma wpływ na ograniczenie pola widzenia."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo holowany pojazd może ograniczać pole widzenia kierowcy pojazdu holującego i ma wpływ na ograniczenie pola widzenia. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/10067/image/full.d71bbadb05ac.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/10067/image/thumb.d5201dc66436.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:holowan",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 43240,
+                    "external_id": "10067",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10080",
+            "prompt": "Czy dopuszczalne jest holowanie samochodem osobowym na autostradzie do najbliższego wyjazdu lub miejsca obsługi podróżnych?",
+            "prompt_variants": [
+                "Czy dopuszczalne jest holowanie samochodem osobowym na autostradzie do najbliższego wyjazdu lub miejsca obsługi podróżnych?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "speed_limits",
+                    "name": "Dopuszczalne predkosci pojazdu, ograniczenia"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Nie.",
+                    "option_b": "Tak.",
+                    "option_c": "Tak, ale jadąc z maksymalną prędkością 20 km/h.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Nie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo zabrania się holowania samochodem osobowym na autostradzie - droga oznaczona znakiem. Na obrazie kluczowe jest poprawne odczytanie oznakowania i jego znaczenia. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/10080/image/full.74c9bebf5331.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/10080/image/thumb.42f57088f3bf.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:holowan",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 43624,
+                    "question_external_id": "10080",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-31-ust-2-pkt-5",
+                    "legal_unit_label": "art. 31 ust. 2 pkt 5",
+                    "legal_unit_title": "Zakaz holowania na autostradzie",
+                    "legal_topic_slug": "holowanie-pojazdu",
+                    "article_slug": "holowanie-pojazdu",
+                    "public_note": "To pytanie dotyczy autostrady. Art. 31 ust. 2 pkt 5 dopuszcza tam holowanie wyłącznie przez pojazd przeznaczony do holowania i tylko do najbliższego wyjazdu lub miejsca obsługi podróżnych."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 43624,
+                    "external_id": "10080",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10081",
+            "prompt": "Czy dopuszczalne jest holowanie za pomocą połączenia sztywnego pojazdu o niesprawnym układzie kierowniczym?",
+            "prompt_variants": [
+                "Czy dopuszczalne jest holowanie za pomocą połączenia sztywnego pojazdu o niesprawnym układzie kierowniczym?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Nie.",
+                    "option_b": "Tak, ale tylko w obszarze niezabudowanym.",
+                    "option_c": "Tak, ale tylko w obszarze zabudowanym.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Nie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:holowan",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 43625,
+                    "question_external_id": "10081",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-31-ust-2-pkt-1",
+                    "legal_unit_label": "art. 31 ust. 2 pkt 1",
+                    "legal_unit_title": "Zakaz holowania przy niesprawnym układzie kierowniczym lub hamulcach",
+                    "legal_topic_slug": "holowanie-pojazdu",
+                    "article_slug": "holowanie-pojazdu",
+                    "public_note": "To pytanie dotyczy niesprawnego układu kierowniczego. Art. 31 ust. 2 pkt 1 zakazuje takiego holowania, chyba że zastosowana metoda całkowicie wyklucza potrzebę używania tego układu."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 43625,
+                    "external_id": "10081",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10109",
+            "prompt": "Czy podczas holowania motocykla powinny być sprawne w nim dwa układy hamulcowe?",
+            "prompt_variants": [
+                "Czy podczas holowania motocykla powinny być sprawne w nim dwa układy hamulcowe?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak, ale tylko przy prędkości powyżej 20 km/h.",
+                    "option_b": "Tak.",
+                    "option_c": "Nie, wystarczy jeden.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Tak."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo kierujacy może holować pojazd silnikowy tylko pod warunkiem, że w pojeździe holowanym na połączeniu sztywnym jest sprawny co najmniej jeden układ. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:holowan",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 43646,
+                    "question_external_id": "10109",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-31-ust-1-pkt-6",
+                    "legal_unit_label": "art. 31 ust. 1 pkt 6",
+                    "legal_unit_title": "Sprawność układów hamulcowych",
+                    "legal_topic_slug": "holowanie-pojazdu",
+                    "article_slug": "holowanie-pojazdu",
+                    "public_note": "Holowany motocykl korzysta z połączenia giętkiego. Art. 31 ust. 1 pkt 6 wymaga wtedy sprawności dwóch układów hamulcowych w pojeździe holowanym."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 43646,
+                    "external_id": "10109",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "11506",
+            "prompt": "Czy wolno Ci holować pojazd, którym kieruje osoba w stanie po użyciu alkoholu?",
+            "prompt_variants": [
+                "Czy wolno Ci holować pojazd, którym kieruje osoba w stanie po użyciu alkoholu?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "perception_decision_alcohol_fatigue",
+                    "name": "Spostrzeganie, ocena sytuacji i podejmowanie decyzji, szczegolnie w zakresie czasu reakcji oraz zmian w zachowaniu za kierownica, spowodowanych wplywem alkoholu, lekow i produktow leczniczych, stanem swiadomosci i zmeczeniem"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo zabrania się holowania pojazdu kierowanego przez osobę w stanie nietrzeźwości, w stanie po użyciu alkoholu lub środka działającego podobnie do alkoholu. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/am/11506/image/full.2c1ff8c07f00.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/am/11506/image/thumb.ea3bd738e070.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/11506/image/full.2c1ff8c07f00.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/11506/image/thumb.ea3bd738e070.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/11506/image/full.2c1ff8c07f00.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/11506/image/thumb.ea3bd738e070.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/11506/image/full.2c1ff8c07f00.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/11506/image/thumb.ea3bd738e070.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/11506/image/full.2c1ff8c07f00.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/11506/image/thumb.ea3bd738e070.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/11506/image/full.2c1ff8c07f00.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/11506/image/thumb.ea3bd738e070.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/11506/image/full.2c1ff8c07f00.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/11506/image/thumb.ea3bd738e070.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/11506/image/full.2c1ff8c07f00.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/11506/image/thumb.ea3bd738e070.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/11506/image/full.2c1ff8c07f00.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/11506/image/thumb.ea3bd738e070.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/11506/image/full.2c1ff8c07f00.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/11506/image/thumb.ea3bd738e070.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/11506/image/full.2c1ff8c07f00.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/11506/image/thumb.ea3bd738e070.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:holowac",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 45885,
+                    "question_external_id": "11506",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-45-ust-1-pkt-2",
+                    "legal_unit_label": "art. 45 ust. 1 pkt 2",
+                    "legal_unit_title": "Zakaz holowania pojazdu kierowanego przez osobę po alkoholu",
+                    "legal_topic_slug": "holowanie-pojazdu",
+                    "article_slug": "holowanie-pojazdu",
+                    "public_note": "To pytanie dotyczy osoby kierującej pojazdem holowanym po użyciu alkoholu. Art. 45 ust. 1 pkt 2 wprost zabrania holowania w takiej sytuacji."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 45885,
+                    "external_id": "11506",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 45904,
+                    "external_id": "11506",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 45925,
+                    "external_id": "11506",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46001,
+                    "external_id": "11506",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46036,
+                    "external_id": "11506",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46060,
+                    "external_id": "11506",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46080,
+                    "external_id": "11506",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46099,
+                    "external_id": "11506",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46119,
+                    "external_id": "11506",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46186,
+                    "external_id": "11506",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46220,
+                    "external_id": "11506",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "13088",
+            "prompt": "Z jaką maksymalną dopuszczalną prędkością możesz holować inny pojazd?",
+            "prompt_variants": [
+                "Z jaką maksymalną dopuszczalną prędkością możesz holować inny pojazd?"
+            ],
+            "categories": [
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "speed_limits",
+                    "name": "Dopuszczalne predkosci pojazdu, ograniczenia"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "50 km/h w obszarze zabudowanym.",
+                    "option_b": "60 km/h poza obszarem zabudowanym.",
+                    "option_c": "80 km/h na drodze dwujezdniowej o co najmniej dwóch pasach przeznaczonych dla każdego kierunku ruchu.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "60 km/h poza obszarem zabudowanym."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo kierujacy może holować pojazd silnikowy z prędkością nie przekraczająca 60 km/h poza obszarem zabudowanym. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:holowac",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 46709,
+                    "question_external_id": "13088",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-31-ust-1-pkt-1",
+                    "legal_unit_label": "art. 31 ust. 1 pkt 1",
+                    "legal_unit_title": "Prędkość podczas holowania",
+                    "legal_topic_slug": "holowanie-pojazdu",
+                    "article_slug": "holowanie-pojazdu",
+                    "public_note": "To pytanie sprawdza maksymalną prędkość podczas holowania. Art. 31 ust. 1 pkt 1 pozwala jechać najwyżej 30 km/h w obszarze zabudowanym i 60 km/h poza nim."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 46709,
+                    "external_id": "13088",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46913,
+                    "external_id": "13088",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        }
+    ]
+}

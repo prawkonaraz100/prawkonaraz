@@ -1,0 +1,267 @@
+{
+    "generated_at": "2026-04-14T23:08:42+02:00",
+    "category": "B",
+    "scope": "active_ready",
+    "rules_count": 3,
+    "exported_candidates": 16,
+    "rule_summaries": [
+        {
+            "name": "b-wave3-speed-limits-exact",
+            "target_topic_key": "speed_limits",
+            "matched_questions": 5
+        },
+        {
+            "name": "b-wave3-risk-factors-exact",
+            "target_topic_key": "risk_factors_conditions_and_weather",
+            "matched_questions": 6
+        },
+        {
+            "name": "b-wave3-lane-change-zipper-exact",
+            "target_topic_key": "lane_change_and_turning",
+            "matched_questions": 5
+        }
+    ],
+    "overrides": [
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "7248",
+            "question_topic_key": "speed_limits",
+            "reason": "PJ360 B wave 3: predkosci i ograniczenia z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave3-speed-limits-exact",
+                "current_topic_key": "driving_technique",
+                "classifier_topic_key": "driving_technique",
+                "classifier_matched_by": "fallback:specialist",
+                "prompt_excerpt": "Czy kierując pojazdem samochodowym o dopuszczalnej masie całkowitej 2,5 t, na obszarze zabudowanym, na tak oznakowanej drodze, możesz jechać z prędkością 70 km/h?",
+                "main_media_original": "5A106.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "8424",
+            "question_topic_key": "speed_limits",
+            "reason": "PJ360 B wave 3: predkosci i ograniczenia z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave3-speed-limits-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy po wjeździe na drogę oznaczoną tymi znakami pionowymi, masz prawo kontynuować jazdę z prędkością 30 km/h?",
+                "main_media_original": "PICT_143_Censored_1024x576.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "10420",
+            "question_topic_key": "speed_limits",
+            "reason": "PJ360 B wave 3: predkosci i ograniczenia z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave3-speed-limits-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy za tym znakiem wolno Ci poruszać się z dowolną prędkością?",
+                "main_media_original": "1671ztV_2.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "12618",
+            "question_topic_key": "speed_limits",
+            "reason": "PJ360 B wave 3: predkosci i ograniczenia z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave3-speed-limits-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy za tym znakiem wolno Ci zwiększyć prędkość do 130 km/h?",
+                "main_media_original": "1875ztV.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "13452",
+            "question_topic_key": "speed_limits",
+            "reason": "PJ360 B wave 3: predkosci i ograniczenia z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave3-speed-limits-exact",
+                "current_topic_key": "driving_technique",
+                "classifier_topic_key": "driving_technique",
+                "classifier_matched_by": "fallback:specialist",
+                "prompt_excerpt": "Czy za widocznymi znakami wolno zwiększyć prędkość do 90 km/h?",
+                "main_media_original": "Ba1_6010ztVpic.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "10041",
+            "question_topic_key": "risk_factors_conditions_and_weather",
+            "reason": "PJ360 B wave 3: warunki, ryzyko i pogoda z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave3-risk-factors-exact",
+                "current_topic_key": "driving_technique",
+                "classifier_topic_key": "driving_technique",
+                "classifier_matched_by": "fallback:specialist",
+                "prompt_excerpt": "Czy stan techniczny pojazdu jest czynnikiem, który powinieneś uwzględniać podczas dobierania prędkości jazdy na drodze?",
+                "main_media_original": "Slajd8122_cen_1024x576.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "10061",
+            "question_topic_key": "risk_factors_conditions_and_weather",
+            "reason": "PJ360 B wave 3: warunki, ryzyko i pogoda z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave3-risk-factors-exact",
+                "current_topic_key": "driving_technique",
+                "classifier_topic_key": "driving_technique",
+                "classifier_matched_by": "fallback:specialist",
+                "prompt_excerpt": "Czy rzeźba terenu jest czynnikiem, który powinieneś brać pod uwagę dobierając prędkość jazdy na drodze?",
+                "main_media_original": "Slajd8122_cen_1024x576.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "10074",
+            "question_topic_key": "risk_factors_conditions_and_weather",
+            "reason": "PJ360 B wave 3: warunki, ryzyko i pogoda z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave3-risk-factors-exact",
+                "current_topic_key": "driving_technique",
+                "classifier_topic_key": "driving_technique",
+                "classifier_matched_by": "fallback:specialist",
+                "prompt_excerpt": "Jak powinieneś zachować się wjeżdżając na odcinek drogi pokryty kałużami?",
+                "main_media_original": "Slajd_002013_cen_1024x576.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "13306",
+            "question_topic_key": "risk_factors_conditions_and_weather",
+            "reason": "PJ360 B wave 3: warunki, ryzyko i pogoda z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave3-risk-factors-exact",
+                "current_topic_key": "driving_technique",
+                "classifier_topic_key": "driving_technique",
+                "classifier_matched_by": "fallback:specialist",
+                "prompt_excerpt": "Czy warunki atmosferyczne to czynnik, który należy uwzględniać podczas dobierania prędkości jazdy?",
+                "main_media_original": "3058pic-zt.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "13561",
+            "question_topic_key": "risk_factors_conditions_and_weather",
+            "reason": "PJ360 B wave 3: warunki, ryzyko i pogoda z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave3-risk-factors-exact",
+                "current_topic_key": "driving_technique",
+                "classifier_topic_key": "driving_technique",
+                "classifier_matched_by": "fallback:specialist",
+                "prompt_excerpt": "Prędkość bezpieczna to prędkość :",
+                "main_media_original": ""
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "13580",
+            "question_topic_key": "risk_factors_conditions_and_weather",
+            "reason": "PJ360 B wave 3: warunki, ryzyko i pogoda z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave3-risk-factors-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Kierując pojazdem poza obszarem zabudowanym w nocy na nieoświetlonej, krętej drodze, aby uniknąć najechania na nieoświetloną przeszkodę nie powinno się jechać z wykorzystaniem maks...",
+                "main_media_original": ""
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "10702",
+            "question_topic_key": "lane_change_and_turning",
+            "reason": "PJ360 B wave 3: zmiana pasa i jazda na suwak z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave3-lane-change-zipper-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy w warunkach znacznego zmniejszenia prędkości na jezdni kierujący pojazdem nr 3 przejeżdża przed pojazdem nr 2?",
+                "main_media_original": "W11 suwak z 001n.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "10703",
+            "question_topic_key": "lane_change_and_turning",
+            "reason": "PJ360 B wave 3: zmiana pasa i jazda na suwak z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave3-lane-change-zipper-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy w warunkach znacznego zmniejszenia prędkości na jezdni kierujący pojazdem nr 2 przejeżdża przed pojazdem nr 3?",
+                "main_media_original": "W11 suwak z 001n.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "10704",
+            "question_topic_key": "lane_change_and_turning",
+            "reason": "PJ360 B wave 3: zmiana pasa i jazda na suwak z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave3-lane-change-zipper-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy w warunkach znacznego zmniejszenia prędkości na jezdni kierujący pojazdem nr 3 przejeżdża przed pojazdem nr 2?",
+                "main_media_original": "W11 suwak z 002n.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "10706",
+            "question_topic_key": "lane_change_and_turning",
+            "reason": "PJ360 B wave 3: zmiana pasa i jazda na suwak z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave3-lane-change-zipper-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy w warunkach znacznego zmniejszenia prędkości na jezdni kierujący pojazdem nr 4 przejeżdża przed kierującym pojazdem nr 2?",
+                "main_media_original": "W11 suwak z 003n.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "10737",
+            "question_topic_key": "lane_change_and_turning",
+            "reason": "PJ360 B wave 3: zmiana pasa i jazda na suwak z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave3-lane-change-zipper-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy kierujący ma obowiązek stosować tzw. \"jazdę na suwak\", gdy nie ma znacznego zmniejszenia prędkości ?",
+                "main_media_original": "W11_suwak_305.jpg"
+            }
+        }
+    ],
+    "source_spec_path": "resources/topic-overrides/pj360-b-wave-3-speed-risk-merge-spec.json"
+}

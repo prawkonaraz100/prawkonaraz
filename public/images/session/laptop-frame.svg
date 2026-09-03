@@ -1,0 +1,40 @@
+<svg width="1600" height="1100" viewBox="0 0 1600 1100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="screenShell" x1="800" y1="70" x2="800" y2="810" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E2E0DB"/>
+      <stop offset="1" stop-color="#CAC7C0"/>
+    </linearGradient>
+    <linearGradient id="baseShell" x1="800" y1="830" x2="800" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E1DED8"/>
+      <stop offset="1" stop-color="#C7C4BE"/>
+    </linearGradient>
+    <linearGradient id="lip" x1="800" y1="830" x2="800" y2="856" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#C8C4BD"/>
+      <stop offset="1" stop-color="#B3AFA8"/>
+    </linearGradient>
+    <filter id="shadow" x="20" y="30" width="1560" height="1060" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="20" stdDeviation="28" flood-color="#221D16" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+
+  <ellipse cx="800" cy="1015" rx="580" ry="42" fill="#CFC9BE" fill-opacity="0.42"/>
+
+  <g filter="url(#shadow)">
+    <path
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="M239 70C220.222 70 205 85.2223 205 104V776C205 794.778 220.222 810 239 810H1361C1379.78 810 1395 794.778 1395 776V104C1395 85.2223 1379.78 70 1361 70H239ZM275 110C263.954 110 255 118.954 255 130V696C255 707.046 263.954 716 275 716H1325C1336.05 716 1345 707.046 1345 696V130C1345 118.954 1336.05 110 1325 110H275Z"
+      fill="url(#screenShell)"
+    />
+    <path d="M239 71H1361C1379.23 71 1394 85.7746 1394 104V776C1394 794.225 1379.23 809 1361 809H239C220.775 809 206 794.225 206 776V104C206 85.7746 220.775 71 239 71Z" stroke="#AAA69D" stroke-width="2"/>
+    <rect x="254.5" y="109.5" width="1091" height="607" rx="20.5" stroke="#97928A"/>
+    <rect x="769" y="87" width="62" height="8" rx="4" fill="#B6B1AA"/>
+    <circle cx="800" cy="92" r="3.5" fill="#8B867F"/>
+
+    <path d="M210 832H1390L1496 960C1508 974 1498.08 996 1479.63 996H120.369C101.917 996 91.9977 974 104.011 960L210 832Z" fill="url(#baseShell)"/>
+    <path d="M210 832H1390L1496 960C1508 974 1498.08 996 1479.63 996H120.369C101.917 996 91.9977 974 104.011 960L210 832Z" stroke="#AAA69D" stroke-width="2"/>
+    <rect x="210" y="831" width="1180" height="22" rx="11" fill="url(#lip)"/>
+    <path d="M646 927C646 917.611 653.611 910 663 910H937C946.389 910 954 917.611 954 927V947C954 956.389 946.389 964 937 964H663C653.611 964 646 956.389 646 947V927Z" fill="#D8D4CD" stroke="#B8B3AB" stroke-width="1.5"/>
+    <path d="M725 993H875C870.913 999.466 863.702 1004 855.5 1004H744.5C736.298 1004 729.087 999.466 725 993Z" fill="#B0ABA3"/>
+  </g>
+</svg>

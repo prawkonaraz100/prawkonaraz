@@ -1,0 +1,1172 @@
+{
+    "generated_at": "2026-06-21T22:51:43+02:00",
+    "candidate": {
+        "slug": "gasnica-trojkat-i-obowiazkowe-wyposazenie",
+        "title": "Gaśnica, trójkąt i obowiązkowe wyposażenie pojazdu",
+        "description": "Węższy temat artykułu wykryty na podstawie treści pytań.",
+        "level": "focused",
+        "status": "candidate",
+        "rule_version": "2026-06-19-prompt-v2",
+        "existing_article_slug": "gasnica-trojkat-i-obowiazkowe-wyposazenie"
+    },
+    "workflow": {
+        "status": "published",
+        "next_action": "Przejrzyj relacje pytan i zdecyduj, czy artykul wymaga rozbudowy lub ponownego review.",
+        "public_relations_are_verified_only": true
+    },
+    "article": {
+        "slug": "gasnica-trojkat-i-obowiazkowe-wyposazenie",
+        "title": "Wyposażenie pojazdu: gaśnica, trójkąt i najczęstsze pułapki",
+        "status": "published",
+        "published_at": "2026-06-21",
+        "last_reviewed_at": "2026-06-21",
+        "legal_units": [
+            {
+                "slug": "par-11-ust-1-pkt-5c",
+                "label": "§ 11 ust. 1 pkt 5c",
+                "title": "Dwa lusterka motocykla szybszego niż 100 km/h",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "par-11-ust-1-pkt-6",
+                "label": "§ 11 ust. 1 pkt 6",
+                "title": "Sygnał dźwiękowy pojazdu samochodowego",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "par-11-ust-1-pkt-13",
+                "label": "§ 11 ust. 1 pkt 13",
+                "title": "Trójkąt ostrzegawczy ze znakiem homologacji",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "par-11-ust-1-pkt-14",
+                "label": "§ 11 ust. 1 pkt 14",
+                "title": "Gaśnica łatwo dostępna w razie potrzeby",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "par-12-ust-3-pkt-11",
+                "label": "§ 12 ust. 3 pkt 11",
+                "title": "Dopuszczalne światła awaryjne motocykla",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "par-40-ust-2-pkt-8",
+                "label": "§ 40 ust. 2 pkt 8",
+                "title": "Dwie gaśnice przy przewozie osób poza kabiną",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "par-46-ust-1-pkt-2",
+                "label": "§ 46 ust. 1 pkt 2",
+                "title": "Gaśnica jako wyposażenie ciągnika rolniczego",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            }
+        ]
+    },
+    "summary": {
+        "canonical_questions": 11,
+        "question_rows": 29,
+        "categories": [
+            "A",
+            "A1",
+            "A2",
+            "AM",
+            "B",
+            "B1",
+            "C",
+            "C1",
+            "D",
+            "D1",
+            "PT",
+            "T"
+        ],
+        "canonical_questions_with_verified_reference": 6,
+        "prompt_conflicts": [],
+        "answer_conflicts": [],
+        "correct_answer_conflicts": []
+    },
+    "questions": [
+        {
+            "external_id": "1905",
+            "prompt": "Który z wymienionych sposobów przewożenia gaśnicy w samochodzie osobowym jest właściwy?",
+            "prompt_variants": [
+                "Który z wymienionych sposobów przewożenia gaśnicy w samochodzie osobowym jest właściwy?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "safety_equipment_and_restraints",
+                    "name": "Wyposazenie pojazdu zwiazane z bezpieczenstwem, korzystanie z pasow, zaglowkow i fotelikow"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Gaśnica umieszczona jest na tylnej półce.",
+                    "option_b": "Gaśnica umieszczona jest luźno między siedzeniami.",
+                    "option_c": "Gaśnica zamocowana pod fotelem pasażera.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Gaśnica zamocowana pod fotelem pasażera."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo obowiązkowe wyposażenie każdego pojazdu samochodowego to m.in.: trójkąt do ustawiania na drodze, przeznaczony do ostrzegania o obecności. W praktyce trzeba ocenic sytuacje zgodnie z zasadami ruchu drogowego, a nie tylko po pozorach. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:gasnic",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 21722,
+                    "question_external_id": "1905",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "par-11-ust-1-pkt-14",
+                    "legal_unit_label": "§ 11 ust. 1 pkt 14",
+                    "legal_unit_title": "Gaśnica łatwo dostępna w razie potrzeby",
+                    "legal_topic_slug": "gasnica-trojkat-i-obowiazkowe-wyposazenie",
+                    "article_slug": "gasnica-trojkat-i-obowiazkowe-wyposazenie",
+                    "public_note": "To pytanie sprawdza sposób przewożenia gaśnicy. § 11 ust. 1 pkt 14 wymaga miejsca łatwo dostępnego, a prawidłowe zamocowanie chroni przed jej przemieszczaniem podczas jazdy."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 21722,
+                    "external_id": "1905",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "2619",
+            "prompt": "Czy wskazane jest użycie gaśnicy proszkowej do stłumienia palącego się paliwa, np. po kolizji z samochodem?",
+            "prompt_variants": [
+                "Czy wskazane jest użycie gaśnicy proszkowej do stłumienia palącego się paliwa, np. po kolizji z samochodem?"
+            ],
+            "categories": [
+                "PT"
+            ],
+            "question_topics": [
+                {
+                    "key": "breakdown_accident_and_first_aid",
+                    "name": "Ogolne zasady okreslajace zachowanie kierowcy w momencie awarii lub wypadku, udzielanie pierwszej pomocy przedmedycznej"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedź Tak. Gaśnica proszkowa nadaje się do tłumienia palącego się paliwa, dlatego może być właściwym środkiem po kolizji z samochodem. Ważne jest jednak zachowanie bezpieczeństwa i odcięcie źródeł zagrożenia."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:gasnic",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 23603,
+                    "external_id": "2619",
+                    "category": "PT",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "2635",
+            "prompt": "W jaką liczbę gaśnic musi być wyposażony skład dwuwagonowy?",
+            "prompt_variants": [
+                "W jaką liczbę gaśnic musi być wyposażony skład dwuwagonowy?"
+            ],
+            "categories": [
+                "PT"
+            ],
+            "question_topics": [
+                {
+                    "key": "safety_equipment_and_restraints",
+                    "name": "Wyposazenie pojazdu zwiazane z bezpieczenstwem, korzystanie z pasow, zaglowkow i fotelikow"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Jedną gaśnicę w każdym wagonie.",
+                    "option_b": "Jedną gaśnicę na cały skład.",
+                    "option_c": "Co najmniej dwie gaśnice w każdym wagonie.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Jedną gaśnicę w każdym wagonie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedź A. Skład dwuwagonowy musi być wyposażony w jedną gaśnicę w każdym wagonie, aby środki gaśnicze były dostępne niezależnie od miejsca zagrożenia. Jedna gaśnica na cały skład byłaby niewystarczająca, a wymóg dwóch gaśnic w każdym wagonie nie wynika z tej zasady."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:gasnic",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 23606,
+                    "external_id": "2635",
+                    "category": "PT",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "4108",
+            "prompt": "W którego rodzaju gaśnicę powinien być wyposażony tramwaj?",
+            "prompt_variants": [
+                "W którego rodzaju gaśnicę powinien być wyposażony tramwaj?"
+            ],
+            "categories": [
+                "PT"
+            ],
+            "question_topics": [
+                {
+                    "key": "safety_equipment_and_restraints",
+                    "name": "Wyposazenie pojazdu zwiazane z bezpieczenstwem, korzystanie z pasow, zaglowkow i fotelikow"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Pianową.",
+                    "option_b": "Wodną.",
+                    "option_c": "Śniegową lub proszkową.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Śniegową lub proszkową."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedź C. Tramwaj powinien być wyposażony w gaśnicę śniegową lub proszkową, bo taki środek gaśniczy nadaje się do zagrożeń występujących w pojeździe. Gaśnice pianowe i wodne nie są tu właściwym wyborem."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:gasnic",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 29127,
+                    "external_id": "4108",
+                    "category": "PT",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6452",
+            "prompt": "Czy apteczka doraźnej pomocy jest obowiązkowym wyposażeniem każdego pojazdu samochodowego?",
+            "prompt_variants": [
+                "Czy apteczka doraźnej pomocy jest obowiązkowym wyposażeniem każdego pojazdu samochodowego?"
+            ],
+            "categories": [
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "safety_equipment_and_restraints",
+                    "name": "Wyposazenie pojazdu zwiazane z bezpieczenstwem, korzystanie z pasow, zaglowkow i fotelikow"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak.",
+                    "option_b": "Nie, ale warto ją mieć.",
+                    "option_c": "Tak, jeżeli jest wyposażony w instalację gazową.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie, ale warto ją mieć."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo obowiązkowe wyposażenie każdego pojazdu samochodowego to m.in.: trójkąt do ustawiania na drodze, przeznaczony do ostrzegania o obecności. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6452/image/full.c9e04e1a1e05.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6452/image/thumb.eb5fde88c1dd.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/6452/image/full.c9e04e1a1e05.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/6452/image/thumb.eb5fde88c1dd.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:obowiazkowym wyposazeniem",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 35405,
+                    "external_id": "6452",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35433,
+                    "external_id": "6452",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6499",
+            "prompt": "Który z elementów jest obowiązkowym wyposażeniem motocykla?",
+            "prompt_variants": [
+                "Który z elementów jest obowiązkowym wyposażeniem motocykla?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2"
+            ],
+            "question_topics": [
+                {
+                    "key": "safety_equipment_and_restraints",
+                    "name": "Wyposazenie pojazdu zwiazane z bezpieczenstwem, korzystanie z pasow, zaglowkow i fotelikow"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Sygnał dźwiękowy.",
+                    "option_b": "Gaśnica.",
+                    "option_c": "Apteczka doraźnej pomocy.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Sygnał dźwiękowy."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo obowiązkowym wyposażeniem motocykla jest sygnał dźwiękowy. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/6499/image/full.8d6e17585631.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/6499/image/thumb.95b80e3a101d.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/6499/image/full.8d6e17585631.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/6499/image/thumb.95b80e3a101d.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/6499/image/full.8d6e17585631.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/6499/image/thumb.95b80e3a101d.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:obowiazkowym wyposazeniem",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 35459,
+                    "question_external_id": "6499",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "par-11-ust-1-pkt-6",
+                    "legal_unit_label": "§ 11 ust. 1 pkt 6",
+                    "legal_unit_title": "Sygnał dźwiękowy pojazdu samochodowego",
+                    "legal_topic_slug": "gasnica-trojkat-i-obowiazkowe-wyposazenie",
+                    "article_slug": "gasnica-trojkat-i-obowiazkowe-wyposazenie",
+                    "public_note": "To pytanie dotyczy obowiązkowego wyposażenia motocykla. Motocykl jako pojazd samochodowy musi mieć sygnał dźwiękowy spełniający wymagania § 11 ust. 1 pkt 6."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 35459,
+                    "external_id": "6499",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35497,
+                    "external_id": "6499",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35535,
+                    "external_id": "6499",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6500",
+            "prompt": "Który z elementów jest obowiązkowym wyposażeniem motocykla jednośladowego, którego prędkość maksymalna jest wyższa niż 100 km/h?",
+            "prompt_variants": [
+                "Który z elementów jest obowiązkowym wyposażeniem motocykla jednośladowego, którego prędkość maksymalna jest wyższa niż 100 km/h?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2"
+            ],
+            "question_topics": [
+                {
+                    "key": "safety_equipment_and_restraints",
+                    "name": "Wyposazenie pojazdu zwiazane z bezpieczenstwem, korzystanie z pasow, zaglowkow i fotelikow"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Trójkąt ostrzegawczy.",
+                    "option_b": "Gaśnica.",
+                    "option_c": "Co najmniej dwa lusterka zewnętrzne.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Co najmniej dwa lusterka zewnętrzne."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo obowiązkowym wyposażeniem motocykla jednośladowego o prędkości maksymalnej wyższej niż 100 km/h są co, najmniej dwa lusterka zewnętrzne oraz sygnał dźwiękowy. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/6500/image/full.7fa1377494f7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/6500/image/thumb.d51ccec2da61.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/6500/image/full.7fa1377494f7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/6500/image/thumb.d51ccec2da61.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/6500/image/full.7fa1377494f7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/6500/image/thumb.d51ccec2da61.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:obowiazkowym wyposazeniem",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 35460,
+                    "question_external_id": "6500",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "par-11-ust-1-pkt-5c",
+                    "legal_unit_label": "§ 11 ust. 1 pkt 5c",
+                    "legal_unit_title": "Dwa lusterka motocykla szybszego niż 100 km/h",
+                    "legal_topic_slug": "gasnica-trojkat-i-obowiazkowe-wyposazenie",
+                    "article_slug": "gasnica-trojkat-i-obowiazkowe-wyposazenie",
+                    "public_note": "To pytanie sprawdza wyposażenie szybkiego motocykla jednośladowego. § 11 ust. 1 pkt 5c wymaga powyżej 100 km/h co najmniej dwóch lusterek, po jednym z każdej strony."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 35460,
+                    "external_id": "6500",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35498,
+                    "external_id": "6500",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35536,
+                    "external_id": "6500",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6501",
+            "prompt": "Czy obowiązkowym wyposażeniem motocykla są światła awaryjne?",
+            "prompt_variants": [
+                "Czy obowiązkowym wyposażeniem motocykla są światła awaryjne?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2"
+            ],
+            "question_topics": [
+                {
+                    "key": "safety_equipment_and_restraints",
+                    "name": "Wyposazenie pojazdu zwiazane z bezpieczenstwem, korzystanie z pasow, zaglowkow i fotelikow"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak.",
+                    "option_b": "Nie, jest to zabronione.",
+                    "option_c": "Nie, ale jest to dopuszczalne.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Nie, ale jest to dopuszczalne."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/6501/image/full.4d6ba8180b0e.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/6501/image/thumb.463986c827a1.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/6501/image/full.4d6ba8180b0e.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/6501/image/thumb.463986c827a1.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/6501/image/full.4d6ba8180b0e.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/6501/image/thumb.463986c827a1.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:obowiazkowym wyposazeniem",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 35461,
+                    "question_external_id": "6501",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "par-12-ust-3-pkt-11",
+                    "legal_unit_label": "§ 12 ust. 3 pkt 11",
+                    "legal_unit_title": "Dopuszczalne światła awaryjne motocykla",
+                    "legal_topic_slug": "gasnica-trojkat-i-obowiazkowe-wyposazenie",
+                    "article_slug": "gasnica-trojkat-i-obowiazkowe-wyposazenie",
+                    "public_note": "To pytanie odróżnia wyposażenie dopuszczalne od obowiązkowego. § 12 ust. 3 pkt 11 pozwala wyposażyć motocykl w światła awaryjne, lecz nie wymaga ich w każdym motocyklu."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 35461,
+                    "external_id": "6501",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35499,
+                    "external_id": "6501",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35537,
+                    "external_id": "6501",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7130",
+            "prompt": "Czy ze względów bezpieczeństwa wskazane jest, aby używając gaśnicy samochodowej, unikać pełnego otwarcia pokrywy komory silnika?",
+            "prompt_variants": [
+                "Czy ze względów bezpieczeństwa wskazane jest, aby używając gaśnicy samochodowej, unikać pełnego otwarcia pokrywy komory silnika?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "breakdown_accident_and_first_aid",
+                    "name": "Ogolne zasady okreslajace zachowanie kierowcy w momencie awarii lub wypadku, udzielanie pierwszej pomocy przedmedycznej"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak, bo ze względów bezpieczeństwa zaleca się unikanie pełnego otwierania pokrywy komory silnika podczas używania gaśnicy samochodowej. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a/7130/video/full.75ebd1295492.mp4",
+                    "poster_path": "media/questions/a/7130/image/poster.deb685398575.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/7130/video/full.75ebd1295492.mp4",
+                    "poster_path": "media/questions/b/7130/image/poster.deb685398575.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c/7130/video/full.75ebd1295492.mp4",
+                    "poster_path": "media/questions/c/7130/image/poster.deb685398575.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d/7130/video/full.75ebd1295492.mp4",
+                    "poster_path": "media/questions/d/7130/image/poster.deb685398575.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/t/7130/video/full.75ebd1295492.mp4",
+                    "poster_path": "media/questions/t/7130/image/poster.deb685398575.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/am/7130/video/full.75ebd1295492.mp4",
+                    "poster_path": "media/questions/am/7130/image/poster.deb685398575.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a1/7130/video/full.75ebd1295492.mp4",
+                    "poster_path": "media/questions/a1/7130/image/poster.deb685398575.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a2/7130/video/full.75ebd1295492.mp4",
+                    "poster_path": "media/questions/a2/7130/image/poster.deb685398575.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b1/7130/video/full.75ebd1295492.mp4",
+                    "poster_path": "media/questions/b1/7130/image/poster.deb685398575.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c1/7130/video/full.75ebd1295492.mp4",
+                    "poster_path": "media/questions/c1/7130/image/poster.deb685398575.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d1/7130/video/full.75ebd1295492.mp4",
+                    "poster_path": "media/questions/d1/7130/image/poster.deb685398575.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:gasnic",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 37272,
+                    "external_id": "7130",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 37300,
+                    "external_id": "7130",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 37331,
+                    "external_id": "7130",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 37364,
+                    "external_id": "7130",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 37399,
+                    "external_id": "7130",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 37437,
+                    "external_id": "7130",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 37460,
+                    "external_id": "7130",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 37488,
+                    "external_id": "7130",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 37516,
+                    "external_id": "7130",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 37546,
+                    "external_id": "7130",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 37579,
+                    "external_id": "7130",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7177",
+            "prompt": "Czy ciągnik rolniczy powinien być wyposażony w gaśnicę?",
+            "prompt_variants": [
+                "Czy ciągnik rolniczy powinien być wyposażony w gaśnicę?"
+            ],
+            "categories": [
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "safety_equipment_and_restraints",
+                    "name": "Wyposazenie pojazdu zwiazane z bezpieczenstwem, korzystanie z pasow, zaglowkow i fotelikow"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak.",
+                    "option_b": "Nie.",
+                    "option_c": "Tylko, jeżeli ciągnie przyczepę.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/7177/image/full.fc83fb3e6dc4.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/7177/image/thumb.1a8ce8d7e89b.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:gasnic",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 37419,
+                    "question_external_id": "7177",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "par-46-ust-1-pkt-2",
+                    "legal_unit_label": "§ 46 ust. 1 pkt 2",
+                    "legal_unit_title": "Gaśnica jako wyposażenie ciągnika rolniczego",
+                    "legal_topic_slug": "gasnica-trojkat-i-obowiazkowe-wyposazenie",
+                    "article_slug": "gasnica-trojkat-i-obowiazkowe-wyposazenie",
+                    "public_note": "To pytanie dotyczy ciągnika rolniczego. § 46 ust. 1 pkt 2 odsyła między innymi do obowiązku posiadania łatwo dostępnej gaśnicy z § 11 ust. 1 pkt 14."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 37419,
+                    "external_id": "7177",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "11442",
+            "prompt": "W ile gaśnic masz obowiązek wyposażyć samochód ciężarowy, którym przewozisz osoby poza kabiną kierowcy?",
+            "prompt_variants": [
+                "W ile gaśnic masz obowiązek wyposażyć samochód ciężarowy, którym przewozisz osoby poza kabiną kierowcy?"
+            ],
+            "categories": [
+                "C",
+                "C1"
+            ],
+            "question_topics": [
+                {
+                    "key": "safety_equipment_and_restraints",
+                    "name": "Wyposazenie pojazdu zwiazane z bezpieczenstwem, korzystanie z pasow, zaglowkow i fotelikow"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Jedną.",
+                    "option_b": "Dwie.",
+                    "option_c": "Trzy.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Dwie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo samochód ciężarowy przewożący osoby poza kabiną kierowcy powinien być wyposażony w dwie gaśnice: jedną łatwo dostępną dla kierowcy w kabinie i drugą. W praktyce trzeba ocenic sytuacje zgodnie z zasadami ruchu drogowego, a nie tylko po pozorach. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:gasnic",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 45960,
+                    "question_external_id": "11442",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "par-40-ust-2-pkt-8",
+                    "legal_unit_label": "§ 40 ust. 2 pkt 8",
+                    "legal_unit_title": "Dwie gaśnice przy przewozie osób poza kabiną",
+                    "legal_topic_slug": "gasnica-trojkat-i-obowiazkowe-wyposazenie",
+                    "article_slug": "gasnica-trojkat-i-obowiazkowe-wyposazenie",
+                    "public_note": "Samochód ciężarowy przewożący osoby poza kabiną wymaga dwóch gaśnic. § 40 ust. 2 pkt 8 wskazuje jedną gaśnicę przy kabinie i drugą wewnątrz przestrzeni przewozowej."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 45960,
+                    "external_id": "11442",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46146,
+                    "external_id": "11442",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        }
+    ]
+}

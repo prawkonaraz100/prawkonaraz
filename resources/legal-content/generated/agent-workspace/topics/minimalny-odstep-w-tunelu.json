@@ -1,0 +1,708 @@
+{
+    "generated_at": "2026-06-20T00:39:21+02:00",
+    "candidate": {
+        "slug": "minimalny-odstep-w-tunelu",
+        "title": "Minimalny odstęp w tunelu",
+        "description": "Węższy temat artykułu wykryty na podstawie treści pytań.",
+        "level": "focused",
+        "status": "candidate",
+        "rule_version": "2026-06-19-prompt-v2",
+        "existing_article_slug": "predkosc-odstep-i-hamowanie"
+    },
+    "workflow": {
+        "status": "published",
+        "next_action": "Przejrzyj relacje pytan i zdecyduj, czy artykul wymaga rozbudowy lub ponownego review.",
+        "public_relations_are_verified_only": true
+    },
+    "article": {
+        "slug": "predkosc-odstep-i-hamowanie",
+        "title": "Prędkość, odstęp i hamowanie pojazdu",
+        "status": "published",
+        "published_at": "2026-06-13",
+        "last_reviewed_at": "2026-06-20",
+        "legal_units": [
+            {
+                "slug": "art-19-ust-1",
+                "label": "art. 19 ust. 1",
+                "title": "Prędkość zapewniająca panowanie nad pojazdem",
+                "status": "verified",
+                "last_checked_at": "2026-06-20"
+            },
+            {
+                "slug": "art-19-ust-2-pkt-2",
+                "label": "art. 19 ust. 2 pkt 2",
+                "title": "Hamowanie bez tworzenia zagrożenia",
+                "status": "verified",
+                "last_checked_at": "2026-06-20"
+            },
+            {
+                "slug": "art-19-ust-2-pkt-3",
+                "label": "art. 19 ust. 2 pkt 3",
+                "title": "Odstęp pozwalający uniknąć zderzenia",
+                "status": "verified",
+                "last_checked_at": "2026-06-20"
+            },
+            {
+                "slug": "art-19-ust-3a",
+                "label": "art. 19 ust. 3a",
+                "title": "Minimalny odstęp na autostradzie i drodze ekspresowej",
+                "status": "verified",
+                "last_checked_at": "2026-06-20"
+            },
+            {
+                "slug": "art-20-ust-2",
+                "label": "art. 20 ust. 2",
+                "title": "Prędkość w strefie zamieszkania",
+                "status": "verified",
+                "last_checked_at": "2026-06-20"
+            },
+            {
+                "slug": "art-20-ust-3-pkt-1-lit-a",
+                "label": "art. 20 ust. 3 pkt 1 lit. a",
+                "title": "Prędkość samochodu osobowego na autostradzie",
+                "status": "verified",
+                "last_checked_at": "2026-06-20"
+            }
+        ]
+    },
+    "summary": {
+        "canonical_questions": 8,
+        "question_rows": 14,
+        "categories": [
+            "A",
+            "A1",
+            "A2",
+            "AM",
+            "B",
+            "B1",
+            "D",
+            "D1",
+            "T"
+        ],
+        "canonical_questions_with_verified_reference": 0,
+        "prompt_conflicts": [],
+        "answer_conflicts": [],
+        "correct_answer_conflicts": []
+    },
+    "questions": [
+        {
+            "external_id": "3650",
+            "prompt": "Jak duży odstęp od poprzedzającego pojazdu należy utrzymywać, kierując samochodem osobowym poza obszarem zabudowanym w tunelu o długości 600 metrów?",
+            "prompt_variants": [
+                "Jak duży odstęp od poprzedzającego pojazdu należy utrzymywać, kierując samochodem osobowym poza obszarem zabudowanym w tunelu o długości 600 metrów?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Nie mniejszy niż 50 metrów.",
+                    "option_b": "Nie mniejszy niż 40 metrów.",
+                    "option_c": "Nie mniejszy niż 30 metrów.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Nie mniejszy niż 50 metrów."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo kierujacy ma obowiazek utrzymywać odstęp niezbędny do uniknięcia zderzenia w razie hamowania lub zatrzymania się poprzedzającego pojazdu. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:tunel|odstep",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 27577,
+                    "external_id": "3650",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6347",
+            "prompt": "Jaki minimalny odstęp od pojazdu poprzedzającego powinieneś zachować, stojąc w tunelu, w zatorze drogowym tzw korku?",
+            "prompt_variants": [
+                "Jaki minimalny odstęp od pojazdu poprzedzającego powinieneś zachować, stojąc w tunelu, w zatorze drogowym tzw korku?"
+            ],
+            "categories": [
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "3 m.",
+                    "option_b": "5 m.",
+                    "option_c": "7 m.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "5 m."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo kierujacy w tunelu, podczas zatrzymania wynikającego z warunków ruchu drogowego. Na obrazie kluczowe jest poprawne odczytanie oznakowania i jego znaczenia. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6347/image/full.33e0e1f6ccfd.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6347/image/thumb.c8e173c97fc0.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/6347/image/full.33e0e1f6ccfd.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/6347/image/thumb.c8e173c97fc0.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:tunel|odstep",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 34909,
+                    "external_id": "6347",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35099,
+                    "external_id": "6347",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6521",
+            "prompt": "Jaki minimalny odstęp masz obowiązek zachować stojąc w zatorze drogowym (\"korku\") w tunelu za innym pojazdem?",
+            "prompt_variants": [
+                "Jaki minimalny odstęp masz obowiązek zachować stojąc w zatorze drogowym (\"korku\") w tunelu za innym pojazdem?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "3 m.",
+                    "option_b": "5 m.",
+                    "option_c": "4 m.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "5 m."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo kierujacy w tunelu, podczas zatrzymania wynikającego z warunków ruchu drogowego. Na obrazie kluczowe jest poprawne odczytanie oznakowania i jego znaczenia. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/6521/image/full.a3b1ceb26c93.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/6521/image/thumb.c8e173c97fc0.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/6521/image/full.a3b1ceb26c93.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/6521/image/thumb.c8e173c97fc0.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/6521/image/full.a3b1ceb26c93.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/6521/image/thumb.c8e173c97fc0.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:tunel|odstep",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 35473,
+                    "external_id": "6521",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35511,
+                    "external_id": "6521",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35549,
+                    "external_id": "6521",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6532",
+            "prompt": "Jaki minimalny odstęp, od poprzedzającego pojazdu, powinieneś zachować podczas zatrzymania się w tunelu, z uwagi na zator drogowy (\"korek\")?",
+            "prompt_variants": [
+                "Jaki minimalny odstęp, od poprzedzającego pojazdu, powinieneś zachować podczas zatrzymania się w tunelu, z uwagi na zator drogowy (\"korek\")?"
+            ],
+            "categories": [
+                "AM"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "3 m.",
+                    "option_b": "5 m.",
+                    "option_c": "4 m.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "5 m."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo kierujacy w tunelu, podczas zatrzymania wynikającego z warunków ruchu drogowego. Na obrazie kluczowe jest poprawne odczytanie oznakowania i jego znaczenia. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/am/6532/image/full.57590892dce9.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/am/6532/image/thumb.c8e173c97fc0.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:tunel|odstep",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 35582,
+                    "external_id": "6532",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6883",
+            "prompt": "Jaki minimalny odstęp od poprzedzającego pojazdu musisz zachować kierując autobusem poza obszarem zabudowanym w tunelu o długości przekraczającej 500 m?",
+            "prompt_variants": [
+                "Jaki minimalny odstęp od poprzedzającego pojazdu musisz zachować kierując autobusem poza obszarem zabudowanym w tunelu o długości przekraczającej 500 m?"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "30 m.",
+                    "option_b": "50 m.",
+                    "option_c": "80 m.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "50 m."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo poza obszarem zabudowanym w tunelach (za znakiem D-37) o długości przekraczającej 500 m, kierujacy ma obowiazek utrzymywać odstęp od poprzedzającego. Na obrazie kluczowe jest poprawne odczytanie oznakowania i jego znaczenia. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/6883/image/full.1c7366d5e439.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/6883/image/thumb.2c4be5bbfc9e.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/6883/image/full.1c7366d5e439.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/6883/image/thumb.2c4be5bbfc9e.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:tunel|odstep",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 36500,
+                    "external_id": "6883",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 36575,
+                    "external_id": "6883",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7446",
+            "prompt": "Jaki odstęp od poprzedzającego pojazdu masz obowiązek zachować podczas zatrzymania w zatorze drogowym w tunelu?",
+            "prompt_variants": [
+                "Jaki odstęp od poprzedzającego pojazdu masz obowiązek zachować podczas zatrzymania w zatorze drogowym w tunelu?"
+            ],
+            "categories": [
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Nie mniejszy niż 3 metry.",
+                    "option_b": "Nie mniejszy niż 5 metrów.",
+                    "option_c": "Nie mniejszy niż 10 metrów.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie mniejszy niż 5 metrów."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo kierujacy w tunelu, podczas zatrzymania wynikającego z warunków ruchu drogowego. Na obrazie kluczowe jest poprawne odczytanie oznakowania i jego znaczenia. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:tunel|odstep",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 40612,
+                    "external_id": "7446",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41144,
+                    "external_id": "7446",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7634",
+            "prompt": "Ile metrów odstępu od pojazdu poprzedzającego masz obowiązek zachować podczas zatrzymania w tunelu wynikającego z warunków ruchu?",
+            "prompt_variants": [
+                "Ile metrów odstępu od pojazdu poprzedzającego masz obowiązek zachować podczas zatrzymania w tunelu wynikającego z warunków ruchu?"
+            ],
+            "categories": [
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Co najmniej 5 metrów.",
+                    "option_b": "Co najmniej 10 metrów.",
+                    "option_c": "Co najmniej 15 metrów.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Co najmniej 5 metrów."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo kierujacy w tunelu, podczas zatrzymania wynikającego z warunków ruchu drogowego. Na obrazie kluczowe jest poprawne odczytanie oznakowania i jego znaczenia. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:tunel|odstep",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 41714,
+                    "external_id": "7634",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7855",
+            "prompt": "Ile metrów odstępu od poprzedzającego pojazdu należy zachować podczas zatrzymania wynikającego z zatoru drogowego w tunelu?",
+            "prompt_variants": [
+                "Ile metrów odstępu od poprzedzającego pojazdu należy zachować podczas zatrzymania wynikającego z zatoru drogowego w tunelu?"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "distances_and_braking",
+                    "name": "Odstepy i hamowanie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Nie mniej niż 3 metry.",
+                    "option_b": "Nie mniej niż 5 metrów.",
+                    "option_c": "Nie mniej niż 7 metrów.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie mniej niż 5 metrów."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe jest poprawne odczytanie oznakowania i jego znaczenia. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/7855/image/full.9d828fde17a4.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/7855/image/thumb.4ccc2a3f4a85.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/7855/image/full.9d828fde17a4.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/7855/image/thumb.4ccc2a3f4a85.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:tunel|odstep",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 42147,
+                    "external_id": "7855",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 42188,
+                    "external_id": "7855",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        }
+    ]
+}

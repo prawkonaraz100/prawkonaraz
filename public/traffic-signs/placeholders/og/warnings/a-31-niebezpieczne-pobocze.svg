@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">A-31 Niebezpieczne pobocze</title>
+  <desc id="desc">Grafika Open Graph dla znaku A-31 Niebezpieczne pobocze</desc>
+  <rect width="1200" height="630" fill="#fff7ed"/>
+  <rect x="48" y="48" width="1104" height="534" rx="30" fill="#ffffff" stroke="#ea580c" stroke-width="16"/>
+  <polygon points="280,110 495,472 65,472" fill="#ffffff" stroke="#d32f2f" stroke-width="28"/>
+  <polygon points="280,162 452,448 108,448" fill="#fef2f2"/>
+  <text x="280" y="365" text-anchor="middle" font-size="118" font-family="Arial, Helvetica, sans-serif" font-weight="700" fill="#0f172a">A-31</text>
+  <text x="560" y="154" font-size="30" font-family="Arial, Helvetica, sans-serif" font-weight="700" fill="#c2410c">Znaki ostrzegawcze</text>
+  <foreignObject x="560" y="206" width="500" height="160">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: Arial, Helvetica, sans-serif; font-size: 52px; line-height: 1.14; color: #0f172a; font-weight: 700;">Niebezpieczne pobocze</div>
+  </foreignObject>
+  <foreignObject x="560" y="404" width="500" height="96">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: Arial, Helvetica, sans-serif; font-size: 24px; line-height: 1.35; color: #475569;">A-31 NIEBEZPIECZNE POBOCZE</div>
+  </foreignObject>
+  <text x="560" y="542" font-size="24" font-family="Arial, Helvetica, sans-serif" fill="#64748b">Asset wygenerowany do publicznego rolloutu warning clusteru</text>
+</svg>

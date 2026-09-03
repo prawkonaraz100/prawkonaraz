@@ -1,0 +1,2915 @@
+{
+  "generated_at": "2026-04-15T00:28:57.027305+00:00",
+  "workflow": "pj360_exact_membership",
+  "category": "B1",
+  "scope": "active_ready",
+  "membership_path": "output\\analysis\\pj360-exact-topic-membership\\exact-topic-membership-all.json",
+  "membership_questions_count": 1472,
+  "local_questions_count": 1424,
+  "exported_overrides_count": 0,
+  "unresolved_count": 115,
+  "overrides": [],
+  "unresolved": [
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaki-ostrzegawcze",
+        "topic_label": "Znaki ostrzegawcze",
+        "topic_key": "warning_signs",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 2,
+        "internal_question_id": "2094",
+        "prompt": "Czy w przedstawionej sytuacji jesteś ostrzegany o wyznaczonym na drodze przejściu dla pieszych?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/3587.jpg",
+        "target_topic_key": "warning_signs",
+        "target_topic_label": "Znaki ostrzegawcze",
+        "target_topic_slug": "znaki-ostrzegawcze"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaki-ostrzegawcze",
+        "topic_label": "Znaki ostrzegawcze",
+        "topic_key": "warning_signs",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 7,
+        "internal_question_id": "2148",
+        "prompt": "Czy ten znak ostrzega o możliwości poślizgu pojazdu spowodowanego zawilgoceniem jezdni?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/3347.jpg",
+        "target_topic_key": "warning_signs",
+        "target_topic_label": "Znaki ostrzegawcze",
+        "target_topic_slug": "znaki-ostrzegawcze"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaki-ostrzegawcze",
+        "topic_label": "Znaki ostrzegawcze",
+        "topic_key": "warning_signs",
+        "bucket": "Pytania podstawowe",
+        "page": 2,
+        "position_on_page": 8,
+        "internal_question_id": "3133",
+        "prompt": "Czy w przedstawionej sytuacji jesteś ostrzegany o możliwości napotkania na drodze dzikich zwierząt?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/3133.mp4",
+        "target_topic_key": "warning_signs",
+        "target_topic_label": "Znaki ostrzegawcze",
+        "target_topic_slug": "znaki-ostrzegawcze"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaki-ostrzegawcze",
+        "topic_label": "Znaki ostrzegawcze",
+        "topic_key": "warning_signs",
+        "bucket": "Pytania podstawowe",
+        "page": 5,
+        "position_on_page": 2,
+        "internal_question_id": "3586",
+        "prompt": "Czy w przedstawionej sytuacji jesteś ostrzegany o możliwości napotkania na drodze zwierząt gospodarskich?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/3586.jpg",
+        "target_topic_key": "warning_signs",
+        "target_topic_label": "Znaki ostrzegawcze",
+        "target_topic_slug": "znaki-ostrzegawcze"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaki-ostrzegawcze",
+        "topic_label": "Znaki ostrzegawcze",
+        "topic_key": "warning_signs",
+        "bucket": "Pytania podstawowe",
+        "page": 6,
+        "position_on_page": 7,
+        "internal_question_id": "3623",
+        "prompt": "Czy w tej sytuacji jesteś ostrzegany o zbliżaniu się do znacznego wzniesienia drogi?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/3623.mp4",
+        "target_topic_key": "warning_signs",
+        "target_topic_label": "Znaki ostrzegawcze",
+        "target_topic_slug": "znaki-ostrzegawcze"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaki-zakazu-nakazu",
+        "topic_label": "Znaki zakazu, nakazu",
+        "topic_key": "prohibition_and_mandatory_signs",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 2,
+        "internal_question_id": "2295",
+        "prompt": "Czy możesz wjechać na zwężony odcinek jezdni jeśli utrudni to ruch pojazdu jadącego z przeciwka?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2295.mp4",
+        "target_topic_key": "prohibition_and_mandatory_signs",
+        "target_topic_label": "Znaki zakazu, nakazu",
+        "target_topic_slug": "znaki-zakazu-nakazu"
+      }
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaki-informacyjne-kierunku-i-miejscowosci-uzupelniajace",
+        "topic_label": "Znaki informacyjne, kierunku i miejscowości, uzupełniające",
+        "topic_key": "informational_direction_and_supplementary_signs",
+        "bucket": "Pytania podstawowe",
+        "page": 2,
+        "position_on_page": 5,
+        "internal_question_id": "3241",
+        "prompt": "Czy w tej sytuacji masz obowiązek zmienić obecnie zajmowany pas ruchu?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/3241.mp4",
+        "target_topic_key": "informational_direction_and_supplementary_signs",
+        "target_topic_label": "Znaki informacyjne, kierunku i miejscowości, uzupełniające",
+        "target_topic_slug": "znaki-informacyjne-kierunku-i-miejscowosci-uzupelniajace"
+      },
+      "candidate_question_ids": [
+        39478,
+        39476
+      ]
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaki-informacyjne-kierunku-i-miejscowosci-uzupelniajace",
+        "topic_label": "Znaki informacyjne, kierunku i miejscowości, uzupełniające",
+        "topic_key": "informational_direction_and_supplementary_signs",
+        "bucket": "Pytania podstawowe",
+        "page": 2,
+        "position_on_page": 10,
+        "internal_question_id": "3281",
+        "prompt": "Czy ten znak informuje o przejściu dla pieszych, po którym mogą przejeżdżać rowerzyści?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/2628.jpg",
+        "target_topic_key": "informational_direction_and_supplementary_signs",
+        "target_topic_label": "Znaki informacyjne, kierunku i miejscowości, uzupełniające",
+        "target_topic_slug": "znaki-informacyjne-kierunku-i-miejscowosci-uzupelniajace"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaki-informacyjne-kierunku-i-miejscowosci-uzupelniajace",
+        "topic_label": "Znaki informacyjne, kierunku i miejscowości, uzupełniające",
+        "topic_key": "informational_direction_and_supplementary_signs",
+        "bucket": "Pytania podstawowe",
+        "page": 4,
+        "position_on_page": 10,
+        "internal_question_id": "12500",
+        "prompt": "Czy ten znak drogowy wyznacza miejsce zatrzymania się przed przejazdem kolejowym podczas przejazdu pociągu?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/12500.mp4",
+        "target_topic_key": "informational_direction_and_supplementary_signs",
+        "target_topic_label": "Znaki informacyjne, kierunku i miejscowości, uzupełniające",
+        "target_topic_slug": "znaki-informacyjne-kierunku-i-miejscowosci-uzupelniajace"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaki-drogowe-poziome",
+        "topic_label": "Znaki drogowe poziome",
+        "topic_key": "road_markings",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 3,
+        "internal_question_id": "2061",
+        "prompt": "Czy na widocznym po lewej stronie znaku poziomym między pasami ruchu możesz zatrzymać pojazd?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/2061.jpg",
+        "target_topic_key": "road_markings",
+        "target_topic_label": "Znaki drogowe poziome",
+        "target_topic_slug": "znaki-drogowe-poziome"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaki-drogowe-poziome",
+        "topic_label": "Znaki drogowe poziome",
+        "topic_key": "road_markings",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 5,
+        "internal_question_id": "2063",
+        "prompt": "Czy na znaku poziomym po lewej stronie za przejściem dla pieszych możesz zatrzymać pojazd?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/2063.jpg",
+        "target_topic_key": "road_markings",
+        "target_topic_label": "Znaki drogowe poziome",
+        "target_topic_slug": "znaki-drogowe-poziome"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaki-drogowe-poziome",
+        "topic_label": "Znaki drogowe poziome",
+        "topic_key": "road_markings",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 8,
+        "internal_question_id": "2158",
+        "prompt": "Czy z tego pasa ruchu możesz skręcić w lewo na skrzyżowaniu?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2158.mp4",
+        "target_topic_key": "road_markings",
+        "target_topic_label": "Znaki drogowe poziome",
+        "target_topic_slug": "znaki-drogowe-poziome"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaki-drogowe-poziome",
+        "topic_label": "Znaki drogowe poziome",
+        "topic_key": "road_markings",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 10,
+        "internal_question_id": "2378",
+        "prompt": "Czy w tej sytuacji możesz wjechać na przejazd bez zatrzymania?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2378.mp4",
+        "target_topic_key": "road_markings",
+        "target_topic_label": "Znaki drogowe poziome",
+        "target_topic_slug": "znaki-drogowe-poziome"
+      }
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaki-drogowe-poziome",
+        "topic_label": "Znaki drogowe poziome",
+        "topic_key": "road_markings",
+        "bucket": "Pytania podstawowe",
+        "page": 2,
+        "position_on_page": 7,
+        "internal_question_id": "2578",
+        "prompt": "Czy na tym odcinku drogi wolno Ci rozpocząć wyprzedzanie pojazdu?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2578.mp4",
+        "target_topic_key": "road_markings",
+        "target_topic_label": "Znaki drogowe poziome",
+        "target_topic_slug": "znaki-drogowe-poziome"
+      },
+      "candidate_question_ids": [
+        39488,
+        39487
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaki-drogowe-poziome",
+        "topic_label": "Znaki drogowe poziome",
+        "topic_key": "road_markings",
+        "bucket": "Pytania podstawowe",
+        "page": 5,
+        "position_on_page": 7,
+        "internal_question_id": "3243",
+        "prompt": "Czy w tej sytuacji masz obowiązek zmienić obecnie zajmowany pas ruchu?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/3243.mp4",
+        "target_topic_key": "road_markings",
+        "target_topic_label": "Znaki drogowe poziome",
+        "target_topic_slug": "znaki-drogowe-poziome"
+      },
+      "candidate_question_ids": [
+        39478,
+        39476
+      ]
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaki-drogowe-poziome",
+        "topic_label": "Znaki drogowe poziome",
+        "topic_key": "road_markings",
+        "bucket": "Pytania podstawowe",
+        "page": 6,
+        "position_on_page": 5,
+        "internal_question_id": "3356",
+        "prompt": "Czy widoczny na jezdni znak - linia łamana - wyznacza miejsce parkingowe dla niepełnosprawnych?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/2822.jpg",
+        "target_topic_key": "road_markings",
+        "target_topic_label": "Znaki drogowe poziome",
+        "target_topic_slug": "znaki-drogowe-poziome"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaki-drogowe-poziome",
+        "topic_label": "Znaki drogowe poziome",
+        "topic_key": "road_markings",
+        "bucket": "Pytania podstawowe",
+        "page": 9,
+        "position_on_page": 2,
+        "internal_question_id": "3684",
+        "prompt": "Czy ten znak poziomy oznacza obszar wyłączony z ruchu?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/3684.jpg",
+        "target_topic_key": "road_markings",
+        "target_topic_label": "Znaki drogowe poziome",
+        "target_topic_slug": "znaki-drogowe-poziome"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "sygnaly-swietlne-sygnaly-dawane-przez-kierujacego-ruchem",
+        "topic_label": "Sygnały świetlne, sygnały dawane przez kierującego ruchem",
+        "topic_key": "traffic_lights_and_controller_signals",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 8,
+        "internal_question_id": "2627",
+        "prompt": "Czy widząc taką postawę policjanta kierującego ruchem możesz wjechać na skrzyżowanie?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/2627.jpg",
+        "target_topic_key": "traffic_lights_and_controller_signals",
+        "target_topic_label": "Sygnały świetlne, sygnały dawane przez kierującego ruchem",
+        "target_topic_slug": "sygnaly-swietlne-sygnaly-dawane-przez-kierujacego-ruchem"
+      }
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "sygnaly-swietlne-sygnaly-dawane-przez-kierujacego-ruchem",
+        "topic_label": "Sygnały świetlne, sygnały dawane przez kierującego ruchem",
+        "topic_key": "traffic_lights_and_controller_signals",
+        "bucket": "Pytania podstawowe",
+        "page": 7,
+        "position_on_page": 6,
+        "internal_question_id": "3719",
+        "prompt": "Czy w tej sytuacji wolno Ci zawrócić na widocznym skrzyżowaniu?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/3719.jpg",
+        "target_topic_key": "traffic_lights_and_controller_signals",
+        "target_topic_label": "Sygnały świetlne, sygnały dawane przez kierującego ruchem",
+        "target_topic_slug": "sygnaly-swietlne-sygnaly-dawane-przez-kierujacego-ruchem"
+      },
+      "candidate_question_ids": [
+        24835,
+        22158
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "sygnaly-swietlne-sygnaly-dawane-przez-kierujacego-ruchem",
+        "topic_label": "Sygnały świetlne, sygnały dawane przez kierującego ruchem",
+        "topic_key": "traffic_lights_and_controller_signals",
+        "bucket": "Pytania podstawowe",
+        "page": 7,
+        "position_on_page": 9,
+        "internal_question_id": "6180",
+        "prompt": "Czy w przedstawionej sytuacji wolno Ci skręcić w prawo?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/6180.jpg",
+        "target_topic_key": "traffic_lights_and_controller_signals",
+        "target_topic_label": "Sygnały świetlne, sygnały dawane przez kierującego ruchem",
+        "target_topic_slug": "sygnaly-swietlne-sygnaly-dawane-przez-kierujacego-ruchem"
+      },
+      "candidate_question_ids": [
+        22190,
+        20722,
+        22189
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "sygnaly-swietlne-sygnaly-dawane-przez-kierujacego-ruchem",
+        "topic_label": "Sygnały świetlne, sygnały dawane przez kierującego ruchem",
+        "topic_key": "traffic_lights_and_controller_signals",
+        "bucket": "Pytania podstawowe",
+        "page": 8,
+        "position_on_page": 4,
+        "internal_question_id": "12627",
+        "prompt": "Czy w tej sytuacji możesz kontynuować jazdę?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/12627.mp4",
+        "target_topic_key": "traffic_lights_and_controller_signals",
+        "target_topic_label": "Sygnały świetlne, sygnały dawane przez kierującego ruchem",
+        "target_topic_slug": "sygnaly-swietlne-sygnaly-dawane-przez-kierujacego-ruchem"
+      },
+      "candidate_question_ids": [
+        46929,
+        46915,
+        46931
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "wlaczanie-sie-do-ruchu-skrzyzowania-rownorzedne",
+        "topic_label": "Włączanie się do ruchu, skrzyżowania równorzędne",
+        "topic_key": "joining_traffic_and_equal_intersections",
+        "bucket": "Pytania podstawowe",
+        "page": 3,
+        "position_on_page": 6,
+        "internal_question_id": "2867",
+        "prompt": "Zamierzasz jechać na wprost. Czy masz obowiązek ustąpić pierwszeństwa pojazdowi nadjeżdżającemu z prawej strony?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2867.mp4",
+        "target_topic_key": "joining_traffic_and_equal_intersections",
+        "target_topic_label": "Włączanie się do ruchu, skrzyżowania równorzędne",
+        "target_topic_slug": "wlaczanie-sie-do-ruchu-skrzyzowania-rownorzedne"
+      },
+      "candidate_question_ids": [
+        28047,
+        28045,
+        18793,
+        26598,
+        20710
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "wlaczanie-sie-do-ruchu-skrzyzowania-rownorzedne",
+        "topic_label": "Włączanie się do ruchu, skrzyżowania równorzędne",
+        "topic_key": "joining_traffic_and_equal_intersections",
+        "bucket": "Pytania podstawowe",
+        "page": 4,
+        "position_on_page": 6,
+        "internal_question_id": "2933",
+        "prompt": "Zamierzasz skręcić w lewo. Czy masz pierwszeństwo przed pojazdem nadjeżdżającym z lewej strony?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2933.mp4",
+        "target_topic_key": "joining_traffic_and_equal_intersections",
+        "target_topic_label": "Włączanie się do ruchu, skrzyżowania równorzędne",
+        "target_topic_slug": "wlaczanie-sie-do-ruchu-skrzyzowania-rownorzedne"
+      },
+      "candidate_question_ids": [
+        46117,
+        41081,
+        28034,
+        24848,
+        24846
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "wlaczanie-sie-do-ruchu-skrzyzowania-rownorzedne",
+        "topic_label": "Włączanie się do ruchu, skrzyżowania równorzędne",
+        "topic_key": "joining_traffic_and_equal_intersections",
+        "bucket": "Pytania podstawowe",
+        "page": 4,
+        "position_on_page": 7,
+        "internal_question_id": "2935",
+        "prompt": "Zamierzasz skręcić w lewo. Czy masz pierwszeństwo przed pojazdem nadjeżdżającym z lewej strony?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2935.mp4",
+        "target_topic_key": "joining_traffic_and_equal_intersections",
+        "target_topic_label": "Włączanie się do ruchu, skrzyżowania równorzędne",
+        "target_topic_slug": "wlaczanie-sie-do-ruchu-skrzyzowania-rownorzedne"
+      },
+      "candidate_question_ids": [
+        46117,
+        41081,
+        28034,
+        24848,
+        24846
+      ]
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "wlaczanie-sie-do-ruchu-skrzyzowania-rownorzedne",
+        "topic_label": "Włączanie się do ruchu, skrzyżowania równorzędne",
+        "topic_key": "joining_traffic_and_equal_intersections",
+        "bucket": "Pytania podstawowe",
+        "page": 4,
+        "position_on_page": 10,
+        "internal_question_id": "3005",
+        "prompt": "Czy w tej sytuacji przy wjeżdżaniu na jezdnię należy zachować szczególną ostrożność?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/3005.mp4",
+        "target_topic_key": "joining_traffic_and_equal_intersections",
+        "target_topic_label": "Włączanie się do ruchu, skrzyżowania równorzędne",
+        "target_topic_slug": "wlaczanie-sie-do-ruchu-skrzyzowania-rownorzedne"
+      }
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "wlaczanie-sie-do-ruchu-skrzyzowania-rownorzedne",
+        "topic_label": "Włączanie się do ruchu, skrzyżowania równorzędne",
+        "topic_key": "joining_traffic_and_equal_intersections",
+        "bucket": "Pytania podstawowe",
+        "page": 6,
+        "position_on_page": 1,
+        "internal_question_id": "3116",
+        "prompt": "Czy w tej sytuacji, jadąc na wprost, masz pierwszeństwo przed pojazdem nadjeżdżającym z prawej strony?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/3116.mp4",
+        "target_topic_key": "joining_traffic_and_equal_intersections",
+        "target_topic_label": "Włączanie się do ruchu, skrzyżowania równorzędne",
+        "target_topic_slug": "wlaczanie-sie-do-ruchu-skrzyzowania-rownorzedne"
+      },
+      "candidate_question_ids": [
+        32266,
+        32265,
+        18833
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "wlaczanie-sie-do-ruchu-skrzyzowania-rownorzedne",
+        "topic_label": "Włączanie się do ruchu, skrzyżowania równorzędne",
+        "topic_key": "joining_traffic_and_equal_intersections",
+        "bucket": "Pytania podstawowe",
+        "page": 6,
+        "position_on_page": 7,
+        "internal_question_id": "5749",
+        "prompt": "Czy w tej sytuacji masz pierwszeństwo przed pojazdem nadjeżdżającym z prawej strony?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/5749.mp4",
+        "target_topic_key": "joining_traffic_and_equal_intersections",
+        "target_topic_label": "Włączanie się do ruchu, skrzyżowania równorzędne",
+        "target_topic_slug": "wlaczanie-sie-do-ruchu-skrzyzowania-rownorzedne"
+      },
+      "candidate_question_ids": [
+        39513,
+        32261
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "wlaczanie-sie-do-ruchu-skrzyzowania-rownorzedne",
+        "topic_label": "Włączanie się do ruchu, skrzyżowania równorzędne",
+        "topic_key": "joining_traffic_and_equal_intersections",
+        "bucket": "Pytania podstawowe",
+        "page": 6,
+        "position_on_page": 8,
+        "internal_question_id": "6103",
+        "prompt": "Zamierzasz jechać na wprost. Czy masz pierwszeństwo przed pojazdem nadjeżdżającym z prawej strony?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/6103.mp4",
+        "target_topic_key": "joining_traffic_and_equal_intersections",
+        "target_topic_label": "Włączanie się do ruchu, skrzyżowania równorzędne",
+        "target_topic_slug": "wlaczanie-sie-do-ruchu-skrzyzowania-rownorzedne"
+      },
+      "candidate_question_ids": [
+        28662,
+        26638,
+        24847
+      ]
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu",
+        "topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "topic_key": "intersections_with_priority_signs",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 4,
+        "internal_question_id": "2220",
+        "prompt": "Skręcasz w lewo. Czy masz obowiązek ustąpić pierwszeństwa pojazdowi nadjeżdżającemu z prawej strony?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2220.mp4",
+        "target_topic_key": "intersections_with_priority_signs",
+        "target_topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "target_topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu"
+      }
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu",
+        "topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "topic_key": "intersections_with_priority_signs",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 7,
+        "internal_question_id": "2277",
+        "prompt": "Zamierzasz jechać na wprost. Czy masz pierwszeństwo przed pojazdem nadjeżdżającym z prawej strony?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2277.mp4",
+        "target_topic_key": "intersections_with_priority_signs",
+        "target_topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "target_topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu"
+      },
+      "candidate_question_ids": [
+        28662,
+        26638,
+        24847
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu",
+        "topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "topic_key": "intersections_with_priority_signs",
+        "bucket": "Pytania podstawowe",
+        "page": 8,
+        "position_on_page": 5,
+        "internal_question_id": "6048",
+        "prompt": "Zamierzasz jechać na wprost. Czy masz pierwszeństwo przed pojazdem nadjeżdżającym z prawej strony?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/6048.mp4",
+        "target_topic_key": "intersections_with_priority_signs",
+        "target_topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "target_topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu"
+      },
+      "candidate_question_ids": [
+        28662,
+        26638,
+        24847
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu",
+        "topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "topic_key": "intersections_with_priority_signs",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 9,
+        "internal_question_id": "2317",
+        "prompt": "Czy w tej sytuacji masz pierwszeństwo przed pojazdem nadjeżdżającym z prawej strony?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2317.mp4",
+        "target_topic_key": "intersections_with_priority_signs",
+        "target_topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "target_topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu"
+      },
+      "candidate_question_ids": [
+        39513,
+        32261
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu",
+        "topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "topic_key": "intersections_with_priority_signs",
+        "bucket": "Pytania podstawowe",
+        "page": 2,
+        "position_on_page": 2,
+        "internal_question_id": "2320",
+        "prompt": "Czy w tej sytuacji jadąc na wprost masz pierwszeństwo przed pojazdem nadjeżdżającym z prawej strony?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2320.mp4",
+        "target_topic_key": "intersections_with_priority_signs",
+        "target_topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "target_topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu"
+      },
+      "candidate_question_ids": [
+        32266,
+        32265,
+        18833
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu",
+        "topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "topic_key": "intersections_with_priority_signs",
+        "bucket": "Pytania podstawowe",
+        "page": 2,
+        "position_on_page": 3,
+        "internal_question_id": "2321",
+        "prompt": "Czy w tej sytuacji jadąc na wprost masz pierwszeństwo przed pojazdem nadjeżdżającym z prawej strony?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2321.mp4",
+        "target_topic_key": "intersections_with_priority_signs",
+        "target_topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "target_topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu"
+      },
+      "candidate_question_ids": [
+        32266,
+        32265,
+        18833
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu",
+        "topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "topic_key": "intersections_with_priority_signs",
+        "bucket": "Pytania podstawowe",
+        "page": 2,
+        "position_on_page": 6,
+        "internal_question_id": "2561",
+        "prompt": "Zamierzasz skręcić w lewo. Czy masz pierwszeństwo przed pojazdem nadjeżdżającym z lewej strony?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2561.mp4",
+        "target_topic_key": "intersections_with_priority_signs",
+        "target_topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "target_topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu"
+      },
+      "candidate_question_ids": [
+        46117,
+        41081,
+        28034,
+        24848,
+        24846
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu",
+        "topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "topic_key": "intersections_with_priority_signs",
+        "bucket": "Pytania podstawowe",
+        "page": 5,
+        "position_on_page": 7,
+        "internal_question_id": "2874",
+        "prompt": "Zamierzasz skręcić w lewo. Czy masz pierwszeństwo przed pojazdem nadjeżdżającym z lewej strony?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2874.mp4",
+        "target_topic_key": "intersections_with_priority_signs",
+        "target_topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "target_topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu"
+      },
+      "candidate_question_ids": [
+        46117,
+        41081,
+        28034,
+        24848,
+        24846
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu",
+        "topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "topic_key": "intersections_with_priority_signs",
+        "bucket": "Pytania podstawowe",
+        "page": 8,
+        "position_on_page": 10,
+        "internal_question_id": "12493",
+        "prompt": "Zamierzasz skręcić w lewo. Czy masz pierwszeństwo przed pojazdem nadjeżdżającym z lewej strony?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/12493.mp4",
+        "target_topic_key": "intersections_with_priority_signs",
+        "target_topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "target_topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu"
+      },
+      "candidate_question_ids": [
+        46117,
+        41081,
+        28034,
+        24848,
+        24846
+      ]
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu",
+        "topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "topic_key": "intersections_with_priority_signs",
+        "bucket": "Pytania podstawowe",
+        "page": 4,
+        "position_on_page": 9,
+        "internal_question_id": "2858",
+        "prompt": "Zamierzasz skręcić w lewo, a kierujący motocyklem zamierza jechać na wprost. Czy masz obowiązek ustąpić mu pierwszeństwa?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2858.mp4",
+        "target_topic_key": "intersections_with_priority_signs",
+        "target_topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "target_topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu"
+      }
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu",
+        "topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "topic_key": "intersections_with_priority_signs",
+        "bucket": "Pytania podstawowe",
+        "page": 5,
+        "position_on_page": 6,
+        "internal_question_id": "2866",
+        "prompt": "Zamierzasz jechać na wprost. Czy masz obowiązek ustąpić pierwszeństwa pojazdowi nadjeżdżającemu z prawej strony?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2866.mp4",
+        "target_topic_key": "intersections_with_priority_signs",
+        "target_topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "target_topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu"
+      },
+      "candidate_question_ids": [
+        28047,
+        28045,
+        18793,
+        26598,
+        20710
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu",
+        "topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "topic_key": "intersections_with_priority_signs",
+        "bucket": "Pytania podstawowe",
+        "page": 7,
+        "position_on_page": 3,
+        "internal_question_id": "3140",
+        "prompt": "Zamierzasz jechać na wprost. Czy masz obowiązek ustąpić pierwszeństwa pojazdowi nadjeżdżającemu z prawej strony?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/3140.mp4",
+        "target_topic_key": "intersections_with_priority_signs",
+        "target_topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "target_topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu"
+      },
+      "candidate_question_ids": [
+        28047,
+        28045,
+        18793,
+        26598,
+        20710
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu",
+        "topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "topic_key": "intersections_with_priority_signs",
+        "bucket": "Pytania podstawowe",
+        "page": 6,
+        "position_on_page": 7,
+        "internal_question_id": "3101",
+        "prompt": "Zamierzasz jechać na wprost. Czy masz obowiązek ustąpić pierwszeństwa pojazdowi nadjeżdżającemu z prawej strony?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/3101.mp4",
+        "target_topic_key": "intersections_with_priority_signs",
+        "target_topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "target_topic_slug": "skrzyzowania-ze-znakami-okreslajacymi-pierwszenstwo-przejazdu"
+      },
+      "candidate_question_ids": [
+        26598,
+        20710,
+        28047,
+        28045,
+        18793
+      ]
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "skrzyzowania-z-sygnalizacja-swietlna",
+        "topic_label": "Skrzyżowania z sygnalizacją świetlną",
+        "topic_key": "intersections_with_traffic_lights",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 3,
+        "internal_question_id": "2291",
+        "prompt": "Czy w przedstawionej sytuacji wolno Ci przejechać przez skrzyżowanie bez potrzeby rozstrzygania kto ma pierwszeństwo przejazdu?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2291.mp4",
+        "target_topic_key": "intersections_with_traffic_lights",
+        "target_topic_label": "Skrzyżowania z sygnalizacją świetlną",
+        "target_topic_slug": "skrzyzowania-z-sygnalizacja-swietlna"
+      }
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "skrzyzowania-z-sygnalizacja-swietlna",
+        "topic_label": "Skrzyżowania z sygnalizacją świetlną",
+        "topic_key": "intersections_with_traffic_lights",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 10,
+        "internal_question_id": "2625",
+        "prompt": "Czy w tej sytuacji wolno Ci zawrócić na skrzyżowaniu?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2299.mp4",
+        "target_topic_key": "intersections_with_traffic_lights",
+        "target_topic_label": "Skrzyżowania z sygnalizacją świetlną",
+        "target_topic_slug": "skrzyzowania-z-sygnalizacja-swietlna"
+      },
+      "candidate_question_ids": [
+        41088,
+        37512,
+        41087,
+        32240
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "skrzyzowania-z-sygnalizacja-swietlna",
+        "topic_label": "Skrzyżowania z sygnalizacją świetlną",
+        "topic_key": "intersections_with_traffic_lights",
+        "bucket": "Pytania podstawowe",
+        "page": 2,
+        "position_on_page": 7,
+        "internal_question_id": "2892",
+        "prompt": "Czy w tej sytuacji masz obowiązek ustąpić pierwszeństwa tramwajowi?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2892.mp4",
+        "target_topic_key": "intersections_with_traffic_lights",
+        "target_topic_label": "Skrzyżowania z sygnalizacją świetlną",
+        "target_topic_slug": "skrzyzowania-z-sygnalizacja-swietlna"
+      },
+      "candidate_question_ids": [
+        37524,
+        26612
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "skrzyzowania-z-sygnalizacja-swietlna",
+        "topic_label": "Skrzyżowania z sygnalizacją świetlną",
+        "topic_key": "intersections_with_traffic_lights",
+        "bucket": "Pytania podstawowe",
+        "page": 3,
+        "position_on_page": 8,
+        "internal_question_id": "3226",
+        "prompt": "Czy w tej sytuacji wolno Ci skręcić w prawo bez zatrzymania się?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/3226.mp4",
+        "target_topic_key": "intersections_with_traffic_lights",
+        "target_topic_label": "Skrzyżowania z sygnalizacją świetlną",
+        "target_topic_slug": "skrzyzowania-z-sygnalizacja-swietlna"
+      },
+      "candidate_question_ids": [
+        39501,
+        39458
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "skrzyzowania-z-sygnalizacja-swietlna",
+        "topic_label": "Skrzyżowania z sygnalizacją świetlną",
+        "topic_key": "intersections_with_traffic_lights",
+        "bucket": "Pytania podstawowe",
+        "page": 4,
+        "position_on_page": 8,
+        "internal_question_id": "3426",
+        "prompt": "Zamierzasz jechać na wprost. Czy masz obowiązek ustąpić pierwszeństwa pojazdowi nadjeżdżającemu z prawej strony?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/3426.mp4",
+        "target_topic_key": "intersections_with_traffic_lights",
+        "target_topic_label": "Skrzyżowania z sygnalizacją świetlną",
+        "target_topic_slug": "skrzyzowania-z-sygnalizacja-swietlna"
+      },
+      "candidate_question_ids": [
+        26598,
+        20710,
+        28047,
+        28045,
+        18793
+      ]
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "skrzyzowania-z-sygnalizacja-swietlna",
+        "topic_label": "Skrzyżowania z sygnalizacją świetlną",
+        "topic_key": "intersections_with_traffic_lights",
+        "bucket": "Pytania podstawowe",
+        "page": 5,
+        "position_on_page": 3,
+        "internal_question_id": "12561",
+        "prompt": "Czy w tej sytuacji, nie widząc innych uczestników ruchu drogowego, jesteś zwolniony z obowiązku zachowania szczególnej ostrożności?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/12561.mp4",
+        "target_topic_key": "intersections_with_traffic_lights",
+        "target_topic_label": "Skrzyżowania z sygnalizacją świetlną",
+        "target_topic_slug": "skrzyzowania-z-sygnalizacja-swietlna"
+      }
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "skrzyzowania-lub-przejscia-dla-pieszych-z-kierujacym-ruchem-miejsca-przystankow-komunikacji-publicznej",
+        "topic_label": "Skrzyżowania lub przejścia dla pieszych z kierującym ruchem, miejsca przystanków komunikacji publicz...",
+        "topic_key": "controlled_crossings_and_public_transport_stops",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 10,
+        "internal_question_id": "3056",
+        "prompt": "Czy w tej sytuacji masz prawo kontynuować jazdę bez zwracania uwagi na zachowanie pieszego?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2624.mp4",
+        "target_topic_key": "controlled_crossings_and_public_transport_stops",
+        "target_topic_label": "Skrzyżowania lub przejścia dla pieszych z kierującym ruchem, miejsca przystanków komunikacji publicz...",
+        "target_topic_slug": "skrzyzowania-lub-przejscia-dla-pieszych-z-kierujacym-ruchem-miejsca-przystankow-komunikacji-publicznej"
+      },
+      "candidate_question_ids": [
+        29382,
+        20774
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "skrzyzowania-lub-przejscia-dla-pieszych-z-kierujacym-ruchem-miejsca-przystankow-komunikacji-publicznej",
+        "topic_label": "Skrzyżowania lub przejścia dla pieszych z kierującym ruchem, miejsca przystanków komunikacji publicz...",
+        "topic_key": "controlled_crossings_and_public_transport_stops",
+        "bucket": "Pytania podstawowe",
+        "page": 2,
+        "position_on_page": 3,
+        "internal_question_id": "3172",
+        "prompt": "Czy w tej sytuacji masz obowiązek zatrzymać pojazd?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/3172.mp4",
+        "target_topic_key": "controlled_crossings_and_public_transport_stops",
+        "target_topic_label": "Skrzyżowania lub przejścia dla pieszych z kierującym ruchem, miejsca przystanków komunikacji publicz...",
+        "target_topic_slug": "skrzyzowania-lub-przejscia-dla-pieszych-z-kierujacym-ruchem-miejsca-przystankow-komunikacji-publicznej"
+      },
+      "candidate_question_ids": [
+        46914,
+        23471,
+        23470,
+        23439,
+        23430
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "skrzyzowania-lub-przejscia-dla-pieszych-z-kierujacym-ruchem-miejsca-przystankow-komunikacji-publicznej",
+        "topic_label": "Skrzyżowania lub przejścia dla pieszych z kierującym ruchem, miejsca przystanków komunikacji publicz...",
+        "topic_key": "controlled_crossings_and_public_transport_stops",
+        "bucket": "Pytania podstawowe",
+        "page": 2,
+        "position_on_page": 4,
+        "internal_question_id": "3173",
+        "prompt": "Czy w tej sytuacji masz obowiązek zatrzymać pojazd?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/3173.mp4",
+        "target_topic_key": "controlled_crossings_and_public_transport_stops",
+        "target_topic_label": "Skrzyżowania lub przejścia dla pieszych z kierującym ruchem, miejsca przystanków komunikacji publicz...",
+        "target_topic_slug": "skrzyzowania-lub-przejscia-dla-pieszych-z-kierujacym-ruchem-miejsca-przystankow-komunikacji-publicznej"
+      },
+      "candidate_question_ids": [
+        46914,
+        23471,
+        23470,
+        23439,
+        23430
+      ]
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "pozycja-pojazdu-na-drodze-wjazd-i-zjazd-ze-skrzyzowania-zatrzymanie-i-postoj",
+        "topic_label": "Pozycja pojazdu na drodze, wjazd i zjazd ze skrzyżowania, zatrzymanie i postój",
+        "topic_key": "road_position_entry_exit_stopping",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 3,
+        "internal_question_id": "2153",
+        "prompt": "Czy postój pojazdu na moście jest zabroniony?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/2686.jpg",
+        "target_topic_key": "road_position_entry_exit_stopping",
+        "target_topic_label": "Pozycja pojazdu na drodze, wjazd i zjazd ze skrzyżowania, zatrzymanie i postój",
+        "target_topic_slug": "pozycja-pojazdu-na-drodze-wjazd-i-zjazd-ze-skrzyzowania-zatrzymanie-i-postoj"
+      }
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "pozycja-pojazdu-na-drodze-wjazd-i-zjazd-ze-skrzyzowania-zatrzymanie-i-postoj",
+        "topic_label": "Pozycja pojazdu na drodze, wjazd i zjazd ze skrzyżowania, zatrzymanie i postój",
+        "topic_key": "road_position_entry_exit_stopping",
+        "bucket": "Pytania podstawowe",
+        "page": 2,
+        "position_on_page": 2,
+        "internal_question_id": "2586",
+        "prompt": "Czy w tej sytuacji wolno Ci skręcić w prawo bez zatrzymania się?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2586.mp4",
+        "target_topic_key": "road_position_entry_exit_stopping",
+        "target_topic_label": "Pozycja pojazdu na drodze, wjazd i zjazd ze skrzyżowania, zatrzymanie i postój",
+        "target_topic_slug": "pozycja-pojazdu-na-drodze-wjazd-i-zjazd-ze-skrzyzowania-zatrzymanie-i-postoj"
+      },
+      "candidate_question_ids": [
+        39501,
+        39458
+      ]
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "pozycja-pojazdu-na-drodze-wjazd-i-zjazd-ze-skrzyzowania-zatrzymanie-i-postoj",
+        "topic_label": "Pozycja pojazdu na drodze, wjazd i zjazd ze skrzyżowania, zatrzymanie i postój",
+        "topic_key": "road_position_entry_exit_stopping",
+        "bucket": "Pytania podstawowe",
+        "page": 5,
+        "position_on_page": 9,
+        "internal_question_id": "3540",
+        "prompt": "Czy chcąc wysadzić pasażera, masz prawo zatrzymać pojazd na jezdni w miejscu, w którym się teraz znajdujesz?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/3540.mp4",
+        "target_topic_key": "road_position_entry_exit_stopping",
+        "target_topic_label": "Pozycja pojazdu na drodze, wjazd i zjazd ze skrzyżowania, zatrzymanie i postój",
+        "target_topic_slug": "pozycja-pojazdu-na-drodze-wjazd-i-zjazd-ze-skrzyzowania-zatrzymanie-i-postoj"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "pozycja-pojazdu-na-drodze-wjazd-i-zjazd-ze-skrzyzowania-zatrzymanie-i-postoj",
+        "topic_label": "Pozycja pojazdu na drodze, wjazd i zjazd ze skrzyżowania, zatrzymanie i postój",
+        "topic_key": "road_position_entry_exit_stopping",
+        "bucket": "Pytania podstawowe",
+        "page": 6,
+        "position_on_page": 4,
+        "internal_question_id": "3545",
+        "prompt": "Czy masz prawo zatrzymać pojazd pod wiaduktem, gdy znaki tego nie zabraniają?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/3545.jpg",
+        "target_topic_key": "road_position_entry_exit_stopping",
+        "target_topic_label": "Pozycja pojazdu na drodze, wjazd i zjazd ze skrzyżowania, zatrzymanie i postój",
+        "target_topic_slug": "pozycja-pojazdu-na-drodze-wjazd-i-zjazd-ze-skrzyzowania-zatrzymanie-i-postoj"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "pozycja-pojazdu-na-drodze-wjazd-i-zjazd-ze-skrzyzowania-zatrzymanie-i-postoj",
+        "topic_label": "Pozycja pojazdu na drodze, wjazd i zjazd ze skrzyżowania, zatrzymanie i postój",
+        "topic_key": "road_position_entry_exit_stopping",
+        "bucket": "Pytania podstawowe",
+        "page": 7,
+        "position_on_page": 9,
+        "internal_question_id": "3704",
+        "prompt": "Czy bezpośrednio za widocznym znakiem wolno Ci zatrzymać pojazd, jeśli nie spowoduje to utrudnienia ruchu?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/3704.jpg",
+        "target_topic_key": "road_position_entry_exit_stopping",
+        "target_topic_label": "Pozycja pojazdu na drodze, wjazd i zjazd ze skrzyżowania, zatrzymanie i postój",
+        "target_topic_slug": "pozycja-pojazdu-na-drodze-wjazd-i-zjazd-ze-skrzyzowania-zatrzymanie-i-postoj"
+      }
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "zmiana-pasa-ruchu-zmiana-kierunku-jazdy",
+        "topic_label": "Zmiana pasa ruchu, zmiana kierunku jazdy",
+        "topic_key": "lane_change_and_turning",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 6,
+        "internal_question_id": "2203",
+        "prompt": "Czy w przedstawionej sytuacji wolno Ci skręcić w prawo?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/2203.jpg",
+        "target_topic_key": "lane_change_and_turning",
+        "target_topic_label": "Zmiana pasa ruchu, zmiana kierunku jazdy",
+        "target_topic_slug": "zmiana-pasa-ruchu-zmiana-kierunku-jazdy"
+      },
+      "candidate_question_ids": [
+        22190,
+        20722,
+        22189
+      ]
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "zmiana-pasa-ruchu-zmiana-kierunku-jazdy",
+        "topic_label": "Zmiana pasa ruchu, zmiana kierunku jazdy",
+        "topic_key": "lane_change_and_turning",
+        "bucket": "Pytania podstawowe",
+        "page": 2,
+        "position_on_page": 1,
+        "internal_question_id": "2280",
+        "prompt": "Czy w przedstawionej sytuacji masz obowiązek skręcić wyłącznie w prawo?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/3380.jpg",
+        "target_topic_key": "lane_change_and_turning",
+        "target_topic_label": "Zmiana pasa ruchu, zmiana kierunku jazdy",
+        "target_topic_slug": "zmiana-pasa-ruchu-zmiana-kierunku-jazdy"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "zmiana-pasa-ruchu-zmiana-kierunku-jazdy",
+        "topic_label": "Zmiana pasa ruchu, zmiana kierunku jazdy",
+        "topic_key": "lane_change_and_turning",
+        "bucket": "Pytania podstawowe",
+        "page": 2,
+        "position_on_page": 3,
+        "internal_question_id": "2517",
+        "prompt": "Czy z zajmowanego pasa ruchu wolno Ci skręcić w prawo?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/2517.jpg",
+        "target_topic_key": "lane_change_and_turning",
+        "target_topic_label": "Zmiana pasa ruchu, zmiana kierunku jazdy",
+        "target_topic_slug": "zmiana-pasa-ruchu-zmiana-kierunku-jazdy"
+      }
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "zmiana-pasa-ruchu-zmiana-kierunku-jazdy",
+        "topic_label": "Zmiana pasa ruchu, zmiana kierunku jazdy",
+        "topic_key": "lane_change_and_turning",
+        "bucket": "Pytania podstawowe",
+        "page": 5,
+        "position_on_page": 3,
+        "internal_question_id": "3213",
+        "prompt": "Czy w tej sytuacji wolno Ci zawrócić na skrzyżowaniu?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/3213.mp4",
+        "target_topic_key": "lane_change_and_turning",
+        "target_topic_label": "Zmiana pasa ruchu, zmiana kierunku jazdy",
+        "target_topic_slug": "zmiana-pasa-ruchu-zmiana-kierunku-jazdy"
+      },
+      "candidate_question_ids": [
+        41088,
+        37512,
+        41087,
+        32240
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "zmiana-pasa-ruchu-zmiana-kierunku-jazdy",
+        "topic_label": "Zmiana pasa ruchu, zmiana kierunku jazdy",
+        "topic_key": "lane_change_and_turning",
+        "bucket": "Pytania podstawowe",
+        "page": 8,
+        "position_on_page": 8,
+        "internal_question_id": "3483",
+        "prompt": "Czy w tej sytuacji wolno Ci zawrócić na widocznym skrzyżowaniu?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/3483.jpg",
+        "target_topic_key": "lane_change_and_turning",
+        "target_topic_label": "Zmiana pasa ruchu, zmiana kierunku jazdy",
+        "target_topic_slug": "zmiana-pasa-ruchu-zmiana-kierunku-jazdy"
+      },
+      "candidate_question_ids": [
+        24835,
+        22158
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "wyprzedzanie",
+        "topic_label": "Wyprzedzanie",
+        "topic_key": "overtaking",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 1,
+        "internal_question_id": "2113",
+        "prompt": "Czy w tej sytuacji masz obowiązek zachować szczególną ostrożność?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2113.mp4",
+        "target_topic_key": "overtaking",
+        "target_topic_label": "Wyprzedzanie",
+        "target_topic_slug": "wyprzedzanie"
+      },
+      "candidate_question_ids": [
+        41135,
+        41131,
+        41117,
+        37533,
+        34316
+      ]
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "wyprzedzanie",
+        "topic_label": "Wyprzedzanie",
+        "topic_key": "overtaking",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 6,
+        "internal_question_id": "2249",
+        "prompt": "Czy przy zachowaniu właściwego odstępu wolno Ci wyprzedzić na tym przejeździe widocznych rowerzystów?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2249.mp4",
+        "target_topic_key": "overtaking",
+        "target_topic_label": "Wyprzedzanie",
+        "target_topic_slug": "wyprzedzanie"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "wyprzedzanie",
+        "topic_label": "Wyprzedzanie",
+        "topic_key": "overtaking",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 8,
+        "internal_question_id": "2350",
+        "prompt": "Czy w tej sytuacji możesz wyprzedzić pojazd który rozpoczął manewr wyprzedzania?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2350.mp4",
+        "target_topic_key": "overtaking",
+        "target_topic_label": "Wyprzedzanie",
+        "target_topic_slug": "wyprzedzanie"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "wyprzedzanie",
+        "topic_label": "Wyprzedzanie",
+        "topic_key": "overtaking",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 10,
+        "internal_question_id": "2365",
+        "prompt": "Czy w tej sytuacji podczas wyprzedzania musisz zachować odstęp nie mniejszy niż 1 m?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2650.mp4",
+        "target_topic_key": "overtaking",
+        "target_topic_label": "Wyprzedzanie",
+        "target_topic_slug": "wyprzedzanie"
+      }
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "wyprzedzanie",
+        "topic_label": "Wyprzedzanie",
+        "topic_key": "overtaking",
+        "bucket": "Pytania podstawowe",
+        "page": 2,
+        "position_on_page": 7,
+        "internal_question_id": "2579",
+        "prompt": "Czy na tym odcinku drogi wolno Ci rozpocząć wyprzedzanie pojazdu?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2579.mp4",
+        "target_topic_key": "overtaking",
+        "target_topic_label": "Wyprzedzanie",
+        "target_topic_slug": "wyprzedzanie"
+      },
+      "candidate_question_ids": [
+        39488,
+        39487
+      ]
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "omijanie-wymijanie-cofanie",
+        "topic_label": "Omijanie, wymijanie, cofanie",
+        "topic_key": "passing_reversing",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 4,
+        "internal_question_id": "2271",
+        "prompt": "Czy w celu kontynuowania jazdy wolno Ci ominąć pojazd który zatrzymał się przed widocznym przejazdem kolejowym?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/2847.jpg",
+        "target_topic_key": "passing_reversing",
+        "target_topic_label": "Omijanie, wymijanie, cofanie",
+        "target_topic_slug": "omijanie-wymijanie-cofanie"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "omijanie-wymijanie-cofanie",
+        "topic_label": "Omijanie, wymijanie, cofanie",
+        "topic_key": "passing_reversing",
+        "bucket": "Pytania podstawowe",
+        "page": 3,
+        "position_on_page": 7,
+        "internal_question_id": "3335",
+        "prompt": "Czy na jezdni za tym znakiem pionowym możesz wykonać manewr cofania?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/3335.jpg",
+        "target_topic_key": "passing_reversing",
+        "target_topic_label": "Omijanie, wymijanie, cofanie",
+        "target_topic_slug": "omijanie-wymijanie-cofanie"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "uzywanie-swiatel-zewnetrznych-i-sygnalow-pojazdu",
+        "topic_label": "Używanie świateł zewnętrznych i sygnałów pojazdu",
+        "topic_key": "vehicle_lights_and_signals",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 1,
+        "internal_question_id": "2023",
+        "prompt": "Czy w takich warunkach możesz prowadzić pojazd z włączonymi światłami drogowymi?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2023.mp4",
+        "target_topic_key": "vehicle_lights_and_signals",
+        "target_topic_label": "Używanie świateł zewnętrznych i sygnałów pojazdu",
+        "target_topic_slug": "uzywanie-swiatel-zewnetrznych-i-sygnalow-pojazdu"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "uzywanie-swiatel-zewnetrznych-i-sygnalow-pojazdu",
+        "topic_label": "Używanie świateł zewnętrznych i sygnałów pojazdu",
+        "topic_key": "vehicle_lights_and_signals",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 2,
+        "internal_question_id": "2065",
+        "prompt": "Czy jadąc w południe w bardzo pochmurny dzień i normalnej przejrzystości powietrza możesz używać świateł do jazdy dziennej?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2065.mp4",
+        "target_topic_key": "vehicle_lights_and_signals",
+        "target_topic_label": "Używanie świateł zewnętrznych i sygnałów pojazdu",
+        "target_topic_slug": "uzywanie-swiatel-zewnetrznych-i-sygnalow-pojazdu"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "uzywanie-swiatel-zewnetrznych-i-sygnalow-pojazdu",
+        "topic_label": "Używanie świateł zewnętrznych i sygnałów pojazdu",
+        "topic_key": "vehicle_lights_and_signals",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 3,
+        "internal_question_id": "2072",
+        "prompt": "Czy możesz używać świateł przeciwmgłowych przednich na oznaczonej znakami krętej drodze w czasie pogodnej nocy?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/2072.jpg",
+        "target_topic_key": "vehicle_lights_and_signals",
+        "target_topic_label": "Używanie świateł zewnętrznych i sygnałów pojazdu",
+        "target_topic_slug": "uzywanie-swiatel-zewnetrznych-i-sygnalow-pojazdu"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "uzywanie-swiatel-zewnetrznych-i-sygnalow-pojazdu",
+        "topic_label": "Używanie świateł zewnętrznych i sygnałów pojazdu",
+        "topic_key": "vehicle_lights_and_signals",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 5,
+        "internal_question_id": "2187",
+        "prompt": "Czy możesz użyć sygnału dźwiękowego na obszarze zabudowanym aby ostrzec kierowcę stwarzającego bezpośrednie zagrożenie bezpieczeństwa ruchu?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/2187.jpg",
+        "target_topic_key": "vehicle_lights_and_signals",
+        "target_topic_label": "Używanie świateł zewnętrznych i sygnałów pojazdu",
+        "target_topic_slug": "uzywanie-swiatel-zewnetrznych-i-sygnalow-pojazdu"
+      }
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "uzywanie-swiatel-zewnetrznych-i-sygnalow-pojazdu",
+        "topic_label": "Używanie świateł zewnętrznych i sygnałów pojazdu",
+        "topic_key": "vehicle_lights_and_signals",
+        "bucket": "Pytania podstawowe",
+        "page": 2,
+        "position_on_page": 1,
+        "internal_question_id": "2658",
+        "prompt": "Czy w tej sytuacji masz prawo użyć sygnału dźwiękowego?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2658.mp4",
+        "target_topic_key": "vehicle_lights_and_signals",
+        "target_topic_label": "Używanie świateł zewnętrznych i sygnałów pojazdu",
+        "target_topic_slug": "uzywanie-swiatel-zewnetrznych-i-sygnalow-pojazdu"
+      },
+      "candidate_question_ids": [
+        41133,
+        34311
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "uzywanie-swiatel-zewnetrznych-i-sygnalow-pojazdu",
+        "topic_label": "Używanie świateł zewnętrznych i sygnałów pojazdu",
+        "topic_key": "vehicle_lights_and_signals",
+        "bucket": "Pytania podstawowe",
+        "page": 2,
+        "position_on_page": 5,
+        "internal_question_id": "2679",
+        "prompt": "Czy w tej sytuacji masz prawo używać świateł drogowych?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2679.mp4",
+        "target_topic_key": "vehicle_lights_and_signals",
+        "target_topic_label": "Używanie świateł zewnętrznych i sygnałów pojazdu",
+        "target_topic_slug": "uzywanie-swiatel-zewnetrznych-i-sygnalow-pojazdu"
+      },
+      "candidate_question_ids": [
+        41160,
+        41125,
+        34287,
+        34282
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "uzywanie-swiatel-zewnetrznych-i-sygnalow-pojazdu",
+        "topic_label": "Używanie świateł zewnętrznych i sygnałów pojazdu",
+        "topic_key": "vehicle_lights_and_signals",
+        "bucket": "Pytania podstawowe",
+        "page": 2,
+        "position_on_page": 7,
+        "internal_question_id": "2681",
+        "prompt": "Czy w tej sytuacji masz prawo używać świateł drogowych?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2681.mp4",
+        "target_topic_key": "vehicle_lights_and_signals",
+        "target_topic_label": "Używanie świateł zewnętrznych i sygnałów pojazdu",
+        "target_topic_slug": "uzywanie-swiatel-zewnetrznych-i-sygnalow-pojazdu"
+      },
+      "candidate_question_ids": [
+        41160,
+        41125,
+        34287,
+        34282
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "uzywanie-swiatel-zewnetrznych-i-sygnalow-pojazdu",
+        "topic_label": "Używanie świateł zewnętrznych i sygnałów pojazdu",
+        "topic_key": "vehicle_lights_and_signals",
+        "bucket": "Pytania podstawowe",
+        "page": 3,
+        "position_on_page": 5,
+        "internal_question_id": "3183",
+        "prompt": "Czy w tej sytuacji masz prawo używać świateł drogowych?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/3183.mp4",
+        "target_topic_key": "vehicle_lights_and_signals",
+        "target_topic_label": "Używanie świateł zewnętrznych i sygnałów pojazdu",
+        "target_topic_slug": "uzywanie-swiatel-zewnetrznych-i-sygnalow-pojazdu"
+      },
+      "candidate_question_ids": [
+        41160,
+        41125,
+        34287,
+        34282
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "uzywanie-swiatel-zewnetrznych-i-sygnalow-pojazdu",
+        "topic_label": "Używanie świateł zewnętrznych i sygnałów pojazdu",
+        "topic_key": "vehicle_lights_and_signals",
+        "bucket": "Pytania podstawowe",
+        "page": 3,
+        "position_on_page": 1,
+        "internal_question_id": "2870",
+        "prompt": "Czy w tej sytuacji masz obowiązek używać świateł mijania?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2870.mp4",
+        "target_topic_key": "vehicle_lights_and_signals",
+        "target_topic_label": "Używanie świateł zewnętrznych i sygnałów pojazdu",
+        "target_topic_slug": "uzywanie-swiatel-zewnetrznych-i-sygnalow-pojazdu"
+      },
+      "candidate_question_ids": [
+        42324,
+        41161,
+        28042
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "uzywanie-swiatel-zewnetrznych-i-sygnalow-pojazdu",
+        "topic_label": "Używanie świateł zewnętrznych i sygnałów pojazdu",
+        "topic_key": "vehicle_lights_and_signals",
+        "bucket": "Pytania podstawowe",
+        "page": 3,
+        "position_on_page": 4,
+        "internal_question_id": "3182",
+        "prompt": "Czy w tej sytuacji masz obowiązek używać świateł mijania?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/3182.mp4",
+        "target_topic_key": "vehicle_lights_and_signals",
+        "target_topic_label": "Używanie świateł zewnętrznych i sygnałów pojazdu",
+        "target_topic_slug": "uzywanie-swiatel-zewnetrznych-i-sygnalow-pojazdu"
+      },
+      "candidate_question_ids": [
+        42324,
+        41161,
+        28042
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu",
+        "topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "topic_key": "special_caution_exiting_and_securing_vehicle",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 7,
+        "internal_question_id": "2186",
+        "prompt": "Czy w tej sytuacji masz obowiązek zachować szczególną ostrożność?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2186.mp4",
+        "target_topic_key": "special_caution_exiting_and_securing_vehicle",
+        "target_topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "target_topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu"
+      },
+      "candidate_question_ids": [
+        41135,
+        41131,
+        41117,
+        37533,
+        34316
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu",
+        "topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "topic_key": "special_caution_exiting_and_securing_vehicle",
+        "bucket": "Pytania podstawowe",
+        "page": 2,
+        "position_on_page": 2,
+        "internal_question_id": "2361",
+        "prompt": "Czy w tej sytuacji masz obowiązek zachować szczególną ostrożność?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2361.mp4",
+        "target_topic_key": "special_caution_exiting_and_securing_vehicle",
+        "target_topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "target_topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu"
+      },
+      "candidate_question_ids": [
+        41135,
+        41131,
+        41117,
+        37533,
+        34316
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu",
+        "topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "topic_key": "special_caution_exiting_and_securing_vehicle",
+        "bucket": "Pytania podstawowe",
+        "page": 3,
+        "position_on_page": 7,
+        "internal_question_id": "5787",
+        "prompt": "Czy w tej sytuacji masz obowiązek zachować szczególną ostrożność?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/5787.mp4",
+        "target_topic_key": "special_caution_exiting_and_securing_vehicle",
+        "target_topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "target_topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu"
+      },
+      "candidate_question_ids": [
+        41135,
+        41131,
+        41117,
+        37533,
+        34316
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu",
+        "topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "topic_key": "special_caution_exiting_and_securing_vehicle",
+        "bucket": "Pytania podstawowe",
+        "page": 3,
+        "position_on_page": 9,
+        "internal_question_id": "6165",
+        "prompt": "Czy w tej sytuacji masz obowiązek zachować szczególną ostrożność?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/6165.mp4",
+        "target_topic_key": "special_caution_exiting_and_securing_vehicle",
+        "target_topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "target_topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu"
+      },
+      "candidate_question_ids": [
+        41135,
+        41131,
+        41117,
+        37533,
+        34316
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu",
+        "topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "topic_key": "special_caution_exiting_and_securing_vehicle",
+        "bucket": "Pytania podstawowe",
+        "page": 3,
+        "position_on_page": 10,
+        "internal_question_id": "6166",
+        "prompt": "Czy w tej sytuacji masz obowiązek zachować szczególną ostrożność?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/6166.mp4",
+        "target_topic_key": "special_caution_exiting_and_securing_vehicle",
+        "target_topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "target_topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu"
+      },
+      "candidate_question_ids": [
+        41135,
+        41131,
+        41117,
+        37533,
+        34316
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu",
+        "topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "topic_key": "special_caution_exiting_and_securing_vehicle",
+        "bucket": "Pytania podstawowe",
+        "page": 4,
+        "position_on_page": 1,
+        "internal_question_id": "6167",
+        "prompt": "Czy w tej sytuacji masz obowiązek zachować szczególną ostrożność?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/6167.mp4",
+        "target_topic_key": "special_caution_exiting_and_securing_vehicle",
+        "target_topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "target_topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu"
+      },
+      "candidate_question_ids": [
+        41135,
+        41131,
+        41117,
+        37533,
+        34316
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu",
+        "topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "topic_key": "special_caution_exiting_and_securing_vehicle",
+        "bucket": "Pytania podstawowe",
+        "page": 4,
+        "position_on_page": 2,
+        "internal_question_id": "6168",
+        "prompt": "Czy w tej sytuacji masz obowiązek zachować szczególną ostrożność?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/6168.mp4",
+        "target_topic_key": "special_caution_exiting_and_securing_vehicle",
+        "target_topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "target_topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu"
+      },
+      "candidate_question_ids": [
+        41135,
+        41131,
+        41117,
+        37533,
+        34316
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu",
+        "topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "topic_key": "special_caution_exiting_and_securing_vehicle",
+        "bucket": "Pytania podstawowe",
+        "page": 4,
+        "position_on_page": 3,
+        "internal_question_id": "6169",
+        "prompt": "Czy w tej sytuacji masz obowiązek zachować szczególną ostrożność?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/6169.mp4",
+        "target_topic_key": "special_caution_exiting_and_securing_vehicle",
+        "target_topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "target_topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu"
+      },
+      "candidate_question_ids": [
+        41135,
+        41131,
+        41117,
+        37533,
+        34316
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu",
+        "topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "topic_key": "special_caution_exiting_and_securing_vehicle",
+        "bucket": "Pytania podstawowe",
+        "page": 4,
+        "position_on_page": 4,
+        "internal_question_id": "6347",
+        "prompt": "Czy w tej sytuacji masz obowiązek zachować szczególną ostrożność?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2581.mp4",
+        "target_topic_key": "special_caution_exiting_and_securing_vehicle",
+        "target_topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "target_topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu"
+      },
+      "candidate_question_ids": [
+        41135,
+        41131,
+        41117,
+        37533,
+        34316
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu",
+        "topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "topic_key": "special_caution_exiting_and_securing_vehicle",
+        "bucket": "Pytania podstawowe",
+        "page": 4,
+        "position_on_page": 5,
+        "internal_question_id": "6350",
+        "prompt": "Czy w tej sytuacji masz obowiązek zachować szczególną ostrożność?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/6350.mp4",
+        "target_topic_key": "special_caution_exiting_and_securing_vehicle",
+        "target_topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "target_topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu"
+      },
+      "candidate_question_ids": [
+        41135,
+        41131,
+        41117,
+        37533,
+        34316
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu",
+        "topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "topic_key": "special_caution_exiting_and_securing_vehicle",
+        "bucket": "Pytania podstawowe",
+        "page": 4,
+        "position_on_page": 6,
+        "internal_question_id": "6357",
+        "prompt": "Czy w tej sytuacji masz obowiązek zachować szczególną ostrożność?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/3195.mp4",
+        "target_topic_key": "special_caution_exiting_and_securing_vehicle",
+        "target_topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "target_topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu"
+      },
+      "candidate_question_ids": [
+        41135,
+        41131,
+        41117,
+        37533,
+        34316
+      ]
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu",
+        "topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "topic_key": "special_caution_exiting_and_securing_vehicle",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 9,
+        "internal_question_id": "2328",
+        "prompt": "Czy żółty sygnał migający na skrzyżowaniu uchyla zasady pierwszeństwa wskazane znakami drogowymi?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/2328.jpg",
+        "target_topic_key": "special_caution_exiting_and_securing_vehicle",
+        "target_topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "target_topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu",
+        "topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "topic_key": "special_caution_exiting_and_securing_vehicle",
+        "bucket": "Pytania podstawowe",
+        "page": 3,
+        "position_on_page": 1,
+        "internal_question_id": "2821",
+        "prompt": "Czy masz obowiązek zachować szczególną ostrożność, gdy omijasz pojazd przewożący zorganizowaną grupę dzieci do 18 lat, które z niego wysiadają?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "none",
+        "question_media_url": null,
+        "target_topic_key": "special_caution_exiting_and_securing_vehicle",
+        "target_topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "target_topic_slug": "znaczenie-zachowania-szczegolnej-ostroznosci-w-stosunku-do-innych-uzytkownikow-drogi-wysiadanie-z-pojazdu-zabezpieczenie-pojazdu"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "zachowanie-wobec-pieszego-wobec-osoby-o-ograniczonej-mozliwosci-poruszania-sie",
+        "topic_label": "Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+        "topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 2,
+        "internal_question_id": "2109",
+        "prompt": "Czy w tej sytuacji przygotujesz się do zatrzymania pojazdu?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2109.mp4",
+        "target_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+        "target_topic_label": "Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+        "target_topic_slug": "zachowanie-wobec-pieszego-wobec-osoby-o-ograniczonej-mozliwosci-poruszania-sie"
+      }
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "zachowanie-wobec-pieszego-wobec-osoby-o-ograniczonej-mozliwosci-poruszania-sie",
+        "topic_label": "Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+        "topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 3,
+        "internal_question_id": "2138",
+        "prompt": "Czy w tej sytuacji masz obowiązek zachować szczególną ostrożność?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2138.mp4",
+        "target_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+        "target_topic_label": "Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+        "target_topic_slug": "zachowanie-wobec-pieszego-wobec-osoby-o-ograniczonej-mozliwosci-poruszania-sie"
+      },
+      "candidate_question_ids": [
+        41135,
+        41131,
+        41117,
+        37533,
+        34316
+      ]
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "zachowanie-wobec-pieszego-wobec-osoby-o-ograniczonej-mozliwosci-poruszania-sie",
+        "topic_label": "Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+        "topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 6,
+        "internal_question_id": "2267",
+        "prompt": "Czy w tej sytuacji zwiększysz prędkość aby zdążyć przejechać przed pieszymi?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2267.mp4",
+        "target_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+        "target_topic_label": "Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+        "target_topic_slug": "zachowanie-wobec-pieszego-wobec-osoby-o-ograniczonej-mozliwosci-poruszania-sie"
+      }
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "zachowanie-wobec-pieszego-wobec-osoby-o-ograniczonej-mozliwosci-poruszania-sie",
+        "topic_label": "Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+        "topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+        "bucket": "Pytania podstawowe",
+        "page": 3,
+        "position_on_page": 4,
+        "internal_question_id": "2816",
+        "prompt": "Czy w tej sytuacji masz prawo kontynuować jazdę bez zwracania uwagi na zachowanie pieszego?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2268.mp4",
+        "target_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+        "target_topic_label": "Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+        "target_topic_slug": "zachowanie-wobec-pieszego-wobec-osoby-o-ograniczonej-mozliwosci-poruszania-sie"
+      },
+      "candidate_question_ids": [
+        29382,
+        20774
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "zachowanie-wobec-pieszego-wobec-osoby-o-ograniczonej-mozliwosci-poruszania-sie",
+        "topic_label": "Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+        "topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+        "bucket": "Pytania podstawowe",
+        "page": 3,
+        "position_on_page": 5,
+        "internal_question_id": "2944",
+        "prompt": "Czy w tej sytuacji masz obowiązek zatrzymać pojazd?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2944.mp4",
+        "target_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+        "target_topic_label": "Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+        "target_topic_slug": "zachowanie-wobec-pieszego-wobec-osoby-o-ograniczonej-mozliwosci-poruszania-sie"
+      },
+      "candidate_question_ids": [
+        46914,
+        23471,
+        23470,
+        23439,
+        23430
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "zachowanie-wobec-pieszego-wobec-osoby-o-ograniczonej-mozliwosci-poruszania-sie",
+        "topic_label": "Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+        "topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+        "bucket": "Pytania podstawowe",
+        "page": 3,
+        "position_on_page": 6,
+        "internal_question_id": "2945",
+        "prompt": "Czy w tej sytuacji masz obowiązek zatrzymać pojazd?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2945.mp4",
+        "target_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+        "target_topic_label": "Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+        "target_topic_slug": "zachowanie-wobec-pieszego-wobec-osoby-o-ograniczonej-mozliwosci-poruszania-sie"
+      },
+      "candidate_question_ids": [
+        46914,
+        23471,
+        23470,
+        23439,
+        23430
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "zachowanie-wobec-pieszego-wobec-osoby-o-ograniczonej-mozliwosci-poruszania-sie",
+        "topic_label": "Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+        "topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+        "bucket": "Pytania podstawowe",
+        "page": 3,
+        "position_on_page": 9,
+        "internal_question_id": "2979",
+        "prompt": "Czy w tej sytuacji masz obowiązek zatrzymać pojazd?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2979.mp4",
+        "target_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+        "target_topic_label": "Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+        "target_topic_slug": "zachowanie-wobec-pieszego-wobec-osoby-o-ograniczonej-mozliwosci-poruszania-sie"
+      },
+      "candidate_question_ids": [
+        46914,
+        23471,
+        23470,
+        23439,
+        23430
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "zachowanie-wobec-pieszego-wobec-osoby-o-ograniczonej-mozliwosci-poruszania-sie",
+        "topic_label": "Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+        "topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+        "bucket": "Pytania podstawowe",
+        "page": 4,
+        "position_on_page": 4,
+        "internal_question_id": "2992",
+        "prompt": "Czy w tej sytuacji masz obowiązek zatrzymać pojazd?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2992.mp4",
+        "target_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+        "target_topic_label": "Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+        "target_topic_slug": "zachowanie-wobec-pieszego-wobec-osoby-o-ograniczonej-mozliwosci-poruszania-sie"
+      },
+      "candidate_question_ids": [
+        46914,
+        23471,
+        23470,
+        23439,
+        23430
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "zachowanie-wobec-pieszego-wobec-osoby-o-ograniczonej-mozliwosci-poruszania-sie",
+        "topic_label": "Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+        "topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+        "bucket": "Pytania podstawowe",
+        "page": 6,
+        "position_on_page": 3,
+        "internal_question_id": "12587",
+        "prompt": "Czy w tej sytuacji masz obowiązek zatrzymać pojazd?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/12587.mp4",
+        "target_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+        "target_topic_label": "Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+        "target_topic_slug": "zachowanie-wobec-pieszego-wobec-osoby-o-ograniczonej-mozliwosci-poruszania-sie"
+      },
+      "candidate_question_ids": [
+        46914,
+        23471,
+        23470,
+        23439,
+        23430
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "zachowanie-wobec-pieszego-wobec-osoby-o-ograniczonej-mozliwosci-poruszania-sie",
+        "topic_label": "Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+        "topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+        "bucket": "Pytania podstawowe",
+        "page": 4,
+        "position_on_page": 9,
+        "internal_question_id": "3191",
+        "prompt": "Czy w tej sytuacji masz prawo użyć sygnału dźwiękowego?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2540.mp4",
+        "target_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+        "target_topic_label": "Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+        "target_topic_slug": "zachowanie-wobec-pieszego-wobec-osoby-o-ograniczonej-mozliwosci-poruszania-sie"
+      },
+      "candidate_question_ids": [
+        41133,
+        34311
+      ]
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "zachowanie-wobec-pieszego-wobec-osoby-o-ograniczonej-mozliwosci-poruszania-sie",
+        "topic_label": "Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+        "topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+        "bucket": "Pytania podstawowe",
+        "page": 6,
+        "position_on_page": 4,
+        "internal_question_id": "12588",
+        "prompt": "Czy w tej sytuacji możesz kontynuować jazdę?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/12588.mp4",
+        "target_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+        "target_topic_label": "Zachowanie wobec pieszego, wobec osoby o ograniczonej możliwości poruszania się",
+        "target_topic_slug": "zachowanie-wobec-pieszego-wobec-osoby-o-ograniczonej-mozliwosci-poruszania-sie"
+      },
+      "candidate_question_ids": [
+        46929,
+        46915,
+        46931
+      ]
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "zachowanie-wobec-rowerzysty-i-dzieci",
+        "topic_label": "Zachowanie wobec rowerzysty i dzieci",
+        "topic_key": "behaviour_towards_cyclists_and_children",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 5,
+        "internal_question_id": "2360",
+        "prompt": "Czy w tej sytuacji masz obowiązek ustąpić pierwszeństwa rowerzyście?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2360.mp4",
+        "target_topic_key": "behaviour_towards_cyclists_and_children",
+        "target_topic_label": "Zachowanie wobec rowerzysty i dzieci",
+        "target_topic_slug": "zachowanie-wobec-rowerzysty-i-dzieci"
+      }
+    },
+    {
+      "reason": "ambiguous_local_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "zachowanie-na-przejazdach-kolejowych-i-tramwajowych",
+        "topic_label": "Zachowanie na przejazdach kolejowych i tramwajowych",
+        "topic_key": "rail_and_tram_crossings",
+        "bucket": "Pytania podstawowe",
+        "page": 1,
+        "position_on_page": 9,
+        "internal_question_id": "2619",
+        "prompt": "Czy w tej sytuacji masz obowiązek ustąpić pierwszeństwa tramwajowi?",
+        "accepted_answer": "tak",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "video",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/video/mp4/2381.mp4",
+        "target_topic_key": "rail_and_tram_crossings",
+        "target_topic_label": "Zachowanie na przejazdach kolejowych i tramwajowych",
+        "target_topic_slug": "zachowanie-na-przejazdach-kolejowych-i-tramwajowych"
+      },
+      "candidate_question_ids": [
+        37524,
+        26612
+      ]
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "ogolne-zasady-okreslajace-zachowanie-kierowcy-w-momencie-awarii-lub-wypadku-udzielanie-pierwszej-pomocy-przedmedycznej",
+        "topic_label": "Ogólne zasady określające zachowanie kierowcy w momencie awarii lub wypadku, udzielanie pierwszej po...",
+        "topic_key": "breakdown_accident_and_first_aid",
+        "bucket": "Pytania podstawowe",
+        "page": 4,
+        "position_on_page": 7,
+        "internal_question_id": "3451",
+        "prompt": "Czy uczestnicząc w wypadku, w którym są zabici lub ranni, masz prawo zacząć samodzielnie usuwać jego skutki?",
+        "accepted_answer": "nie",
+        "answer_count": 2,
+        "question_type": "boolean",
+        "question_media_kind": "none",
+        "question_media_url": null,
+        "target_topic_key": "breakdown_accident_and_first_aid",
+        "target_topic_label": "Ogólne zasady określające zachowanie kierowcy w momencie awarii lub wypadku, udzielanie pierwszej po...",
+        "target_topic_slug": "ogolne-zasady-okreslajace-zachowanie-kierowcy-w-momencie-awarii-lub-wypadku-udzielanie-pierwszej-pomocy-przedmedycznej"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "dopuszczalne-predkosci-pojazdu-ograniczenia",
+        "topic_label": "Dopuszczalne prędkości pojazdu, ograniczenia",
+        "topic_key": "speed_limits",
+        "bucket": "Pytania specjalistyczne",
+        "page": 1,
+        "position_on_page": 1,
+        "internal_question_id": "2453",
+        "prompt": "Widoczne na znaku ograniczenie prędkości obowiązuje:",
+        "accepted_answer": "na całym obszarze zabudowanym o ile dalsze znaki nie stanowią inaczej.",
+        "answer_count": 3,
+        "question_type": "single_choice",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/2453.jpg",
+        "target_topic_key": "speed_limits",
+        "target_topic_label": "Dopuszczalne prędkości pojazdu, ograniczenia",
+        "target_topic_slug": "dopuszczalne-predkosci-pojazdu-ograniczenia"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "dopuszczalne-predkosci-pojazdu-ograniczenia",
+        "topic_label": "Dopuszczalne prędkości pojazdu, ograniczenia",
+        "topic_key": "speed_limits",
+        "bucket": "Pytania specjalistyczne",
+        "page": 1,
+        "position_on_page": 2,
+        "internal_question_id": "2484",
+        "prompt": "Na których pasach ruchu na autostradzie możesz jechać z prędkością 140 km/h?",
+        "accepted_answer": "na wszystkich.",
+        "answer_count": 3,
+        "question_type": "single_choice",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/3932.jpg",
+        "target_topic_key": "speed_limits",
+        "target_topic_label": "Dopuszczalne prędkości pojazdu, ograniczenia",
+        "target_topic_slug": "dopuszczalne-predkosci-pojazdu-ograniczenia"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "dopuszczalne-predkosci-pojazdu-ograniczenia",
+        "topic_label": "Dopuszczalne prędkości pojazdu, ograniczenia",
+        "topic_key": "speed_limits",
+        "bucket": "Pytania specjalistyczne",
+        "page": 1,
+        "position_on_page": 6,
+        "internal_question_id": "3947",
+        "prompt": "Z jaką dopuszczalną prędkością możesz jechać w strefie zamieszkania?",
+        "accepted_answer": "20 km/h",
+        "answer_count": 3,
+        "question_type": "single_choice",
+        "question_media_kind": "none",
+        "question_media_url": null,
+        "target_topic_key": "speed_limits",
+        "target_topic_label": "Dopuszczalne prędkości pojazdu, ograniczenia",
+        "target_topic_slug": "dopuszczalne-predkosci-pojazdu-ograniczenia"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "odstepy-i-hamowanie-pojazdu",
+        "topic_label": "Odstępy i hamowanie pojazdu",
+        "topic_key": "distances_and_braking",
+        "bucket": "Pytania specjalistyczne",
+        "page": 1,
+        "position_on_page": 1,
+        "internal_question_id": "2496",
+        "prompt": "Jaki minimalny odstęp powinieneś zachować podczas wyprzedzania widocznego pojazdu?",
+        "accepted_answer": "1 m.",
+        "answer_count": 3,
+        "question_type": "single_choice",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/2496.jpg",
+        "target_topic_key": "distances_and_braking",
+        "target_topic_label": "Odstępy i hamowanie pojazdu",
+        "target_topic_slug": "odstepy-i-hamowanie-pojazdu"
+      }
+    },
+    {
+      "reason": "media_kind_mismatch",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "odstepy-i-hamowanie-pojazdu",
+        "topic_label": "Odstępy i hamowanie pojazdu",
+        "topic_key": "distances_and_braking",
+        "bucket": "Pytania specjalistyczne",
+        "page": 2,
+        "position_on_page": 2,
+        "internal_question_id": "3966",
+        "prompt": "Którą z podanych wielkości należy uwzględnić, ustalając odstęp od poprzedzającego pojazdu?",
+        "accepted_answer": "prędkość pojazdów.",
+        "answer_count": 3,
+        "question_type": "single_choice",
+        "question_media_kind": "none",
+        "question_media_url": null,
+        "target_topic_key": "distances_and_braking",
+        "target_topic_label": "Odstępy i hamowanie pojazdu",
+        "target_topic_slug": "odstepy-i-hamowanie-pojazdu"
+      },
+      "local_question": {
+        "question_id": 43461,
+        "prompt": "Którą z podanych wielkości należy uwzględnić, ustalając odstęp od poprzedzającego pojazdu?",
+        "accepted_answer": "Prędkość pojazdów.",
+        "question_media_kind": "image",
+        "current_topic_key": "distances_and_braking"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "czynniki-ryzyka-zwiazane-z-roznymi-warunkami-drogowymi-w-szczegolnosci-ze-zmiana-tych-warunkow-w-zaleznosci-od-pogody-i-pory-dnia-lub-nocy-wlasciwosci-roznych-typow-drog-i-zwiazane-z-tym-obowiazujace-wymagania",
+        "topic_label": "Czynniki ryzyka związane z różnymi warunkami drogowymi, w szczególności ze zmianą tych warunków w za...",
+        "topic_key": "risk_factors_conditions_and_weather",
+        "bucket": "Pytania specjalistyczne",
+        "page": 1,
+        "position_on_page": 1,
+        "internal_question_id": "2464",
+        "prompt": "O czym ostrzega ten znak?",
+        "accepted_answer": "o przejeździe przez tory tramwajowe.",
+        "answer_count": 3,
+        "question_type": "single_choice",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/2464.jpg",
+        "target_topic_key": "risk_factors_conditions_and_weather",
+        "target_topic_label": "Czynniki ryzyka związane z różnymi warunkami drogowymi, w szczególności ze zmianą tych warunków w za...",
+        "target_topic_slug": "czynniki-ryzyka-zwiazane-z-roznymi-warunkami-drogowymi-w-szczegolnosci-ze-zmiana-tych-warunkow-w-zaleznosci-od-pogody-i-pory-dnia-lub-nocy-wlasciwosci-roznych-typow-drog-i-zwiazane-z-tym-obowiazujace-wymagania"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "czynniki-ryzyka-zwiazane-z-roznymi-warunkami-drogowymi-w-szczegolnosci-ze-zmiana-tych-warunkow-w-zaleznosci-od-pogody-i-pory-dnia-lub-nocy-wlasciwosci-roznych-typow-drog-i-zwiazane-z-tym-obowiazujace-wymagania",
+        "topic_label": "Czynniki ryzyka związane z różnymi warunkami drogowymi, w szczególności ze zmianą tych warunków w za...",
+        "topic_key": "risk_factors_conditions_and_weather",
+        "bucket": "Pytania specjalistyczne",
+        "page": 1,
+        "position_on_page": 2,
+        "internal_question_id": "2468",
+        "prompt": "O jakich podmuchach wiatru ostrzega ten znak?",
+        "accepted_answer": "silnych z prawej lub lewej strony pojazdu.",
+        "answer_count": 3,
+        "question_type": "single_choice",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/2468.jpg",
+        "target_topic_key": "risk_factors_conditions_and_weather",
+        "target_topic_label": "Czynniki ryzyka związane z różnymi warunkami drogowymi, w szczególności ze zmianą tych warunków w za...",
+        "target_topic_slug": "czynniki-ryzyka-zwiazane-z-roznymi-warunkami-drogowymi-w-szczegolnosci-ze-zmiana-tych-warunkow-w-zaleznosci-od-pogody-i-pory-dnia-lub-nocy-wlasciwosci-roznych-typow-drog-i-zwiazane-z-tym-obowiazujace-wymagania"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "rozne-pola-widzenia-kierowcow",
+        "topic_label": "Różne pola widzenia kierowców",
+        "topic_key": "driver_field_of_view",
+        "bucket": "Pytania specjalistyczne",
+        "page": 1,
+        "position_on_page": 2,
+        "internal_question_id": "3944",
+        "prompt": "Który z wymienionych czynników może ograniczyć pole widzenia kierowcy?",
+        "accepted_answer": "brudna przednia szyba.",
+        "answer_count": 3,
+        "question_type": "single_choice",
+        "question_media_kind": "none",
+        "question_media_url": null,
+        "target_topic_key": "driver_field_of_view",
+        "target_topic_label": "Różne pola widzenia kierowców",
+        "target_topic_slug": "rozne-pola-widzenia-kierowcow"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "czynniki-bezpieczenstwa-odnoszace-sie-do-pojazdu-ladunku-i-przewozonych-osob",
+        "topic_label": "Czynniki bezpieczeństwa odnoszące się do pojazdu, ładunku i przewożonych osób",
+        "topic_key": "vehicle_load_and_passenger_safety",
+        "bucket": "Pytania specjalistyczne",
+        "page": 3,
+        "position_on_page": 4,
+        "internal_question_id": "11998",
+        "prompt": "Za które naruszenie przepisów ruchu drogowego policjant zatrzyma prawo jazdy?",
+        "accepted_answer": "za kierowanie pojazdem z prędkością przekraczającą dopuszczalną o więcej niż 50 km/h na obszarze zabudowanym.",
+        "answer_count": 3,
+        "question_type": "single_choice",
+        "question_media_kind": "none",
+        "question_media_url": null,
+        "target_topic_key": "vehicle_load_and_passenger_safety",
+        "target_topic_label": "Czynniki bezpieczeństwa odnoszące się do pojazdu, ładunku i przewożonych osób",
+        "target_topic_slug": "czynniki-bezpieczenstwa-odnoszace-sie-do-pojazdu-ladunku-i-przewozonych-osob"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "czynniki-bezpieczenstwa-odnoszace-sie-do-pojazdu-ladunku-i-przewozonych-osob",
+        "topic_label": "Czynniki bezpieczeństwa odnoszące się do pojazdu, ładunku i przewożonych osób",
+        "topic_key": "vehicle_load_and_passenger_safety",
+        "bucket": "Pytania specjalistyczne",
+        "page": 3,
+        "position_on_page": 6,
+        "internal_question_id": "12003",
+        "prompt": "O ile czasu starosta wydłuży okres zatrzymania prawa jazdy, jeśli zostałeś zatrzymany do kontroli, gdy prowadziłeś pojazd pomimo że wcześniej zatrzymano Ci prawo jazdy na trzy miesiące za przekroczenie prędkości o więcej niż 50 km/h w obszarze zabudowanym?",
+        "accepted_answer": "o kolejne trzy miesiące.",
+        "answer_count": 3,
+        "question_type": "single_choice",
+        "question_media_kind": "none",
+        "question_media_url": null,
+        "target_topic_key": "vehicle_load_and_passenger_safety",
+        "target_topic_label": "Czynniki bezpieczeństwa odnoszące się do pojazdu, ładunku i przewożonych osób",
+        "target_topic_slug": "czynniki-bezpieczenstwa-odnoszace-sie-do-pojazdu-ladunku-i-przewozonych-osob"
+      }
+    },
+    {
+      "reason": "no_local_prompt_match",
+      "membership_question": {
+        "category_code": "B1",
+        "topic_slug": "akcje-ratunkowe",
+        "topic_label": "Akcje ratunkowe",
+        "topic_key": "rescue_actions",
+        "bucket": "Pytania specjalistyczne",
+        "page": 1,
+        "position_on_page": 2,
+        "internal_question_id": "2469",
+        "prompt": "Jak długo należy prowadzić sztuczne oddechy i uciśnięcia klatki piersiowej u dzieci?",
+        "accepted_answer": "do momentu pojawienia się spontanicznej czynności życiowej (oddechu ruchu kaszlu).",
+        "answer_count": 3,
+        "question_type": "single_choice",
+        "question_media_kind": "image",
+        "question_media_url": "https://www.prawo-jazdy-360.pl/static/images/2469.jpg",
+        "target_topic_key": "rescue_actions",
+        "target_topic_label": "Akcje ratunkowe",
+        "target_topic_slug": "akcje-ratunkowe"
+      }
+    }
+  ]
+}

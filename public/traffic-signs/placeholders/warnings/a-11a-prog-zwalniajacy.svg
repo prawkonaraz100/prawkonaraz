@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320" role="img" aria-labelledby="title desc">
+  <title id="title">A-11a Próg zwalniający</title>
+  <desc id="desc">Grafika referencyjna dla znaku A-11a Próg zwalniający</desc>
+  <rect width="320" height="320" fill="#ffffff"/>
+  <rect x="18" y="18" width="284" height="284" rx="22" fill="#f5ffff" stroke="#0f766e" stroke-width="10"/>
+  <polygon points="160,48 258,232 62,232" fill="#ffffff" stroke="#d32f2f" stroke-width="14"/>
+  <polygon points="160,78 231,215 89,215" fill="#fef2f2"/>
+  <text x="160" y="174" text-anchor="middle" font-size="42" font-family="Arial, Helvetica, sans-serif" font-weight="700" fill="#0f172a">A-11a</text>
+  <text x="160" y="258" text-anchor="middle" font-size="15" font-family="Arial, Helvetica, sans-serif" font-weight="700" fill="#0f766e">Znaki ostrzegawcze</text>
+  <foreignObject x="40" y="268" width="240" height="34">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; line-height: 1.25; color: #475569; text-align: center;">A-11A PRÓG ZWALNIAJĄCY</div>
+  </foreignObject>
+  <foreignObject x="48" y="226" width="224" height="36">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; line-height: 1.2; color: #0f172a; text-align: center; font-weight: 600;">Próg zwalniający</div>
+  </foreignObject>
+</svg>

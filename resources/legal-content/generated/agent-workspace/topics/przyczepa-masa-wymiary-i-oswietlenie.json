@@ -1,0 +1,2193 @@
+{
+    "generated_at": "2026-06-21T11:11:24+02:00",
+    "candidate": {
+        "slug": "przyczepa-masa-wymiary-i-oswietlenie",
+        "title": "Przyczepa: masa, wymiary i oświetlenie",
+        "description": "Węższy temat artykułu wykryty na podstawie treści pytań.",
+        "level": "focused",
+        "status": "candidate",
+        "rule_version": "2026-06-19-prompt-v2",
+        "existing_article_slug": "przyczepa-masa-wymiary-i-oswietlenie"
+    },
+    "workflow": {
+        "status": "published",
+        "next_action": "Przejrzyj relacje pytan i zdecyduj, czy artykul wymaga rozbudowy lub ponownego review.",
+        "public_relations_are_verified_only": true
+    },
+    "article": {
+        "slug": "przyczepa-masa-wymiary-i-oswietlenie",
+        "title": "Przyczepa: masa, wymiary i obowiązkowe oświetlenie",
+        "status": "published",
+        "published_at": "2026-06-21",
+        "last_reviewed_at": "2026-06-21",
+        "legal_units": [
+            {
+                "slug": "art-62-ust-1-pkt-1",
+                "label": "art. 62 ust. 1 pkt 1",
+                "title": "Masa przyczepy ciągniętej przez samochód osobowy",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-62-ust-1-pkt-3",
+                "label": "art. 62 ust. 1 pkt 3",
+                "title": "Masa przyczepy ciągniętej przez motocykl lub motorower",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-62-ust-4a-pkt-1",
+                "label": "art. 62 ust. 4a pkt 1",
+                "title": "Długość motocykla lub motoroweru z przyczepą",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-62-ust-4a-pkt-2",
+                "label": "art. 62 ust. 4a pkt 2",
+                "title": "Długość pojazdu z przyczepą",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "par-12-ust-1-pkt-11",
+                "label": "§ 12 ust. 1 pkt 11",
+                "title": "Boczne światła odblaskowe przyczepy",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            }
+        ]
+    },
+    "summary": {
+        "canonical_questions": 27,
+        "question_rows": 38,
+        "categories": [
+            "A",
+            "A1",
+            "A2",
+            "AM",
+            "B",
+            "B1",
+            "C",
+            "C1",
+            "D",
+            "D1",
+            "T"
+        ],
+        "canonical_questions_with_verified_reference": 18,
+        "prompt_conflicts": [],
+        "answer_conflicts": [],
+        "correct_answer_conflicts": []
+    },
+    "questions": [
+        {
+            "external_id": "1877",
+            "prompt": "W jaki sposób wolno Ci przewozić ładunek w przyczepie ciągniętej przez samochód osobowy?",
+            "prompt_variants": [
+                "W jaki sposób wolno Ci przewozić ładunek w przyczepie ciągniętej przez samochód osobowy?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Ładunek może zasłaniać niektóre światła przyczepy.",
+                    "option_b": "Ładunek nie może naruszać stateczności pojazdu.",
+                    "option_c": "Ładunek nie musi być zabezpieczony przed zmianą położenia.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Ładunek nie może naruszać stateczności pojazdu."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo ładunek na pojeździe umieszcza się w taki sposób, aby nie naruszał stateczności pojazdu. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 21712,
+                    "question_external_id": "1877",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-2-pkt-2",
+                    "legal_unit_label": "art. 61 ust. 2 pkt 2",
+                    "legal_unit_title": "Stateczność i kierowanie pojazdem z ładunkiem",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie dotyczy rozmieszczenia ładunku w sposób zachowujący stateczność i możliwość kierowania pojazdem. Taki obowiązek wynika wprost z art. 61 ust. 2 pkt 2."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 21712,
+                    "external_id": "1877",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "1878",
+            "prompt": "W jaki sposób przewieziesz ładunek w przyczepie ciągniętej przez samochód osobowy?",
+            "prompt_variants": [
+                "W jaki sposób przewieziesz ładunek w przyczepie ciągniętej przez samochód osobowy?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Zabezpieczę go przed przemieszczaniem.",
+                    "option_b": "Umieszczę ładunek luźno na przyczepie.",
+                    "option_c": "Nie zabezpieczę ładunku przed przemieszczaniem, jeżeli będę jechał wolno.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Zabezpieczę go przed przemieszczaniem."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo ładunek umieszczony na pojeździe powinien być zabezpieczony przed zmianą położenia, przed przemieszczeniem. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 21713,
+                    "question_external_id": "1878",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-3",
+                    "legal_unit_label": "art. 61 ust. 3",
+                    "legal_unit_title": "Zabezpieczenie ładunku przed zmianą położenia",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie sprawdza obowiązek zabezpieczenia ładunku przed zmianą położenia podczas jazdy. Art. 61 ust. 3 wymaga takiego mocowania niezależnie od rodzaju pojazdu."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 21713,
+                    "external_id": "1878",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "1879",
+            "prompt": "Jak przewieziesz ładunek sypki w przyczepie ciągniętej przez samochód osobowy?",
+            "prompt_variants": [
+                "Jak przewieziesz ładunek sypki w przyczepie ciągniętej przez samochód osobowy?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Niezasłonięty - umieszczony poniżej wysokości burt.",
+                    "option_b": "Nie przekraczajac prędkości 30 km/h.",
+                    "option_c": "Zasłonięty w szczelnej skrzyni ładunkowej.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Zasłonięty w szczelnej skrzyni ładunkowej."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo ładunek sypki może być umieszczony tylko w szczelnej skrzyni ładunkowej, zabezpieczonej dodatkowo odpowiednimi zasłonami uniemożliwiającymi. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 21714,
+                    "question_external_id": "1879",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-5",
+                    "legal_unit_label": "art. 61 ust. 5",
+                    "legal_unit_title": "Przewóz ładunku sypkiego",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie sprawdza szczególną zasadę przewozu materiału sypkiego. Art. 61 ust. 5 wymaga szczelnej skrzyni ładunkowej i odpowiednich zasłon."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 21714,
+                    "external_id": "1879",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "1880",
+            "prompt": "Jak powinieneś zabezpieczyć urządzenie, którym zamocowałeś ładunek w przyczepie ciągniętej przez samochód osobowy?",
+            "prompt_variants": [
+                "Jak powinieneś zabezpieczyć urządzenie, którym zamocowałeś ładunek w przyczepie ciągniętej przez samochód osobowy?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak, żeby mocowanie nie rozluźniło się.",
+                    "option_b": "Może swobodnie zwisać z przyczepy.",
+                    "option_c": "Nie musi być zabezpieczone przed spadnięciem podczas jazdy.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak, żeby mocowanie nie rozluźniło się."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo urządzenia służące do mocowania ładunku powinny być zabezpieczone przed rozluźnieniem się, swobodnym zwisaniem lub spadnięciem podczas jazdy. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 21715,
+                    "question_external_id": "1880",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-4",
+                    "legal_unit_label": "art. 61 ust. 4",
+                    "legal_unit_title": "Zabezpieczenie urządzeń mocujących",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "Pytanie dotyczy samego urządzenia mocującego. Art. 61 ust. 4 wymaga zabezpieczenia go przed rozluźnieniem, swobodnym zwisaniem lub spadnięciem."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 21715,
+                    "external_id": "1880",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "1883",
+            "prompt": "W jaki sposób umieścisz ładunek na przyczepie samochodu osobowego?",
+            "prompt_variants": [
+                "W jaki sposób umieścisz ładunek na przyczepie samochodu osobowego?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak, aby nie zasłaniał świateł przyczepy.",
+                    "option_b": "Umieszczę go po jednej stronie przyczepy.",
+                    "option_c": "Umieszczę go zawsze w tylnej części przyczepy.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak, aby nie zasłaniał świateł przyczepy."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo ładunek na pojeździe umieszcza się w taki sposób, aby nie ograniczał widoczności drogi lub nie zasłaniał świateł, urządzeń sygnalizacyjnych, tablic. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 21718,
+                    "question_external_id": "1883",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-2-pkt-4",
+                    "legal_unit_label": "art. 61 ust. 2 pkt 4",
+                    "legal_unit_title": "Widoczność, światła i tablice nie mogą być zasłonięte",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "Ładunek nie może ograniczać widoczności ani zasłaniać świateł, urządzeń sygnalizacyjnych lub tablic. To pytanie sprawdza właśnie zakaz określony w art. 61 ust. 2 pkt 4."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 21718,
+                    "external_id": "1883",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6403",
+            "prompt": "Jaka jest maksymalna dopuszczalna długość zespołu pojazdów składającego się z samochodu osobowego i przyczepy kempingowej?",
+            "prompt_variants": [
+                "Jaka jest maksymalna dopuszczalna długość zespołu pojazdów składającego się z samochodu osobowego i przyczepy kempingowej?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "18,75 m.",
+                    "option_b": "17,75 m.",
+                    "option_c": "15 m.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "18,75 m."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo maksymalna długość zespołu 2 pojazdów (np. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6403/image/full.d3250e1a1b03.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6403/image/thumb.ae1f194d311c.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 34950,
+                    "question_external_id": "6403",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-62-ust-4a-pkt-2",
+                    "legal_unit_label": "art. 62 ust. 4a pkt 2",
+                    "legal_unit_title": "Długość pojazdu z przyczepą",
+                    "legal_topic_slug": "przyczepa-masa-wymiary-i-oswietlenie",
+                    "article_slug": "przyczepa-masa-wymiary-i-oswietlenie",
+                    "public_note": "To pytanie dotyczy maksymalnej długości zespołu dwóch pojazdów innego niż motocykl lub motorower z przyczepą. Art. 62 ust. 4a pkt 2 wyznacza limit 18,75 m."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 34950,
+                    "external_id": "6403",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6571",
+            "prompt": "Ile wynosi maksymalna długość zespołu pojazdów składającego się z motocykla i przyczepy?",
+            "prompt_variants": [
+                "Ile wynosi maksymalna długość zespołu pojazdów składającego się z motocykla i przyczepy?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2"
+            ],
+            "question_topics": [
+                {
+                    "key": "driving_with_trailer",
+                    "name": "Kierowanie pojazdem z przyczepa"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "5 m.",
+                    "option_b": "4 m.",
+                    "option_c": "3 m.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "4 m."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/6571/image/full.5d0572731331.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/6571/image/thumb.baaf2150ce22.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/6571/image/full.5d0572731331.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/6571/image/thumb.baaf2150ce22.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/6571/image/full.5d0572731331.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/6571/image/thumb.baaf2150ce22.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 35798,
+                    "question_external_id": "6571",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-62-ust-4a-pkt-1",
+                    "legal_unit_label": "art. 62 ust. 4a pkt 1",
+                    "legal_unit_title": "Długość motocykla lub motoroweru z przyczepą",
+                    "legal_topic_slug": "przyczepa-masa-wymiary-i-oswietlenie",
+                    "article_slug": "przyczepa-masa-wymiary-i-oswietlenie",
+                    "public_note": "To pytanie sprawdza długość zespołu z motocyklem albo motorowerem i przyczepą. Art. 62 ust. 4a pkt 1 ustanawia limit 4 m."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 35798,
+                    "external_id": "6571",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35842,
+                    "external_id": "6571",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35888,
+                    "external_id": "6571",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6573",
+            "prompt": "Który z wymienionych warunków powinna spełniać przyczepa ciągnięta przez motocykl?",
+            "prompt_variants": [
+                "Który z wymienionych warunków powinna spełniać przyczepa ciągnięta przez motocykl?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2"
+            ],
+            "question_topics": [
+                {
+                    "key": "driving_with_trailer",
+                    "name": "Kierowanie pojazdem z przyczepa"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Oznaczenie chorągiewką barwy czerwonej.",
+                    "option_b": "Wyposażenie we własną tablicę rejestracyjną o numerze innym niż tablica rejestracyjna motocykla.",
+                    "option_c": "Wyposażenie w tablicę rejestracyjną przeniesioną z motocykla.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Wyposażenie w tablicę rejestracyjną przeniesioną z motocykla."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo przyczepa ciągnięta przez motocykl powinna wyposażona być w tablicę rejestracyjną przeniesioną z motocykla. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/6573/image/full.638ee6667149.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/6573/image/thumb.baaf2150ce22.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/6573/image/full.638ee6667149.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/6573/image/thumb.baaf2150ce22.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/6573/image/full.638ee6667149.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/6573/image/thumb.baaf2150ce22.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 35799,
+                    "external_id": "6573",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35843,
+                    "external_id": "6573",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35889,
+                    "external_id": "6573",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6588",
+            "prompt": "Jaka jest maksymalna dopuszczalna długość zespołu pojazdów składającego się z motoroweru i przyczepy?",
+            "prompt_variants": [
+                "Jaka jest maksymalna dopuszczalna długość zespołu pojazdów składającego się z motoroweru i przyczepy?"
+            ],
+            "categories": [
+                "AM"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "5 m.",
+                    "option_b": "4 m.",
+                    "option_c": "3 m.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "4 m."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/am/6588/image/full.2c85d8c320e8.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/am/6588/image/thumb.e5ddd0ca15a9.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 35934,
+                    "question_external_id": "6588",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-62-ust-4a-pkt-1",
+                    "legal_unit_label": "art. 62 ust. 4a pkt 1",
+                    "legal_unit_title": "Długość motocykla lub motoroweru z przyczepą",
+                    "legal_topic_slug": "przyczepa-masa-wymiary-i-oswietlenie",
+                    "article_slug": "przyczepa-masa-wymiary-i-oswietlenie",
+                    "public_note": "To pytanie sprawdza długość zespołu z motocyklem albo motorowerem i przyczepą. Art. 62 ust. 4a pkt 1 ustanawia limit 4 m."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 35934,
+                    "external_id": "6588",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6653",
+            "prompt": "Którą z wymienionych grup osób, masz prawo przewozić w przyczepie ciągniętej przez ciągnik rolniczy?",
+            "prompt_variants": [
+                "Którą z wymienionych grup osób, masz prawo przewozić w przyczepie ciągniętej przez ciągnik rolniczy?"
+            ],
+            "categories": [
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "driving_with_trailer",
+                    "name": "Kierowanie pojazdem z przyczepa"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Drużynę roboczą składającą się z 7 osób.",
+                    "option_b": "3 konwojentów w pozycji siedzącej znajdujących się pomiędzy ładunkiem, a przednią ścianą przyczepy.",
+                    "option_c": "4 osoby wykonujące czynności ładunkowe, jadące w pozycji stojącej trzymając się uchwytów.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "4 osoby wykonujące czynności ładunkowe, jadące w pozycji stojącej trzymając się uchwytów."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo co prawda zabrania się przewozu osób w przyczepie, jednakże dopuszcza się przewóz konwojentów, drużyn roboczych i osób wykonujących czynności. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/6653/image/full.a76a51f66510.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/6653/image/thumb.e23ea3ada270.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 35960,
+                    "external_id": "6653",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6656",
+            "prompt": "W jaki sposób możesz skręcić w prawo ciągnikiem rolniczym z przyczepą, jeśli wymiary zespołu pojazdów uniemożliwiają rozpoczęcie manewru od prawej krawędzi jezdni?",
+            "prompt_variants": [
+                "W jaki sposób możesz skręcić w prawo ciągnikiem rolniczym z przyczepą, jeśli wymiary zespołu pojazdów uniemożliwiają rozpoczęcie manewru od prawej krawędzi jezdni?"
+            ],
+            "categories": [
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "driving_with_trailer",
+                    "name": "Kierowanie pojazdem z przyczepa"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Możesz rozpocząć manewr nie trzymając się prawej krawędzi jezdni.",
+                    "option_b": "Możesz najechać prawymi kołami na chodnik z zachowaniem szczególnej ostrożności.",
+                    "option_c": "Możesz przejechać przez linię ciągłą.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Możesz rozpocząć manewr nie trzymając się prawej krawędzi jezdni."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/6656/image/full.733a97f3d8d9.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/6656/image/thumb.dc852f6aaf66.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 35962,
+                    "external_id": "6656",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6663",
+            "prompt": "Czy kierując ciągnikiem rolniczym masz prawo ciągnąć przyczepę bez świateł odblaskowych bocznych?",
+            "prompt_variants": [
+                "Czy kierując ciągnikiem rolniczym masz prawo ciągnąć przyczepę bez świateł odblaskowych bocznych?"
+            ],
+            "categories": [
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "driving_with_trailer",
+                    "name": "Kierowanie pojazdem z przyczepa"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak.",
+                    "option_b": "Nie.",
+                    "option_c": "Tak, ale tylko krótszą niż 6 m.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo nie wolno ciągnąć przyczepy bez wymaganych świateł odblaskowych bocznych, bo przyczepa musi być wyposażona w odblaski boczne barwy żółtej samochodowej. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/6663/image/full.f441bf03f42b.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/6663/image/thumb.a204a93b9f76.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 35967,
+                    "question_external_id": "6663",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "par-12-ust-1-pkt-11",
+                    "legal_unit_label": "§ 12 ust. 1 pkt 11",
+                    "legal_unit_title": "Boczne światła odblaskowe przyczepy",
+                    "legal_topic_slug": "przyczepa-masa-wymiary-i-oswietlenie",
+                    "article_slug": "przyczepa-masa-wymiary-i-oswietlenie",
+                    "public_note": "To pytanie sprawdza obowiązkowe wyposażenie przyczepy ciągnika rolniczego. § 12 ust. 1 pkt 11 wymaga bocznych świateł odblaskowych barwy żółtej samochodowej."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 35967,
+                    "external_id": "6663",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6684",
+            "prompt": "Kierujesz ciągnikiem rolniczym z załadowaną przyczepą. Co powinieneś zrobić przed wjechaniem na długie wzniesienie?",
+            "prompt_variants": [
+                "Kierujesz ciągnikiem rolniczym z załadowaną przyczepą. Co powinieneś zrobić przed wjechaniem na długie wzniesienie?"
+            ],
+            "categories": [
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "driving_with_trailer",
+                    "name": "Kierowanie pojazdem z przyczepa"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Włączyć taki bieg, żeby wjechać na wzniesienie bez redukowania biegów.",
+                    "option_b": "Rozpędzić zespół pojazdów na najwyższym biegu i próbować na nim jechać do końca wzniesienia.",
+                    "option_c": "W każdym przypadku zredukować biegi na polowe.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Włączyć taki bieg, żeby wjechać na wzniesienie bez redukowania biegów."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo trzeba włączyć taki bieg (zredukować), aby móc pokonać wzniesienie bez konieczności zmiany biegów podczas jazdy pod górę, bo odpowiednio wczesna. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/6684/image/full.5d131542d93c.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/6684/image/thumb.1d25f1a7b68b.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 36141,
+                    "external_id": "6684",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6687",
+            "prompt": "W jaki sposób powinieneś obserwować drogę za ciągnikiem rolniczym z przyczepą w czasie cofania?",
+            "prompt_variants": [
+                "W jaki sposób powinieneś obserwować drogę za ciągnikiem rolniczym z przyczepą w czasie cofania?"
+            ],
+            "categories": [
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "driving_with_trailer",
+                    "name": "Kierowanie pojazdem z przyczepa"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Przez tylną szybę oraz w lusterkach zewnętrznych obserwując tor jazdy ciągnika i przyczepy.",
+                    "option_b": "Patrząc do tyłu bez analizy toru jazdy przodu ciągnika.",
+                    "option_c": "Patrząc na kierownicę i na jej podstawie obserwować tor jazdy.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Przez tylną szybę oraz w lusterkach zewnętrznych obserwując tor jazdy ciągnika i przyczepy."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/6687/image/full.64a51217b0ed.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/6687/image/thumb.16534f1e0c76.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 36143,
+                    "external_id": "6687",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6695",
+            "prompt": "Czy na przyczepie ciągnika rolniczego masz prawo przewozić ładunek powodujący przekroczenie jej dopuszczalnej ładowności?",
+            "prompt_variants": [
+                "Czy na przyczepie ciągnika rolniczego masz prawo przewozić ładunek powodujący przekroczenie jej dopuszczalnej ładowności?"
+            ],
+            "categories": [
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak.",
+                    "option_b": "Tak, ale tylko podczas jazdy po drogach publicznych gruntowych.",
+                    "option_c": "Nie.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Nie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo ładunek nie może powodować przekroczenia dopuszczalnej masy całkowitej lub dopuszczalnej ładowności pojazdu. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/6695/image/full.f441bf03f42b.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/6695/image/thumb.a204a93b9f76.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 36149,
+                    "question_external_id": "6695",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-1",
+                    "legal_unit_label": "art. 61 ust. 1",
+                    "legal_unit_title": "Zakaz przekraczania dopuszczalnej masy i ładowności",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie sprawdza zakaz przeciążenia pojazdu lub przyczepy. Art. 61 ust. 1 nie pozwala, aby ładunek powodował przekroczenie dopuszczalnej masy całkowitej albo dopuszczalnej ładowności."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 36149,
+                    "external_id": "6695",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6857",
+            "prompt": "Jaka jest maksymalna dopuszczalna długość zespołu pojazdów złożonego z autobusu i przyczepy?",
+            "prompt_variants": [
+                "Jaka jest maksymalna dopuszczalna długość zespołu pojazdów złożonego z autobusu i przyczepy?"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "driving_with_trailer",
+                    "name": "Kierowanie pojazdem z przyczepa"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "22 m.",
+                    "option_b": "18,75 m.",
+                    "option_c": "16,5 m.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "18,75 m."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo długość zespołu 2 pojazdów nie może przekraczać 18,75m. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/6857/image/full.4205c0c8c4d1.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/6857/image/thumb.5b75531ef300.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/6857/image/full.4205c0c8c4d1.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/6857/image/thumb.5b75531ef300.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 36479,
+                    "question_external_id": "6857",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-62-ust-4a-pkt-2",
+                    "legal_unit_label": "art. 62 ust. 4a pkt 2",
+                    "legal_unit_title": "Długość pojazdu z przyczepą",
+                    "legal_topic_slug": "przyczepa-masa-wymiary-i-oswietlenie",
+                    "article_slug": "przyczepa-masa-wymiary-i-oswietlenie",
+                    "public_note": "To pytanie dotyczy maksymalnej długości zespołu dwóch pojazdów innego niż motocykl lub motorower z przyczepą. Art. 62 ust. 4a pkt 2 wyznacza limit 18,75 m."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 36479,
+                    "external_id": "6857",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 36554,
+                    "external_id": "6857",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7452",
+            "prompt": "Jakiej wielkości nie ma prawa przekroczyć rzeczywista masa całkowita przyczepy ciągniętej przez samochód osobowy?",
+            "prompt_variants": [
+                "Jakiej wielkości nie ma prawa przekroczyć rzeczywista masa całkowita przyczepy ciągniętej przez samochód osobowy?"
+            ],
+            "categories": [
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Masy własnej samochodu.",
+                    "option_b": "Rzeczywistej masy całkowitej samochodu.",
+                    "option_c": "Rzeczywistej masy całkowitej samochodu pomniejszonej o 40%.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Rzeczywistej masy całkowitej samochodu."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 40617,
+                    "question_external_id": "7452",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-62-ust-1-pkt-1",
+                    "legal_unit_label": "art. 62 ust. 1 pkt 1",
+                    "legal_unit_title": "Masa przyczepy ciągniętej przez samochód osobowy",
+                    "legal_topic_slug": "przyczepa-masa-wymiary-i-oswietlenie",
+                    "article_slug": "przyczepa-masa-wymiary-i-oswietlenie",
+                    "public_note": "To pytanie porównuje rzeczywiste masy samochodu osobowego i przyczepy. Art. 62 ust. 1 pkt 1 nie pozwala, aby przyczepa była rzeczywiście cięższa od ciągnącego ją samochodu."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 40617,
+                    "external_id": "7452",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41148,
+                    "external_id": "7452",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7511",
+            "prompt": "Jakiej wielkości nie ma prawa przekraczać rzeczywista masa całkowita przyczepy ciągniętej przez motocykl?",
+            "prompt_variants": [
+                "Jakiej wielkości nie ma prawa przekraczać rzeczywista masa całkowita przyczepy ciągniętej przez motocykl?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2"
+            ],
+            "question_topics": [
+                {
+                    "key": "driving_with_trailer",
+                    "name": "Kierowanie pojazdem z przyczepa"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Masy własnej motocykla, jednak nie może być większa niż 100 kg.",
+                    "option_b": "Rzeczywistej masy całkowitej motocykla.",
+                    "option_c": "Rzeczywistej masy całkowitej motocykla pomniejszonej o 40%.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Masy własnej motocykla, jednak nie może być większa niż 100 kg."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 40543,
+                    "question_external_id": "7511",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-62-ust-1-pkt-3",
+                    "legal_unit_label": "art. 62 ust. 1 pkt 3",
+                    "legal_unit_title": "Masa przyczepy ciągniętej przez motocykl lub motorower",
+                    "legal_topic_slug": "przyczepa-masa-wymiary-i-oswietlenie",
+                    "article_slug": "przyczepa-masa-wymiary-i-oswietlenie",
+                    "public_note": "To pytanie dotyczy przyczepy ciągniętej przez motocykl. Jej rzeczywista masa nie może przekraczać masy własnej motocykla, a jednocześnie nie może być większa niż 100 kg."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 40543,
+                    "external_id": "7511",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40999,
+                    "external_id": "7511",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41075,
+                    "external_id": "7511",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7527",
+            "prompt": "Czy wolno Ci przewozić osoby w przyczepie ciągniętej przez samochód ciężarowy?",
+            "prompt_variants": [
+                "Czy wolno Ci przewozić osoby w przyczepie ciągniętej przez samochód ciężarowy?"
+            ],
+            "categories": [
+                "C",
+                "C1"
+            ],
+            "question_topics": [
+                {
+                    "key": "driving_with_trailer",
+                    "name": "Kierowanie pojazdem z przyczepa"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak, zawsze gdy przyczepą nie przewozi się ładunku.",
+                    "option_b": "Tak, jeśli są to osoby wykonujące czynności ładunkowe.",
+                    "option_c": "Nie, jest to zabronione, chyba że osoby są przewożone pojazdami niektórych slużb, np. Policji.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Nie, jest to zabronione, chyba że osoby są przewożone pojazdami niektórych slużb, np. Policji."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo zabrania się przewozić osoby w przyczepie ciągniętej przez samochód ciężarowy, gdzie przepisu tego nie stosuje się do przewozu pojazdami. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 41606,
+                    "external_id": "7527",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41624,
+                    "external_id": "7527",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7531",
+            "prompt": "Na jaką maksymalną długość ma prawo wystawać drewno długie z tyłu przyczepy kłonicowej?",
+            "prompt_variants": [
+                "Na jaką maksymalną długość ma prawo wystawać drewno długie z tyłu przyczepy kłonicowej?"
+            ],
+            "categories": [
+                "C",
+                "C1"
+            ],
+            "question_topics": [
+                {
+                    "key": "driving_with_trailer",
+                    "name": "Kierowanie pojazdem z przyczepa"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "2 m.",
+                    "option_b": "5 m.",
+                    "option_c": "7 m.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "5 m."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo ładunek wystający poza płaszczyzny obrysu pojazdu może być na nim umieszczony tylko w taki sposób, że nie może wystawać z tyłu pojazdu na odległość. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 41608,
+                    "question_external_id": "7531",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-7",
+                    "legal_unit_label": "art. 61 ust. 7",
+                    "legal_unit_title": "Drewno długie na przyczepie kłonicowej",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie sprawdza szczególny wyjątek dla drewna długiego na przyczepie kłonicowej. Art. 61 ust. 7 dopuszcza wystawanie z tyłu do 5 m od osi przyczepy."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 41608,
+                    "external_id": "7531",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41626,
+                    "external_id": "7531",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7540",
+            "prompt": "Czy wolno Ci holować autobusem samochód ciężarowy z przyczepą?",
+            "prompt_variants": [
+                "Czy wolno Ci holować autobusem samochód ciężarowy z przyczepą?"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "driving_with_trailer",
+                    "name": "Kierowanie pojazdem z przyczepa"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak, ale tylko poza autostradą.",
+                    "option_b": "Tak, bez ograniczeń.",
+                    "option_c": "Nie.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Nie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo zabrania się holowania więcej niż jednego pojazdu, z wyjątkiem pojazdu członowego. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 41645,
+                    "external_id": "7540",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41670,
+                    "external_id": "7540",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7607",
+            "prompt": "W jaki sposób kierujący ciągnikiem rolniczym z przyczepą powinien kontrolować swój tor jazdy podczas cofania?",
+            "prompt_variants": [
+                "W jaki sposób kierujący ciągnikiem rolniczym z przyczepą powinien kontrolować swój tor jazdy podczas cofania?"
+            ],
+            "categories": [
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "driving_with_trailer",
+                    "name": "Kierowanie pojazdem z przyczepa"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Patrząc przez tylną szybę i lusterka zewnętrzne.",
+                    "option_b": "Patrząc tylko przez tylną szybę.",
+                    "option_c": "Patrząc tylko w lusterka zewnętrzne.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Patrząc przez tylną szybę i lusterka zewnętrzne."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. W praktyce trzeba ocenic sytuacje zgodnie z zasadami ruchu drogowego, a nie tylko po pozorach. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 41694,
+                    "external_id": "7607",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7613",
+            "prompt": "Co powinieneś uwzględnić podczas jazdy po łuku ciągnikiem rolniczym z przyczepą jednoosiową?",
+            "prompt_variants": [
+                "Co powinieneś uwzględnić podczas jazdy po łuku ciągnikiem rolniczym z przyczepą jednoosiową?"
+            ],
+            "categories": [
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "driving_with_trailer",
+                    "name": "Kierowanie pojazdem z przyczepa"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Przyczepa jedzie po mniejszym promieniu niż ciągnik.",
+                    "option_b": "Przyczepa jedzie po większym promieniu niż ciągnik.",
+                    "option_c": "Oba pojazdy poruszają się tym samym torem jazdy.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Przyczepa jedzie po mniejszym promieniu niż ciągnik."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo podczas jazdy po łuku ciągnikiem rolniczym z przyczepą jednoosiową najważniejsze jest uwzględnienie, że przyczepa jedzie po mniejszym promieniu. W praktyce trzeba ocenic sytuacje zgodnie z zasadami ruchu drogowego, a nie tylko po pozorach. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 41699,
+                    "external_id": "7613",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7615",
+            "prompt": "Czy na drodze publicznej dozwolone jest przewożenie w przyczepie ciągniętej przez ciągnik rolniczy ładunku przekraczającego jej dopuszczalną ładowność?",
+            "prompt_variants": [
+                "Czy na drodze publicznej dozwolone jest przewożenie w przyczepie ciągniętej przez ciągnik rolniczy ładunku przekraczającego jej dopuszczalną ładowność?"
+            ],
+            "categories": [
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "driving_with_trailer",
+                    "name": "Kierowanie pojazdem z przyczepa"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak, o ile dopuszczalna ładowność przyczepy nie jest przekroczona o więcej niż 40% wielkości nominalnej.",
+                    "option_b": "Nie.",
+                    "option_c": "Tak, ale tylko na trasie nieprzekraczającej 5 km.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo ładunek nie może powodować przekroczenia dopuszczalnej masy całkowitej lub dopuszczalnej ładowności pojazdu, a więc również przyczepy ciągniętej przez ciągnik rolniczy. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/7615/image/full.b1911901c6a0.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/7615/image/thumb.ff82346b1e37.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 41701,
+                    "question_external_id": "7615",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-1",
+                    "legal_unit_label": "art. 61 ust. 1",
+                    "legal_unit_title": "Zakaz przekraczania dopuszczalnej masy i ładowności",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie sprawdza zakaz przeciążenia pojazdu lub przyczepy. Art. 61 ust. 1 nie pozwala, aby ładunek powodował przekroczenie dopuszczalnej masy całkowitej albo dopuszczalnej ładowności."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 41701,
+                    "external_id": "7615",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10084",
+            "prompt": "Ile wynosi maksymalnie dopuszczalna długość zespołu pojazdów składającego się z samochodu ciężarowego o dopuszczalnej masie całkowitej do 3,5 tony i przyczepy kempingowej?",
+            "prompt_variants": [
+                "Ile wynosi maksymalnie dopuszczalna długość zespołu pojazdów składającego się z samochodu ciężarowego o dopuszczalnej masie całkowitej do 3,5 tony i przyczepy kempingowej?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "19,85 metra.",
+                    "option_b": "18,75 metra.",
+                    "option_c": "14,95 metra.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "18,75 metra."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo maksymalna długość zespołu 2 pojazdów (np. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/10084/image/full.569e447517b8.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/10084/image/thumb.0de85edd0649.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 43627,
+                    "question_external_id": "10084",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-62-ust-4a-pkt-2",
+                    "legal_unit_label": "art. 62 ust. 4a pkt 2",
+                    "legal_unit_title": "Długość pojazdu z przyczepą",
+                    "legal_topic_slug": "przyczepa-masa-wymiary-i-oswietlenie",
+                    "article_slug": "przyczepa-masa-wymiary-i-oswietlenie",
+                    "public_note": "To pytanie dotyczy maksymalnej długości zespołu dwóch pojazdów innego niż motocykl lub motorower z przyczepą. Art. 62 ust. 4a pkt 2 wyznacza limit 18,75 m."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 43627,
+                    "external_id": "10084",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10085",
+            "prompt": "Który z wymienionych przypadków jest prawidłowym sposobem przewożenia ładunku na przyczepie ciągniętej przez samochód osobowy?",
+            "prompt_variants": [
+                "Który z wymienionych przypadków jest prawidłowym sposobem przewożenia ładunku na przyczepie ciągniętej przez samochód osobowy?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Ładunek jest zabezpieczony przed przesuwaniem się.",
+                    "option_b": "Ładunek nie jest zabezpieczony przed zmianą położenia.",
+                    "option_c": "Ładunek nie jest zabezpieczony przed zmianą położenia, jeżeli prędkość jazdy nie będzie większa niż 30 km/h.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Ładunek jest zabezpieczony przed przesuwaniem się."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo ładunek umieszczony na przyczepie ciągniętej przez samochód osobowy powinien być zabezpieczony przed zmianą położenia - przed przesuwaniem. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/10085/image/full.569e447517b8.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/10085/image/thumb.0de85edd0649.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 43628,
+                    "question_external_id": "10085",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-3",
+                    "legal_unit_label": "art. 61 ust. 3",
+                    "legal_unit_title": "Zabezpieczenie ładunku przed zmianą położenia",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie sprawdza obowiązek zabezpieczenia ładunku przed zmianą położenia podczas jazdy. Art. 61 ust. 3 wymaga takiego mocowania niezależnie od rodzaju pojazdu."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 43628,
+                    "external_id": "10085",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10086",
+            "prompt": "W jaki sposób powinieneś przewozić ładunek w przyczepie ciągniętej przez samochód osobowy?",
+            "prompt_variants": [
+                "W jaki sposób powinieneś przewozić ładunek w przyczepie ciągniętej przez samochód osobowy?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Ładunek nie powinien być zabezpieczony przed zmianą położenia.",
+                    "option_b": "Ładunek może zasłaniać niektóre światła przyczepy.",
+                    "option_c": "Ładunek nie może naruszać stateczności pojazdu.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Ładunek nie może naruszać stateczności pojazdu."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo ładunek na pojeździe umieszcza się w taki sposób, aby nie naruszał stateczności pojazdu. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/10086/image/full.98c7bbda646c.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/10086/image/thumb.f2beac9af99a.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:przyczep",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 43629,
+                    "question_external_id": "10086",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-61-ust-2-pkt-2",
+                    "legal_unit_label": "art. 61 ust. 2 pkt 2",
+                    "legal_unit_title": "Stateczność i kierowanie pojazdem z ładunkiem",
+                    "legal_topic_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "article_slug": "zabezpieczenie-ladunku-i-wymiary",
+                    "public_note": "To pytanie dotyczy rozmieszczenia ładunku w sposób zachowujący stateczność i możliwość kierowania pojazdem. Taki obowiązek wynika wprost z art. 61 ust. 2 pkt 2."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 43629,
+                    "external_id": "10086",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        }
+    ]
+}

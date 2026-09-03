@@ -1,0 +1,272 @@
+{
+    "generated_at": "2026-04-14T23:01:37+02:00",
+    "category": "B",
+    "scope": "active_ready",
+    "rules_count": 7,
+    "exported_candidates": 15,
+    "rule_summaries": [
+        {
+            "name": "b-wave2-prohibition-signs-exact",
+            "target_topic_key": "prohibition_and_mandatory_signs",
+            "matched_questions": 4
+        },
+        {
+            "name": "b-wave2-warning-signs-exact",
+            "target_topic_key": "warning_signs",
+            "matched_questions": 2
+        },
+        {
+            "name": "b-wave2-informational-signs-exact",
+            "target_topic_key": "informational_direction_and_supplementary_signs",
+            "matched_questions": 2
+        },
+        {
+            "name": "b-wave2-traffic-signals-exact",
+            "target_topic_key": "traffic_lights_and_controller_signals",
+            "matched_questions": 4
+        },
+        {
+            "name": "b-wave2-signalized-intersections-exact",
+            "target_topic_key": "intersections_with_traffic_lights",
+            "matched_questions": 1
+        },
+        {
+            "name": "b-wave2-lane-change-exact",
+            "target_topic_key": "lane_change_and_turning",
+            "matched_questions": 1
+        },
+        {
+            "name": "b-wave2-perception-exact",
+            "target_topic_key": "perception_decision_alcohol_fatigue",
+            "matched_questions": 1
+        }
+    ],
+    "overrides": [
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "352",
+            "question_topic_key": "prohibition_and_mandatory_signs",
+            "reason": "PJ360 B wave 2: znaki zakazu i nakazu z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave2-prohibition-signs-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy na jezdni oznaczonej tym znakiem wolno Ci zawrócić?",
+                "main_media_original": "IMG_4251orgbm.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "8353",
+            "question_topic_key": "prohibition_and_mandatory_signs",
+            "reason": "PJ360 B wave 2: znaki zakazu i nakazu z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave2-prohibition-signs-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy ten znak informuje o prędkości minimalnej, z jaką masz prawo się poruszać?",
+                "main_media_original": "ZZ-10-14_0006_Censored_1024x576.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "8363",
+            "question_topic_key": "prohibition_and_mandatory_signs",
+            "reason": "PJ360 B wave 2: znaki zakazu i nakazu z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave2-prohibition-signs-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy w tej sytuacji masz prawo wjechać na drogę za tym znakiem pionowym, jeżeli nie utrudnisz ruchu innym pojazdom?",
+                "main_media_original": "PICT_144_1024x576.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "10394",
+            "question_topic_key": "prohibition_and_mandatory_signs",
+            "reason": "PJ360 B wave 2: znaki zakazu i nakazu z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave2-prohibition-signs-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy ten znak dotyczy pojazdów z materiałami wybuchowymi lub łatwo zapalnymi?",
+                "main_media_original": "1661ztV_2.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "12714",
+            "question_topic_key": "warning_signs",
+            "reason": "PJ360 B wave 2: znaki ostrzegawcze z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave2-warning-signs-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy za tym znakiem należy spodziewać się trzech niebezpiecznych zakrętów, z których wszystkie mogą być w lewo?",
+                "main_media_original": "1928ztV.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "13633",
+            "question_topic_key": "warning_signs",
+            "reason": "PJ360 B wave 2: znaki ostrzegawcze z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave2-warning-signs-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy ten znak zawsze zobowiązuje kierującego pojazdem do zwiększenia uwagi ?",
+                "main_media_original": "PW12-2025-41.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "10161",
+            "question_topic_key": "informational_direction_and_supplementary_signs",
+            "reason": "PJ360 B wave 2: znaki informacyjne z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave2-informational-signs-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy widoczny znak oznacza koniec drogi ekspresowej?",
+                "main_media_original": "1_1515ztV.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "10165",
+            "question_topic_key": "informational_direction_and_supplementary_signs",
+            "reason": "PJ360 B wave 2: znaki informacyjne z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave2-informational-signs-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy ten znak oznacza koniec drogi ekspresowej?",
+                "main_media_original": "1_1326ztV.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "3122",
+            "question_topic_key": "traffic_lights_and_controller_signals",
+            "reason": "PJ360 B wave 2: sygnaly swietlne i kierujacy ruchem z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave2-traffic-signals-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Zatrzymałeś właśnie swój pojazd. Czy w związku ze znaczeniem nadawanego sygnału świetlnego zrobiłeś to we właściwym miejscu?",
+                "main_media_original": "IMG_0555orgbm.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "7450",
+            "question_topic_key": "traffic_lights_and_controller_signals",
+            "reason": "PJ360 B wave 2: sygnaly swietlne i kierujacy ruchem z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave2-traffic-signals-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy masz obowiązek stosowania się do poleceń i sygnałów dawanych przez osobę wykonującą roboty na drodze na zlecenie zarządcy drogi?",
+                "main_media_original": "30079_2.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "10805",
+            "question_topic_key": "traffic_lights_and_controller_signals",
+            "reason": "PJ360 B wave 2: sygnaly swietlne i kierujacy ruchem z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave2-traffic-signals-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy masz obowiązek stosować się do poleceń lub sygnałów dawanych przez pilota pojazdu nienormatywnego?",
+                "main_media_original": ""
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "13155",
+            "question_topic_key": "traffic_lights_and_controller_signals",
+            "reason": "PJ360 B wave 2: sygnaly swietlne i kierujacy ruchem z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave2-traffic-signals-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy w tej sytuacji, żeby kontynuować jazdę, musisz oczekiwać na zmianę sygnału czerwonego na zielony?",
+                "main_media_original": "GM_W9-2.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "6068",
+            "question_topic_key": "intersections_with_traffic_lights",
+            "reason": "PJ360 B wave 2: skrzyzowania z sygnalizacja z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave2-signalized-intersections-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy ten sygnał oznacza bezkolizyjny skręt w lewo?",
+                "main_media_original": "1A301.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "9203",
+            "question_topic_key": "lane_change_and_turning",
+            "reason": "PJ360 B wave 2: zmiana pasa i kierunku jazdy z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave2-lane-change-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy w przedstawionej sytuacji zamierzając skręcić w prawo w strefę zamieszkania musisz sygnalizować ten manewr?",
+                "main_media_original": "1247ztV.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "916",
+            "question_topic_key": "perception_decision_alcohol_fatigue",
+            "reason": "PJ360 B wave 2: percepcja i zmeczenie z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave2-perception-exact",
+                "current_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_topic_key": "special_caution_exiting_and_securing_vehicle",
+                "classifier_matched_by": "fallback:basic",
+                "prompt_excerpt": "Czy w trakcie prowadzenia pojazdu, wraz z upływem czasu, poprawia się Twoja zdolność dostrzegania znaków i sygnałów drogowych?",
+                "main_media_original": "IMG_9599org.jpg"
+            }
+        }
+    ],
+    "source_spec_path": "resources/topic-overrides/pj360-b-wave-2-signals-and-signs-spec.json"
+}

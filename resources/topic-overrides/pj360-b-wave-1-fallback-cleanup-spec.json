@@ -1,0 +1,98 @@
+{
+  "category": "B",
+  "scope": "active_ready",
+  "rules": [
+    {
+      "name": "b-wave1-pedestrians-from-basic-fallback",
+      "target_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+      "reason": "PJ360 B wave 1: piesi i ograniczona mobilnosc z fallback:basic",
+      "current_topic_keys": [
+        "special_caution_exiting_and_securing_vehicle"
+      ],
+      "classifier_matched_by": [
+        "fallback:basic"
+      ],
+      "prompt_contains_any": [
+        "piesz",
+        "przejsc"
+      ],
+      "prompt_not_contains_any": [
+        "pojazdowi uprzywilejowanemu",
+        "roboty na drodze",
+        "pilot"
+      ]
+    },
+    {
+      "name": "b-wave1-rail-crossings-from-basic-fallback",
+      "target_topic_key": "rail_and_tram_crossings",
+      "reason": "PJ360 B wave 1: przejazdy kolejowe z fallback:basic",
+      "current_topic_keys": [
+        "special_caution_exiting_and_securing_vehicle"
+      ],
+      "classifier_matched_by": [
+        "fallback:basic"
+      ],
+      "prompt_contains_any": [
+        "przejazdzie kolejow",
+        "tory kolejowe",
+        "pociag",
+        "polzapory",
+        "pojazdem szynowym",
+        "pracownika kolejowego"
+      ]
+    },
+    {
+      "name": "b-wave1-safety-equipment-from-specialist-fallback",
+      "target_topic_key": "safety_equipment_and_restraints",
+      "reason": "PJ360 B wave 1: pasy, zaglowki i foteliki z fallback:specialist",
+      "current_topic_keys": [
+        "driving_technique"
+      ],
+      "classifier_matched_by": [
+        "fallback:specialist"
+      ],
+      "prompt_contains_any": [
+        "pas bezpieczenstwa",
+        "pasy bezpieczenstwa",
+        "fotelik",
+        "zaglowek",
+        "zaglowki"
+      ]
+    },
+    {
+      "name": "b-wave1-vehicle-load-from-specialist-fallback",
+      "target_topic_key": "vehicle_load_and_passenger_safety",
+      "reason": "PJ360 B wave 1: ladunek i przewoz osob z fallback:specialist",
+      "current_topic_keys": [
+        "driving_technique"
+      ],
+      "classifier_matched_by": [
+        "fallback:specialist"
+      ],
+      "prompt_contains_any": [
+        "przewozonych osob",
+        "liczbe osob",
+        "liczba miejsc",
+        "ladunek",
+        "ladunku"
+      ]
+    },
+    {
+      "name": "b-wave1-rescue-actions-from-specialist-fallback",
+      "target_topic_key": "rescue_actions",
+      "reason": "PJ360 B wave 1: akcje ratunkowe z fallback:specialist",
+      "current_topic_keys": [
+        "driving_technique"
+      ],
+      "classifier_matched_by": [
+        "fallback:specialist"
+      ],
+      "prompt_contains_any": [
+        "112",
+        "rannego",
+        "wypadku",
+        "ratowniczych"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,242 @@
+{
+    "generated_at": "2026-04-15T00:07:02+02:00",
+    "category": "B",
+    "scope": "active_ready",
+    "rules_count": 4,
+    "exported_candidates": 14,
+    "rule_summaries": [
+        {
+            "name": "b-wave5-signalized-intersections-entry-exact",
+            "target_topic_key": "intersections_with_traffic_lights",
+            "matched_questions": 8
+        },
+        {
+            "name": "b-wave5-lane-change-on-intersection-exact",
+            "target_topic_key": "lane_change_and_turning",
+            "matched_questions": 4
+        },
+        {
+            "name": "b-wave5-overtaking-on-intersection-exact",
+            "target_topic_key": "overtaking",
+            "matched_questions": 1
+        },
+        {
+            "name": "b-wave5-mandatory-turn-sign-exact",
+            "target_topic_key": "prohibition_and_mandatory_signs",
+            "matched_questions": 1
+        }
+    ],
+    "overrides": [
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "2509",
+            "question_topic_key": "intersections_with_traffic_lights",
+            "reason": "PJ360 B wave 5: skrzyzowania z sygnalizacja z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave5-signalized-intersections-entry-exact",
+                "current_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_matched_by": "keyword:generic_intersection",
+                "prompt_excerpt": "Czy w przedstawionej sytuacji masz prawo wjechać na skrzyżowanie?",
+                "main_media_original": "121D11orgbm.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "3415",
+            "question_topic_key": "intersections_with_traffic_lights",
+            "reason": "PJ360 B wave 5: skrzyzowania z sygnalizacja z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave5-signalized-intersections-entry-exact",
+                "current_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_matched_by": "keyword:generic_intersection",
+                "prompt_excerpt": "Czy w tej sytuacji masz prawo wjechać na skrzyżowanie?",
+                "main_media_original": "154D11orgbm.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "4612",
+            "question_topic_key": "intersections_with_traffic_lights",
+            "reason": "PJ360 B wave 5: skrzyzowania z sygnalizacja z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave5-signalized-intersections-entry-exact",
+                "current_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_matched_by": "keyword:generic_intersection",
+                "prompt_excerpt": "Czy w tej sytuacji masz prawo wjechać na skrzyżowanie, jeżeli zamierzasz jechać na wprost?",
+                "main_media_original": "1A351.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "6074",
+            "question_topic_key": "intersections_with_traffic_lights",
+            "reason": "PJ360 B wave 5: skrzyzowania z sygnalizacja z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave5-signalized-intersections-entry-exact",
+                "current_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_matched_by": "keyword:generic_intersection",
+                "prompt_excerpt": "Czy w tej sytuacji wolno Ci wjechać na skrzyżowanie?",
+                "main_media_original": "1A309.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "6075",
+            "question_topic_key": "intersections_with_traffic_lights",
+            "reason": "PJ360 B wave 5: skrzyzowania z sygnalizacja z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave5-signalized-intersections-entry-exact",
+                "current_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_matched_by": "keyword:generic_intersection",
+                "prompt_excerpt": "Czy w tej sytuacji wolno Ci wjechać na skrzyżowanie?",
+                "main_media_original": "1A310.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "6081",
+            "question_topic_key": "intersections_with_traffic_lights",
+            "reason": "PJ360 B wave 5: skrzyzowania z sygnalizacja z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave5-signalized-intersections-entry-exact",
+                "current_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_matched_by": "keyword:generic_intersection",
+                "prompt_excerpt": "Czy w tej sytuacji wolno Ci wjechać na skrzyżowanie?",
+                "main_media_original": "1A352.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "6082",
+            "question_topic_key": "intersections_with_traffic_lights",
+            "reason": "PJ360 B wave 5: skrzyzowania z sygnalizacja z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave5-signalized-intersections-entry-exact",
+                "current_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_matched_by": "keyword:generic_intersection",
+                "prompt_excerpt": "Czy w tej sytuacji masz prawo wjechać na skrzyżowanie?",
+                "main_media_original": "1A353.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "7334",
+            "question_topic_key": "intersections_with_traffic_lights",
+            "reason": "PJ360 B wave 5: skrzyzowania z sygnalizacja z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave5-signalized-intersections-entry-exact",
+                "current_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_matched_by": "keyword:generic_intersection",
+                "prompt_excerpt": "Czy w tej sytuacji masz prawo wjechać na skrzyżowanie?",
+                "main_media_original": "L5T1_037_1.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "1448",
+            "question_topic_key": "lane_change_and_turning",
+            "reason": "PJ360 B wave 5: zmiana pasa i kierunku jazdy z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave5-lane-change-on-intersection-exact",
+                "current_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_matched_by": "keyword:generic_intersection",
+                "prompt_excerpt": "Czy w tej sytuacji, zamierzając skręcić w prawo, powinieneś jechać dalej zajmowanym pasem ruchu i zmienić go bezpośrednio przed skrzyżowaniem?",
+                "main_media_original": "IMG_6706_1orgbm.jpg"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "1707",
+            "question_topic_key": "lane_change_and_turning",
+            "reason": "PJ360 B wave 5: zmiana pasa i kierunku jazdy z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave5-lane-change-on-intersection-exact",
+                "current_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_matched_by": "keyword:generic_intersection",
+                "prompt_excerpt": "Czy masz obowiązek włączyć lewy kierunkowskaz, jeśli zamierzasz jechać przez to skrzyżowanie na wprost?",
+                "main_media_original": "MD_D5_03_ff_loorg.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "1729",
+            "question_topic_key": "lane_change_and_turning",
+            "reason": "PJ360 B wave 5: zmiana pasa i kierunku jazdy z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave5-lane-change-on-intersection-exact",
+                "current_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_matched_by": "keyword:generic_intersection",
+                "prompt_excerpt": "Czy w tej sytuacji zabronione jest opuszczenie skrzyżowania prawym pasem ruchu?",
+                "main_media_original": "W11(49,50)org.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "11499",
+            "question_topic_key": "lane_change_and_turning",
+            "reason": "PJ360 B wave 5: zmiana pasa i kierunku jazdy z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave5-lane-change-on-intersection-exact",
+                "current_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_matched_by": "keyword:generic_intersection",
+                "prompt_excerpt": "Czy planując opuszczenie tego skrzyżowania, zmieniłeś pas ruchu we właściwym momencie?",
+                "main_media_original": "W11(51)org.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "13144",
+            "question_topic_key": "overtaking",
+            "reason": "PJ360 B wave 5: wyprzedzanie z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave5-overtaking-on-intersection-exact",
+                "current_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_matched_by": "keyword:equal_intersection_priority",
+                "prompt_excerpt": "Czy na tym skrzyżowaniu możesz wyprzedzić pojazd z prawej strony?",
+                "main_media_original": "F20_wyprzedzanie_skrzyzowanie.wmv"
+            }
+        },
+        {
+            "license_category_code": "B",
+            "source": "gov.pl-mi",
+            "external_id": "3907",
+            "question_topic_key": "prohibition_and_mandatory_signs",
+            "reason": "PJ360 B wave 5: znak nakazu z curated external_id",
+            "metadata": {
+                "package_rule": "b-wave5-mandatory-turn-sign-exact",
+                "current_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_topic_key": "joining_traffic_and_equal_intersections",
+                "classifier_matched_by": "keyword:generic_intersection",
+                "prompt_excerpt": "Czy w przedstawionej sytuacji masz obowiązek skręcić wyłącznie w prawo na najbliższym skrzyżowaniu?",
+                "main_media_original": "IMG_9448org.jpg"
+            }
+        }
+    ],
+    "source_spec_path": "/var/www/html/resources/topic-overrides/pj360-b-wave-5-signalized-and-lane-spec.json"
+}

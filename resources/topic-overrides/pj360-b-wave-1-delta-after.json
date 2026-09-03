@@ -1,0 +1,50 @@
+{
+    "generated_at": "2026-04-14T22:44:32+02:00",
+    "scope": "active_ready",
+    "category_filter": [
+        "B"
+    ],
+    "limit": null,
+    "processed_questions": 2137,
+    "changed_questions": 18,
+    "changed_topic_rows": 5,
+    "delta_by_category": {
+        "B": [
+            {
+                "topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+                "topic_label": "Piesi i ograniczona mobilnosc",
+                "current_count": 89,
+                "proposed_count": 98,
+                "delta": 9
+            },
+            {
+                "topic_key": "driving_technique",
+                "topic_label": "Technika kierowania",
+                "current_count": 63,
+                "proposed_count": 60,
+                "delta": -3
+            },
+            {
+                "topic_key": "rail_and_tram_crossings",
+                "topic_label": "Przejazdy kolejowe i tramwajowe",
+                "current_count": 60,
+                "proposed_count": 66,
+                "delta": 6
+            },
+            {
+                "topic_key": "rescue_actions",
+                "topic_label": "Akcje ratunkowe",
+                "current_count": 18,
+                "proposed_count": 21,
+                "delta": 3
+            },
+            {
+                "topic_key": "special_caution_exiting_and_securing_vehicle",
+                "topic_label": "Szczegolna ostroznosc i pojazd",
+                "current_count": 312,
+                "proposed_count": 297,
+                "delta": -15
+            }
+        ]
+    }
+}

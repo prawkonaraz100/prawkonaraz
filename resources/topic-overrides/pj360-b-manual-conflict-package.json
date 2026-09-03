@@ -1,0 +1,99 @@
+{
+  "generated_at": "2026-04-15T15:35:00+02:00",
+  "workflow": "pj360_manual_conflict_resolution",
+  "category": "B",
+  "source": "pj360_b_manual_conflicts_final_pass",
+  "exported_overrides_count": 4,
+  "summary": {
+    "target_topic_counts": {
+      "prohibition_and_mandatory_signs": 2,
+      "intersections_with_traffic_lights": 2
+    }
+  },
+  "overrides": [
+    {
+      "license_category_code": "B",
+      "source": "gov.pl-mi",
+      "external_id": "9549",
+      "question_topic_key": "prohibition_and_mandatory_signs",
+      "reason": "PJ360 manual conflict resolution dla B: znak STOP przy przejezdzie kolejowym kierujemy do Znaki zakazu, nakazu",
+      "metadata": {
+        "workflow": "pj360_manual_conflict_resolution",
+        "current_topic_key": "road_position_entry_exit_stopping",
+        "decision_basis": "manual_final_pass",
+        "question_ids": [
+          43192
+        ],
+        "prompt_excerpt": "Czy w tej sytuacji, zbliżając się do przejazdu kolejowego, masz obowiązek zatrzymać pojazd przed znakiem STOP?",
+        "accepted_answer": "nie",
+        "question_media_kind": "image",
+        "main_media_originals": [
+          "ktw2541.jpg"
+        ]
+      }
+    },
+    {
+      "license_category_code": "B",
+      "source": "gov.pl-mi",
+      "external_id": "13426",
+      "question_topic_key": "prohibition_and_mandatory_signs",
+      "reason": "PJ360 manual conflict resolution dla B: znak STOP przy przejezdzie kolejowym kierujemy do Znaki zakazu, nakazu",
+      "metadata": {
+        "workflow": "pj360_manual_conflict_resolution",
+        "current_topic_key": "road_position_entry_exit_stopping",
+        "decision_basis": "manual_final_pass",
+        "question_ids": [
+          47846
+        ],
+        "prompt_excerpt": "Czy w tej sytuacji, zbliżając się do przejazdu kolejowego, masz obowiązek zatrzymać pojazd przed znakiem STOP?",
+        "accepted_answer": "nie",
+        "question_media_kind": "image",
+        "main_media_originals": [
+          "3004pic-zt.jpg"
+        ]
+      }
+    },
+    {
+      "license_category_code": "B",
+      "source": "gov.pl-mi",
+      "external_id": "7141",
+      "question_topic_key": "intersections_with_traffic_lights",
+      "reason": "PJ360 manual conflict resolution dla B: pytanie o pierwszenstwo tramwaju kierujemy do Skrzyzowania z sygnalizacja swietlna",
+      "metadata": {
+        "workflow": "pj360_manual_conflict_resolution",
+        "current_topic_key": "intersections_with_priority_signs",
+        "decision_basis": "manual_final_pass",
+        "question_ids": [
+          37308
+        ],
+        "prompt_excerpt": "Czy w tej sytuacji masz obowiązek ustąpić pierwszeństwa tramwajowi?",
+        "accepted_answer": "tak",
+        "question_media_kind": "video",
+        "main_media_originals": [
+          "1A4225.wmv"
+        ]
+      }
+    },
+    {
+      "license_category_code": "B",
+      "source": "gov.pl-mi",
+      "external_id": "3384",
+      "question_topic_key": "intersections_with_traffic_lights",
+      "reason": "PJ360 manual conflict resolution dla B: pytanie o pierwszenstwo tramwaju kierujemy do Skrzyzowania z sygnalizacja swietlna",
+      "metadata": {
+        "workflow": "pj360_manual_conflict_resolution",
+        "current_topic_key": "intersections_with_priority_signs",
+        "decision_basis": "manual_final_pass",
+        "question_ids": [
+          26019
+        ],
+        "prompt_excerpt": "Czy w tej sytuacji masz obowiązek ustąpić pierwszeństwa tramwajowi?",
+        "accepted_answer": "tak",
+        "question_media_kind": "video",
+        "main_media_originals": [
+          "D23MMX_20org.wmv"
+        ]
+      }
+    }
+  ]
+}

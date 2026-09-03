@@ -1,0 +1,306 @@
+{
+  "generated_at": "2026-04-15T17:39:56.390660+00:00",
+  "category": "C",
+  "reason": "pj360_missing_local_import",
+  "overrides": [
+    {
+      "license_category_code": "C",
+      "source": "pj360",
+      "external_id": "pj360:3451",
+      "question_topic_key": "breakdown_accident_and_first_aid",
+      "reason": "pj360_missing_local_recovered_from_other_category",
+      "metadata": {
+        "topic_label": "Ogólne zasady określające zachowanie kierowcy w momencie awarii lub wypadku, udzielanie pierwszej po...",
+        "pj360_site_question_id": "3451",
+        "recovered_from_category": "B",
+        "import_origin": "recoverable_from_other_category"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "pj360",
+      "external_id": "pj360:12500",
+      "question_topic_key": "informational_direction_and_supplementary_signs",
+      "reason": "pj360_missing_local_recovered_from_other_category",
+      "metadata": {
+        "topic_label": "Znaki informacyjne, kierunku i miejscowości, uzupełniające",
+        "pj360_site_question_id": "12500",
+        "recovered_from_category": "B",
+        "import_origin": "recoverable_from_other_category"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "6943",
+      "question_topic_key": "informational_direction_and_supplementary_signs",
+      "reason": "pj360_missing_local_recovered_from_other_category",
+      "metadata": {
+        "topic_label": "Znaki informacyjne, kierunku i miejscowości, uzupełniające",
+        "pj360_site_question_id": "3281",
+        "recovered_from_category": "B",
+        "import_origin": "recoverable_from_other_category"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "pj360",
+      "external_id": "pj360:2220",
+      "question_topic_key": "intersections_with_priority_signs",
+      "reason": "pj360_missing_local_recovered_from_other_category",
+      "metadata": {
+        "topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "pj360_site_question_id": "2220",
+        "recovered_from_category": "B",
+        "import_origin": "recoverable_from_other_category"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "pj360",
+      "external_id": "pj360:2858",
+      "question_topic_key": "intersections_with_priority_signs",
+      "reason": "pj360_missing_local_recovered_from_other_category",
+      "metadata": {
+        "topic_label": "Skrzyżowania ze znakami określającymi pierwszeństwo przejazdu",
+        "pj360_site_question_id": "2858",
+        "recovered_from_category": "B",
+        "import_origin": "recoverable_from_other_category"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "pj360",
+      "external_id": "pj360:12561",
+      "question_topic_key": "intersections_with_traffic_lights",
+      "reason": "pj360_missing_local_recovered_from_other_category",
+      "metadata": {
+        "topic_label": "Skrzyżowania z sygnalizacją świetlną",
+        "pj360_site_question_id": "12561",
+        "recovered_from_category": "B",
+        "import_origin": "recoverable_from_other_category"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "pj360",
+      "external_id": "pj360:3005",
+      "question_topic_key": "joining_traffic_and_equal_intersections",
+      "reason": "pj360_missing_local_recovered_from_other_category",
+      "metadata": {
+        "topic_label": "Włączanie się do ruchu, skrzyżowania równorzędne",
+        "pj360_site_question_id": "3005",
+        "recovered_from_category": "B",
+        "import_origin": "recoverable_from_other_category"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "pj360",
+      "external_id": "pj360:2517",
+      "question_topic_key": "lane_change_and_turning",
+      "reason": "pj360_missing_local_recovered_from_other_category",
+      "metadata": {
+        "topic_label": "Zmiana pasa ruchu, zmiana kierunku jazdy",
+        "pj360_site_question_id": "2517",
+        "recovered_from_category": "B",
+        "import_origin": "recoverable_from_other_category"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "pj360",
+      "external_id": "pj360:3335",
+      "question_topic_key": "passing_reversing",
+      "reason": "pj360_missing_local_recovered_from_other_category",
+      "metadata": {
+        "topic_label": "Omijanie, wymijanie, cofanie",
+        "pj360_site_question_id": "3335",
+        "recovered_from_category": "B",
+        "import_origin": "recoverable_from_other_category"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "4543",
+      "question_topic_key": "road_markings",
+      "reason": "pj360_missing_local_recovered_from_other_category",
+      "metadata": {
+        "topic_label": "Znaki drogowe poziome",
+        "pj360_site_question_id": "3356",
+        "recovered_from_category": "PT",
+        "import_origin": "recoverable_from_other_category"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "pj360",
+      "external_id": "pj360:3684",
+      "question_topic_key": "road_markings",
+      "reason": "pj360_missing_local_recovered_from_other_category",
+      "metadata": {
+        "topic_label": "Znaki drogowe poziome",
+        "pj360_site_question_id": "3684",
+        "recovered_from_category": "B",
+        "import_origin": "recoverable_from_other_category"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "pj360",
+      "external_id": "pj360:3540",
+      "question_topic_key": "road_position_entry_exit_stopping",
+      "reason": "pj360_missing_local_recovered_from_other_category",
+      "metadata": {
+        "topic_label": "Pozycja pojazdu na drodze, wjazd i zjazd ze skrzyżowania, zatrzymanie i postój",
+        "pj360_site_question_id": "3540",
+        "recovered_from_category": "B",
+        "import_origin": "recoverable_from_other_category"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "pj360",
+      "external_id": "pj360:3545",
+      "question_topic_key": "road_position_entry_exit_stopping",
+      "reason": "pj360_missing_local_recovered_from_other_category",
+      "metadata": {
+        "topic_label": "Pozycja pojazdu na drodze, wjazd i zjazd ze skrzyżowania, zatrzymanie i postój",
+        "pj360_site_question_id": "3545",
+        "recovered_from_category": "B",
+        "import_origin": "recoverable_from_other_category"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "pj360",
+      "external_id": "pj360:3704",
+      "question_topic_key": "road_position_entry_exit_stopping",
+      "reason": "pj360_missing_local_recovered_from_other_category",
+      "metadata": {
+        "topic_label": "Pozycja pojazdu na drodze, wjazd i zjazd ze skrzyżowania, zatrzymanie i postój",
+        "pj360_site_question_id": "3704",
+        "recovered_from_category": "B",
+        "import_origin": "recoverable_from_other_category"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "4057",
+      "question_topic_key": "special_caution_exiting_and_securing_vehicle",
+      "reason": "pj360_missing_local_recovered_from_other_category",
+      "metadata": {
+        "topic_label": "Znaczenie zachowania szczególnej ostrożności w stosunku do innych użytkowników drogi, wysiadanie z p...",
+        "pj360_site_question_id": "2821",
+        "recovered_from_category": "B",
+        "import_origin": "recoverable_from_other_category"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "4170",
+      "question_topic_key": "speed_limits",
+      "reason": "pj360_missing_local_recovered_from_other_category",
+      "metadata": {
+        "topic_label": "Dopuszczalne prędkości pojazdu, ograniczenia",
+        "pj360_site_question_id": "3947",
+        "recovered_from_category": "PT",
+        "import_origin": "recoverable_from_other_category"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "gov.pl-mi",
+      "external_id": "6992",
+      "question_topic_key": "traffic_lights_and_controller_signals",
+      "reason": "pj360_missing_local_recovered_from_other_category",
+      "metadata": {
+        "topic_label": "Sygnały świetlne, sygnały dawane przez kierującego ruchem",
+        "pj360_site_question_id": "2627",
+        "recovered_from_category": "B",
+        "import_origin": "recoverable_from_other_category"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "pj360",
+      "external_id": "pj360:11998",
+      "question_topic_key": "vehicle_load_and_passenger_safety",
+      "reason": "pj360_missing_local_recovered_from_other_category",
+      "metadata": {
+        "topic_label": "Czynniki bezpieczeństwa odnoszące się do pojazdu, ładunku i przewożonych osób",
+        "pj360_site_question_id": "11998",
+        "recovered_from_category": "B",
+        "import_origin": "recoverable_from_other_category"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "pj360",
+      "external_id": "pj360:12003",
+      "question_topic_key": "vehicle_load_and_passenger_safety",
+      "reason": "pj360_missing_local_recovered_from_other_category",
+      "metadata": {
+        "topic_label": "Czynniki bezpieczeństwa odnoszące się do pojazdu, ładunku i przewożonych osób",
+        "pj360_site_question_id": "12003",
+        "recovered_from_category": "B",
+        "import_origin": "recoverable_from_other_category"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "pj360",
+      "external_id": "pj360:2148",
+      "question_topic_key": "warning_signs",
+      "reason": "pj360_missing_local_recovered_from_other_category",
+      "metadata": {
+        "topic_label": "Znaki ostrzegawcze",
+        "pj360_site_question_id": "2148",
+        "recovered_from_category": "B",
+        "import_origin": "recoverable_from_other_category"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "pj360",
+      "external_id": "pj360:3133",
+      "question_topic_key": "warning_signs",
+      "reason": "pj360_missing_local_recovered_from_other_category",
+      "metadata": {
+        "topic_label": "Znaki ostrzegawcze",
+        "pj360_site_question_id": "3133",
+        "recovered_from_category": "B",
+        "import_origin": "recoverable_from_other_category"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "pj360",
+      "external_id": "pj360:3586",
+      "question_topic_key": "warning_signs",
+      "reason": "pj360_missing_local_recovered_from_other_category",
+      "metadata": {
+        "topic_label": "Znaki ostrzegawcze",
+        "pj360_site_question_id": "3586",
+        "recovered_from_category": "B",
+        "import_origin": "recoverable_from_other_category"
+      }
+    },
+    {
+      "license_category_code": "C",
+      "source": "pj360",
+      "external_id": "pj360:3623",
+      "question_topic_key": "warning_signs",
+      "reason": "pj360_missing_local_recovered_from_other_category",
+      "metadata": {
+        "topic_label": "Znaki ostrzegawcze",
+        "pj360_site_question_id": "3623",
+        "recovered_from_category": "B",
+        "import_origin": "recoverable_from_other_category"
+      }
+    }
+  ]
+}

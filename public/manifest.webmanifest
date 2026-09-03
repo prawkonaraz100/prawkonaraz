@@ -1,0 +1,79 @@
+{
+    "id": "/nauka",
+    "name": "PrawkoNaRaz",
+    "short_name": "PrawkoNaRaz",
+    "description": "Aplikacja do nauki testow na prawo jazdy.",
+    "lang": "pl-PL",
+    "dir": "ltr",
+    "start_url": "/nauka?utm_source=pwa",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff",
+    "categories": ["education", "productivity"],
+    "icons": [
+        {
+            "src": "/pwa/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/pwa/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/pwa/maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/pwa/maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Nauka",
+            "short_name": "Nauka",
+            "url": "/nauka?utm_source=pwa_shortcut",
+            "icons": [
+                {
+                    "src": "/pwa/icon-192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Kontynuuj nauke",
+            "short_name": "Teraz",
+            "url": "/nauka/teraz?utm_source=pwa_shortcut",
+            "icons": [
+                {
+                    "src": "/pwa/icon-192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Trener pamieci",
+            "short_name": "Trener",
+            "url": "/trener-pamieci?utm_source=pwa_shortcut",
+            "icons": [
+                {
+                    "src": "/pwa/icon-192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        }
+    ]
+}

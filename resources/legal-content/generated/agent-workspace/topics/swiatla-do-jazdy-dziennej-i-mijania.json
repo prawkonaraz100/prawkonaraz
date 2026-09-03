@@ -1,0 +1,2696 @@
+{
+    "generated_at": "2026-06-21T12:10:32+02:00",
+    "candidate": {
+        "slug": "swiatla-do-jazdy-dziennej-i-mijania",
+        "title": "Światła do jazdy dziennej i światła mijania",
+        "description": "Węższy temat artykułu wykryty na podstawie treści pytań.",
+        "level": "focused",
+        "status": "candidate",
+        "rule_version": "2026-06-19-prompt-v2",
+        "existing_article_slug": "swiatla-do-jazdy-dziennej-i-mijania"
+    },
+    "workflow": {
+        "status": "published",
+        "next_action": "Przejrzyj relacje pytan i zdecyduj, czy artykul wymaga rozbudowy lub ponownego review.",
+        "public_relations_are_verified_only": true
+    },
+    "article": {
+        "slug": "swiatla-do-jazdy-dziennej-i-mijania",
+        "title": "Światła mijania i dzienne: kiedy których używać",
+        "status": "published",
+        "published_at": "2026-06-21",
+        "last_reviewed_at": "2026-06-21",
+        "legal_units": [
+            {
+                "slug": "art-51-ust-1",
+                "label": "art. 51 ust. 1",
+                "title": "Całodobowy obowiązek używania świateł mijania",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-51-ust-2",
+                "label": "art. 51 ust. 2",
+                "title": "Kiedy światła dzienne mogą zastąpić mijania",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-30-ust-1-pkt-1-lit-a",
+                "label": "art. 30 ust. 1 pkt 1 lit. a",
+                "title": "Światła podczas zmniejszonej przejrzystości powietrza",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            }
+        ]
+    },
+    "summary": {
+        "canonical_questions": 17,
+        "question_rows": 104,
+        "categories": [
+            "A",
+            "A1",
+            "A2",
+            "AM",
+            "B",
+            "B1",
+            "C",
+            "C1",
+            "D",
+            "D1",
+            "T"
+        ],
+        "canonical_questions_with_verified_reference": 11,
+        "prompt_conflicts": [],
+        "answer_conflicts": [],
+        "correct_answer_conflicts": []
+    },
+    "questions": [
+        {
+            "external_id": "1319",
+            "prompt": "Czy w tej sytuacji masz obowiązek używać świateł mijania lub świateł do jazdy dziennej?",
+            "prompt_variants": [
+                "Czy w tej sytuacji masz obowiązek używać świateł mijania lub świateł do jazdy dziennej?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak, bo kierujacy ma obowiazek używać świateł mijania podczas jazdy w warunkach normalnej przejrzystości powietrza. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/1319/video/full.2f5dfceba621.mp4",
+                    "poster_path": "media/questions/b/1319/image/poster.7de067bf5963.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatel do jazdy dziennej|swiatel mijania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 20220,
+                    "question_external_id": "1319",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-51-ust-1",
+                    "legal_unit_label": "art. 51 ust. 1",
+                    "legal_unit_title": "Całodobowy obowiązek używania świateł mijania",
+                    "legal_topic_slug": "swiatla-do-jazdy-dziennej-i-mijania",
+                    "article_slug": "swiatla-do-jazdy-dziennej-i-mijania",
+                    "public_note": "To pytanie sprawdza całoroczny obowiązek używania świateł podczas jazdy. Art. 51 ust. 1 ustanawia światła mijania jako podstawową regułę w warunkach normalnej przejrzystości."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 20220,
+                    "external_id": "1319",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "2065",
+            "prompt": "Czy jadąc w południe w bardzo pochmurny dzień i normalnej przejrzystości powietrza możesz używać świateł do jazdy dziennej?",
+            "prompt_variants": [
+                "Czy jadąc w południe w bardzo pochmurny dzień i normalnej przejrzystości powietrza możesz używać świateł do jazdy dziennej?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "\"TAK\" - bowiem, w czasie od świtu do zmierzchu w warunkach normalnej przejrzystości powietrza, zamiast świateł mijania, kierujący pojazdem może używać świateł do jazdy dziennej"
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "imports/pj360/b/2065/full.mp4",
+                    "poster_path": "imports/pj360/b/2065/full-poster.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatel do jazdy dziennej",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 51060,
+                    "question_external_id": "pj360:2065",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-51-ust-2",
+                    "legal_unit_label": "art. 51 ust. 2",
+                    "legal_unit_title": "Kiedy światła dzienne mogą zastąpić mijania",
+                    "legal_topic_slug": "swiatla-do-jazdy-dziennej-i-mijania",
+                    "article_slug": "swiatla-do-jazdy-dziennej-i-mijania",
+                    "public_note": "To pytanie sprawdza warunki zastąpienia świateł mijania światłami do jazdy dziennej. Art. 51 ust. 2 pozwala na to tylko od świtu do zmierzchu i przy normalnej przejrzystości powietrza."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 51060,
+                    "external_id": "pj360:2065",
+                    "category": "B",
+                    "source": "pj360",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "3544",
+            "prompt": "Czy w tej sytuacji masz obowiązek używać świateł mijania?",
+            "prompt_variants": [
+                "Czy w tej sytuacji masz obowiązek używać świateł mijania?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak, bo w warunkach normalnej przejrzystości powietrza przez cała dobę kierujacy ma obowiazek używać świateł mijania. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/3544/video/full.8cfbc0719b83.mp4",
+                    "poster_path": "media/questions/b/3544/image/poster.8758c63d6f00.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a/3544/video/full.8cfbc0719b83.mp4",
+                    "poster_path": "media/questions/a/3544/image/poster.8758c63d6f00.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c/3544/video/full.8cfbc0719b83.mp4",
+                    "poster_path": "media/questions/c/3544/image/poster.8758c63d6f00.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d/3544/video/full.8cfbc0719b83.mp4",
+                    "poster_path": "media/questions/d/3544/image/poster.8758c63d6f00.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/am/3544/video/full.8cfbc0719b83.mp4",
+                    "poster_path": "media/questions/am/3544/image/poster.8758c63d6f00.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a1/3544/video/full.8cfbc0719b83.mp4",
+                    "poster_path": "media/questions/a1/3544/image/poster.8758c63d6f00.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a2/3544/video/full.8cfbc0719b83.mp4",
+                    "poster_path": "media/questions/a2/3544/image/poster.8758c63d6f00.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b1/3544/video/full.8cfbc0719b83.mp4",
+                    "poster_path": "media/questions/b1/3544/image/poster.8758c63d6f00.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c1/3544/video/full.8cfbc0719b83.mp4",
+                    "poster_path": "media/questions/c1/3544/image/poster.8758c63d6f00.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d1/3544/video/full.8cfbc0719b83.mp4",
+                    "poster_path": "media/questions/d1/3544/image/poster.8758c63d6f00.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatel mijania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 27540,
+                    "question_external_id": "3544",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-51-ust-1",
+                    "legal_unit_label": "art. 51 ust. 1",
+                    "legal_unit_title": "Całodobowy obowiązek używania świateł mijania",
+                    "legal_topic_slug": "swiatla-do-jazdy-dziennej-i-mijania",
+                    "article_slug": "swiatla-do-jazdy-dziennej-i-mijania",
+                    "public_note": "To pytanie sprawdza całoroczny obowiązek używania świateł podczas jazdy. Art. 51 ust. 1 ustanawia światła mijania jako podstawową regułę w warunkach normalnej przejrzystości."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 27540,
+                    "external_id": "3544",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 27627,
+                    "external_id": "3544",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 27688,
+                    "external_id": "3544",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 27750,
+                    "external_id": "3544",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 27867,
+                    "external_id": "3544",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 27922,
+                    "external_id": "3544",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 27982,
+                    "external_id": "3544",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 28042,
+                    "external_id": "3544",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 28107,
+                    "external_id": "3544",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 28169,
+                    "external_id": "3544",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "4242",
+            "prompt": "Czy w tej sytuacji po wyminięciu pojazdu masz prawo zmienić światła mijania na drogowe?",
+            "prompt_variants": [
+                "Czy w tej sytuacji po wyminięciu pojazdu masz prawo zmienić światła mijania na drogowe?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak, bo w czasie od zmierzchu do świtu, na nieoświetlonych drogach, zamiast świateł mijania lub łącznie z nimi, kierujacy może używać świateł drogowych. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a/4242/video/full.e1d0cb0e809f.mp4",
+                    "poster_path": "media/questions/a/4242/image/poster.7adc0ba17ee5.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/4242/video/full.e1d0cb0e809f.mp4",
+                    "poster_path": "media/questions/b/4242/image/poster.7adc0ba17ee5.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c/4242/video/full.e1d0cb0e809f.mp4",
+                    "poster_path": "media/questions/c/4242/image/poster.7adc0ba17ee5.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d/4242/video/full.e1d0cb0e809f.mp4",
+                    "poster_path": "media/questions/d/4242/image/poster.7adc0ba17ee5.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a1/4242/video/full.e1d0cb0e809f.mp4",
+                    "poster_path": "media/questions/a1/4242/image/poster.7adc0ba17ee5.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a2/4242/video/full.e1d0cb0e809f.mp4",
+                    "poster_path": "media/questions/a2/4242/image/poster.7adc0ba17ee5.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c1/4242/video/full.e1d0cb0e809f.mp4",
+                    "poster_path": "media/questions/c1/4242/image/poster.7adc0ba17ee5.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d1/4242/video/full.e1d0cb0e809f.mp4",
+                    "poster_path": "media/questions/d1/4242/image/poster.7adc0ba17ee5.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b1/4242/video/full.e1d0cb0e809f.mp4",
+                    "poster_path": "media/questions/b1/4242/image/poster.7adc0ba17ee5.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatla mijania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 29178,
+                    "external_id": "4242",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 29201,
+                    "external_id": "4242",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 29224,
+                    "external_id": "4242",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 29246,
+                    "external_id": "4242",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 29268,
+                    "external_id": "4242",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 29289,
+                    "external_id": "4242",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 29310,
+                    "external_id": "4242",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 29331,
+                    "external_id": "4242",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 29387,
+                    "external_id": "4242",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "4396",
+            "prompt": "Czy w tej sytuacji zamiast świateł mijania wolno Ci używać świateł do jazdy dziennej?",
+            "prompt_variants": [
+                "Czy w tej sytuacji zamiast świateł mijania wolno Ci używać świateł do jazdy dziennej?"
+            ],
+            "categories": [
+                "B",
+                "C",
+                "C1",
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak, bo w czasie od świtu do zmierzchu tzn. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/4396/video/full.f651c3c4afbb.mp4",
+                    "poster_path": "media/questions/b/4396/image/poster.cad91659b5ef.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c/4396/video/full.f651c3c4afbb.mp4",
+                    "poster_path": "media/questions/c/4396/image/poster.cad91659b5ef.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d/4396/video/full.f651c3c4afbb.mp4",
+                    "poster_path": "media/questions/d/4396/image/poster.cad91659b5ef.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c1/4396/video/full.f651c3c4afbb.mp4",
+                    "poster_path": "media/questions/c1/4396/image/poster.cad91659b5ef.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d1/4396/video/full.f651c3c4afbb.mp4",
+                    "poster_path": "media/questions/d1/4396/image/poster.cad91659b5ef.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatel do jazdy dziennej|swiatel mijania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 29998,
+                    "question_external_id": "4396",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-51-ust-2",
+                    "legal_unit_label": "art. 51 ust. 2",
+                    "legal_unit_title": "Kiedy światła dzienne mogą zastąpić mijania",
+                    "legal_topic_slug": "swiatla-do-jazdy-dziennej-i-mijania",
+                    "article_slug": "swiatla-do-jazdy-dziennej-i-mijania",
+                    "public_note": "To pytanie sprawdza warunki zastąpienia świateł mijania światłami do jazdy dziennej. Art. 51 ust. 2 pozwala na to tylko od świtu do zmierzchu i przy normalnej przejrzystości powietrza."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 29998,
+                    "external_id": "4396",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 30058,
+                    "external_id": "4396",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 30103,
+                    "external_id": "4396",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 30366,
+                    "external_id": "4396",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 30410,
+                    "external_id": "4396",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6211",
+            "prompt": "Czy masz prawo używać świateł do jazdy dziennej, gdy jedziesz po zmierzchu dobrze oświetloną drogą?",
+            "prompt_variants": [
+                "Czy masz prawo używać świateł do jazdy dziennej, gdy jedziesz po zmierzchu dobrze oświetloną drogą?"
+            ],
+            "categories": [
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, świateł do jazdy dziennej możesz używać zamiast świateł mijania od świtu do zmierzchu, przy dobrej widoczności. W nocy oraz przy złej widoczności obowiązują światła mijania"
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/6211/video/full.4bed3bda5d06.mp4",
+                    "poster_path": "media/questions/b/6211/image/poster.13943b4f5219.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c/6211/video/full.4bed3bda5d06.mp4",
+                    "poster_path": "media/questions/c/6211/image/poster.13943b4f5219.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d/6211/video/full.4bed3bda5d06.mp4",
+                    "poster_path": "media/questions/d/6211/image/poster.13943b4f5219.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b1/6211/video/full.4bed3bda5d06.mp4",
+                    "poster_path": "media/questions/b1/6211/image/poster.13943b4f5219.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c1/6211/video/full.4bed3bda5d06.mp4",
+                    "poster_path": "media/questions/c1/6211/image/poster.13943b4f5219.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d1/6211/video/full.4bed3bda5d06.mp4",
+                    "poster_path": "media/questions/d1/6211/image/poster.13943b4f5219.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatel do jazdy dziennej",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 33634,
+                    "question_external_id": "6211",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-51-ust-2",
+                    "legal_unit_label": "art. 51 ust. 2",
+                    "legal_unit_title": "Kiedy światła dzienne mogą zastąpić mijania",
+                    "legal_topic_slug": "swiatla-do-jazdy-dziennej-i-mijania",
+                    "article_slug": "swiatla-do-jazdy-dziennej-i-mijania",
+                    "public_note": "To pytanie sprawdza warunki zastąpienia świateł mijania światłami do jazdy dziennej. Art. 51 ust. 2 pozwala na to tylko od świtu do zmierzchu i przy normalnej przejrzystości powietrza."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 33634,
+                    "external_id": "6211",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33731,
+                    "external_id": "6211",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33828,
+                    "external_id": "6211",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34281,
+                    "external_id": "6211",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34378,
+                    "external_id": "6211",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34475,
+                    "external_id": "6211",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6223",
+            "prompt": "Czy w tej sytuacji masz obowiązek zmienić światła drogowe na światła mijania?",
+            "prompt_variants": [
+                "Czy w tej sytuacji masz obowiązek zmienić światła drogowe na światła mijania?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak, bo w czasie od zmierzchu do świtu, na nieoświetlonych drogach, zamiast świateł mijania lub łącznie z nimi, kierujacy może używać świateł drogowych. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a/6223/video/full.3f209c71fc95.mp4",
+                    "poster_path": "media/questions/a/6223/image/poster.1734546ada8f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/6223/video/full.3f209c71fc95.mp4",
+                    "poster_path": "media/questions/b/6223/image/poster.1734546ada8f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c/6223/video/full.3f209c71fc95.mp4",
+                    "poster_path": "media/questions/c/6223/image/poster.1734546ada8f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d/6223/video/full.3f209c71fc95.mp4",
+                    "poster_path": "media/questions/d/6223/image/poster.1734546ada8f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/t/6223/video/full.3f209c71fc95.mp4",
+                    "poster_path": "media/questions/t/6223/image/poster.1734546ada8f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/am/6223/video/full.3f209c71fc95.mp4",
+                    "poster_path": "media/questions/am/6223/image/poster.1734546ada8f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a1/6223/video/full.3f209c71fc95.mp4",
+                    "poster_path": "media/questions/a1/6223/image/poster.1734546ada8f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a2/6223/video/full.3f209c71fc95.mp4",
+                    "poster_path": "media/questions/a2/6223/image/poster.1734546ada8f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b1/6223/video/full.3f209c71fc95.mp4",
+                    "poster_path": "media/questions/b1/6223/image/poster.1734546ada8f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c1/6223/video/full.3f209c71fc95.mp4",
+                    "poster_path": "media/questions/c1/6223/image/poster.1734546ada8f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d1/6223/video/full.3f209c71fc95.mp4",
+                    "poster_path": "media/questions/d1/6223/image/poster.1734546ada8f.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatla mijania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 33542,
+                    "external_id": "6223",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33641,
+                    "external_id": "6223",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33738,
+                    "external_id": "6223",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33835,
+                    "external_id": "6223",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33924,
+                    "external_id": "6223",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34015,
+                    "external_id": "6223",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34102,
+                    "external_id": "6223",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34189,
+                    "external_id": "6223",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34288,
+                    "external_id": "6223",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34385,
+                    "external_id": "6223",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34482,
+                    "external_id": "6223",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6224",
+            "prompt": "Czy w tej sytuacji masz prawo używać świateł do jazdy dziennej?",
+            "prompt_variants": [
+                "Czy w tej sytuacji masz prawo używać świateł do jazdy dziennej?"
+            ],
+            "categories": [
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo kierujacy ma obowiazek w czasie jazdy w warunkach zmniejszonej przejrzystości powietrza, spowodowanej mgłą, opadami atmosferycznymi włączyć światła. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/6224/video/full.bea819782bde.mp4",
+                    "poster_path": "media/questions/b/6224/image/poster.50e928cdb957.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c/6224/video/full.bea819782bde.mp4",
+                    "poster_path": "media/questions/c/6224/image/poster.50e928cdb957.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d/6224/video/full.bea819782bde.mp4",
+                    "poster_path": "media/questions/d/6224/image/poster.50e928cdb957.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/t/6224/video/full.bea819782bde.mp4",
+                    "poster_path": "media/questions/t/6224/image/poster.50e928cdb957.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b1/6224/video/full.bea819782bde.mp4",
+                    "poster_path": "media/questions/b1/6224/image/poster.50e928cdb957.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c1/6224/video/full.bea819782bde.mp4",
+                    "poster_path": "media/questions/c1/6224/image/poster.50e928cdb957.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d1/6224/video/full.bea819782bde.mp4",
+                    "poster_path": "media/questions/d1/6224/image/poster.50e928cdb957.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatel do jazdy dziennej",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 33642,
+                    "question_external_id": "6224",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-30-ust-1-pkt-1-lit-a",
+                    "legal_unit_label": "art. 30 ust. 1 pkt 1 lit. a",
+                    "legal_unit_title": "Światła podczas zmniejszonej przejrzystości powietrza",
+                    "legal_topic_slug": "swiatla-do-jazdy-dziennej-i-mijania",
+                    "article_slug": "swiatla-do-jazdy-dziennej-i-mijania",
+                    "public_note": "W tej sytuacji przejrzystość powietrza jest zmniejszona. Art. 30 ust. 1 pkt 1 lit. a wymaga wtedy świateł mijania albo przednich przeciwmgłowych, więc same światła dzienne nie wystarczają."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 33642,
+                    "external_id": "6224",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33739,
+                    "external_id": "6224",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33836,
+                    "external_id": "6224",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33925,
+                    "external_id": "6224",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34289,
+                    "external_id": "6224",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34386,
+                    "external_id": "6224",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34483,
+                    "external_id": "6224",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6225",
+            "prompt": "Czy w tej sytuacji masz obowiązek zmienić światła drogowe na światła mijania?",
+            "prompt_variants": [
+                "Czy w tej sytuacji masz obowiązek zmienić światła drogowe na światła mijania?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak. Jezeli jedziesz na swiatlach drogowych i inny pojazd Cie wyprzedza, masz obowiazek przelaczyc je na swiatla mijania. Chodzi o to, zeby nie oslepiac kierujacego jadacego przed Toba."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a/6225/video/full.df99411ce8cc.mp4",
+                    "poster_path": "media/questions/a/6225/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/6225/video/full.df99411ce8cc.mp4",
+                    "poster_path": "media/questions/b/6225/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c/6225/video/full.df99411ce8cc.mp4",
+                    "poster_path": "media/questions/c/6225/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d/6225/video/full.df99411ce8cc.mp4",
+                    "poster_path": "media/questions/d/6225/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/t/6225/video/full.df99411ce8cc.mp4",
+                    "poster_path": "media/questions/t/6225/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/am/6225/video/full.df99411ce8cc.mp4",
+                    "poster_path": "media/questions/am/6225/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a1/6225/video/full.df99411ce8cc.mp4",
+                    "poster_path": "media/questions/a1/6225/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a2/6225/video/full.df99411ce8cc.mp4",
+                    "poster_path": "media/questions/a2/6225/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b1/6225/video/full.df99411ce8cc.mp4",
+                    "poster_path": "media/questions/b1/6225/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c1/6225/video/full.df99411ce8cc.mp4",
+                    "poster_path": "media/questions/c1/6225/image/poster.653558c6499e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d1/6225/video/full.df99411ce8cc.mp4",
+                    "poster_path": "media/questions/d1/6225/image/poster.653558c6499e.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatla mijania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 33543,
+                    "external_id": "6225",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33643,
+                    "external_id": "6225",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33740,
+                    "external_id": "6225",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33837,
+                    "external_id": "6225",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33926,
+                    "external_id": "6225",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34016,
+                    "external_id": "6225",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34103,
+                    "external_id": "6225",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34190,
+                    "external_id": "6225",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34290,
+                    "external_id": "6225",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34387,
+                    "external_id": "6225",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34484,
+                    "external_id": "6225",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6226",
+            "prompt": "Czy obowiązek używania świateł mijania w pojeździe dotyczy tylko okresu zimowego?",
+            "prompt_variants": [
+                "Czy obowiązek używania świateł mijania w pojeździe dotyczy tylko okresu zimowego?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo kierujacy ma obowiazek używać świateł mijania podczas jazdy w warunkach normalnej przejrzystości powietrza, niezależnie od pory. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/6226/image/full.39ccc4c50cce.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/6226/image/thumb.02ec5ffd8102.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6226/image/full.39ccc4c50cce.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6226/image/thumb.02ec5ffd8102.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/6226/image/full.39ccc4c50cce.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/6226/image/thumb.02ec5ffd8102.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/6226/image/full.39ccc4c50cce.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/6226/image/thumb.02ec5ffd8102.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/6226/image/full.39ccc4c50cce.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/6226/image/thumb.02ec5ffd8102.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/am/6226/image/full.39ccc4c50cce.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/am/6226/image/thumb.02ec5ffd8102.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/6226/image/full.39ccc4c50cce.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/6226/image/thumb.02ec5ffd8102.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/6226/image/full.39ccc4c50cce.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/6226/image/thumb.02ec5ffd8102.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/6226/image/full.39ccc4c50cce.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/6226/image/thumb.02ec5ffd8102.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/6226/image/full.39ccc4c50cce.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/6226/image/thumb.02ec5ffd8102.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/6226/image/full.39ccc4c50cce.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/6226/image/thumb.02ec5ffd8102.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatel mijania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 33544,
+                    "question_external_id": "6226",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-51-ust-1",
+                    "legal_unit_label": "art. 51 ust. 1",
+                    "legal_unit_title": "Całodobowy obowiązek używania świateł mijania",
+                    "legal_topic_slug": "swiatla-do-jazdy-dziennej-i-mijania",
+                    "article_slug": "swiatla-do-jazdy-dziennej-i-mijania",
+                    "public_note": "To pytanie sprawdza całoroczny obowiązek używania świateł podczas jazdy. Art. 51 ust. 1 ustanawia światła mijania jako podstawową regułę w warunkach normalnej przejrzystości."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 33544,
+                    "external_id": "6226",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33644,
+                    "external_id": "6226",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33741,
+                    "external_id": "6226",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33838,
+                    "external_id": "6226",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33927,
+                    "external_id": "6226",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34017,
+                    "external_id": "6226",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34104,
+                    "external_id": "6226",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34191,
+                    "external_id": "6226",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34291,
+                    "external_id": "6226",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34388,
+                    "external_id": "6226",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34485,
+                    "external_id": "6226",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7464",
+            "prompt": "Czy w tych warunkach atmosferycznych masz prawo używać jednocześnie świateł mijania i przeciwmgłowych przednich?",
+            "prompt_variants": [
+                "Czy w tych warunkach atmosferycznych masz prawo używać jednocześnie świateł mijania i przeciwmgłowych przednich?"
+            ],
+            "categories": [
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak, bo kierujacy ma obowiazek w czasie jazdy w warunkach zmniejszonej przejrzystości powietrza, spowodowanej mgłą, opadami atmosferycznymi włączyć światła. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/7464/image/full.a3db3d18b406.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/7464/image/thumb.6b08f79f6bf0.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/7464/image/full.a3db3d18b406.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/7464/image/thumb.6b08f79f6bf0.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/7464/image/full.a3db3d18b406.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/7464/image/thumb.6b08f79f6bf0.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/7464/image/full.a3db3d18b406.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/7464/image/thumb.6b08f79f6bf0.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/7464/image/full.a3db3d18b406.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/7464/image/thumb.6b08f79f6bf0.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/7464/image/full.a3db3d18b406.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/7464/image/thumb.6b08f79f6bf0.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatel mijania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 40626,
+                    "external_id": "7464",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40711,
+                    "external_id": "7464",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40789,
+                    "external_id": "7464",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41155,
+                    "external_id": "7464",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41240,
+                    "external_id": "7464",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41318,
+                    "external_id": "7464",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7470",
+            "prompt": "Czy w tej sytuacji masz obowiązek używać świateł mijania?",
+            "prompt_variants": [
+                "Czy w tej sytuacji masz obowiązek używać świateł mijania?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak, bo w warunkach normalnej przejrzystości powietrza przez cała dobę kierujacy ma obowiazek używać świateł mijania."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a/7470/video/full.8f8d83ba56b4.mp4",
+                    "poster_path": "media/questions/a/7470/image/poster.212befb1590e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/7470/video/full.8f8d83ba56b4.mp4",
+                    "poster_path": "media/questions/b/7470/image/poster.212befb1590e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c/7470/video/full.8f8d83ba56b4.mp4",
+                    "poster_path": "media/questions/c/7470/image/poster.212befb1590e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d/7470/video/full.8f8d83ba56b4.mp4",
+                    "poster_path": "media/questions/d/7470/image/poster.212befb1590e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/t/7470/video/full.8f8d83ba56b4.mp4",
+                    "poster_path": "media/questions/t/7470/image/poster.212befb1590e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/am/7470/video/full.8f8d83ba56b4.mp4",
+                    "poster_path": "media/questions/am/7470/image/poster.212befb1590e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a1/7470/video/full.8f8d83ba56b4.mp4",
+                    "poster_path": "media/questions/a1/7470/image/poster.212befb1590e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a2/7470/video/full.8f8d83ba56b4.mp4",
+                    "poster_path": "media/questions/a2/7470/image/poster.212befb1590e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b1/7470/video/full.8f8d83ba56b4.mp4",
+                    "poster_path": "media/questions/b1/7470/image/poster.212befb1590e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c1/7470/video/full.8f8d83ba56b4.mp4",
+                    "poster_path": "media/questions/c1/7470/image/poster.212befb1590e.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d1/7470/video/full.8f8d83ba56b4.mp4",
+                    "poster_path": "media/questions/d1/7470/image/poster.212befb1590e.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatel mijania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 40539,
+                    "question_external_id": "7470",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-51-ust-1",
+                    "legal_unit_label": "art. 51 ust. 1",
+                    "legal_unit_title": "Całodobowy obowiązek używania świateł mijania",
+                    "legal_topic_slug": "swiatla-do-jazdy-dziennej-i-mijania",
+                    "article_slug": "swiatla-do-jazdy-dziennej-i-mijania",
+                    "public_note": "To pytanie sprawdza całoroczny obowiązek używania świateł podczas jazdy. Art. 51 ust. 1 ustanawia światła mijania jako podstawową regułę w warunkach normalnej przejrzystości."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 40539,
+                    "external_id": "7470",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40632,
+                    "external_id": "7470",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40717,
+                    "external_id": "7470",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40795,
+                    "external_id": "7470",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40860,
+                    "external_id": "7470",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40922,
+                    "external_id": "7470",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 40995,
+                    "external_id": "7470",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41071,
+                    "external_id": "7470",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41161,
+                    "external_id": "7470",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41246,
+                    "external_id": "7470",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41324,
+                    "external_id": "7470",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7884",
+            "prompt": "Czy w tej sytuacji masz obowiązek używać świateł mijania?",
+            "prompt_variants": [
+                "Czy w tej sytuacji masz obowiązek używać świateł mijania?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak, bo w warunkach normalnej przejrzystości powietrza przez cała dobę kierujacy ma obowiazek używać świateł mijania. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d/7884/video/full.9c09106f7b5d.mp4",
+                    "poster_path": "media/questions/d/7884/image/poster.ba5c3b4931fd.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d1/7884/video/full.9c09106f7b5d.mp4",
+                    "poster_path": "media/questions/d1/7884/image/poster.ba5c3b4931fd.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/t/7884/video/full.9c09106f7b5d.mp4",
+                    "poster_path": "media/questions/t/7884/image/poster.ba5c3b4931fd.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/7884/video/full.9c09106f7b5d.mp4",
+                    "poster_path": "media/questions/b/7884/image/poster.ba5c3b4931fd.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a/7884/video/full.9c09106f7b5d.mp4",
+                    "poster_path": "media/questions/a/7884/image/poster.ba5c3b4931fd.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c/7884/video/full.9c09106f7b5d.mp4",
+                    "poster_path": "media/questions/c/7884/image/poster.ba5c3b4931fd.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/am/7884/video/full.9c09106f7b5d.mp4",
+                    "poster_path": "media/questions/am/7884/image/poster.ba5c3b4931fd.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a1/7884/video/full.9c09106f7b5d.mp4",
+                    "poster_path": "media/questions/a1/7884/image/poster.ba5c3b4931fd.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a2/7884/video/full.9c09106f7b5d.mp4",
+                    "poster_path": "media/questions/a2/7884/image/poster.ba5c3b4931fd.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b1/7884/video/full.9c09106f7b5d.mp4",
+                    "poster_path": "media/questions/b1/7884/image/poster.ba5c3b4931fd.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c1/7884/video/full.9c09106f7b5d.mp4",
+                    "poster_path": "media/questions/c1/7884/image/poster.ba5c3b4931fd.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatel mijania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 42151,
+                    "question_external_id": "7884",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-51-ust-1",
+                    "legal_unit_label": "art. 51 ust. 1",
+                    "legal_unit_title": "Całodobowy obowiązek używania świateł mijania",
+                    "legal_topic_slug": "swiatla-do-jazdy-dziennej-i-mijania",
+                    "article_slug": "swiatla-do-jazdy-dziennej-i-mijania",
+                    "public_note": "To pytanie sprawdza całoroczny obowiązek używania świateł podczas jazdy. Art. 51 ust. 1 ustanawia światła mijania jako podstawową regułę w warunkach normalnej przejrzystości."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 42151,
+                    "external_id": "7884",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 42192,
+                    "external_id": "7884",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 42216,
+                    "external_id": "7884",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 42229,
+                    "external_id": "7884",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 42268,
+                    "external_id": "7884",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 42283,
+                    "external_id": "7884",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 42291,
+                    "external_id": "7884",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 42303,
+                    "external_id": "7884",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 42315,
+                    "external_id": "7884",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 42324,
+                    "external_id": "7884",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 42339,
+                    "external_id": "7884",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10974",
+            "prompt": "Czy w tych warunkach drogowych, podczas jazdy motorowerem lub czterokołowcem lekkim, możesz używać świateł do jazdy dziennej?",
+            "prompt_variants": [
+                "Czy w tych warunkach drogowych, podczas jazdy motorowerem lub czterokołowcem lekkim, możesz używać świateł do jazdy dziennej?"
+            ],
+            "categories": [
+                "AM"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo kierujacy ma obowiazek używać świateł mijania podczas jazdy w warunkach normalnej przejrzystości powietrza, gdzie w czasie od świtu do zmierzchu. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/am/10974/video/full.402830e5ef96.mp4",
+                    "poster_path": "media/questions/am/10974/image/poster.2488803b1c10.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatel do jazdy dziennej",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 45190,
+                    "external_id": "10974",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10976",
+            "prompt": "Czy podczas jazdy motorowerem w ciągu dnia, od świtu do zmierzchu, przy dobrej przejrzystości powietrza, możesz używać świateł do jazdy dziennej, zamiast świateł mijania?",
+            "prompt_variants": [
+                "Czy podczas jazdy motorowerem w ciągu dnia, od świtu do zmierzchu, przy dobrej przejrzystości powietrza, możesz używać świateł do jazdy dziennej, zamiast świateł mijania?"
+            ],
+            "categories": [
+                "AM"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak, bo kierujacy ma obowiazek używać świateł mijania podczas jazdy w warunkach normalnej przejrzystości powietrza, gdzie w czasie od świtu do zmierzchu. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/am/10976/video/full.56ab01d8c39c.mp4",
+                    "poster_path": "media/questions/am/10976/image/poster.588d65683f57.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatel do jazdy dziennej|swiatel mijania",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 45191,
+                    "question_external_id": "10976",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-51-ust-2",
+                    "legal_unit_label": "art. 51 ust. 2",
+                    "legal_unit_title": "Kiedy światła dzienne mogą zastąpić mijania",
+                    "legal_topic_slug": "swiatla-do-jazdy-dziennej-i-mijania",
+                    "article_slug": "swiatla-do-jazdy-dziennej-i-mijania",
+                    "public_note": "To pytanie sprawdza warunki zastąpienia świateł mijania światłami do jazdy dziennej. Art. 51 ust. 2 pozwala na to tylko od świtu do zmierzchu i przy normalnej przejrzystości powietrza."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 45191,
+                    "external_id": "10976",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10979",
+            "prompt": "Czy w pogarszających się warunkach atmosferycznych, kierujący motorowerem może używać świateł do jazdy dziennej?",
+            "prompt_variants": [
+                "Czy w pogarszających się warunkach atmosferycznych, kierujący motorowerem może używać świateł do jazdy dziennej?"
+            ],
+            "categories": [
+                "AM"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo kierujacy ma obowiazek używać świateł mijania podczas jazdy w warunkach normalnej przejrzystości powietrza, gdzie w czasie od świtu do zmierzchu. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/am/10979/video/full.7435ba24379d.mp4",
+                    "poster_path": "media/questions/am/10979/image/poster.b182e5ffaf0a.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatel do jazdy dziennej",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 45192,
+                    "question_external_id": "10979",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-30-ust-1-pkt-1-lit-a",
+                    "legal_unit_label": "art. 30 ust. 1 pkt 1 lit. a",
+                    "legal_unit_title": "Światła podczas zmniejszonej przejrzystości powietrza",
+                    "legal_topic_slug": "swiatla-do-jazdy-dziennej-i-mijania",
+                    "article_slug": "swiatla-do-jazdy-dziennej-i-mijania",
+                    "public_note": "W tej sytuacji przejrzystość powietrza jest zmniejszona. Art. 30 ust. 1 pkt 1 lit. a wymaga wtedy świateł mijania albo przednich przeciwmgłowych, więc same światła dzienne nie wystarczają."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 45192,
+                    "external_id": "10979",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10983",
+            "prompt": "Czy na tym odcinku drogi, kierując motorowerem niewyposażonym w światła do jazdy dziennej, możesz używać świateł pozycyjnych?",
+            "prompt_variants": [
+                "Czy na tym odcinku drogi, kierując motorowerem niewyposażonym w światła do jazdy dziennej, możesz używać świateł pozycyjnych?"
+            ],
+            "categories": [
+                "AM"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_lights_and_signals",
+                    "name": "Uzywanie swiatel zewnetrznych i sygnalow pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo znak D-37 oznacza wjazd do tunelu, gdzie nakazuje się włączenie w pojeździe przednich świateł mijania. Na nagraniu trzeba zwrocic uwage na oznakowanie i to, jak wplywa ono na dalszy przebieg sytuacji. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/am/10983/video/full.5a14ee21ada2.mp4",
+                    "poster_path": "media/questions/am/10983/image/poster.740cb300d7f2.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:swiatla do jazdy dziennej",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 45196,
+                    "external_id": "10983",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        }
+    ]
+}

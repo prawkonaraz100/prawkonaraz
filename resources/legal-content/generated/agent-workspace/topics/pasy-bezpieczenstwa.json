@@ -1,0 +1,1616 @@
+{
+    "generated_at": "2026-06-21T12:10:16+02:00",
+    "candidate": {
+        "slug": "pasy-bezpieczenstwa",
+        "title": "Pasy bezpieczeństwa: obowiązek i wyjątki",
+        "description": "Węższy temat artykułu wykryty na podstawie treści pytań.",
+        "level": "focused",
+        "status": "candidate",
+        "rule_version": "2026-06-19-prompt-v2",
+        "existing_article_slug": "pasy-bezpieczenstwa"
+    },
+    "workflow": {
+        "status": "published",
+        "next_action": "Przejrzyj relacje pytan i zdecyduj, czy artykul wymaga rozbudowy lub ponownego review.",
+        "public_relations_are_verified_only": true
+    },
+    "article": {
+        "slug": "pasy-bezpieczenstwa",
+        "title": "Pasy bezpieczeństwa: kto musi zapinać i jakie są wyjątki",
+        "status": "published",
+        "published_at": "2026-06-21",
+        "last_reviewed_at": "2026-06-21",
+        "legal_units": [
+            {
+                "slug": "art-39-ust-1",
+                "label": "art. 39 ust. 1",
+                "title": "Obowiązek korzystania z pasów bezpieczeństwa",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-39-ust-2-pkt-2",
+                "label": "art. 39 ust. 2 pkt 2",
+                "title": "Wyjątek dla kobiety o widocznej ciąży",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-39-ust-2-pkt-10",
+                "label": "art. 39 ust. 2 pkt 10",
+                "title": "Wyjątek dla dziecka poniżej 3 lat w autobusie",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            }
+        ]
+    },
+    "summary": {
+        "canonical_questions": 19,
+        "question_rows": 31,
+        "categories": [
+            "B",
+            "B1",
+            "C",
+            "C1",
+            "D",
+            "D1"
+        ],
+        "canonical_questions_with_verified_reference": 8,
+        "prompt_conflicts": [],
+        "answer_conflicts": [],
+        "correct_answer_conflicts": []
+    },
+    "questions": [
+        {
+            "external_id": "4483",
+            "prompt": "Która osoba ma obowiązek korzystania z pasów bezpieczeństwa?",
+            "prompt_variants": [
+                "Która osoba ma obowiązek korzystania z pasów bezpieczeństwa?"
+            ],
+            "categories": [
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "safety_equipment_and_restraints",
+                    "name": "Wyposazenie pojazdu zwiazane z bezpieczenstwem, korzystanie z pasow, zaglowkow i fotelikow"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Osoba przewożona na wózku inwalidzkim.",
+                    "option_b": "Kierujący pojazdem.",
+                    "option_c": "Kobieta w widocznej ciąży.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Kierujący pojazdem."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo kierujacy samochodowym oraz osoba przewożona takim pojazdem wyposażonym w pasy bezpieczeństwa są obowiązani korzystać z tych pasów podczas jazdy. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/4483/image/full.51f31f8b3075.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/4483/image/thumb.bafca067a041.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/4483/image/full.51f31f8b3075.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/4483/image/thumb.bafca067a041.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:pasow bezpieczenstwa",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 30009,
+                    "question_external_id": "4483",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-39-ust-1",
+                    "legal_unit_label": "art. 39 ust. 1",
+                    "legal_unit_title": "Obowiązek korzystania z pasów bezpieczeństwa",
+                    "legal_topic_slug": "pasy-bezpieczenstwa",
+                    "article_slug": "pasy-bezpieczenstwa",
+                    "public_note": "To pytanie sprawdza podstawowy obowiązek korzystania z pasów bezpieczeństwa. Art. 39 ust. 1 obejmuje kierującego oraz osoby przewożone pojazdem lub na siedzeniu wyposażonym w pasy."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 30009,
+                    "external_id": "4483",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 30323,
+                    "external_id": "4483",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "4485",
+            "prompt": "Jaki wpływ ma stosowanie pasów bezpieczeństwa na powstanie obrażeń ciężkich przy zderzeniach czołowych?",
+            "prompt_variants": [
+                "Jaki wpływ ma stosowanie pasów bezpieczeństwa na powstanie obrażeń ciężkich przy zderzeniach czołowych?"
+            ],
+            "categories": [
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "safety_equipment_and_restraints",
+                    "name": "Wyposazenie pojazdu zwiazane z bezpieczenstwem, korzystanie z pasow, zaglowkow i fotelikow"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "zmniejsza ryzyko powstania obrażeń ciężkich lub śmiertelnych.",
+                    "option_b": "zwiększa ryzyko powstania obrażeń lekkich.",
+                    "option_c": "nie ma wpływu na ryzyko powstania obrażeń bez względu na ich rodzaj.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "zmniejsza ryzyko powstania obrażeń ciężkich lub śmiertelnych."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo poprawnie zapięty pas bezpieczeństwa zmniejsza ryzyko powstania obrażeń ciężkich lub śmiertelnych, bo zabezpiecza. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/4485/image/full.51f31f8b3075.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/4485/image/thumb.bafca067a041.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/4485/image/full.51f31f8b3075.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/4485/image/thumb.bafca067a041.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:pasow bezpieczenstwa",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 30011,
+                    "external_id": "4485",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 30324,
+                    "external_id": "4485",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6344",
+            "prompt": "Czy podczas jazdy w takich warunkach drogowych powinieneś korzystać z pasów bezpieczeństwa?",
+            "prompt_variants": [
+                "Czy podczas jazdy w takich warunkach drogowych powinieneś korzystać z pasów bezpieczeństwa?"
+            ],
+            "categories": [
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "safety_equipment_and_restraints",
+                    "name": "Wyposazenie pojazdu zwiazane z bezpieczenstwem, korzystanie z pasow, zaglowkow i fotelikow"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Nie, gdy  poruszam się z niewielką prędkością.",
+                    "option_b": "Tak, w każdym przypadku.",
+                    "option_c": "Tak, ale tylko w przypadku jazdy z prędkością  większą niż 50 km/h.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Tak, w każdym przypadku."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo kierujacy samochodowym oraz osoba przewożona takim pojazdem wyposażonym w pasy bezpieczeństwa są obowiązani korzystać z tych pasów podczas jazdy. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6344/image/full.4af3a215a9ce.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6344/image/thumb.5c5554b9799b.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/6344/image/full.4af3a215a9ce.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/6344/image/thumb.5c5554b9799b.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:pasow bezpieczenstwa",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 34907,
+                    "question_external_id": "6344",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-39-ust-1",
+                    "legal_unit_label": "art. 39 ust. 1",
+                    "legal_unit_title": "Obowiązek korzystania z pasów bezpieczeństwa",
+                    "legal_topic_slug": "pasy-bezpieczenstwa",
+                    "article_slug": "pasy-bezpieczenstwa",
+                    "public_note": "To pytanie sprawdza podstawowy obowiązek korzystania z pasów bezpieczeństwa. Art. 39 ust. 1 obejmuje kierującego oraz osoby przewożone pojazdem lub na siedzeniu wyposażonym w pasy."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 34907,
+                    "external_id": "6344",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35097,
+                    "external_id": "6344",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6388",
+            "prompt": "Kto ma obowiązek korzystania z pasów bezpieczeństwa?",
+            "prompt_variants": [
+                "Kto ma obowiązek korzystania z pasów bezpieczeństwa?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "safety_equipment_and_restraints",
+                    "name": "Wyposazenie pojazdu zwiazane z bezpieczenstwem, korzystanie z pasow, zaglowkow i fotelikow"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tylko kierujący i pasażer siedzący na przednim siedzeniu.",
+                    "option_b": "Kierujący i pasażer - na przednim siedzeniu zawsze, a na tylnym tylko wówczas, gdy pojazd porusza się poza obszarem zabudowanym.",
+                    "option_c": "Kierujący i wszyscy pasażerowie.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Kierujący i wszyscy pasażerowie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo kierujacy samochodowym oraz osoba przewożona takim pojazdem wyposażonym w pasy bezpieczeństwa są obowiązani korzystać z tych pasów podczas jazdy. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6388/image/full.e55c8e78666f.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6388/image/thumb.e667d464c527.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:pasow bezpieczenstwa",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 34940,
+                    "question_external_id": "6388",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-39-ust-1",
+                    "legal_unit_label": "art. 39 ust. 1",
+                    "legal_unit_title": "Obowiązek korzystania z pasów bezpieczeństwa",
+                    "legal_topic_slug": "pasy-bezpieczenstwa",
+                    "article_slug": "pasy-bezpieczenstwa",
+                    "public_note": "To pytanie sprawdza podstawowy obowiązek korzystania z pasów bezpieczeństwa. Art. 39 ust. 1 obejmuje kierującego oraz osoby przewożone pojazdem lub na siedzeniu wyposażonym w pasy."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 34940,
+                    "external_id": "6388",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6389",
+            "prompt": "Czy dorosły pasażer samochodu osobowego przewożony na tylnym siedzeniu ma obowiązek używania pasów bezpieczeństwa?",
+            "prompt_variants": [
+                "Czy dorosły pasażer samochodu osobowego przewożony na tylnym siedzeniu ma obowiązek używania pasów bezpieczeństwa?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "safety_equipment_and_restraints",
+                    "name": "Wyposazenie pojazdu zwiazane z bezpieczenstwem, korzystanie z pasow, zaglowkow i fotelikow"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Nie.",
+                    "option_b": "Tak, ale tylko wówczas, gdy pojazd porusza się poza obszarem zabudowanym.",
+                    "option_c": "Tak.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Tak."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo kierujacy samochodowym oraz osoba przewożona takim pojazdem wyposażonym w pasy bezpieczeństwa są obowiązani korzystać z tych pasów podczas jazdy. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6389/image/full.768e27a7d64a.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6389/image/thumb.9ef243231757.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:pasow bezpieczenstwa",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 34941,
+                    "question_external_id": "6389",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-39-ust-1",
+                    "legal_unit_label": "art. 39 ust. 1",
+                    "legal_unit_title": "Obowiązek korzystania z pasów bezpieczeństwa",
+                    "legal_topic_slug": "pasy-bezpieczenstwa",
+                    "article_slug": "pasy-bezpieczenstwa",
+                    "public_note": "To pytanie sprawdza podstawowy obowiązek korzystania z pasów bezpieczeństwa. Art. 39 ust. 1 obejmuje kierującego oraz osoby przewożone pojazdem lub na siedzeniu wyposażonym w pasy."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 34941,
+                    "external_id": "6389",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6393",
+            "prompt": "Na których drogach publicznych masz obowiązek zapinać pasy bezpieczeństwa?",
+            "prompt_variants": [
+                "Na których drogach publicznych masz obowiązek zapinać pasy bezpieczeństwa?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "safety_equipment_and_restraints",
+                    "name": "Wyposazenie pojazdu zwiazane z bezpieczenstwem, korzystanie z pasow, zaglowkow i fotelikow"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Na wszystkich drogach.",
+                    "option_b": "Tylko na drogach twardych.",
+                    "option_c": "Tylko na drogach poza obszarem zabudowanym.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Na wszystkich drogach."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo kierujacy samochodowym oraz osoba przewożona takim pojazdem wyposażonym w pasy bezpieczeństwa są obowiązani korzystać z tych pasów podczas jazdy. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6393/image/full.f7f33e0ecceb.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6393/image/thumb.080360429658.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:pasy bezpieczenstwa",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 34944,
+                    "question_external_id": "6393",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-39-ust-1",
+                    "legal_unit_label": "art. 39 ust. 1",
+                    "legal_unit_title": "Obowiązek korzystania z pasów bezpieczeństwa",
+                    "legal_topic_slug": "pasy-bezpieczenstwa",
+                    "article_slug": "pasy-bezpieczenstwa",
+                    "public_note": "To pytanie sprawdza podstawowy obowiązek korzystania z pasów bezpieczeństwa. Art. 39 ust. 1 obejmuje kierującego oraz osoby przewożone pojazdem lub na siedzeniu wyposażonym w pasy."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 34944,
+                    "external_id": "6393",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6432",
+            "prompt": "Jakie mogą być skutki niezapięcia pasów bezpieczeństwa przez kierowcę?",
+            "prompt_variants": [
+                "Jakie mogą być skutki niezapięcia pasów bezpieczeństwa przez kierowcę?"
+            ],
+            "categories": [
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "safety_equipment_and_restraints",
+                    "name": "Wyposazenie pojazdu zwiazane z bezpieczenstwem, korzystanie z pasow, zaglowkow i fotelikow"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Większe uszkodzenia pojazdu podczas kolizji.",
+                    "option_b": "Większe obrażenia ciała kierowcy podczas wypadku.",
+                    "option_c": "Uszkodzenie poduszki powietrznej.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Większe obrażenia ciała kierowcy podczas wypadku."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo poprawnie zapięty pas bezpieczeństwa zmniejsza ryzyko powstania obrażeń ciężkich lub śmiertelnych podczas wypadku, bo zabezpiecza ciało przed. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6432/image/full.f7f33e0ecceb.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6432/image/thumb.080360429658.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/6432/image/full.f7f33e0ecceb.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/6432/image/thumb.080360429658.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:pasow bezpieczenstwa",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 35387,
+                    "external_id": "6432",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35418,
+                    "external_id": "6432",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6858",
+            "prompt": "W jakim przypadku pasy bezpieczeństwa będą mogły spełnić swoją funkcję?",
+            "prompt_variants": [
+                "W jakim przypadku pasy bezpieczeństwa będą mogły spełnić swoją funkcję?"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "safety_equipment_and_restraints",
+                    "name": "Wyposazenie pojazdu zwiazane z bezpieczenstwem, korzystanie z pasow, zaglowkow i fotelikow"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Jeżeli będą właściwie wyregulowane i zapięte.",
+                    "option_b": "Jeżeli będą zapięte z dużym luzem w odcinku biodrowym.",
+                    "option_c": "Jeżeli będą przeprowadzone na wysokości szyi.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Jeżeli będą właściwie wyregulowane i zapięte."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo pasy bezpieczeństwa spełnią swoją funkcję, gdy są właściwie zapięte (bez luzu, biodrowa na miednicy, naramienna na barku i piersi) i prawidłowo wyregulowane. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/6858/image/full.e0a402ce9431.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/6858/image/thumb.32c866714f74.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/6858/image/full.e0a402ce9431.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/6858/image/thumb.32c866714f74.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:pasy bezpieczenstwa",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 36480,
+                    "external_id": "6858",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 36555,
+                    "external_id": "6858",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6907",
+            "prompt": "Czy osoba dorosła przewożona autobusem na siedzeniu wyposażonym w pasy bezpieczeństwa ma obowiązek z nich korzystać?",
+            "prompt_variants": [
+                "Czy osoba dorosła przewożona autobusem na siedzeniu wyposażonym w pasy bezpieczeństwa ma obowiązek z nich korzystać?"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "safety_equipment_and_restraints",
+                    "name": "Wyposazenie pojazdu zwiazane z bezpieczenstwem, korzystanie z pasow, zaglowkow i fotelikow"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak.",
+                    "option_b": "Tak, ale tylko wtedy, gdy przed tym miejscem nie ma innych siedzeń.",
+                    "option_c": "Nie, gdyż ten obowiązek nie dotyczy autobusu.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo kierujacy samochodowym oraz osoby przewożone takim pojazdem wyposażonym w pasy bezpieczeństwa są obowiązani korzystać z tych pasów podczas jazdy. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/6907/image/full.51845a2ac6ab.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/6907/image/thumb.f4d1f4b1d607.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/6907/image/full.51845a2ac6ab.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/6907/image/thumb.f4d1f4b1d607.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:pasy bezpieczenstwa",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 36521,
+                    "question_external_id": "6907",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-39-ust-1",
+                    "legal_unit_label": "art. 39 ust. 1",
+                    "legal_unit_title": "Obowiązek korzystania z pasów bezpieczeństwa",
+                    "legal_topic_slug": "pasy-bezpieczenstwa",
+                    "article_slug": "pasy-bezpieczenstwa",
+                    "public_note": "To pytanie sprawdza podstawowy obowiązek korzystania z pasów bezpieczeństwa. Art. 39 ust. 1 obejmuje kierującego oraz osoby przewożone pojazdem lub na siedzeniu wyposażonym w pasy."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 36521,
+                    "external_id": "6907",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 36596,
+                    "external_id": "6907",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7441",
+            "prompt": "Która z osób jest zwolniona z obowiązku korzystania z pasów bezpieczeństwa w czasie jazdy samochodem osobowym?",
+            "prompt_variants": [
+                "Która z osób jest zwolniona z obowiązku korzystania z pasów bezpieczeństwa w czasie jazdy samochodem osobowym?"
+            ],
+            "categories": [
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "safety_equipment_and_restraints",
+                    "name": "Wyposazenie pojazdu zwiazane z bezpieczenstwem, korzystanie z pasow, zaglowkow i fotelikow"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Każdy pasażer na tylnym siedzeniu pojazdu.",
+                    "option_b": "Każdy pasażer w trakcie spożywania posiłku.",
+                    "option_c": "Kobieta w widocznej ciąży.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Kobieta w widocznej ciąży."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo obowiązek korzystania z pasów bezpieczeństwa nie dotyczy kobiet o widocznej ciąży. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/7441/image/full.968bfb081149.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/7441/image/thumb.1b9e6ac95fe0.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/7441/image/full.968bfb081149.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/7441/image/thumb.1b9e6ac95fe0.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:pasow bezpieczenstwa",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 40608,
+                    "question_external_id": "7441",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-39-ust-2-pkt-2",
+                    "legal_unit_label": "art. 39 ust. 2 pkt 2",
+                    "legal_unit_title": "Wyjątek dla kobiety o widocznej ciąży",
+                    "legal_topic_slug": "pasy-bezpieczenstwa",
+                    "article_slug": "pasy-bezpieczenstwa",
+                    "public_note": "To pytanie dotyczy ustawowego wyjątku dla kobiety o widocznej ciąży. Zwolnienie wynika wprost z art. 39 ust. 2 pkt 2."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 40608,
+                    "external_id": "7441",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 41140,
+                    "external_id": "7441",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7662",
+            "prompt": "W którym przypadku pasy bezpieczeństwa są zapięte prawidłowo?",
+            "prompt_variants": [
+                "W którym przypadku pasy bezpieczeństwa są zapięte prawidłowo?"
+            ],
+            "categories": [
+                "D"
+            ],
+            "question_topics": [
+                {
+                    "key": "safety_equipment_and_restraints",
+                    "name": "Wyposazenie pojazdu zwiazane z bezpieczenstwem, korzystanie z pasow, zaglowkow i fotelikow"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Gdy przylegają do szyi.",
+                    "option_b": "Gdy są w ogóle zapięte, niezależnie od sposobu przylegania do ciała.",
+                    "option_c": "Gdy przylegają do ciała poniżej szyi.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Gdy przylegają do ciała poniżej szyi."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo pasy bezpieczeństwa spełniają swoją funkcję kiedy są zapięte, ich ułożenie jest poprawnie wyregulowane, pasy nie mają luzu - przylegają do ciała. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/7662/image/full.bd4ef2ac01b4.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/7662/image/thumb.da1724bbf207.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:pasy bezpieczenstwa",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 41657,
+                    "external_id": "7662",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "8935",
+            "prompt": "Które z wymienionych uszkodzeń pasów bezpieczeństwa oznaczają bezwzględną konieczność wymiany pasów na nowe?",
+            "prompt_variants": [
+                "Które z wymienionych uszkodzeń pasów bezpieczeństwa oznaczają bezwzględną konieczność wymiany pasów na nowe?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "safety_equipment_and_restraints",
+                    "name": "Wyposazenie pojazdu zwiazane z bezpieczenstwem, korzystanie z pasow, zaglowkow i fotelikow"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Skręcenie lub zwinięcie pasów.",
+                    "option_b": "Przetarcia, przewężenia i naderwania taśmy pasów.",
+                    "option_c": "Trwałe zabrudzenia i plamy na taśmie pasów.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Przetarcia, przewężenia i naderwania taśmy pasów."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/8935/image/full.b5a3c46f87b3.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/8935/image/thumb.a48833f0d175.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:pasow bezpieczenstwa",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 42700,
+                    "external_id": "8935",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "9102",
+            "prompt": "Która z widocznych na ilustracji lampek kontrolnych sygnalizuje niezapięte pasy bezpieczeństwa?",
+            "prompt_variants": [
+                "Która z widocznych na ilustracji lampek kontrolnych sygnalizuje niezapięte pasy bezpieczeństwa?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "safety_equipment_and_restraints",
+                    "name": "Wyposazenie pojazdu zwiazane z bezpieczenstwem, korzystanie z pasow, zaglowkow i fotelikow"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "A.",
+                    "option_b": "B.",
+                    "option_c": "C.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "B."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo piktogram niezapiętych pasów, który świeci gdy pasy są niezapięte. Na obrazie kluczowe jest poprawne odczytanie oznakowania i jego znaczenia. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/9102/image/full.ccd5514c718a.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/9102/image/thumb.803a2cba7c92.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:pasy bezpieczenstwa",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 42728,
+                    "external_id": "9102",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10809",
+            "prompt": "Przewożenie dziecka w wieku poniżej trzech lat samochodem osobowym, niewyposażonym w pasy bezpieczeństwa i fotelik bezpieczeństwa dla dziecka lub w pasy bezpieczeństwa i inne urządzenie przytrzymujące dla dzieci jest:",
+            "prompt_variants": [
+                "Przewożenie dziecka w wieku poniżej trzech lat samochodem osobowym, niewyposażonym w pasy bezpieczeństwa i fotelik bezpieczeństwa dla dziecka lub w pasy bezpieczeństwa i inne urządzenie przytrzymujące dla dzieci jest:"
+            ],
+            "categories": [
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Zabronione.",
+                    "option_b": "Dozwolone.",
+                    "option_c": "Dozwolone, jeżeli dziecko trzymane jest na rękach przez pełnoletniego pasażera.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Zabronione."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo Kierującemu pojazdem zabrania się przewożenia dziecka w wieku poniżej 3 lat w pojeździe kategorii. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:pasy bezpieczenstwa",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 44977,
+                    "external_id": "10809",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10811",
+            "prompt": "Obowiązek korzystania z pasów bezpieczeństwa:",
+            "prompt_variants": [
+                "Obowiązek korzystania z pasów bezpieczeństwa:"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Dotyczy kierującego taksówką podczas przewożenia pasażera.",
+                    "option_b": "Nie dotyczy dziecka poniżej 3 lat przewożonego autobusem.",
+                    "option_c": "Dotyczy kobiety o widocznej ciąży.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie dotyczy dziecka poniżej 3 lat przewożonego autobusem."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:pasow bezpieczenstwa",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 44842,
+                    "question_external_id": "10811",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-39-ust-2-pkt-10",
+                    "legal_unit_label": "art. 39 ust. 2 pkt 10",
+                    "legal_unit_title": "Wyjątek dla dziecka poniżej 3 lat w autobusie",
+                    "legal_topic_slug": "pasy-bezpieczenstwa",
+                    "article_slug": "pasy-bezpieczenstwa",
+                    "public_note": "To pytanie sprawdza wyjątek dotyczący dziecka poniżej 3 lat przewożonego autobusem. Art. 39 ust. 2 pkt 10 wyłącza wtedy obowiązek korzystania z pasów."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 44842,
+                    "external_id": "10811",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44979,
+                    "external_id": "10811",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "10812",
+            "prompt": "Dziecko mające mniej niż 150 cm wzrostu, przewożone samochodem osobowym wyposażonym w pasy bezpieczeństwa, powinno znajdować się w foteliku bezpieczeństwa dla dziecka, zgodnym z:",
+            "prompt_variants": [
+                "Dziecko mające mniej niż 150 cm wzrostu, przewożone samochodem osobowym wyposażonym w pasy bezpieczeństwa, powinno znajdować się w foteliku bezpieczeństwa dla dziecka, zgodnym z:"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Masą i wzrostem dziecka oraz właściwymi warunkami technicznymi określonymi w przepisach Unii Europejskiej.",
+                    "option_b": "Masą i wzrostem dziecka.",
+                    "option_c": "Wiekiem dziecka.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Masą i wzrostem dziecka oraz właściwymi warunkami technicznymi określonymi w przepisach Unii Europejskiej."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo dziecko mające mniej niż 150 cm wzrostu jest przewożone samochodem osobowym w foteliku bezpieczeństwa dla dziecka lub innym urządzeniu. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:pasy bezpieczenstwa",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 44843,
+                    "external_id": "10812",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44980,
+                    "external_id": "10812",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10814",
+            "prompt": "Przewożenie na tylnym siedzeniu samochodu osobowego dziecka przytrzymywanego za pomocą pasów bezpieczeństwa jest:",
+            "prompt_variants": [
+                "Przewożenie na tylnym siedzeniu samochodu osobowego dziecka przytrzymywanego za pomocą pasów bezpieczeństwa jest:"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Dozwolone, jeżeli dziecko ma co najmniej 135 cm wzrostu i nie jest możliwe zapewnienie mu fotelika bezpieczeństwa ze względu na jego wzrost i masę.",
+                    "option_b": "Zabronione bez fotelika bezpieczeństwa.",
+                    "option_c": "Dozwolone, jeżeli dziecko ma co najmniej 125 cm wzrostu i nie jest możliwe zapewnienie mu fotelika bezpieczeństwa ze względu na jego wzrost i masę.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Dozwolone, jeżeli dziecko ma co najmniej 135 cm wzrostu i nie jest możliwe zapewnienie mu fotelika bezpieczeństwa ze względu na jego wzrost i masę."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo zezwala się na przewożenie w samochodzie osobowym na tylnym siedzeniu pojazdu, dziecka mającego co najmniej 135 cm wzrostu przytrzymywanego za pomocą. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:pasow bezpieczenstwa",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 44845,
+                    "external_id": "10814",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44982,
+                    "external_id": "10814",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10994",
+            "prompt": "Kiedy wolno przewozić samochodem ciężarowym, na przednim siedzeniu, dziecko mające poniżej 150 cm wzrostu, przytrzymywane jedynie za pomocą pasów bezpieczeństwa?",
+            "prompt_variants": [
+                "Kiedy wolno przewozić samochodem ciężarowym, na przednim siedzeniu, dziecko mające poniżej 150 cm wzrostu, przytrzymywane jedynie za pomocą pasów bezpieczeństwa?"
+            ],
+            "categories": [
+                "B",
+                "C"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Jeżeli dziecko ma co najmniej 135 cm wzrostu.",
+                    "option_b": "Jeżeli w samochodzie tym nie ma możliwości zamontowania fotelika bezpieczeństwa.",
+                    "option_c": "Jeżeli dziecko ma zaświadczenie lekarskie o przeciwwskazaniu do przewożenia w foteliku bezpieczeństwa.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Jeżeli dziecko ma zaświadczenie lekarskie o przeciwwskazaniu do przewożenia w foteliku bezpieczeństwa."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:pasow bezpieczenstwa",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 45242,
+                    "external_id": "10994",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 45255,
+                    "external_id": "10994",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "11437",
+            "prompt": "Czy poduszka powietrzna spełni swoją funkcję w czasie wypadku, jeżeli nie zapniesz pasów bezpieczeństwa?",
+            "prompt_variants": [
+                "Czy poduszka powietrzna spełni swoją funkcję w czasie wypadku, jeżeli nie zapniesz pasów bezpieczeństwa?"
+            ],
+            "categories": [
+                "C",
+                "C1"
+            ],
+            "question_topics": [
+                {
+                    "key": "safety_equipment_and_restraints",
+                    "name": "Wyposazenie pojazdu zwiazane z bezpieczenstwem, korzystanie z pasow, zaglowkow i fotelikow"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak, są to dwa niezależne systemy bezpieczeństwa.",
+                    "option_b": "Nie, zadziałanie poduszki powietrznej narazi Cię na urazy głowy lub kręgosłupa.",
+                    "option_c": "Tak, poduszka powietrzna zastępuje użycie pasów bezpieczeństwa.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie, zadziałanie poduszki powietrznej narazi Cię na urazy głowy lub kręgosłupa."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo poduszka powietrzna nie spełni swojej funkcji prawidłowo bez zapiętych pasów bezpieczeństwa, a wręcz może być niebezpieczna, bo wybucha z ogromną siłą. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/11437/image/full.5d14e3b4f257.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/11437/image/thumb.43eb97548915.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/11437/image/full.5d14e3b4f257.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/11437/image/thumb.43eb97548915.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:pasow bezpieczenstwa",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 45957,
+                    "external_id": "11437",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46143,
+                    "external_id": "11437",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        }
+    ]
+}

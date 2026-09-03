@@ -1,0 +1,2171 @@
+{
+    "generated_at": "2026-06-22T15:40:01+02:00",
+    "candidate": {
+        "slug": "dokumenty-podczas-kontroli-drogowej",
+        "title": "Dokumenty podczas kontroli drogowej",
+        "description": "Węższy temat artykułu wykryty na podstawie treści pytań.",
+        "level": "focused",
+        "status": "candidate",
+        "rule_version": "2026-06-19-prompt-v2",
+        "existing_article_slug": null
+    },
+    "workflow": {
+        "status": "ready",
+        "next_action": "Zweryfikuj klaster, oficjalna podstawe prawna i utworz artykul zgodnie z runbookiem.",
+        "public_relations_are_verified_only": true
+    },
+    "article": null,
+    "summary": {
+        "canonical_questions": 23,
+        "question_rows": 119,
+        "categories": [
+            "A",
+            "A1",
+            "A2",
+            "AM",
+            "B",
+            "B1",
+            "C",
+            "C1",
+            "D",
+            "D1",
+            "PT",
+            "T"
+        ],
+        "canonical_questions_with_verified_reference": 0,
+        "prompt_conflicts": [],
+        "answer_conflicts": [],
+        "correct_answer_conflicts": []
+    },
+    "questions": [
+        {
+            "external_id": "2684",
+            "prompt": "Czy kierując tramwajem jesteś obowiązany mieć przy sobie i okazywać na żądanie uprawnionego organu dokument stwierdzający dopuszczenie tramwaju do ruchu?",
+            "prompt_variants": [
+                "Czy kierując tramwajem jesteś obowiązany mieć przy sobie i okazywać na żądanie uprawnionego organu dokument stwierdzający dopuszczenie tramwaju do ruchu?"
+            ],
+            "categories": [
+                "PT"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak.",
+                    "option_b": "Nie, ponieważ taki dokument znajduje się tylko w zajezdni.",
+                    "option_c": "Nie, ponieważ taki dokument nie dotyczy tramwaju.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedź A. Kierujący tramwajem ma obowiązek mieć przy sobie i okazywać na żądanie uprawnionego organu dokument stwierdzający dopuszczenie tramwaju do ruchu. To, że dokument może być przechowywany w zajezdni, nie zwalnia z obowiązków podczas kontroli."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:okazywac na zadanie uprawnionego organu",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 23611,
+                    "external_id": "2684",
+                    "category": "PT",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10827",
+            "prompt": "Kierujący pojazdem, zarejestrowanym na terytorium Rzeczypospolitej Polskiej, jest zobowiązany mieć przy sobie i okazywać na żądanie uprawnionego organu:",
+            "prompt_variants": [
+                "Kierujący pojazdem, zarejestrowanym na terytorium Rzeczypospolitej Polskiej, jest zobowiązany mieć przy sobie i okazywać na żądanie uprawnionego organu:"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Pokwitowanie zatrzymania dowodu rejestracyjnego albo pozwolenia czasowego.",
+                    "option_b": "Dokument stwierdzający dopuszczenie pojazdu do ruchu.",
+                    "option_c": "Dokument potwierdzający zawarcie umowy obowiązkowego ubezpieczenia OC posiadacza pojazdu.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Pokwitowanie zatrzymania dowodu rejestracyjnego albo pozwolenia czasowego."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo kierujacy ma obowiazek mieć przy sobie i okazywać na żądanie uprawnionego organu pokwitowanie zatrzymania dowodu rejestracyjnego albo pozwolenia. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:okazywac na zadanie uprawnionego organu",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 44850,
+                    "external_id": "10827",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44987,
+                    "external_id": "10827",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10834",
+            "prompt": "Kierujący pojazdem, zarejestrowanym na terytorium Rzeczypospolitej Polskiej,  jest obowiązany mieć przy sobie i okazywać na żądanie uprawnionego organu:",
+            "prompt_variants": [
+                "Kierujący pojazdem, zarejestrowanym na terytorium Rzeczypospolitej Polskiej,  jest obowiązany mieć przy sobie i okazywać na żądanie uprawnionego organu:"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Dokument stwierdzający uprawnienie do kierowania pojazdem.",
+                    "option_b": "Dokument stwierdzajacy uprawnienie do kierowania pojazdem, inny niż wydane w kraju prawo jazdy.",
+                    "option_c": "Dokument stwierdzający dopuszczenie pojazdu do ruchu.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Dokument stwierdzajacy uprawnienie do kierowania pojazdem, inny niż wydane w kraju prawo jazdy."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:okazywac na zadanie uprawnionego organu",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 44854,
+                    "external_id": "10834",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44991,
+                    "external_id": "10834",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10835",
+            "prompt": "Kierujący pojazdem, zarejestrowanym na terytorium RP oraz posiadający prawo jazdy wydane przez organy RP, jest obowiązany mieć przy sobie i okazywać na żądanie uprawnionego organu:",
+            "prompt_variants": [
+                "Kierujący pojazdem, zarejestrowanym na terytorium RP oraz posiadający prawo jazdy wydane przez organy RP, jest obowiązany mieć przy sobie i okazywać na żądanie uprawnionego organu:"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Ważne pokwitowanie zatrzymania prawa jazdy.",
+                    "option_b": "Dokument stwierdzający uprawnienie do kierowania pojazdem.",
+                    "option_c": "Dowód opłacenia składki za obowiązkowe ubezpieczenie odpowiedzialności cywilnej posiadacza pojazdu.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Ważne pokwitowanie zatrzymania prawa jazdy."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo kierujacy ma obowiazek mieć przy sobie i okazywać na żądanie uprawnionego organu ważne pokwitowanie zatrzymania prawa jazdy. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:okazywac na zadanie uprawnionego organu",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 44855,
+                    "external_id": "10835",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44992,
+                    "external_id": "10835",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10836",
+            "prompt": "Kierujący pojazdem, zarejestrowanym na terytorium RP, posiadający prawo jazdy wydane przez organy RP, jest obowiązany mieć przy sobie i okazywać na żądanie uprawnionego organu:",
+            "prompt_variants": [
+                "Kierujący pojazdem, zarejestrowanym na terytorium RP, posiadający prawo jazdy wydane przez organy RP, jest obowiązany mieć przy sobie i okazywać na żądanie uprawnionego organu:"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Dowód opłacenia składki za obowiązkowe ubezpieczenie odpowiedzialności cywilnej posiadacza pojazdu.",
+                    "option_b": "Dokument stwierdzający uprawnienie do kierowania pojazdem.",
+                    "option_c": "Inne dokumenty, jeżeli obowiązek taki wynika z odrębnej ustawy.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Inne dokumenty, jeżeli obowiązek taki wynika z odrębnej ustawy."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo kierujacy ma obowiazek mieć przy sobie i okazywać na żądanie uprawnionego organu inne dokumenty, jeżeli obowiązek taki wynika z odrębnej ustawy. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:okazywac na zadanie uprawnionego organu",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 44856,
+                    "external_id": "10836",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44993,
+                    "external_id": "10836",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10838",
+            "prompt": "Kierujący samochodem osobowym zarejestrowanym za granicą i uczestniczącym w ruchu na terytorium RP jest obowiązany mieć przy sobie i okazywać na żądanie uprawnionego organu:",
+            "prompt_variants": [
+                "Kierujący samochodem osobowym zarejestrowanym za granicą i uczestniczącym w ruchu na terytorium RP jest obowiązany mieć przy sobie i okazywać na żądanie uprawnionego organu:"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Dokument stwierdzający uprawnienie do kierowania pojazdem inny niż wydane w kraju prawo jazdy.",
+                    "option_b": "Paszport wydany przez kraj, w którym został zarejestrowany pojazd.",
+                    "option_c": "Dokument potwierdzający przeprowadzenie badania technicznego.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Dokument stwierdzający uprawnienie do kierowania pojazdem inny niż wydane w kraju prawo jazdy."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:okazywac na zadanie uprawnionego organu",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 44858,
+                    "external_id": "10838",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44995,
+                    "external_id": "10838",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10839",
+            "prompt": "Kierujący pojazdem wykonujący jazdę testową z wykorzystaniem profesjonalnego dowodu rejestracyjnego jest obowiązany mieć przy sobie i okazywać na żądanie uprawnionego organu:",
+            "prompt_variants": [
+                "Kierujący pojazdem wykonujący jazdę testową z wykorzystaniem profesjonalnego dowodu rejestracyjnego jest obowiązany mieć przy sobie i okazywać na żądanie uprawnionego organu:"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Dokument stwierdzający uprawnienie do kierowania pojazdem, wydany na terytorium RP.",
+                    "option_b": "Dokument stwierdzający dopuszczenie pojazdu do ruchu.",
+                    "option_c": "Dowód opłacenia składki za obowiązkowe ubezpieczenie OC.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Dokument stwierdzający dopuszczenie pojazdu do ruchu."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo w przypadku wykonywania pojazdem jazdy testowej z wykorzystaniem profesjonalnego dowodu rejestracyjnego i profesjonalnych tablic (tablicy). Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:okazywac na zadanie uprawnionego organu",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 44859,
+                    "external_id": "10839",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44996,
+                    "external_id": "10839",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10841",
+            "prompt": "Kierujący pojazdem zarejestrowanym na terytorium RP i posiadający uprawnienia wydane przez organy RP jest obowiązany mieć przy sobie i okazywać na żądanie uprawnionego organu:",
+            "prompt_variants": [
+                "Kierujący pojazdem zarejestrowanym na terytorium RP i posiadający uprawnienia wydane przez organy RP jest obowiązany mieć przy sobie i okazywać na żądanie uprawnionego organu:"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Dokument stwierdzający dopuszczenie pojazdu do ruchu.",
+                    "option_b": "Dokument stwierdzający uprawnienie do kierowania pojazdem.",
+                    "option_c": "Zaświadczenie o przeprowadzonym badaniu technicznym z wynikiem pozytywnym w zakresie wyposażenia pojazdu w blokadę alkoholową.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Zaświadczenie o przeprowadzonym badaniu technicznym z wynikiem pozytywnym w zakresie wyposażenia pojazdu w blokadę alkoholową."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo kierujacy ma obowiazek mieć przy sobie i okazywać na żądanie uprawnionego organu zaświadczenie o przeprowadzonym badaniu technicznym z wynikiem. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:okazywac na zadanie uprawnionego organu",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 44860,
+                    "external_id": "10841",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44997,
+                    "external_id": "10841",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10843",
+            "prompt": "Kierujący pojazdem zarejestrowanym na terytorium RP i posiadający uprawnienia wydane przez organy RP jest obowiązany mieć przy sobie i okazywać na żądanie uprawnionego organu:",
+            "prompt_variants": [
+                "Kierujący pojazdem zarejestrowanym na terytorium RP i posiadający uprawnienia wydane przez organy RP jest obowiązany mieć przy sobie i okazywać na żądanie uprawnionego organu:"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Dowód rejestracyjny pojazdu.",
+                    "option_b": "Dokument stwierdzający kalibrację blokady alkoholowej, jeżeli obowiązek posiadanie blokady wynika z jego prawa jazdy.",
+                    "option_c": "Dokument stwierdzający uprawnienie do kierowania pojazdem.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Dokument stwierdzający kalibrację blokady alkoholowej, jeżeli obowiązek posiadanie blokady wynika z jego prawa jazdy."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedź B. Jeżeli z prawa jazdy wynika obowiązek prowadzenia pojazdu z blokadą alkoholową, kierujący powinien mieć przy sobie dokument potwierdzający kalibrację tej blokady. To właśnie ten dokument trzeba okazać przy kontroli w opisanej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:okazywac na zadanie uprawnionego organu",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 44862,
+                    "external_id": "10843",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44999,
+                    "external_id": "10843",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10885",
+            "prompt": "Jakie dokumenty masz obowiązek mieć przy sobie i okazywać na żądanie uprawnionego organu podczas kontroli drogowej?",
+            "prompt_variants": [
+                "Jakie dokumenty masz obowiązek mieć przy sobie i okazywać na żądanie uprawnionego organu podczas kontroli drogowej?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Potwierdzenie opłaty obowiązkowego ubezpieczenia odpowiedzialności cywilnej.",
+                    "option_b": "Pokwitowanie zatrzymania dowodu rejestracyjnego w okresie, w którym uprawnia ono do używania pojazdu.",
+                    "option_c": "W każdym przypadku zaświadczenie o przeprowadzonym badaniu technicznym.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Pokwitowanie zatrzymania dowodu rejestracyjnego w okresie, w którym uprawnia ono do używania pojazdu."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:dokumenty masz obowiazek miec przy sobie|okazywac na zadanie uprawnionego organu",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 44790,
+                    "external_id": "10885",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44800,
+                    "external_id": "10885",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44825,
+                    "external_id": "10885",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44866,
+                    "external_id": "10885",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44876,
+                    "external_id": "10885",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44913,
+                    "external_id": "10885",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44933,
+                    "external_id": "10885",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44942,
+                    "external_id": "10885",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44953,
+                    "external_id": "10885",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44965,
+                    "external_id": "10885",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 45003,
+                    "external_id": "10885",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10886",
+            "prompt": "Jakie dokumenty masz obowiązek mieć przy sobie i okazywać na żądanie uprawnionego organu podczas kontroli drogowej?",
+            "prompt_variants": [
+                "Jakie dokumenty masz obowiązek mieć przy sobie i okazywać na żądanie uprawnionego organu podczas kontroli drogowej?"
+            ],
+            "categories": [
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Potwierdzenie opłaty ubezpieczenia AC.",
+                    "option_b": "Pokwitowanie zatrzymania pozwolenia czasowego w okresie, w którym uprawnia ono do używania pojazdu.",
+                    "option_c": "Zaświadczenie o przeprowadzonym badaniu technicznym, w przypadku, gdy pojazd jest zasilany gazem.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Pokwitowanie zatrzymania pozwolenia czasowego w okresie, w którym uprawnia ono do używania pojazdu."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A. Jezeli pozwolenie czasowe zostalo zatrzymane, ale pokwitowanie nadal uprawnia do uzywania pojazdu, to wlasnie to pokwitowanie trzeba miec przy sobie i okazywac podczas kontroli. Nie chodzi tutaj o dowod rejestracyjny, tylko o dokument zastepujacy zatrzymane pozwolenie czasowe."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:dokumenty masz obowiazek miec przy sobie|okazywac na zadanie uprawnionego organu",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 44791,
+                    "external_id": "10886",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44826,
+                    "external_id": "10886",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44867,
+                    "external_id": "10886",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44877,
+                    "external_id": "10886",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44954,
+                    "external_id": "10886",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44966,
+                    "external_id": "10886",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 45004,
+                    "external_id": "10886",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10887",
+            "prompt": "Jakie dokumenty masz obowiązek mieć przy sobie i okazywać na żądanie uprawnionego organu podczas kontroli drogowej?",
+            "prompt_variants": [
+                "Jakie dokumenty masz obowiązek mieć przy sobie i okazywać na żądanie uprawnionego organu podczas kontroli drogowej?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Dowód rejestracyjny.",
+                    "option_b": "Pokwitowanie zatrzymania dowodu rejestracyjnego w okresie, w którym uprawnia ono do używania pojazdu.",
+                    "option_c": "Świadectwo zgodności z warunkami technicznymi.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Pokwitowanie zatrzymania dowodu rejestracyjnego w okresie, w którym uprawnia ono do używania pojazdu."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B. Gdy dowod rejestracyjny zostal zatrzymany, podczas kontroli okazujesz wazne pokwitowanie jego zatrzymania, o ile nadal uprawnia do uzywania pojazdu. Sam zatrzymany dowod ani swiadectwo zgodnosci nie zastepuja tego dokumentu."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:dokumenty masz obowiazek miec przy sobie|okazywac na zadanie uprawnionego organu",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 44792,
+                    "external_id": "10887",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44801,
+                    "external_id": "10887",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44827,
+                    "external_id": "10887",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44868,
+                    "external_id": "10887",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44878,
+                    "external_id": "10887",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44914,
+                    "external_id": "10887",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44934,
+                    "external_id": "10887",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44943,
+                    "external_id": "10887",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44955,
+                    "external_id": "10887",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44967,
+                    "external_id": "10887",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 45005,
+                    "external_id": "10887",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10888",
+            "prompt": "Jakie dokumenty masz obowiązek mieć przy sobie i okazywać na żądanie uprawnionego organu podczas kontroli drogowej?",
+            "prompt_variants": [
+                "Jakie dokumenty masz obowiązek mieć przy sobie i okazywać na żądanie uprawnionego organu podczas kontroli drogowej?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Pokwitowanie zatrzymania pozwolenia czasowego w okresie, w którym uprawnia ono do używania pojazdu.",
+                    "option_b": "Świadectwo zgodności WE.",
+                    "option_c": "Dowód rejestracyjny.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Pokwitowanie zatrzymania pozwolenia czasowego w okresie, w którym uprawnia ono do używania pojazdu."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A. Jezeli pozwolenie czasowe zostalo zatrzymane, ale pokwitowanie nadal pozwala uzywac pojazdu, to ten dokument nalezy miec przy sobie podczas kontroli drogowej. W tym pytaniu chodzi o pokwitowanie zatrzymania pozwolenia czasowego, a nie dowodu rejestracyjnego."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:dokumenty masz obowiazek miec przy sobie|okazywac na zadanie uprawnionego organu",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 44793,
+                    "external_id": "10888",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44802,
+                    "external_id": "10888",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44828,
+                    "external_id": "10888",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44869,
+                    "external_id": "10888",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44879,
+                    "external_id": "10888",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44915,
+                    "external_id": "10888",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44935,
+                    "external_id": "10888",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44944,
+                    "external_id": "10888",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44956,
+                    "external_id": "10888",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44968,
+                    "external_id": "10888",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 45006,
+                    "external_id": "10888",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10889",
+            "prompt": "Jakie dokumenty masz obowiązek mieć przy sobie i okazywać na żądanie uprawnionego organu, gdy na terytorium Rzeczypospolitej kierujesz pojazdem, który jest zarejestrowany za granicą?",
+            "prompt_variants": [
+                "Jakie dokumenty masz obowiązek mieć przy sobie i okazywać na żądanie uprawnionego organu, gdy na terytorium Rzeczypospolitej kierujesz pojazdem, który jest zarejestrowany za granicą?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Dokument dopuszczający pojazd do ruchu.",
+                    "option_b": "Dokument potwierdzający zawarcie umowy ubezpieczenia od nieszczęśliwych wypadków.",
+                    "option_c": "Kopię zaświadczenia o przeprowadzonym badaniu technicznym.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Dokument dopuszczający pojazd do ruchu."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo kierujacy zarejestrowanym za granicą uczestniczącym w ruchu na terytorium. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:dokumenty masz obowiazek miec przy sobie|okazywac na zadanie uprawnionego organu",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 44794,
+                    "external_id": "10889",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44803,
+                    "external_id": "10889",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44829,
+                    "external_id": "10889",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44870,
+                    "external_id": "10889",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44880,
+                    "external_id": "10889",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44916,
+                    "external_id": "10889",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44936,
+                    "external_id": "10889",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44945,
+                    "external_id": "10889",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44957,
+                    "external_id": "10889",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44969,
+                    "external_id": "10889",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 45007,
+                    "external_id": "10889",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10890",
+            "prompt": "Jakie dokumenty masz obowiązek mieć przy sobie i okazywać na żądanie uprawnionego organu, gdy na terytorium Rzeczypospolitej kierujesz pojazdem, który jest zarejestrowany za granicą?",
+            "prompt_variants": [
+                "Jakie dokumenty masz obowiązek mieć przy sobie i okazywać na żądanie uprawnionego organu, gdy na terytorium Rzeczypospolitej kierujesz pojazdem, który jest zarejestrowany za granicą?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Dowód własności pojazdu.",
+                    "option_b": "Dokument potwierdzający zawarcie umowy obowiązkowego ubezpieczenia odpowiedzialności cywilnej posiadacza pojazdu.",
+                    "option_c": "Dokument potwierdzający opłatę skarbową.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Dokument potwierdzający zawarcie umowy obowiązkowego ubezpieczenia odpowiedzialności cywilnej posiadacza pojazdu."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedź B. Kierując na terytorium Rzeczypospolitej pojazdem zarejestrowanym za granicą, musisz mieć przy sobie dokument potwierdzający obowiązkowe ubezpieczenie OC tego pojazdu. Dowód własności ani potwierdzenie opłaty skarbowej nie spełniają tego obowiązku."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:dokumenty masz obowiazek miec przy sobie|okazywac na zadanie uprawnionego organu",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 44795,
+                    "external_id": "10890",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44804,
+                    "external_id": "10890",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44830,
+                    "external_id": "10890",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44871,
+                    "external_id": "10890",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44881,
+                    "external_id": "10890",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44917,
+                    "external_id": "10890",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44937,
+                    "external_id": "10890",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44946,
+                    "external_id": "10890",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44958,
+                    "external_id": "10890",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44970,
+                    "external_id": "10890",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 45008,
+                    "external_id": "10890",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10891",
+            "prompt": "Jakie dokumenty masz obowiązek mieć przy sobie i okazywać na żądanie uprawnionego organu, gdy na terytorium Rzeczypospolitej kierujesz pojazdem, który jest zarejestrowany za granicą?",
+            "prompt_variants": [
+                "Jakie dokumenty masz obowiązek mieć przy sobie i okazywać na żądanie uprawnionego organu, gdy na terytorium Rzeczypospolitej kierujesz pojazdem, który jest zarejestrowany za granicą?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Profesjonalny dowód rejestracyjny.",
+                    "option_b": "Dowód opłacenia składki za obowiązkowe ubezpieczenie odpowiedzialności cywilnej.",
+                    "option_c": "Dokument potwierdzający opłatę za korzystanie z autostrad i dróg ekspresowych.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Dowód opłacenia składki za obowiązkowe ubezpieczenie odpowiedzialności cywilnej."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedź B. W tej sytuacji dokumentem, który trzeba mieć przy sobie, jest dowód opłacenia składki za obowiązkowe ubezpieczenie odpowiedzialności cywilnej pojazdu. Dokument opłaty za autostrady ani profesjonalny dowód rejestracyjny nie są tu właściwą odpowiedzią spośród podanych wariantów."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:dokumenty masz obowiazek miec przy sobie|okazywac na zadanie uprawnionego organu",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 44796,
+                    "external_id": "10891",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44805,
+                    "external_id": "10891",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44831,
+                    "external_id": "10891",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44872,
+                    "external_id": "10891",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44882,
+                    "external_id": "10891",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44918,
+                    "external_id": "10891",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44938,
+                    "external_id": "10891",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44947,
+                    "external_id": "10891",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44959,
+                    "external_id": "10891",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44971,
+                    "external_id": "10891",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 45009,
+                    "external_id": "10891",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10892",
+            "prompt": "Jakie dokumenty masz obowiązek mieć przy sobie i okazywać na żądanie uprawnionego organu podczas kontroli drogowej?",
+            "prompt_variants": [
+                "Jakie dokumenty masz obowiązek mieć przy sobie i okazywać na żądanie uprawnionego organu podczas kontroli drogowej?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Krajowe prawo jazdy.",
+                    "option_b": "Inny dokument stwierdzający uprawnienie do kierowania pojazdem niż wydane w kraju prawo jazdy.",
+                    "option_c": "Świadectwo kwalifikacji.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Inny dokument stwierdzający uprawnienie do kierowania pojazdem niż wydane w kraju prawo jazdy."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedź B. Jeżeli nie chodzi o wydane w kraju prawo jazdy, dokumentem potwierdzającym uprawnienie do kierowania może być inny ważny dokument stwierdzający to uprawnienie, na przykład odpowiedni dokument zagraniczny. Świadectwo kwalifikacji nie zastępuje takiego dokumentu, a odpowiedź o krajowym prawie jazdy nie pasuje do treści pytania."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:dokumenty masz obowiazek miec przy sobie|okazywac na zadanie uprawnionego organu",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 44797,
+                    "external_id": "10892",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44806,
+                    "external_id": "10892",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44832,
+                    "external_id": "10892",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44873,
+                    "external_id": "10892",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44883,
+                    "external_id": "10892",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44919,
+                    "external_id": "10892",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44939,
+                    "external_id": "10892",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44948,
+                    "external_id": "10892",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44960,
+                    "external_id": "10892",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44972,
+                    "external_id": "10892",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 45010,
+                    "external_id": "10892",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10893",
+            "prompt": "Jakie dokumenty masz obowiązek mieć przy sobie i okazywać na żądanie uprawnionego organu podczas kontroli drogowej?",
+            "prompt_variants": [
+                "Jakie dokumenty masz obowiązek mieć przy sobie i okazywać na żądanie uprawnionego organu podczas kontroli drogowej?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Orzeczenie lekarskie, jeżeli wykonujesz zarobkowy przewóz osób.",
+                    "option_b": "Pokwitowanie zatrzymania prawa jazdy w okresie, w którym upoważnia ono do kierowania.",
+                    "option_c": "Orzeczenie psychologiczne.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Pokwitowanie zatrzymania prawa jazdy w okresie, w którym upoważnia ono do kierowania."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedź B. Jeżeli prawo jazdy zostało zatrzymane, podczas kontroli okazujesz pokwitowanie jego zatrzymania, o ile nadal upoważnia ono do kierowania pojazdem. Orzeczenie lekarskie ani psychologiczne nie zastępuje tego dokumentu."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:dokumenty masz obowiazek miec przy sobie|okazywac na zadanie uprawnionego organu",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 44833,
+                    "external_id": "10893",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10894",
+            "prompt": "Jakie dokumenty masz obowiązek mieć przy sobie i okazywać na żądanie uprawnionego organu podczas kontroli drogowej?",
+            "prompt_variants": [
+                "Jakie dokumenty masz obowiązek mieć przy sobie i okazywać na żądanie uprawnionego organu podczas kontroli drogowej?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Orzeczenie psychologiczne, jeżeli wykonujesz zarobkowy przewóz osób.",
+                    "option_b": "Pokwitowanie zatrzymania prawa jazdy w okresie, w którym upoważnia ono do kierowania.",
+                    "option_c": "Orzeczenie lekarskie.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Pokwitowanie zatrzymania prawa jazdy w okresie, w którym upoważnia ono do kierowania."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedź B. Pokwitowanie zatrzymania prawa jazdy, ważne w okresie, w którym upoważnia do kierowania, jest dokumentem, który należy okazać przy kontroli w opisanej sytuacji. Same orzeczenia psychologiczne albo lekarskie nie dają tego uprawnienia."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:dokumenty masz obowiazek miec przy sobie|okazywac na zadanie uprawnionego organu",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 44834,
+                    "external_id": "10894",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10895",
+            "prompt": "Jaki dokument jesteś zobowiązany mieć przy sobie i okazywać na żądanie uprawnionego organu?",
+            "prompt_variants": [
+                "Jaki dokument jesteś zobowiązany mieć przy sobie i okazywać na żądanie uprawnionego organu?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Dokument potwierdzający uczestnictwo w kursie kwalifikacji wstępnej.",
+                    "option_b": "Dokument stwierdzający uprawnienie do kierowania pojazdem inny niż wydane w kraju prawo jazdy.",
+                    "option_c": "Dokument stwierdzający ukończenie kursu z pierwszej pomocy przedmedycznej.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Dokument stwierdzający uprawnienie do kierowania pojazdem inny niż wydane w kraju prawo jazdy."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo kierujacy ma obowiazek mieć przy sobie i okazywać na żądanie uprawnionego organu wymagany dokument stwierdzający uprawnienie do kierowania pojazdem. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:okazywac na zadanie uprawnionego organu",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 44798,
+                    "external_id": "10895",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44807,
+                    "external_id": "10895",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44835,
+                    "external_id": "10895",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44874,
+                    "external_id": "10895",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44884,
+                    "external_id": "10895",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44920,
+                    "external_id": "10895",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44940,
+                    "external_id": "10895",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44949,
+                    "external_id": "10895",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44961,
+                    "external_id": "10895",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 44973,
+                    "external_id": "10895",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 45011,
+                    "external_id": "10895",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10999",
+            "prompt": "Który z wymienionych dokumentów musisz mieć przy sobie i okazywać na żądanie uprawnionego organu, gdy wykonujesz zarobkowy transport rzeczy samochodem ciężarowym o dopuszczalnej masie całkowitej powyżej 12 t?",
+            "prompt_variants": [
+                "Który z wymienionych dokumentów musisz mieć przy sobie i okazywać na żądanie uprawnionego organu, gdy wykonujesz zarobkowy transport rzeczy samochodem ciężarowym o dopuszczalnej masie całkowitej powyżej 12 t?"
+            ],
+            "categories": [
+                "C"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Krajowe prawo jazdy.",
+                    "option_b": "Potwierdzenie zawarcia przez właściciela pojazdu umowy  obowiązkowego ubezpieczenia OC lub dowód opłaty składki za ubezpieczenie.",
+                    "option_c": "Pokwitowanie zatrzymania dowodu rejestracyjnego pojazdu w okresie, w którym upoważnia ono do  jego używania,",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Pokwitowanie zatrzymania dowodu rejestracyjnego pojazdu w okresie, w którym upoważnia ono do  jego używania,"
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo kierujacy ma obowiazek mieć przy sobie i okazywać na żądanie uprawnionego organu wymagane dla danego rodzaju pojazdu pokwitowanie zatrzymania dowodu. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:okazywac na zadanie uprawnionego organu",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 45256,
+                    "external_id": "10999",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "11001",
+            "prompt": "Który z wymienionych dokumentów kierujący pojazdem zarejestrowanym na terytorium RP musi mieć przy sobie i okazywać na żądanie uprawnionego organu?",
+            "prompt_variants": [
+                "Który z wymienionych dokumentów kierujący pojazdem zarejestrowanym na terytorium RP musi mieć przy sobie i okazywać na żądanie uprawnionego organu?"
+            ],
+            "categories": [
+                "B",
+                "C",
+                "D"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Potwierdzenie opłacenia obowiązkowego ubezpieczenia odpowiedzialności cywilnej właściciela pojazdu.",
+                    "option_b": "Dowód rejestracyjny.",
+                    "option_c": "Jeśli kierujący ma uprawnienia do kierowania ograniczone do pojazdu wyposażonego w blokadę alkoholową - zaświadczenie o pozytywnym wyniku badania technicznego w tym zakresie.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Jeśli kierujący ma uprawnienia do kierowania ograniczone do pojazdu wyposażonego w blokadę alkoholową - zaświadczenie o pozytywnym wyniku badania technicznego w tym zakresie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:okazywac na zadanie uprawnionego organu",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 45243,
+                    "external_id": "11001",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 45257,
+                    "external_id": "11001",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 45267,
+                    "external_id": "11001",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "11041",
+            "prompt": "Kierujący zarejestrowanym na terytorium RP ciągnikiem rolniczym z przyczepą jest obowiązany mieć przy sobie i okazywać na żądanie uprawnionego organu:",
+            "prompt_variants": [
+                "Kierujący zarejestrowanym na terytorium RP ciągnikiem rolniczym z przyczepą jest obowiązany mieć przy sobie i okazywać na żądanie uprawnionego organu:"
+            ],
+            "categories": [
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "owner_obligations_insurance_documents",
+                    "name": "Obowiazki wlasciciela/posiadacza pojazdu, ubezpieczenia, wymagane dokumenty"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Dowód rejestracyjny ciągnika rolniczego.",
+                    "option_b": "Pokwitowanie zatrzymania dowodu rejestracyjnego ciągniętej przyczepy w okresie, w którym upoważnia ono do używania przyczepy.",
+                    "option_c": "Zaświadczenie o przeprowadzonym ostatnim badaniu technicznym ciągnika z wynikiem pozytywnym.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Pokwitowanie zatrzymania dowodu rejestracyjnego ciągniętej przyczepy w okresie, w którym upoważnia ono do używania przyczepy."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo kierujacy ma obowiazek mieć przy sobie i okazywać na żądanie uprawnionego organu wymagane dla danego rodzaju pojazdu pokwitowanie zatrzymania dowodu. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:okazywac na zadanie uprawnionego organu",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 45289,
+                    "external_id": "11041",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        }
+    ]
+}

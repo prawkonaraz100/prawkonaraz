@@ -1,0 +1,3111 @@
+{
+    "generated_at": "2026-06-21T16:21:42+02:00",
+    "candidate": {
+        "slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+        "title": "Rogatki i sygnały na przejeździe kolejowym",
+        "description": "Węższy temat artykułu wykryty na podstawie treści pytań.",
+        "level": "focused",
+        "status": "candidate",
+        "rule_version": "2026-06-19-prompt-v2",
+        "existing_article_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym"
+    },
+    "workflow": {
+        "status": "published",
+        "next_action": "Przejrzyj relacje pytan i zdecyduj, czy artykul wymaga rozbudowy lub ponownego review.",
+        "public_relations_are_verified_only": true
+    },
+    "article": {
+        "slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+        "title": "Rogatki i czerwone światło: kiedy wolno ruszyć",
+        "status": "published",
+        "published_at": "2026-06-21",
+        "last_reviewed_at": "2026-06-21",
+        "legal_units": [
+            {
+                "slug": "art-28-ust-1",
+                "label": "art. 28 ust. 1",
+                "title": "Szczególna ostrożność przed przejazdem kolejowym",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-28-ust-2",
+                "label": "art. 28 ust. 2",
+                "title": "Prędkość umożliwiająca zatrzymanie przed torami",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "art-28-ust-3-pkt-1",
+                "label": "art. 28 ust. 3 pkt 1",
+                "title": "Zakaz omijania i wjazdu przy zaporach",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            },
+            {
+                "slug": "par-98-ust-5",
+                "label": "§ 98 ust. 5",
+                "title": "Czerwony sygnał migający na przejeździe",
+                "status": "verified",
+                "last_checked_at": "2026-06-20"
+            }
+        ]
+    },
+    "summary": {
+        "canonical_questions": 16,
+        "question_rows": 136,
+        "categories": [
+            "A",
+            "A1",
+            "A2",
+            "AM",
+            "B",
+            "B1",
+            "C",
+            "C1",
+            "D",
+            "D1",
+            "T"
+        ],
+        "canonical_questions_with_verified_reference": 13,
+        "prompt_conflicts": [],
+        "answer_conflicts": [],
+        "correct_answer_conflicts": []
+    },
+    "questions": [
+        {
+            "external_id": "2436",
+            "prompt": "Czy w sytuacji, kiedy zapory kolejowe są podniesione masz obowiązek upewnienia się, czy nie zbliża się pociąg?",
+            "prompt_variants": [
+                "Czy w sytuacji, kiedy zapory kolejowe są podniesione masz obowiązek upewnienia się, czy nie zbliża się pociąg?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "rail_and_tram_crossings",
+                    "name": "Zachowanie na przejazdach kolejowych i tramwajowych"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak, bo w tej sytuacji warunki rzeczywiscie pozwalaja na takie zachowanie. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a/2436/video/full.426e12755dc9.mp4",
+                    "poster_path": "media/questions/a/2436/image/poster.ccf41e81a3fc.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/2436/video/full.426e12755dc9.mp4",
+                    "poster_path": "media/questions/b/2436/image/poster.ccf41e81a3fc.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c/2436/video/full.426e12755dc9.mp4",
+                    "poster_path": "media/questions/c/2436/image/poster.ccf41e81a3fc.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d/2436/video/full.426e12755dc9.mp4",
+                    "poster_path": "media/questions/d/2436/image/poster.ccf41e81a3fc.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/t/2436/video/full.426e12755dc9.mp4",
+                    "poster_path": "media/questions/t/2436/image/poster.ccf41e81a3fc.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/am/2436/video/full.426e12755dc9.mp4",
+                    "poster_path": "media/questions/am/2436/image/poster.ccf41e81a3fc.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a1/2436/video/full.426e12755dc9.mp4",
+                    "poster_path": "media/questions/a1/2436/image/poster.ccf41e81a3fc.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a2/2436/video/full.426e12755dc9.mp4",
+                    "poster_path": "media/questions/a2/2436/image/poster.ccf41e81a3fc.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b1/2436/video/full.426e12755dc9.mp4",
+                    "poster_path": "media/questions/b1/2436/image/poster.ccf41e81a3fc.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c1/2436/video/full.426e12755dc9.mp4",
+                    "poster_path": "media/questions/c1/2436/image/poster.ccf41e81a3fc.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d1/2436/video/full.426e12755dc9.mp4",
+                    "poster_path": "media/questions/d1/2436/image/poster.ccf41e81a3fc.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:zapor",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 23012,
+                    "question_external_id": "2436",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-28-ust-1",
+                    "legal_unit_label": "art. 28 ust. 1",
+                    "legal_unit_title": "Szczególna ostrożność przed przejazdem kolejowym",
+                    "legal_topic_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "article_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "public_note": "To pytanie sprawdza obowiązek obserwacji torów mimo podniesionych zapór. Art. 28 ust. 1 wymaga szczególnej ostrożności i upewnienia się, czy nie zbliża się pojazd szynowy."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 23012,
+                    "external_id": "2436",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23069,
+                    "external_id": "2436",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23129,
+                    "external_id": "2436",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23183,
+                    "external_id": "2436",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23236,
+                    "external_id": "2436",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23289,
+                    "external_id": "2436",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23342,
+                    "external_id": "2436",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23395,
+                    "external_id": "2436",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23449,
+                    "external_id": "2436",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23503,
+                    "external_id": "2436",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23557,
+                    "external_id": "2436",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "2443",
+            "prompt": "Czy wolno Ci wjechać na przejazd kolejowy, jeżeli półzapory zostały całkowicie podniesione, a sygnał czerwony jeszcze nie został wyłączony?",
+            "prompt_variants": [
+                "Czy wolno Ci wjechać na przejazd kolejowy, jeżeli półzapory zostały całkowicie podniesione, a sygnał czerwony jeszcze nie został wyłączony?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "rail_and_tram_crossings",
+                    "name": "Zachowanie na przejazdach kolejowych i tramwajowych"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo Kierującemu pojazdem zabrania się objeżdżania opuszczonych zapór lub półzapór oraz wjeżdżania na przejazd, jeżeli opuszczanie ich zostało rozpoczęte. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a/2443/video/full.d85207f00dbd.mp4",
+                    "poster_path": "media/questions/a/2443/image/poster.bb1e79328276.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/2443/video/full.d85207f00dbd.mp4",
+                    "poster_path": "media/questions/b/2443/image/poster.bb1e79328276.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c/2443/video/full.d85207f00dbd.mp4",
+                    "poster_path": "media/questions/c/2443/image/poster.bb1e79328276.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d/2443/video/full.d85207f00dbd.mp4",
+                    "poster_path": "media/questions/d/2443/image/poster.bb1e79328276.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/t/2443/video/full.d85207f00dbd.mp4",
+                    "poster_path": "media/questions/t/2443/image/poster.bb1e79328276.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/am/2443/video/full.d85207f00dbd.mp4",
+                    "poster_path": "media/questions/am/2443/image/poster.bb1e79328276.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a1/2443/video/full.d85207f00dbd.mp4",
+                    "poster_path": "media/questions/a1/2443/image/poster.bb1e79328276.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a2/2443/video/full.d85207f00dbd.mp4",
+                    "poster_path": "media/questions/a2/2443/image/poster.bb1e79328276.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b1/2443/video/full.d85207f00dbd.mp4",
+                    "poster_path": "media/questions/b1/2443/image/poster.bb1e79328276.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c1/2443/video/full.d85207f00dbd.mp4",
+                    "poster_path": "media/questions/c1/2443/image/poster.bb1e79328276.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d1/2443/video/full.d85207f00dbd.mp4",
+                    "poster_path": "media/questions/d1/2443/image/poster.bb1e79328276.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:zapor",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 23016,
+                    "question_external_id": "2443",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "par-98-ust-5",
+                    "legal_unit_label": "§ 98 ust. 5",
+                    "legal_unit_title": "Czerwony sygnał migający na przejeździe",
+                    "legal_topic_slug": "wjazd-na-przejazd-kolejowy",
+                    "article_slug": "wjazd-na-przejazd-kolejowy",
+                    "public_note": "Mimo podniesionych półzapór nadal działa czerwony sygnał migający. § 98 ust. 5 zakazuje wtedy wjazdu na przejazd aż do wyłączenia sygnału."
+                },
+                {
+                    "question_id": 23016,
+                    "question_external_id": "2443",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "par-98-ust-5",
+                    "legal_unit_label": "§ 98 ust. 5",
+                    "legal_unit_title": "Czerwony sygnał migający na przejeździe",
+                    "legal_topic_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "article_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "public_note": "Zapory są już podniesione, ale czerwony sygnał migający nadal działa. § 98 ust. 5 samodzielnie zakazuje wtedy wjazdu na przejazd."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 23016,
+                    "external_id": "2443",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23073,
+                    "external_id": "2443",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23133,
+                    "external_id": "2443",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23187,
+                    "external_id": "2443",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23240,
+                    "external_id": "2443",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23293,
+                    "external_id": "2443",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23346,
+                    "external_id": "2443",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23399,
+                    "external_id": "2443",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23453,
+                    "external_id": "2443",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23507,
+                    "external_id": "2443",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23561,
+                    "external_id": "2443",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "2458",
+            "prompt": "Czy w przedstawionej sytuacji wolno Ci wjechać na widoczny przejazd kolejowy, jeżeli czerwone światło już zgasło, ale półzapory nie zostały jeszcze całkowicie podniesione?",
+            "prompt_variants": [
+                "Czy w przedstawionej sytuacji wolno Ci wjechać na widoczny przejazd kolejowy, jeżeli czerwone światło już zgasło, ale półzapory nie zostały jeszcze całkowicie podniesione?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "rail_and_tram_crossings",
+                    "name": "Zachowanie na przejazdach kolejowych i tramwajowych"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo Kierującemu pojazdem zabrania się objeżdżania opuszczonych zapór lub półzapór oraz wjeżdżania na przejazd, jeżeli opuszczanie ich zostało rozpoczęte. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a/2458/video/full.af1b981a989c.mp4",
+                    "poster_path": "media/questions/a/2458/image/poster.7c5f202dbc17.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/2458/video/full.af1b981a989c.mp4",
+                    "poster_path": "media/questions/b/2458/image/poster.7c5f202dbc17.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c/2458/video/full.af1b981a989c.mp4",
+                    "poster_path": "media/questions/c/2458/image/poster.7c5f202dbc17.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d/2458/video/full.af1b981a989c.mp4",
+                    "poster_path": "media/questions/d/2458/image/poster.7c5f202dbc17.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/t/2458/video/full.af1b981a989c.mp4",
+                    "poster_path": "media/questions/t/2458/image/poster.7c5f202dbc17.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/am/2458/video/full.af1b981a989c.mp4",
+                    "poster_path": "media/questions/am/2458/image/poster.7c5f202dbc17.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a1/2458/video/full.af1b981a989c.mp4",
+                    "poster_path": "media/questions/a1/2458/image/poster.7c5f202dbc17.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a2/2458/video/full.af1b981a989c.mp4",
+                    "poster_path": "media/questions/a2/2458/image/poster.7c5f202dbc17.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b1/2458/video/full.af1b981a989c.mp4",
+                    "poster_path": "media/questions/b1/2458/image/poster.7c5f202dbc17.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c1/2458/video/full.af1b981a989c.mp4",
+                    "poster_path": "media/questions/c1/2458/image/poster.7c5f202dbc17.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d1/2458/video/full.af1b981a989c.mp4",
+                    "poster_path": "media/questions/d1/2458/image/poster.7c5f202dbc17.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:zapor",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 23021,
+                    "question_external_id": "2458",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-28-ust-3-pkt-1",
+                    "legal_unit_label": "art. 28 ust. 3 pkt 1",
+                    "legal_unit_title": "Zakaz omijania i wjazdu przy zaporach",
+                    "legal_topic_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "article_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "public_note": "To pytanie dotyczy położenia lub ruchu zapór. Art. 28 ust. 3 pkt 1 zakazuje ich objeżdżania oraz wjazdu od rozpoczęcia opuszczania aż do całkowitego zakończenia podnoszenia."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 23021,
+                    "external_id": "2458",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23078,
+                    "external_id": "2458",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23138,
+                    "external_id": "2458",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23192,
+                    "external_id": "2458",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23245,
+                    "external_id": "2458",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23298,
+                    "external_id": "2458",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23351,
+                    "external_id": "2458",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23404,
+                    "external_id": "2458",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23458,
+                    "external_id": "2458",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23512,
+                    "external_id": "2458",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23566,
+                    "external_id": "2458",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "2467",
+            "prompt": "Czy wolno Ci wjechać na widoczny przejazd bezpośrednio po podniesieniu zapór kolejowych bez upewnienia się, czy nie nadjeżdża pociąg?",
+            "prompt_variants": [
+                "Czy wolno Ci wjechać na widoczny przejazd bezpośrednio po podniesieniu zapór kolejowych bez upewnienia się, czy nie nadjeżdża pociąg?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "rail_and_tram_crossings",
+                    "name": "Zachowanie na przejazdach kolejowych i tramwajowych"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo kierujacy przed wjechaniem na tory ma obowiazek upewnić się, czy nie zbliża się pojazd szynowy, niezależnie od faktu, że zapory są podniesione. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a/2467/video/full.92e0e8427961.mp4",
+                    "poster_path": "media/questions/a/2467/image/poster.a06efeca951d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/2467/video/full.92e0e8427961.mp4",
+                    "poster_path": "media/questions/b/2467/image/poster.a06efeca951d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c/2467/video/full.92e0e8427961.mp4",
+                    "poster_path": "media/questions/c/2467/image/poster.a06efeca951d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d/2467/video/full.92e0e8427961.mp4",
+                    "poster_path": "media/questions/d/2467/image/poster.a06efeca951d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/t/2467/video/full.92e0e8427961.mp4",
+                    "poster_path": "media/questions/t/2467/image/poster.a06efeca951d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/am/2467/video/full.92e0e8427961.mp4",
+                    "poster_path": "media/questions/am/2467/image/poster.a06efeca951d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a1/2467/video/full.92e0e8427961.mp4",
+                    "poster_path": "media/questions/a1/2467/image/poster.a06efeca951d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a2/2467/video/full.92e0e8427961.mp4",
+                    "poster_path": "media/questions/a2/2467/image/poster.a06efeca951d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b1/2467/video/full.92e0e8427961.mp4",
+                    "poster_path": "media/questions/b1/2467/image/poster.a06efeca951d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c1/2467/video/full.92e0e8427961.mp4",
+                    "poster_path": "media/questions/c1/2467/image/poster.a06efeca951d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d1/2467/video/full.92e0e8427961.mp4",
+                    "poster_path": "media/questions/d1/2467/image/poster.a06efeca951d.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:zapor",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 23024,
+                    "question_external_id": "2467",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-28-ust-1",
+                    "legal_unit_label": "art. 28 ust. 1",
+                    "legal_unit_title": "Szczególna ostrożność przed przejazdem kolejowym",
+                    "legal_topic_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "article_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "public_note": "To pytanie sprawdza obowiązek obserwacji torów mimo podniesionych zapór. Art. 28 ust. 1 wymaga szczególnej ostrożności i upewnienia się, czy nie zbliża się pojazd szynowy."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 23024,
+                    "external_id": "2467",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23081,
+                    "external_id": "2467",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23141,
+                    "external_id": "2467",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23195,
+                    "external_id": "2467",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23248,
+                    "external_id": "2467",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23301,
+                    "external_id": "2467",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23354,
+                    "external_id": "2467",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23407,
+                    "external_id": "2467",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23461,
+                    "external_id": "2467",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23515,
+                    "external_id": "2467",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23569,
+                    "external_id": "2467",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "2472",
+            "prompt": "Czy przy niepełnym podniesieniu zapór wolno Ci wjechać na przejazd kolejowy?",
+            "prompt_variants": [
+                "Czy przy niepełnym podniesieniu zapór wolno Ci wjechać na przejazd kolejowy?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "rail_and_tram_crossings",
+                    "name": "Zachowanie na przejazdach kolejowych i tramwajowych"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo Kierującemu pojazdem zabrania się objeżdżania opuszczonych zapór lub półzapór oraz wjeżdżania na przejazd, jeżeli opuszczanie ich zostało rozpoczęte. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a/2472/video/full.92e0e8427961.mp4",
+                    "poster_path": "media/questions/a/2472/image/poster.a06efeca951d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/2472/video/full.92e0e8427961.mp4",
+                    "poster_path": "media/questions/b/2472/image/poster.a06efeca951d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c/2472/video/full.92e0e8427961.mp4",
+                    "poster_path": "media/questions/c/2472/image/poster.a06efeca951d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d/2472/video/full.92e0e8427961.mp4",
+                    "poster_path": "media/questions/d/2472/image/poster.a06efeca951d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/t/2472/video/full.92e0e8427961.mp4",
+                    "poster_path": "media/questions/t/2472/image/poster.a06efeca951d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/am/2472/video/full.92e0e8427961.mp4",
+                    "poster_path": "media/questions/am/2472/image/poster.a06efeca951d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a1/2472/video/full.92e0e8427961.mp4",
+                    "poster_path": "media/questions/a1/2472/image/poster.a06efeca951d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a2/2472/video/full.92e0e8427961.mp4",
+                    "poster_path": "media/questions/a2/2472/image/poster.a06efeca951d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b1/2472/video/full.92e0e8427961.mp4",
+                    "poster_path": "media/questions/b1/2472/image/poster.a06efeca951d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c1/2472/video/full.92e0e8427961.mp4",
+                    "poster_path": "media/questions/c1/2472/image/poster.a06efeca951d.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d1/2472/video/full.92e0e8427961.mp4",
+                    "poster_path": "media/questions/d1/2472/image/poster.a06efeca951d.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:zapor",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 23026,
+                    "question_external_id": "2472",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-28-ust-3-pkt-1",
+                    "legal_unit_label": "art. 28 ust. 3 pkt 1",
+                    "legal_unit_title": "Zakaz omijania i wjazdu przy zaporach",
+                    "legal_topic_slug": "wjazd-na-przejazd-kolejowy",
+                    "article_slug": "wjazd-na-przejazd-kolejowy",
+                    "public_note": "To pytanie dotyczy zapór lub półzapór. Art. 28 ust. 3 pkt 1 zabrania ich objeżdżania oraz wjazdu od rozpoczęcia opuszczania aż do całkowitego zakończenia podnoszenia."
+                },
+                {
+                    "question_id": 23026,
+                    "question_external_id": "2472",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-28-ust-3-pkt-1",
+                    "legal_unit_label": "art. 28 ust. 3 pkt 1",
+                    "legal_unit_title": "Zakaz omijania i wjazdu przy zaporach",
+                    "legal_topic_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "article_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "public_note": "To pytanie dotyczy położenia lub ruchu zapór. Art. 28 ust. 3 pkt 1 zakazuje ich objeżdżania oraz wjazdu od rozpoczęcia opuszczania aż do całkowitego zakończenia podnoszenia."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 23026,
+                    "external_id": "2472",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23083,
+                    "external_id": "2472",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23143,
+                    "external_id": "2472",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23197,
+                    "external_id": "2472",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23250,
+                    "external_id": "2472",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23303,
+                    "external_id": "2472",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23356,
+                    "external_id": "2472",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23409,
+                    "external_id": "2472",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23463,
+                    "external_id": "2472",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23517,
+                    "external_id": "2472",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 23571,
+                    "external_id": "2472",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "3419",
+            "prompt": "Czy w tej sytuacji, chcąc kontynuować jazdę w lewo za przejazdem, powinieneś zatrzymać się przed półzaporą?",
+            "prompt_variants": [
+                "Czy w tej sytuacji, chcąc kontynuować jazdę w lewo za przejazdem, powinieneś zatrzymać się przed półzaporą?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "rail_and_tram_crossings",
+                    "name": "Zachowanie na przejazdach kolejowych i tramwajowych"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak, bo Kierującemu pojazdem zabrania się wjeżdżania na przejazd, jeżeli po drugiej stronie przejazdu nie ma miejsca do kontynuowania jazdy kierujacy. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a/3419/video/full.b9ea21aa4d19.mp4",
+                    "poster_path": "media/questions/a/3419/image/poster.1c2fbd0afe3f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/3419/video/full.b9ea21aa4d19.mp4",
+                    "poster_path": "media/questions/b/3419/image/poster.1c2fbd0afe3f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c/3419/video/full.b9ea21aa4d19.mp4",
+                    "poster_path": "media/questions/c/3419/image/poster.1c2fbd0afe3f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d/3419/video/full.b9ea21aa4d19.mp4",
+                    "poster_path": "media/questions/d/3419/image/poster.1c2fbd0afe3f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/t/3419/video/full.b9ea21aa4d19.mp4",
+                    "poster_path": "media/questions/t/3419/image/poster.1c2fbd0afe3f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/am/3419/video/full.b9ea21aa4d19.mp4",
+                    "poster_path": "media/questions/am/3419/image/poster.1c2fbd0afe3f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a1/3419/video/full.b9ea21aa4d19.mp4",
+                    "poster_path": "media/questions/a1/3419/image/poster.1c2fbd0afe3f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a2/3419/video/full.b9ea21aa4d19.mp4",
+                    "poster_path": "media/questions/a2/3419/image/poster.1c2fbd0afe3f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b1/3419/video/full.b9ea21aa4d19.mp4",
+                    "poster_path": "media/questions/b1/3419/image/poster.1c2fbd0afe3f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c1/3419/video/full.b9ea21aa4d19.mp4",
+                    "poster_path": "media/questions/c1/3419/image/poster.1c2fbd0afe3f.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d1/3419/video/full.b9ea21aa4d19.mp4",
+                    "poster_path": "media/questions/d1/3419/image/poster.1c2fbd0afe3f.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:zapor",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 25940,
+                    "external_id": "3419",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 26027,
+                    "external_id": "3419",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 26113,
+                    "external_id": "3419",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 26197,
+                    "external_id": "3419",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 26281,
+                    "external_id": "3419",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 26365,
+                    "external_id": "3419",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 26450,
+                    "external_id": "3419",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 26535,
+                    "external_id": "3419",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 26620,
+                    "external_id": "3419",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 26705,
+                    "external_id": "3419",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 26789,
+                    "external_id": "3419",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6283",
+            "prompt": "Czy w tej sytuacji masz prawo ominąć zaporę i wjechać na przejazd kolejowy po upewnieniu się, że nie nadjeżdża pociąg?",
+            "prompt_variants": [
+                "Czy w tej sytuacji masz prawo ominąć zaporę i wjechać na przejazd kolejowy po upewnieniu się, że nie nadjeżdża pociąg?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "rail_and_tram_crossings",
+                    "name": "Zachowanie na przejazdach kolejowych i tramwajowych"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo Kierującemu pojazdem zabrania się objeżdżania opuszczonych zapór lub półzapór oraz wjeżdżania na przejazd, jeżeli opuszczanie ich zostało rozpoczęte. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a/6283/video/full.10dd5be21113.mp4",
+                    "poster_path": "media/questions/a/6283/image/poster.e4311d714181.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/6283/video/full.10dd5be21113.mp4",
+                    "poster_path": "media/questions/b/6283/image/poster.e4311d714181.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c/6283/video/full.10dd5be21113.mp4",
+                    "poster_path": "media/questions/c/6283/image/poster.e4311d714181.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d/6283/video/full.10dd5be21113.mp4",
+                    "poster_path": "media/questions/d/6283/image/poster.e4311d714181.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/t/6283/video/full.10dd5be21113.mp4",
+                    "poster_path": "media/questions/t/6283/image/poster.e4311d714181.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/am/6283/video/full.10dd5be21113.mp4",
+                    "poster_path": "media/questions/am/6283/image/poster.e4311d714181.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a1/6283/video/full.10dd5be21113.mp4",
+                    "poster_path": "media/questions/a1/6283/image/poster.e4311d714181.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/a2/6283/video/full.10dd5be21113.mp4",
+                    "poster_path": "media/questions/a2/6283/image/poster.e4311d714181.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b1/6283/video/full.10dd5be21113.mp4",
+                    "poster_path": "media/questions/b1/6283/image/poster.e4311d714181.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/c1/6283/video/full.10dd5be21113.mp4",
+                    "poster_path": "media/questions/c1/6283/image/poster.e4311d714181.jpg"
+                },
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/d1/6283/video/full.10dd5be21113.mp4",
+                    "poster_path": "media/questions/d1/6283/image/poster.e4311d714181.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:zapor",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 33585,
+                    "question_external_id": "6283",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-28-ust-3-pkt-1",
+                    "legal_unit_label": "art. 28 ust. 3 pkt 1",
+                    "legal_unit_title": "Zakaz omijania i wjazdu przy zaporach",
+                    "legal_topic_slug": "wjazd-na-przejazd-kolejowy",
+                    "article_slug": "wjazd-na-przejazd-kolejowy",
+                    "public_note": "To pytanie dotyczy zapór lub półzapór. Art. 28 ust. 3 pkt 1 zabrania ich objeżdżania oraz wjazdu od rozpoczęcia opuszczania aż do całkowitego zakończenia podnoszenia."
+                },
+                {
+                    "question_id": 33585,
+                    "question_external_id": "6283",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-28-ust-3-pkt-1",
+                    "legal_unit_label": "art. 28 ust. 3 pkt 1",
+                    "legal_unit_title": "Zakaz omijania i wjazdu przy zaporach",
+                    "legal_topic_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "article_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "public_note": "To pytanie dotyczy położenia lub ruchu zapór. Art. 28 ust. 3 pkt 1 zakazuje ich objeżdżania oraz wjazdu od rozpoczęcia opuszczania aż do całkowitego zakończenia podnoszenia."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 33585,
+                    "external_id": "6283",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33685,
+                    "external_id": "6283",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33782,
+                    "external_id": "6283",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33879,
+                    "external_id": "6283",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 33968,
+                    "external_id": "6283",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34058,
+                    "external_id": "6283",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34145,
+                    "external_id": "6283",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34232,
+                    "external_id": "6283",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34332,
+                    "external_id": "6283",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34429,
+                    "external_id": "6283",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 34526,
+                    "external_id": "6283",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "8309",
+            "prompt": "Czy masz prawo wjechać na przejazd kolejowy, w czasie podnoszenia zapór przez pracownika kolejowego?",
+            "prompt_variants": [
+                "Czy masz prawo wjechać na przejazd kolejowy, w czasie podnoszenia zapór przez pracownika kolejowego?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "rail_and_tram_crossings",
+                    "name": "Zachowanie na przejazdach kolejowych i tramwajowych"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo Kierującemu pojazdem zabrania się objeżdżania opuszczonych zapór lub półzapór oraz wjeżdżania na przejazd, jeżeli opuszczanie ich zostało rozpoczęte. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/8309/image/full.c75d50683cab.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/8309/image/thumb.aa869630cec9.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:zapor|pracownika kolejowego",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 42473,
+                    "question_external_id": "8309",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-28-ust-3-pkt-1",
+                    "legal_unit_label": "art. 28 ust. 3 pkt 1",
+                    "legal_unit_title": "Zakaz omijania i wjazdu przy zaporach",
+                    "legal_topic_slug": "wjazd-na-przejazd-kolejowy",
+                    "article_slug": "wjazd-na-przejazd-kolejowy",
+                    "public_note": "To pytanie dotyczy zapór lub półzapór. Art. 28 ust. 3 pkt 1 zabrania ich objeżdżania oraz wjazdu od rozpoczęcia opuszczania aż do całkowitego zakończenia podnoszenia."
+                },
+                {
+                    "question_id": 42473,
+                    "question_external_id": "8309",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-28-ust-3-pkt-1",
+                    "legal_unit_label": "art. 28 ust. 3 pkt 1",
+                    "legal_unit_title": "Zakaz omijania i wjazdu przy zaporach",
+                    "legal_topic_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "article_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "public_note": "To pytanie dotyczy położenia lub ruchu zapór. Art. 28 ust. 3 pkt 1 zakazuje ich objeżdżania oraz wjazdu od rozpoczęcia opuszczania aż do całkowitego zakończenia podnoszenia."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 42473,
+                    "external_id": "8309",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "8316",
+            "prompt": "Po przejechaniu pojazdu szynowego półzapory unoszą się do góry. Czy w tej sytuacji masz prawo rozpocząć jazdę i wjechać na tory kolejowe?",
+            "prompt_variants": [
+                "Po przejechaniu pojazdu szynowego półzapory unoszą się do góry. Czy w tej sytuacji masz prawo rozpocząć jazdę i wjechać na tory kolejowe?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "rail_and_tram_crossings",
+                    "name": "Zachowanie na przejazdach kolejowych i tramwajowych"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo Kierującemu pojazdem zabrania się objeżdżania opuszczonych zapór lub półzapór oraz wjeżdżania na przejazd, jeżeli opuszczanie ich zostało rozpoczęte. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/8316/image/full.e8c8c717a427.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/8316/image/thumb.53d79e63702c.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:zapor",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 42477,
+                    "question_external_id": "8316",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-28-ust-3-pkt-1",
+                    "legal_unit_label": "art. 28 ust. 3 pkt 1",
+                    "legal_unit_title": "Zakaz omijania i wjazdu przy zaporach",
+                    "legal_topic_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "article_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "public_note": "To pytanie dotyczy położenia lub ruchu zapór. Art. 28 ust. 3 pkt 1 zakazuje ich objeżdżania oraz wjazdu od rozpoczęcia opuszczania aż do całkowitego zakończenia podnoszenia."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 42477,
+                    "external_id": "8316",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "8528",
+            "prompt": "Czy kierując pojazdem silnikowym masz obowiązek stosować się do poleceń i sygnałów wydawanych w nocy poza obszarem zabudowanym przez pracownika kolejowego na przejeździe kolejowym?",
+            "prompt_variants": [
+                "Czy kierując pojazdem silnikowym masz obowiązek stosować się do poleceń i sygnałów wydawanych w nocy poza obszarem zabudowanym przez pracownika kolejowego na przejeździe kolejowym?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "rail_and_tram_crossings",
+                    "name": "Zachowanie na przejazdach kolejowych i tramwajowych"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak. Na przejezdzie kolejowym musisz stosowac sie do polecen i sygnalow wydawanych przez uprawnionego pracownika kolejowego tak samo jak do sygnalow innych osob kierujacych ruchem. Dotyczy to rowniez nocy i obszaru poza zabudowanym."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/8528/image/full.39eecb3d030e.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/8528/image/thumb.1547982ee2a2.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:pracownika kolejowego",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 42667,
+                    "external_id": "8528",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "10242",
+            "prompt": "Czy wolno Ci wjechać na przejazd kolejowy, jeżeli podnoszenie zapór nie zostało zakończone?",
+            "prompt_variants": [
+                "Czy wolno Ci wjechać na przejazd kolejowy, jeżeli podnoszenie zapór nie zostało zakończone?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "rail_and_tram_crossings",
+                    "name": "Zachowanie na przejazdach kolejowych i tramwajowych"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo Kierującemu pojazdem zabrania się objeżdżania opuszczonych zapór lub półzapór oraz wjeżdżania na przejazd, jeżeli opuszczanie ich zostało rozpoczęte. Na nagraniu najwazniejszy jest przebieg sytuacji, a nie pojedynczy detal. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "video",
+                    "variant": "full",
+                    "path": "media/questions/b/10242/video/full.7b60db840abd.mp4",
+                    "poster_path": "media/questions/b/10242/image/poster.cb7fbad42154.jpg"
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:zapor",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 43691,
+                    "question_external_id": "10242",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-28-ust-3-pkt-1",
+                    "legal_unit_label": "art. 28 ust. 3 pkt 1",
+                    "legal_unit_title": "Zakaz omijania i wjazdu przy zaporach",
+                    "legal_topic_slug": "wjazd-na-przejazd-kolejowy",
+                    "article_slug": "wjazd-na-przejazd-kolejowy",
+                    "public_note": "To pytanie dotyczy zapór lub półzapór. Art. 28 ust. 3 pkt 1 zabrania ich objeżdżania oraz wjazdu od rozpoczęcia opuszczania aż do całkowitego zakończenia podnoszenia."
+                },
+                {
+                    "question_id": 43691,
+                    "question_external_id": "10242",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-28-ust-3-pkt-1",
+                    "legal_unit_label": "art. 28 ust. 3 pkt 1",
+                    "legal_unit_title": "Zakaz omijania i wjazdu przy zaporach",
+                    "legal_topic_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "article_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "public_note": "To pytanie dotyczy położenia lub ruchu zapór. Art. 28 ust. 3 pkt 1 zakazuje ich objeżdżania oraz wjazdu od rozpoczęcia opuszczania aż do całkowitego zakończenia podnoszenia."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 43691,
+                    "external_id": "10242",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "13463",
+            "prompt": "Czy konstrukcja zapór pozwala na ich wyłamanie, jeśli pojazd znalazł się na przejeździe kolejowym pomiędzy zamkniętymi zaporami.",
+            "prompt_variants": [
+                "Czy konstrukcja zapór pozwala na ich wyłamanie, jeśli pojazd znalazł się na przejeździe kolejowym pomiędzy zamkniętymi zaporami."
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "rail_and_tram_crossings",
+                    "name": "Zachowanie na przejazdach kolejowych i tramwajowych"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak, bo konstrukcja zapór na przejazdach kolejowych umożliwia ich wyłamanie, bo są zaprojektowane na tyle elastycznie (zwłaszcza półzapory), by w sytuacji. W praktyce trzeba ocenic sytuacje zgodnie z zasadami ruchu drogowego, a nie tylko po pozorach. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:zapor",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 47879,
+                    "external_id": "13463",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 47942,
+                    "external_id": "13463",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48004,
+                    "external_id": "13463",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48064,
+                    "external_id": "13463",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48120,
+                    "external_id": "13463",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48171,
+                    "external_id": "13463",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48226,
+                    "external_id": "13463",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48288,
+                    "external_id": "13463",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48350,
+                    "external_id": "13463",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48412,
+                    "external_id": "13463",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48472,
+                    "external_id": "13463",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "13464",
+            "prompt": "Czy, zachowując zwiększoną uwagę, masz prawo wjechać na przejazd kolejowy, jeżeli opuszczanie półzapór dopiero się rozpoczęło?",
+            "prompt_variants": [
+                "Czy, zachowując zwiększoną uwagę, masz prawo wjechać na przejazd kolejowy, jeżeli opuszczanie półzapór dopiero się rozpoczęło?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "rail_and_tram_crossings",
+                    "name": "Zachowanie na przejazdach kolejowych i tramwajowych"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo Kierującemu pojazdem zabrania się objeżdżania opuszczonych zapór lub półzapór oraz wjeżdżania na przejazd, jeżeli opuszczanie ich zostało rozpoczęte. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:zapor",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 47880,
+                    "question_external_id": "13464",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-28-ust-3-pkt-1",
+                    "legal_unit_label": "art. 28 ust. 3 pkt 1",
+                    "legal_unit_title": "Zakaz omijania i wjazdu przy zaporach",
+                    "legal_topic_slug": "wjazd-na-przejazd-kolejowy",
+                    "article_slug": "wjazd-na-przejazd-kolejowy",
+                    "public_note": "To pytanie dotyczy zapór lub półzapór. Art. 28 ust. 3 pkt 1 zabrania ich objeżdżania oraz wjazdu od rozpoczęcia opuszczania aż do całkowitego zakończenia podnoszenia."
+                },
+                {
+                    "question_id": 47880,
+                    "question_external_id": "13464",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-28-ust-3-pkt-1",
+                    "legal_unit_label": "art. 28 ust. 3 pkt 1",
+                    "legal_unit_title": "Zakaz omijania i wjazdu przy zaporach",
+                    "legal_topic_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "article_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "public_note": "To pytanie dotyczy położenia lub ruchu zapór. Art. 28 ust. 3 pkt 1 zakazuje ich objeżdżania oraz wjazdu od rozpoczęcia opuszczania aż do całkowitego zakończenia podnoszenia."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 47880,
+                    "external_id": "13464",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 47943,
+                    "external_id": "13464",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48005,
+                    "external_id": "13464",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48065,
+                    "external_id": "13464",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48121,
+                    "external_id": "13464",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48172,
+                    "external_id": "13464",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48227,
+                    "external_id": "13464",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48289,
+                    "external_id": "13464",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48351,
+                    "external_id": "13464",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48413,
+                    "external_id": "13464",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48473,
+                    "external_id": "13464",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "13466",
+            "prompt": "Czy w tej sytuacji po upewnieniu się, że nie nadjeżdża pociąg , masz prawo objechać półzapory i przejechać przez przejazd kolejowy ?",
+            "prompt_variants": [
+                "Czy w tej sytuacji po upewnieniu się, że nie nadjeżdża pociąg , masz prawo objechać półzapory i przejechać przez przejazd kolejowy ?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "rail_and_tram_crossings",
+                    "name": "Zachowanie na przejazdach kolejowych i tramwajowych"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo Kierującemu pojazdem zabrania się objeżdżania opuszczonych zapór lub półzapór oraz wjeżdżania na przejazd, jeżeli opuszczanie ich zostało rozpoczęte. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/13466/image/full.9b42cc60b2be.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/13466/image/thumb.90625ae2b70b.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/13466/image/full.9b42cc60b2be.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/13466/image/thumb.90625ae2b70b.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/13466/image/full.9b42cc60b2be.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/13466/image/thumb.90625ae2b70b.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/13466/image/full.9b42cc60b2be.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/13466/image/thumb.90625ae2b70b.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/13466/image/full.9b42cc60b2be.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/13466/image/thumb.90625ae2b70b.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/am/13466/image/full.9b42cc60b2be.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/am/13466/image/thumb.90625ae2b70b.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/13466/image/full.9b42cc60b2be.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/13466/image/thumb.90625ae2b70b.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/13466/image/full.9b42cc60b2be.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/13466/image/thumb.90625ae2b70b.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/13466/image/full.9b42cc60b2be.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/13466/image/thumb.90625ae2b70b.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/13466/image/full.9b42cc60b2be.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/13466/image/thumb.90625ae2b70b.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/13466/image/full.9b42cc60b2be.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/13466/image/thumb.90625ae2b70b.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:zapor",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 47882,
+                    "question_external_id": "13466",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-28-ust-3-pkt-1",
+                    "legal_unit_label": "art. 28 ust. 3 pkt 1",
+                    "legal_unit_title": "Zakaz omijania i wjazdu przy zaporach",
+                    "legal_topic_slug": "wjazd-na-przejazd-kolejowy",
+                    "article_slug": "wjazd-na-przejazd-kolejowy",
+                    "public_note": "To pytanie dotyczy zapór lub półzapór. Art. 28 ust. 3 pkt 1 zabrania ich objeżdżania oraz wjazdu od rozpoczęcia opuszczania aż do całkowitego zakończenia podnoszenia."
+                },
+                {
+                    "question_id": 47882,
+                    "question_external_id": "13466",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-28-ust-3-pkt-1",
+                    "legal_unit_label": "art. 28 ust. 3 pkt 1",
+                    "legal_unit_title": "Zakaz omijania i wjazdu przy zaporach",
+                    "legal_topic_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "article_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "public_note": "To pytanie dotyczy położenia lub ruchu zapór. Art. 28 ust. 3 pkt 1 zakazuje ich objeżdżania oraz wjazdu od rozpoczęcia opuszczania aż do całkowitego zakończenia podnoszenia."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 47882,
+                    "external_id": "13466",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 47945,
+                    "external_id": "13466",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48007,
+                    "external_id": "13466",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48067,
+                    "external_id": "13466",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48123,
+                    "external_id": "13466",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48174,
+                    "external_id": "13466",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48229,
+                    "external_id": "13466",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48291,
+                    "external_id": "13466",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48353,
+                    "external_id": "13466",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48415,
+                    "external_id": "13466",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48475,
+                    "external_id": "13466",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "13473",
+            "prompt": "Czy zbliżając się do przejazdu kolejowego z zaporami powinieneś uwzględniać, że wskutek różnych przyczyn  urządzenia zabezpieczające mogą na czas nie zamknąć przejazdu ?",
+            "prompt_variants": [
+                "Czy zbliżając się do przejazdu kolejowego z zaporami powinieneś uwzględniać, że wskutek różnych przyczyn  urządzenia zabezpieczające mogą na czas nie zamknąć przejazdu ?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "rail_and_tram_crossings",
+                    "name": "Zachowanie na przejazdach kolejowych i tramwajowych"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak, bo kierujacy, zbliżając się do przejazdu kolejowego oraz przejeżdżając przez przejazd, ma obowiazek zachować szczególną ostrożność, a przed wjechaniem. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/13473/image/full.0e80f472cd54.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/13473/image/thumb.b37ba3eee376.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/13473/image/full.0e80f472cd54.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/13473/image/thumb.b37ba3eee376.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/13473/image/full.0e80f472cd54.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/13473/image/thumb.b37ba3eee376.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/13473/image/full.0e80f472cd54.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/13473/image/thumb.b37ba3eee376.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/t/13473/image/full.0e80f472cd54.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/t/13473/image/thumb.b37ba3eee376.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/am/13473/image/full.0e80f472cd54.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/am/13473/image/thumb.b37ba3eee376.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/13473/image/full.0e80f472cd54.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/13473/image/thumb.b37ba3eee376.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/13473/image/full.0e80f472cd54.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/13473/image/thumb.b37ba3eee376.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/13473/image/full.0e80f472cd54.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/13473/image/thumb.b37ba3eee376.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c1/13473/image/full.0e80f472cd54.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c1/13473/image/thumb.b37ba3eee376.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/13473/image/full.0e80f472cd54.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/13473/image/thumb.b37ba3eee376.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:zapor",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 47889,
+                    "question_external_id": "13473",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-28-ust-1",
+                    "legal_unit_label": "art. 28 ust. 1",
+                    "legal_unit_title": "Szczególna ostrożność przed przejazdem kolejowym",
+                    "legal_topic_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "article_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "public_note": "To pytanie sprawdza obowiązek obserwacji torów mimo podniesionych zapór. Art. 28 ust. 1 wymaga szczególnej ostrożności i upewnienia się, czy nie zbliża się pojazd szynowy."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 47889,
+                    "external_id": "13473",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 47952,
+                    "external_id": "13473",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48014,
+                    "external_id": "13473",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48074,
+                    "external_id": "13473",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48130,
+                    "external_id": "13473",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48181,
+                    "external_id": "13473",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48236,
+                    "external_id": "13473",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48298,
+                    "external_id": "13473",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48360,
+                    "external_id": "13473",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48422,
+                    "external_id": "13473",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 48482,
+                    "external_id": "13473",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "13618",
+            "prompt": "Czy dojeżdżając do przejazdu kolejowego masz obowiązek upewnić się czy nie zbliża się pojazd szynowy w sytuacji, w której zapory są podniesione ?",
+            "prompt_variants": [
+                "Czy dojeżdżając do przejazdu kolejowego masz obowiązek upewnić się czy nie zbliża się pojazd szynowy w sytuacji, w której zapory są podniesione ?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1",
+                "T"
+            ],
+            "question_topics": [
+                {
+                    "key": "rail_and_tram_crossings",
+                    "name": "Zachowanie na przejazdach kolejowych i tramwajowych"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Tak, bo kierujacy, zbliżając się do przejazdu kolejowego oraz przejeżdżając przez przejazd, ma obowiazek zachować szczególną ostrożność, a przed wjechaniem. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:zapor",
+                    "confidence": 90,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 49501,
+                    "question_external_id": "13618",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-28-ust-1",
+                    "legal_unit_label": "art. 28 ust. 1",
+                    "legal_unit_title": "Szczególna ostrożność przed przejazdem kolejowym",
+                    "legal_topic_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "article_slug": "rogatki-i-sygnaly-na-przejezdzie-kolejowym",
+                    "public_note": "To pytanie sprawdza obowiązek obserwacji torów mimo podniesionych zapór. Art. 28 ust. 1 wymaga szczególnej ostrożności i upewnienia się, czy nie zbliża się pojazd szynowy."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 49501,
+                    "external_id": "13618",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 49592,
+                    "external_id": "13618",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 49684,
+                    "external_id": "13618",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 49768,
+                    "external_id": "13618",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 49855,
+                    "external_id": "13618",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 49945,
+                    "external_id": "13618",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 50034,
+                    "external_id": "13618",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 50122,
+                    "external_id": "13618",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 50207,
+                    "external_id": "13618",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 50282,
+                    "external_id": "13618",
+                    "category": "T",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 50358,
+                    "external_id": "13618",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        }
+    ]
+}

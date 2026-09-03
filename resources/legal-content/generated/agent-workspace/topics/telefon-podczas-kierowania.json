@@ -1,0 +1,624 @@
+{
+    "generated_at": "2026-06-21T22:05:38+02:00",
+    "candidate": {
+        "slug": "telefon-podczas-kierowania",
+        "title": "Telefon podczas kierowania pojazdem, rowerem lub hulajnogą",
+        "description": "Węższy temat artykułu wykryty na podstawie treści pytań.",
+        "level": "focused",
+        "status": "candidate",
+        "rule_version": "2026-06-19-prompt-v2",
+        "existing_article_slug": "telefon-podczas-kierowania"
+    },
+    "workflow": {
+        "status": "published",
+        "next_action": "Przejrzyj relacje pytan i zdecyduj, czy artykul wymaga rozbudowy lub ponownego review.",
+        "public_relations_are_verified_only": true
+    },
+    "article": {
+        "slug": "telefon-podczas-kierowania",
+        "title": "Telefon za kierownicą: co dokładnie jest zabronione",
+        "status": "published",
+        "published_at": "2026-06-21",
+        "last_reviewed_at": "2026-06-21",
+        "legal_units": [
+            {
+                "slug": "art-45-ust-2-pkt-1",
+                "label": "art. 45 ust. 2 pkt 1",
+                "title": "Zakaz trzymania telefonu podczas kierowania",
+                "status": "verified",
+                "last_checked_at": "2026-06-21"
+            }
+        ]
+    },
+    "summary": {
+        "canonical_questions": 6,
+        "question_rows": 12,
+        "categories": [
+            "A",
+            "A1",
+            "A2",
+            "AM",
+            "B",
+            "B1",
+            "PT"
+        ],
+        "canonical_questions_with_verified_reference": 6,
+        "prompt_conflicts": [],
+        "answer_conflicts": [],
+        "correct_answer_conflicts": []
+    },
+    "questions": [
+        {
+            "external_id": "3991",
+            "prompt": "Czy motorniczemu wolno podczas kierowania tramwajem korzystać z trzymanego w ręku telefonu komórkowego?",
+            "prompt_variants": [
+                "Czy motorniczemu wolno podczas kierowania tramwajem korzystać z trzymanego w ręku telefonu komórkowego?"
+            ],
+            "categories": [
+                "PT"
+            ],
+            "question_topics": [
+                {
+                    "key": "special_caution_exiting_and_securing_vehicle",
+                    "name": "Znaczenie zachowania szczegolnej ostroznosci w stosunku do innych uzytkownikow drogi, wysiadanie z pojazdu, zabezpieczenie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedź Nie. Motorniczemu nie wolno podczas prowadzenia tramwaju korzystać z telefonu trzymanego w ręku, ponieważ odrywa to uwagę od kierowania. Taki sposób używania telefonu jest zabroniony."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:telefon|podczas kierowania",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 28724,
+                    "question_external_id": "3991",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-45-ust-2-pkt-1",
+                    "legal_unit_label": "art. 45 ust. 2 pkt 1",
+                    "legal_unit_title": "Zakaz trzymania telefonu podczas kierowania",
+                    "legal_topic_slug": "telefon-podczas-kierowania",
+                    "article_slug": "telefon-podczas-kierowania",
+                    "public_note": "To pytanie sprawdza, czy korzystanie z telefonu wymaga trzymania słuchawki lub mikrofonu w ręku. Art. 45 ust. 2 pkt 1 zabrania właśnie takiego sposobu używania urządzenia podczas kierowania."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 28724,
+                    "external_id": "3991",
+                    "category": "PT",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "3992",
+            "prompt": "Czy podczas kierowania tramwajem dozwolone jest korzystanie z telefonu komórkowego, jeśli nie wymaga to trzymania aparatu w ręku?",
+            "prompt_variants": [
+                "Czy podczas kierowania tramwajem dozwolone jest korzystanie z telefonu komórkowego, jeśli nie wymaga to trzymania aparatu w ręku?"
+            ],
+            "categories": [
+                "PT"
+            ],
+            "question_topics": [
+                {
+                    "key": "special_caution_exiting_and_securing_vehicle",
+                    "name": "Znaczenie zachowania szczegolnej ostroznosci w stosunku do innych uzytkownikow drogi, wysiadanie z pojazdu, zabezpieczenie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedź Tak. Korzystanie z telefonu w czasie kierowania jest dopuszczalne, jeśli nie wymaga trzymania aparatu w ręku i nie ogranicza panowania nad pojazdem. Warunkiem jest zachowanie pełnej kontroli nad jazdą."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:telefon|podczas kierowania",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 28725,
+                    "question_external_id": "3992",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-45-ust-2-pkt-1",
+                    "legal_unit_label": "art. 45 ust. 2 pkt 1",
+                    "legal_unit_title": "Zakaz trzymania telefonu podczas kierowania",
+                    "legal_topic_slug": "telefon-podczas-kierowania",
+                    "article_slug": "telefon-podczas-kierowania",
+                    "public_note": "To pytanie sprawdza, czy korzystanie z telefonu wymaga trzymania słuchawki lub mikrofonu w ręku. Art. 45 ust. 2 pkt 1 zabrania właśnie takiego sposobu używania urządzenia podczas kierowania."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 28725,
+                    "external_id": "3992",
+                    "category": "PT",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "4006",
+            "prompt": "Czy podczas kierowania tramwajem masz prawo rozmawiać przez telefon komórkowy, wymagający trzymania słuchawki lub mikrofonu w ręku?",
+            "prompt_variants": [
+                "Czy podczas kierowania tramwajem masz prawo rozmawiać przez telefon komórkowy, wymagający trzymania słuchawki lub mikrofonu w ręku?"
+            ],
+            "categories": [
+                "PT"
+            ],
+            "question_topics": [
+                {
+                    "key": "special_caution_exiting_and_securing_vehicle",
+                    "name": "Znaczenie zachowania szczegolnej ostroznosci w stosunku do innych uzytkownikow drogi, wysiadanie z pojazdu, zabezpieczenie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedź Nie. W czasie kierowania tramwajem nie wolno rozmawiać przez telefon wymagający trzymania słuchawki albo mikrofonu w ręku. Ogranicza to możliwość bezpiecznego prowadzenia pojazdu."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:telefon|sluchawki lub mikrofonu|podczas kierowania",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 28734,
+                    "question_external_id": "4006",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-45-ust-2-pkt-1",
+                    "legal_unit_label": "art. 45 ust. 2 pkt 1",
+                    "legal_unit_title": "Zakaz trzymania telefonu podczas kierowania",
+                    "legal_topic_slug": "telefon-podczas-kierowania",
+                    "article_slug": "telefon-podczas-kierowania",
+                    "public_note": "To pytanie sprawdza, czy korzystanie z telefonu wymaga trzymania słuchawki lub mikrofonu w ręku. Art. 45 ust. 2 pkt 1 zabrania właśnie takiego sposobu używania urządzenia podczas kierowania."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 28734,
+                    "external_id": "4006",
+                    "category": "PT",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "4027",
+            "prompt": "Czy podczas kierowania tramwajem masz prawo rozmawiać przez telefon komórkowy, jeżeli nie trzymasz słuchawki i mikrofonu w ręku?",
+            "prompt_variants": [
+                "Czy podczas kierowania tramwajem masz prawo rozmawiać przez telefon komórkowy, jeżeli nie trzymasz słuchawki i mikrofonu w ręku?"
+            ],
+            "categories": [
+                "PT"
+            ],
+            "question_topics": [
+                {
+                    "key": "special_caution_exiting_and_securing_vehicle",
+                    "name": "Znaczenie zachowania szczegolnej ostroznosci w stosunku do innych uzytkownikow drogi, wysiadanie z pojazdu, zabezpieczenie pojazdu"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak"
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedź Tak. Rozmowa przez telefon w czasie kierowania jest dopuszczalna tylko wtedy, gdy motorniczy nie trzyma słuchawki ani mikrofonu w ręku. Musi przy tym zachować pełną kontrolę nad pojazdem."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:telefon|podczas kierowania",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 28753,
+                    "question_external_id": "4027",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-45-ust-2-pkt-1",
+                    "legal_unit_label": "art. 45 ust. 2 pkt 1",
+                    "legal_unit_title": "Zakaz trzymania telefonu podczas kierowania",
+                    "legal_topic_slug": "telefon-podczas-kierowania",
+                    "article_slug": "telefon-podczas-kierowania",
+                    "public_note": "To pytanie sprawdza, czy korzystanie z telefonu wymaga trzymania słuchawki lub mikrofonu w ręku. Art. 45 ust. 2 pkt 1 zabrania właśnie takiego sposobu używania urządzenia podczas kierowania."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 28753,
+                    "external_id": "4027",
+                    "category": "PT",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6390",
+            "prompt": "Czy naruszasz przepisy ruchu drogowego, jeżeli kierując pojazdem rozmawiasz przez telefon trzymając go w ręku?",
+            "prompt_variants": [
+                "Czy naruszasz przepisy ruchu drogowego, jeżeli kierując pojazdem rozmawiasz przez telefon trzymając go w ręku?"
+            ],
+            "categories": [
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "vehicle_load_and_passenger_safety",
+                    "name": "Czynniki bezpieczenstwa odnoszace sie do pojazdu, ladunku i przewozonych osob"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Nie, pod warunkiem panowania nad pojazdem.",
+                    "option_b": "Nie, pod warunkiem, że telefon trzymam oddalony od ucha z włączonym trybem głośnomówiącym.",
+                    "option_c": "Tak, nawet wówczas gdy telefon trzymam oddalony od ucha z włączonym trybem głośnomówiącym.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Tak, nawet wówczas gdy telefon trzymam oddalony od ucha z włączonym trybem głośnomówiącym."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/6390/image/full.ef9d82a617c7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/6390/image/thumb.92af70836c17.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/6390/image/full.ef9d82a617c7.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/6390/image/thumb.92af70836c17.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:telefon|kierujac pojazdem",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 34942,
+                    "question_external_id": "6390",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-45-ust-2-pkt-1",
+                    "legal_unit_label": "art. 45 ust. 2 pkt 1",
+                    "legal_unit_title": "Zakaz trzymania telefonu podczas kierowania",
+                    "legal_topic_slug": "telefon-podczas-kierowania",
+                    "article_slug": "telefon-podczas-kierowania",
+                    "public_note": "To pytanie sprawdza, czy korzystanie z telefonu wymaga trzymania słuchawki lub mikrofonu w ręku. Art. 45 ust. 2 pkt 1 zabrania właśnie takiego sposobu używania urządzenia podczas kierowania."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 34942,
+                    "external_id": "6390",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 35124,
+                    "external_id": "6390",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "13535",
+            "prompt": "Czy podczas kierowania hulajnogą elektryczną, wolno Ci korzystać z telefonu wymagającego trzymania słuchawki lub mikrofonu w ręku?",
+            "prompt_variants": [
+                "Czy podczas kierowania hulajnogą elektryczną, wolno Ci korzystać z telefonu wymagającego trzymania słuchawki lub mikrofonu w ręku?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "AM",
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "behaviour_towards_cyclists_and_children",
+                    "name": "Zachowanie wobec rowerzysty i dzieci"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak",
+                    "option_b": "Nie",
+                    "option_c": null,
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie"
+                }
+            ],
+            "explanations": [
+                "Nie, bo w tej sytuacji przepisy albo okolicznosci na to nie pozwalaja. Na obrazie kluczowe sa elementy sytuacji i ich znaczenie dla ruchu. Zapamietaj: w takich pytaniach liczy sie to, czy warunki sytuacji rzeczywiscie pozwalaja na takie zachowanie."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a/13535/image/full.c0a9b408022d.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a/13535/image/thumb.09d562a5c3d0.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/13535/image/full.c0a9b408022d.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/13535/image/thumb.09d562a5c3d0.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a1/13535/image/full.c0a9b408022d.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a1/13535/image/thumb.09d562a5c3d0.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/a2/13535/image/full.c0a9b408022d.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/a2/13535/image/thumb.09d562a5c3d0.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/13535/image/full.c0a9b408022d.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/13535/image/thumb.09d562a5c3d0.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/am/13535/image/full.c0a9b408022d.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/am/13535/image/thumb.09d562a5c3d0.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:telefon|sluchawki lub mikrofonu|podczas kierowania|kierowania hulajnoga",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 49466,
+                    "question_external_id": "13535",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-21",
+                    "legal_unit_slug": "art-45-ust-2-pkt-1",
+                    "legal_unit_label": "art. 45 ust. 2 pkt 1",
+                    "legal_unit_title": "Zakaz trzymania telefonu podczas kierowania",
+                    "legal_topic_slug": "telefon-podczas-kierowania",
+                    "article_slug": "telefon-podczas-kierowania",
+                    "public_note": "To pytanie sprawdza, czy korzystanie z telefonu wymaga trzymania słuchawki lub mikrofonu w ręku. Art. 45 ust. 2 pkt 1 zabrania właśnie takiego sposobu używania urządzenia podczas kierowania."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 49466,
+                    "external_id": "13535",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 49557,
+                    "external_id": "13535",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 49821,
+                    "external_id": "13535",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 49911,
+                    "external_id": "13535",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 50001,
+                    "external_id": "13535",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 50330,
+                    "external_id": "13535",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        }
+    ]
+}

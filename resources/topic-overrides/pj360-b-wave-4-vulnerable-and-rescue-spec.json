@@ -1,0 +1,101 @@
+{
+  "category": "B",
+  "scope": "active_ready",
+  "rules": [
+    {
+      "name": "b-wave4-signalized-intersection-exact",
+      "target_topic_key": "intersections_with_traffic_lights",
+      "reason": "PJ360 B wave 4: skrzyzowania z sygnalizacja z curated external_id",
+      "current_topic_keys": [
+        "joining_traffic_and_equal_intersections"
+      ],
+      "external_ids": [
+        "8633"
+      ]
+    },
+    {
+      "name": "b-wave4-lane-change-signaling-exact",
+      "target_topic_key": "lane_change_and_turning",
+      "reason": "PJ360 B wave 4: sygnalizowanie manewru z curated external_id",
+      "current_topic_keys": [
+        "joining_traffic_and_equal_intersections"
+      ],
+      "external_ids": [
+        "10243"
+      ]
+    },
+    {
+      "name": "b-wave4-road-markings-yellow-line-exact",
+      "target_topic_key": "road_markings",
+      "reason": "PJ360 B wave 4: oznakowanie poziome z curated external_id",
+      "current_topic_keys": [
+        "special_caution_exiting_and_securing_vehicle"
+      ],
+      "external_ids": [
+        "10488"
+      ]
+    },
+    {
+      "name": "b-wave4-pedestrians-vulnerable-exact",
+      "target_topic_key": "behaviour_towards_pedestrians_and_reduced_mobility",
+      "reason": "PJ360 B wave 4: piesi i ograniczona mobilnosc z curated external_id",
+      "current_topic_keys": [
+        "joining_traffic_and_equal_intersections",
+        "driving_technique"
+      ],
+      "external_ids": [
+        "13402",
+        "13528"
+      ]
+    },
+    {
+      "name": "b-wave4-children-school-bus-exact",
+      "target_topic_key": "behaviour_towards_cyclists_and_children",
+      "reason": "PJ360 B wave 4: dzieci i autobus szkolny z curated external_id",
+      "current_topic_keys": [
+        "special_caution_exiting_and_securing_vehicle"
+      ],
+      "external_ids": [
+        "6242"
+      ]
+    },
+    {
+      "name": "b-wave4-controlled-crossings-public-transport-exact",
+      "target_topic_key": "controlled_crossings_and_public_transport_stops",
+      "reason": "PJ360 B wave 4: przystanki komunikacji publicznej z curated external_id",
+      "current_topic_keys": [
+        "special_caution_exiting_and_securing_vehicle"
+      ],
+      "external_ids": [
+        "7377"
+      ]
+    },
+    {
+      "name": "b-wave4-rescue-actions-exact",
+      "target_topic_key": "rescue_actions",
+      "reason": "PJ360 B wave 4: akcje ratunkowe z curated external_id",
+      "current_topic_keys": [
+        "special_caution_exiting_and_securing_vehicle"
+      ],
+      "external_ids": [
+        "10698",
+        "10700",
+        "10709",
+        "10720",
+        "10732"
+      ]
+    },
+    {
+      "name": "b-wave4-breakdown-first-aid-exact",
+      "target_topic_key": "breakdown_accident_and_first_aid",
+      "reason": "PJ360 B wave 4: awaria, wypadek i pierwsza pomoc z curated external_id",
+      "current_topic_keys": [
+        "special_caution_exiting_and_securing_vehicle"
+      ],
+      "external_ids": [
+        "2457",
+        "7646"
+      ]
+    }
+  ]
+}

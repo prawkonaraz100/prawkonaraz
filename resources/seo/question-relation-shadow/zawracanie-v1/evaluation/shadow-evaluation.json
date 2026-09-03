@@ -1,0 +1,109 @@
+{
+    "schema_version": 1,
+    "evaluation_version": "question-relation-shadow-evaluation-v1",
+    "dataset_version": "question-relation-gold-set-v1-pilot-zawracanie",
+    "gold_dataset_version": "question-relation-gold-set-v1-pilot-zawracanie-reviewed",
+    "algorithm_version": "question-relation-shadow-zawracanie-v1",
+    "evaluation_scope": "offline_post_selection_gold_evaluation",
+    "evaluation_policy": {
+        "gold_used_only_after_selection": true,
+        "unknown_links_treated_as_negative": false,
+        "fallback_without_gold_label": "unassessed_hub_context"
+    },
+    "counts": {
+        "questions": 72,
+        "directed_links": 1087,
+        "direct_score_links": 532,
+        "hub_fallback_links": 555,
+        "gold_labelled_links": 532,
+        "unknown_links": 555,
+        "unique_gold_positive_pairs_selected": 260,
+        "gold_positive_pairs": 337,
+        "unique_false_positive_direct_pairs": 6
+    },
+    "direct_core": {
+        "label_coverage": 1,
+        "precision": 0.977444,
+        "positive_directed_links": 520,
+        "negative_directed_links": 12,
+        "recall_within_gold_set": 0.771513,
+        "type_accuracy_on_positive_links": 0.180769
+    },
+    "ranking": {
+        "at_10": {
+            "slots": 720,
+            "labelled_slots": 452,
+            "unknown_slots": 268,
+            "positive_labelled_slots": 443,
+            "precision_among_labelled": 0.980088,
+            "label_coverage": 0.627778,
+            "unknown_treated_as_negative": false
+        },
+        "at_15": {
+            "slots": 1080,
+            "labelled_slots": 525,
+            "unknown_slots": 555,
+            "positive_labelled_slots": 513,
+            "precision_among_labelled": 0.977143,
+            "label_coverage": 0.486111,
+            "unknown_treated_as_negative": false
+        }
+    },
+    "fallback": {
+        "gold_labelled_links": 0,
+        "unknown_links": 555,
+        "scope_distribution": {
+            "same_primary": 101,
+            "same_secondary": 454
+        },
+        "interpretation": "Szerszy kontekst tematyczny; nie jest klasyfikowany jako bezpośrednia relacja."
+    },
+    "graph_shape": {
+        "inbound_links_per_question": {
+            "minimum": 7,
+            "median": 16,
+            "maximum": 19,
+            "average": 15.097222
+        },
+        "reciprocal_directed_links": 908,
+        "reciprocal_link_ratio": 0.835327,
+        "identical_related_sets": 0,
+        "largest_identical_set_group": 1
+    },
+    "quality_gates": {
+        "passed": true,
+        "minimum_fifteen_links": true,
+        "no_inbound_orphans": true,
+        "direct_core_fully_gold_labelled": true,
+        "direct_core_precision_at_least_95_percent": true,
+        "fallback_is_outside_gold_candidate_set": true,
+        "public_rollout_authorized": false,
+        "limitations": [
+            "Fallback hubowy nie ma etykiet gold i pozostaje nieoceniony semantycznie.",
+            "Gold set powstał w trybie assisted_self_review bez niezależnego człowieka.",
+            "Wynik dotyczy wyłącznie pilota Zawracanie i nie zastępuje canary ani metryk CTR."
+        ]
+    },
+    "inputs": {
+        "shadow_ranking": {
+            "filename": "shadow-ranking.jsonl",
+            "sha256": "44a959135acd0cae07d5f2d2d56e85c0b20a1293b45dde6aee410b62eb7862f9",
+            "bytes": 1098796
+        },
+        "gold_set": {
+            "filename": "gold-set.jsonl",
+            "sha256": "39cbf6a2547d74f6f868fefee98a5a077da28c689cc0852a5138edb4a78dc1b2",
+            "bytes": 1607173
+        }
+    },
+    "outputs": {
+        "per-question-shadow-evaluation.csv": {
+            "sha256": "ea255bcd8104e733720ea4000e03ca624070584cbdf08b885d8db1119cbef61f",
+            "bytes": 8899
+        },
+        "direct-labelled-errors.csv": {
+            "sha256": "a56bb292be19da1fb01e4dfee76780860ca206775e321d213917fa7048c81008",
+            "bytes": 1545
+        }
+    }
+}

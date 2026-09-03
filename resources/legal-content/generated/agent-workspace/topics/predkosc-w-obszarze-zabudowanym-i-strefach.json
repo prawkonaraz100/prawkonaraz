@@ -1,0 +1,1026 @@
+{
+    "generated_at": "2026-06-20T00:38:47+02:00",
+    "candidate": {
+        "slug": "predkosc-w-obszarze-zabudowanym-i-strefach",
+        "title": "Prędkość w obszarze zabudowanym, strefie zamieszkania i strefie ruchu",
+        "description": "Węższy temat artykułu wykryty na podstawie treści pytań.",
+        "level": "focused",
+        "status": "candidate",
+        "rule_version": "2026-06-19-prompt-v2",
+        "existing_article_slug": "predkosc-odstep-i-hamowanie"
+    },
+    "workflow": {
+        "status": "published",
+        "next_action": "Przejrzyj relacje pytan i zdecyduj, czy artykul wymaga rozbudowy lub ponownego review.",
+        "public_relations_are_verified_only": true
+    },
+    "article": {
+        "slug": "predkosc-odstep-i-hamowanie",
+        "title": "Prędkość, odstęp i hamowanie pojazdu",
+        "status": "published",
+        "published_at": "2026-06-13",
+        "last_reviewed_at": "2026-06-20",
+        "legal_units": [
+            {
+                "slug": "art-19-ust-1",
+                "label": "art. 19 ust. 1",
+                "title": "Prędkość zapewniająca panowanie nad pojazdem",
+                "status": "verified",
+                "last_checked_at": "2026-06-20"
+            },
+            {
+                "slug": "art-19-ust-2-pkt-2",
+                "label": "art. 19 ust. 2 pkt 2",
+                "title": "Hamowanie bez tworzenia zagrożenia",
+                "status": "verified",
+                "last_checked_at": "2026-06-20"
+            },
+            {
+                "slug": "art-19-ust-2-pkt-3",
+                "label": "art. 19 ust. 2 pkt 3",
+                "title": "Odstęp pozwalający uniknąć zderzenia",
+                "status": "verified",
+                "last_checked_at": "2026-06-20"
+            },
+            {
+                "slug": "art-19-ust-3a",
+                "label": "art. 19 ust. 3a",
+                "title": "Minimalny odstęp na autostradzie i drodze ekspresowej",
+                "status": "verified",
+                "last_checked_at": "2026-06-20"
+            },
+            {
+                "slug": "art-20-ust-2",
+                "label": "art. 20 ust. 2",
+                "title": "Prędkość w strefie zamieszkania",
+                "status": "verified",
+                "last_checked_at": "2026-06-20"
+            },
+            {
+                "slug": "art-20-ust-3-pkt-1-lit-a",
+                "label": "art. 20 ust. 3 pkt 1 lit. a",
+                "title": "Prędkość samochodu osobowego na autostradzie",
+                "status": "verified",
+                "last_checked_at": "2026-06-20"
+            }
+        ]
+    },
+    "summary": {
+        "canonical_questions": 12,
+        "question_rows": 25,
+        "categories": [
+            "A",
+            "A1",
+            "A2",
+            "AM",
+            "B",
+            "B1",
+            "C",
+            "C1",
+            "D",
+            "D1",
+            "PT"
+        ],
+        "canonical_questions_with_verified_reference": 3,
+        "prompt_conflicts": [],
+        "answer_conflicts": [],
+        "correct_answer_conflicts": []
+    },
+    "questions": [
+        {
+            "external_id": "4098",
+            "prompt": "Jaka jest maksymalna dopuszczalna prędkość tramwaju na obszarze zabudowanym w godzinach 5:00 - 23:00 (jeżeli znaki drogowe nie wskazują inaczej)?",
+            "prompt_variants": [
+                "Jaka jest maksymalna dopuszczalna prędkość tramwaju na obszarze zabudowanym w godzinach 5:00 - 23:00 (jeżeli znaki drogowe nie wskazują inaczej)?"
+            ],
+            "categories": [
+                "PT"
+            ],
+            "question_topics": [
+                {
+                    "key": "speed_limits",
+                    "name": "Dopuszczalne predkosci pojazdu, ograniczenia"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "60 km/h",
+                    "option_b": "50 km/h",
+                    "option_c": "55 km/h",
+                    "correct_answer": "b",
+                    "correct_answer_text": "50 km/h"
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedź B. Na obszarze zabudowanym w godzinach 5:00-23:00, o ile znaki nie stanowią inaczej, maksymalna dopuszczalna prędkość tramwaju wynosi 50 km/h. Pozostałe wartości są nieprawidłowe dla tej ogólnej zasady."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:obszarze zabudowanym|predkosc",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 29120,
+                    "external_id": "4098",
+                    "category": "PT",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "4170",
+            "prompt": "Z jaką dopuszczalną prędkością możesz jechać w strefie zamieszkania?",
+            "prompt_variants": [
+                "Z jaką dopuszczalną prędkością możesz jechać w strefie zamieszkania?"
+            ],
+            "categories": [
+                "B",
+                "C",
+                "PT"
+            ],
+            "question_topics": [
+                {
+                    "key": "speed_limits",
+                    "name": "Dopuszczalne predkosci pojazdu, ograniczenia"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "40 km/h",
+                    "option_b": "30 km/h",
+                    "option_c": "20 km/h",
+                    "correct_answer": "c",
+                    "correct_answer_text": "20 km/h"
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedź C. W strefie zamieszkania dopuszczalna prędkość wynosi 20 km/h, dlatego także kierujący tramwajem musi się do niej dostosować. Wyższe wartości byłyby naruszeniem zasad ruchu w tej strefie."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:strefie zamieszkania|predkosc|jechac",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 29164,
+                    "question_external_id": "4170",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-20",
+                    "legal_unit_slug": "art-20-ust-2",
+                    "legal_unit_label": "art. 20 ust. 2",
+                    "legal_unit_title": "Prędkość w strefie zamieszkania",
+                    "legal_topic_slug": "predkosc-odstep-i-hamowanie",
+                    "article_slug": "predkosc-odstep-i-hamowanie",
+                    "public_note": "To pytanie sprawdza podstawowy limit w strefie zamieszkania. Art. 20 ust. 2 ustala prędkość dopuszczalną pojazdu lub zespołu pojazdów na 20 km/h."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 29164,
+                    "external_id": "4170",
+                    "category": "PT",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 51074,
+                    "external_id": "4170",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 51114,
+                    "external_id": "4170",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "6741",
+            "prompt": "Czy kierując samochodem ciężarowym o dopuszczalnej masie całkowitej powyżej 3,5 t, na obszarze zabudowanym, możesz jechać z prędkością 70 km/h na drodze za tym znakiem?",
+            "prompt_variants": [
+                "Czy kierując samochodem ciężarowym o dopuszczalnej masie całkowitej powyżej 3,5 t, na obszarze zabudowanym, możesz jechać z prędkością 70 km/h na drodze za tym znakiem?"
+            ],
+            "categories": [
+                "C"
+            ],
+            "question_topics": [
+                {
+                    "key": "speed_limits",
+                    "name": "Dopuszczalne predkosci pojazdu, ograniczenia"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak.",
+                    "option_b": "Nie.",
+                    "option_c": "Tak, ale tylko w godzinach od 23.00 do 5.00.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo znak B-33 określający dopuszczalną prędkość większą niż 50 km/h, umieszczony na obszarze zabudowanym, dotyczy samochodu osobowego, motocykla. Na obrazie kluczowe jest poprawne odczytanie oznakowania i jego znaczenia. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/c/6741/image/full.2f340aa4cab2.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/c/6741/image/thumb.151445056e34.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:obszarze zabudowanym|predkosc|km h|jechac",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 36182,
+                    "external_id": "6741",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "6844",
+            "prompt": "Czy kierując autobusem na obszarze zabudowanym, masz prawo jechać z prędkością 80 km/h na tak oznakowanej drodze?",
+            "prompt_variants": [
+                "Czy kierując autobusem na obszarze zabudowanym, masz prawo jechać z prędkością 80 km/h na tak oznakowanej drodze?"
+            ],
+            "categories": [
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "speed_limits",
+                    "name": "Dopuszczalne predkosci pojazdu, ograniczenia"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak.",
+                    "option_b": "Nie.",
+                    "option_c": "Tak, ale tylko w godzinach od 23.00 do 5.00.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Nie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo znak zakazu B-33 określający dopuszczalną prędkość większą niż 50 km/h (w tym przykładzie jest to 80 km/h), umieszczony na obszarze zabudowanym. Na obrazie kluczowe jest poprawne odczytanie oznakowania i jego znaczenia. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d/6844/image/full.e621ce9d8872.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d/6844/image/thumb.ca3cd4295907.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/d1/6844/image/full.e621ce9d8872.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/d1/6844/image/thumb.ca3cd4295907.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:obszarze zabudowanym|predkosc|km h|jechac",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 36288,
+                    "external_id": "6844",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 36292,
+                    "external_id": "6844",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7065",
+            "prompt": "Jaka jest maksymalna dopuszczalna prędkość tramwaju na drodze oznaczonej tym znakiem na obszarze zabudowanym w godzinach od 5:00 do 23:00?",
+            "prompt_variants": [
+                "Jaka jest maksymalna dopuszczalna prędkość tramwaju na drodze oznaczonej tym znakiem na obszarze zabudowanym w godzinach od 5:00 do 23:00?"
+            ],
+            "categories": [
+                "PT"
+            ],
+            "question_topics": [
+                {
+                    "key": "speed_limits",
+                    "name": "Dopuszczalne predkosci pojazdu, ograniczenia"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "50 km/h.",
+                    "option_b": "60 km/h.",
+                    "option_c": "70 km/h.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "50 km/h."
+                }
+            ],
+            "explanations": [],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/pt/7065/image/full.99e628c3489b.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/pt/7065/image/thumb.91d90ddbe378.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:obszarze zabudowanym|predkosc",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 36831,
+                    "external_id": "7065",
+                    "category": "PT",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "7237",
+            "prompt": "Z jaką prędkością nie możesz poruszać się w strefie zamieszkania?",
+            "prompt_variants": [
+                "Z jaką prędkością nie możesz poruszać się w strefie zamieszkania?"
+            ],
+            "categories": [
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "speed_limits",
+                    "name": "Dopuszczalne predkosci pojazdu, ograniczenia"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "10 km/h.",
+                    "option_b": "15 km/h.",
+                    "option_c": "25 km/h.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "25 km/h."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo prędkość dopuszczalna pojazdu lub zespołu pojazdów w strefie zamieszkania wynosi 20 km/h , w związku z czym w strefie zamieszkania oznaczonego znakiem. Na obrazie kluczowe jest poprawne odczytanie oznakowania i jego znaczenia. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/7237/image/full.8da3ab74fa86.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/7237/image/thumb.5d26ea633e83.webp",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b1/7237/image/full.8da3ab74fa86.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b1/7237/image/thumb.5d26ea633e83.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:strefie zamieszkania|predkosc",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 38979,
+                    "question_external_id": "7237",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-20",
+                    "legal_unit_slug": "art-20-ust-2",
+                    "legal_unit_label": "art. 20 ust. 2",
+                    "legal_unit_title": "Prędkość w strefie zamieszkania",
+                    "legal_topic_slug": "predkosc-odstep-i-hamowanie",
+                    "article_slug": "predkosc-odstep-i-hamowanie",
+                    "public_note": "Na obrazie widoczny jest znak strefy zamieszkania, a pytanie wymaga wskazania prędkości niedozwolonej. Art. 20 ust. 2 ustala limit 20 km/h, dlatego jazda 25 km/h przekracza prędkość dopuszczalną."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 38979,
+                    "external_id": "7237",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 39433,
+                    "external_id": "7237",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "7248",
+            "prompt": "Czy kierując pojazdem samochodowym o dopuszczalnej masie całkowitej 2,5 t, na obszarze zabudowanym, na tak oznakowanej drodze, możesz jechać z prędkością 70 km/h?",
+            "prompt_variants": [
+                "Czy kierując pojazdem samochodowym o dopuszczalnej masie całkowitej 2,5 t, na obszarze zabudowanym, na tak oznakowanej drodze, możesz jechać z prędkością 70 km/h?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "speed_limits",
+                    "name": "Dopuszczalne predkosci pojazdu, ograniczenia"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak.",
+                    "option_b": "Nie.",
+                    "option_c": "Nie, jeżeli jedziesz w godzinach od 5.00 do 23.00.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Na obrazie kluczowe jest poprawne odczytanie oznakowania i jego znaczenia. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/7248/image/full.49c2ae3a66db.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/7248/image/thumb.151445056e34.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:obszarze zabudowanym|predkosc|km h|jechac",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 38983,
+                    "external_id": "7248",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "12942",
+            "prompt": "Czy prędkość dopuszczalna 50 km/h obowiązuje na obszarze zabudowanym przez całą dobę?",
+            "prompt_variants": [
+                "Czy prędkość dopuszczalna 50 km/h obowiązuje na obszarze zabudowanym przez całą dobę?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "speed_limits",
+                    "name": "Dopuszczalne predkosci pojazdu, ograniczenia"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak.",
+                    "option_b": "Nie, tylko od godziny 5:00 do 23:00.",
+                    "option_c": "Nie, tylko od zmierzchu do świtu.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "Tak."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo prędkość dopuszczalna pojazdu lub zespołu pojazdów na obszarze zabudowanym oznaczonym znakiem. Na obrazie kluczowe jest poprawne odczytanie oznakowania i jego znaczenia. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/12942/image/full.ef0a59146c06.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/12942/image/thumb.5e5839f31c3e.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:obszarze zabudowanym|predkosc|km h",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 46684,
+                    "external_id": "12942",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "13035",
+            "prompt": "Czy prowadząc pojazd silnikowy z przyczepą w strefie zamieszkania masz prawo jechać z prędkością 30 km/h?",
+            "prompt_variants": [
+                "Czy prowadząc pojazd silnikowy z przyczepą w strefie zamieszkania masz prawo jechać z prędkością 30 km/h?"
+            ],
+            "categories": [
+                "B"
+            ],
+            "question_topics": [
+                {
+                    "key": "speed_limits",
+                    "name": "Dopuszczalne predkosci pojazdu, ograniczenia"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Tak, ale tylko po zmroku.",
+                    "option_b": "Tak.",
+                    "option_c": "Nie.",
+                    "correct_answer": "c",
+                    "correct_answer_text": "Nie."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz C, bo prędkość dopuszczalna pojazdu lub zespołu pojazdów w strefie zamieszkania oznaczonej znakiem. Na obrazie kluczowe jest poprawne odczytanie oznakowania i jego znaczenia. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [
+                {
+                    "kind": "image",
+                    "variant": "full",
+                    "path": "media/questions/b/13035/image/full.b83c102bb985.jpg",
+                    "poster_path": null
+                },
+                {
+                    "kind": "image",
+                    "variant": "thumb",
+                    "path": "media/questions/b/13035/image/thumb.07b28adb3f6b.webp",
+                    "poster_path": null
+                }
+            ],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:strefie zamieszkania|predkosc|km h|jechac",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [
+                {
+                    "question_id": 46688,
+                    "question_external_id": "13035",
+                    "status": "verified",
+                    "assignment_source": "seed",
+                    "confidence": 85,
+                    "verified_at": "2026-06-20",
+                    "legal_unit_slug": "art-20-ust-2",
+                    "legal_unit_label": "art. 20 ust. 2",
+                    "legal_unit_title": "Prędkość w strefie zamieszkania",
+                    "legal_topic_slug": "predkosc-odstep-i-hamowanie",
+                    "article_slug": "predkosc-odstep-i-hamowanie",
+                    "public_note": "To pytanie dotyczy pojazdu silnikowego z przyczepą w strefie zamieszkania. Art. 20 ust. 2 obejmuje pojazd oraz zespół pojazdów, więc także w tym przypadku limit wynosi 20 km/h, a nie 30 km/h."
+                }
+            ],
+            "source_rows": [
+                {
+                    "id": 46688,
+                    "external_id": "13035",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": true,
+                "has_verified_legal_reference": true
+            }
+        },
+        {
+            "external_id": "13050",
+            "prompt": "Z jaką maksymalną prędkością wolno poruszać się w obszarze zabudowanym, gdy czterokołowcem lekkim przewozisz pięcioletnie dziecko?",
+            "prompt_variants": [
+                "Z jaką maksymalną prędkością wolno poruszać się w obszarze zabudowanym, gdy czterokołowcem lekkim przewozisz pięcioletnie dziecko?"
+            ],
+            "categories": [
+                "AM"
+            ],
+            "question_topics": [
+                {
+                    "key": "speed_limits",
+                    "name": "Dopuszczalne predkosci pojazdu, ograniczenia"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "45 km/h.",
+                    "option_b": "40 km/h.",
+                    "option_c": "50 km/h.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "40 km/h."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:obszarze zabudowanym|predkosc",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 46752,
+                    "external_id": "13050",
+                    "category": "AM",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "13064",
+            "prompt": "Jaka jest dopuszczalna prędkość czterokołowca na obszarze zabudowanym?",
+            "prompt_variants": [
+                "Jaka jest dopuszczalna prędkość czterokołowca na obszarze zabudowanym?"
+            ],
+            "categories": [
+                "B",
+                "B1"
+            ],
+            "question_topics": [
+                {
+                    "key": "speed_limits",
+                    "name": "Dopuszczalne predkosci pojazdu, ograniczenia"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "50 km/h bez względu na jego dopuszczalną masę całkowitą.",
+                    "option_b": "40 km/h, jeżeli jego dopuszczalna masa całkowita przekracza 3,5 t.",
+                    "option_c": "20 km/h.",
+                    "correct_answer": "a",
+                    "correct_answer_text": "50 km/h bez względu na jego dopuszczalną masę całkowitą."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz A, bo tylko ta odpowiedz odpowiada zasadom obowiazujacym w tej sytuacji. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:obszarze zabudowanym|predkosc",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 46699,
+                    "external_id": "13064",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 46904,
+                    "external_id": "13064",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        },
+        {
+            "external_id": "13556",
+            "prompt": "W którym z wymienionych przypadków przekroczenia dopuszczalnej prędkości w obszarze zabudowanym policjant zatrzyma prawo jazdy?",
+            "prompt_variants": [
+                "W którym z wymienionych przypadków przekroczenia dopuszczalnej prędkości w obszarze zabudowanym policjant zatrzyma prawo jazdy?"
+            ],
+            "categories": [
+                "A",
+                "A1",
+                "A2",
+                "B",
+                "B1",
+                "C",
+                "C1",
+                "D",
+                "D1"
+            ],
+            "question_topics": [
+                {
+                    "key": "speed_limits",
+                    "name": "Dopuszczalne predkosci pojazdu, ograniczenia"
+                }
+            ],
+            "answers": [
+                {
+                    "option_a": "Kierujący jechał z prędkością 50 km/h w strefie zamieszkania.",
+                    "option_b": "Kierujący jechał z prędkością 90 km/h przy ograniczeniu prędkości do 30 km/h.",
+                    "option_c": "Kierujący przejeżdżał przez przejazd kolejowy z prędkością 70 km/h.",
+                    "correct_answer": "b",
+                    "correct_answer_text": "Kierujący jechał z prędkością 90 km/h przy ograniczeniu prędkości do 30 km/h."
+                }
+            ],
+            "explanations": [
+                "Poprawna jest odpowiedz B, bo Policjant zatrzyma wydane w kraju prawo jazdy za pokwitowaniem w przypadku ujawnienia czynu polegającego na kierowaniu pojazdem z prędkością. Rozstrzyga tu konkretna zasada ruchu drogowego, a nie intuicja kierujacego. Pozostale odpowiedzi odpadaja, bo nie pasuja do zasad obowiazujacych w tej sytuacji."
+            ],
+            "media": [],
+            "candidate_matches": [
+                {
+                    "match_type": "prompt_rule",
+                    "matched_by": "prompt:obszarze zabudowanym|predkosc",
+                    "confidence": 95,
+                    "assignment_source": "prompt_scan"
+                }
+            ],
+            "legal_references": [],
+            "source_rows": [
+                {
+                    "id": 49479,
+                    "external_id": "13556",
+                    "category": "A",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 49570,
+                    "external_id": "13556",
+                    "category": "B",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 49665,
+                    "external_id": "13556",
+                    "category": "C",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 49749,
+                    "external_id": "13556",
+                    "category": "D",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 49834,
+                    "external_id": "13556",
+                    "category": "A1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 49924,
+                    "external_id": "13556",
+                    "category": "A2",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 50014,
+                    "external_id": "13556",
+                    "category": "B1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 50103,
+                    "external_id": "13556",
+                    "category": "C1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                },
+                {
+                    "id": 50188,
+                    "external_id": "13556",
+                    "category": "D1",
+                    "source": "gov.pl-mi",
+                    "is_active": true,
+                    "delivery_issue": null
+                }
+            ],
+            "checks": {
+                "prompt_variants": 1,
+                "answer_variants": 1,
+                "correct_answer_conflict": false,
+                "has_media": false,
+                "has_verified_legal_reference": false
+            }
+        }
+    ]
+}

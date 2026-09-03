@@ -1,0 +1,95 @@
+{
+    "schema_version": 1,
+    "algorithm_version": "question-relation-shadow-zawracanie-v1",
+    "dataset_version": "question-relation-gold-set-v1-pilot-zawracanie",
+    "mode": "offline_shadow_only",
+    "selection_policy": {
+        "minimum_links": 15,
+        "direct_score_threshold": 0.3,
+        "direct_links_have_no_maximum": true,
+        "known_pairs_below_threshold_excluded_from_fallback": true,
+        "fallback_balances_inbound_links_within_topic_scope": true,
+        "fallback_priority": [
+            "same_secondary",
+            "same_primary",
+            "core_hub",
+            "pilot_hub"
+        ],
+        "gold_labels_used_for_selection": false,
+        "fields_used_from_candidates": [
+            "dataset_version",
+            "pair_key",
+            "cohort",
+            "source_id",
+            "target_id",
+            "proposed_score",
+            "proposed_relation_type",
+            "exclude_from_semantic_metrics"
+        ],
+        "fields_explicitly_ignored": [
+            "gold_label",
+            "gold_relation_type",
+            "review_status",
+            "reviewer",
+            "reviewed_at",
+            "notes"
+        ]
+    },
+    "counts": {
+        "questions": 72,
+        "input_semantic_candidates": 394,
+        "directed_links": 1087,
+        "direct_score_links": 532,
+        "hub_fallback_links": 555,
+        "questions_above_minimum_due_to_direct_links": 3
+    },
+    "links_per_question": {
+        "minimum": 15,
+        "maximum": 19,
+        "average": 15.097222
+    },
+    "inbound_links_per_question": {
+        "minimum": 7,
+        "median": 16,
+        "maximum": 19,
+        "average": 15.097222
+    },
+    "quality_gates": {
+        "passed": true,
+        "all_questions_covered": true,
+        "minimum_links_met": true,
+        "no_inbound_orphans": true,
+        "self_links": 0,
+        "duplicate_targets_per_source": 0,
+        "below_threshold_known_pairs_used_as_fallback": 0,
+        "excluded_pairs_used": 0,
+        "public_rollout_authorized": false
+    },
+    "inputs": {
+        "questions": {
+            "filename": "questions.json",
+            "sha256": "086e4858bbad3ff629094bca6a96d92301cfbf69f064f3beb2f7d9cf51acc7c8",
+            "bytes": 27088
+        },
+        "candidates": {
+            "filename": "review.jsonl",
+            "sha256": "78ee636afd95e573c45f0da0da038f112c2fd80fab57a5116b571d1face9e1bf",
+            "bytes": 1440350
+        },
+        "config": {
+            "filename": "config.json",
+            "sha256": "0468cec26d0687c6c4802bf06f6f345807743cb3b2b242623e1391a5c09788ff",
+            "bytes": 496
+        }
+    },
+    "outputs": {
+        "shadow-ranking.jsonl": {
+            "sha256": "44a959135acd0cae07d5f2d2d56e85c0b20a1293b45dde6aee410b62eb7862f9",
+            "bytes": 1098796
+        },
+        "per-question-shadow.csv": {
+            "sha256": "61849e7a308c80f15e98fdff40368c006226956745561a97c800ebfe0534160c",
+            "bytes": 10377
+        }
+    }
+}

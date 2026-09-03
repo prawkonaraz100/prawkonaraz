@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">B-28 Koniec zakazu wyprzedzania przez samochody ciężarowe</title>
+  <desc id="desc">Open Graph placeholder dla znaku B-28 Koniec zakazu wyprzedzania przez samochody ciężarowe</desc>
+  <rect width="1200" height="630" fill="#fffaf9"/>
+  <rect x="60" y="60" width="1080" height="510" rx="28" fill="#ffffff" stroke="#dc2626" stroke-width="18"/>
+  <text x="120" y="170" font-size="28" font-family="Arial, Helvetica, sans-serif" font-weight="700" fill="#0d47a1">Znaki zakazu</text>
+  <text x="120" y="320" font-size="120" font-family="Arial, Helvetica, sans-serif" font-weight="700" fill="#b91c1c">B-28</text>
+  <foreignObject x="120" y="360" width="900" height="130">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: Arial, Helvetica, sans-serif; font-size: 44px; line-height: 1.2; color: #0f172a;">Koniec zakazu wyprzedzania przez samochody ciężarowe</div>
+  </foreignObject>
+  <text x="120" y="530" font-size="24" font-family="Arial, Helvetica, sans-serif" fill="#475569">Szkic assetu do finalnej publikacji i review redakcyjnego</text>
+</svg>
