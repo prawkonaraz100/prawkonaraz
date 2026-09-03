@@ -6,6 +6,15 @@ on:
 jobs:
   browser-smoke:
     runs-on: ubuntu-latest
+    env:
+      APP_ENV: testing
+      DB_CONNECTION: sqlite
+      DB_DATABASE: database/database.sqlite
+      DB_URL: ''
+      CACHE_STORE: file
+      SESSION_DRIVER: file
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: log
 
     steps:
       - name: Checkout repository
