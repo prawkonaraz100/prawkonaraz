@@ -25,6 +25,11 @@ zakladania serwera, DNS ani pierwszej instalacji systemu. Do tego sluzy
   techniczna i nie oznacza starej domeny.
 - Produkcyjna domena kanoniczna to `https://prawkonaraz.pl`.
 - `www.prawkonaraz.pl` ma przekierowywac na wersje bez `www`.
+- Legacy hosty `prawkoapp.pl`, `www.prawkoapp.pl` i
+  `wild-bison5536.byst.re` maja przekierowywac `301` na odpowiadajaca sciezke
+  pod `https://prawkonaraz.pl`.
+- Nieznane hosty trafiajace bezposrednio do Nginx maja byc odrzucane przez
+  domyslny blok `return 444`, a nie obslugiwane przez aplikacje.
 - Sekretow, hasel, tokenow SMTP, OAuth ani `.env` nie zapisujemy w repo.
 
 ## 3. Kiedy uzywac tego runbooka
@@ -399,6 +404,10 @@ Invoke-WebRequest -Uri https://prawkonaraz.pl/api/v1/health -UseBasicParsing
 Minimalny sukces:
 
 - publiczne URL-e zwracaja `200` albo oczekiwane `301`,
+- legacy domeny zachowuja sciezke i query string w pojedynczym przekierowaniu
+  `301` do `https://prawkonaraz.pl`,
+- zadna legacy domena ani tymczasowy host nie zwraca strony aplikacji z kodem
+  `200` i wlasnym canonicalem,
 - `ops:health-report` ma status `OK` albo znany, wyjasniony `degraded`,
 - `ops:smoke-test` zwraca `Smoke test status: OK`,
 - aplikacja nie zostala w maintenance mode.
