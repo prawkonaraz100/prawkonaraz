@@ -78,9 +78,10 @@ serwerem produkcyjnym i nie może łączyć się z produkcyjną bazą ani usług
 - [x] Naprawa lokalnego Nginx znajduje się w commicie `a5ab30d`.
 - [x] Odzyskana dokumentacja znajduje się w commicie `103948a`.
 - [x] Stan `main` był czysty podczas utworzenia tego planu.
-- [ ] Repozytorium nie ma jeszcze zdalnego `origin`.
-- [ ] Kod i historia nie zostały jeszcze wysłane do prywatnego repozytorium
-  GitHub.
+- [x] Zdalne `origin` wskazuje prywatne repozytorium
+  `https://github.com/prawkonaraz100/prawkonaraz`.
+- [x] Gałąź `main`, historia oraz tag odzyskania zostały wysłane do prywatnego
+  repozytorium GitHub.
 - [!] Stare repozytorium na dysku G jest częściowo uszkodzone. Nie wolno
   kopiować jego `.git` nad repozytorium na F ani usuwać go przed zakończeniem
   odzyskiwania OSK.
@@ -141,12 +142,12 @@ krytycznych danych i bezpieczny dostęp administracyjny.
 
 ### Etap 1 — prywatne repozytorium GitHub
 
-- [ ] Utworzyć prywatne, puste repozytorium GitHub.
-- [ ] Przed pierwszym wysłaniem ponownie przeskanować historię i indeks Git pod
+- [x] Utworzyć prywatne, puste repozytorium GitHub.
+- [x] Przed pierwszym wysłaniem ponownie przeskanować historię i indeks Git pod
   kątem `.env`, kluczy, haseł, dumpów, mediów i plików prywatnych.
-- [ ] Dodać zdalne `origin`.
-- [ ] Wysłać `main` oraz tag `production-recovery-2026-09-02`.
-- [ ] Zweryfikować przez świeże klonowanie, że repozytorium daje się pobrać i że
+- [x] Dodać zdalne `origin`.
+- [x] Wysłać `main` oraz tag `production-recovery-2026-09-02`.
+- [x] Zweryfikować przez świeże klonowanie, że repozytorium daje się pobrać i że
   nie zawiera wykluczonych danych.
 - [ ] Włączyć ochronę `main`: zmiany przez pull request, zielone kontrole przed
   merge i brak force-push.
@@ -162,16 +163,29 @@ zawiera sekretów ani danych produkcyjnych.
 
 - [~] Istnieją workflow `.github/workflows/ci.yml` i
   `.github/workflows/browser-smoke.yml`.
-- [ ] Przejrzeć workflow po odzyskaniu i dopasować je do faktycznego stosu
+- [~] Przejrzeć workflow po odzyskaniu i dopasować je do faktycznego stosu
   produkcyjnego oraz lokalnego Dockera.
-- [ ] Uruchomić lokalnie testy PHP, kontrolę formatowania oraz produkcyjny build
+- [~] Uruchomić lokalnie testy PHP, kontrolę formatowania oraz produkcyjny build
   frontendu.
-- [ ] Uruchomić pierwszy pipeline na GitHubie.
-- [ ] Potwierdzić test na `pull_request` i blokadę merge po nieudanym CI.
-- [ ] Zmierzyć rzeczywisty czas pipeline i zapisać przewidywane miesięczne użycie
+- [x] Uruchomić pierwszy pipeline na GitHubie.
+- [~] Potwierdzić test na `pull_request` i blokadę merge po nieudanym CI.
+- [~] Zmierzyć rzeczywisty czas pipeline i zapisać przewidywane miesięczne użycie
   darmowych minut.
-- [ ] Nie przechowywać pełnej kopii produkcji ani wielkich paczek wdrożeniowych
+- [x] Nie przechowywać pełnej kopii produkcji ani wielkich paczek wdrożeniowych
   jako artefaktów GitHub Actions.
+
+Aktualny wynik pierwszego PR:
+
+- pull request `#1` naprawia użycie SQLite, lokalnego storage, cache i sesji na
+  runnerze oraz usuwa podwójne uruchamianie CI dla tej samej zmiany,
+- bootstrap, migracje, instalacja zależności, seed danych i smoke test przeszły,
+- pełny zestaw testów zakończył się wynikiem: 743 zaliczone, 69 niezaliczonych,
+  2 pominięte,
+- część błędów pochodzi z bezpośredniego użycia Redis w testach rankingowych,
+  a pozostałe ujawniają rozbieżności odzyskanego kodu i oczekiwań testów,
+- przebieg trwał 7 min 27 s; nie jest to jeszcze czas zielonego pipeline,
+- PR pozostaje otwarty i nie może zostać połączony przed lokalną analizą
+  niezaliczonych testów.
 
 Warunek zakończenia: zielony CI potwierdza, że świeży checkout można zbudować i
 przetestować bez dostępu do sekretów produkcyjnych.
@@ -327,6 +341,9 @@ Po zakończeniu zadania agent powinien:
 | 2026-09-03 | Naprawiono lokalny błąd 502 na `/nauka` | commit `a5ab30d` |
 | 2026-09-03 | Zachowano odzyskaną dokumentację starego projektu | commit `103948a` |
 | 2026-09-03 | Utworzono ten główny plan dalszych prac | ten dokument |
+| 2026-09-03 | Utworzono prywatne repozytorium i wysłano produkcyjną bazę Git | `prawkonaraz100/prawkonaraz`, `main`, tag odzyskania |
+| 2026-09-03 | Zweryfikowano historię przed publikacją i świeże klonowanie | Gitleaks 8.30.1, `git fsck --full --strict` |
+| 2026-09-03 | Uruchomiono pierwszy PR i ujawniono stan testów odzyskanej bazy | PR `#1`, 743 zaliczone / 69 niezaliczonych / 2 pominięte |
 
 ## 12. Dokumenty powiązane
 
