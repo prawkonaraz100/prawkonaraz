@@ -1,9 +1,17 @@
 server {
     listen 80;
     listen [::]:80;
-    server_name www.prawkonaraz.pl;
+    server_name www.prawkonaraz.pl prawkoapp.pl www.prawkoapp.pl wild-bison5536.byst.re;
 
     return 301 https://prawkonaraz.pl$request_uri;
+}
+
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name _;
+
+    return 444;
 }
 
 server {

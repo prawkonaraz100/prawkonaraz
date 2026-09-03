@@ -8,6 +8,7 @@ use App\Http\Middleware\EnsureStudySessionAccess;
 use App\Http\Middleware\EnsureUserIsNotBanned;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\MarkReturningUser;
+use App\Http\Middleware\RedirectToCanonicalHost;
 use App\Http\Middleware\TrackUserIpActivity;
 use App\Support\ApiErrorResponseFactory;
 use App\Support\RankedApiErrorResponseFactory;
@@ -39,7 +40,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
 
-        $middleware->append(AssignRequestId::class);
+        $middleware->append([
+            RedirectToCanonicalHost::class,
+            AssignRequestId::class,
+        ]);
 
         $middleware->web(append: [
             EnsureUserIsNotBanned::class,
