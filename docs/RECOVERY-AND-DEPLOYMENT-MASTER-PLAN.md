@@ -161,31 +161,35 @@ zawiera sekretów ani danych produkcyjnych.
 
 ### Etap 2 — potwierdzenie CI
 
-- [~] Istnieją workflow `.github/workflows/ci.yml` i
+- [x] Istnieją workflow `.github/workflows/ci.yml` i
   `.github/workflows/browser-smoke.yml`.
-- [~] Przejrzeć workflow po odzyskaniu i dopasować je do faktycznego stosu
-  produkcyjnego oraz lokalnego Dockera.
-- [~] Uruchomić lokalnie testy PHP, kontrolę formatowania oraz produkcyjny build
+- [x] Przejrzeć główny workflow CI po odzyskaniu i dopasować go do PHP 8.3,
+  SQLite, Redis oraz lokalnego storage używanego przez testy.
+- [x] Uruchomić lokalnie testy PHP, kontrolę formatowania oraz produkcyjny build
   frontendu.
 - [x] Uruchomić pierwszy pipeline na GitHubie.
-- [~] Potwierdzić test na `pull_request` i blokadę merge po nieudanym CI.
+- [~] Potwierdzono zielony test na `pull_request`; wymuszenie blokady merge po
+  nieudanym CI wymaga jeszcze ochrony gałęzi `main` z Etapu 1.
 - [~] Zmierzyć rzeczywisty czas pipeline i zapisać przewidywane miesięczne użycie
-  darmowych minut.
+  darmowych minut. Zielony przebieg trwał 9 min 14 s; prognoza miesięczna nie
+  została jeszcze ustalona.
 - [x] Nie przechowywać pełnej kopii produkcji ani wielkich paczek wdrożeniowych
   jako artefaktów GitHub Actions.
 
 Aktualny wynik pierwszego PR:
 
-- pull request `#1` naprawia użycie SQLite, lokalnego storage, cache i sesji na
-  runnerze oraz usuwa podwójne uruchamianie CI dla tej samej zmiany,
-- bootstrap, migracje, instalacja zależności, seed danych i smoke test przeszły,
-- pełny zestaw testów zakończył się wynikiem: 743 zaliczone, 69 niezaliczonych,
-  2 pominięte,
-- część błędów pochodzi z bezpośredniego użycia Redis w testach rankingowych,
-  a pozostałe ujawniają rozbieżności odzyskanego kodu i oczekiwań testów,
-- przebieg trwał 7 min 27 s; nie jest to jeszcze czas zielonego pipeline,
-- PR pozostaje otwarty i nie może zostać połączony przed lokalną analizą
-  niezaliczonych testów.
+- pull request `#1` naprawia uruchamianie odzyskanej bazy w CI oraz rozbieżności
+  ujawnione przez pierwszy przebieg,
+- bootstrap, migracje, seed danych, smoke test i komplet 814 testów backendu
+  przeszły,
+- kontrola Laravel Pint przeszła dla 922 plików,
+- produkcyjny build frontendu przeszedł,
+- zielony przebieg dla commita `2d64b73` ma identyfikator `33803149375` i trwał
+  9 min 14 s,
+- lokalny Docker montuje teraz także katalog `scripts`, dzięki czemu Pint nie
+  sprawdza już jego nieaktualnej kopii zapisanej w obrazie,
+- PR pozostaje otwarty; jego połączenie z `main` wymaga osobnej decyzji
+  użytkownika i nie uruchamia automatycznego deploymentu.
 
 Warunek zakończenia: zielony CI potwierdza, że świeży checkout można zbudować i
 przetestować bez dostępu do sekretów produkcyjnych.
@@ -305,9 +309,9 @@ zmian bezpośrednio w aktywnym katalogu produkcji.
 
 Przed pierwszym wdrożeniem zmian wykonanych po odzyskaniu muszą być spełnione:
 
-- [ ] prywatne repozytorium zdalne i zweryfikowany push,
-- [ ] skan sekretów przed publikacją repozytorium,
-- [ ] zielone testy adekwatne do zmiany i produkcyjny build frontendu,
+- [x] prywatne repozytorium zdalne i zweryfikowany push,
+- [x] skan sekretów przed publikacją repozytorium,
+- [x] zielone testy adekwatne do zmiany i produkcyjny build frontendu,
 - [ ] aktualny, zweryfikowany backup produkcyjnej bazy i mediów,
 - [ ] potwierdzony plan rollbacku,
 - [ ] wskazany konkretny commit do wdrożenia,
@@ -316,12 +320,13 @@ Przed pierwszym wdrożeniem zmian wykonanych po odzyskaniu muszą być spełnion
 
 ## 9. Najbliższy następny krok
 
-**Etap 1: utworzenie pustego prywatnego repozytorium GitHub, wykonanie skanu
-sekretów i dopiero potem dodanie `origin` oraz pierwszy push.**
+**Przejrzeć zakres PR `#1`, włączyć ochronę gałęzi `main`, a następnie połączyć
+PR dopiero po jawnej decyzji użytkownika.**
 
-Nie rozpoczynać odzyskiwania OSK ani przebudowy produkcji równocześnie z pierwszą
-publikacją repozytorium. Każdy z tych obszarów powinien mieć osobny etap i osobną
-gałąź.
+Zielony CI nie jest zgodą na deployment. Przed pierwszym wdrożeniem nadal trzeba
+przygotować zweryfikowany backup, wersjonowane wydania, procedurę rollbacku oraz
+osobnego użytkownika `deploy`. Odzyskiwanie OSK powinno otrzymać osobną gałąź po
+ustabilizowaniu bazy w `main`.
 
 ## 10. Jak aktualizować ten dokument
 
@@ -344,6 +349,7 @@ Po zakończeniu zadania agent powinien:
 | 2026-09-03 | Utworzono prywatne repozytorium i wysłano produkcyjną bazę Git | `prawkonaraz100/prawkonaraz`, `main`, tag odzyskania |
 | 2026-09-03 | Zweryfikowano historię przed publikacją i świeże klonowanie | Gitleaks 8.30.1, `git fsck --full --strict` |
 | 2026-09-03 | Uruchomiono pierwszy PR i ujawniono stan testów odzyskanej bazy | PR `#1`, 743 zaliczone / 69 niezaliczonych / 2 pominięte |
+| 2026-09-03 | Doprowadzono główny pipeline PR do stanu zielonego | PR `#1`, commit `2d64b73`, run `33803149375`, 814 testów, Pint 922 pliki, build OK |
 
 ## 12. Dokumenty powiązane
 
