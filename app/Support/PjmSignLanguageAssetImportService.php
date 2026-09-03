@@ -70,6 +70,7 @@ class PjmSignLanguageAssetImportService
             if ($parsed === null) {
                 $report['invalid_files_count']++;
                 $this->pushSample($report['invalid_files_sample'], $file->getRelativePathname(), $sampleLimit);
+
                 continue;
             }
 

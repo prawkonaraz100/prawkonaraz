@@ -35,4 +35,3 @@ class QuestionTopicCategoryHeroFactory extends Factory
         ]);
     }
 }
-

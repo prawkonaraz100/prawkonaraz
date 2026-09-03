@@ -7,7 +7,7 @@ use App\Models\UserQuestionProgress;
 use Inertia\Testing\AssertableInertia as Assert;
 
 test('users can open a category analytics page', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->withPurchasedAccess()->create();
     $category = LicenseCategory::factory()->create([
         'code' => 'B',
         'name' => 'Kategoria B',
@@ -64,7 +64,7 @@ test('users can open a category analytics page', function () {
 });
 
 test('inactive categories return 404 on category analytics page', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->withPurchasedAccess()->create();
     $category = LicenseCategory::factory()->create([
         'is_active' => false,
     ]);

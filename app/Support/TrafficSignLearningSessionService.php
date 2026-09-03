@@ -8,8 +8,8 @@ use App\Models\TrafficSignLearningSession;
 use App\Models\User;
 use App\Models\UserTrafficSignProgress;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class TrafficSignLearningSessionService
@@ -159,7 +159,7 @@ class TrafficSignLearningSessionService
                     ->values()
                     ->all();
 
-                throw (new ModelNotFoundException())->setModel(TrafficSignLearningAnswer::class, $missingAnswerIds);
+                throw (new ModelNotFoundException)->setModel(TrafficSignLearningAnswer::class, $missingAnswerIds);
             }
 
             $timestamp = now();

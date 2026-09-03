@@ -5,7 +5,7 @@ namespace App\Support;
 class PolishDashboardLightContentBuilder
 {
     /**
-     * @param array<string, mixed> $signData
+     * @param  array<string, mixed>  $signData
      * @return array<string, mixed>
      */
     public function build(array $signData, int $index): array
@@ -18,16 +18,16 @@ class PolishDashboardLightContentBuilder
         $placement = 'Kontrolka znajduje się na zestawie wskaźników (desce rozdzielczej) w polu widzenia kierowcy, najczęściej tuż za kołem kierownicy. Jej dokładne położenie zależy od marki i modelu pojazdu.';
         $driverBehavior = $this->getDriverBehavior($code);
         $legalSummary = 'Znajomość kontrolek ostrzegawczych (czerwonych) i informacyjnych (żółtych) wchodzi w zakres podstawowej wiedzy z obsługi pojazdu, sprawdzanej na egzaminie państwowym na placu manewrowym. Niestosowanie się do sygnałów awarii może narazić pojazd na uszkodzenie, a kierowcę na utratę kontroli nad pojazdem.';
-        
+
         $legalReferenceLabel = 'Załącznik do rozporządzenia w sprawie egzaminowania';
         $legalReferenceUrl = 'https://isap.sejm.gov.pl';
-        
+
         $fineSummary = 'Zignorowanie kontrolki z reguły nie wiąże się z mandatem karnym wprost, chyba że poruszanie się niesprawnym pojazdem stworzy zagrożenie w ruchu lub pojazd nie spełnia warunków technicznych (np. wycieki płynów, brak oświetlenia). Koszty zaniedbania usterki to przede wszystkim ogromne rachunki w serwisie mechanicznym.';
         $commonMistakes = $this->getCommonMistakes($code);
         $editorialNotes = 'Warto pamiętać, że na egzaminie państwowym kolor kontrolki od razu podpowiada powagę sytuacji. Czerwone kontrolki oznaczają bezwzględną konieczność przerwania jazdy. Kontrolki żółte pozwalają na kontynuowanie jazdy, ale wymuszają ostrożność i pilną wizytę u mechanika.';
-        
+
         $faqItems = $this->getFaqItems($code);
-        
+
         $metaTitle = "Kontrolka {$code} {$name} - znaczenie i co robić";
         $metaDescription = "Sprawdź, co oznacza kontrolka {$code} ({$name}). Dowiedz się, czy możesz kontynuować jazdę i co sprawdzić pod maską samochodu.";
 

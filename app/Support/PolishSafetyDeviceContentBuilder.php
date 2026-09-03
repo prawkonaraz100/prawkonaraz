@@ -5,7 +5,7 @@ namespace App\Support;
 class PolishSafetyDeviceContentBuilder
 {
     /**
-     * @param array<string, mixed> $deviceData
+     * @param  array<string, mixed>  $deviceData
      * @return array<string, mixed>
      */
     public function build(array $deviceData, int $index): array
@@ -18,16 +18,16 @@ class PolishSafetyDeviceContentBuilder
         $placement = 'Urządzenia BRD umieszcza się najczęściej na drodze (np. pachołki, separatory), bezpośrednio przy krawędzi jezdni (słupki prowadzące) lub na wysepkach i przeszkodach na jezdni (sierżanty, słupki przeszkodowe).';
         $driverBehavior = 'Kierowca musi bezwzględnie stosować się do wytyczonych przez urządzenia BRD torów jazdy i granic obszarów wyłączonych, ze względu na fizyczne ryzyko kolizji z urządzeniem lub zabezpieczaną przez nie przeszkodą.';
         $legalSummary = 'Urządzenia bezpieczeństwa ruchu drogowego (Grupa U) nie są znakami drogowymi, lecz fizycznymi elementami infrastruktury, służącymi do optycznego prowadzenia ruchu, zabezpieczenia robót i wskazania pikietażu (kilometrażu) drogi.';
-        
+
         $legalReferenceLabel = 'Rozporządzenie ws. szczegółowych warunków technicznych dla znaków i sygnałów - Urządzenia BRD';
         $legalReferenceUrl = 'https://isap.sejm.gov.pl';
-        
+
         $fineSummary = 'Za potrącenie i zniszczenie urządzenia BRD (np. wpadnięcie w pachołki na robotach drogowych) grozi mandat karny za spowodowanie zagrożenia bezpieczeństwa w ruchu drogowym, a także odpowiedzialność finansowa za zniszczoną infrastrukturę państwową.';
         $commonMistakes = 'Ignorowanie kierunku pasków na sierżancie drogowym (U-21) oraz mylenie strony drogi w nocy na podstawie koloru odblasku na słupkach prowadzących (U-1).';
         $editorialNotes = 'Pytania egzaminacyjne z grupy urządzeń U bardzo często opierają się na spostrzegawczości. Pasy opadające na "sierżancie" tworzą strzałkę, która pokazuje bezpieczną stronę ominięcia.';
-        
+
         $faqItems = $this->getFaqItems($code);
-        
+
         $metaTitle = "Urządzenie BRD {$code} - do czego służy?";
         $metaDescription = "Sprawdź, jakie jest zastosowanie urządzenia BRD {$code} ({$name}). Dowiedz się, co oznacza to oznakowanie dla kierowcy na drodze.";
 

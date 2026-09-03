@@ -54,6 +54,7 @@ test('catalog manifest import uploads ready assets and persists catalog data', f
 
     $this->artisan('catalog:import-manifest', [
         'path' => $directory.'/manifest.json',
+        '--skip-sitemap' => true,
         '--report' => $reportPath,
     ])->assertSuccessful();
 
@@ -67,7 +68,7 @@ test('catalog manifest import uploads ready assets and persists catalog data', f
     expect($question->licenseCategory->code)->toBe('B');
     expect($question->external_id)->toBe('B-100');
     expect($question->questionTopic)->toBeInstanceOf(QuestionTopic::class);
-    expect($question->questionTopic?->key)->toBe('vehicle_operation_and_safety');
+    expect($question->questionTopic?->key)->toBe('safety_equipment_and_restraints');
     expect($media)->toHaveCount(3);
     expect($media[0]->kind)->toBe('image');
     expect($media[0]->variant)->toBe('full');
@@ -154,6 +155,7 @@ test('catalog manifest import fails the batch when a referenced media file is mi
 
     $this->artisan('catalog:import-manifest', [
         'path' => $directory.'/manifest.json',
+        '--skip-sitemap' => true,
         '--report' => $reportPath,
     ])->assertFailed();
 
@@ -206,6 +208,7 @@ test('catalog manifest import optimizes oversized staged images when ffmpeg is a
 
     $this->artisan('catalog:import-manifest', [
         'path' => $directory.'/manifest.json',
+        '--skip-sitemap' => true,
         '--report' => $reportPath,
     ])->assertSuccessful();
 

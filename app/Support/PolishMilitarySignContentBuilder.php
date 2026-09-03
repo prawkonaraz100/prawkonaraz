@@ -5,7 +5,7 @@ namespace App\Support;
 class PolishMilitarySignContentBuilder
 {
     /**
-     * @param array<string, mixed> $signData
+     * @param  array<string, mixed>  $signData
      * @return array<string, mixed>
      */
     public function build(array $signData, int $index): array
@@ -18,16 +18,16 @@ class PolishMilitarySignContentBuilder
         $placement = 'Znaki te umieszcza się najczęściej przed obiektami mostowymi (mostami, wiaduktami) znajdującymi się w ciągach dróg publicznych, wykorzystywanych jako trasy przejazdu kolumn wojskowych.';
         $driverBehavior = $this->getDriverBehavior($code);
         $legalSummary = 'Znaki z grupy W nie dotyczą kierowców pojazdów cywilnych. Opierają się one na klasyfikacji MLC (Military Load Classification), która uwzględnia nie tylko samą masę pojazdu, ale też nacisk osi, wymiary i dynamikę przejazdu w kolumnie wojskowej.';
-        
+
         $legalReferenceLabel = 'Rozporządzenie ws. znaków i sygnałów drogowych - Znaki wojskowe';
         $legalReferenceUrl = 'https://isap.sejm.gov.pl';
-        
+
         $fineSummary = 'Ponieważ znaki te kierowane są wyłącznie do kierujących pojazdami Sił Zbrojnych RP i wojsk sojuszniczych, kierowca pojazdu cywilnego nie może otrzymać mandatu za niestosowanie się do nich (o ile nie łamie cywilnego znaku np. B-18).';
         $commonMistakes = $this->getCommonMistakes($code);
         $editorialNotes = 'Warto wyraźnie zaznaczyć dla kursantów, że widoczna na znakach liczba NIE oznacza ograniczenia tonażowego w tonach. To klasa MLC, do której wojsko ma własne tabele przeliczeniowe.';
-        
+
         $faqItems = $this->getFaqItems($code);
-        
+
         $metaTitle = "Znak {$code} {$name} - znaczenie";
         $metaDescription = "Sprawdź, co oznacza żółty znak wojskowy {$code}. Dowiedz się, czy dotyczy kierowców cywilnych i jak odczytać klasę obciążenia MLC przed mostem.";
 

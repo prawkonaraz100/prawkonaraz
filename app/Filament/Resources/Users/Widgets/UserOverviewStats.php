@@ -17,9 +17,9 @@ class UserOverviewStats extends StatsOverviewWidget
 
     protected ?string $description = 'Szybki obraz skali bazy, weryfikacji, aktywności i blokad przed wejściem w wykresy trendów.';
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
-    protected int | array | null $columns = [
+    protected int|array|null $columns = [
         'md' => 2,
         'xl' => 4,
     ];

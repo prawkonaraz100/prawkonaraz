@@ -5,8 +5,9 @@ use App\Models\QuestionExplanationAsset;
 use App\Models\SharedQuestionExplanationAsset;
 use App\Support\QuestionExplanationAssetManager;
 use Illuminate\Support\Facades\Storage;
+use Tests\TestCase;
 
-uses(Tests\TestCase::class);
+uses(TestCase::class);
 
 test('reference explanation assets are stored under a question-specific directory', function () {
     Storage::fake('media_local');

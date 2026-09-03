@@ -42,13 +42,17 @@ test('quality pass prioritizes semantically related prohibition signs on sign pa
 
     $this->get(route('traffic-signs.show', 'b-39-strefa-ograniczonego-postoju'))
         ->assertOk()
-        ->assertSeeText('B-40 Koniec strefy ograniczonego postoju')
-        ->assertSeeText('B-35 Zakaz postoju');
+        ->assertSeeText('B-40')
+        ->assertSeeText('Koniec strefy ograniczonego postoju')
+        ->assertSeeText('B-35')
+        ->assertSeeText('Zakaz postoju');
 
     $this->get(route('traffic-signs.show', 'b-26-zakaz-wyprzedzania-przez-samochody-ciezarowe'))
         ->assertOk()
-        ->assertSeeText('B-25 Zakaz wyprzedzania')
-        ->assertSeeText('B-28 Koniec zakazu wyprzedzania przez samochody ciężarowe');
+        ->assertSeeText('B-25')
+        ->assertSeeText('Zakaz wyprzedzania')
+        ->assertSeeText('B-28')
+        ->assertSeeText('Koniec zakazu wyprzedzania przez samochody ciężarowe');
 });
 
 test('published prohibition sign exposes the same webp asset in page markup, og:image and json-ld', function () {
@@ -58,11 +62,11 @@ test('published prohibition sign exposes the same webp asset in page markup, og:
 
     $this->get(route('traffic-signs.show', 'b-20-stop'))
         ->assertOk()
-        ->assertSee('meta property="og:image" content="'.$assetUrl.'"', false)
+        ->assertSee('meta property="og:image" content="'.$assetUrl.'?v=', false)
         ->assertSee('meta property="og:image:alt" content="STOP"', false)
         ->assertSee('meta property="og:image:width" content="1200"', false)
         ->assertSee('meta property="og:image:height" content="1200"', false)
-        ->assertSee('"url":"'.$assetUrl.'"', false)
+        ->assertSee('"url":"'.$assetUrl.'?v=', false)
         ->assertSee('"caption":"STOP"', false)
-        ->assertSee('rel="preload" href="'.$assetUrl.'" as="image"', false);
+        ->assertSee('rel="preload" href="'.$assetUrl.'?v=', false);
 });

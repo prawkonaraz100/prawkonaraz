@@ -7,4 +7,3 @@ return [
     'token' => 'Ten link resetu hasła jest nieprawidłowy albo wygasł.',
     'user' => 'Nie znaleźliśmy konta z takim adresem e-mail.',
 ];
-

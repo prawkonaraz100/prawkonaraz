@@ -17,8 +17,7 @@ class ModeratorAccountStartCredentials extends Notification
         protected string $startPassword,
         protected string $targetCategoryCode,
         protected ?CarbonInterface $accessExpiresAt,
-    ) {
-    }
+    ) {}
 
     /**
      * @return list<string>

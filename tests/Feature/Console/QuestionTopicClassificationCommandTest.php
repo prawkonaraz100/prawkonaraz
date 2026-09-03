@@ -130,7 +130,7 @@ test('question topic classification command assigns thematic topics to existing 
         ->create([
             'external_id' => 'B-TOPIC-013',
             'prompt' => 'Czy w tej sytuacji masz obowiazek zareagowac na zachowanie pieszego?',
-                'metadata' => [],
+            'metadata' => [],
         ]);
 
     $controllerSignalQuestion = Question::factory()

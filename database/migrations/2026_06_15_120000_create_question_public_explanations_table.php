@@ -33,4 +33,3 @@ return new class extends Migration
         Schema::dropIfExists('question_public_explanations');
     }
 };
-

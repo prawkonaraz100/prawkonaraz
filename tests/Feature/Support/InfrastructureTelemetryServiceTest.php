@@ -4,7 +4,7 @@ use App\Support\DatabaseBackupService;
 use App\Support\InfrastructureTelemetryService;
 
 test('infrastructure telemetry falls back to error status when backup storage is unavailable', function () {
-    $backupService = \Mockery::mock(DatabaseBackupService::class);
+    $backupService = Mockery::mock(DatabaseBackupService::class);
     $backupService
         ->shouldReceive('backupHealth')
         ->once()
@@ -26,7 +26,7 @@ test('infrastructure telemetry reports configured pgsql target without sqlite fi
     config()->set('database.connections.pgsql.port', '5432');
     config()->set('database.connections.pgsql.database', 'prawkobit');
 
-    $backupService = \Mockery::mock(DatabaseBackupService::class);
+    $backupService = Mockery::mock(DatabaseBackupService::class);
     $backupService
         ->shouldReceive('backupHealth')
         ->once()

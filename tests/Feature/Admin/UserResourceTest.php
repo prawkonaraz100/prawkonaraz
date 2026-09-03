@@ -1,14 +1,15 @@
 <?php
 
-use App\Filament\Resources\Users\UserResource;
 use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
+use App\Filament\Resources\Users\UserResource;
 use App\Models\AuditLog;
 use App\Models\User;
 use App\Models\UserIpHistory;
 use App\Models\UserProfile;
 use App\Models\UserSocialAccount;
+use App\Support\UserAvatarService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -254,7 +255,7 @@ test('admin users can suppress social avatar fallback', function () {
         ->assertHasNoTableActionErrors();
 
     expect($user->fresh()->avatar_social_fallback_disabled_at)->not->toBeNull()
-        ->and(app(\App\Support\UserAvatarService::class)->url($user->fresh()))->toBeNull();
+        ->and(app(UserAvatarService::class)->url($user->fresh()))->toBeNull();
 });
 
 test('non admin users cannot access the user resource', function () {

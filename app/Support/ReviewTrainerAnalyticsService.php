@@ -138,8 +138,7 @@ class ReviewTrainerAnalyticsService
         int $todayUnknownCount = 0,
         int $todayChoiceIncorrectCount = 0,
         int $todayNeedsRecoveryCount = 0,
-    ): array
-    {
+    ): array {
         return [
             'started_sessions_count' => 0,
             'completed_sessions_count' => 0,

@@ -101,7 +101,7 @@ test('admin users can trigger a manual backup from the backups page', function (
         }
     };
 
-    $mock = \Mockery::mock(DatabaseBackupService::class);
+    $mock = Mockery::mock(DatabaseBackupService::class);
     $mock->shouldReceive('backup')
         ->once()
         ->with(null, true, 'manual-admin-panel')
@@ -251,7 +251,7 @@ test('admin users can delete a backup from the backups page', function () {
         }
     };
 
-    $mock = \Mockery::mock(DatabaseBackupService::class);
+    $mock = Mockery::mock(DatabaseBackupService::class);
     $mock->shouldReceive('deleteBackup')
         ->once()
         ->with('manifest.json')
@@ -280,7 +280,7 @@ test('admin users can download a backup artifact', function () {
     fwrite($stream, 'backup-body');
     rewind($stream);
 
-    $mock = \Mockery::mock(DatabaseBackupService::class);
+    $mock = Mockery::mock(DatabaseBackupService::class);
     $mock->shouldReceive('downloadPayload')
         ->once()
         ->with('manifest.json')

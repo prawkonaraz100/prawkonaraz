@@ -4,6 +4,4 @@ namespace App\Exceptions;
 
 use RuntimeException;
 
-class SocialAccountNeedsCategoryException extends RuntimeException
-{
-}
+class SocialAccountNeedsCategoryException extends RuntimeException {}

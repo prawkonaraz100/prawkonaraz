@@ -71,7 +71,7 @@ class QuestionExplanationDraftStagingService
                 $payload = $this->buildDraftPayload(
                     $source,
                     $record,
-                    $questionsByExternalId->get($externalId, new EloquentCollection())
+                    $questionsByExternalId->get($externalId, new EloquentCollection)
                 );
 
                 QuestionExplanationDraft::query()->updateOrCreate(
@@ -234,7 +234,6 @@ class QuestionExplanationDraftStagingService
     }
 
     /**
-     * @param  mixed  $value
      * @return array<int, string>
      */
     protected function normalizeCategories(mixed $value): array
@@ -248,7 +247,6 @@ class QuestionExplanationDraftStagingService
     }
 
     /**
-     * @param  mixed  $value
      * @return array<int, string>
      */
     protected function normalizeStringList(mixed $value): array

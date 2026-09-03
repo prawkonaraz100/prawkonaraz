@@ -5,9 +5,9 @@ use App\Models\Question;
 use App\Models\QuestionMedia;
 use App\Models\QuestionPublicExplanation;
 use App\Support\QuestionVideoSeoDescriptionService;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Carbon;
 
 beforeEach(function (): void {
     config()->set('app.url', 'https://prawkonaraz.pl');
@@ -57,11 +57,13 @@ test('seo sitemap generator splits canonical question urls by category', functio
         'sort_order' => 0,
     ]);
 
+    $latestQuestionUpdatedAt = now();
+
     Question::factory()->create([
         'license_category_id' => $categoryA->getKey(),
         'external_id' => '99',
         'prompt' => 'Czy w tej sytuacji masz obowiązek zatrzymać pojazd?',
-        'updated_at' => now(),
+        'updated_at' => $latestQuestionUpdatedAt,
     ]);
 
     Question::factory()->create([
@@ -108,7 +110,7 @@ test('seo sitemap generator splits canonical question urls by category', functio
     expect(substr_count($questionsB, '/pytanie/99/'))->toBe(1);
     expect($questionsB)
         ->toContain('https://prawkonaraz.pl/pytanie/99/czy-w-tej-sytuacji-masz-obowiazek-zatrzymac-pojazd')
-        ->toMatch('/<loc>https:\/\/prawkonaraz\.pl\/pytanie\/99\/czy-w-tej-sytuacji-masz-obowiazek-zatrzymac-pojazd<\/loc>\s*<lastmod>'.preg_quote($publicExplanationUpdatedAt->toIso8601String(), '/').'<\/lastmod>/')
+        ->toMatch('/<loc>https:\/\/prawkonaraz\.pl\/pytanie\/99\/czy-w-tej-sytuacji-masz-obowiazek-zatrzymac-pojazd<\/loc>\s*<lastmod>'.preg_quote($latestQuestionUpdatedAt->toIso8601String(), '/').'<\/lastmod>/')
         ->toContain('<image:loc>https://prawkonaraz.pl/storage/questions/99/full.webp</image:loc>');
     expect($questionsA)
         ->not->toContain('/pytanie/99/')

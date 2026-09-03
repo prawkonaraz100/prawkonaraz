@@ -46,4 +46,3 @@ return [
         'to' => 'adres odbiorcy',
     ],
 ];
-

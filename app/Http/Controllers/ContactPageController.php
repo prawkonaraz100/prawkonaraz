@@ -15,8 +15,7 @@ class ContactPageController extends Controller
         TrafficSignSchemaService $trafficSignSchemaService,
         TrafficSignBreadcrumbs $trafficSignBreadcrumbs,
         PublicUrlResolver $publicUrlResolver,
-    ): View
-    {
+    ): View {
         $breadcrumbs = $trafficSignBreadcrumbs->contact();
         $organization = (array) config('content.organization');
         $organization['public_url'] = $publicUrlResolver->currentRoot();

@@ -892,7 +892,7 @@ test('public question detail uses public explanation instead of system explanati
         ->assertSeeText('Przejście dla pieszych jest konieczne.')
         ->assertSeeText('Zamknięte drzwi pozwalają od razu ruszyć.')
         ->assertSeeText('Powiązane pytania')
-        ->assertSeeText('Redakcyjnie wybrane relacje')
+        ->assertSeeText('Sprawdź podobne sytuacje i utrwal wiedzę przed egzaminem.')
         ->assertSeeText($relatedPrompt)
         ->assertSeeText('pytanie o błąd polegający na samym zmniejszeniu prędkości.')
         ->assertSee('href="'.route('public.questions.category.show', [

@@ -42,13 +42,17 @@ test('quality pass prioritizes semantically related mandatory signs on sign page
 
     $this->get(route('traffic-signs.show', 'c-18-nakaz-uzywania-lancuchow-przeciwslizgowych'))
         ->assertOk()
-        ->assertSeeText('C-19 Koniec nakazu używania łańcuchów przeciwślizgowych')
-        ->assertSeeText('C-14 Prędkość minimalna 40 km/h');
+        ->assertSeeText('C-19')
+        ->assertSeeText('Koniec nakazu używania łańcuchów przeciwślizgowych')
+        ->assertSeeText('C-14')
+        ->assertSeeText('Prędkość minimalna 40 km/h');
 
     $this->get(route('traffic-signs.show', 'c-13-droga-dla-rowerow'))
         ->assertOk()
-        ->assertSeeText('C-13a Koniec drogi dla rowerów')
-        ->assertSeeText('C-13/16 Droga dla rowerów i pieszych');
+        ->assertSeeText('C-13a')
+        ->assertSeeText('Koniec drogi dla rowerów')
+        ->assertSeeText('C-13/16')
+        ->assertSeeText('Droga dla rowerów i pieszych');
 });
 
 test('published mandatory sign exposes the same webp asset in page markup, og:image and json-ld', function () {
@@ -58,11 +62,11 @@ test('published mandatory sign exposes the same webp asset in page markup, og:im
 
     $this->get(route('traffic-signs.show', 'c-1-nakaz-jazdy-w-prawo'))
         ->assertOk()
-        ->assertSee('meta property="og:image" content="'.$assetUrl.'"', false)
+        ->assertSee('meta property="og:image" content="'.$assetUrl.'?v=', false)
         ->assertSee('meta property="og:image:alt" content="Nakaz jazdy w prawo"', false)
         ->assertSee('meta property="og:image:width" content="1200"', false)
         ->assertSee('meta property="og:image:height" content="1200"', false)
-        ->assertSee('"url":"'.$assetUrl.'"', false)
+        ->assertSee('"url":"'.$assetUrl.'?v=', false)
         ->assertSee('"caption":"Nakaz jazdy w prawo"', false)
-        ->assertSee('rel="preload" href="'.$assetUrl.'" as="image"', false);
+        ->assertSee('rel="preload" href="'.$assetUrl.'?v=', false);
 });

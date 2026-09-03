@@ -19,4 +19,3 @@ class ListQuestionTopics extends ListRecords
         return 'Ustaw globalne zdjęcia banerów działów. Wyjątki dla konkretnych kategorii ustawiaj w zasobie Kategorie.';
     }
 }
-

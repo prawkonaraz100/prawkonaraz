@@ -26,8 +26,8 @@ class PolishWarningSignContentBuilder
             'fine_summary' => "Największe ryzyko przy {$sign['code']} nie polega na \"minięciu znaku\", tylko na zbyt późnej reakcji na zagrożenie, przed którym ostrzega. Jeśli kierowca nie dostosuje zachowania do warunków, łatwo dochodzi tu do błędu ocenianego przez pryzmat niedostosowania prędkości, braku ostrożności albo naruszenia pierwszeństwa.",
             'common_mistakes' => $config['mistake'],
             'editorial_notes' => $config['editorial_notes'],
-            'review_notes' => "Szkic merytoryczny przygotowany dla pełnego pokrycia kategorii znaków ostrzegawczych. Przed publikacją zrobić pass redakcyjny na przykładach sytuacyjnych i na różnicach wobec podobnych znaków z grupy A.",
-            'source_notes' => "Treść bazowa przygotowana na podstawie urzędowego wykazu znaków ostrzegawczych i praktyki szkolenia kierowców. Przed publikacją potwierdzić finalny wording, przykłady ruchowe i ewentualne powiązania z tabliczkami lub oznakowaniem towarzyszącym.",
+            'review_notes' => 'Szkic merytoryczny przygotowany dla pełnego pokrycia kategorii znaków ostrzegawczych. Przed publikacją zrobić pass redakcyjny na przykładach sytuacyjnych i na różnicach wobec podobnych znaków z grupy A.',
+            'source_notes' => 'Treść bazowa przygotowana na podstawie urzędowego wykazu znaków ostrzegawczych i praktyki szkolenia kierowców. Przed publikacją potwierdzić finalny wording, przykłady ruchowe i ewentualne powiązania z tabliczkami lub oznakowaniem towarzyszącym.',
             'faq_items' => [
                 [
                     'question' => "Na co znak {$sign['code']} każe przygotować się kierowcy?",

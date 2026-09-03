@@ -2,10 +2,10 @@
 
 namespace App\SEO\Schema;
 
-use App\Models\LicenseCategory;
 use App\Models\LegalContentPage;
 use App\Models\LegalTopic;
 use App\Models\LegalUnit;
+use App\Models\LicenseCategory;
 use App\Models\Question;
 use App\Models\QuestionTopic;
 use App\Models\TrafficSign;

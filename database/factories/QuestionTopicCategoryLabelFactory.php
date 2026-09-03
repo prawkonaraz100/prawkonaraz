@@ -33,4 +33,3 @@ class QuestionTopicCategoryLabelFactory extends Factory
         ]);
     }
 }
-

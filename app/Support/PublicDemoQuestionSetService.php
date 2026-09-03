@@ -91,7 +91,7 @@ class PublicDemoQuestionSetService
     }
 
     /**
-     * @param list<int> $excludeQuestionIds
+     * @param  list<int>  $excludeQuestionIds
      * @return list<int>
      */
     protected function fallbackQuestionIds(int $limit, array $excludeQuestionIds): array

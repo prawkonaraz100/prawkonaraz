@@ -4,8 +4,9 @@ use App\Models\User;
 use App\Models\UserProfile;
 use App\Support\StudyContextService;
 use App\Support\UserProfileService;
+use Tests\TestCase;
 
-uses(Tests\TestCase::class);
+uses(TestCase::class);
 
 test('users without a profile default visual explanations to after incorrect', function () {
     $user = User::factory()->create();

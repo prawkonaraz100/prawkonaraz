@@ -4,8 +4,9 @@ use App\Models\Question;
 use App\Models\QuestionExplanationAsset;
 use App\Models\SharedQuestionExplanationAsset;
 use App\Support\SharedQuestionExplanationAssetResolver;
+use Tests\TestCase;
 
-uses(Tests\TestCase::class);
+uses(TestCase::class);
 
 test('resolver returns shared explanation asset when question has no local override', function () {
     $question = Question::factory()->create([

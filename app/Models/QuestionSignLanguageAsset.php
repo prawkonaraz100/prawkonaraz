@@ -12,12 +12,17 @@ class QuestionSignLanguageAsset extends Model
     use HasFactory;
 
     public const ROLE_QUESTION = 'question';
+
     public const ROLE_ANSWER_A = 'answer_a';
+
     public const ROLE_ANSWER_B = 'answer_b';
+
     public const ROLE_ANSWER_C = 'answer_c';
 
     public const STATUS_READY = 'ready';
+
     public const STATUS_REVIEW_REQUIRED = 'review_required';
+
     public const STATUS_DISABLED = 'disabled';
 
     public const VARIANT_STANDARD = 'standard';

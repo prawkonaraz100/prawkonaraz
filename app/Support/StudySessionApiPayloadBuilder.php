@@ -131,7 +131,7 @@ class StudySessionApiPayloadBuilder
                 : null,
             'review_completion' => $this->reviewCompletion($studySession),
             'questions' => $orderedQuestions
-                ->map(function (Question $question) use ($answerMap, $includeVisualExplanations, $revealsOutcomes): array {
+                ->map(function (Question $question) use ($answerMap, $includeVisualExplanations, $publicExplanationUrls, $revealsOutcomes): array {
                     return $this->question(
                         $question,
                         $answerMap->get($question->getKey()),

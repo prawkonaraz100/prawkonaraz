@@ -2082,8 +2082,10 @@ class TrafficSignSupportingPageCatalog
                                 return true;
                             }
                         }
+
                         return false;
                     }
+
                     return str_starts_with($slug, $prefix);
                 });
 

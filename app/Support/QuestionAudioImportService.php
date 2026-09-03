@@ -67,6 +67,7 @@ class QuestionAudioImportService
             if (! is_array($record)) {
                 $report['errors_count']++;
                 $this->pushSample($report['errors_sample'], ['message' => 'Manifest record is not an object.'], $sampleLimit);
+
                 continue;
             }
 

@@ -101,4 +101,3 @@ test('question topic category labels are unique per category and topic', functio
         'display_name' => 'Druga nazwa',
     ]))->toThrow(QueryException::class);
 });
-

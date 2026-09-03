@@ -2,9 +2,9 @@
 
 namespace App\Filament\Pages;
 
+use App\Support\AdminBackupConsoleService;
 use App\Support\BackupSettingsService;
 use App\Support\DatabaseBackupService;
-use App\Support\AdminBackupConsoleService;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
@@ -32,9 +32,9 @@ class Backups extends Page
     /** @var array<string, mixed>|null */
     public ?array $backupError = null;
 
-    protected static string | BackedEnum | null $navigationIcon = Heroicon::ArchiveBoxArrowDown;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::ArchiveBoxArrowDown;
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Operacje';
+    protected static string|\UnitEnum|null $navigationGroup = 'Operacje';
 
     protected static ?int $navigationSort = 16;
 
@@ -49,19 +49,19 @@ class Backups extends Page
         return 'Backupy';
     }
 
-    public static function getNavigationIcon(): string | BackedEnum | Htmlable | null
+    public static function getNavigationIcon(): string|BackedEnum|Htmlable|null
     {
         return static::$navigationIcon
             ?? FilamentIcon::resolve(PanelsIconAlias::PAGES_DASHBOARD_NAVIGATION_ITEM)
             ?? Heroicon::ArchiveBoxArrowDown;
     }
 
-    public function getHeading(): string | Htmlable
+    public function getHeading(): string|Htmlable
     {
         return 'Backupy';
     }
 
-    public function getSubheading(): string | Htmlable | null
+    public function getSubheading(): string|Htmlable|null
     {
         return 'Dedykowany widok kopii bazy: harmonogram tygodniowy, retencja, ostatnie artefakty i stan storage backupów.';
     }

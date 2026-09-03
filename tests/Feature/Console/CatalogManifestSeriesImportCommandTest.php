@@ -43,6 +43,7 @@ test('catalog manifest series import processes multiple chunk directories and ag
 
     $this->artisan('catalog:import-manifest-series', [
         'path' => $seriesDirectory,
+        '--skip-sitemap' => true,
         '--report' => $reportPath,
     ])->assertSuccessful();
 
@@ -161,12 +162,14 @@ test('catalog manifest series import can resume from a previous success report',
     $this->artisan('catalog:import-manifest-series', [
         'path' => $seriesDirectory,
         '--to-chunk' => 1,
+        '--skip-sitemap' => true,
         '--report' => $resumeReportPath,
     ])->assertSuccessful();
 
     $this->artisan('catalog:import-manifest-series', [
         'path' => $seriesDirectory,
         '--resume-from-report' => $resumeReportPath,
+        '--skip-sitemap' => true,
         '--report' => $resumeReportPath,
     ])->assertSuccessful();
 

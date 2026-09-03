@@ -10,8 +10,7 @@ class SocialProviderUser
         public readonly ?string $name = null,
         public readonly ?string $avatarUrl = null,
         public readonly ?bool $emailVerified = null,
-    ) {
-    }
+    ) {}
 
     public function normalizedEmail(): ?string
     {

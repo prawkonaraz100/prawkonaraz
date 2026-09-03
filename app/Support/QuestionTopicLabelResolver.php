@@ -65,4 +65,3 @@ class QuestionTopicLabelResolver
         return (string) $topic->key;
     }
 }
-

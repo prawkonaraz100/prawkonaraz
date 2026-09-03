@@ -13,8 +13,7 @@ class MethodologyPageController extends Controller
         TrafficSignSeoService $trafficSignSeoService,
         TrafficSignSchemaService $trafficSignSchemaService,
         TrafficSignBreadcrumbs $trafficSignBreadcrumbs,
-    ): View
-    {
+    ): View {
         $breadcrumbs = $trafficSignBreadcrumbs->methodology();
 
         return view('about.methodology', [

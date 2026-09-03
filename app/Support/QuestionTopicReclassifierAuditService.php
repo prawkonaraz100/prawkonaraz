@@ -11,7 +11,9 @@ use InvalidArgumentException;
 class QuestionTopicReclassifierAuditService
 {
     public const SCOPE_ACTIVE_READY = 'active_ready';
+
     public const SCOPE_ACTIVE = 'active';
+
     public const SCOPE_ALL = 'all';
 
     public function __construct(
