@@ -6,9 +6,7 @@ import { setupCsrfSessionLifecycle } from './lib/csrfSession';
 import { registerPwaServiceWorker } from './lib/pwa';
 import { setupPublicAuthDrawerLoader } from './public/authDrawerLoader';
 import { setupQuestionLessonAudio } from './public/questionLessonAudio';
-import '../images/home/home-hero-laptop.png';
-import '../images/home/hero-driver-cutout-v4.webp';
-import '../images/home/hero-desktop.png';
+import '../images/home/hero-composite-v3.webp';
 import '../images/home/hero-mobile.png';
 import '../images/home/proof/dashboard.webp';
 import '../images/home/proof/exam.webp';
@@ -101,6 +99,105 @@ const setupPublicSourceStrip = () => {
         } catch {
             // Ignore storage failures; the strip is already hidden in the current page.
         }
+    });
+};
+
+const setupHomeHeaderPointerReveal = () => {
+    const header = document.querySelector<HTMLElement>('[data-home-site-header]');
+
+    if (!header) {
+        return;
+    }
+
+    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+    let revealed = false;
+
+    const reveal = () => {
+        if (revealed) {
+            return;
+        }
+
+        revealed = true;
+        header.classList.add('is-visible');
+        header.classList.remove('home-site-header--awaiting-pointer');
+        window.removeEventListener('pointermove', reveal);
+        window.removeEventListener('keydown', revealFromKeyboard);
+        document.removeEventListener('focusin', reveal);
+    };
+
+    const revealFromKeyboard = (event: KeyboardEvent) => {
+        if (event.key === 'Tab') {
+            reveal();
+        }
+    };
+
+    if (!finePointer.matches) {
+        reveal();
+
+        return;
+    }
+
+    window.addEventListener('pointermove', reveal, { passive: true });
+    window.addEventListener('keydown', revealFromKeyboard);
+    document.addEventListener('focusin', reveal);
+};
+
+const setupHomeHeaderMenus = () => {
+    const header = document.querySelector<HTMLElement>('[data-home-site-header]');
+    const menus = Array.from(
+        header?.querySelectorAll<HTMLDetailsElement>('[data-home-header-menu]') ?? [],
+    );
+
+    if (!header || menus.length === 0) {
+        return;
+    }
+
+    const closeMenu = (menu: HTMLDetailsElement, restoreFocus = false) => {
+        if (!menu.open) {
+            return;
+        }
+
+        menu.open = false;
+
+        if (restoreFocus) {
+            menu.querySelector<HTMLElement>(':scope > summary')?.focus();
+        }
+    };
+
+    menus.forEach((menu) => {
+        menu.addEventListener('toggle', () => {
+            if (!menu.open) {
+                return;
+            }
+
+            menus.forEach((otherMenu) => {
+                if (otherMenu !== menu) {
+                    closeMenu(otherMenu);
+                }
+            });
+        });
+    });
+
+    document.addEventListener('click', (event) => {
+        const target = event.target;
+
+        if (!(target instanceof Node)) {
+            return;
+        }
+
+        menus.forEach((menu) => {
+            if (!menu.contains(target)) {
+                closeMenu(menu);
+            }
+        });
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') {
+            return;
+        }
+
+        menus.forEach((menu) => closeMenu(menu, true));
     });
 };
 
@@ -232,6 +329,8 @@ if (document.readyState === 'loading') {
         setupCsrfRefreshForms();
         setupPublicMobileMenu();
         setupPublicSourceStrip();
+        setupHomeHeaderPointerReveal();
+        setupHomeHeaderMenus();
         setupPublicAuthDrawerLoader();
         setupQuestionLessonAudio();
         setupHomeOpsReveals();
@@ -245,6 +344,8 @@ if (document.readyState === 'loading') {
     setupCsrfRefreshForms();
     setupPublicMobileMenu();
     setupPublicSourceStrip();
+    setupHomeHeaderPointerReveal();
+    setupHomeHeaderMenus();
     setupPublicAuthDrawerLoader();
     setupQuestionLessonAudio();
     setupHomeOpsReveals();

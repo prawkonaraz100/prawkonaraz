@@ -15,6 +15,14 @@ return [
             env('CONTENT_ORGANIZATION_FACEBOOK_URL'),
         ])),
     ],
+    'legal_documents' => [
+        'operator_address' => env('CONTENT_ORGANIZATION_ADDRESS'),
+        'operator_tax_id' => env('CONTENT_ORGANIZATION_TAX_ID'),
+        'privacy_email' => env('CONTENT_PRIVACY_EMAIL', env('CONTENT_CONTACT_EMAIL', 'kontakt@prawkonaraz.pl')),
+        'effective_date' => env('LEGAL_DOCUMENTS_EFFECTIVE_DATE', '2026-09-04'),
+        'terms_version' => env('LEGAL_TERMS_VERSION', '2026-09-04'),
+        'privacy_version' => env('LEGAL_PRIVACY_VERSION', '2026-09-04'),
+    ],
     'legal_content' => [
         'article_images' => [
             'zatrzymanie-i-postoj' => [

@@ -194,6 +194,10 @@
             <div class="auth-login-drawer-social auth-dialog__social">
                 <div class="auth-login-drawer-social-grid grid gap-3">
                     @if (in_array('google', $enabledSocialProviders, true))
+                    <p class="auth-dialog__legal-consent">
+                        <span>Kontynuując z Google, akceptujesz <a href="{{ route('legal.terms', absolute: false) }}">Regulamin</a> i potwierdzasz</span>
+                        <span>zapoznanie się z <a href="{{ route('legal.privacy', absolute: false) }}">Polityką prywatności</a>.</span>
+                    </p>
                     <a
                         href="{{ route('social.redirect', ['provider' => 'google'], absolute: false) }}"
                         class="auth-google-login-button"

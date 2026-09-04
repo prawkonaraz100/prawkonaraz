@@ -59,7 +59,7 @@ import {
     type Ref,
 } from 'vue';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
-import { ArrowLeft, ArrowRight, ArrowUpRight, Bold, Check, CircleCheck, CirclePlay, ExternalLink, FastForward, Gauge, LibraryBig, MessageSquareText, Palette, Repeat2, Settings, Speech, SquarePlay, SquareX, Trophy, Volume2 } from '@lucide/vue';
+import { ArrowLeft, ArrowRight, ArrowUpRight, Bold, Check, CircleCheck, CirclePlay, ExternalLink, FastForward, Gauge, Info, Keyboard, LibraryBig, Lightbulb, MessageSquareText, Palette, Repeat2, Settings, Speech, SquarePlay, SquareX, Trophy, Volume2, X } from '@lucide/vue';
 
 interface SessionContext {
     type: string;
@@ -640,6 +640,8 @@ const showCompletionResults = ref(props.session.status === 'completed');
 const showCorrectCompletionResults = ref(props.session.status === 'completed');
 const showReviewTrainerQuestionDetails = ref(false);
 const isPublicDemoCompletionPromptDismissed = ref(false);
+const isPublicDemoGateDismissed = ref(false);
+const skipPublicDemoGateNextTime = ref(false);
 const showExplanation = ref(false);
 const showExplanationOnDemand = ref(false);
 const visualExplanationsMode = ref<VisualExplanationsMode>('after_incorrect');
@@ -743,6 +745,7 @@ const SESSION_VISUAL_EXPLANATIONS_KEY_PREFIX = 'study-session-visual-explanation
 const SESSION_LEARNING_PANEL_SEEN_KEY = 'study-session-learning-panel-seen';
 const SESSION_LEARNING_GUIDE_DISMISSED_KEY = 'study-session-learning-guide-dismissed';
 const SESSION_TOPIC_GUIDE_DISMISSED_KEY = 'study-session-topic-guide-dismissed';
+const PUBLIC_DEMO_GATE_DISMISSED_KEY = 'public-demo-learning-intro-dismissed';
 const INSTANT_FEEDBACK_GLANCE_MS = 90;
 const INSTRUCTOR_HINT_MIN_GLANCE_MS = 4200;
 const INSTRUCTOR_HINT_MAX_GLANCE_MS = 6800;
@@ -1065,7 +1068,9 @@ const isPublicDemoMode = computed(() => Boolean(props.publicDemo?.enabled));
 const usesFrozenPublicDemo = computed(() =>
     Boolean(isPublicDemoMode.value && props.publicDemo?.mode === 'frozen_packet'),
 );
-const isPublicDemoGate = computed(() => Boolean(props.publicDemo?.gate?.enabled));
+const isPublicDemoGate = computed(() =>
+    Boolean(props.publicDemo?.gate?.enabled) && !isPublicDemoGateDismissed.value,
+);
 const pageTitle = computed(() =>
     isPublicDemoGate.value
         ? 'Testy na prawo jazdy 2026 - demo odtwarzacza'
@@ -2986,12 +2991,24 @@ const publicDemoPrimaryUsesRegisterDrawer = computed(() =>
 const publicDemoPrimaryLabel = computed(() => 'Załóż konto i kontynuuj');
 const publicDemoPricingHref = computed(() => props.publicDemo?.routes.pricing ?? '/cennik');
 const publicDemoGateDemoHref = computed(() => props.publicDemo?.routes.demo ?? '/testy-na-prawo-jazdy/demo?fresh=1');
-const publicDemoGatePrimaryLabel = computed(
-    () => props.publicDemo?.gate?.primary_label ?? `Sprawdź ${displayProgress.value.total} pytań próbnych`,
-);
-const publicDemoGateSecondaryLabel = computed(
-    () => props.publicDemo?.gate?.secondary_label ?? 'Zobacz pełny dostęp',
-);
+const rememberPublicDemoGatePreference = () => {
+    if (
+        !skipPublicDemoGateNextTime.value
+        || typeof window === 'undefined'
+    ) {
+        return;
+    }
+
+    window.localStorage.setItem(PUBLIC_DEMO_GATE_DISMISSED_KEY, '1');
+};
+const dismissPublicDemoGate = () => {
+    rememberPublicDemoGatePreference();
+    isPublicDemoGateDismissed.value = true;
+};
+const customizePublicDemoSettings = () => {
+    dismissPublicDemoGate();
+    openSettingsPopover({ markSeen: false });
+};
 const showPublicDemoCompletionPrompt = computed(() =>
     isPublicDemoMode.value
     && localSessionCompleted.value
@@ -6924,6 +6941,14 @@ onMounted(() => {
     syncViewport();
 
     if (typeof window !== 'undefined') {
+        if (
+            props.publicDemo?.gate?.enabled
+            && window.localStorage.getItem(PUBLIC_DEMO_GATE_DISMISSED_KEY) === '1'
+        ) {
+            isPublicDemoGateDismissed.value = true;
+            skipPublicDemoGateNextTime.value = true;
+        }
+
         if (
             sessionState.value.status === 'in_progress'
             && (
@@ -10931,47 +10956,165 @@ watch(
             <Transition name="public-demo-gate">
                 <section
                     v-if="isPublicDemoGate"
-                    class="fixed inset-0 z-[90] flex items-center justify-center overflow-y-auto bg-white/42 px-4 py-6 backdrop-blur-[9px] sm:px-6"
+                    class="fixed inset-0 z-[90] flex items-center justify-center overflow-y-auto bg-[#0f172a]/30 px-3 py-4 backdrop-blur-[5px] sm:px-6 sm:py-6"
                     aria-label="Podgląd modułu testów"
+                    aria-modal="true"
+                    role="dialog"
                 >
                     <div
                         aria-hidden="true"
-                        class="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(255,255,255,0.18),rgba(248,250,252,0.72)_58%,rgba(241,245,249,0.9))]"
+                        class="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(255,255,255,0.08),rgba(15,23,42,0.18)_70%)]"
                     />
                     <div
-                        class="relative max-h-[calc(100svh-3rem)] w-full max-w-[34rem] overflow-y-auto border border-[#dbe3ec] bg-white px-5 py-5 text-center shadow-[0_24px_70px_rgba(15,23,42,0.18)] sm:px-7 sm:py-6"
+                        lang="pl"
+                        class="relative max-h-[calc(100svh-2rem)] w-full max-w-[46rem] overflow-y-auto rounded-xl border border-[#d8e0ea] bg-white px-4 py-4 text-left shadow-[0_24px_70px_rgba(15,23,42,0.22)] sm:max-h-[calc(100svh-3rem)] sm:px-6 sm:py-4"
                     >
-                        <div lang="pl" class="mx-auto mb-5 max-w-[31rem] space-y-3">
-                            <h2 class="text-center text-lg font-semibold leading-7 text-[#111827]">
-                                Tryb zapoznawczy - kilka słów na start
-                            </h2>
-                            <p class="text-pretty text-left text-sm leading-6 text-[#334155] [hyphens:auto] sm:text-[0.95rem]">
-                                W&nbsp;trybie testowym wszystkie pomoce naukowe są włączone.<br>
-                                Chodzi o&nbsp;to, żebyś jak najszybciej zapoznał się z&nbsp;pytaniami i&nbsp;odpowiadał na&nbsp;nie intuicyjnie - bez zastanawiania się.
+                        <button
+                            type="button"
+                            aria-label="Zamknij"
+                            class="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-md text-[#475569] transition hover:bg-[#f1f5f9] hover:text-[#0f172a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b67d1] sm:right-4 sm:top-4"
+                            @click="dismissPublicDemoGate"
+                        >
+                            <X :size="21" :stroke-width="2" aria-hidden="true" />
+                        </button>
+
+                        <header class="pr-11">
+                            <div class="flex items-center gap-3">
+                                <Settings :size="27" :stroke-width="1.9" class="shrink-0 text-[#EFC54F]" aria-hidden="true" />
+                                <h2 class="text-xl font-semibold tracking-[-0.01em] text-[#17233b] sm:text-[1.35rem]">
+                                    Dostosuj naukę do siebie
+                                </h2>
+                            </div>
+                            <p class="mt-1 text-xs leading-5 text-[#536176] sm:text-[0.8rem]">
+                                Ustawienia możesz zmienić w dowolnym momencie podczas nauki.
                             </p>
-                            <p class="text-pretty text-left text-sm leading-6 text-[#334155] [hyphens:auto] sm:text-[0.95rem]">
-                                Masz przed sobą 2000 pytań, więc w&nbsp;pierwszym przebiegu nie musisz analizować każdego z&nbsp;nich. Wystarczy, że się z&nbsp;nim zapoznasz i&nbsp;odpowiesz tak, jak podpowiada ci&nbsp;intuicja.
+                        </header>
+
+                        <section class="mt-2.5 rounded-lg border border-[#d9e2ec] px-4 py-2.5">
+                            <h3 class="text-sm font-semibold text-[#1f2937]">Aktualne ustawienia</h3>
+                            <div class="mt-2 grid gap-x-7 gap-y-2 text-xs sm:grid-cols-2">
+                                <div class="space-y-2 sm:border-r sm:border-[#dbe3ec] sm:pr-6">
+                                    <div class="grid grid-cols-[1.25rem_minmax(6.5rem,1fr)_auto] items-center gap-2">
+                                        <MessageSquareText :size="17" :stroke-width="1.7" class="text-[#334155]" aria-hidden="true" />
+                                        <span class="text-[#536176]">Po odpowiedzi:</span>
+                                        <strong class="font-semibold text-[#17233b]">{{ classicFeedbackModeLabel }}</strong>
+                                    </div>
+                                    <div class="grid grid-cols-[1.25rem_minmax(6.5rem,1fr)_auto] items-center gap-2">
+                                        <ArrowRight :size="17" :stroke-width="1.7" class="text-[#334155]" aria-hidden="true" />
+                                        <span class="text-[#536176]">Przejście dalej:</span>
+                                        <strong class="font-semibold text-[#17233b]">{{ classicAdvanceModeLabel }}</strong>
+                                    </div>
+                                    <div class="grid grid-cols-[1.25rem_minmax(6.5rem,1fr)_auto] items-center gap-2">
+                                        <Gauge :size="17" :stroke-width="1.7" class="text-[#334155]" aria-hidden="true" />
+                                        <span class="text-[#536176]">Prędkość odtwarzania:</span>
+                                        <strong class="font-semibold text-[#17233b]">{{ classicMediaModeLabel }}</strong>
+                                    </div>
+                                </div>
+                                <div class="space-y-2 sm:pl-1">
+                                    <div class="grid grid-cols-[1.25rem_minmax(5.5rem,1fr)_auto] items-center gap-2">
+                                        <Volume2 :size="17" :stroke-width="1.7" class="text-[#334155]" aria-hidden="true" />
+                                        <span class="text-[#536176]">Audio pytania:</span>
+                                        <strong class="font-semibold text-[#17233b]">{{ classicQuestionAudioModeLabel }}</strong>
+                                    </div>
+                                    <div class="grid grid-cols-[1.25rem_minmax(5.5rem,1fr)_auto] items-center gap-2">
+                                        <Lightbulb :size="17" :stroke-width="1.7" class="text-[#334155]" aria-hidden="true" />
+                                        <span class="text-[#536176]">Wskazówki:</span>
+                                        <strong class="font-semibold text-[#17233b]">{{ classicInlineFormattingLabel }}</strong>
+                                    </div>
+                                    <div class="grid grid-cols-[1.25rem_minmax(5.5rem,1fr)_auto] items-center gap-2">
+                                        <ArrowUpRight :size="17" :stroke-width="1.7" class="text-[#334155]" aria-hidden="true" />
+                                        <span class="text-[#536176]">Strzałki pomocnicze:</span>
+                                        <strong class="font-semibold text-[#17233b]">{{ classicAnnotationsLabel }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="mt-2 grid gap-2 sm:grid-cols-2">
+                            <article class="flex gap-3 rounded-lg border border-[#d9e2ec] px-3 py-2.5">
+                                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#fff8e7] text-[#17233b]">
+                                    <MessageSquareText :size="22" :stroke-width="1.7" aria-hidden="true" />
+                                </span>
+                                <div>
+                                    <h3 class="text-sm font-semibold text-[#17233b]">Po odpowiedzi</h3>
+                                    <p class="mt-1 text-[0.7rem] leading-[1.35] text-[#445269]">Wybierz, co ma się dziać po udzieleniu odpowiedzi. Szybko, z wyjaśnieniem albo wynik na końcu.</p>
+                                </div>
+                            </article>
+                            <article class="flex gap-3 rounded-lg border border-[#d9e2ec] px-3 py-2.5">
+                                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#f3f6fa] text-[#17233b]">
+                                    <Volume2 :size="22" :stroke-width="1.7" aria-hidden="true" />
+                                </span>
+                                <div>
+                                    <h3 class="text-sm font-semibold text-[#17233b]">Audio pytania</h3>
+                                    <p class="mt-1 text-[0.7rem] leading-[1.35] text-[#445269]">Czytaj pytania sam albo słuchaj lektora. Czytanie własne = szybciej, lektor = gdy jesteś zmęczony lub pytania są długie.</p>
+                                </div>
+                            </article>
+                            <article class="flex gap-3 rounded-lg border border-[#d9e2ec] px-3 py-2.5">
+                                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#fff8e7] text-[#17233b]">
+                                    <Lightbulb :size="22" :stroke-width="1.7" aria-hidden="true" />
+                                </span>
+                                <div>
+                                    <h3 class="text-sm font-semibold text-[#17233b]">Wskazówki w pytaniu</h3>
+                                    <p class="mt-1 text-[0.7rem] leading-[1.35] text-[#445269]">Pogrubienia, kolory i strzałki pomagają zwrócić uwagę na to, co ważne.</p>
+                                </div>
+                            </article>
+                            <article class="flex gap-3 rounded-lg border border-[#d9e2ec] px-3 py-2.5">
+                                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#f3f6fa] text-[#17233b]">
+                                    <SquarePlay :size="22" :stroke-width="1.7" aria-hidden="true" />
+                                </span>
+                                <div>
+                                    <h3 class="text-sm font-semibold text-[#17233b]">Filmy w pytaniach</h3>
+                                    <p class="mt-1 text-[0.7rem] leading-[1.35] text-[#445269]">Zdecyduj, czy filmy mają ruszać automatycznie i jak szybko je odtwarzać. Możesz też od razu oglądać końcówkę filmu (ostatnie 2 s).</p>
+                                </div>
+                            </article>
+                        </section>
+
+                        <section class="mt-2 rounded-lg border border-[#d9e2ec] px-4 py-2.5">
+                            <div class="flex items-center gap-2">
+                                <Keyboard :size="19" :stroke-width="1.7" class="text-[#17233b]" aria-hidden="true" />
+                                <h3 class="text-sm font-semibold text-[#17233b]">Skróty klawiaturowe</h3>
+                            </div>
+                            <div class="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[0.7rem] text-[#445269]">
+                                <span class="inline-flex items-center gap-1.5"><kbd class="rounded border border-[#cbd5e1] bg-white px-2 py-1 font-semibold text-[#17233b]">A lub ←</kbd><span>— zaznacz odpowiedź TAK</span></span>
+                                <span class="inline-flex items-center gap-1.5"><kbd class="rounded border border-[#cbd5e1] bg-white px-2 py-1 font-semibold text-[#17233b]">D lub →</kbd><span>— zaznacz odpowiedź NIE</span></span>
+                                <span class="inline-flex items-center gap-1.5"><kbd class="rounded border border-[#cbd5e1] bg-white px-2 py-1 font-semibold text-[#17233b]">S lub ↓</kbd><span>— pokaż wyjaśnienie</span></span>
+                            </div>
+                            <p class="mt-1.5 text-[0.7rem] leading-4 text-[#536176]">Skróty przyspieszają naukę i pozwalają przechodzić przez sesję bez używania myszy.</p>
+                        </section>
+
+                        <aside class="mt-2 flex gap-2.5 rounded-lg border border-[#d9e2ec] px-4 py-2 text-[0.7rem] leading-[0.95rem] text-[#445269]">
+                            <Info :size="17" :stroke-width="1.8" class="mt-0.5 shrink-0 text-[#334155]" aria-hidden="true" />
+                            <p>
+                                Pamiętaj, że czytając pytania sam, czytasz je szybciej i jesteś w stanie przerobić większą ilość pytań podczas sesji.<br>
+                                Tryb lektora sprawdza się super, kiedy jesteś zmęczony albo na pytaniach specjalistycznych, kiedy są bardzo długie.
                             </p>
-                            <p class="text-pretty text-left text-sm leading-6 text-[#334155] [hyphens:auto] sm:text-[0.95rem]">
-                                Dopiero od kolejnej sesji - kiedy wiesz już, czego się spodziewać, skup się na odpowiadaniu poprawnie i&nbsp;zgodnie z&nbsp;wymogami egzaminu państwowego.
-                            </p>
-                            <p class="text-pretty text-center text-sm font-semibold leading-6 text-[#111827] [hyphens:auto] sm:text-[0.95rem]">
-                                Cel pierwszego przejścia: szybko, sprawnie, intuicyjnie.
-                            </p>
-                        </div>
-                        <div class="grid gap-3 sm:grid-cols-2">
-                            <Link
-                                :href="publicDemoGateDemoHref"
-                                class="inline-flex min-h-[3.25rem] items-center justify-center rounded-none border border-[#0646a8] bg-[#0646a8] px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_34px_rgba(6,70,168,0.24)] transition hover:border-[#053b8d] hover:bg-[#053b8d] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0646a8] focus-visible:ring-offset-2"
-                            >
-                                {{ publicDemoGatePrimaryLabel }}
-                            </Link>
-                            <a
-                                :href="publicDemoPricingHref"
-                                class="inline-flex min-h-[3.25rem] items-center justify-center rounded-none border border-[#cbd5e1] bg-white/88 px-5 py-3 text-sm font-semibold text-[#111827] transition hover:border-[#94a3b8] hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0646a8] focus-visible:ring-offset-2"
-                            >
-                                {{ publicDemoGateSecondaryLabel }}
-                            </a>
+                        </aside>
+
+                        <div class="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <label class="inline-flex cursor-pointer items-center gap-2 text-xs text-[#445269]">
+                                <input
+                                    v-model="skipPublicDemoGateNextTime"
+                                    type="checkbox"
+                                    class="h-4 w-4 rounded border-[#cbd5e1] text-[#0b67d1] focus:ring-[#0b67d1]"
+                                >
+                                <span>Nie pokazuj tego okna ponownie</span>
+                            </label>
+                            <div class="grid gap-2 sm:grid-cols-2">
+                                <button
+                                    type="button"
+                                    class="inline-flex min-h-[2.75rem] items-center justify-center rounded-md border border-[#cbd5e1] bg-white px-5 py-2.5 text-xs font-semibold text-[#17233b] transition hover:border-[#94a3b8] hover:bg-[#f8fafc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b67d1] focus-visible:ring-offset-2"
+                                    @click="customizePublicDemoSettings"
+                                >
+                                    Dostosuj ustawienia
+                                </button>
+                                <Link
+                                    :href="publicDemoGateDemoHref"
+                                    class="inline-flex min-h-[2.75rem] items-center justify-center rounded-md border border-[#EFC54F] bg-[#EFC54F] px-5 py-2.5 text-xs font-semibold text-[#17233b] transition hover:border-[#ddb43f] hover:bg-[#ddb43f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EFC54F] focus-visible:ring-offset-2"
+                                    @click="rememberPublicDemoGatePreference"
+                                >
+                                    Rozpocznij naukę
+                                </Link>
+                            </div>
                         </div>
                     </div>
                 </section>

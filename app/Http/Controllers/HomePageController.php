@@ -14,7 +14,7 @@ class HomePageController extends Controller
         $updatedAt = now('Europe/Warsaw')->locale('pl');
         $updatedLabel = $updatedAt->translatedFormat('j F Y');
         $canonical = route('home');
-        $heroImage = Vite::asset('resources/images/home/home-hero-laptop.png');
+        $heroImage = Vite::asset('resources/images/home/hero-composite-v3.webp');
         $logoImage = asset('images/orly-na-drodze-logo-tight.png');
         $featuredCategoryCodes = ['B', 'A', 'C', 'D'];
         $featuredCategories = $questionCatalog
@@ -35,6 +35,40 @@ class HomePageController extends Controller
                 ];
             })
             ->values();
+        $featuredCategoriesByCode = $featuredCategories
+            ->keyBy(fn (array $category): string => Str::upper((string) $category['code']));
+        $questionSearchUrl = static fn (string $query): string => route(
+            'public.questions.search',
+            ['q' => $query],
+            absolute: false,
+        );
+        $learningAreas = collect([
+            $featuredCategoriesByCode->has('B') ? [
+                'label' => 'Kategoria B',
+                'url' => $featuredCategoriesByCode->get('B')['url'],
+            ] : null,
+            $featuredCategoriesByCode->has('C') ? [
+                'label' => 'Kategoria C',
+                'url' => $featuredCategoriesByCode->get('C')['url'],
+            ] : null,
+            [
+                'label' => 'Znaki drogowe',
+                'url' => route('traffic-signs.index', absolute: false),
+            ],
+            ['label' => 'Pierwsza pomoc', 'url' => $questionSearchUrl('pierwsza pomoc')],
+            ['label' => 'Skrzyżowania', 'url' => $questionSearchUrl('skrzyżowania')],
+            ['label' => 'Prędkości i ograniczenia', 'url' => $questionSearchUrl('prędkość ograniczenia')],
+            ['label' => 'Czas pracy kierowcy', 'url' => $questionSearchUrl('czas pracy kierowcy')],
+            ['label' => 'Kwalifikacja zawodowa', 'url' => $questionSearchUrl('kwalifikacja zawodowa')],
+            [
+                'label' => 'Egzamin próbny',
+                'url' => route('public.tests', absolute: false),
+            ],
+            [
+                'label' => 'Błędne pytania',
+                'url' => route('incorrect-questions.index', absolute: false),
+            ],
+        ])->filter()->values();
 
         $title = 'Testy na prawo jazdy 2026 - oficjalna baza pytań i skuteczna nauka teorii';
         $description = 'Ucz się do egzaminu na prawo jazdy na oficjalnej bazie pytań. Korzystaj z trybów nauki, wyjaśnień, znaków drogowych i materiałów przygotowanych pod szybkie zdanie teorii.';
@@ -76,6 +110,7 @@ class HomePageController extends Controller
                 ],
             ],
             'featuredCategories' => $featuredCategories,
+            'learningAreas' => $learningAreas,
         ]);
     }
 }

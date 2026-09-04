@@ -22,8 +22,8 @@
 
             <nav class="site-footer__compact-nav" aria-label="Stopka">
                 <a href="{{ route('about.organization', absolute: false) }}">O nas</a>
-                <a href="{{ route('public.regulations', absolute: false) }}">Regulamin</a>
-                <a href="{{ route('about.methodology', absolute: false) }}">Polityka prywatności</a>
+                <a href="{{ route('legal.terms', absolute: false) }}">Regulamin</a>
+                <a href="{{ route('legal.privacy', absolute: false) }}">Polityka prywatności</a>
                 <a href="{{ route('about.contact', absolute: false) }}">Kontakt</a>
             </nav>
 

@@ -244,6 +244,8 @@ test('robots and sitemaps expose crawlable seo infrastructure', function () {
 
     $this->get(route('sitemap.static'))
         ->assertOk()
+        ->assertSee('<loc>'.route('legal.terms').'</loc>', false)
+        ->assertSee('<loc>'.route('legal.privacy').'</loc>', false)
         ->assertSee('<loc>'.route('about.organization').'</loc>', false)
         ->assertSee('<loc>'.route('about.methodology').'</loc>', false)
         ->assertSee('<loc>'.route('about.contact').'</loc>', false);

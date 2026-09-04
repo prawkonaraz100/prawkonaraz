@@ -124,6 +124,8 @@ class SeoSitemapBuilder
             ['loc' => route('home'), 'lastmod' => null, 'images' => []],
             ['loc' => route('public.tests'), 'lastmod' => null, 'images' => []],
             ['loc' => route('public.pricing'), 'lastmod' => null, 'images' => []],
+            ['loc' => route('legal.terms'), 'lastmod' => null, 'images' => []],
+            ['loc' => route('legal.privacy'), 'lastmod' => null, 'images' => []],
             ['loc' => route('public.hardest-questions.index'), 'lastmod' => $this->publicQuestionCatalogService->latestQuestionLastModified(), 'images' => []],
             ['loc' => route('traffic-signs.index'), 'lastmod' => $this->maxLastModified($this->publishedSignsQuery()->max('updated_at')), 'images' => []],
             ['loc' => route('public.regulations'), 'lastmod' => $this->legalContentCatalogService->latestPublishedPageLastModified(), 'images' => []],

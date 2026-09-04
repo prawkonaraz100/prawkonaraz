@@ -308,6 +308,14 @@ onUnmounted(() => {
                             {{ csrfError }}
                         </div>
 
+                        <p
+                            v-if="socialProviders.some((provider) => provider.key === 'google')"
+                            class="auth-dialog__legal-consent mt-5"
+                        >
+                            <span>Kontynuując z Google, akceptujesz <a :href="route('legal.terms')">Regulamin</a> i potwierdzasz</span>
+                            <span>zapoznanie się z <a :href="route('legal.privacy')">Polityką prywatności</a>.</span>
+                        </p>
+
                         <div
                             v-if="isGoogleIdentityRegistration && googleIdentityRegistration"
                             class="flex items-center gap-3 rounded-[6px] border border-[#d8dee8] bg-[#f8fafc] px-3 py-3"
