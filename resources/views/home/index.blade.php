@@ -1,8 +1,7 @@
 @extends('layouts.public-content')
 
 @php
-    $heroPortrait = \Illuminate\Support\Facades\Vite::asset('resources/images/home/hero-driver-cutout-v4.webp');
-    $heroProduct = \Illuminate\Support\Facades\Vite::asset('resources/images/home/hero-desktop.png');
+    $heroScene = \Illuminate\Support\Facades\Vite::asset('resources/images/home/hero-composite-v3.webp');
     $mobileAppScreen = \Illuminate\Support\Facades\Vite::asset('resources/images/home/hero-mobile.png');
     $proofDashboard = \Illuminate\Support\Facades\Vite::asset('resources/images/home/proof/dashboard.webp');
     $proofExplanation = \Illuminate\Support\Facades\Vite::asset('resources/images/home/proof/explanation.webp');
@@ -13,6 +12,10 @@
     $proofRanking = \Illuminate\Support\Facades\Vite::asset('resources/images/home/proof/ranking.webp');
     $proofTrafficSigns = \Illuminate\Support\Facades\Vite::asset('resources/images/home/proof/traffic-signs.webp');
 @endphp
+
+@section('site_header')
+    <x-site.home-header />
+@endsection
 
 @section('content')
     @include('home.partials.desktop-story')

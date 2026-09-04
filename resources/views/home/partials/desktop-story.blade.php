@@ -1,72 +1,150 @@
 <div class="home-ops">
-    <section class="home-ops__hero" aria-labelledby="home-ops-title">
-        <div class="home-ops__shell home-ops__hero-grid" data-home-reveal>
-            <div class="home-ops__hero-title">
-                <span class="home-ops__rule" aria-hidden="true"></span>
-                <p class="home-ops__hero-kicker">Oficjalna baza {{ now()->year }}</p>
-                <h1 id="home-ops-title">
-                    Testy na<br>
-                    prawo jazdy<em>.</em>
+    @php
+        $googleLoginAvailable = filled(config('services.google.client_id'))
+            && filled(config('services.google.client_secret'));
+    @endphp
+
+    <section class="home-entry" aria-labelledby="home-entry-title">
+        <div class="home-entry__shell home-entry__grid">
+            <div class="home-entry__copy" data-home-reveal>
+                <h1 id="home-entry-title">
+                    Ucz się szybko<br>
+                    i zdaj <span>prawko na raz!</span>
                 </h1>
-                <p class="home-ops__hero-title-note">Teoria bez zgadywania.</p>
+                <p class="home-entry__lead">
+                    Oficjalna baza pytań na prawo jazdy 2026, proste i skuteczne wyjaśnienia
+                    do egzaminu na prawo jazdy!
+                </p>
+
+                @guest
+                    <div class="home-entry__auth" aria-label="Szybkie logowanie">
+                        <a href="{{ route('public.tests', absolute: false) }}" class="home-entry__auth-button home-entry__auth-button--primary">
+                            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                                <path d="M8 5.5h8M9 3h6a1 1 0 0 1 1 1v2H8V4a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                                <path d="M7 5.5H5.5A1.5 1.5 0 0 0 4 7v12a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 20 19V7a1.5 1.5 0 0 0-1.5-1.5H17" stroke="currentColor" stroke-width="1.8"/>
+                                <path d="m8 13 2.2 2.2L16.5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Rozpocznij test</span>
+                        </a>
+                        <a
+                            href="{{ $googleLoginAvailable ? route('social.redirect', ['provider' => 'google'], absolute: false) : route('login', absolute: false) }}"
+                            class="home-entry__auth-button"
+                        >
+                            <svg aria-hidden="true" viewBox="0 0 48 48">
+                                <path fill="#EA4335" d="M24 9.5c3.2 0 6.1 1.1 8.4 3.2l6.3-6.3C34.8 2.8 29.7.8 24 .8 14.8.8 6.9 6 3 13.6l7.3 5.7C12.1 13.6 17.5 9.5 24 9.5Z"/>
+                                <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.5 2.8-2.2 5.2-4.7 6.8l7.2 5.6c4.2-3.9 7.3-9.6 7.3-16.4Z"/>
+                                <path fill="#FBBC05" d="M10.3 28.7A14.6 14.6 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7L3 13.6A23.1 23.1 0 0 0 .5 24c0 3.7.9 7.3 2.5 10.4l7.3-5.7Z"/>
+                                <path fill="#34A853" d="M24 47.2c5.7 0 10.6-1.9 14.1-5.1l-6.1-6.8c-1.7 1.1-4 1.9-8 1.9-6.5 0-11.9-4.1-13.7-9.8L3 33.1c3.9 7.8 11.8 14.1 21 14.1Z"/>
+                            </svg>
+                            <span>Kontynuuj z Google</span>
+                        </a>
+                        <a href="{{ route('login', absolute: false) }}" class="home-entry__auth-button">
+                            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                                <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/>
+                                <path d="m4.5 7 7.5 6 7.5-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Zaloguj się e-mailem</span>
+                        </a>
+                    </div>
+                    <p class="home-entry__register">Nie masz konta? <a href="{{ route('register', absolute: false) }}">Załóż konto</a></p>
+                    <p class="home-entry__legal">
+                        <span>Kontynuując, akceptujesz <a href="{{ route('legal.terms', absolute: false) }}">Regulamin</a> i potwierdzasz</span>
+                        <span>zapoznanie się z <a href="{{ route('legal.privacy', absolute: false) }}">Polityką prywatności</a>.</span>
+                    </p>
+                @else
+                    <div class="home-entry__member-actions">
+                        <a href="{{ route('session.index', absolute: false) }}" class="home-entry__member-primary">Kontynuuj naukę</a>
+                        <a href="{{ route('public.tests', absolute: false) }}" class="home-entry__member-secondary">Uruchom egzamin próbny</a>
+                    </div>
+                @endguest
             </div>
 
-            <figure class="home-ops__hero-person">
-                <span class="home-ops__hero-person-backdrop" aria-hidden="true"></span>
-                <img src="{{ $heroPortrait }}" alt="Kierująca samochodem z kluczykami po zdanym egzaminie">
+            <figure class="home-entry__visual home-entry__visual--composite" data-home-reveal>
+                <img
+                    src="{{ $heroScene }}"
+                    alt="Nauka do egzaminu na laptopie, znak nauki jazdy i podręczniki"
+                    class="home-entry__hero-art"
+                    width="1000"
+                    height="750"
+                    loading="eager"
+                    fetchpriority="high"
+                    decoding="async"
+                >
+                <figcaption class="sr-only">Oficjalne pytania egzaminacyjne dostępne na komputerze.</figcaption>
             </figure>
-
-            <div class="home-ops__hero-copy">
-                <span class="home-ops__rule" aria-hidden="true"></span>
-                <p class="home-ops__hero-promise">
-                    Nie klikaj w ciemno.<br>
-                    <strong>Zrozum, dlaczego.</strong>
-                </p>
-                <p class="home-ops__hero-description">
-                    PrawkoNaRaz pokazuje najważniejszy detal, tłumaczy każdą odpowiedź i prowadzi Cię przez oficjalne pytania aż do pozytywnego wyniku egzaminacyjnego.
-                </p>
-                <p class="home-ops__hero-source"><span aria-hidden="true">✓</span> Pytania z państwowej bazy</p>
-                <p class="home-ops__hero-source"><span aria-hidden="true">✓</span> Inteligentna platforma, która prowadzi Cię krok po kroku</p>
-            </div>
         </div>
 
-        <div class="home-ops__signal-band" aria-hidden="true">
-            <div class="home-ops__signal-panel home-ops__signal-panel--left">
-                <span class="home-ops__road-mark"></span>
-                <span class="home-ops__sign-unit">
-                    <span class="home-ops__sign-ring"></span>
-                    <span class="home-ops__sign-post"></span>
-                    <img src="{{ asset('traffic-signs/sign-cutouts/c-12-ruch-okrezny.png') }}" alt="">
-                </span>
-            </div>
-            <div class="home-ops__signal-core"></div>
-            <div class="home-ops__signal-panel home-ops__signal-panel--right">
-                <span class="home-ops__road-mark"></span>
-                <span class="home-ops__sign-unit">
-                    <span class="home-ops__sign-ring"></span>
-                    <span class="home-ops__sign-post"></span>
-                    <img src="{{ asset('traffic-signs/sign-cutouts/b-33-ograniczenie-predkosci.png') }}" alt="">
-                </span>
-            </div>
-        </div>
+        <div class="home-entry__shell">
+            <section class="home-showcase" aria-labelledby="home-showcase-title" data-home-reveal>
+                <h2 id="home-showcase-title" class="sr-only">Najważniejsze możliwości PrawkoNaRaz</h2>
 
-        <div class="home-ops__shell home-ops__product-wrap">
-            <a href="{{ route('public.tests', absolute: false) }}" class="home-ops__primary-cta">
-                Rozpocznij Speedrun
-                <span aria-hidden="true">→</span>
-            </a>
-            <div class="home-ops__product-frame">
-                <picture>
-                    <source media="(max-width: 767px)" srcset="{{ $mobileAppScreen }}">
-                    <img
-                        src="{{ $heroProduct }}"
-                        alt="Widok platformy podczas rozwiązywania pytania egzaminacyjnego"
-                        loading="eager"
-                        fetchpriority="high"
-                        decoding="async"
-                    >
-                </picture>
-            </div>
+                <div class="home-showcase__track" role="list">
+                    <article class="home-showcase__card home-showcase__card--blue" role="listitem">
+                        <div class="home-showcase__copy">
+                            <h3>Cała nauka<br>w jednym miejscu</h3>
+                            <p>Pytania · wyjaśnienia · postęp</p>
+                        </div>
+                        <div class="home-showcase__phone home-showcase__phone--upright">
+                            <span aria-hidden="true"></span>
+                            <img src="{{ $mobileAppScreen }}" alt="Pytanie egzaminacyjne w aplikacji PrawkoNaRaz" loading="lazy" decoding="async">
+                        </div>
+                    </article>
+
+                    <article class="home-showcase__card home-showcase__card--violet" role="listitem">
+                        <div class="home-showcase__copy">
+                            <h3>Oficjalne pytania.<br>Zawsze pod ręką.</h3>
+                            <p>Uczysz się z aktualnej bazy.</p>
+                        </div>
+                        <div class="home-showcase__browser home-showcase__browser--receipt">
+                            <i aria-hidden="true"></i>
+                            <img src="{{ $proofDashboard }}" alt="Panel nauki z oficjalną bazą pytań" loading="lazy" decoding="async">
+                        </div>
+                    </article>
+
+                    <article class="home-showcase__card home-showcase__card--focus" role="listitem">
+                        <div class="home-showcase__badge">Egzamin próbny</div>
+                        <div class="home-showcase__phone home-showcase__phone--focus">
+                            <span aria-hidden="true"></span>
+                            <img src="{{ $mobileAppScreen }}" alt="Mobilny egzamin próbny PrawkoNaRaz" loading="lazy" decoding="async">
+                        </div>
+                    </article>
+
+                    <article class="home-showcase__card home-showcase__card--light" role="listitem">
+                        <div class="home-showcase__copy">
+                            <h3>Uczysz się mądrzej,<br>nie dłużej.</h3>
+                            <p>Plan powtórek dopasowany do Ciebie.</p>
+                        </div>
+                        <div class="home-showcase__browser home-showcase__browser--memory">
+                            <i aria-hidden="true"></i>
+                            <img src="{{ $proofMemoryTrainer }}" alt="Trener pamięci z planem dziennym" loading="lazy" decoding="async">
+                        </div>
+                    </article>
+
+                    <article class="home-showcase__card home-showcase__card--deep" role="listitem">
+                        <div class="home-showcase__copy">
+                            <h3>Każdy błąd<br>zamieniasz w postęp.</h3>
+                            <p>Wracasz dokładnie do tego, co sprawia trudność.</p>
+                        </div>
+                        <div class="home-showcase__browser home-showcase__browser--mistakes">
+                            <i aria-hidden="true"></i>
+                            <img src="{{ $proofIncorrectQuestions }}" alt="Lista pytań wymagających powtórki" loading="lazy" decoding="async">
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <section class="home-entry__areas" aria-labelledby="home-entry-areas-title" data-home-reveal>
+                <div class="home-entry__areas-copy">
+                    <h2 id="home-entry-areas-title">Przeglądaj najważniejsze<br>obszary nauki</h2>
+                    <p>Wybierz temat, ucz się krok po kroku<br>i przygotuj się do egzaminu w uporządkowany sposób.</p>
+                </div>
+                <div class="home-entry__area-links">
+                    @foreach ($learningAreas as $area)
+                        <a href="{{ $area['url'] }}">{{ $area['label'] }}</a>
+                    @endforeach
+                    <a href="{{ route('public.questions.hub', absolute: false) }}" class="home-entry__area-links-more">Pokaż wszystko</a>
+                </div>
+            </section>
         </div>
     </section>
 

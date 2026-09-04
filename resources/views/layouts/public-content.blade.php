@@ -172,7 +172,11 @@
         @endforeach
     </head>
     <body class="min-h-screen bg-white text-slate-950">
-        <x-site.public-header />
+        @hasSection('site_header')
+            @yield('site_header')
+        @else
+            <x-site.public-header />
+        @endif
 
         <main>
             @if ($breadcrumbs !== [])

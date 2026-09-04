@@ -297,6 +297,13 @@
                     <div class="h-px flex-1 bg-[#e2e7ee]"></div>
                 </div>
 
+                @if (in_array('google', $enabledSocialProviders, true))
+                <p class="auth-dialog__legal-consent mt-5">
+                    <span>Kontynuując z Google, akceptujesz <a href="{{ route('legal.terms', absolute: false) }}">Regulamin</a> i potwierdzasz</span>
+                    <span>zapoznanie się z <a href="{{ route('legal.privacy', absolute: false) }}">Polityką prywatności</a>.</span>
+                </p>
+                @endif
+
                 <div class="auth-register-social-grid mt-5 grid gap-3 {{ count($enabledSocialProviders) > 1 ? 'sm:grid-cols-2' : '' }}">
                     @if (in_array('google', $enabledSocialProviders, true))
                     <button

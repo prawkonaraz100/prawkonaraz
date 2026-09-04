@@ -11,6 +11,8 @@ return [
             'public.tests.demo.complete',
             'public.tests.demo.restart',
             'public.pricing',
+            'legal.terms',
+            'legal.privacy',
             'login',
             'logout',
             'register',

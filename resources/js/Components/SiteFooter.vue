@@ -41,8 +41,8 @@ const footer = computed(() => page.props.footer);
 
                 <nav class="site-footer__compact-nav" aria-label="Stopka">
                     <a href="/o-nas">O nas</a>
-                    <a href="/przepisy">Regulamin</a>
-                    <a href="/metodologia">Polityka prywatności</a>
+                    <a href="/regulamin">Regulamin</a>
+                    <a href="/polityka-prywatnosci">Polityka prywatności</a>
                     <a href="/kontakt">Kontakt</a>
                 </nav>
 

@@ -58,6 +58,7 @@ use App\Http\Controllers\QuestionCollectionLearningController;
 use App\Http\Controllers\RankedSessionPageController;
 use App\Http\Controllers\ReviewQueueController;
 use App\Http\Controllers\RobotsController;
+use App\Http\Controllers\ServiceLegalDocumentController;
 use App\Http\Controllers\SessionPageController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SitemapQuestionsController;
@@ -206,6 +207,10 @@ Route::get('/statystyki', fn () => Inertia::render('Public/MarketingPlaceholder'
 ]))->name('public.statistics');
 Route::get('/cennik', PricingPageController::class)
     ->name('public.pricing');
+Route::get('/regulamin', [ServiceLegalDocumentController::class, 'terms'])
+    ->name('legal.terms');
+Route::get('/polityka-prywatnosci', [ServiceLegalDocumentController::class, 'privacy'])
+    ->name('legal.privacy');
 
 Route::get('/najtrudniejsze-pytania', fn () => to_route('public.hardest-questions.index'));
 Route::get('/najtrudniejsze-pytania-na-prawo-jazdy', [PublicQuestionDifficultyController::class, 'index'])

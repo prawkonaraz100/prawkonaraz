@@ -317,6 +317,10 @@ onUnmounted(() => {
 
                     <div v-if="socialProviders.length > 0" class="auth-login-drawer-social auth-dialog__social">
                         <div class="auth-login-drawer-social-grid grid gap-3">
+                            <p v-if="googleProvider" class="auth-dialog__legal-consent">
+                                <span>Kontynuując z Google, akceptujesz <a :href="route('legal.terms')">Regulamin</a> i potwierdzasz</span>
+                                <span>zapoznanie się z <a :href="route('legal.privacy')">Polityką prywatności</a>.</span>
+                            </p>
                             <a
                                 v-if="googleProvider"
                                 :href="route('social.redirect', { provider: 'google' })"
