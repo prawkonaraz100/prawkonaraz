@@ -69,24 +69,6 @@ export const createPublicAuthDrawers = (root: HTMLElement) => {
     let previousBodyOverflow = '';
     let googleInitializationPromise: Promise<void> | null = null;
     let googleSubmitting = false;
-    const oneTapHost = root.querySelector<HTMLElement>('[data-google-one-tap-host]');
-
-    const setOneTapVisible = (visible: boolean) => {
-        if (!oneTapHost) {
-            return;
-        }
-
-        oneTapHost.classList.toggle('is-visible', visible);
-        oneTapHost.setAttribute('aria-hidden', String(!visible));
-    };
-
-    const closeOneTap = () => {
-        window.google?.accounts?.id.cancel();
-        setOneTapVisible(false);
-    };
-
-    root.querySelector<HTMLButtonElement>('[data-google-one-tap-close]')
-        ?.addEventListener('click', closeOneTap);
 
     const getDrawer = (name: AuthDrawerName) =>
         root.querySelector<HTMLElement>(drawerSelector(name));
@@ -236,7 +218,6 @@ export const createPublicAuthDrawers = (root: HTMLElement) => {
 
         googleSubmitting = true;
         setGoogleError(null);
-        setOneTapVisible(false);
 
         try {
             const session = await refreshCsrfSession();
@@ -346,12 +327,7 @@ export const createPublicAuthDrawers = (root: HTMLElement) => {
         }
 
         await ensureGoogleInitialized(config);
-        setOneTapVisible(true);
-        const fallbackButton = root.querySelector<HTMLElement>('[data-google-one-tap-button]');
-
-        if (fallbackButton) {
-            renderGoogleButton(fallbackButton, 'filled_black');
-        }
+        window.google?.accounts?.id.prompt();
     };
 
     const setupGoogleButton = async (drawer: HTMLElement) => {
@@ -663,7 +639,7 @@ export const createPublicAuthDrawers = (root: HTMLElement) => {
     };
 
     async function open(name: AuthDrawerName) {
-        closeOneTap();
+        window.google?.accounts?.id.cancel();
         requestedDrawer = name;
         const drawer = await ensureDrawer(name);
 
