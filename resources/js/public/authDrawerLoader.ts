@@ -5,12 +5,6 @@ interface PublicAuthDrawersController {
     setupOneTap: () => Promise<void>;
 }
 
-const returningUserCookieName = 'prawkonaraz_returning_user';
-
-const hasReturningUserMarker = () => document.cookie
-    .split(';')
-    .some((cookie) => cookie.trim().startsWith(`${returningUserCookieName}=`));
-
 const drawerNameFromUrl = (url: URL): AuthDrawerName | null => {
     if (url.origin !== window.location.origin) {
         return null;
@@ -110,7 +104,6 @@ export const setupPublicAuthDrawerLoader = () => {
     if (
         window.location.pathname === '/'
         && root.dataset.googleOneTapEnabled === 'true'
-        && hasReturningUserMarker()
     ) {
         void getController()
             .then((controller) => controller.setupOneTap())

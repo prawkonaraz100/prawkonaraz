@@ -1,5 +1,8 @@
 .git
 .github
+.env
+.env.*
+!.env.example
 bootstrap/cache
 database
 node_modules

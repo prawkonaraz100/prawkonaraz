@@ -11,6 +11,36 @@ services:
     env_file:
       - .env
 
+  test:
+    profiles:
+      - test
+    image: serwistestyprawojazdy_f-test:latest
+    build:
+      context: docker/php
+      dockerfile: Dockerfile.test
+      args:
+        BASE_IMAGE: serwistestyprawojazdy_f-app:latest
+    working_dir: /var/www/html
+    env_file:
+      - .env
+    environment:
+      APP_ENV: testing
+      APP_DEBUG: "true"
+    command: php artisan test
+    volumes:
+      - ./app:/var/www/html/app:ro
+      - ./bootstrap/app.php:/var/www/html/bootstrap/app.php:ro
+      - ./bootstrap/providers.php:/var/www/html/bootstrap/providers.php:ro
+      - ./config:/var/www/html/config:ro
+      - ./database:/var/www/html/database
+      - ./lang:/var/www/html/lang:ro
+      - ./public:/var/www/html/public:ro
+      - ./resources:/var/www/html/resources:ro
+      - ./routes:/var/www/html/routes:ro
+      - ./tests:/var/www/html/tests:ro
+      - ./artisan:/var/www/html/artisan:ro
+      - ./phpunit.xml:/var/www/html/phpunit.xml:ro
+
   vite:
     profiles:
       - frontend-dev
