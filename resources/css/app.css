@@ -5810,6 +5810,110 @@ html:has([data-register-drawer-open='true']) {
     text-underline-offset: 0.14rem;
 }
 
+.google-one-tap-host {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 2147483646;
+    display: none;
+    width: min(391px, calc(100vw - 2rem));
+    filter: drop-shadow(0 14px 32px rgb(15 23 42 / 0.16));
+}
+
+.google-one-tap-host.is-visible {
+    display: block;
+}
+
+.google-one-tap-consent {
+    position: relative;
+    padding: 1rem 2.75rem 1rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-bottom: 0;
+    border-radius: 10px 10px 0 0;
+    background: #f4f6f8;
+    color: #1f2937;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.google-one-tap-consent h2 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.google-one-tap-consent p {
+    margin: 0.3rem 0 0;
+    font-size: 0.82rem;
+    font-weight: 400;
+    line-height: 1.55;
+}
+
+.google-one-tap-consent a {
+    color: #0a66c2;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.google-one-tap-consent a:hover,
+.google-one-tap-consent a:focus-visible {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.google-one-tap-consent__close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    display: grid;
+    width: 1.75rem;
+    height: 1.75rem;
+    place-items: center;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: #64748b;
+    cursor: pointer;
+}
+
+.google-one-tap-consent__close:hover,
+.google-one-tap-consent__close:focus-visible {
+    background: #e2e8f0;
+    color: #0f172a;
+    outline: none;
+}
+
+.google-one-tap-consent__close svg {
+    width: 1.15rem;
+    height: 1.15rem;
+}
+
+.google-one-tap-fallback {
+    display: flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1rem 1rem;
+    border: 1px solid #202124;
+    border-top: 0;
+    border-radius: 0 0 10px 10px;
+    background: #202124;
+}
+
+.google-one-tap-fallback > div,
+.google-one-tap-fallback iframe {
+    max-width: 100%;
+}
+
+@media (max-width: 640px) {
+    .google-one-tap-host {
+        top: 0.75rem;
+        right: 0.75rem;
+        left: 0.75rem;
+        width: auto;
+    }
+}
+
 .auth-dialog .auth-register-category-trigger + div {
     border-color: #dce0e6 !important;
     border-radius: 0.62rem !important;

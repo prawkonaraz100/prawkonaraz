@@ -20,10 +20,6 @@ const csrfToken = () => document
     .querySelector<HTMLMetaElement>('meta[name="csrf-token"]')
     ?.content ?? '';
 
-const hasReturningUserMarker = () => document.cookie
-    .split(';')
-    .some((cookie) => cookie.trim().startsWith('prawkonaraz_returning_user='));
-
 const googleIdentityErrorFromPayload = (payload: unknown, fallback: string) => {
     if (!payload || typeof payload !== 'object') {
         return fallback;
@@ -73,6 +69,24 @@ export const createPublicAuthDrawers = (root: HTMLElement) => {
     let previousBodyOverflow = '';
     let googleInitializationPromise: Promise<void> | null = null;
     let googleSubmitting = false;
+    const oneTapHost = root.querySelector<HTMLElement>('[data-google-one-tap-host]');
+
+    const setOneTapVisible = (visible: boolean) => {
+        if (!oneTapHost) {
+            return;
+        }
+
+        oneTapHost.classList.toggle('is-visible', visible);
+        oneTapHost.setAttribute('aria-hidden', String(!visible));
+    };
+
+    const closeOneTap = () => {
+        window.google?.accounts?.id.cancel();
+        setOneTapVisible(false);
+    };
+
+    root.querySelector<HTMLButtonElement>('[data-google-one-tap-close]')
+        ?.addEventListener('click', closeOneTap);
 
     const getDrawer = (name: AuthDrawerName) =>
         root.querySelector<HTMLElement>(drawerSelector(name));
@@ -222,6 +236,7 @@ export const createPublicAuthDrawers = (root: HTMLElement) => {
 
         googleSubmitting = true;
         setGoogleError(null);
+        setOneTapVisible(false);
 
         try {
             const session = await refreshCsrfSession();
@@ -294,13 +309,49 @@ export const createPublicAuthDrawers = (root: HTMLElement) => {
         return googleInitializationPromise;
     };
 
+    const renderGoogleButton = (
+        buttonRoot: HTMLElement,
+        theme: 'outline' | 'filled_black' = 'outline',
+    ) => {
+        if (renderedGoogleButtons.has(buttonRoot)) {
+            return;
+        }
+
+        window.google?.accounts?.id.renderButton(buttonRoot, {
+            type: 'standard',
+            theme,
+            size: 'large',
+            text: 'continue_with',
+            shape: 'rectangular',
+            logo_alignment: 'left',
+            width: Math.max(
+                240,
+                Math.min(
+                    Math.round(
+                        buttonRoot.getBoundingClientRect().width
+                        || buttonRoot.clientWidth
+                        || 400,
+                    ),
+                    400,
+                ),
+            ),
+            locale: 'pl',
+        });
+        renderedGoogleButtons.add(buttonRoot);
+    };
+
     const promptOneTap = async (config: GoogleIdentityConfig) => {
-        if (!config.oneTapEnabled || !hasReturningUserMarker()) {
+        if (!config.oneTapEnabled) {
             return;
         }
 
         await ensureGoogleInitialized(config);
-        window.google?.accounts?.id.prompt();
+        setOneTapVisible(true);
+        const fallbackButton = root.querySelector<HTMLElement>('[data-google-one-tap-button]');
+
+        if (fallbackButton) {
+            renderGoogleButton(fallbackButton, 'filled_black');
+        }
     };
 
     const setupGoogleButton = async (drawer: HTMLElement) => {
@@ -324,31 +375,8 @@ export const createPublicAuthDrawers = (root: HTMLElement) => {
         try {
             await ensureGoogleInitialized(config);
 
-            if (!renderedGoogleButtons.has(buttonRoot)) {
-                window.google?.accounts?.id.renderButton(buttonRoot, {
-                    type: 'standard',
-                    theme: 'outline',
-                    size: 'large',
-                    text: 'continue_with',
-                    shape: 'rectangular',
-                    logo_alignment: 'left',
-                    width: Math.max(
-                        240,
-                        Math.min(
-                            Math.round(
-                                buttonRoot.getBoundingClientRect().width
-                                || buttonRoot.clientWidth
-                                || 400,
-                            ),
-                            400,
-                        ),
-                    ),
-                    locale: 'pl',
-                });
-                renderedGoogleButtons.add(buttonRoot);
-            }
+            renderGoogleButton(buttonRoot);
 
-            await promptOneTap(config);
         } catch {
             setGoogleError('Nie udało się załadować logowania Google. Możesz użyć e-maila albo klasycznego przekierowania Google.');
         }
@@ -635,6 +663,7 @@ export const createPublicAuthDrawers = (root: HTMLElement) => {
     };
 
     async function open(name: AuthDrawerName) {
+        closeOneTap();
         requestedDrawer = name;
         const drawer = await ensureDrawer(name);
 
