@@ -22,36 +22,6 @@
     data-google-login-url="{{ $googleIdentityEnabled ? route('google.identity.login', absolute: false) : '' }}"
     data-google-one-tap-enabled="{{ $googleOneTapEnabled ? 'true' : 'false' }}"
 >
-    @if ($googleOneTapEnabled)
-        <aside
-            class="google-one-tap-host"
-            data-google-one-tap-host
-            aria-hidden="true"
-        >
-            <section class="google-one-tap-consent" aria-labelledby="google-one-tap-consent-title">
-                <button
-                    type="button"
-                    class="google-one-tap-consent__close"
-                    aria-label="Zamknij szybkie logowanie Google"
-                    data-google-one-tap-close
-                >
-                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M18 6 6 18" />
-                        <path d="m6 6 12 12" />
-                    </svg>
-                </button>
-                <h2 id="google-one-tap-consent-title">Wyraź zgodę i dołącz do Prawko na Raz</h2>
-                <p>
-                    Klikając Kontynuuj, aby dołączyć lub się zalogować, wyrażasz zgodę na
-                    <a href="{{ route('legal.terms', absolute: false) }}">Regulamin</a>
-                    i potwierdzasz zapoznanie się z
-                    <a href="{{ route('legal.privacy', absolute: false) }}">Polityką prywatności</a>.
-                </p>
-            </section>
-            <div class="google-one-tap-fallback" data-google-one-tap-button></div>
-        </aside>
-    @endif
-
     @if (! $lazy)
         <x-site.login-drawer :open="$loginShouldOpen" />
         <x-site.register-drawer :open="$registerShouldOpen" />

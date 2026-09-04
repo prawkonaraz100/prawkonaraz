@@ -49,7 +49,7 @@ test('public footer and login drawer link to the correct legal pages', function 
         ->assertSeeText('Kontynuując z Google, akceptujesz');
 });
 
-test('homepage renders one tap legal notice for first time visitors when google identity is enabled', function () {
+test('homepage enables native google one tap for first time visitors when google identity is enabled', function () {
     config()->set('services.google.client_id', 'google-client-id');
     config()->set('services.google.identity_enabled', true);
     config()->set('services.google.one_tap_enabled', true);
@@ -57,9 +57,6 @@ test('homepage renders one tap legal notice for first time visitors when google 
     $this->get(route('home'))
         ->assertOk()
         ->assertSee('data-google-one-tap-enabled="true"', false)
-        ->assertSee('data-google-one-tap-host', false)
-        ->assertSee('data-google-one-tap-button', false)
-        ->assertDontSee('data-google-one-tap-prompt', false)
-        ->assertSeeText('Wyraź zgodę i dołącz do Prawko na Raz')
-        ->assertSeeText('Klikając Kontynuuj, aby dołączyć lub się zalogować');
+        ->assertDontSee('data-google-one-tap-host', false)
+        ->assertDontSeeText('Wyraź zgodę i dołącz do Prawko na Raz');
 });
