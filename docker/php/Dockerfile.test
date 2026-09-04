@@ -1,0 +1,8 @@
+ARG BASE_IMAGE=serwistestyprawojazdy_f-app:latest
+FROM ${BASE_IMAGE}
+
+ENV APP_ENV=testing \
+    COMPOSER_ALLOW_SUPERUSER=1
+
+RUN composer config optimize-autoloader false \
+    && composer install --no-interaction --no-progress --prefer-dist
