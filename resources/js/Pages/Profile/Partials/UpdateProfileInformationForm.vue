@@ -17,21 +17,24 @@ const props = withDefaults(
     },
 );
 
-const user = usePage<PageProps>().props.auth.user!;
+const page = usePage<PageProps>();
+const user = computed(() => page.props.auth.user!);
 
 const form = useForm({
-    name: user.name,
-    email: user.email,
+    name: user.value.name,
+    email: user.value.email,
     current_password: '',
 });
 
 const normalizedEmail = (email: string) => email.trim().toLowerCase();
 
 const emailChanged = computed(
-    () => normalizedEmail(form.email) !== normalizedEmail(user.email),
+    () => normalizedEmail(form.email) !== normalizedEmail(user.value.email),
 );
 
 const updateProfileInformation = () => {
+    if (form.processing) return;
+    form.email = normalizedEmail(form.email);
     form.patch(route('profile.update'), {
         preserveScroll: true,
         onFinish: () => form.reset('current_password'),
@@ -77,7 +80,6 @@ const updateProfileInformation = () => {
                         type="text"
                         class="mt-2 h-12 w-full rounded-lg border border-[#d0d5dd] bg-white px-4 text-base text-[#101828] outline-none transition focus:border-[#0b5cff] focus:ring-2 focus:ring-[#0b5cff]/10 sm:h-11 sm:rounded-md sm:text-sm"
                         required
-                        :autofocus="!props.mobileSheet"
                         autocomplete="name"
                     />
 
@@ -95,6 +97,8 @@ const updateProfileInformation = () => {
                         type="email"
                         class="mt-2 h-12 w-full rounded-lg border border-[#d0d5dd] bg-white px-4 text-base text-[#101828] outline-none transition focus:border-[#0b5cff] focus:ring-2 focus:ring-[#0b5cff]/10 sm:h-11 sm:rounded-md sm:text-sm"
                         required
+                        autocapitalize="none"
+                        spellcheck="false"
                         autocomplete="username"
                     />
 
@@ -196,6 +200,7 @@ const updateProfileInformation = () => {
                 >
                     <p
                         v-if="form.recentlySuccessful"
+                        role="status"
                         class="text-sm font-medium text-emerald-700"
                     >
                         Zapisano.

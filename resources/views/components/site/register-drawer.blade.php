@@ -1,7 +1,7 @@
 @props(['open' => null])
 
 @php
-    $authScene = \Illuminate\Support\Facades\Vite::asset('resources/images/auth/auth-reference-road-car.png');
+    $authScene = \Illuminate\Support\Facades\Vite::asset('resources/images/home/hero-composite-v3.webp');
     $studyContextService = app(\App\Support\StudyContextService::class);
     $categories = $studyContextService->activeCategories()
         ->map(fn ($category) => [
@@ -20,7 +20,7 @@
 
 <div
     data-register-drawer
-    class="auth-dialog-overlay fixed inset-0 z-[90] {{ $shouldOpen ? 'flex' : 'hidden' }} font-[system-ui,-apple-system,'Segoe_UI',Roboto,Helvetica,Arial,sans-serif]"
+    class="auth-dialog-overlay auth-dialog-overlay--standalone fixed inset-0 z-[90] {{ $shouldOpen ? 'flex' : 'hidden' }} font-[system-ui,-apple-system,'Segoe_UI',Roboto,Helvetica,Arial,sans-serif]"
     role="presentation"
     aria-hidden="{{ $shouldOpen ? 'false' : 'true' }}"
     data-register-drawer-open="{{ $shouldOpen ? 'true' : 'false' }}"
@@ -54,10 +54,10 @@
                     id="public-register-drawer-title"
                     class="auth-register-drawer-title auth-dialog__title"
                 >
-                    Zarejestruj się
+                    Załóż konto i rozpocznij test
                 </h2>
                 <p class="auth-register-drawer-lead auth-dialog__lead">
-                    Wybierz kategorię, załóż konto i potwierdź e-mail.
+                    Wybierz kategorię i zacznij uczyć się w swoim tempie.
                 </p>
                 <nav class="auth-switcher" aria-label="Wybierz formularz konta">
                     <button
@@ -147,7 +147,7 @@
                                     data-register-category-option
                                     data-category-id="{{ $category['id'] }}"
                                     data-category-name="{{ $category['name'] }}"
-                                    class="flex min-h-10 w-full items-center rounded-[5px] px-3 text-left text-[0.9rem] font-medium transition focus:outline-none focus:ring-2 focus:ring-[#111827]/15 {{ $isSelectedCategory ? 'bg-[#d01921] text-white' : 'bg-white text-[#374151] hover:bg-[#fff5f5] hover:text-[#111827]' }}"
+                                    class="flex min-h-10 w-full items-center rounded-[5px] px-3 text-left text-[0.9rem] font-medium transition focus:outline-none focus:ring-2 focus:ring-[#111827]/15 {{ $isSelectedCategory ? 'bg-[#0a66c2] text-white' : 'bg-white text-[#374151] hover:bg-[#f2f7ff] hover:text-[#111827]' }}"
                                 >
                                     {{ $category['name'] }}
                                 </button>
@@ -274,7 +274,7 @@
 
                 <button
                     type="submit"
-                    class="auth-register-submit inline-flex h-12 w-full items-center justify-center rounded-[6px] bg-[#d01921] px-5 text-[0.95rem] font-medium text-white transition hover:bg-[#b9151c] disabled:cursor-not-allowed disabled:opacity-60"
+                    class="auth-register-submit inline-flex h-12 w-full items-center justify-center rounded-[6px] bg-[#0a66c2] px-5 text-[0.95rem] font-medium text-white transition hover:bg-[#084f96] disabled:cursor-not-allowed disabled:opacity-60"
                     @disabled($categories->isEmpty())
                     data-csrf-submit
                 >
@@ -296,13 +296,6 @@
                     <span class="text-[0.82rem] font-normal text-[#8b95a1]">Szybki start</span>
                     <div class="h-px flex-1 bg-[#e2e7ee]"></div>
                 </div>
-
-                @if (in_array('google', $enabledSocialProviders, true))
-                <p class="auth-dialog__legal-consent mt-5">
-                    <span>Kontynuując z Google, akceptujesz <a href="{{ route('legal.terms', absolute: false) }}">Regulamin</a> i potwierdzasz</span>
-                    <span>zapoznanie się z <a href="{{ route('legal.privacy', absolute: false) }}">Polityką prywatności</a>.</span>
-                </p>
-                @endif
 
                 <div class="auth-register-social-grid mt-5 grid gap-3 {{ count($enabledSocialProviders) > 1 ? 'sm:grid-cols-2' : '' }}">
                     @if (in_array('google', $enabledSocialProviders, true))
@@ -340,22 +333,19 @@
                 Masz kod od znajomego?
                 <a
                     href="{{ route('friend-invitations.code.create', absolute: false) }}"
-                    class="font-normal text-[#d01921] underline decoration-[#d01921]/35 underline-offset-2 transition hover:text-[#a80f16]"
+                    class="font-normal text-[#0a66c2] underline decoration-[#0a66c2]/35 underline-offset-2 transition hover:text-[#084f96]"
                 >
                     Wpisz kod zaproszenia
                 </a>
             </p>
 
-            <p class="auth-register-login">
-                Masz już konto?
-                <button
-                    type="button"
-                    class="font-normal text-[#d01921] underline decoration-[#d01921]/35 underline-offset-2 transition hover:text-[#a80f16]"
-                    data-auth-drawer-switch="login"
-                >
-                    Zaloguj się
-                </button>
+            @if (in_array('google', $enabledSocialProviders, true))
+            <p class="auth-dialog__legal-consent">
+                Kontynuując z Google, akceptujesz <a href="{{ route('legal.terms', absolute: false) }}">Regulamin</a>
+                i potwierdzasz zapoznanie się z <a href="{{ route('legal.privacy', absolute: false) }}">Polityką prywatności</a>.
             </p>
+            @endif
+
             </footer>
             </div>
         </div>

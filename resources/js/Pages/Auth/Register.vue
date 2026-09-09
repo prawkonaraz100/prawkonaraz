@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AuthPricingBackdrop from '@/Components/Auth/AuthPricingBackdrop.vue';
+import AuthTopNavigation from '@/Components/Auth/AuthTopNavigation.vue';
 import LoginDrawer from '@/Components/Auth/LoginDrawer.vue';
 import RegisterDrawer from '@/Components/Auth/RegisterDrawer.vue';
 import type { PageProps, StudyContextCategory } from '@/types';
@@ -40,12 +41,15 @@ const openRegisterPanel = () => {
 <template>
     <Head title="Rejestracja" />
 
-    <div class="relative min-h-screen overflow-hidden bg-white text-[#111827]">
+    <div class="auth-page--standalone relative min-h-screen overflow-hidden bg-white text-[#111827]">
+        <AuthTopNavigation />
+
         <div inert aria-hidden="true">
             <AuthPricingBackdrop />
         </div>
 
         <RegisterDrawer
+            standalone
             :open="activePanel === 'register'"
             :retain-visual="visualHostPanel === 'register' && activePanel === 'login'"
             :hide-visual="visualHostPanel === 'login' && activePanel === 'register'"
@@ -55,6 +59,7 @@ const openRegisterPanel = () => {
         />
 
         <LoginDrawer
+            standalone
             :open="activePanel === 'login'"
             :retain-visual="visualHostPanel === 'login' && activePanel === 'register'"
             :hide-visual="visualHostPanel === 'register' && activePanel === 'login'"

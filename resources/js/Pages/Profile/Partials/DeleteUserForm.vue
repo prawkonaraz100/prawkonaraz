@@ -45,6 +45,7 @@ const confirmUserDeletion = () => {
 };
 
 const deleteUser = () => {
+    if (passwordForm.processing) return;
     passwordForm.delete(route('profile.destroy'), {
         preserveScroll: true,
         onSuccess: () => closeModal(),
@@ -56,6 +57,7 @@ const deleteUser = () => {
 };
 
 const sendDeletionLink = () => {
+    if (deletionLinkForm.processing) return;
     deletionLinkForm.post(route('profile.deletion.send'), {
         preserveScroll: true,
         onSuccess: () => {
@@ -145,17 +147,18 @@ const closeModal = () => {
                 </p>
 
                 <div v-if="passwordLoginEnabled" class="mt-6">
-                    <label for="password" class="sr-only">
+                    <label for="delete_account_password" class="sr-only">
                         Hasło
                     </label>
 
                     <input
-                        id="password"
+                        id="delete_account_password"
                         ref="passwordInput"
                         v-model="passwordForm.password"
                         type="password"
                         class="h-12 w-full rounded-lg border border-[#d0d5dd] bg-white px-4 text-base text-slate-950 outline-none transition focus:border-[#d92d20] focus:ring-2 focus:ring-[#d92d20]/10 sm:h-11 sm:w-3/4 sm:rounded-md sm:text-sm"
                         placeholder="Hasło"
+                        autocomplete="current-password"
                         @keyup.enter="deleteUser"
                     />
 

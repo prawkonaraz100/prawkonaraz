@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import SiteFooter from '@/Components/SiteFooter.vue';
-import SiteHeader from '@/Components/SiteHeader.vue';
+import PublicTopNavigation from '@/Components/PublicTopNavigation.vue';
 import type { PageProps } from '@/types';
 import friendInvitationHero from '../../../images/invitations/friend-invitation-hero.png';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
@@ -60,7 +60,7 @@ const accept = () => {
     <Head title="Zaproszenie do nauki" />
 
     <div class="flex min-h-screen flex-col bg-white text-[#081331]">
-        <SiteHeader />
+        <PublicTopNavigation />
 
         <main class="flex-1">
             <section class="border-b border-[#e4eaf3] bg-[#fbfcff]">

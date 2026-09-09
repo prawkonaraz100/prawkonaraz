@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import SiteFooter from '@/Components/SiteFooter.vue';
-import SiteHeader from '@/Components/SiteHeader.vue';
+import PublicTopNavigation from '@/Components/PublicTopNavigation.vue';
 import { renderInlineFormattedHtml } from '@/utils/explanationFormatting';
 import { Head, Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
@@ -202,7 +202,7 @@ const faqItems = [
     </Head>
 
     <div class="flex min-h-screen flex-col bg-[#fbfaf7] text-[#1f1d18]">
-        <SiteHeader />
+        <PublicTopNavigation />
 
         <main class="mx-auto max-w-6xl flex-1 px-4 py-10 sm:px-6 lg:px-8">
             <section class="rounded-[2rem] border border-[#e3dccf] bg-white px-6 py-8 shadow-[0_18px_48px_rgba(46,39,26,0.06)] sm:px-8">

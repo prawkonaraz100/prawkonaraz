@@ -131,6 +131,24 @@ export const createPublicAuthDrawers = (root: HTMLElement) => {
         ([name, drawer]) => drawer.dataset[openStateKey(name)] === 'true',
     );
 
+    const syncCoveredHomeHeader = () => {
+        const drawerOpen = anyDrawerOpen();
+
+        document
+            .querySelectorAll<HTMLElement>(
+                '[data-home-site-header]:not(.auth-drawer-top-navigation)',
+            )
+            .forEach((header) => {
+                header.toggleAttribute('inert', drawerOpen);
+
+                if (drawerOpen) {
+                    header.setAttribute('aria-hidden', 'true');
+                } else {
+                    header.removeAttribute('aria-hidden');
+                }
+            });
+    };
+
     const closeDrawer = (name: AuthDrawerName) => {
         const drawer = getDrawer(name);
 
@@ -155,6 +173,8 @@ export const createPublicAuthDrawers = (root: HTMLElement) => {
         if (!anyDrawerOpen()) {
             document.body.style.overflow = previousBodyOverflow;
         }
+
+        syncCoveredHomeHeader();
     };
 
     const closeActiveDrawer = () => {
@@ -668,6 +688,7 @@ export const createPublicAuthDrawers = (root: HTMLElement) => {
 
         activeDrawer = name;
         document.body.style.overflow = 'hidden';
+        syncCoveredHomeHeader();
         document.dispatchEvent(new CustomEvent('public-auth-drawer-opened', {
             detail: { name },
         }));

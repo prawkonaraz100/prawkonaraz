@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import SiteFooter from '@/Components/SiteFooter.vue';
-import SiteHeader from '@/Components/SiteHeader.vue';
+import PublicTopNavigation from '@/Components/PublicTopNavigation.vue';
 
 withDefaults(
     defineProps<{
@@ -16,7 +16,7 @@ withDefaults(
 
 <template>
     <div class="flex min-h-screen flex-col bg-[#fcfcfa] text-[#1f1d18]">
-        <SiteHeader />
+        <PublicTopNavigation />
 
         <main
             v-if="cardless"

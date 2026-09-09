@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import SiteFooter from '@/Components/SiteFooter.vue';
-import SiteHeader from '@/Components/SiteHeader.vue';
+import PublicTopNavigation from '@/Components/PublicTopNavigation.vue';
 import { Head, Link } from '@inertiajs/vue3';
 
 defineProps<{
@@ -26,7 +26,7 @@ defineProps<{
     <Head title="Dostęp aktywowany" />
 
     <div class="flex min-h-screen flex-col bg-[#fbfaf7] text-[#211f1b]">
-        <SiteHeader />
+        <PublicTopNavigation />
 
         <main class="flex-1">
             <section class="mx-auto flex min-h-[calc(100svh-170px)] w-full max-w-[68rem] items-center px-4 py-12 sm:px-6 lg:px-8">

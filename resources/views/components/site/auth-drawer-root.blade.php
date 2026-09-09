@@ -22,6 +22,8 @@
     data-google-login-url="{{ $googleIdentityEnabled ? route('google.identity.login', absolute: false) : '' }}"
     data-google-one-tap-enabled="{{ $googleOneTapEnabled ? 'true' : 'false' }}"
 >
+    <x-site.home-header :immediate="true" :auth-overlay="true" />
+
     @if (! $lazy)
         <x-site.login-drawer :open="$loginShouldOpen" />
         <x-site.register-drawer :open="$registerShouldOpen" />

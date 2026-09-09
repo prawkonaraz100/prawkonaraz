@@ -4,7 +4,7 @@ import { refreshCsrfSession } from '@/lib/csrfSession';
 import type { PageProps } from '@/types';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
 import { computed, onUnmounted, ref, watch } from 'vue';
-import authScene from '../../../images/auth/auth-reference-road-car.png';
+import authScene from '../../../images/home/hero-composite-v3.webp';
 
 const props = withDefaults(
     defineProps<{
@@ -13,12 +13,14 @@ const props = withDefaults(
         status?: string;
         retainVisual?: boolean;
         hideVisual?: boolean;
+        standalone?: boolean;
     }>(),
     {
         canResetPassword: true,
         status: '',
         retainVisual: false,
         hideVisual: false,
+        standalone: false,
     },
 );
 
@@ -144,6 +146,7 @@ onUnmounted(() => {
             :class="{
                 'auth-dialog-overlay--retain-visual': retainVisual,
                 'auth-dialog-overlay--form-layer': open && hideVisual,
+                'auth-dialog-overlay--standalone': standalone,
             }"
             :data-auth-dialog-open="open ? 'true' : undefined"
             @click.self="close"
@@ -177,10 +180,10 @@ onUnmounted(() => {
                             id="login-drawer-title"
                             class="auth-login-drawer-title auth-dialog__title"
                         >
-                            Witaj w Prawko na Raz
+                            Zaloguj się i kontynuuj naukę
                         </h2>
                         <p class="auth-login-drawer-lead auth-dialog__lead">
-                            Twoje miejsce do skutecznej nauki i zdania egzaminu.
+                            Wróć dokładnie do miejsca, w którym skończyłeś.
                         </p>
                         <div class="auth-switcher" role="tablist" aria-label="Wybierz formularz konta">
                             <button
@@ -286,14 +289,14 @@ onUnmounted(() => {
                                     v-model="form.remember"
                                     name="remember"
                                     type="checkbox"
-                                    class="h-4 w-4 rounded border-[#cfd6e2] text-[#d01921] focus:ring-[#d01921]/25"
+                                    class="h-4 w-4 rounded border-[#cfd6e2] text-[#0a66c2] focus:ring-[#0a66c2]/25"
                                 >
                                 <span>Zapamiętaj mnie</span>
                             </label>
                             <Link
                                 v-if="canResetPassword"
                                 :href="route('password.request')"
-                                class="text-[0.82rem] font-normal text-[#d01921] underline decoration-[#d01921]/35 underline-offset-2 transition hover:text-[#a80f16]"
+                                class="text-[0.82rem] font-normal text-[#0a66c2] underline decoration-[#0a66c2]/35 underline-offset-2 transition hover:text-[#084f96]"
                             >
                                 Nie pamiętasz hasła?
                             </Link>
@@ -302,7 +305,7 @@ onUnmounted(() => {
                         <button
                             type="submit"
                             data-testid="login-submit"
-                            class="auth-login-drawer-submit inline-flex h-12 w-full items-center justify-center rounded-[6px] bg-[#d01921] px-5 text-[0.95rem] font-medium text-white transition hover:bg-[#b9151c] disabled:cursor-not-allowed disabled:opacity-60"
+                            class="auth-login-drawer-submit inline-flex h-12 w-full items-center justify-center rounded-[6px] bg-[#0a66c2] px-5 text-[0.95rem] font-medium text-white transition hover:bg-[#084f96] disabled:cursor-not-allowed disabled:opacity-60"
                             :disabled="csrfPreparing || form.processing"
                         >
                             {{
@@ -317,10 +320,6 @@ onUnmounted(() => {
 
                     <div v-if="socialProviders.length > 0" class="auth-login-drawer-social auth-dialog__social">
                         <div class="auth-login-drawer-social-grid grid gap-3">
-                            <p v-if="googleProvider" class="auth-dialog__legal-consent">
-                                <span>Kontynuując z Google, akceptujesz <a :href="route('legal.terms')">Regulamin</a> i potwierdzasz</span>
-                                <span>zapoznanie się z <a :href="route('legal.privacy')">Polityką prywatności</a>.</span>
-                            </p>
                             <a
                                 v-if="googleProvider"
                                 :href="route('social.redirect', { provider: 'google' })"
@@ -359,24 +358,9 @@ onUnmounted(() => {
                     <p class="auth-login-drawer-return">
                         Po zalogowaniu wrócisz dokładnie tam, gdzie skończyłeś naukę.
                     </p>
-                    <p class="auth-login-drawer-register">
-                        Nie masz konta?
-                        <button
-                            type="button"
-                            class="font-normal text-[#d01921] underline decoration-[#d01921]/35 underline-offset-2 transition hover:text-[#a80f16]"
-                            @click="openRegister"
-                        >
-                            Zarejestruj się
-                        </button>
-                    </p>
-                    <p class="auth-login-drawer-invite">
-                        Masz kod od znajomego?
-                        <Link
-                            :href="route('friend-invitations.code.create')"
-                            class="font-normal text-[#0d47a1] underline decoration-[#0d47a1]/35 underline-offset-2 transition hover:text-[#083777]"
-                        >
-                            Wpisz kod zaproszenia
-                        </Link>
+                    <p v-if="googleProvider" class="auth-dialog__legal-consent">
+                        Kontynuując z Google, akceptujesz <a :href="route('legal.terms')">Regulamin</a>
+                        i potwierdzasz zapoznanie się z <a :href="route('legal.privacy')">Polityką prywatności</a>.
                     </p>
                     </footer>
                     </div>

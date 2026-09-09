@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
 import SiteFooter from "@/Components/SiteFooter.vue";
-import SiteHeader from "@/Components/SiteHeader.vue";
+import PublicTopNavigation from "@/Components/PublicTopNavigation.vue";
 import type { PageProps } from "@/types";
 import { Head, Link, usePage } from "@inertiajs/vue3";
 import heroDesktopImg from "../../images/home/hero-desktop.png";
@@ -66,7 +66,7 @@ onUnmounted(() => {
     <Head :title="page.props.app.name" />
 
     <div class="flex min-h-screen flex-col bg-white text-[#1f1d18]">
-        <SiteHeader />
+        <PublicTopNavigation />
 
         <main class="flex-1 bg-white">
             <section

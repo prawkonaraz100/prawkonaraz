@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+import AuthTopNavigation from '@/Components/Auth/AuthTopNavigation.vue';
 import LoginDrawer from '@/Components/Auth/LoginDrawer.vue';
 import RegisterDrawer from '@/Components/Auth/RegisterDrawer.vue';
 import { useSafeLogout } from '@/composables/useSafeLogout';
@@ -25,7 +26,7 @@ type HeaderNavigationIcon =
     | 'monitor'
     | 'tag';
 
-type HeaderNavigationLink = NavigationLink & {
+type HeaderNavigationLink = Omit<NavigationLink, 'icon'> & {
     icon: HeaderNavigationIcon;
 };
 
@@ -57,6 +58,9 @@ const mobileMenuOpen = ref(false);
 const accountMenuOpen = ref(false);
 const loginDrawerOpen = ref(false);
 const registerDrawerOpen = ref(false);
+const authDrawerOpen = computed(
+    () => loginDrawerOpen.value || registerDrawerOpen.value,
+);
 const authDrawerVisualHost = ref<AuthDrawerName | null>(null);
 const sourceStripVisible = ref(true);
 const currentYear = new Date().getFullYear();
@@ -226,7 +230,10 @@ watch(currentPath, () => {
 </script>
 
 <template>
-    <header class="site-header">
+    <header
+        class="site-header"
+        :class="{ 'site-header--auth-covered': authDrawerOpen }"
+    >
         <div
             class="site-header__source-strip"
             :class="{ 'is-hidden': !sourceStripVisible }"
@@ -620,8 +627,11 @@ watch(currentPath, () => {
         </div>
     </header>
 
+    <AuthTopNavigation v-if="!isAuthed && authDrawerOpen" />
+
     <LoginDrawer
         v-if="!isAuthed"
+        standalone
         :open="loginDrawerOpen"
         :retain-visual="retainsAuthDrawerVisual('login')"
         :hide-visual="hidesAuthDrawerVisual('login')"
@@ -631,6 +641,7 @@ watch(currentPath, () => {
 
     <RegisterDrawer
         v-if="!isAuthed"
+        standalone
         :open="registerDrawerOpen"
         :categories="registrationCategories"
         :retain-visual="retainsAuthDrawerVisual('register')"
