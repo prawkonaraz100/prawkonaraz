@@ -1,6 +1,8 @@
 @extends('layouts.public-content')
 
 @php
+    $friendInvitationsEnabled = app(\App\Support\PaymentRequirementService::class)->requiresPayment();
+
     $steps = [
         [
             'number' => '01',
@@ -68,10 +70,10 @@
             'title' => 'Darmowy start',
             'body' => 'Możesz sprawdzić część materiałów bez zobowiązań i zobaczyć, czy sposób nauki pasuje do Ciebie.',
         ],
-        [
+        ...($friendInvitationsEnabled ? [[
             'title' => 'Zaproszenie od znajomego',
             'body' => 'Jeśli masz kod lub link od znajomego, możesz aktywować dostęp z poziomu dedykowanej strony zaproszenia.',
-        ],
+        ]] : []),
         [
             'title' => 'Plany dla spokojniejszej nauki',
             'body' => 'Cennik pokazuje aktualne warianty dostępu, w tym dłuższe plany dla osób, które chcą uczyć się bez presji.',
@@ -155,15 +157,21 @@
                     Możesz zacząć ostrożnie, a pełny dostęp dobrać wtedy, gdy wiesz, że serwis Ci pomaga.
                 </h2>
                 <p class="content-muted mt-5 text-base leading-7">
-                    Aktualne formy dostępu pokazujemy w cenniku. Jeśli dostajesz kod od znajomego, wpisujesz go na stronie zaproszenia i przechodzisz przez normalny, bezpieczny proces konta.
+                    @if ($friendInvitationsEnabled)
+                        Aktualne formy dostępu pokazujemy w cenniku. Jeśli dostajesz kod od znajomego, wpisujesz go na stronie zaproszenia i przechodzisz przez normalny, bezpieczny proces konta.
+                    @else
+                        Dostęp do platformy jest obecnie otwarty. Załóż konto, potwierdź adres e-mail i rozpocznij naukę bez kupowania planu.
+                    @endif
                 </p>
                 <div class="mt-8 flex flex-wrap gap-3">
                     <a href="{{ route('public.pricing') }}" class="inline-flex items-center justify-center bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700">
                         Sprawdź plany
                     </a>
-                    <a href="{{ route('friend-invitations.code.create') }}" class="inline-flex items-center justify-center border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:border-slate-950">
-                        Mam kod zaproszenia
-                    </a>
+                    @if ($friendInvitationsEnabled)
+                        <a href="{{ route('friend-invitations.code.create') }}" class="inline-flex items-center justify-center border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:border-slate-950">
+                            Mam kod zaproszenia
+                        </a>
+                    @endif
                 </div>
             </div>
 

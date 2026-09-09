@@ -30,8 +30,29 @@ class PublicFooter
                 'label' => 'Przejdź do bazy pytań',
                 'href' => route('public.questions.hub', absolute: false),
             ],
+            'legal_links' => [
+                ['label' => 'O nas', 'href' => route('about.organization', absolute: false)],
+                ['label' => 'Jak to działa', 'href' => route('about.how-it-works', absolute: false)],
+                ['label' => 'Regulamin', 'href' => route('legal.terms', absolute: false)],
+                ['label' => 'Polityka prywatności', 'href' => route('legal.privacy', absolute: false)],
+                ['label' => 'Metodologia', 'href' => route('about.methodology', absolute: false)],
+                ['label' => 'Kontakt', 'href' => route('about.contact', absolute: false)],
+            ],
+            'service_links' => [
+                ['label' => 'Baza pytań', 'href' => route('public.questions.hub', absolute: false)],
+                ['label' => 'Testy na prawo jazdy', 'href' => route('public.tests', absolute: false)],
+                ['label' => 'Kurs', 'href' => route('public.course', absolute: false)],
+                ['label' => 'Cennik', 'href' => route('public.pricing', absolute: false)],
+            ],
+            'social_links' => [
+                ['label' => 'Facebook', 'href' => 'https://www.facebook.com/PrawkoNaRaz/'],
+                ['label' => 'Instagram', 'href' => 'https://www.instagram.com/prawkonaraz.pl/'],
+                ['label' => 'TikTok', 'href' => 'https://www.tiktok.com/@prawkonaraz'],
+                ['label' => 'YouTube', 'href' => 'https://www.youtube.com/channel/UCSrCDt_Aj1yslMY8sfXFBkg'],
+            ],
+            'language' => 'Polski',
             'groups' => $navigation['footer_groups'],
-            'copyright' => '© '.now()->year.' prawkonaraz.pl',
+            'copyright' => '© '.now()->year,
         ];
     }
 }

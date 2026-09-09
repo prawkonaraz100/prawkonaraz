@@ -19,6 +19,7 @@ export interface NavigationLink {
     href: string;
     match: string[];
     variant?: 'text' | 'primary';
+    icon?: 'baza-pytan' | 'plany-nauki' | 'kursy' | 'cennik' | 'kontakt';
 }
 
 export interface NavigationGroup {
@@ -27,6 +28,7 @@ export interface NavigationGroup {
 }
 
 export interface NavigationData {
+    top: NavigationLink[];
     utility: NavigationLink[];
     primary: NavigationLink[];
     header_actions: NavigationLink[];
@@ -46,12 +48,21 @@ export interface FooterActionData {
     href: string;
 }
 
+export interface FooterLinkData {
+    label: string;
+    href: string;
+}
+
 export interface FooterData {
     home_href: string;
     brand: FooterBrandData;
     description: string;
     primary_action: FooterActionData;
     secondary_action: FooterActionData;
+    legal_links: FooterLinkData[];
+    service_links: FooterLinkData[];
+    social_links: FooterLinkData[];
+    language: string;
     groups: NavigationGroup[];
     copyright: string;
 }

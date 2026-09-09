@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import SiteFooter from '@/Components/SiteFooter.vue';
-import SiteHeader from '@/Components/SiteHeader.vue';
+import PublicTopNavigation from '@/Components/PublicTopNavigation.vue';
 import { Head } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
@@ -51,7 +51,7 @@ const nextSteps = [
     <Head title="Aktywuj dostęp" />
 
     <div class="flex min-h-screen flex-col bg-white text-slate-950">
-        <SiteHeader />
+        <PublicTopNavigation />
 
         <main class="flex-1">
             <section class="border-b border-slate-200">

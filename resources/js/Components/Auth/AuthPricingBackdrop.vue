@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import SiteHeader from '@/Components/SiteHeader.vue';
+import PublicTopNavigation from '@/Components/PublicTopNavigation.vue';
 
 const plans = [
     {
@@ -50,7 +50,7 @@ const plans = [
 
 <template>
     <div class="min-h-screen bg-[#f7f8fb] text-[#111827]">
-        <SiteHeader />
+        <PublicTopNavigation />
 
         <main class="mx-auto max-w-[81.75rem] px-4 py-8 sm:px-6 lg:py-10 xl:px-8">
             <section class="mx-auto max-w-2xl text-center">

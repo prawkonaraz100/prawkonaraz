@@ -98,8 +98,11 @@ class CheckoutController extends Controller
             ->with('status', 'Zamówienie zostało anulowane.');
     }
 
-    public function success(Request $request, PurchaseOrder $order): Response|RedirectResponse
-    {
+    public function success(
+        Request $request,
+        PurchaseOrder $order,
+        PaymentRequirementService $paymentRequirementService,
+    ): Response|RedirectResponse {
         $this->ensureOwner($request, $order);
 
         $order->load('productPlan', 'productAccessGrant');
@@ -114,7 +117,7 @@ class CheckoutController extends Controller
             'accessExpiresAt' => $order->productAccessGrant?->expires_at?->toIso8601String(),
             'sessionUrl' => route('session.index', absolute: false),
             'friendInvitationCta' => [
-                'available' => in_array(
+                'available' => $paymentRequirementService->requiresPayment() && in_array(
                     $order->productPlan?->code,
                     FriendInvitationEligibilityService::ELIGIBLE_PLAN_CODES,
                     true,

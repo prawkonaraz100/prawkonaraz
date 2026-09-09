@@ -31,6 +31,13 @@ class PublicNavigation
         ];
 
         return [
+            'top' => [
+                $this->link('Baza pytań', route('public.questions.hub', absolute: false), ['/oficjalna-baza-pytan-na-prawo-jazdy', '/pytanie'], icon: 'baza-pytan'),
+                $this->link('Plany nauki', route('public.pricing', absolute: false), ['/cennik'], icon: 'plany-nauki'),
+                $this->link('Kursy', route('public.course', absolute: false), ['/kurs'], icon: 'kursy'),
+                $this->link('Cennik', route('public.pricing', absolute: false), ['/cennik'], icon: 'cennik'),
+                $this->link('Kontakt', route('about.contact', absolute: false), ['/kontakt'], icon: 'kontakt'),
+            ],
             'utility' => [
                 $this->link('O nas', route('about.organization', absolute: false), ['/o-nas', '/autorzy']),
                 $this->link('Jak to działa', route('about.how-it-works', absolute: false), ['/jak-to-dziala']),
@@ -114,6 +121,7 @@ class PublicNavigation
         string $href,
         array $match,
         ?string $variant = null,
+        ?string $icon = null,
     ): array {
         $link = [
             'label' => $label,
@@ -123,6 +131,10 @@ class PublicNavigation
 
         if ($variant !== null) {
             $link['variant'] = $variant;
+        }
+
+        if ($icon !== null) {
+            $link['icon'] = $icon;
         }
 
         return $link;

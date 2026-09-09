@@ -8,14 +8,18 @@ import { setupPublicAuthDrawerLoader } from './public/authDrawerLoader';
 import { setupQuestionLessonAudio } from './public/questionLessonAudio';
 import '../images/home/hero-composite-v3.webp';
 import '../images/home/hero-mobile.png';
+import '../images/home/contact/advisor-monday.jpg';
+import '../images/home/contact/advisor-tuesday.jpg';
+import '../images/home/contact/advisor-wednesday.jpg';
+import '../images/home/contact/advisor-thursday.jpg';
+import '../images/home/contact/advisor-friday.jpg';
+import '../images/home/contact/advisor-saturday.jpg';
+import '../images/home/contact/advisor-sunday.jpg';
 import '../images/home/proof/dashboard.webp';
 import '../images/home/proof/exam.webp';
 import '../images/home/proof/explanation.webp';
 import '../images/home/proof/incorrect-questions.webp';
 import '../images/home/proof/memory-trainer.webp';
-import '../images/home/proof/pjm.webp';
-import '../images/home/proof/ranking.webp';
-import '../images/home/proof/traffic-signs.webp';
 import '../images/home/inteligentny-odtwarzacz-wideo-poster.jpg';
 import '../images/home/mistakes-learning-poster.jpg';
 import '../videos/home/inteligentny-odtwarzacz-wideo-720p.mp4';
@@ -102,53 +106,45 @@ const setupPublicSourceStrip = () => {
     });
 };
 
-const setupHomeHeaderPointerReveal = () => {
-    const header = document.querySelector<HTMLElement>('[data-home-site-header]');
+const setupHomeHeaderScrollDensity = () => {
+    const headers = Array.from(
+        document.querySelectorAll<HTMLElement>('[data-home-site-header]'),
+    );
 
-    if (!header) {
+    if (headers.length === 0) {
         return;
     }
 
-    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
-    let revealed = false;
+    let animationFrame: number | null = null;
 
-    const reveal = () => {
-        if (revealed) {
+    const syncCompactState = () => {
+        const compact = window.scrollY > 72;
+
+        headers.forEach((header) => {
+            header.classList.toggle('is-compact', compact);
+        });
+
+        animationFrame = null;
+    };
+
+    const handleScroll = () => {
+        if (animationFrame !== null) {
             return;
         }
 
-        revealed = true;
-        header.classList.add('is-visible');
-        header.classList.remove('home-site-header--awaiting-pointer');
-        window.removeEventListener('pointermove', reveal);
-        window.removeEventListener('keydown', revealFromKeyboard);
-        document.removeEventListener('focusin', reveal);
+        animationFrame = window.requestAnimationFrame(syncCompactState);
     };
 
-    const revealFromKeyboard = (event: KeyboardEvent) => {
-        if (event.key === 'Tab') {
-            reveal();
-        }
-    };
-
-    if (!finePointer.matches) {
-        reveal();
-
-        return;
-    }
-
-    window.addEventListener('pointermove', reveal, { passive: true });
-    window.addEventListener('keydown', revealFromKeyboard);
-    document.addEventListener('focusin', reveal);
+    syncCompactState();
+    window.addEventListener('scroll', handleScroll, { passive: true });
 };
 
 const setupHomeHeaderMenus = () => {
-    const header = document.querySelector<HTMLElement>('[data-home-site-header]');
     const menus = Array.from(
-        header?.querySelectorAll<HTMLDetailsElement>('[data-home-header-menu]') ?? [],
+        document.querySelectorAll<HTMLDetailsElement>('[data-home-header-menu]'),
     );
 
-    if (!header || menus.length === 0) {
+    if (menus.length === 0) {
         return;
     }
 
@@ -265,18 +261,20 @@ const setupHomeOpsVideos = () => {
     });
 };
 
-const setupHomeComparisonProof = () => {
-    const dialog = document.querySelector<HTMLDialogElement>('[data-home-proof-dialog]');
-    const image = dialog?.querySelector<HTMLImageElement>('[data-home-proof-image]');
-    const eyebrow = dialog?.querySelector<HTMLElement>('[data-home-proof-eyebrow]');
-    const title = dialog?.querySelector<HTMLElement>('[data-home-proof-title]');
-    const description = dialog?.querySelector<HTMLElement>('[data-home-proof-description]');
-    const points = dialog?.querySelector<HTMLElement>('[data-home-proof-points]');
-    const closeButtons = dialog?.querySelectorAll<HTMLButtonElement>('[data-home-proof-close]');
+const setupHomeContactDialog = () => {
+    const dialog = document.querySelector<HTMLDialogElement>('[data-home-contact-dialog]');
+    const triggers = document.querySelectorAll<HTMLButtonElement>('[data-home-contact-trigger]');
+    const closeButtons = dialog?.querySelectorAll<HTMLButtonElement>('[data-home-contact-close]');
 
-    if (!dialog || !image || !eyebrow || !title || !description || !points || !closeButtons) {
+    if (!dialog || triggers.length === 0 || !closeButtons) {
         return;
     }
+
+    const open = () => {
+        if (!dialog.open) {
+            dialog.showModal();
+        }
+    };
 
     const close = () => {
         if (dialog.open) {
@@ -284,43 +282,18 @@ const setupHomeComparisonProof = () => {
         }
     };
 
-    document.querySelectorAll<HTMLButtonElement>('[data-home-proof-trigger]').forEach((trigger) => {
-        trigger.addEventListener('click', () => {
-            const imageUrl = trigger.dataset.proofImage;
-
-            if (!imageUrl) {
-                return;
-            }
-
-            eyebrow.textContent = trigger.dataset.proofEyebrow || 'Funkcja platformy';
-            title.textContent = trigger.dataset.proofTitle || '';
-            description.textContent = trigger.dataset.proofDescription || '';
-            image.alt = trigger.dataset.proofAlt || '';
-
-            if (image.getAttribute('src') !== imageUrl) {
-                image.src = imageUrl;
-            }
-
-            points.replaceChildren();
-
-            [trigger.dataset.proofPointOne, trigger.dataset.proofPointTwo]
-                .filter((point): point is string => Boolean(point))
-                .forEach((point) => {
-                    const item = document.createElement('li');
-                    item.textContent = point;
-                    points.appendChild(item);
-                });
-
-            dialog.showModal();
-        });
-    });
-
+    triggers.forEach((trigger) => trigger.addEventListener('click', open));
     closeButtons.forEach((button) => button.addEventListener('click', close));
+
     dialog.addEventListener('click', (event) => {
         if (event.target === dialog) {
             close();
         }
     });
+
+    if (dialog.dataset.homeContactAutoOpen === 'true') {
+        open();
+    }
 };
 
 if (document.readyState === 'loading') {
@@ -329,13 +302,13 @@ if (document.readyState === 'loading') {
         setupCsrfRefreshForms();
         setupPublicMobileMenu();
         setupPublicSourceStrip();
-        setupHomeHeaderPointerReveal();
+        setupHomeHeaderScrollDensity();
         setupHomeHeaderMenus();
         setupPublicAuthDrawerLoader();
         setupQuestionLessonAudio();
         setupHomeOpsReveals();
         setupHomeOpsVideos();
-        setupHomeComparisonProof();
+        setupHomeContactDialog();
     }, {
         once: true,
     });
@@ -344,11 +317,11 @@ if (document.readyState === 'loading') {
     setupCsrfRefreshForms();
     setupPublicMobileMenu();
     setupPublicSourceStrip();
-    setupHomeHeaderPointerReveal();
+    setupHomeHeaderScrollDensity();
     setupHomeHeaderMenus();
     setupPublicAuthDrawerLoader();
     setupQuestionLessonAudio();
     setupHomeOpsReveals();
     setupHomeOpsVideos();
-    setupHomeComparisonProof();
+    setupHomeContactDialog();
 }

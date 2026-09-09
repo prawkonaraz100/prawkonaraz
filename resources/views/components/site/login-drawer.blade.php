@@ -1,7 +1,7 @@
 @props(['open' => null])
 
 @php
-    $authScene = \Illuminate\Support\Facades\Vite::asset('resources/images/auth/auth-reference-road-car.png');
+    $authScene = \Illuminate\Support\Facades\Vite::asset('resources/images/home/hero-composite-v3.webp');
     $authPanel = old('_auth_panel');
     $shouldOpen = is_bool($open)
         ? $open
@@ -11,7 +11,7 @@
 
 <div
     data-login-drawer
-    class="auth-dialog-overlay fixed inset-0 z-[90] {{ $shouldOpen ? 'flex' : 'hidden' }} font-[system-ui,-apple-system,'Segoe_UI',Roboto,Helvetica,Arial,sans-serif]"
+    class="auth-dialog-overlay auth-dialog-overlay--standalone fixed inset-0 z-[90] {{ $shouldOpen ? 'flex' : 'hidden' }} font-[system-ui,-apple-system,'Segoe_UI',Roboto,Helvetica,Arial,sans-serif]"
     role="presentation"
     aria-hidden="{{ $shouldOpen ? 'false' : 'true' }}"
     data-login-drawer-open="{{ $shouldOpen ? 'true' : 'false' }}"
@@ -45,10 +45,10 @@
                     id="public-login-drawer-title"
                     class="auth-login-drawer-title auth-dialog__title"
                 >
-                    Witaj w Prawko na Raz
+                    Zaloguj się i kontynuuj naukę
                 </h2>
                 <p class="auth-login-drawer-lead auth-dialog__lead">
-                    Twoje miejsce do skutecznej nauki i zdania egzaminu.
+                    Wróć dokładnie do miejsca, w którym skończyłeś.
                 </p>
                 <nav class="auth-switcher" aria-label="Wybierz formularz konta">
                     <span class="auth-switcher__tab is-active" aria-current="page">Logowanie</span>
@@ -158,7 +158,7 @@
                         <input
                             name="remember"
                             type="checkbox"
-                            class="h-4 w-4 rounded border-[#cfd6e2] text-[#d01921] focus:ring-[#d01921]/25"
+                            class="h-4 w-4 rounded border-[#cfd6e2] text-[#0a66c2] focus:ring-[#0a66c2]/25"
                             @checked(old('remember'))
                         >
                         <span>Zapamiętaj mnie</span>
@@ -166,7 +166,7 @@
                     @if (Route::has('password.request'))
                         <a
                             href="{{ route('password.request', absolute: false) }}"
-                            class="text-[0.82rem] font-normal text-[#d01921] underline decoration-[#d01921]/35 underline-offset-2 transition hover:text-[#a80f16]"
+                            class="text-[0.82rem] font-normal text-[#0a66c2] underline decoration-[#0a66c2]/35 underline-offset-2 transition hover:text-[#084f96]"
                         >
                             Nie pamiętasz hasła?
                         </a>
@@ -176,7 +176,7 @@
                 <button
                     type="submit"
                     data-testid="login-submit"
-                    class="auth-login-drawer-submit inline-flex h-12 w-full items-center justify-center rounded-[6px] bg-[#d01921] px-5 text-[0.95rem] font-medium text-white transition hover:bg-[#b9151c] disabled:cursor-not-allowed disabled:opacity-60"
+                    class="auth-login-drawer-submit inline-flex h-12 w-full items-center justify-center rounded-[6px] bg-[#0a66c2] px-5 text-[0.95rem] font-medium text-white transition hover:bg-[#084f96] disabled:cursor-not-allowed disabled:opacity-60"
                     data-csrf-submit
                 >
                     Zaloguj się
@@ -194,10 +194,6 @@
             <div class="auth-login-drawer-social auth-dialog__social">
                 <div class="auth-login-drawer-social-grid grid gap-3">
                     @if (in_array('google', $enabledSocialProviders, true))
-                    <p class="auth-dialog__legal-consent">
-                        <span>Kontynuując z Google, akceptujesz <a href="{{ route('legal.terms', absolute: false) }}">Regulamin</a> i potwierdzasz</span>
-                        <span>zapoznanie się z <a href="{{ route('legal.privacy', absolute: false) }}">Polityką prywatności</a>.</span>
-                    </p>
                     <a
                         href="{{ route('social.redirect', ['provider' => 'google'], absolute: false) }}"
                         class="auth-google-login-button"
@@ -233,26 +229,12 @@
             <p class="auth-login-drawer-return">
                 Po zalogowaniu wrócisz dokładnie tam, gdzie skończyłeś naukę.
             </p>
-            <p class="auth-login-drawer-invite">
-                Masz kod od znajomego?
-                <a
-                    href="{{ route('friend-invitations.code.create', absolute: false) }}"
-                    class="font-normal text-[#d01921] underline decoration-[#d01921]/35 underline-offset-2 transition hover:text-[#a80f16]"
-                >
-                    Wpisz kod zaproszenia
-                </a>
+            @if (in_array('google', $enabledSocialProviders, true))
+            <p class="auth-dialog__legal-consent">
+                Kontynuując z Google, akceptujesz <a href="{{ route('legal.terms', absolute: false) }}">Regulamin</a>
+                i potwierdzasz zapoznanie się z <a href="{{ route('legal.privacy', absolute: false) }}">Polityką prywatności</a>.
             </p>
-
-            <p class="auth-login-drawer-register">
-                Nie masz konta?
-                <button
-                    type="button"
-                    class="font-normal text-[#d01921] underline decoration-[#d01921]/35 underline-offset-2 transition hover:text-[#a80f16]"
-                    data-auth-drawer-switch="register"
-                >
-                    Zarejestruj się
-                </button>
-            </p>
+            @endif
             </footer>
             </div>
         </div>

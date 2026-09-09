@@ -278,6 +278,9 @@ Route::get('/jak-to-dziala', HowItWorksPageController::class)
     ->name('about.how-it-works');
 Route::get('/kontakt', ContactPageController::class)
     ->name('about.contact');
+Route::post('/kontakt', [ContactPageController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('about.contact.store');
 Route::get('/metodologia', MethodologyPageController::class)
     ->name('about.methodology');
 

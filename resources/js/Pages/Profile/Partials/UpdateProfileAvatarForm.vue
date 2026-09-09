@@ -26,6 +26,7 @@ const uploadForm = useForm<{
 });
 
 const deleteForm = useForm({});
+const busy = computed(() => uploadForm.processing || deleteForm.processing);
 
 const avatarUrl = computed(() => previewUrl.value ?? user.value.avatar_url ?? null);
 const initials = computed(() => user.value.avatar_initials ?? 'U');
@@ -54,11 +55,17 @@ const chooseAvatar = () => {
 };
 
 const onAvatarSelected = (event: Event) => {
+    if (busy.value) return;
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0] ?? null;
 
     if (!file) {
+        return;
+    }
+
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 2 * 1024 * 1024) {
         resetSelectedFile();
+        uploadForm.setError('avatar', 'Wybierz zdjęcie JPG, PNG lub WEBP o rozmiarze do 2 MB.');
         return;
     }
 
@@ -70,7 +77,7 @@ const onAvatarSelected = (event: Event) => {
 };
 
 const submitAvatar = () => {
-    if (!uploadForm.avatar) {
+    if (!uploadForm.avatar || busy.value) {
         return;
     }
 
@@ -82,6 +89,7 @@ const submitAvatar = () => {
 };
 
 const removeAvatar = () => {
+    if (busy.value) return;
     deleteForm.delete('/profile/avatar', {
         preserveScroll: true,
         onSuccess: resetSelectedFile,
@@ -140,7 +148,7 @@ onBeforeUnmount(clearPreview);
                         Korzystasz z własnego zdjęcia profilowego.
                     </p>
                     <p v-else-if="usesSocialFallback" class="mt-1 text-sm leading-6 text-slate-600">
-                        Pokazujemy zdjęcie z podłączonego konta Google lub Facebook. Własny upload zawsze je zastąpi.
+                        Pokazujemy zdjęcie z podłączonego konta Google lub Facebook. Wybrane przez Ciebie zdjęcie je zastąpi.
                     </p>
                     <p v-else class="mt-1 text-sm leading-6 text-slate-600">
                         Nie masz jeszcze zdjęcia profilowego. W menu pokazujemy inicjały.
@@ -157,6 +165,9 @@ onBeforeUnmount(clearPreview);
                     ref="fileInput"
                     type="file"
                     class="sr-only"
+                    aria-label="Wybierz zdjęcie profilowe"
+                    tabindex="-1"
+                    :disabled="busy"
                     accept="image/jpeg,image/png,image/webp"
                     @change="onAvatarSelected"
                 >
@@ -167,6 +178,7 @@ onBeforeUnmount(clearPreview);
                         class="inline-flex h-12 items-center justify-center rounded-lg border border-[#d0d5dd] bg-white px-6 text-sm font-semibold text-[#344054] transition hover:bg-[#f9fafb] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] focus-visible:ring-offset-2"
                         :class="props.mobileSheet ? 'w-full' : 'sm:h-11 sm:w-auto sm:rounded-md'"
                         @click="chooseAvatar"
+                        :disabled="busy"
                     >
                         {{ uploadForm.avatar ? 'Wybierz inne zdjęcie' : 'Wybierz zdjęcie' }}
                     </button>
@@ -191,7 +203,7 @@ onBeforeUnmount(clearPreview);
                         type="submit"
                         class="inline-flex h-12 items-center justify-center rounded-lg bg-[#0b5cff] px-6 text-sm font-semibold text-white transition hover:bg-[#084fdc] disabled:cursor-not-allowed disabled:opacity-50"
                         :class="props.mobileSheet ? 'w-full' : 'sm:h-11 sm:w-auto sm:rounded-md sm:bg-[#0d47a1]'"
-                        :disabled="!uploadForm.avatar || uploadForm.processing"
+                        :disabled="!uploadForm.avatar || busy"
                     >
                         {{ uploadForm.processing ? 'Zapisywanie...' : 'Zapisz zdjęcie' }}
                     </button>
@@ -201,6 +213,7 @@ onBeforeUnmount(clearPreview);
                         type="button"
                         class="inline-flex h-11 items-center justify-center rounded-lg px-4 text-sm font-semibold text-[#667085] transition hover:bg-[#f2f4f7] hover:text-[#101828]"
                         @click="resetSelectedFile"
+                        :disabled="busy"
                     >
                         Anuluj wybór
                     </button>
@@ -239,7 +252,7 @@ onBeforeUnmount(clearPreview);
                     type="button"
                     class="inline-flex h-11 items-center justify-center rounded-lg border border-red-200 bg-white px-6 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
                     :class="props.mobileSheet ? 'w-full' : 'sm:w-auto sm:rounded-md'"
-                    :disabled="deleteForm.processing"
+                    :disabled="busy"
                     @click="removeAvatar"
                 >
                     {{ deleteForm.processing ? 'Usuwanie...' : 'Usuń zdjęcie' }}

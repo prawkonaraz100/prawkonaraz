@@ -171,14 +171,14 @@
             <script type="application/ld+json">{!! json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
         @endforeach
     </head>
-    <body class="min-h-screen bg-white text-slate-950">
+    <body class="flex min-h-screen flex-col bg-white text-slate-950">
         @hasSection('site_header')
             @yield('site_header')
         @else
-            <x-site.public-header />
+            <x-site.home-header :immediate="true" />
         @endif
 
-        <main>
+        <main class="flex-1">
             @if ($breadcrumbs !== [])
                 @php
                     $breadcrumbBandClass = trim($__env->yieldContent('breadcrumb_band_class')) ?: 'content-band';

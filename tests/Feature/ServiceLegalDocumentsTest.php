@@ -46,7 +46,18 @@ test('public footer and login drawer link to the correct legal pages', function 
 
     $this->get(route('public.auth-drawers.show', ['drawer' => 'login']))
         ->assertOk()
-        ->assertSeeText('Kontynuując z Google, akceptujesz');
+        ->assertSeeText('Kontynuując z Google, akceptujesz')
+        ->assertSeeInOrder([
+            'Po zalogowaniu wrócisz dokładnie tam, gdzie skończyłeś naukę.',
+            'Kontynuując z Google, akceptujesz',
+        ]);
+
+    $this->get(route('public.auth-drawers.show', ['drawer' => 'register']))
+        ->assertOk()
+        ->assertSeeInOrder([
+            'Masz kod od znajomego?',
+            'Kontynuując z Google, akceptujesz',
+        ]);
 });
 
 test('homepage enables native google one tap for first time visitors when google identity is enabled', function () {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\FriendInvitation;
 use App\Models\User;
+use App\Support\FriendInvitationEligibilityService;
 use App\Support\FriendInvitationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,8 +16,16 @@ class FriendInvitationClaimController extends Controller
 {
     private const SESSION_KEY = 'friend_invitation.pending_id';
 
+    public function __construct(
+        protected FriendInvitationEligibilityService $eligibility,
+    ) {}
+
     public function codeForm(): Response
     {
+        if (! $this->eligibility->isAvailable()) {
+            return $this->renderInvitation(null, 'access_open');
+        }
+
         return Inertia::render('FriendInvitations/Code', [
             'status' => session('status'),
         ]);
@@ -24,6 +33,12 @@ class FriendInvitationClaimController extends Controller
 
     public function submitCode(Request $request, FriendInvitationService $friendInvitationService): RedirectResponse
     {
+        if (! $this->eligibility->isAvailable()) {
+            $request->session()->forget(self::SESSION_KEY);
+
+            return to_route('friend-invitations.code.create');
+        }
+
         $validated = $request->validate([
             'code' => ['required', 'string', 'max:32'],
         ]);
@@ -48,6 +63,12 @@ class FriendInvitationClaimController extends Controller
         string $token,
         FriendInvitationService $friendInvitationService,
     ): Response {
+        if (! $this->eligibility->isAvailable()) {
+            $request->session()->forget(self::SESSION_KEY);
+
+            return $this->renderInvitation(null, 'access_open');
+        }
+
         $invitation = $friendInvitationService->findPendingByToken($token);
 
         if (! $invitation instanceof FriendInvitation) {
@@ -63,6 +84,12 @@ class FriendInvitationClaimController extends Controller
 
     public function showPending(Request $request): Response|RedirectResponse
     {
+        if (! $this->eligibility->isAvailable()) {
+            $request->session()->forget(self::SESSION_KEY);
+
+            return $this->renderInvitation(null, 'access_open');
+        }
+
         $user = $request->user();
 
         if (! $user instanceof User) {
@@ -88,6 +115,13 @@ class FriendInvitationClaimController extends Controller
         Request $request,
         FriendInvitationService $friendInvitationService,
     ): RedirectResponse {
+        if (! $this->eligibility->isAvailable()) {
+            $request->session()->forget(self::SESSION_KEY);
+
+            return to_route('session.index')
+                ->with('status', 'Dostęp do platformy jest obecnie otwarty. Kod zaproszenia nie jest potrzebny.');
+        }
+
         $invitation = $this->pendingInvitation($request);
 
         if (! $invitation instanceof FriendInvitation) {

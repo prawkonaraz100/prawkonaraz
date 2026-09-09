@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import LoginDrawer from '@/Components/Auth/LoginDrawer.vue';
+import AuthTopNavigation from '@/Components/Auth/AuthTopNavigation.vue';
 import MobileAppBar from '@/Components/MobileAppBar.vue';
 import MobileBottomNavigation from '@/Components/MobileBottomNavigation.vue';
 import Modal from '@/Components/Modal.vue';
@@ -3019,6 +3020,9 @@ const dismissPublicDemoCompletionPrompt = () => {
 };
 const publicDemoLoginDrawerOpen = ref(false);
 const publicDemoRegisterDrawerOpen = ref(false);
+const publicDemoAuthDrawerOpen = computed(
+    () => publicDemoLoginDrawerOpen.value || publicDemoRegisterDrawerOpen.value,
+);
 const publicDemoAuthDrawerVisualHost = ref<'login' | 'register' | null>(null);
 const publicDemoRegistrationCategories = computed(
     () => page.props.authDrawers.registrationCategories,
@@ -10967,12 +10971,12 @@ watch(
                     />
                     <div
                         lang="pl"
-                        class="relative max-h-[calc(100svh-2rem)] w-full max-w-[46rem] overflow-y-auto rounded-xl border border-[#d8e0ea] bg-white px-4 py-4 text-left shadow-[0_24px_70px_rgba(15,23,42,0.22)] sm:max-h-[calc(100svh-3rem)] sm:px-6 sm:py-4"
+                        class="relative max-h-[calc(100svh-2rem)] w-full max-w-[60rem] overflow-y-auto rounded-xl border border-[#d8e0ea] bg-white px-5 py-5 text-left shadow-[0_24px_70px_rgba(15,23,42,0.22)] sm:max-h-[calc(100svh-3rem)] sm:px-8 sm:py-7"
                     >
                         <button
                             type="button"
                             aria-label="Zamknij"
-                            class="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-md text-[#475569] transition hover:bg-[#f1f5f9] hover:text-[#0f172a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b67d1] sm:right-4 sm:top-4"
+                            class="absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center rounded-md text-[#475569] transition hover:bg-[#f1f5f9] hover:text-[#0f172a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b67d1] sm:right-5 sm:top-5"
                             @click="dismissPublicDemoGate"
                         >
                             <X :size="21" :stroke-width="2" aria-hidden="true" />
@@ -10980,49 +10984,49 @@ watch(
 
                         <header class="pr-11">
                             <div class="flex items-center gap-3">
-                                <Settings :size="27" :stroke-width="1.9" class="shrink-0 text-[#EFC54F]" aria-hidden="true" />
-                                <h2 class="text-xl font-semibold tracking-[-0.01em] text-[#17233b] sm:text-[1.35rem]">
+                                <Settings :size="30" :stroke-width="1.9" class="shrink-0 text-[#EFC54F]" aria-hidden="true" />
+                                <h2 class="text-2xl font-semibold tracking-[-0.02em] text-[#17233b] sm:text-[1.7rem]">
                                     Dostosuj naukę do siebie
                                 </h2>
                             </div>
-                            <p class="mt-1 text-xs leading-5 text-[#536176] sm:text-[0.8rem]">
+                            <p class="mt-1.5 text-sm leading-6 text-[#536176] sm:text-[0.95rem]">
                                 Ustawienia możesz zmienić w dowolnym momencie podczas nauki.
                             </p>
                         </header>
 
-                        <section class="mt-2.5 rounded-lg border border-[#d9e2ec] px-4 py-2.5">
-                            <h3 class="text-sm font-semibold text-[#1f2937]">Aktualne ustawienia</h3>
-                            <div class="mt-2 grid gap-x-7 gap-y-2 text-xs sm:grid-cols-2">
-                                <div class="space-y-2 sm:border-r sm:border-[#dbe3ec] sm:pr-6">
-                                    <div class="grid grid-cols-[1.25rem_minmax(6.5rem,1fr)_auto] items-center gap-2">
-                                        <MessageSquareText :size="17" :stroke-width="1.7" class="text-[#334155]" aria-hidden="true" />
+                        <section class="mt-4 rounded-xl border border-[#d9e2ec] px-5 py-4">
+                            <h3 class="text-base font-semibold text-[#1f2937]">Aktualne ustawienia</h3>
+                            <div class="mt-3 grid gap-x-8 gap-y-3 text-[0.9rem] sm:grid-cols-2 sm:text-[0.92rem]">
+                                <div class="space-y-3 sm:border-r sm:border-[#dbe3ec] sm:pr-7">
+                                    <div class="grid grid-cols-[1.5rem_minmax(7.5rem,1fr)_auto] items-center gap-2.5">
+                                        <MessageSquareText :size="19" :stroke-width="1.7" class="text-[#334155]" aria-hidden="true" />
                                         <span class="text-[#536176]">Po odpowiedzi:</span>
                                         <strong class="font-semibold text-[#17233b]">{{ classicFeedbackModeLabel }}</strong>
                                     </div>
-                                    <div class="grid grid-cols-[1.25rem_minmax(6.5rem,1fr)_auto] items-center gap-2">
-                                        <ArrowRight :size="17" :stroke-width="1.7" class="text-[#334155]" aria-hidden="true" />
+                                    <div class="grid grid-cols-[1.5rem_minmax(7.5rem,1fr)_auto] items-center gap-2.5">
+                                        <ArrowRight :size="19" :stroke-width="1.7" class="text-[#334155]" aria-hidden="true" />
                                         <span class="text-[#536176]">Przejście dalej:</span>
                                         <strong class="font-semibold text-[#17233b]">{{ classicAdvanceModeLabel }}</strong>
                                     </div>
-                                    <div class="grid grid-cols-[1.25rem_minmax(6.5rem,1fr)_auto] items-center gap-2">
-                                        <Gauge :size="17" :stroke-width="1.7" class="text-[#334155]" aria-hidden="true" />
+                                    <div class="grid grid-cols-[1.5rem_minmax(7.5rem,1fr)_auto] items-center gap-2.5">
+                                        <Gauge :size="19" :stroke-width="1.7" class="text-[#334155]" aria-hidden="true" />
                                         <span class="text-[#536176]">Prędkość odtwarzania:</span>
                                         <strong class="font-semibold text-[#17233b]">{{ classicMediaModeLabel }}</strong>
                                     </div>
                                 </div>
-                                <div class="space-y-2 sm:pl-1">
-                                    <div class="grid grid-cols-[1.25rem_minmax(5.5rem,1fr)_auto] items-center gap-2">
-                                        <Volume2 :size="17" :stroke-width="1.7" class="text-[#334155]" aria-hidden="true" />
+                                <div class="space-y-3 sm:pl-1">
+                                    <div class="grid grid-cols-[1.5rem_minmax(6.5rem,1fr)_auto] items-center gap-2.5">
+                                        <Volume2 :size="19" :stroke-width="1.7" class="text-[#334155]" aria-hidden="true" />
                                         <span class="text-[#536176]">Audio pytania:</span>
                                         <strong class="font-semibold text-[#17233b]">{{ classicQuestionAudioModeLabel }}</strong>
                                     </div>
-                                    <div class="grid grid-cols-[1.25rem_minmax(5.5rem,1fr)_auto] items-center gap-2">
-                                        <Lightbulb :size="17" :stroke-width="1.7" class="text-[#334155]" aria-hidden="true" />
+                                    <div class="grid grid-cols-[1.5rem_minmax(6.5rem,1fr)_auto] items-center gap-2.5">
+                                        <Lightbulb :size="19" :stroke-width="1.7" class="text-[#334155]" aria-hidden="true" />
                                         <span class="text-[#536176]">Wskazówki:</span>
                                         <strong class="font-semibold text-[#17233b]">{{ classicInlineFormattingLabel }}</strong>
                                     </div>
-                                    <div class="grid grid-cols-[1.25rem_minmax(5.5rem,1fr)_auto] items-center gap-2">
-                                        <ArrowUpRight :size="17" :stroke-width="1.7" class="text-[#334155]" aria-hidden="true" />
+                                    <div class="grid grid-cols-[1.5rem_minmax(6.5rem,1fr)_auto] items-center gap-2.5">
+                                        <ArrowUpRight :size="19" :stroke-width="1.7" class="text-[#334155]" aria-hidden="true" />
                                         <span class="text-[#536176]">Strzałki pomocnicze:</span>
                                         <strong class="font-semibold text-[#17233b]">{{ classicAnnotationsLabel }}</strong>
                                     </div>
@@ -11030,86 +11034,86 @@ watch(
                             </div>
                         </section>
 
-                        <section class="mt-2 grid gap-2 sm:grid-cols-2">
-                            <article class="flex gap-3 rounded-lg border border-[#d9e2ec] px-3 py-2.5">
-                                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#fff8e7] text-[#17233b]">
-                                    <MessageSquareText :size="22" :stroke-width="1.7" aria-hidden="true" />
+                        <section class="mt-3 grid gap-3 sm:grid-cols-2">
+                            <article class="flex gap-4 rounded-xl border border-[#d9e2ec] px-4 py-4">
+                                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#fff8e7] text-[#17233b]">
+                                    <MessageSquareText :size="24" :stroke-width="1.7" aria-hidden="true" />
                                 </span>
                                 <div>
-                                    <h3 class="text-sm font-semibold text-[#17233b]">Po odpowiedzi</h3>
-                                    <p class="mt-1 text-[0.7rem] leading-[1.35] text-[#445269]">Wybierz, co ma się dziać po udzieleniu odpowiedzi. Szybko, z wyjaśnieniem albo wynik na końcu.</p>
+                                    <h3 class="text-base font-semibold text-[#17233b]">Po odpowiedzi</h3>
+                                    <p class="mt-1.5 text-[0.85rem] leading-[1.5] text-[#445269] sm:text-sm">Wybierz, co ma się dziać po udzieleniu odpowiedzi. Szybko, z wyjaśnieniem albo wynik na końcu.</p>
                                 </div>
                             </article>
-                            <article class="flex gap-3 rounded-lg border border-[#d9e2ec] px-3 py-2.5">
-                                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#f3f6fa] text-[#17233b]">
-                                    <Volume2 :size="22" :stroke-width="1.7" aria-hidden="true" />
+                            <article class="flex gap-4 rounded-xl border border-[#d9e2ec] px-4 py-4">
+                                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#f3f6fa] text-[#17233b]">
+                                    <Volume2 :size="24" :stroke-width="1.7" aria-hidden="true" />
                                 </span>
                                 <div>
-                                    <h3 class="text-sm font-semibold text-[#17233b]">Audio pytania</h3>
-                                    <p class="mt-1 text-[0.7rem] leading-[1.35] text-[#445269]">Czytaj pytania sam albo słuchaj lektora. Czytanie własne = szybciej, lektor = gdy jesteś zmęczony lub pytania są długie.</p>
+                                    <h3 class="text-base font-semibold text-[#17233b]">Audio pytania</h3>
+                                    <p class="mt-1.5 text-[0.85rem] leading-[1.5] text-[#445269] sm:text-sm">Czytaj pytania sam albo słuchaj lektora. Czytanie własne = szybciej, lektor = gdy jesteś zmęczony lub pytania są długie.</p>
                                 </div>
                             </article>
-                            <article class="flex gap-3 rounded-lg border border-[#d9e2ec] px-3 py-2.5">
-                                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#fff8e7] text-[#17233b]">
-                                    <Lightbulb :size="22" :stroke-width="1.7" aria-hidden="true" />
+                            <article class="flex gap-4 rounded-xl border border-[#d9e2ec] px-4 py-4">
+                                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#fff8e7] text-[#17233b]">
+                                    <Lightbulb :size="24" :stroke-width="1.7" aria-hidden="true" />
                                 </span>
                                 <div>
-                                    <h3 class="text-sm font-semibold text-[#17233b]">Wskazówki w pytaniu</h3>
-                                    <p class="mt-1 text-[0.7rem] leading-[1.35] text-[#445269]">Pogrubienia, kolory i strzałki pomagają zwrócić uwagę na to, co ważne.</p>
+                                    <h3 class="text-base font-semibold text-[#17233b]">Wskazówki w pytaniu</h3>
+                                    <p class="mt-1.5 text-[0.85rem] leading-[1.5] text-[#445269] sm:text-sm">Pogrubienia, kolory i strzałki pomagają zwrócić uwagę na to, co ważne.</p>
                                 </div>
                             </article>
-                            <article class="flex gap-3 rounded-lg border border-[#d9e2ec] px-3 py-2.5">
-                                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#f3f6fa] text-[#17233b]">
-                                    <SquarePlay :size="22" :stroke-width="1.7" aria-hidden="true" />
+                            <article class="flex gap-4 rounded-xl border border-[#d9e2ec] px-4 py-4">
+                                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#f3f6fa] text-[#17233b]">
+                                    <SquarePlay :size="24" :stroke-width="1.7" aria-hidden="true" />
                                 </span>
                                 <div>
-                                    <h3 class="text-sm font-semibold text-[#17233b]">Filmy w pytaniach</h3>
-                                    <p class="mt-1 text-[0.7rem] leading-[1.35] text-[#445269]">Zdecyduj, czy filmy mają ruszać automatycznie i jak szybko je odtwarzać. Możesz też od razu oglądać końcówkę filmu (ostatnie 2 s).</p>
+                                    <h3 class="text-base font-semibold text-[#17233b]">Filmy w pytaniach</h3>
+                                    <p class="mt-1.5 text-[0.85rem] leading-[1.5] text-[#445269] sm:text-sm">Zdecyduj, czy filmy mają ruszać automatycznie i jak szybko je odtwarzać. Możesz też od razu oglądać końcówkę filmu (ostatnie 2 s).</p>
                                 </div>
                             </article>
                         </section>
 
-                        <section class="mt-2 rounded-lg border border-[#d9e2ec] px-4 py-2.5">
+                        <section class="mt-3 rounded-xl border border-[#d9e2ec] px-5 py-4">
                             <div class="flex items-center gap-2">
-                                <Keyboard :size="19" :stroke-width="1.7" class="text-[#17233b]" aria-hidden="true" />
-                                <h3 class="text-sm font-semibold text-[#17233b]">Skróty klawiaturowe</h3>
+                                <Keyboard :size="21" :stroke-width="1.7" class="text-[#17233b]" aria-hidden="true" />
+                                <h3 class="text-base font-semibold text-[#17233b]">Skróty klawiaturowe</h3>
                             </div>
-                            <div class="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[0.7rem] text-[#445269]">
-                                <span class="inline-flex items-center gap-1.5"><kbd class="rounded border border-[#cbd5e1] bg-white px-2 py-1 font-semibold text-[#17233b]">A lub ←</kbd><span>— zaznacz odpowiedź TAK</span></span>
-                                <span class="inline-flex items-center gap-1.5"><kbd class="rounded border border-[#cbd5e1] bg-white px-2 py-1 font-semibold text-[#17233b]">D lub →</kbd><span>— zaznacz odpowiedź NIE</span></span>
-                                <span class="inline-flex items-center gap-1.5"><kbd class="rounded border border-[#cbd5e1] bg-white px-2 py-1 font-semibold text-[#17233b]">S lub ↓</kbd><span>— pokaż wyjaśnienie</span></span>
+                            <div class="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-[0.82rem] text-[#445269] sm:text-sm">
+                                <span class="inline-flex items-center gap-1.5"><kbd class="rounded border border-[#cbd5e1] bg-white px-2.5 py-1.5 font-semibold text-[#17233b]">A lub ←</kbd><span>— zaznacz odpowiedź TAK</span></span>
+                                <span class="inline-flex items-center gap-1.5"><kbd class="rounded border border-[#cbd5e1] bg-white px-2.5 py-1.5 font-semibold text-[#17233b]">D lub →</kbd><span>— zaznacz odpowiedź NIE</span></span>
+                                <span class="inline-flex items-center gap-1.5"><kbd class="rounded border border-[#cbd5e1] bg-white px-2.5 py-1.5 font-semibold text-[#17233b]">S lub ↓</kbd><span>— pokaż wyjaśnienie</span></span>
                             </div>
-                            <p class="mt-1.5 text-[0.7rem] leading-4 text-[#536176]">Skróty przyspieszają naukę i pozwalają przechodzić przez sesję bez używania myszy.</p>
+                            <p class="mt-2.5 text-[0.82rem] leading-5 text-[#536176] sm:text-sm">Skróty przyspieszają naukę i pozwalają przechodzić przez sesję bez używania myszy.</p>
                         </section>
 
-                        <aside class="mt-2 flex gap-2.5 rounded-lg border border-[#d9e2ec] px-4 py-2 text-[0.7rem] leading-[0.95rem] text-[#445269]">
-                            <Info :size="17" :stroke-width="1.8" class="mt-0.5 shrink-0 text-[#334155]" aria-hidden="true" />
+                        <aside class="mt-3 flex gap-3 rounded-xl border border-[#d9e2ec] px-5 py-3.5 text-[0.82rem] leading-5 text-[#445269] sm:text-sm">
+                            <Info :size="19" :stroke-width="1.8" class="mt-0.5 shrink-0 text-[#334155]" aria-hidden="true" />
                             <p>
                                 Pamiętaj, że czytając pytania sam, czytasz je szybciej i jesteś w stanie przerobić większą ilość pytań podczas sesji.<br>
                                 Tryb lektora sprawdza się super, kiedy jesteś zmęczony albo na pytaniach specjalistycznych, kiedy są bardzo długie.
                             </p>
                         </aside>
 
-                        <div class="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                            <label class="inline-flex cursor-pointer items-center gap-2 text-xs text-[#445269]">
+                        <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <label class="inline-flex cursor-pointer items-center gap-2.5 text-sm text-[#445269]">
                                 <input
                                     v-model="skipPublicDemoGateNextTime"
                                     type="checkbox"
-                                    class="h-4 w-4 rounded border-[#cbd5e1] text-[#0b67d1] focus:ring-[#0b67d1]"
+                                    class="h-5 w-5 rounded border-[#cbd5e1] text-[#0b67d1] focus:ring-[#0b67d1]"
                                 >
                                 <span>Nie pokazuj tego okna ponownie</span>
                             </label>
                             <div class="grid gap-2 sm:grid-cols-2">
                                 <button
                                     type="button"
-                                    class="inline-flex min-h-[2.75rem] items-center justify-center rounded-md border border-[#cbd5e1] bg-white px-5 py-2.5 text-xs font-semibold text-[#17233b] transition hover:border-[#94a3b8] hover:bg-[#f8fafc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b67d1] focus-visible:ring-offset-2"
+                                    class="inline-flex min-h-[3rem] items-center justify-center rounded-md border border-[#cbd5e1] bg-white px-6 py-3 text-sm font-semibold text-[#17233b] transition hover:border-[#94a3b8] hover:bg-[#f8fafc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b67d1] focus-visible:ring-offset-2"
                                     @click="customizePublicDemoSettings"
                                 >
                                     Dostosuj ustawienia
                                 </button>
                                 <Link
                                     :href="publicDemoGateDemoHref"
-                                    class="inline-flex min-h-[2.75rem] items-center justify-center rounded-md border border-[#EFC54F] bg-[#EFC54F] px-5 py-2.5 text-xs font-semibold text-[#17233b] transition hover:border-[#ddb43f] hover:bg-[#ddb43f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EFC54F] focus-visible:ring-offset-2"
+                                    class="inline-flex min-h-[3rem] items-center justify-center rounded-md border border-[#EFC54F] bg-[#EFC54F] px-6 py-3 text-sm font-semibold text-[#17233b] transition hover:border-[#ddb43f] hover:bg-[#ddb43f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EFC54F] focus-visible:ring-offset-2"
                                     @click="rememberPublicDemoGatePreference"
                                 >
                                     Rozpocznij naukę
@@ -11121,8 +11125,13 @@ watch(
             </Transition>
         </div>
 
+        <AuthTopNavigation
+            v-if="isPublicDemoMode && publicDemoPrimaryUsesRegisterDrawer && publicDemoAuthDrawerOpen"
+        />
+
         <LoginDrawer
             v-if="isPublicDemoMode && publicDemoPrimaryUsesRegisterDrawer"
+            standalone
             :open="publicDemoLoginDrawerOpen"
             :retain-visual="publicDemoRetainsAuthDrawerVisual('login')"
             :hide-visual="publicDemoHidesAuthDrawerVisual('login')"
@@ -11132,6 +11141,7 @@ watch(
 
         <RegisterDrawer
             v-if="isPublicDemoMode && publicDemoPrimaryUsesRegisterDrawer"
+            standalone
             :open="publicDemoRegisterDrawerOpen"
             :categories="publicDemoRegistrationCategories"
             :retain-visual="publicDemoRetainsAuthDrawerVisual('register')"

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import SiteFooter from '@/Components/SiteFooter.vue';
-import SiteHeader from '@/Components/SiteHeader.vue';
+import PublicTopNavigation from '@/Components/PublicTopNavigation.vue';
 import type { PageProps } from '@/types';
 import friendInvitationHero from '../../../images/invitations/friend-invitation-hero.png';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
@@ -42,11 +42,28 @@ const formatDate = (value?: string | null) => {
 };
 
 const title = computed(() => {
+    if (props.invitation.inactive_reason === 'access_open') {
+        return 'Dostęp do platformy jest otwarty';
+    }
+
     if (!props.invitation.active) {
         return 'To zaproszenie jest nieaktywne';
     }
 
     return `${props.invitation.inviter_name ?? 'Znajomy'} Cię zaprasza`;
+});
+
+const accessIsOpen = computed(
+    () => props.invitation.inactive_reason === 'access_open',
+);
+
+const inactiveDescription = computed(() => {
+    if (accessIsOpen.value) {
+        return 'Nie musisz używać kodu zaproszenia ani kupować planu. Załóż konto lub zaloguj się i rozpocznij naukę.';
+    }
+
+    return props.invitation.inactive_reason
+        ?? 'Link albo kod wygasł, został unieważniony albo slot zajął już inny znajomy.';
 });
 
 const accept = () => {
@@ -57,17 +74,17 @@ const accept = () => {
 </script>
 
 <template>
-    <Head title="Zaproszenie do nauki" />
+    <Head :title="accessIsOpen ? 'Dostęp otwarty' : 'Zaproszenie do nauki'" />
 
     <div class="flex min-h-screen flex-col bg-white text-[#081331]">
-        <SiteHeader />
+        <PublicTopNavigation />
 
         <main class="flex-1">
             <section class="border-b border-[#e4eaf3] bg-[#fbfcff]">
                 <div class="mx-auto grid max-w-[90rem] gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(18rem,0.55fr)] lg:items-center lg:py-12 xl:px-8">
                     <div class="min-w-0">
                         <p class="text-xs font-bold uppercase tracking-[0] text-[#e11d2e]">
-                            Zaproszenie Premium
+                            {{ accessIsOpen ? 'Otwarty dostęp' : 'Zaproszenie Premium' }}
                         </p>
                         <h1 class="mt-3 max-w-4xl text-[2rem] font-bold leading-[1.12] tracking-[0] text-[#081331] md:text-[2.6rem]">
                             {{ title }}
@@ -76,7 +93,7 @@ const accept = () => {
                             Przyjmij zaproszenie, żeby korzystać z nauki Premium do końca okresu osoby zapraszającej.
                         </p>
                         <p v-else class="mt-4 max-w-3xl text-[1rem] font-medium leading-7 text-[#4e5b78] md:text-[1.08rem]">
-                            {{ invitation.inactive_reason ?? 'Link albo kod wygasł, został unieważniony albo slot zajął już inny znajomy.' }}
+                            {{ inactiveDescription }}
                         </p>
                         <p
                             v-if="status"
@@ -97,7 +114,10 @@ const accept = () => {
             </section>
 
             <section>
-                <div class="mx-auto grid max-w-[90rem] gap-10 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:py-10 xl:px-8">
+                <div
+                    class="mx-auto grid max-w-[90rem] gap-10 px-4 py-8 sm:px-6 lg:py-10 xl:px-8"
+                    :class="invitation.active ? 'lg:grid-cols-[minmax(0,1fr)_22rem]' : 'lg:grid-cols-1'"
+                >
                     <div class="min-w-0">
                         <div v-if="invitation.active" class="divide-y divide-[#e4eaf3] border-y border-[#e4eaf3]">
                             <div class="grid gap-5 py-5 md:grid-cols-3">
@@ -167,18 +187,20 @@ const accept = () => {
 
                         <div v-else class="border-y border-[#e4eaf3] py-6">
                             <p class="text-sm font-medium leading-6 text-[#4e5b78]">
-                                Poproś osobę zapraszającą o wygenerowanie nowego zaproszenia albo wpisz kod, jeśli dostałeś inny.
+                                {{ accessIsOpen
+                                    ? 'Pełny dostęp otrzymasz po zalogowaniu i potwierdzeniu adresu e-mail.'
+                                    : 'Poproś osobę zapraszającą o wygenerowanie nowego zaproszenia albo wpisz kod, jeśli dostałeś inny.' }}
                             </p>
                             <Link
-                                :href="codeUrl"
+                                :href="accessIsOpen ? (user ? route('session.index') : registerUrl) : codeUrl"
                                 class="mt-5 inline-flex min-h-11 items-center justify-center rounded-[6px] border border-[#c9d2e3] px-6 text-sm font-bold text-[#081331] transition hover:border-[#9aa8bd] hover:bg-[#f7faff] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#081331] focus-visible:ring-offset-2"
                             >
-                                Mam kod zaproszenia
+                                {{ accessIsOpen ? 'Rozpocznij naukę' : 'Mam kod zaproszenia' }}
                             </Link>
                         </div>
                     </div>
 
-                    <aside class="border-y border-[#e4eaf3] py-5 lg:self-start">
+                    <aside v-if="invitation.active" class="border-y border-[#e4eaf3] py-5 lg:self-start">
                         <p class="text-xs font-bold uppercase tracking-[0] text-[#e11d2e]">
                             Ważność
                         </p>

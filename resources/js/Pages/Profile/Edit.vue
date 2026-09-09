@@ -9,9 +9,10 @@ import UpdateProfileInformationForm from './Partials/UpdateProfileInformationFor
 import { useSafeLogout } from '@/composables/useSafeLogout';
 import type { PageProps } from '@/types';
 import { Head, usePage } from '@inertiajs/vue3';
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 
 interface FriendInvitationPanelData {
+    enabled: boolean;
     eligible: boolean;
     can_issue: boolean;
     reason: string | null;
@@ -147,14 +148,16 @@ const profileSummary = computed(() => [
     },
 ]);
 
-const profileSections = [
+const profileSections = computed(() => [
     { href: '#zdjecie', label: 'Zdjęcie' },
     { href: '#dane-konta', label: 'Dane konta' },
-    { href: '#zapros-znajomego', label: 'Zaproszenia' },
+    ...(props.friendInvitations.enabled
+        ? [{ href: '#zapros-znajomego', label: 'Zaproszenia' }]
+        : []),
     { href: '#haslo', label: 'Hasło' },
     { href: '#social-login', label: 'Logowanie' },
     { href: '#usun-konto', label: 'Usunięcie konta' },
-];
+]);
 
 type ProfileSheet = 'avatar' | 'account' | 'invitations' | 'password' | 'social' | 'delete';
 
@@ -176,6 +179,11 @@ const {
     logoutPreparing,
 } = useSafeLogout();
 const openProfileSheet = ref<ProfileSheet | null>(null);
+const isMobile = ref(false);
+const profileDialog = ref<HTMLDialogElement | null>(null);
+let mobileMedia: MediaQueryList | null = null;
+let previousOverflow: string | null = null;
+let sheetTrigger: HTMLElement | null = null;
 const profileSheetTitle = computed(() => ({
     avatar: 'Zdjęcie profilowe',
     account: 'Dane konta',
@@ -189,42 +197,63 @@ const closeProfileSheet = () => {
     openProfileSheet.value = null;
 
     if (typeof window !== 'undefined' && profileSheetByHash[window.location.hash]) {
-        window.history.replaceState({}, '', `${window.location.pathname}${window.location.search}`);
-    }
-};
-
-const handleProfileKeydown = (event: KeyboardEvent) => {
-    if (event.defaultPrevented) {
-        return;
-    }
-
-    if (event.key === 'Escape' && openProfileSheet.value) {
-        closeProfileSheet();
+        window.history.replaceState(window.history.state, '', `${window.location.pathname}${window.location.search}`);
     }
 };
 
 const syncProfileSheetFromHash = () => {
-    const requestedSheet = profileSheetByHash[window.location.hash];
+    const requestedSheet = profileSheetByHash[window.location.hash] ?? null;
 
-    if (requestedSheet) {
-        openProfileSheet.value = requestedSheet;
-    }
+    openProfileSheet.value = isMobile.value
+        && (requestedSheet !== 'invitations' || props.friendInvitations.enabled)
+        ? requestedSheet
+        : null;
 };
 
-watch(openProfileSheet, (section) => {
-    document.body.style.overflow = section ? 'hidden' : '';
+const restoreSheetState = () => {
+    if (previousOverflow !== null) {
+        document.body.style.overflow = previousOverflow;
+        previousOverflow = null;
+    }
+    if (sheetTrigger?.isConnected) {
+        sheetTrigger.focus({ preventScroll: true });
+    }
+    sheetTrigger = null;
+};
+
+const syncViewport = () => {
+    isMobile.value = mobileMedia?.matches ?? false;
+    syncProfileSheetFromHash();
+};
+
+watch(openProfileSheet, async (section) => {
+    if (!section) {
+        profileDialog.value?.close();
+        restoreSheetState();
+        return;
+    }
+
+    if (previousOverflow === null) {
+        previousOverflow = document.body.style.overflow;
+        sheetTrigger = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    }
+    document.body.style.overflow = 'hidden';
+    await nextTick();
+    if (openProfileSheet.value === section && isMobile.value && !profileDialog.value?.open) {
+        profileDialog.value?.showModal();
+    }
 });
 
 onMounted(() => {
-    syncProfileSheetFromHash();
-    window.requestAnimationFrame(syncProfileSheetFromHash);
-    window.addEventListener('keydown', handleProfileKeydown);
+    mobileMedia = window.matchMedia('(max-width: 767px)');
+    syncViewport();
+    mobileMedia.addEventListener('change', syncViewport);
     window.addEventListener('hashchange', syncProfileSheetFromHash);
 });
 
 onUnmounted(() => {
-    document.body.style.overflow = '';
-    window.removeEventListener('keydown', handleProfileKeydown);
+    restoreSheetState();
+    mobileMedia?.removeEventListener('change', syncViewport);
     window.removeEventListener('hashchange', syncProfileSheetFromHash);
 });
 </script>
@@ -335,7 +364,7 @@ onUnmounted(() => {
                             </span>
                         </button>
 
-                        <button type="button" class="profile-mobile-row" @click="openProfileSheet = 'invitations'">
+                        <button v-if="friendInvitations.enabled" type="button" class="profile-mobile-row" @click="openProfileSheet = 'invitations'">
                             <span class="profile-mobile-row__icon" aria-hidden="true">
                                 <svg class="h-[1.15rem] w-[1.15rem]" viewBox="0 0 24 24" fill="none">
                                     <path d="M4.5 10h15v10h-15V10ZM3.5 7h17v3h-17V7Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
@@ -488,11 +517,11 @@ onUnmounted(() => {
             </aside>
 
             <div class="space-y-14">
-                <section id="zdjecie">
+                <section v-if="!isMobile" id="zdjecie" class="scroll-mt-24">
                     <UpdateProfileAvatarForm />
                 </section>
 
-                <section id="dane-konta">
+                <section v-if="!isMobile" id="dane-konta" class="scroll-mt-24">
                     <UpdateProfileInformationForm
                         :must-verify-email="mustVerifyEmail"
                         :password-login-enabled="socialConnections.password_login_enabled"
@@ -500,27 +529,27 @@ onUnmounted(() => {
                     />
                 </section>
 
-                <section id="zapros-znajomego">
+                <section v-if="!isMobile && friendInvitations.enabled" id="zapros-znajomego" class="scroll-mt-24">
                     <FriendInvitationPanel
                         :invitations="friendInvitations"
                         :status="status"
                     />
                 </section>
 
-                <section id="haslo">
+                <section v-if="!isMobile" id="haslo" class="scroll-mt-24">
                     <UpdatePasswordForm
                         :password-login-enabled="socialConnections.password_login_enabled"
                     />
                 </section>
 
-                <section id="social-login">
+                <section v-if="!isMobile" id="social-login" class="scroll-mt-24">
                     <SocialConnectionsForm
                         :social-connections="socialConnections"
                         :status="status"
                     />
                 </section>
 
-                <section id="usun-konto">
+                <section v-if="!isMobile" id="usun-konto" class="scroll-mt-24">
                     <DeleteUserForm
                         :password-login-enabled="socialConnections.password_login_enabled"
                     />
@@ -530,12 +559,13 @@ onUnmounted(() => {
 
         <Teleport to="body">
             <Transition name="profile-mobile-sheet">
-                <div
+                <dialog
                     v-if="openProfileSheet"
-                    class="fixed inset-0 z-[70] md:hidden"
-                    role="dialog"
+                    ref="profileDialog"
+                    class="fixed inset-0 z-[70] m-0 h-full max-h-none w-full max-w-none border-0 bg-transparent p-0 backdrop:bg-transparent md:hidden"
                     aria-modal="true"
                     :aria-label="profileSheetTitle"
+                    @cancel.prevent="closeProfileSheet"
                 >
                     <button
                         type="button"
@@ -571,7 +601,7 @@ onUnmounted(() => {
                                 mobile-sheet
                             />
                             <FriendInvitationPanel
-                                v-else-if="openProfileSheet === 'invitations'"
+                                v-else-if="openProfileSheet === 'invitations' && friendInvitations.enabled"
                                 :invitations="friendInvitations"
                                 :status="status"
                                 mobile-sheet
@@ -594,7 +624,7 @@ onUnmounted(() => {
                             />
                         </div>
                     </section>
-                </div>
+                </dialog>
             </Transition>
         </Teleport>
     </AuthenticatedLayout>

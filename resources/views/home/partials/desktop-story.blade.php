@@ -12,8 +12,8 @@
                     i zdaj <span>prawko na raz!</span>
                 </h1>
                 <p class="home-entry__lead">
-                    Oficjalna baza pytań na prawo jazdy 2026, proste i skuteczne wyjaśnienia
-                    do egzaminu na prawo jazdy!
+                    Oficjalna baza pytań na prawo jazdy, testy próbne i proste wyjaśnienia.
+                    Przygotuj się do egzaminu teoretycznego krok po kroku.
                 </p>
 
                 @guest
@@ -133,21 +133,98 @@
                 </div>
             </section>
 
-            <section class="home-entry__areas" aria-labelledby="home-entry-areas-title" data-home-reveal>
-                <div class="home-entry__areas-copy">
-                    <h2 id="home-entry-areas-title">Przeglądaj najważniejsze<br>obszary nauki</h2>
-                    <p>Wybierz temat, ucz się krok po kroku<br>i przygotuj się do egzaminu w uporządkowany sposób.</p>
-                </div>
-                <div class="home-entry__area-links">
-                    @foreach ($learningAreas as $area)
-                        <a href="{{ $area['url'] }}">{{ $area['label'] }}</a>
-                    @endforeach
-                    <a href="{{ route('public.questions.hub', absolute: false) }}" class="home-entry__area-links-more">Pokaż wszystko</a>
-                </div>
+            <section class="home-trust" aria-labelledby="home-trust-title" data-home-reveal>
+                <h2 id="home-trust-title" class="home-trust__caption">
+                    Oficjalne źródła
+                </h2>
+                <ul class="home-trust__logos">
+                    <li>
+                        <a href="https://www.gov.pl" class="home-trust__logo home-trust__logo--rp" rel="noopener noreferrer" target="_blank">
+                            <img src="{{ asset('images/partners/herb-polski.svg') }}" alt="Herb Rzeczypospolitej Polskiej" width="3158" height="3716" loading="lazy" decoding="async">
+                            <span>gov.pl</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.gov.pl/web/infrastruktura" class="home-trust__logo home-trust__logo--ministry" rel="noopener noreferrer" target="_blank">
+                            <img src="{{ asset('images/partners/ministerstwo-infrastruktury.png') }}" alt="Ministerstwo Infrastruktury" width="903" height="328" loading="lazy" decoding="async">
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.gov.pl/web/cepik" class="home-trust__logo home-trust__logo--cepik" rel="noopener noreferrer" target="_blank">
+                            <img src="{{ asset('images/partners/cepik-gov.png') }}" alt="CEPiK — Centralna Ewidencja Pojazdów i Kierowców" width="564" height="147" loading="lazy" decoding="async">
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://eli.gov.pl" class="home-trust__logo home-trust__logo--eli" rel="noopener noreferrer" target="_blank">
+                            <img src="{{ asset('images/partners/eli.png') }}" alt="ELI — Europejski Identyfikator Prawodawstwa" width="177" height="58" loading="lazy" decoding="async">
+                        </a>
+                    </li>
+                </ul>
+
+                <details class="home-trust__audit">
+                    <summary class="home-trust__audit-toggle">
+                        <strong>Zgodność platformy z wymaganiami e-learningu OSK</strong>
+                        <span class="home-trust__audit-action">
+                            <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
+                                <path d="m6 8 4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                    </summary>
+
+                    <div class="home-trust__audit-content">
+                    <p class="home-trust__audit-intro">Pozytywny audyt obejmuje cztery kluczowe obszary działania platformy oraz ich odniesienia do obowiązujących przepisów.</p>
+
+                    <ol class="home-trust__audit-list">
+                        <li>
+                            <div>
+                                <h4>Nadzór OSK nad szkoleniem</h4>
+                                <p>Ośrodek ma dostęp do przebiegu szkolenia i postępu kursanta.</p>
+                                <div class="home-trust__audit-basis">
+                                    <span>Podstawa prawna</span>
+                                    <p>art. 23 ust. 3, art. 26 ust. 7 ustawy o kierujących pojazdami</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div>
+                                <h4>Czas szkolenia zgodny z przepisami</h4>
+                                <p>System rozlicza zajęcia teoretyczne zgodnie z wymogami prawnymi – 1 godzina zajęć teoretycznych = 45 minut.</p>
+                                <div class="home-trust__audit-basis">
+                                    <span>Podstawa prawna</span>
+                                    <p>§ 9 i § 10 rozporządzenia w sprawie szkolenia</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div>
+                                <h4>Dokumentowanie przebiegu kursu</h4>
+                                <p>System rejestruje realizację materiału, czas szkolenia oraz historię aktywności kursanta.</p>
+                                <div class="home-trust__audit-basis">
+                                    <span>Podstawa prawna</span>
+                                    <p>art. 27 ustawy o kierujących pojazdami oraz przepisy wykonawcze</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div>
+                                <h4>Dane dostępne do kontroli</h4>
+                                <p>Uprawniony użytkownik może odczytać i przygotować dokumentację na potrzeby kontroli lub urzędu.</p>
+                                <div class="home-trust__audit-basis">
+                                    <span>Podstawa prawna</span>
+                                    <p>art. 27 ust. 7 ustawy o kierujących pojazdami oraz przepisy wykonawcze</p>
+                                </div>
+                            </div>
+                        </li>
+                    </ol>
+
+                    </div>
+                </details>
             </section>
+
         </div>
     </section>
 
+    @if (false)
     <section class="home-ops__app-teaser" aria-labelledby="home-ops-app-teaser-title">
         <div class="home-ops__shell home-ops__app-teaser-grid" data-home-reveal>
             <div class="home-ops__app-teaser-intro">
@@ -487,4 +564,163 @@
             </div>
         </dialog>
     </section>
+    @endif
+
+    @php
+        $contactErrors = $errors->getBag('contact');
+        $contactDialogShouldOpen = $contactErrors->any() || session()->has('contact_error');
+    @endphp
+
+    <aside
+        id="kontakt"
+        class="home-contact"
+        data-contact-advisor-day="{{ $contactAdvisor['day_index'] }}"
+        aria-label="Szybki kontakt z zespołem"
+    >
+        <button
+            type="button"
+            class="home-contact__launcher"
+            data-home-contact-trigger
+            aria-haspopup="dialog"
+            aria-label="Masz pytanie? Napisz wiadomość do zespołu PrawkoNaRaz"
+        >
+            <span class="home-contact__advisor-image">
+                <img
+                    src="{{ $contactAdvisor['image'] }}"
+                    alt=""
+                    width="720"
+                    height="720"
+                    loading="lazy"
+                    decoding="async"
+                >
+            </span>
+            <span class="home-contact__question" aria-hidden="true">?</span>
+            <span class="home-contact__availability" aria-hidden="true"></span>
+        </button>
+
+        @if (session('contact_success'))
+            <p class="home-contact__status" role="status">
+                <span aria-hidden="true">✓</span>
+                {{ session('contact_success') }}
+            </p>
+        @endif
+
+        <dialog
+            class="home-contact__dialog"
+            data-home-contact-dialog
+            data-home-contact-auto-open="{{ $contactDialogShouldOpen ? 'true' : 'false' }}"
+            aria-labelledby="home-contact-dialog-title"
+        >
+            <div class="home-contact__dialog-panel">
+                <header class="home-contact__dialog-header">
+                    <div>
+                        <p>Napisz do PrawkoNaRaz</p>
+                        <h3 id="home-contact-dialog-title">W czym możemy pomóc?</h3>
+                    </div>
+                    <button type="button" class="home-contact__dialog-close" data-home-contact-close aria-label="Zamknij formularz">×</button>
+                </header>
+
+                <p class="home-contact__dialog-intro">
+                    Uzupełnij krótki formularz. Odpowiemy na podany przez Ciebie adres e-mail.
+                </p>
+
+                @if (session('contact_error'))
+                    <p class="home-contact__form-alert" role="alert">{{ session('contact_error') }}</p>
+                @elseif ($contactErrors->any())
+                    <p class="home-contact__form-alert" role="alert">Sprawdź zaznaczone pola i spróbuj ponownie.</p>
+                @endif
+
+                <form method="POST" action="{{ route('about.contact.store', absolute: false) }}" class="home-contact__form" data-home-contact-form>
+                    @csrf
+
+                    <div class="home-contact__honeypot" aria-hidden="true">
+                        <label for="contact-website">Strona internetowa</label>
+                        <input id="contact-website" type="text" name="website" value="" tabindex="-1" autocomplete="off">
+                    </div>
+
+                    <div class="home-contact__field-grid">
+                        <label class="home-contact__field">
+                            <span>Imię</span>
+                            <input
+                                type="text"
+                                name="contact_name"
+                                value="{{ old('contact_name') }}"
+                                maxlength="100"
+                                autocomplete="name"
+                                required
+                                @class(['is-invalid' => $contactErrors->has('contact_name')])
+                            >
+                            @error('contact_name', 'contact')
+                                <small>{{ $message }}</small>
+                            @enderror
+                        </label>
+
+                        <label class="home-contact__field">
+                            <span>Adres e-mail</span>
+                            <input
+                                type="email"
+                                name="contact_email"
+                                value="{{ old('contact_email') }}"
+                                maxlength="254"
+                                autocomplete="email"
+                                required
+                                @class(['is-invalid' => $contactErrors->has('contact_email')])
+                            >
+                            @error('contact_email', 'contact')
+                                <small>{{ $message }}</small>
+                            @enderror
+                        </label>
+                    </div>
+
+                    <label class="home-contact__field">
+                        <span>Temat</span>
+                        <select name="contact_topic" required @class(['is-invalid' => $contactErrors->has('contact_topic')])>
+                            <option value="">Wybierz temat</option>
+                            @foreach ($contactTopics as $topicValue => $topicLabel)
+                                <option value="{{ $topicValue }}" @selected(old('contact_topic') === $topicValue)>{{ $topicLabel }}</option>
+                            @endforeach
+                        </select>
+                        @error('contact_topic', 'contact')
+                            <small>{{ $message }}</small>
+                        @enderror
+                    </label>
+
+                    <label class="home-contact__field">
+                        <span>Wiadomość</span>
+                        <textarea
+                            name="contact_message"
+                            rows="6"
+                            minlength="10"
+                            maxlength="5000"
+                            placeholder="Napisz krótko, czego dotyczy sprawa..."
+                            required
+                            @class(['is-invalid' => $contactErrors->has('contact_message')])
+                        >{{ old('contact_message') }}</textarea>
+                        @error('contact_message', 'contact')
+                            <small>{{ $message }}</small>
+                        @enderror
+                    </label>
+
+                    <label class="home-contact__consent">
+                        <input type="checkbox" name="contact_consent" value="1" required @checked(old('contact_consent'))>
+                        <span>
+                            Potwierdzam zapoznanie się z
+                            <a href="{{ route('legal.privacy', absolute: false) }}" target="_blank">Polityką prywatności</a>.
+                        </span>
+                    </label>
+                    @error('contact_consent', 'contact')
+                        <small class="home-contact__consent-error">{{ $message }}</small>
+                    @enderror
+
+                    <div class="home-contact__form-actions">
+                        <button type="button" class="home-contact__cancel" data-home-contact-close>Anuluj</button>
+                        <button type="submit" class="home-contact__submit">
+                            Wyślij wiadomość
+                            <span aria-hidden="true">→</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </dialog>
+    </aside>
 </div>

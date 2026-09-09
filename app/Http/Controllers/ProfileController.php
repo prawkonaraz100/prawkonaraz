@@ -155,9 +155,13 @@ class ProfileController extends Controller
     ): RedirectResponse {
         $userProfileService->update($request->user(), $request->validated());
 
-        $returnTo = (string) $request->input('return_to', '');
+        $returnTo = $request->input('return_to', '');
 
-        if (Str::startsWith($returnTo, '/')) {
+        if (is_string($returnTo)
+            && Str::startsWith($returnTo, '/')
+            && ! Str::startsWith($returnTo, '//')
+            && ! str_contains($returnTo, '\\')
+            && ! preg_match('/[\x00-\x1F\x7F]/', $returnTo)) {
             return Redirect::to($returnTo);
         }
 

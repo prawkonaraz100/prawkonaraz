@@ -25,6 +25,7 @@ const form = useForm({
 });
 
 const updatePassword = () => {
+    if (form.processing) return;
     lastSubmissionWasInitialPassword.value = !props.passwordLoginEnabled;
 
     form.put(route('password.update'), {
@@ -52,7 +53,7 @@ const heading = computed(() =>
 const description = computed(() =>
     props.passwordLoginEnabled
         ? 'Ustaw mocne hasło, jeśli logujesz się e-mailem albo chcesz odświeżyć zapasową metodę dostępu do konta.'
-        : 'To konto loguje się teraz przez Google. Ustaw hasło, jeśli chcesz mieć również standardowe logowanie e-mailem.',
+        : 'Korzystasz z logowania przez konto społecznościowe. Ustaw hasło, aby logować się również e-mailem.',
 );
 
 const submitLabel = computed(() =>
@@ -109,6 +110,7 @@ const passwordGridClass = computed(() =>
                         type="password"
                         class="mt-2 h-12 w-full rounded-lg border border-[#d0d5dd] bg-white px-4 text-base text-[#101828] outline-none transition focus:border-[#0b5cff] focus:ring-2 focus:ring-[#0b5cff]/10 sm:h-11 sm:rounded-md sm:text-sm"
                         autocomplete="current-password"
+                        required
                     />
 
                     <InputError
@@ -129,6 +131,7 @@ const passwordGridClass = computed(() =>
                         type="password"
                         class="mt-2 h-12 w-full rounded-lg border border-[#d0d5dd] bg-white px-4 text-base text-[#101828] outline-none transition focus:border-[#0b5cff] focus:ring-2 focus:ring-[#0b5cff]/10 sm:h-11 sm:rounded-md sm:text-sm"
                         autocomplete="new-password"
+                        required
                     />
 
                     <InputError :message="form.errors.password" class="mt-2" />
@@ -145,6 +148,7 @@ const passwordGridClass = computed(() =>
                         type="password"
                         class="mt-2 h-12 w-full rounded-lg border border-[#d0d5dd] bg-white px-4 text-base text-[#101828] outline-none transition focus:border-[#0b5cff] focus:ring-2 focus:ring-[#0b5cff]/10 sm:h-11 sm:rounded-md sm:text-sm"
                         autocomplete="new-password"
+                        required
                     />
 
                     <InputError
@@ -175,6 +179,7 @@ const passwordGridClass = computed(() =>
                 >
                     <p
                         v-if="form.recentlySuccessful"
+                        role="status"
                         class="text-sm font-medium text-emerald-700"
                     >
                         {{ successMessage }}

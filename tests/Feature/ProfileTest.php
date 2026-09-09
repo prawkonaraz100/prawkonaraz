@@ -136,6 +136,33 @@ test('profile information can be updated', function () {
     Notification::assertSentTo($user, VerifyEmail::class);
 });
 
+test('profile email is normalized without requiring a password for a case-only change', function () {
+    Notification::fake();
+    $user = User::factory()->create(['email' => 'learner@example.com']);
+
+    $this->actingAs($user)->patch('/profile', [
+        'name' => 'Learner',
+        'email' => '  LEARNER@EXAMPLE.COM  ',
+    ])->assertSessionHasNoErrors()->assertRedirect('/profile');
+
+    expect($user->refresh()->email)->toBe('learner@example.com');
+    expect($user->email_verified_at)->not->toBeNull();
+    Notification::assertNothingSent();
+});
+
+test('product profile does not redirect outside the application', function ($returnTo) {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)->patch(route('profile.product.update'), [
+        'return_to' => $returnTo,
+    ])->assertSessionHasNoErrors()->assertRedirect('/profile');
+})->with([
+    'protocol-relative URL' => '//example.com',
+    'absolute URL' => 'https://example.com',
+    'backslash URL' => '/\\example.com',
+    'array value' => [['/dashboard']],
+]);
+
 test('current password is required when password enabled user changes email address', function () {
     Notification::fake();
 

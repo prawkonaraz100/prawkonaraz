@@ -5,7 +5,7 @@ import { trackAnalyticsEvent } from '@/utils/analytics';
 import type { PageProps, StudyContextCategory } from '@/types';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
 import { computed, onUnmounted, ref, watch } from 'vue';
-import authScene from '../../../images/auth/auth-reference-road-car.png';
+import authScene from '../../../images/home/hero-composite-v3.webp';
 
 const props = withDefaults(
     defineProps<{
@@ -13,11 +13,13 @@ const props = withDefaults(
         categories: StudyContextCategory[];
         retainVisual?: boolean;
         hideVisual?: boolean;
+        standalone?: boolean;
     }>(),
     {
         categories: () => [],
         retainVisual: false,
         hideVisual: false,
+        standalone: false,
     },
 );
 
@@ -44,6 +46,9 @@ const categoryDropdownOpen = ref(false);
 const categoryDropdown = ref<HTMLElement | null>(null);
 const categoryTrigger = ref<HTMLButtonElement | null>(null);
 const page = usePage<PageProps>();
+const friendInvitationsEnabled = computed(
+    () => page.props.authDrawers.paymentRequired,
+);
 const googleIdentityRegistration = computed(
     () => page.props.authDrawers.googleIdentityRegistration,
 );
@@ -100,13 +105,15 @@ const drawerEyebrow = computed(() =>
 );
 
 const drawerTitle = computed(() =>
-    isGoogleIdentityRegistration.value ? 'Wybierz kategorię' : 'Zarejestruj się',
+    isGoogleIdentityRegistration.value
+        ? 'Wybierz kategorię'
+        : 'Załóż konto i rozpocznij test',
 );
 
 const drawerLead = computed(() =>
     isGoogleIdentityRegistration.value
         ? 'Dokończ rejestrację, wybierając kategorię prawa jazdy i sposób nauki.'
-        : 'Wybierz kategorię, załóż konto i potwierdź e-mail.',
+        : 'Wybierz kategorię i zacznij uczyć się w swoim tempie.',
 );
 
 const submitLabel = computed(() => {
@@ -234,6 +241,7 @@ onUnmounted(() => {
             :class="{
                 'auth-dialog-overlay--retain-visual': retainVisual,
                 'auth-dialog-overlay--form-layer': open && hideVisual,
+                'auth-dialog-overlay--standalone': standalone,
             }"
             :data-auth-dialog-open="open ? 'true' : undefined"
             @click.self="close"
@@ -308,14 +316,6 @@ onUnmounted(() => {
                             {{ csrfError }}
                         </div>
 
-                        <p
-                            v-if="socialProviders.some((provider) => provider.key === 'google')"
-                            class="auth-dialog__legal-consent mt-5"
-                        >
-                            <span>Kontynuując z Google, akceptujesz <a :href="route('legal.terms')">Regulamin</a> i potwierdzasz</span>
-                            <span>zapoznanie się z <a :href="route('legal.privacy')">Polityką prywatności</a>.</span>
-                        </p>
-
                         <div
                             v-if="isGoogleIdentityRegistration && googleIdentityRegistration"
                             class="flex items-center gap-3 rounded-[6px] border border-[#d8dee8] bg-[#f8fafc] px-3 py-3"
@@ -388,8 +388,8 @@ onUnmounted(() => {
                                         class="flex min-h-10 w-full items-center rounded-[5px] px-3 text-left text-[0.9rem] font-medium transition focus:outline-none focus:ring-2 focus:ring-[#111827]/15"
                                         :class="
                                             form.target_category_id === category.id
-                                                ? 'bg-[#d01921] text-white'
-                                                : 'bg-white text-[#374151] hover:bg-[#fff5f5] hover:text-[#111827]'
+                                                ? 'bg-[#0a66c2] text-white'
+                                                : 'bg-white text-[#374151] hover:bg-[#f2f7ff] hover:text-[#111827]'
                                         "
                                         @click="selectCategory(category)"
                                     >
@@ -508,7 +508,7 @@ onUnmounted(() => {
 
                         <button
                             type="submit"
-                            class="auth-register-submit inline-flex h-12 w-full items-center justify-center rounded-[6px] bg-[#d01921] px-5 text-[0.95rem] font-medium text-white transition hover:bg-[#b9151c] disabled:cursor-not-allowed disabled:opacity-60"
+                            class="auth-register-submit inline-flex h-12 w-full items-center justify-center rounded-[6px] bg-[#0a66c2] px-5 text-[0.95rem] font-medium text-white transition hover:bg-[#084f96] disabled:cursor-not-allowed disabled:opacity-60"
                             :disabled="csrfPreparing || form.processing || categories.length === 0"
                         >
                             {{ submitLabel }}
@@ -560,17 +560,7 @@ onUnmounted(() => {
                     </div>
 
                     <footer class="auth-dialog__footer">
-                    <p class="auth-register-login">
-                        Masz już konto?
-                        <button
-                            type="button"
-                            class="font-normal text-[#d01921] underline decoration-[#d01921]/35 underline-offset-2 transition hover:text-[#a80f16]"
-                            @click="openLogin"
-                        >
-                            Zaloguj się
-                        </button>
-                    </p>
-                    <p class="auth-register-invite">
+                    <p v-if="friendInvitationsEnabled" class="auth-register-invite">
                         Masz kod od znajomego?
                         <Link
                             :href="route('friend-invitations.code.create')"
@@ -578,6 +568,13 @@ onUnmounted(() => {
                         >
                             Wpisz kod zaproszenia
                         </Link>
+                    </p>
+                    <p
+                        v-if="socialProviders.some((provider) => provider.key === 'google')"
+                        class="auth-dialog__legal-consent"
+                    >
+                        Kontynuując z Google, akceptujesz <a :href="route('legal.terms')">Regulamin</a>
+                        i potwierdzasz zapoznanie się z <a :href="route('legal.privacy')">Polityką prywatności</a>.
                     </p>
                     </footer>
                     </div>

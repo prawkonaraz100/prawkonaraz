@@ -224,7 +224,9 @@ class LearningHomePayloadBuilder
     protected function friendInvitationCta(array $state): array
     {
         return [
-            'visible' => (bool) ($state['eligible'] ?? false) && ($state['active_guest'] ?? null) === null,
+            'visible' => (bool) ($state['enabled'] ?? false)
+                && (bool) ($state['eligible'] ?? false)
+                && ($state['active_guest'] ?? null) === null,
             'can_issue' => (bool) ($state['can_issue'] ?? false),
             'pending_count' => (int) ($state['pending_count'] ?? 0),
             'pending_limit' => (int) ($state['pending_limit'] ?? 0),

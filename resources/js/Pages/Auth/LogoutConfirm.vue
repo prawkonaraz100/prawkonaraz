@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import SiteFooter from '@/Components/SiteFooter.vue';
-import SiteHeader from '@/Components/SiteHeader.vue';
+import PublicTopNavigation from '@/Components/PublicTopNavigation.vue';
 import { useSafeLogout } from '@/composables/useSafeLogout';
 import { Head, Link } from '@inertiajs/vue3';
 
@@ -21,7 +21,7 @@ const {
     <Head title="Potwierdź wylogowanie" />
 
     <div class="flex min-h-screen flex-col bg-[#f8fafc] text-[#0f172a]">
-        <SiteHeader />
+        <PublicTopNavigation />
 
         <main class="flex-1">
             <section class="mx-auto max-w-[82rem] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">

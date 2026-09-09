@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import SiteFooter from '@/Components/SiteFooter.vue';
-import SiteHeader from '@/Components/SiteHeader.vue';
+import PublicTopNavigation from '@/Components/PublicTopNavigation.vue';
 import { Head } from '@inertiajs/vue3';
 
 defineProps<{
@@ -14,7 +14,7 @@ defineProps<{
     <Head :title="title" />
 
     <div class="flex min-h-screen flex-col bg-white text-[#171717]">
-        <SiteHeader />
+        <PublicTopNavigation />
 
         <main class="flex-1 bg-[#f7f8fa]">
             <section class="mx-auto max-w-[84rem] px-4 py-14 sm:px-6 lg:px-8">
