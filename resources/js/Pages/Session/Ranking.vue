@@ -44,6 +44,7 @@ import {
 } from '@/utils/rankedRealtimeTransportClient';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import type { PageProps } from '@/types';
 
 type RankedScreen = 'lobby' | 'waiting' | 'match' | 'result';
 
@@ -448,7 +449,7 @@ const props = defineProps<{
     realtimeTransport: RealtimeTransportSummary;
 }>();
 
-const page = usePage();
+const page = usePage<PageProps>();
 
 const availableCategories = computed<CategoryOption[]>(() => {
     const categories = (page.props.studyContext?.categories ?? []) as CategoryOption[];

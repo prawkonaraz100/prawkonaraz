@@ -134,7 +134,7 @@ const mobilePanelActions = computed(() => headerActions.value);
 const isMatchActive = (matchPaths: string[]) =>
     matchesPath(currentPath.value, matchPaths);
 
-const isLinkActive = (link: NavigationLink) => isMatchActive(link.match);
+const isLinkActive = (link: Pick<NavigationLink, 'match'>) => isMatchActive(link.match);
 
 const closeMobileMenu = () => {
     mobileMenuOpen.value = false;

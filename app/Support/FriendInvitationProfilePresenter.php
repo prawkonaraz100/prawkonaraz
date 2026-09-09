@@ -19,6 +19,7 @@ class FriendInvitationProfilePresenter
     public function forOwner(User $owner, ?array $generated = null): array
     {
         $now = now();
+        $enabled = $this->eligibility->isAvailable();
 
         $this->friendInvitationService->expireStaleForOwner($owner, $now);
 
@@ -32,7 +33,9 @@ class FriendInvitationProfilePresenter
 
         $reason = null;
 
-        if ($ownerGrant === null) {
+        if (! $enabled) {
+            $reason = 'access_open';
+        } elseif ($ownerGrant === null) {
             $reason = 'plan_not_eligible';
         } elseif ($activeGuest !== null) {
             $reason = 'slot_taken';
@@ -41,8 +44,9 @@ class FriendInvitationProfilePresenter
         }
 
         return [
+            'enabled' => $enabled,
             'eligible' => $ownerGrant !== null,
-            'can_issue' => $reason === null,
+            'can_issue' => $enabled && $reason === null,
             'reason' => $reason,
             'reason_label' => $this->reasonLabel($reason),
             'pending_limit' => FriendInvitationEligibilityService::PENDING_LIMIT,
@@ -75,6 +79,7 @@ class FriendInvitationProfilePresenter
     protected function reasonLabel(?string $reason): ?string
     {
         return match ($reason) {
+            'access_open' => 'Dostęp do platformy jest obecnie otwarty. Zaproszenie nie jest potrzebne.',
             'plan_not_eligible' => 'Zaproszenia są dostępne tylko w planach 3 miesiące i rok.',
             'slot_taken' => 'Masz już aktywnego gościa. Slot zwolni się po końcu jego dostępu albo po zakupie własnego planu przez gościa.',
             'pending_limit_reached' => 'Osiągnąłeś limit oczekujących zaproszeń.',

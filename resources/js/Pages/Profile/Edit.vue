@@ -12,6 +12,7 @@ import { Head, usePage } from '@inertiajs/vue3';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 
 interface FriendInvitationPanelData {
+    enabled: boolean;
     eligible: boolean;
     can_issue: boolean;
     reason: string | null;
@@ -147,14 +148,16 @@ const profileSummary = computed(() => [
     },
 ]);
 
-const profileSections = [
+const profileSections = computed(() => [
     { href: '#zdjecie', label: 'Zdjęcie' },
     { href: '#dane-konta', label: 'Dane konta' },
-    { href: '#zapros-znajomego', label: 'Zaproszenia' },
+    ...(props.friendInvitations.enabled
+        ? [{ href: '#zapros-znajomego', label: 'Zaproszenia' }]
+        : []),
     { href: '#haslo', label: 'Hasło' },
     { href: '#social-login', label: 'Logowanie' },
     { href: '#usun-konto', label: 'Usunięcie konta' },
-];
+]);
 
 type ProfileSheet = 'avatar' | 'account' | 'invitations' | 'password' | 'social' | 'delete';
 
@@ -199,8 +202,11 @@ const closeProfileSheet = () => {
 };
 
 const syncProfileSheetFromHash = () => {
+    const requestedSheet = profileSheetByHash[window.location.hash] ?? null;
+
     openProfileSheet.value = isMobile.value
-        ? profileSheetByHash[window.location.hash] ?? null
+        && (requestedSheet !== 'invitations' || props.friendInvitations.enabled)
+        ? requestedSheet
         : null;
 };
 
@@ -358,7 +364,7 @@ onUnmounted(() => {
                             </span>
                         </button>
 
-                        <button type="button" class="profile-mobile-row" @click="openProfileSheet = 'invitations'">
+                        <button v-if="friendInvitations.enabled" type="button" class="profile-mobile-row" @click="openProfileSheet = 'invitations'">
                             <span class="profile-mobile-row__icon" aria-hidden="true">
                                 <svg class="h-[1.15rem] w-[1.15rem]" viewBox="0 0 24 24" fill="none">
                                     <path d="M4.5 10h15v10h-15V10ZM3.5 7h17v3h-17V7Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
@@ -523,7 +529,7 @@ onUnmounted(() => {
                     />
                 </section>
 
-                <section v-if="!isMobile" id="zapros-znajomego" class="scroll-mt-24">
+                <section v-if="!isMobile && friendInvitations.enabled" id="zapros-znajomego" class="scroll-mt-24">
                     <FriendInvitationPanel
                         :invitations="friendInvitations"
                         :status="status"
@@ -595,7 +601,7 @@ onUnmounted(() => {
                                 mobile-sheet
                             />
                             <FriendInvitationPanel
-                                v-else-if="openProfileSheet === 'invitations'"
+                                v-else-if="openProfileSheet === 'invitations' && friendInvitations.enabled"
                                 :invitations="friendInvitations"
                                 :status="status"
                                 mobile-sheet

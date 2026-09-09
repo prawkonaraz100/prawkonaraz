@@ -4,9 +4,14 @@ use App\Models\ProductAccessGrant;
 use App\Models\ProductPlan;
 use App\Models\PurchaseOrder;
 use App\Models\User;
+use App\Support\PaymentRequirementService;
 use App\Support\ProductAccessResolver;
 use App\Support\ProductCheckoutService;
 use Inertia\Testing\AssertableInertia as Assert;
+
+afterEach(function (): void {
+    app(PaymentRequirementService::class)->forgetCachedRequirement();
+});
 
 test('public pricing page renders seo ready checkout plans', function () {
     $this->get(route('public.pricing'))
@@ -112,6 +117,23 @@ test('checkout success exposes invite friend cta for eligible plans', function (
             ->component('Checkout/Result')
             ->where('friendInvitationCta.available', true)
             ->where('friendInvitationCta.profile_url', route('profile.edit', absolute: false).'#zapros-znajomego')
+        );
+});
+
+test('checkout success hides invite friend cta while access is open', function () {
+    $user = User::factory()->create();
+    $plan = ProductPlan::query()->where('code', 'start-90')->firstOrFail();
+    $order = app(ProductCheckoutService::class)->createOrder($user, $plan);
+
+    app(ProductCheckoutService::class)->markPaid($order, $user, 'sandbox-open-access-plan');
+    app(PaymentRequirementService::class)->setRequiresPayment(false);
+
+    $this->actingAs($user)
+        ->get(route('checkout.success', $order->refresh()))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Checkout/Result')
+            ->where('friendInvitationCta.available', false)
         );
 });
 

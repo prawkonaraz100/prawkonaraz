@@ -46,6 +46,9 @@ const categoryDropdownOpen = ref(false);
 const categoryDropdown = ref<HTMLElement | null>(null);
 const categoryTrigger = ref<HTMLButtonElement | null>(null);
 const page = usePage<PageProps>();
+const friendInvitationsEnabled = computed(
+    () => page.props.authDrawers.paymentRequired,
+);
 const googleIdentityRegistration = computed(
     () => page.props.authDrawers.googleIdentityRegistration,
 );
@@ -557,7 +560,7 @@ onUnmounted(() => {
                     </div>
 
                     <footer class="auth-dialog__footer">
-                    <p class="auth-register-invite">
+                    <p v-if="friendInvitationsEnabled" class="auth-register-invite">
                         Masz kod od znajomego?
                         <Link
                             :href="route('friend-invitations.code.create')"

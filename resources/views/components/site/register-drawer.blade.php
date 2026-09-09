@@ -16,6 +16,7 @@
     $selectedCategory = $categories->first(
         static fn (array $category): bool => (string) $category['id'] === (string) $selectedCategoryId,
     );
+    $friendInvitationsEnabled = app(\App\Support\PaymentRequirementService::class)->requiresPayment();
 @endphp
 
 <div
@@ -329,6 +330,7 @@
             @endif
 
             <footer class="auth-dialog__footer">
+            @if ($friendInvitationsEnabled)
             <p class="auth-register-invite">
                 Masz kod od znajomego?
                 <a
@@ -338,6 +340,7 @@
                     Wpisz kod zaproszenia
                 </a>
             </p>
+            @endif
 
             @if (in_array('google', $enabledSocialProviders, true))
             <p class="auth-dialog__legal-consent">

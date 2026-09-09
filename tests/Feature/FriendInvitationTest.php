@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Notifications\FriendInvitationGuestAccessShortenedAfterRefund;
 use App\Support\FriendInvitationEligibilityService;
 use App\Support\FriendInvitationService;
+use App\Support\PaymentRequirementService;
 use App\Support\ProductAccessResolver;
 use App\Support\ProductCheckoutService;
 use App\Support\ProductRefundService;
@@ -16,6 +17,10 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 use Inertia\Testing\AssertableInertia as Assert;
+
+afterEach(function (): void {
+    app(PaymentRequirementService::class)->forgetCachedRequirement();
+});
 
 function inviteFriendCreatePurchaseGrant(
     User $user,
@@ -89,12 +94,82 @@ test('profile page exposes owner invitation panel data', function () {
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('Profile/Edit')
+            ->where('friendInvitations.enabled', true)
             ->where('friendInvitations.eligible', true)
             ->where('friendInvitations.can_issue', true)
             ->where('friendInvitations.pending_limit', FriendInvitationEligibilityService::PENDING_LIMIT)
             ->where('friendInvitations.pending_count', 0)
             ->where('friendInvitations.active_guest', null)
         );
+});
+
+test('open access mode hides invitation entry points and blocks new invitation operations', function () {
+    $owner = User::factory()->create();
+    $guest = User::factory()->create();
+    inviteFriendCreatePurchaseGrant($owner, 'start-90');
+    $issued = app(FriendInvitationService::class)->issue($owner);
+    $existingInvitation = $issued->invitation->refresh();
+
+    expect(app(PaymentRequirementService::class)->setRequiresPayment(false))->toBeTrue();
+
+    $this
+        ->actingAs($owner)
+        ->get(route('profile.edit'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Profile/Edit')
+            ->where('friendInvitations.enabled', false)
+            ->where('friendInvitations.can_issue', false)
+            ->where('friendInvitations.reason', 'access_open')
+        );
+
+    $this
+        ->actingAs($owner)
+        ->get(route('session.index'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Session/Index')
+            ->where('friend_invitation_cta.visible', false)
+        );
+
+    $this
+        ->get(route('friend-invitations.code.create'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('FriendInvitations/Show')
+            ->where('invitation.active', false)
+            ->where('invitation.inactive_reason', 'access_open')
+        );
+
+    $this
+        ->get(route('friend-invitations.show-token', ['token' => $issued->token]))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('FriendInvitations/Show')
+            ->where('invitation.inactive_reason', 'access_open')
+        );
+
+    $this
+        ->actingAs($owner)
+        ->from(route('profile.edit'))
+        ->post(route('friend-invitations.store'))
+        ->assertSessionHasErrors('invitation')
+        ->assertRedirect(route('profile.edit'));
+
+    expect($existingInvitation->refresh()->status)->toBe(FriendInvitation::STATUS_PENDING)
+        ->and($owner->ownedFriendInvitations()->count())->toBe(1);
+
+    expect(fn () => app(FriendInvitationService::class)->accept($existingInvitation, $guest))
+        ->toThrow(ValidationException::class);
+
+    expect($existingInvitation->refresh()->status)->toBe(FriendInvitation::STATUS_PENDING)
+        ->and($guest->productAccessGrants()->exists())->toBeFalse()
+        ->and(app(PaymentRequirementService::class)->setRequiresPayment(true))->toBeTrue();
+
+    $accepted = app(FriendInvitationService::class)->accept($existingInvitation, $guest);
+
+    expect($accepted->status)->toBe(FriendInvitation::STATUS_ACCEPTED)
+        ->and($accepted->accepted_by_user_id)->toBe($guest->getKey());
 });
 
 test('eligible owner can generate invitation from profile route', function () {

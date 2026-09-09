@@ -1,5 +1,11 @@
 <?php
 
+use App\Support\PaymentRequirementService;
+
+afterEach(function (): void {
+    app(PaymentRequirementService::class)->forgetCachedRequirement();
+});
+
 test('home page renders the public landing page', function () {
     $seoYear = now('Europe/Warsaw')->format('Y');
 
@@ -41,4 +47,17 @@ test('home page renders the public landing page', function () {
         ->assertSee('przygotuj się do egzaminu teoretycznego na prawo jazdy', false)
         ->assertSee('data-home-contact-dialog', false)
         ->assertDontSeeText('Wybierz dostęp i zacznij naukę');
+});
+
+test('open access mode hides public friend invitation entry points', function () {
+    app(PaymentRequirementService::class)->setRequiresPayment(false);
+
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertDontSeeText('Wpisz kod zaproszenia');
+
+    $this->get(route('about.how-it-works'))
+        ->assertOk()
+        ->assertDontSeeText('Mam kod zaproszenia')
+        ->assertDontSeeText('Zaproszenie od znajomego');
 });

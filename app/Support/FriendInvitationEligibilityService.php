@@ -20,7 +20,13 @@ class FriendInvitationEligibilityService
 
     public function __construct(
         protected ProductAccessResolver $productAccessResolver,
+        protected PaymentRequirementService $paymentRequirementService,
     ) {}
+
+    public function isAvailable(): bool
+    {
+        return $this->paymentRequirementService->requiresPayment();
+    }
 
     public function eligibleOwnerGrant(User $owner, ?CarbonInterface $now = null, bool $lock = false): ?ProductAccessGrant
     {
@@ -109,6 +115,8 @@ class FriendInvitationEligibilityService
     {
         $now ??= now();
 
+        $this->assertAvailable();
+
         $ownerGrant = $this->eligibleOwnerGrant($owner, $now, lock: true);
 
         if ($ownerGrant === null) {
@@ -135,6 +143,8 @@ class FriendInvitationEligibilityService
     public function assertGuestCanAccept(User $guest, User $owner, ?CarbonInterface $now = null): void
     {
         $now ??= now();
+
+        $this->assertAvailable();
 
         if ((int) $guest->getKey() === (int) $owner->getKey()) {
             throw ValidationException::withMessages([
@@ -173,5 +183,16 @@ class FriendInvitationEligibilityService
                 'invitation' => 'Posiadasz już aktywny dostęp Premium. Nie możesz przyjąć tego zaproszenia.',
             ]);
         }
+    }
+
+    protected function assertAvailable(): void
+    {
+        if ($this->isAvailable()) {
+            return;
+        }
+
+        throw ValidationException::withMessages([
+            'invitation' => 'Dostęp do platformy jest obecnie otwarty. Kod zaproszenia nie jest potrzebny.',
+        ]);
     }
 }
