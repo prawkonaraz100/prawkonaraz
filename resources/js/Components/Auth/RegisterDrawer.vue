@@ -560,22 +560,26 @@ onUnmounted(() => {
                     </div>
 
                     <footer class="auth-dialog__footer">
-                    <p v-if="friendInvitationsEnabled" class="auth-register-invite">
-                        Masz kod od znajomego?
-                        <Link
-                            :href="route('friend-invitations.code.create')"
-                            class="font-normal text-[#0d47a1] underline decoration-[#0d47a1]/35 underline-offset-2 transition hover:text-[#083777]"
+                        <p v-if="friendInvitationsEnabled" class="auth-register-invite">
+                            Masz kod od znajomego?
+                            <Link
+                                :href="route('friend-invitations.code.create')"
+                                class="font-normal text-[#0d47a1] underline decoration-[#0d47a1]/35 underline-offset-2 transition hover:text-[#083777]"
+                            >
+                                Wpisz kod zaproszenia
+                            </Link>
+                        </p>
+                        <p
+                            v-if="socialProviders.some((provider) => provider.key === 'google')"
+                            class="auth-dialog__legal-consent"
                         >
-                            Wpisz kod zaproszenia
-                        </Link>
-                    </p>
-                    <p
-                        v-if="socialProviders.some((provider) => provider.key === 'google')"
-                        class="auth-dialog__legal-consent"
-                    >
-                        Kontynuując z Google, akceptujesz <a :href="route('legal.terms')">Regulamin</a>
-                        i potwierdzasz zapoznanie się z <a :href="route('legal.privacy')">Polityką prywatności</a>.
-                    </p>
+                            <span class="auth-dialog__legal-line">
+                                Kontynuując z Google, akceptujesz <a :href="route('legal.terms')">Regulamin</a>
+                            </span>
+                            <span class="auth-dialog__legal-line">
+                                i potwierdzasz zapoznanie się z <a :href="route('legal.privacy')">Polityką prywatności</a>.
+                            </span>
+                        </p>
                     </footer>
                     </div>
                 </div>

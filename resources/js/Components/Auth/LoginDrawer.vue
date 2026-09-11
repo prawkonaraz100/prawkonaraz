@@ -355,13 +355,17 @@ onUnmounted(() => {
                     </div>
 
                     <footer class="auth-dialog__footer">
-                    <p class="auth-login-drawer-return">
-                        Po zalogowaniu wrócisz dokładnie tam, gdzie skończyłeś naukę.
-                    </p>
-                    <p v-if="googleProvider" class="auth-dialog__legal-consent">
-                        Kontynuując z Google, akceptujesz <a :href="route('legal.terms')">Regulamin</a>
-                        i potwierdzasz zapoznanie się z <a :href="route('legal.privacy')">Polityką prywatności</a>.
-                    </p>
+                        <p class="auth-login-drawer-return">
+                            Po zalogowaniu wrócisz dokładnie tam, gdzie skończyłeś naukę.
+                        </p>
+                        <p v-if="googleProvider" class="auth-dialog__legal-consent">
+                            <span class="auth-dialog__legal-line">
+                                Kontynuując z Google, akceptujesz <a :href="route('legal.terms')">Regulamin</a>
+                            </span>
+                            <span class="auth-dialog__legal-line">
+                                i potwierdzasz zapoznanie się z <a :href="route('legal.privacy')">Polityką prywatności</a>.
+                            </span>
+                        </p>
                     </footer>
                     </div>
                 </div>

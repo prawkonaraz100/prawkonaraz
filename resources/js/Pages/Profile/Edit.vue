@@ -72,6 +72,12 @@ const props = defineProps<{
         }>;
     };
     friendInvitations: FriendInvitationPanelData;
+    review: {
+        exists: boolean;
+        status: 'pending' | 'approved' | 'rejected' | null;
+        status_label: string | null;
+        edit_url: string;
+    };
 }>();
 
 const targetCategoryLabel = computed(() => {
@@ -132,6 +138,8 @@ const invitationStatusLabel = computed(() => {
 
     return null;
 });
+const reviewActionLabel = computed(() => props.review.exists ? 'Edytuj swoją opinię' : 'Dodaj swoją opinię');
+const reviewStatusLabel = computed(() => props.review.status_label ?? 'Nie dodano');
 
 const profileSummary = computed(() => [
     {
@@ -154,6 +162,7 @@ const profileSections = computed(() => [
     ...(props.friendInvitations.enabled
         ? [{ href: '#zapros-znajomego', label: 'Zaproszenia' }]
         : []),
+    { href: props.review.edit_url, label: 'Moja opinia' },
     { href: '#haslo', label: 'Hasło' },
     { href: '#social-login', label: 'Logowanie' },
     { href: '#usun-konto', label: 'Usunięcie konta' },
@@ -364,6 +373,23 @@ onUnmounted(() => {
                             </span>
                         </button>
 
+                        <a class="profile-mobile-row" :href="review.edit_url">
+                            <span class="profile-mobile-row__icon" aria-hidden="true">
+                                <svg class="h-[1.15rem] w-[1.15rem]" viewBox="0 0 24 24" fill="none">
+                                    <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.8 1-6.1-4.4-4.3 6.1-.9L12 3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                                </svg>
+                            </span>
+                            <span class="min-w-0 flex-1">
+                                <span class="block text-[0.88rem] font-medium text-[#101828]">{{ reviewActionLabel }}</span>
+                                <span class="mt-0.5 block truncate text-[0.7rem] text-[#667085]">{{ reviewStatusLabel }}</span>
+                            </span>
+                            <span class="profile-mobile-row__trailing">
+                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                    <path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </span>
+                        </a>
+
                         <button v-if="friendInvitations.enabled" type="button" class="profile-mobile-row" @click="openProfileSheet = 'invitations'">
                             <span class="profile-mobile-row__icon" aria-hidden="true">
                                 <svg class="h-[1.15rem] w-[1.15rem]" viewBox="0 0 24 24" fill="none">
@@ -527,6 +553,22 @@ onUnmounted(() => {
                         :password-login-enabled="socialConnections.password_login_enabled"
                         :status="status"
                     />
+                </section>
+
+                <section v-if="!isMobile" class="border-y border-slate-200 py-6">
+                    <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[#0d47a1]">Moja opinia</p>
+                            <h2 class="mt-2 text-xl font-semibold text-slate-950">{{ reviewActionLabel }}</h2>
+                            <p class="mt-2 text-sm leading-6 text-slate-600">Status: {{ reviewStatusLabel }}. Każda zmiana ponownie trafia do zatwierdzenia.</p>
+                        </div>
+                        <a
+                            :href="review.edit_url"
+                            class="inline-flex min-h-11 shrink-0 items-center justify-center border border-[#0d47a1] px-5 text-sm font-semibold text-[#0d47a1] transition hover:bg-[#0d47a1] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0d47a1] focus-visible:ring-offset-2"
+                        >
+                            {{ reviewActionLabel }}
+                        </a>
+                    </div>
                 </section>
 
                 <section v-if="!isMobile && friendInvitations.enabled" id="zapros-znajomego" class="scroll-mt-24">

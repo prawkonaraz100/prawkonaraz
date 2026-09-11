@@ -330,25 +330,28 @@
             @endif
 
             <footer class="auth-dialog__footer">
-            @if ($friendInvitationsEnabled)
-            <p class="auth-register-invite">
-                Masz kod od znajomego?
-                <a
-                    href="{{ route('friend-invitations.code.create', absolute: false) }}"
-                    class="font-normal text-[#0a66c2] underline decoration-[#0a66c2]/35 underline-offset-2 transition hover:text-[#084f96]"
-                >
-                    Wpisz kod zaproszenia
-                </a>
-            </p>
-            @endif
+                @if ($friendInvitationsEnabled)
+                    <p class="auth-register-invite">
+                        Masz kod od znajomego?
+                        <a
+                            href="{{ route('friend-invitations.code.create', absolute: false) }}"
+                            class="font-normal text-[#0a66c2] underline decoration-[#0a66c2]/35 underline-offset-2 transition hover:text-[#084f96]"
+                        >
+                            Wpisz kod zaproszenia
+                        </a>
+                    </p>
+                @endif
 
-            @if (in_array('google', $enabledSocialProviders, true))
-            <p class="auth-dialog__legal-consent">
-                Kontynuując z Google, akceptujesz <a href="{{ route('legal.terms', absolute: false) }}">Regulamin</a>
-                i potwierdzasz zapoznanie się z <a href="{{ route('legal.privacy', absolute: false) }}">Polityką prywatności</a>.
-            </p>
-            @endif
-
+                @if (in_array('google', $enabledSocialProviders, true))
+                    <p class="auth-dialog__legal-consent">
+                        <span class="auth-dialog__legal-line">
+                            Kontynuując z Google, akceptujesz <a href="{{ route('legal.terms', absolute: false) }}">Regulamin</a>
+                        </span>
+                        <span class="auth-dialog__legal-line">
+                            i potwierdzasz zapoznanie się z <a href="{{ route('legal.privacy', absolute: false) }}">Polityką prywatności</a>.
+                        </span>
+                    </p>
+                @endif
             </footer>
             </div>
         </div>

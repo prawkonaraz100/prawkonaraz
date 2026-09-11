@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\UserReviewPhotoService;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
@@ -104,6 +105,12 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 
             $user->moderator_quota ??= self::DEFAULT_MODERATOR_QUOTA;
         });
+
+        static::deleting(function (User $user): void {
+            app(UserReviewPhotoService::class)->delete(
+                $user->review()->value('photo_path'),
+            );
+        });
     }
 
     public function canAccessPanel(Panel $panel): bool
@@ -159,6 +166,11 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     public function socialAccounts(): HasMany
     {
         return $this->hasMany(UserSocialAccount::class);
+    }
+
+    public function review(): HasOne
+    {
+        return $this->hasOne(UserReview::class);
     }
 
     public function createdModeratorAccounts(): HasMany

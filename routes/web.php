@@ -65,6 +65,7 @@ use App\Http\Controllers\PublicQuestionTopicController;
 use App\Http\Controllers\QuestionCollectionLearningController;
 use App\Http\Controllers\RankedSessionPageController;
 use App\Http\Controllers\ReviewQueueController;
+use App\Http\Controllers\ReviewPageController;
 use App\Http\Controllers\RobotsController;
 use App\Http\Controllers\ServiceLegalDocumentController;
 use App\Http\Controllers\SessionPageController;
@@ -77,6 +78,8 @@ use App\Http\Controllers\TrafficSignHubController;
 use App\Http\Controllers\TrafficSignLearningController;
 use App\Http\Controllers\TrafficSignShowController;
 use App\Http\Controllers\TrafficSignSupportingPageController;
+use App\Http\Controllers\UserReviewController;
+use App\Http\Controllers\UserReviewPhotoController;
 use App\Http\Middleware\EnsureUserIsNotBanned;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\MarkReturningUser;
@@ -92,6 +95,11 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Inertia\Inertia;
 
 Route::get('/', HomePageController::class)->name('home');
+Route::get('/opinie-o-prawkonaraz', ReviewPageController::class)
+    ->name('reviews.index');
+Route::get('/opinie-o-prawkonaraz/{review}/zdjecie', UserReviewPhotoController::class)
+    ->whereNumber('review')
+    ->name('reviews.photo');
 
 Route::get('/auth/csrf-token', CsrfTokenController::class)
     ->name('auth.csrf-token');
@@ -313,6 +321,10 @@ Route::get('/zasady-redakcyjne', EditorialPrinciplesPageController::class)
     ->name('about.editorial-principles');
 
 Route::middleware('auth')->group(function () {
+    Route::post('/opinie', [UserReviewController::class, 'store'])
+        ->middleware('throttle:5,1')
+        ->name('reviews.store');
+
     Route::get('/dashboard', PostAuthRedirectController::class)
         ->name('dashboard');
     Route::get('/konto/przejmij', [TemporaryAccountClaimController::class, 'edit'])
