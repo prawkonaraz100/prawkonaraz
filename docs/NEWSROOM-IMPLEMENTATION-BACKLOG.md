@@ -644,7 +644,7 @@ Computed blocking/warning items.
 - status,
 - description,
 - featured article,
-- article ordering,
+- article membership bez ręcznego corpus rankingu,
 - SEO metadata.
 
 ### DoD
