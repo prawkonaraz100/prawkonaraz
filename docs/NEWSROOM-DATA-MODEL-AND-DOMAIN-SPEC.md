@@ -294,6 +294,14 @@ Status scheduled wymaga:
 - kompletności jak dla publikacji,
 - scheduled_for > moment przyjęcia komendy schedule.
 
+Status withdrawn wymaga:
+
+- first_published_at != null,
+- withdrawn_at != null,
+- niepustego withdrawal_reason.
+
+Restore-to-review zmienia workflow_status na in_review, ale pozostawia withdrawn_at/withdrawal_reason jako aktywny tombstone do czasu udanego ponownego Publish. Publish po review zapisuje historię w AuditLog, a następnie czyści bieżące withdrawn_at/withdrawal_reason w tej samej transakcji.
+
 ### 6.5. Invariants breaking
 
 is_breaking = true wymaga:
@@ -453,7 +461,7 @@ Reguły:
 - publiczny topic wymaga własnego, niepustego opisu redakcyjnego i statusu published,
 - v1 baseline publikacji topicu: co najmniej 3 `activelyDistributed()` i indeksowalne artykuły przypięte do topicu; to reguła jakości produktu, nie gwarancja SEO,
 - samo przypięcie taga nie tworzy topicu,
-- `featured_article_id`, jeśli ustawione, musi wskazywać publiczny artykuł należący do tego samego topicu,
+- `featured_article_id`, jeśli ustawione, musi wskazywać `activelyDistributed()` i indeksowalny artykuł należący do tego samego topicu,
 - slug topicu może zmieniać się w draft; po pierwszej publikacji jest immutable w v1, ponieważ nie mamy topic redirect history,
 - spadek corpus poniżej baseline po archiwizacji/usunięciu relacji wymaga cofnięcia topicu do draft/archived przed kolejnym publicznym renderem.
 
@@ -665,8 +673,9 @@ Nie pozwalamy administratorowi tworzyć dowolnych nowych nazw modułów w bazie.
 
 - null starts_at oznacza aktywność od razu po spełnieniu innych warunków,
 - null ends_at oznacza brak automatycznego końca,
-- artykuł musi być publiczny w czasie, dla którego rozwiązujemy kompozycję,
-- scheduled article może być widoczny w future preview, ale nie w bieżącej stronie przed publikacją.
+- bieżący publiczny render placementu może wskazać wyłącznie `activelyDistributed()` article,
+- `needs_review`, `archived`, active-withdrawal tombstone, draft i future scheduled są niekwalifikowane do bieżącego placementu,
+- scheduled article może być widoczny w future preview tylko wtedy, gdy dla wybranego czasu resolver przewiduje stan `published`; preview nie zmienia danych.
 
 ### 16.3. Kolizje placements
 
@@ -1031,7 +1040,7 @@ Resolver rozstrzyga jawnie:
 
 - visible article -> 200,
 - redirect history -> 301 do canonical,
-- withdrawn article bez następcy -> 410,
+- aktywny withdrawal tombstone (`withdrawn_at != null`), także po restore-to-review przed ponownym Publish -> 410,
 - draft/scheduled/never-public/unknown -> 404.
 
 Listy/home/feed używają osobnych `activelyDistributed()` queries. Controller nie może utożsamić publicznego detail URL z aktywną dystrybucją.
@@ -1185,7 +1194,7 @@ V1 zawiera jawny status `withdrawn` dla materiału, który musi przestać być p
 - treść/body/source pozostają dostępne wyłącznie w adminie dla audytu/ewentualnego review,
 - restore nie wraca bezpośrednio do published; przechodzi przez in_review zgodnie z policy,
 - podczas restore-to-review publiczny tombstone pozostaje nieaktywny jako treść; URL nie wraca do 200 article przed udanym Publish,
-- successful Publish po review czyści bieżący withdrawal disposition i aktualizuje `public_state_changed_at`; historyczny powód pozostaje w AuditLog.
+- successful Publish po review zapisuje withdrawal history w AuditLog, czyści bieżące `withdrawn_at` + `withdrawal_reason` i aktualizuje `public_state_changed_at` w tej samej transakcji.
 
 Hard delete jest dopuszczalny tylko administracyjnie dla błędnych/testowych rekordów bez historii publicznej.
 
