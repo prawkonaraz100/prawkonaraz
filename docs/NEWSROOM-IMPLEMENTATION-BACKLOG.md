@@ -123,13 +123,19 @@ Preferowany:
 - /poradniki
 - /poradniki/{articleSlug}
 
+### Potwierdzony stan
+
+- `/aktualnosci` już istnieje jako named route `public.news` i renderuje `Public/MarketingPlaceholder`,
+- `/poradniki` już istnieje jako named route `public.guides` i renderuje placeholder,
+- oba linki już istnieją w primary `PublicNavigation`.
+
 ### Zadania
 
-- sprawdzić conflicts z istniejącymi routes,
-- reserved slug list,
-- route naming convention,
+- **zachować istniejące top-level route names** i podmienić target/controller zamiast dodawać duplikaty,
+- dodać detail/category/topic/feed routes przed catch-all zgodnie z route contract,
+- reserved slug list + regex,
 - jawnie zmapować type -> route family,
-- test route matching.
+- test route matching/order.
 
 ### Route family
 
@@ -365,6 +371,7 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 - archive,
 - withdraw + restore-to-review,
 - needs review,
+- transition out of published clears breaking flag/expiry,
 - transaction boundary dla state/timestamps/AuditLog,
 - User actor w AuditLog oddzielony od ContentAuthor author/reviewer,
 - public side effects wyłącznie after commit.
@@ -393,7 +400,9 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 ### Testy
 
 - future not published,
-- due published,
+- due + nadal valid published,
+- due ale author/category/source/reviewer/body policy przestała być valid -> nie publikuje, log/audit failure,
+- failure jednego rekordu nie blokuje kolejnych,
 - already published ignored,
 - repeated command safe.
 
@@ -785,13 +794,21 @@ Old article path -> 301 canonical.
 
 ## NEWSROOM-N3-007 — Author profile integration
 
+### Potwierdzony stan
+
+- `ContentAuthorController` już agreguje Traffic Signs i legal content,
+- structured data autora jest dziś budowane przez traffic-sign-specific `TrafficSignSchemaService::author(..., $signs)`,
+- obecny ProfilePage Person nie ma jeszcze docelowego stabilnego `/autorzy/{slug}#person` ani `worksFor -> /#organization`,
+- `SeoSitemapBuilder::authorUrls()` kwalifikuje autora tylko przez signs/legal content.
+
 ### Zakres
 
-Re-use istniejącego `ContentAuthorController` i ProfilePage.
+Re-use istniejącego `ContentAuthorController` i route, ale wyekstrahować współdzielony author/ProfilePage schema builder zamiast dokładania newsroom semantics do `TrafficSignSchemaService`.
 
 - publiczny profil autora pokazuje activelyDistributed publications oraz osobno/oznaczone archived+indexable publications; needs_review/withdrawn/draft/scheduled są wykluczone,
 - ujednolicić ProfilePage mainEntity Person do stabilnego `/autorzy/{slug}#person`,
 - Person worksFor -> canonical `/#organization`,
+- `authorUrls()` uwzględnia autora także wtedy, gdy jego jedynym publicznym/indexable dorobkiem jest newsroom,
 - author sitemap lastmod uwzględnia zmianę outputu profilu wynikającą z publish/archive/needs-review/withdraw/restore przez public-state timestamps, nie techniczny updated_at,
 - article graph referuje dokładnie ten sam Person @id.
 
@@ -893,15 +910,19 @@ Wdrożyć publiczną warstwę bez natychmiastowego przełączania istniejących 
 
 ## NEWSROOM-N4-005 — Navigation integration
 
+### Potwierdzony stan
+
+`PublicNavigation` ma już primary links „Aktualności” i „Poradniki” z właściwymi prefixami.
+
 ### Zakres
 
-- PublicNavigation,
-- documentNavigationPrefixes if required,
-- footer links,
-- active states.
+- zachować istniejące linki i active states, bez dublowania,
+- sprawdzić footer/inne renderery i dodać tylko brakujące, uzasadnione wejścia,
+- documentNavigationPrefixes tylko jeśli faktycznie potrzebne.
 
 ### DoD
 
+- zero duplicate nav items,
 - Vue + Blade renderers verified.
 
 ---
@@ -1096,7 +1117,7 @@ Nie zmieniamy produkcyjnego modelu na runtime generation.
 6. podmieniać główny `sitemap.xml` dopiero na końcu,
 7. stare, nieużywane shardy usuwać po przełączeniu indexu,
 8. po commit ustawić tani dirty/version signal zamiast uruchamiać pełny generator w request,
-9. dodać częstą scheduler command, która przy dirty signal bierze distributed lock i uruchamia refresh,
+9. dodać częstą scheduler command, która przy dirty signal bierze **shared Redis/distributed lock** i uruchamia refresh; przy wielu scheduler nodes użyć także `onOneServer()` lub równoważnej gwarancji single execution,
 10. czyścić marker tylko gdy version nie zmieniła się podczas generacji,
 11. istniejący daily `seo:refresh-sitemaps` zachować jako niezależny safety net.
 
