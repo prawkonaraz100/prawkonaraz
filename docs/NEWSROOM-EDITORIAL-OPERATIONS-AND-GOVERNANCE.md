@@ -1,0 +1,960 @@
+# Newsroom Editorial Operations and Governance
+
+## 1. Status
+
+- Status: Proposed / implementation-ready operating model
+- Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
+- Powiązany model danych: [NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md](./NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md)
+- Data: 2026-09-15
+- Cel: zdefiniować sposób pracy redakcji tak, aby wdrożony CMS nie był tylko formularzem do wpisywania tekstu, ale kontrolowanym procesem publikacji.
+
+---
+
+## 2. Zasada nadrzędna
+
+Newsroom PrawkoNaRaz ma działać jak wyspecjalizowana redakcja informacyjna, nie jak generator treści SEO.
+
+Każda publikacja musi mieć odpowiedź na pięć pytań:
+
+1. Co jest faktem?
+2. Jakie jest źródło?
+3. Kiedy informacja obowiązuje lub miała miejsce?
+4. Kogo dotyczy?
+5. Co użytkownik może zrobić dalej w PrawkoNaRaz?
+
+Jeżeli nie da się odpowiedzieć na pytania 1–4, materiał nie powinien być publikowany jako news.
+
+---
+
+## 3. Zakres tematyczny
+
+Redakcja obejmuje:
+
+- prawo jazdy,
+- egzaminy państwowe,
+- WORD,
+- przepisy ruchu drogowego,
+- kierowców i obowiązki po uzyskaniu uprawnień,
+- szkoły jazdy / OSK,
+- bezpieczeństwo ruchu drogowego,
+- dane i analizy związane z nauką i egzaminami.
+
+Poza zakresem:
+
+- ogólna motoryzacja bez związku z kierowcą, egzaminem lub bezpieczeństwem,
+- newsy sensacyjne tylko dlatego, że generują zasięg,
+- polityka partyjna bez bezpośredniego związku z regulacjami istotnymi dla odbiorców,
+- kopiowanie depesz i artykułów innych mediów,
+- publikacje sponsorowane udające niezależny materiał redakcyjny.
+
+---
+
+## 4. Typy materiałów
+
+### 4.1. News
+
+Cel:
+
+- poinformować o nowym, konkretnym zdarzeniu lub zmianie.
+
+Wymaga:
+
+- aktualnego źródła,
+- jasnej daty,
+- rozróżnienia „weszło w życie” od „zapowiedziano/projekt”.
+
+### 4.2. Guide
+
+Cel:
+
+- evergreen, instrukcja lub proces krok po kroku.
+
+Wymaga:
+
+- kompletności,
+- okresowego review,
+- jasnych warunków i wyjątków.
+
+### 4.3. Explainer
+
+Cel:
+
+- wyjaśnić zmianę, zjawisko lub przepis.
+
+Wymaga:
+
+- źródła pierwotnego,
+- prostego języka,
+- oddzielenia faktu od interpretacji.
+
+### 4.4. Analysis
+
+Cel:
+
+- interpretacja danych lub trendu.
+
+Wymaga:
+
+- metodologii,
+- źródła danych,
+- jawnych ograniczeń.
+
+### 4.5. Report
+
+Cel:
+
+- oryginalny materiał PrawkoNaRaz oparty na danych własnych lub zebranych.
+
+Wymaga:
+
+- opisanej metodologii,
+- agregacji/anonymizacji danych,
+- okresu badania,
+- liczebności próby, jeśli ma zastosowanie,
+- wyraźnego rozdzielenia korelacji i przyczynowości.
+
+---
+
+## 5. Role redakcyjne
+
+V1 może korzystać operacyjnie z administratorów, ale proces ma rozdzielać role pojęciowo.
+
+### 5.1. Author
+
+Odpowiada za:
+
+- research,
+- draft,
+- źródła,
+- prawidłowe daty,
+- linkowanie do produktu,
+- poprawki po review.
+
+### 5.2. Editor
+
+Odpowiada za:
+
+- jakość tytułu i leadu,
+- strukturę tekstu,
+- zgodność z kategorią i typem,
+- eliminację niepotrzebnej sensacyjności,
+- spójność brand voice.
+
+### 5.3. Reviewer
+
+Wymagany dla materiałów o podwyższonym ryzyku:
+
+- zmiany prawa,
+- obowiązki kierowców,
+- interpretacja regulacji,
+- materiały formalne dla OSK,
+- raporty mogące wpływać na decyzje użytkowników.
+
+Reviewer nie jest automatycznie „prawnikiem”, jeśli nie ma takich kwalifikacji. Profil autora/reviewera nie może sugerować kwalifikacji, których nie posiada.
+
+### 5.4. Publisher
+
+Osoba/rola mająca uprawnienie do publicznego publish/schedule.
+
+Publisher sprawdza checklistę, ale nie zastępuje autora i reviewera.
+
+---
+
+## 6. Macierz odpowiedzialności
+
+| Czynność | Author | Editor | Reviewer | Publisher |
+| --- | --- | --- | --- | --- |
+| Research | R | C | C | I |
+| Draft | R | C | I | I |
+| Źródła | R | C | C | I |
+| Copy edit | C | R | I | I |
+| Review prawne | C | I | R | I |
+| SEO metadata | R/C | R | I | I |
+| Schedule | I | C | I | R |
+| Publish | I | C | I | R |
+| Correction | R | R | C | A |
+| Archive | C | R | C | A |
+
+Legenda:
+
+- R — Responsible
+- A — Accountable
+- C — Consulted
+- I — Informed
+
+W małym zespole jedna osoba może pełnić kilka ról, ale checklisty i audit trail nadal obowiązują.
+
+---
+
+## 7. Workflow
+
+### 7.1. Draft
+
+Materiał roboczy.
+
+Może być niekompletny.
+Nie jest publiczny.
+Nie jest indeksowalny.
+
+### 7.2. In review
+
+Warunki wejścia:
+
+- tytuł,
+- lead,
+- body,
+- kategoria,
+- autor,
+- źródła,
+- podstawowe media lub jawna decyzja „bez hero”.
+
+### 7.3. Scheduled
+
+Warunki:
+
+- przeszedł checklistę publikacyjną,
+- ma dokładny scheduled_for,
+- nie wymaga nierozstrzygniętego review,
+- preview zaakceptowany.
+
+### 7.4. Published
+
+Publiczny i indeksowalny zgodnie z SEO policy.
+
+### 7.5. Needs review
+
+Materiał pozostaje publiczny, ale wymaga sprawdzenia.
+
+Nie należy automatycznie noindexować materiału tylko dlatego, że data review minęła.
+
+### 7.6. Archived
+
+Materiał wycofany z normalnej dystrybucji.
+
+Decyzja o 200/404/410/redirect zależy od konkretnego przypadku i jest opisana w release/SEO docs.
+
+---
+
+## 8. Zasada „status prawny”
+
+Każdy materiał o prawie musi jednoznacznie wskazywać, czy opisuje:
+
+- obowiązujące prawo,
+- uchwaloną zmianę z przyszłą datą wejścia w życie,
+- projekt,
+- konsultacje,
+- zapowiedź,
+- propozycję,
+- interpretację.
+
+Zakazane skróty redakcyjne:
+
+- „wchodzi zmiana”, jeśli istnieje tylko projekt,
+- „od dziś”, jeśli data wejścia w życie jest inna,
+- „kierowcy muszą”, jeśli obowiązek dotyczy tylko części grupy.
+
+---
+
+## 9. Hierarchia źródeł
+
+### Tier 1 — źródła pierwotne
+
+Preferowane:
+
+- Dziennik Ustaw / ELI,
+- gov.pl,
+- Ministerstwo Infrastruktury,
+- Policja,
+- CEPiK,
+- oficjalne WORD,
+- uchwały/regulaminy/komunikaty właściwych instytucji,
+- dane publiczne z właściwego organu.
+
+### Tier 2 — źródła bezpośrednie
+
+- odpowiedź instytucji,
+- komunikat prasowy,
+- wywiad z osobą odpowiedzialną,
+- dokument organizacji,
+- dane otrzymane bezpośrednio.
+
+### Tier 3 — źródła wtórne
+
+- media,
+- portale branżowe,
+- publikacje ekspertów.
+
+Tier 3 może naprowadzać na temat, ale dla zmian regulacyjnych należy szukać Tier 1/2.
+
+---
+
+## 10. Research checklist
+
+Przed napisaniem materiału autor sprawdza:
+
+- [ ] datę zdarzenia,
+- [ ] datę publikacji źródła,
+- [ ] datę wejścia w życie, jeśli dotyczy,
+- [ ] status dokumentu,
+- [ ] zakres podmiotowy,
+- [ ] geograficzny zakres informacji,
+- [ ] czy istnieje źródło pierwotne,
+- [ ] czy wcześniejszy artykuł PrawkoNaRaz wymaga aktualizacji,
+- [ ] czy temat ma powiązane pytania/przepisy/znaki.
+
+---
+
+## 11. Standard tytułów
+
+Tytuł ma:
+
+- opisywać najważniejszy fakt,
+- unikać clickbaitu,
+- nie sugerować pewności tam, gdzie jej nie ma,
+- nie nadużywać „PILNE”, „SZOK”, „wszyscy kierowcy”,
+- być zrozumiały poza kontekstem social media.
+
+Przykład poprawny:
+
+„Nowe zasady X od 1 stycznia 2027 r. Kogo obejmą?”
+
+Przykład niepoprawny:
+
+„Kierowcy w szoku! Wszystko zmieni się za chwilę”
+
+---
+
+## 12. Lead
+
+Lead powinien odpowiedzieć w 2–4 zdaniach:
+
+- co się wydarzyło,
+- kogo dotyczy,
+- kiedy,
+- co jest najważniejszą konsekwencją.
+
+Lead nie może być pustym teaserem typu „Sprawdź, co się zmieni”.
+
+---
+
+## 13. Struktura newsa
+
+Rekomendowana:
+
+1. H1
+2. lead
+3. „W skrócie” opcjonalnie
+4. najważniejszy fakt
+5. co dokładnie się zmienia
+6. kogo dotyczy
+7. od kiedy
+8. źródło / podstawa
+9. co to oznacza praktycznie
+10. powiązane materiały PrawkoNaRaz
+
+Nie każdy news musi mieć identyczne nagłówki, ale czytelnik nie powinien szukać daty lub zakresu zmiany w połowie tekstu.
+
+---
+
+## 14. Standard poradnika
+
+Poradnik ma zawierać:
+
+- jasny zakres,
+- wymagania wstępne,
+- kroki,
+- wyjątki,
+- koszty tylko z datą/źródłem, jeśli zmienne,
+- FAQ tylko z realnymi pytaniami,
+- datę ostatniego review,
+- powiązany etap produktu.
+
+---
+
+## 15. Standard analizy danych
+
+Każda analiza musi mieć blok „Metodologia”.
+
+Minimum:
+
+- źródło danych,
+- zakres dat,
+- liczebność,
+- filtry,
+- definicję metryki,
+- znane ograniczenia.
+
+Dane użytkowników:
+
+- tylko agregowane,
+- bez identyfikacji osób,
+- bez publikowania małych grup mogących prowadzić do reidentyfikacji,
+- zgodnie z polityką prywatności i decyzjami prawnymi projektu.
+
+---
+
+## 16. Correction policy
+
+### 16.1. Drobna korekta
+
+Literówka, formatowanie, błędny link bez wpływu na sens:
+
+- poprawiamy,
+- nie wymaga public correction note,
+- audit trail zachowany.
+
+### 16.2. Istotna korekta
+
+Zmiana:
+
+- daty,
+- kwoty,
+- zakresu obowiązku,
+- statusu prawa,
+- cytowanej wypowiedzi,
+- wniosku analizy.
+
+Wymaga:
+
+- correction_note,
+- last_substantive_update_at,
+- ponownego review,
+- publicznej informacji o korekcie, jeśli błąd mógł wpłynąć na odbiorcę.
+
+### 16.3. Wycofanie materiału
+
+Jeśli cały materiał jest nieprawdziwy lub nie powinien być publiczny:
+
+- natychmiast zdejmujemy z modułów,
+- publisher podejmuje decyzję o archive/404/410/redirect,
+- dokumentujemy przyczynę,
+- nie zostawiamy fałszywego tekstu tylko „dla SEO”.
+
+---
+
+## 17. Update policy
+
+Aktualizacja istniejącego artykułu jest preferowana, gdy:
+
+- to ten sam temat i intencja,
+- zmieniają się szczegóły lub kolejny etap tej samej sprawy,
+- stary URL ma już wartość i nadal odpowiada użytkownikowi.
+
+Nowy artykuł jest preferowany, gdy:
+
+- następuje odrębne wydarzenie,
+- zmiana ma własną intencję wyszukiwania,
+- stary materiał jest historycznym zapisem konkretnego zdarzenia.
+
+Nie przepisujemy historycznego newsa tak, aby udawał nowy news.
+
+---
+
+## 18. Breaking / „Pilne”
+
+Breaking jest stanem ekspozycji, nie typem treści.
+
+Można użyć, gdy:
+
+- wydarzenie jest naprawdę świeże,
+- ma istotny wpływ na dużą część odbiorców,
+- informacja jest potwierdzona.
+
+Nie używać:
+
+- dla zwykłego poradnika,
+- dla starej informacji,
+- dla informacji tylko po to, aby zwiększyć CTR.
+
+Breaking powinno wygasać automatycznie zgodnie z breaking_expires_at.
+
+---
+
+## 19. Featured
+
+Featured oznacza rekomendację redakcji do mocniejszej ekspozycji.
+
+Nie musi być breaking.
+Może być:
+
+- ważny explainer,
+- analiza,
+- raport,
+- poradnik sezonowy.
+
+Featured jest decyzją redakcyjną, nie metryką popularności.
+
+---
+
+## 20. Źródła w artykule
+
+Publiczny blok źródeł ma być czytelny.
+
+Zasady:
+
+- nie chowamy podstawowych źródeł tylko w JSON-LD,
+- źródło pierwotne powinno być linkowane, jeśli publicznie dostępne,
+- nie publikujemy prywatnych danych kontaktowych z korespondencji,
+- przy źródle dokumentu wskazujemy nazwę dokumentu/instytucji.
+
+---
+
+## 21. Cytaty
+
+Cytat musi być:
+
+- wierny,
+- przypisany,
+- osadzony w kontekście,
+- nie może zmieniać znaczenia przez selektywne skrócenie.
+
+Jeśli cytat pochodzi z publicznej publikacji, przestrzegamy praw autorskich i nie kopiujemy nadmiernych fragmentów.
+
+---
+
+## 22. Obrazy i kredyt
+
+Przed publikacją hero:
+
+- [ ] źródło/licencja znane,
+- [ ] alt opisuje obraz,
+- [ ] credit zapisany, jeśli wymagany,
+- [ ] nie używamy zdjęcia sugerującego wydarzenie, którego obraz faktycznie nie przedstawia,
+- [ ] nie używamy AI image jako „fotografii dokumentalnej” bez jasnego oznaczenia kontekstu.
+
+---
+
+## 23. AI w redakcji
+
+AI może pomagać w:
+
+- research checklist,
+- wyszukiwaniu powiązań w naszym corpusie,
+- streszczeniu materiałów roboczych,
+- propozycjach tytułów,
+- poprawie języka,
+- tagowaniu,
+- wykrywaniu niespójności dat,
+- propozycjach pytań do źródła.
+
+AI nie może samodzielnie:
+
+- ustalić stanu prawnego bez źródła,
+- publikować,
+- wymyślać cytatów,
+- tworzyć źródeł,
+- zmieniać istotnych faktów bez review,
+- przedstawiać wygenerowanego tekstu jako wypowiedzi instytucji.
+
+Autor/publisher odpowiada za finalny materiał.
+
+---
+
+## 24. Polityka linkowania do produktu
+
+Link do produktu musi być kontekstowy.
+
+Dobre przykłady:
+
+- news o znaku -> karta znaku,
+- zmiana przepisu -> odpowiednie pytania,
+- poradnik o teorii -> test demo,
+- materiał o błędach -> najtrudniejsze pytania.
+
+Złe przykłady:
+
+- ten sam „Kup dostęp” po każdym akapicie,
+- losowe pytania tylko dla zwiększenia liczby linków,
+- linkowanie do prywatnej funkcji bez wyjaśnienia wymogu logowania.
+
+---
+
+## 25. Internal linking editorial checklist
+
+- [ ] co najmniej jeden sensowny link do istniejącej wiedzy, jeśli istnieje,
+- [ ] nie linkować tego samego anchoru wielokrotnie bez potrzeby,
+- [ ] anchor opisuje cel,
+- [ ] powiązane pytania są faktycznie powiązane,
+- [ ] linki nie prowadzą do draftów/404.
+
+---
+
+## 26. Freshness policy
+
+### 26.1. Materiały prawne
+
+Trigger review:
+
+- nowelizacja aktu,
+- nowy komunikat organu,
+- zmiana daty wejścia w życie,
+- sygnał o błędzie,
+- osiągnięcie freshness_review_due_at.
+
+### 26.2. Guides
+
+Standardowy review:
+
+- co 90–180 dni zależnie od zmienności.
+
+### 26.3. News
+
+News historyczny nie musi być sztucznie „odświeżany”.
+Jeśli zmienia się historia, dodajemy update lub nowy materiał zależnie od reguł z sekcji 17.
+
+---
+
+## 27. „Stan na dzień”
+
+Dla treści o zmiennych wymaganiach można jawnie pokazywać:
+
+„Stan informacji: 15 września 2026 r.”
+
+To nie zastępuje daty publikacji i aktualizacji.
+
+---
+
+## 28. Zasady dla WORD / informacji lokalnych
+
+Przy materiale lokalnym zawsze ustalamy:
+
+- konkretny WORD,
+- miasto,
+- datę obowiązywania,
+- czy zmiana jest stała czy tymczasowa.
+
+Nie generalizujemy zmiany jednego WORD na całą Polskę.
+
+---
+
+## 29. Zasady dla kosztów i opłat
+
+Kwota wymaga:
+
+- daty,
+- zakresu,
+- źródła,
+- informacji, czy cena jest urzędowa, rynkowa czy przykładowa.
+
+Nie publikujemy jednej ceny jako „koszt prawa jazdy w Polsce”, jeśli jest zależna od OSK/miasta.
+
+---
+
+## 30. Zasady dla statystyk zdawalności
+
+Należy wskazać:
+
+- okres,
+- ośrodek,
+- kategorię,
+- teorię/praktykę,
+- źródło,
+- definicję wskaźnika.
+
+Nie porównujemy nieporównywalnych okresów bez wyjaśnienia.
+
+---
+
+## 31. Standard językowy
+
+Styl:
+
+- prosty,
+- konkretny,
+- neutralny,
+- bez urzędowego żargonu, jeśli można go wyjaśnić,
+- bez protekcjonalnego tonu,
+- bez sensacyjnych dopowiedzeń.
+
+Terminy prawne:
+
+- zachowujemy nazwę oficjalną,
+- wyjaśniamy prostym językiem,
+- nie upraszczamy do poziomu zmiany znaczenia.
+
+---
+
+## 32. Publikacyjna checklista mandatory
+
+Przed publish publisher potwierdza:
+
+- [ ] title
+- [ ] lead
+- [ ] body
+- [ ] type
+- [ ] category
+- [ ] author
+- [ ] sources
+- [ ] prawidłowe daty
+- [ ] status prawny
+- [ ] hero/alt lub jawna decyzja bez hero
+- [ ] SEO title/description lub poprawny fallback
+- [ ] canonical
+- [ ] preview desktop
+- [ ] preview mobile
+- [ ] related content
+- [ ] product bridge
+- [ ] spelling/copy
+- [ ] reviewer, jeśli wymagany
+- [ ] brak draft links
+- [ ] brak nieautoryzowanych assetów
+
+Checklistę warto odwzorować w Filament jako stan/validation, a nie tylko dokument.
+
+---
+
+## 33. Checklist po publikacji
+
+Dla ważnego materiału:
+
+- [ ] HTTP 200
+- [ ] canonical poprawny
+- [ ] meta title/description poprawne
+- [ ] schema renderuje się
+- [ ] obraz dostępny
+- [ ] link źródła działa
+- [ ] artykuł pojawia się w właściwym hubie
+- [ ] feed/sitemap po odświeżeniu zawiera URL
+- [ ] CTA prowadzi poprawnie
+- [ ] brak noindex
+
+---
+
+## 34. Emergency correction
+
+Jeśli opublikowano potencjalnie szkodliwy błąd:
+
+1. publisher może natychmiast zdjąć featured/breaking,
+2. poprawa lub tymczasowe archive,
+3. weryfikacja źródła,
+4. correction note,
+5. audit,
+6. ponowne opublikowanie po review.
+
+Nie czekamy na pełny cykl redakcyjny, jeśli błędna informacja jest publiczna.
+
+---
+
+## 35. Materiały sponsorowane
+
+Poza v1, ale policy należy ustalić od początku.
+
+Jeśli pojawią się:
+
+- muszą być jawnie oznaczone,
+- sponsor nie może ukrywać autorstwa reklamy,
+- oznaczenie musi być widoczne przed treścią,
+- relacje linków zgodne z polityką wyszukiwarek,
+- materiał sponsorowany nie może być oznaczany jako niezależny report.
+
+---
+
+## 36. Konflikt interesów
+
+Autor/reviewer powinien ujawnić wewnętrznie konflikt, jeśli:
+
+- materiał dotyczy partnera biznesowego,
+- materiał dotyczy OSK/firmy, z którą istnieje relacja,
+- publikacja może wpłynąć na własny interes.
+
+W razie potrzeby publiczna nota transparentności.
+
+---
+
+## 37. UGC / komentarze
+
+Komentarze użytkowników nie wchodzą do newsroom v1.
+
+Powód:
+
+- moderacja,
+- spam,
+- ryzyko prawne,
+- dodatkowy system zgłoszeń.
+
+Jeśli wrócą do scope, wymagają osobnej specyfikacji.
+
+---
+
+## 38. Social copy
+
+Tytuł artykułu nie musi być identyczny z copy social.
+
+Social copy:
+
+- nie może przeinaczać artykułu,
+- nie może obiecywać informacji, której tekst nie zawiera,
+- powinno podawać najważniejszy fakt.
+
+---
+
+## 39. Newsletter
+
+Poza v1.
+
+Gdy wejdzie:
+
+- wyraźny opt-in,
+- osobna polityka częstotliwości,
+- nie mieszamy konta produktowego z marketing consent bez podstawy.
+
+---
+
+## 40. Retencja materiałów
+
+Nie usuwamy starych newsów tylko dlatego, że są stare.
+
+Stary news może mieć wartość archiwalną.
+
+Usuwamy/noindex/410 tylko, gdy:
+
+- materiał nigdy nie powinien być publiczny,
+- jest duplikatem bez wartości,
+- wymaga tego prawo,
+- nie da się go naprawić i pozostawienie szkodzi użytkownikowi.
+
+---
+
+## 41. KPI redakcyjne
+
+Jakość:
+
+- correction rate,
+- time-to-correction,
+- procent artykułów z primary source,
+- procent artykułów po review,
+- freshness backlog.
+
+Dystrybucja:
+
+- impressions/clicks,
+- CTR,
+- Discover exposure, jeśli występuje,
+- returning readers.
+
+Produkt:
+
+- article -> question click,
+- article -> test click,
+- article -> registration,
+- article -> learning entry.
+
+Nie premiujemy autora tylko page views, ponieważ prowadzi to do clickbaitu.
+
+---
+
+## 42. SLA redakcyjne — punkt startowy
+
+Nie są to zobowiązania zewnętrzne, tylko cele operacyjne.
+
+- breaking correction: natychmiast po potwierdzeniu błędu,
+- istotny błąd zwykłego artykułu: ten sam dzień,
+- broken source/link: do kolejnego review lub szybciej dla primary source,
+- freshness overdue legal explainer: priorytet wysoki.
+
+---
+
+## 43. Filament — wymagania operacyjne
+
+Lista artykułów powinna pokazywać:
+
+- status,
+- typ,
+- kategoria,
+- autor,
+- reviewer,
+- published_at / scheduled_for,
+- źródła count,
+- featured/breaking,
+- freshness due.
+
+W formularzu powinny być ostrzeżenia:
+
+- brak primary source dla prawnego newsa,
+- scheduled_for w przeszłości,
+- breaking bez expiry,
+- published bez hero alt, jeśli hero istnieje,
+- brak powiązań produktu nie blokuje publish, ale powinien być widoczny.
+
+---
+
+## 44. Preview
+
+Preview musi:
+
+- wyglądać możliwie identycznie jak publiczna strona,
+- mieć noindex,
+- nie wejść do sitemap/feed,
+- nie pojawiać się w publicznych hubach,
+- wymagać auth lub signed URL,
+- nie ujawniać nieopublikowanych materiałów przypadkowym użytkownikom.
+
+---
+
+## 45. Audit trail
+
+Audit powinien odpowiedzieć:
+
+- kto utworzył,
+- kto edytował,
+- kto zmienił status,
+- kto opublikował,
+- kto zmienił slug,
+- kto usunął źródło,
+- kto ustawił breaking/featured,
+- kiedy wykonano istotną korektę.
+
+---
+
+## 46. Definition of Done procesu redakcyjnego
+
+Proces jest gotowy, gdy:
+
+- redaktor nie musi edytować kodu,
+- źródła są pierwszoklasowym elementem CMS,
+- preview istnieje,
+- scheduling jest bezpieczny,
+- corrections mają workflow,
+- reviewer policy da się egzekwować,
+- breaking wygasa,
+- freshness backlog jest widoczny,
+- każdy publish zostawia audit,
+- checklisty są częściowo egzekwowane technicznie.
+
+---
+
+## 47. Stan implementacji
+
+Na 2026-09-15:
+
+- istnieje ContentAuthor,
+- istnieją mechanizmy review/freshness w innych modułach,
+- istnieje AuditLog,
+- nie istnieje newsroomowy workflow,
+- nie istnieje newsroom Filament resource,
+- nie istnieje source model dla artykułów.
+
+---
+
+## 48. Pozostałe zadania
+
+- [ ] wdrożyć role/policies przynajmniej na poziomie admina,
+- [ ] odwzorować mandatory checklist w walidacji,
+- [ ] wdrożyć source model,
+- [ ] wdrożyć preview,
+- [ ] wdrożyć scheduling,
+- [ ] wdrożyć corrections,
+- [ ] wdrożyć freshness filters,
+- [ ] przygotować publiczną stronę zasad redakcyjnych przed większym rolloutem.
+
+---
+
+## 49. Historia zmian
+
+### 2026-09-15 — v0.1
+
+- utworzono operacyjny standard redakcyjny,
+- zdefiniowano role i RACI,
+- zdefiniowano source hierarchy,
+- dodano correction/update/breaking/freshness policies,
+- opisano AI policy, publikacyjne checklisty i emergency correction.

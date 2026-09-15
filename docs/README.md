@@ -66,7 +66,16 @@ Jesli zaczynasz od zera, rekomendowana kolejnosc jest taka:
   Formalizuje finalny wybor Laravel + Inertia + Vue + PostgreSQL + Filament.
 
 - [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
-  Kanoniczna specyfikacja publicznego pionu medialnego: newsroom, aktualnosci, poradniki, model artykulu i zrodel, workflow redakcyjny, Filament, architektura informacji, SEO/schema, dystrybucja, integracja z pytaniami i przepisami oraz etapy wdrozenia N0-N6. Rozdziela stan obecny od projektu docelowego i nie traktuje placeholderow `/aktualnosci` oraz `/poradniki` jako gotowego newsroomu.
+  Kanoniczna specyfikacja publicznego pionu medialnego. Ustala granice newsroomu, zaleznosci od istniejacego produktu, SSR-first, jedna domene/repo, typy contentu, architekture informacji i rollout N0-N6. To dokument nadrzedny dla calego pakietu newsroomowego.
+
+  Dokumenty wykonawcze newsroomu:
+  - [NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md](./NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md) — tabele, constraints, indeksy, relacje, serwisy, scheduling, redirecty i invariants.
+  - [NEWSROOM-ADMIN-CMS-SPEC.md](./NEWSROOM-ADMIN-CMS-SPEC.md) — Filament Resource/Form/Table/Infolist, workflow actions, checklisty, preview, permissions i wydajnosc panelu.
+  - [NEWSROOM-EDITORIAL-OPERATIONS-AND-GOVERNANCE.md](./NEWSROOM-EDITORIAL-OPERATIONS-AND-GOVERNANCE.md) — role redakcyjne, hierarchia zrodel, review, correction policy, breaking, freshness i AI policy.
+  - [NEWSROOM-PUBLIC-UI-UX-SPEC.md](./NEWSROOM-PUBLIC-UI-UX-SPEC.md) — hub `/aktualnosci`, kategorie, artykul, komponenty, responsive, accessibility i publiczny kontrakt UI.
+  - [NEWSROOM-SEO-DISTRIBUTION-AND-OBSERVABILITY.md](./NEWSROOM-SEO-DISTRIBUTION-AND-OBSERVABILITY.md) — canonical, Article/NewsArticle, obrazy, news sitemap, feed, Discover, analytics i monitoring.
+  - [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./NEWSROOM-IMPLEMENTATION-BACKLOG.md) — wykonawcza kolejnosc N0-N6, taski, zaleznosci, PR boundaries, ryzyka i Definition of Done.
+  - [NEWSROOM-TEST-RELEASE-AND-ROLLBACK-RUNBOOK.md](./NEWSROOM-TEST-RELEASE-AND-ROLLBACK-RUNBOOK.md) — test matrix, E2E, release, smoke, incident handling i rollback.
 
 - [DATABASE-SCHEMA.md](C:/Users/xxx/Desktop/serwistestyprawojazdy/docs/DATABASE-SCHEMA.md)
   Definiuje model danych, relacje, indeksy i granice MVP/V2.

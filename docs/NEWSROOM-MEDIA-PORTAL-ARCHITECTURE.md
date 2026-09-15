@@ -24,6 +24,31 @@ W razie konfliktu obowiązuje następująca kolejność:
 
 Dokument nie zmienia stacku i nie wprowadza nowej aplikacji. Projekt newsroomu ma być naturalnym rozwinięciem istniejącego systemu.
 
+### 2.1. Mapa dokumentacji wykonawczej newsroomu
+
+Ten dokument opisuje decyzje nadrzędne. Szczegóły implementacyjne są rozdzielone celowo:
+
+- [NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md](./NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md) — model domenowy, tabele, constraints, indeksy, serwisy, scheduling i redirecty.
+- [NEWSROOM-ADMIN-CMS-SPEC.md](./NEWSROOM-ADMIN-CMS-SPEC.md) — panel Filament, formularze, workflow actions, checklisty, preview i uprawnienia.
+- [NEWSROOM-EDITORIAL-OPERATIONS-AND-GOVERNANCE.md](./NEWSROOM-EDITORIAL-OPERATIONS-AND-GOVERNANCE.md) — proces redakcyjny, źródła, korekty, breaking, freshness, AI policy i governance.
+- [NEWSROOM-PUBLIC-UI-UX-SPEC.md](./NEWSROOM-PUBLIC-UI-UX-SPEC.md) — kontrakt publicznego layoutu, komponenty, mobile, accessibility i performance UI.
+- [NEWSROOM-SEO-DISTRIBUTION-AND-OBSERVABILITY.md](./NEWSROOM-SEO-DISTRIBUTION-AND-OBSERVABILITY.md) — canonical, schema, obrazy, news sitemap, feed, Discover, analytics i monitoring.
+- [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./NEWSROOM-IMPLEMENTATION-BACKLOG.md) — kolejność N0–N6, taski, zależności, granice PR-ów i Definition of Done.
+- [NEWSROOM-TEST-RELEASE-AND-ROLLBACK-RUNBOOK.md](./NEWSROOM-TEST-RELEASE-AND-ROLLBACK-RUNBOOK.md) — test matrix, E2E, release, smoke, incident handling i rollback.
+
+### 2.2. Jak rozstrzygać konflikt między dokumentami newsroomu
+
+1. decyzja architektoniczna i granica systemu — ten dokument,
+2. dane/invariants — Data Model and Domain Spec,
+3. zachowanie backoffice — Admin CMS Spec,
+4. reguły redakcyjne — Editorial Operations,
+5. zachowanie publicznego UI — Public UI/UX Spec,
+6. Search/dystrybucja/monitoring — SEO Distribution and Observability,
+7. kolejność implementacji — Implementation Backlog,
+8. test/deploy/rollback — Test Release and Rollback Runbook.
+
+Jeżeli kod wymusi zmianę decyzji nadrzędnej, najpierw aktualizujemy ten dokument. Jeżeli zmienia się tylko szczegół wykonawczy, aktualizujemy właściwą specyfikację bez przepisywania całej architektury.
+
 ---
 
 ## 3. Problem do rozwiązania
@@ -215,12 +240,12 @@ Po uruchomieniu i zebraniu danych można dodać blok „Najnowsze informacje” 
 ```text
 /
 ├── aktualnosci/
-│   ├── prawo-jazdy/
-│   ├── egzaminy/
-│   ├── przepisy/
-│   ├── word/
-│   ├── kierowcy/
-│   └── osk/
+│   ├── kategoria/prawo-jazdy/
+│   ├── kategoria/egzaminy/
+│   ├── kategoria/przepisy/
+│   ├── kategoria/word/
+│   ├── kategoria/kierowcy/
+│   └── kategoria/osk/
 ├── poradniki/
 ├── przepisy/
 ├── znaki-drogowe/
@@ -243,9 +268,11 @@ Nie umieszczamy daty w canonical URL. Data jest metadanym artykułu, nie częśc
 
 ### 7.3. URL kategorii
 
-`/aktualnosci/{categorySlug}`
+Rekomendowany i przyjęty do backlogu wykonawczego wariant:
 
-Slug kategorii jest stabilny i zarządzany centralnie.
+`/aktualnosci/kategoria/{categorySlug}`
+
+Jawny segment `kategoria` usuwa kolizję routingu między slugiem kategorii i slugiem artykułu. Slug kategorii jest stabilny i zarządzany centralnie. Każda zmiana tej decyzji wymaga aktualizacji architektury i testu konfliktów route.
 
 ### 7.4. Redirect governance
 
@@ -335,7 +362,9 @@ Poniższy model jest **docelowym projektem**, a nie opisem obecnej bazy.
 
 ### 9.1. `content_articles`
 
-Minimalne pola:
+Poniższa lista jest skrótem architektonicznym. **Normatywny kontrakt pól, typów, constraints i indeksów znajduje się w [NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md](./NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md).**
+
+Minimalny rdzeń:
 
 ```text
 id
@@ -343,35 +372,41 @@ type
 category_id
 author_id
 reviewer_id nullable
+created_by_user_id nullable
+updated_by_user_id nullable
 
 title
 slug
 lead
 body
+key_points nullable
 
-status
+workflow_status
 is_featured
 is_breaking
-priority
+editorial_priority
+breaking_expires_at nullable
 
-hero_image_path
-hero_image_alt
-hero_image_width
-hero_image_height
+hero_image_path nullable
+hero_image_alt nullable
+hero_image_width nullable
+hero_image_height nullable
+og_image_path nullable
 
-seo_title
-seo_description
+seo_title nullable
+seo_description nullable
 canonical_url nullable
 robots nullable
 
-source_summary nullable
+scheduled_for nullable
 published_at nullable
 first_published_at nullable
 reviewed_at nullable
 needs_review_at nullable
+source_checked_at nullable
+freshness_review_due_at nullable
+last_substantive_update_at nullable
 
-created_by
-updated_by
 created_at
 updated_at
 ```
@@ -461,7 +496,7 @@ Artykuł nie może być publicznie indeksowalny, jeśli:
 - nie ma kategorii,
 - nie ma treści,
 - nie ma poprawnego sluga,
-- ma `published_at` w przyszłości bez statusu `scheduled`,
+- ma niespójny `workflow_status` / `scheduled_for` / `published_at`,
 - nie spełnia minimalnej checklisty źródeł dla typu wymagającego źródeł.
 
 ### 10.3. Breaking / pilne
@@ -944,80 +979,96 @@ scheduled article
 
 ## 23. Etapy wdrożenia
 
-### Etap N0 — porządek przed implementacją
+Szczegółowy tasking i granice PR-ów są kanonicznie utrzymywane w [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./NEWSROOM-IMPLEMENTATION-BACKLOG.md). Na poziomie architektury obowiązuje:
 
-- ujednolicić publisher/Organization branding,
-- potwierdzić kategorię i taxonomy v1,
-- potwierdzić model źródeł,
-- potwierdzić publiczny URL pattern,
-- dodać testy kontraktowe dla istniejącego `/aktualnosci`.
+### Etap N0 — foundation
 
-### Etap N1 — domain + CMS
+- publisher/Organization branding source of truth,
+- finalny route contract,
+- taxonomy v1,
+- decyzja editor + sanitization.
+
+**Exit criteria:** nie ma nierozstrzygniętej decyzji, która zmieniałaby schema, routing albo bezpieczeństwo body.
+
+### Etap N1 — domain + database
 
 - migrations,
-- models,
-- policies,
-- Filament resources,
-- workflow,
-- preview,
-- testy backend.
+- enumy,
+- models/factories,
+- slug redirects,
+- publishing service,
+- scheduler.
 
-**Exit criteria:** redaktor może przygotować i opublikować artykuł bez edycji kodu.
+**Exit criteria:** domena może bezpiecznie przechować i deterministycznie opublikować artykuł bez CMS i publicznego renderera.
 
-### Etap N2 — publiczny artykuł
+### Etap N2 — CMS + workflow
 
-- controller/service,
-- Blade layout,
-- metadata,
-- schema,
+- ContentCategoryResource,
+- ContentArticleResource,
+- body editor,
 - źródła,
-- autor,
-- powiązane pytania,
-- breadcrumbs,
-- testy.
+- relacje,
+- workflow actions,
+- checklist,
+- preview.
 
-**Exit criteria:** pojedynczy artykuł jest produkcyjnie indeksowalny i poprawnie połączony z produktem.
+**Exit criteria:** redaktor może przygotować, sprawdzić, podejrzeć, zaplanować i opublikować artykuł bez edycji kodu.
 
-### Etap N3 — hub `/aktualnosci`
+### Etap N3 — publiczny artykuł
 
-- editorial homepage,
-- latest,
-- category sections,
-- featured,
-- breaking,
-- responsywność,
-- cache.
+- public catalog service,
+- SEO/schema services,
+- Blade article page,
+- sources/byline,
+- product bridge,
+- old-slug redirects.
 
-**Exit criteria:** `/aktualnosci` działa jak prawdziwy portal, nie lista blogowa.
+**Exit criteria:** pojedynczy opublikowany artykuł jest poprawnie renderowany, indeksowalny i połączony z istniejącym produktem.
 
-### Etap N4 — kategorie + poradniki
+### Etap N4 — hub + kategorie + poradniki
 
-- strony kategorii,
-- paginacja,
+- editorial home `/aktualnosci`,
+- category pages,
 - `/poradniki`,
-- linkowanie newsroom ↔ evergreen.
+- navigation integration,
+- cache/invalidation.
 
-### Etap N5 — dystrybucja
+**Exit criteria:** portal działa jako redakcyjny system wejść, a nie pojedyncza strona artykułu.
 
-- sitemap/news sitemap,
+### Etap N5 — SEO + dystrybucja + analytics
+
+- articles sitemap,
+- news sitemap,
 - RSS/Atom,
 - analytics events,
-- OG pipeline,
-- monitoring indeksacji.
+- IndexNow review,
+- link/content audit.
 
-### Etap N6 — rozszerzenia oparte na danych
+**Exit criteria:** publiczny corpus ma pełną warstwę dystrybucji i obserwowalności.
 
-Dopiero po ruchu:
+### Etap N6 — hardening + pierwszy rollout
+
+- E2E golden paths,
+- production scheduler smoke,
+- production SEO validation,
+- performance/security pass,
+- pierwszy kontrolowany batch treści,
+- Search Console observation.
+
+**Exit criteria:** newsroom jest operacyjnie gotowy do regularnej publikacji.
+
+### Po v1 — rozszerzenia zależne od danych
+
+Dopiero po realnym ruchu i obserwacji:
 
 - „najczęściej czytane”,
 - personalizacja,
 - lokalne huby WORD,
 - newsletter,
-- raporty własne,
-- rozbudowa home `/`.
+- większe raporty własne,
+- ewentualna rozbudowa home `/`.
 
 ---
-
 ## 24. Definition of Done v1
 
 Newsroom v1 jest ukończony, gdy:
@@ -1038,20 +1089,30 @@ Newsroom v1 jest ukończony, gdy:
 
 ---
 
-## 25. Otwarte decyzje przed kodowaniem
+## 25. Decyzje zamknięte i otwarte przed kodowaniem
 
-Poniższe kwestie wymagają jawnego rozstrzygnięcia przed lub w Etapie N1:
+### 25.1. Decyzje zamknięte przez pakiet projektowy
 
-1. Czy `guide` i `news` korzystają z tej samej tabeli — **rekomendacja: tak**.
-2. Czy źródła są osobną tabelą już w v1 — **rekomendacja: tak**, jeśli newsroom ma publikować zmiany prawa.
-3. Czy reviewer jest wymagany dla wszystkich newsów — **rekomendacja: nie**, obowiązkowy tylko dla wybranych typów/tematów.
-4. Czy lokalne strony WORD wchodzą do v1 — **rekomendacja: model gotowy, masowy rollout później**.
-5. Czy `/` zmienia się w home portalu — **rekomendacja: nie w v1**.
-6. Czy page builder jest potrzebny — **rekomendacja: nie; kontrolowane moduły wystarczą**.
-7. Czy komentarze użytkowników wchodzą do newsroomu — **rekomendacja: poza scope v1**.
+1. `guide`, `news`, `explainer`, `analysis` i `report` korzystają ze wspólnego agregatu `content_articles`.
+2. Źródła są osobną relacyjną tabelą `content_article_sources` już w v1.
+3. Reviewer nie jest wymagany dla wszystkich newsów; wymóg wynika z typu/ryzyka materiału.
+4. Lokalne huby WORD nie wchodzą do v1; model ma nie blokować ich późniejszego dodania.
+5. `/` pozostaje produktowym home w v1.
+6. Page builder nie wchodzi do v1; stosujemy kontrolowane moduły.
+7. Komentarze użytkowników są poza scope v1.
+8. Kategorie używają ścieżki `/aktualnosci/kategoria/{categorySlug}`.
+9. Feed v1 używa `/aktualnosci/feed.xml`.
+10. Publiczne strony newsroomu są SSR/Blade-first.
+
+### 25.2. Otwarte decyzje N0 wymagające domknięcia przed implementacją zależnych elementów
+
+- konkretny editor body i techniczna strategia sanitization (`NEWSROOM-N0-004`),
+- finalne źródło brand name/logo/publisher po usunięciu pozostałości „Orły na Drodze” (`NEWSROOM-N0-001`),
+- finalne wspólne design tokens używane przez newsroom po audycie obecnego publicznego UI.
+
+Pozostałe szczegóły nie powinny blokować N1, jeśli nie wpływają na schema, bezpieczeństwo body albo publiczny routing.
 
 ---
-
 ## 26. Ukończone prace związane z tym obszarem
 
 Na moment utworzenia dokumentu za ukończone uznajemy wyłącznie elementy rzeczywiście istniejące w kodzie:
@@ -1073,30 +1134,17 @@ Na moment utworzenia dokumentu za ukończone uznajemy wyłącznie elementy rzecz
 
 ## 27. Pozostałe zadania
 
-Najbliższy backlog:
+Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./NEWSROOM-IMPLEMENTATION-BACKLOG.md). Najbliższa kolejność:
 
-- [ ] uporządkowanie branding/publisher,
-- [ ] finalna taxonomy v1,
-- [ ] projekt migracji,
-- [ ] model `ContentArticle`,
-- [ ] model kategorii,
-- [ ] model źródeł,
-- [ ] relacje z pytaniami i legal units,
-- [ ] Filament resource,
-- [ ] preview,
-- [ ] publikacja/scheduling,
-- [ ] publiczny article renderer,
-- [ ] schema services,
-- [ ] `/aktualnosci` editorial hub,
-- [ ] strony kategorii,
-- [ ] `/poradniki`,
-- [ ] sitemap/feed,
-- [ ] analytics,
-- [ ] E2E,
-- [ ] monitoring produkcyjny.
+- [ ] `NEWSROOM-N0-001` — publisher branding source of truth,
+- [ ] `NEWSROOM-N0-002` — test/utrwalenie przyjętego route contract,
+- [ ] `NEWSROOM-N0-003` — deterministyczny taxonomy seed contract,
+- [ ] `NEWSROOM-N0-004` — editor + sanitization decision,
+- [ ] następnie N1 domain + database.
+
+Pozostałe elementy N2–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu checklistę.
 
 ---
-
 ## 28. Zasady utrzymania dokumentu
 
 Po każdej implementacji dotyczącej newsroomu dokument musi zostać zaktualizowany tak, aby osobno pokazywał:
@@ -1119,6 +1167,13 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-15 — v0.2
+
+- dodano mapę siedmiu wykonawczych dokumentów newsroomu i reguły rozstrzygania konfliktów,
+- ujednolicono routing kategorii do `/aktualnosci/kategoria/{categorySlug}`,
+- oznaczono szczegółowy Data Model Spec jako normatywny kontrakt schema,
+- wyrównano etapy N0–N6 z wykonawczym backlogiem.
 
 ### 2026-09-15 — v0.1
 
