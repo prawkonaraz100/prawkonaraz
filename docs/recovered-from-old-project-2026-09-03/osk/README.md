@@ -13,13 +13,15 @@
 > w [Etapie 5G](./OSK_V2_12_STAGE_5G_CONTINUOUS_LESSON_FLOW.md).
 
 
-**Status:** Etapy 1–3, Etap 4A, techniczna warstwa Etapu 4B, Etapy 5A–5P oraz przygotowanie danych Etapu 6A — organizacje, enrollment, kredyty, wersjonowane wymagania, program, odizolowany player, źródłowe sesje czasu, walidacja przedziałów, warstwa HTTP, integracja sesji z playerem, izolowany kursor postępu, kontrolowany rollout, płynne przejście między lekcjami, profesjonalny edytor, źródłowy kurs kategorii B, publikacja V1, kontrola gotowości enrollmentu, dwa kanały zapisu kursanta, brama aktywacji pilota, katalog B, onboarding B2B, operacyjna lista zapisów, konto gotowe przy biurku OSK, fail-closed preflight e-maila z hasłem oraz immutable dane robocze PAPER — wdrożone i zweryfikowane lokalnie. Jeden kontrolowany pilot lokalny źródłowej wersji B przeszedł pełny smoke HTTP oraz ręczny smoke B2B.
-**Ostatnia weryfikacja:** 2026-08-30. Etap 5P: końcowa regresja OSK, paneli administratora, logowania i dashboardu `147` testów / `1278` asercji. Po niej ponowiony mały pilot DEMO potwierdził pięć bram dostępu, logowanie kursanta, player, blokadę operatora bez enrollmentu oraz niezależność `/nauka`; regresja pilota: `61` testów / `674` asercje. Przeszły również build Vite, cache konfiguracji i widoków Blade oraz kontrola diffu. Docker i wszystkie migracje OSK są gotowe lokalnie.
-**Stan smoke B2B:** pełny przebieg lokalny jest zakończony na oddzielnych danych: onboarding szkoły, pięć miejsc startowych, utworzenie dwóch zapisów, ponowne wydanie linku i odwołanie starego, anulowanie drugiego zapisu ze zwrotem miejsca, aktywacja pierwszego kursanta, allow-lista pilota oraz pozytywny i negatywny test dostępu.
-**Najbliższy bezpieczny krok:** decyzje operacyjne przed prawdziwym pilotem: partner OSK, osoba odpowiedzialna, mała grupa kursantów, produkcyjny mailer i nadawca, SPF/DKIM/DMARC, monitoring oraz rollback. Nie wykonywać deployu ani nie zmieniać produkcyjnej flagi środowiskowej bez osobnej decyzji; lokalny test nie jest zgodą na uruchomienie produkcji.
-**Stan katalogu i onboardingu:** Etap 5L jest zakończony lokalnie dla kategorii B, Etap 5M dodaje ręcznie akceptowany onboarding OSK, Etap 5N operacyjną listę zapisów, a Etapy 5O–5P konto gotowe przy biurku z bezpiecznym wydrukiem domyślnie. E-mail z hasłem pojawia się dopiero po jawnej konfiguracji środowiska. Nie rozszerzaj katalogu o inne kategorie ani nie przedstawiaj walidacji NIP/telefonu jako automatycznej weryfikacji firmy bez osobnej decyzji o zakresie i integracjach.
-**Stan PAPER:** zapisano źródłowy wyciąg urzędowego wzoru karty z załącznika nr 3, a Etap 6A dodaje wersjonowane dane robocze z jawnymi blockerami. Identyczne odświeżenie nie tworzy kopii, a wyłącznie zastąpiona historia robocza jest automatycznie porządkowana po 90 dniach na produkcji. Nie ma zatwierdzonego operacyjnego szablonu, formalnych danych, review, generatora PDF, procesu podpisów ani formalnego wystawiania dokumentów.
-**Weryfikacja Etapu 6A (2026-08-31):** `6` testów / `50` asercji, lokalna migracja, dry run retencji oraz filtr harmonogramu przeszły. Harmonogram nie wykonuje się lokalnie, a najnowsza rewizja nigdy nie jest usuwana.
+**Historyczny status local worktree (2026-08-30):** Etapy 1–3, Etap 4A, techniczna warstwa Etapu 4B, Etapy 5A–5P oraz przygotowanie danych Etapu 6A — organizacje, enrollment, kredyty, wersjonowane wymagania, program, odizolowany player, źródłowe sesje czasu, walidacja przedziałów, warstwa HTTP, integracja sesji z playerem, izolowany kursor postępu, kontrolowany rollout, płynne przejście między lekcjami, profesjonalny edytor, źródłowy kurs kategorii B, publikacja V1, kontrola gotowości enrollmentu, dwa kanały zapisu kursanta, brama aktywacji pilota, katalog B, onboarding B2B, operacyjna lista zapisów, konto gotowe przy biurku OSK, fail-closed preflight e-maila z hasłem oraz immutable dane robocze PAPER — wdrożone i zweryfikowane lokalnie. Jeden kontrolowany pilot lokalny źródłowej wersji B przeszedł pełny smoke HTTP oraz ręczny smoke B2B.
+**Historyczna ostatnia weryfikacja:** 2026-08-30. Etap 5P: końcowa regresja OSK, paneli administratora, logowania i dashboardu `147` testów / `1278` asercji. Po niej ponowiony mały pilot DEMO potwierdził pięć bram dostępu, logowanie kursanta, player, blokadę operatora bez enrollmentu oraz niezależność `/nauka`; regresja pilota: `61` testów / `674` asercje. Przeszły również build Vite, cache konfiguracji i widoków Blade oraz kontrola diffu. Docker i wszystkie migracje OSK są gotowe lokalnie.
+**Historyczny stan smoke B2B:** pełny przebieg lokalny jest zakończony na oddzielnych danych: onboarding szkoły, pięć miejsc startowych, utworzenie dwóch zapisów, ponowne wydanie linku i odwołanie starego, anulowanie drugiego zapisu ze zwrotem miejsca, aktywacja pierwszego kursanta, allow-lista pilota oraz pozytywny i negatywny test dostępu.
+**Historyczny najbliższy bezpieczny krok (2026-08-30):** decyzje operacyjne przed prawdziwym pilotem: partner OSK, osoba odpowiedzialna, mała grupa kursantów, produkcyjny mailer i nadawca, SPF/DKIM/DMARC, monitoring oraz rollback. Nie wykonywać deployu ani nie zmieniać produkcyjnej flagi środowiskowej bez osobnej decyzji; lokalny test nie jest zgodą na uruchomienie produkcji.
+**Historyczny stan katalogu i onboardingu:** Etap 5L jest zakończony lokalnie dla kategorii B, Etap 5M dodaje ręcznie akceptowany onboarding OSK, Etap 5N operacyjną listę zapisów, a Etapy 5O–5P konto gotowe przy biurku z bezpiecznym wydrukiem domyślnie. E-mail z hasłem pojawia się dopiero po jawnej konfiguracji środowiska. Nie rozszerzaj katalogu o inne kategorie ani nie przedstawiaj walidacji NIP/telefonu jako automatycznej weryfikacji firmy bez osobnej decyzji o zakresie i integracjach.
+**Historyczny stan PAPER:** zapisano źródłowy wyciąg urzędowego wzoru karty z załącznika nr 3, a Etap 6A dodaje wersjonowane dane robocze z jawnymi blockerami. Identyczne odświeżenie nie tworzy kopii, a wyłącznie zastąpiona historia robocza jest automatycznie porządkowana po 90 dniach na produkcji. Nie ma zatwierdzonego operacyjnego szablonu, formalnych danych, review, generatora PDF, procesu podpisów ani formalnego wystawiania dokumentów.
+**Historyczna weryfikacja Etapu 6A (2026-08-31):** `6` testów / `50` asercji, lokalna migracja, dry run retencji oraz filtr harmonogramu przeszły. Harmonogram nie wykonuje się lokalnie, a najnowsza rewizja nigdy nie jest usuwana.
+
+**Bieżący stan potwierdzony dla repozytorium (2026-09-15):** aktualny `main@4b10738705f3696bc2bcce730a707473eab8cd2b` nie zawiera opisanego niżej runtime'u OSK. Kod historycznego local worktree nie został jeszcze wskazany ani odzyskany do bieżącego `main`. Bieżący status odzyskiwania i następny krok są nadrzędnie prowadzone w [głównym planie odzyskania i wdrożeń](../../RECOVERY-AND-DEPLOYMENT-MASTER-PLAN.md), Etap 6.
 
 Ten plik jest punktem startowym dla człowieka lub kolejnego agenta. Najpierw przeczytaj go w całości, potem otwieraj dokumenty w kolejności poniżej. Nie zaczynaj od losowego pliku z katalogu `docs/` ani od implementacji w `StudySession`.
 
@@ -120,7 +122,9 @@ Nowe klucze muszą na początku pozostać zgodne z aktualnym projektem Laravel: 
 - Nie używaj w standardowym Browser Exam Station loginu, hasła, PIN-u, kodu lub QR kursanta.
 - Nie buduj w tej inicjatywie rezerwacji jazd, kalendarza, dostępności instruktorów, floty, CRM ani SMS.
 
-## 5. Stan na dziś
+## 5. Historyczny stan local worktree — snapshot 2026-08-30
+
+Poniższa tabela zachowuje stan potwierdzony w dawnym local worktree. Nie opisuje aktualnego `main`; bieżący stan implementacji OSK w dostępnym repozytorium jest opisany wyżej oraz w Etapie 6 głównego planu odzyskania.
 
 | Obszar | Stan |
 | --- | --- |
@@ -146,7 +150,9 @@ Nowe klucze muszą na początku pozostać zgodne z aktualnym projektem Laravel: 
 | Generator PDF i canonical PAPER template | Zapisano źródłowy wzór z załącznika nr 3; nadal brak zatwierdzonego szablonu operacyjnego, formalnych danych, review i generatora |
 | Rezerwacje jazd / kalendarz | Świadomie poza zakresem |
 
-## 6. Co dokładnie robi następny agent
+## 6. Historyczny handoff dla kolejnego agenta — 2026-08-30
+
+Poniższe komendy, etapy i wyniki testów są zachowanym handoffem starego local worktree. Nie należy wykonywać ich jako dowodu stanu bieżącego `main`. Dla aktualnego repozytorium pierwszym krokiem pozostaje zidentyfikowanie rzeczywistego working tree / commita uruchamiającego lokalny runtime OSK, zgodnie z Etapem 6 głównego planu odzyskania.
 
 ### Przed pierwszą edycją kodu
 
