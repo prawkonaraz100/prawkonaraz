@@ -951,7 +951,7 @@ Usuwamy/noindex/410 tylko, gdy:
 
 ---
 
-## 40.1. Anti-scaled-content / programmatic publishing policy
+### 40.1. Anti-scaled-content / programmatic publishing policy
 
 Automatyzacja nie może tworzyć indeksowalnych stron wyłącznie dlatego, że istnieje kombinacja słów kluczowych, taga, miasta albo rekordu w bazie.
 
