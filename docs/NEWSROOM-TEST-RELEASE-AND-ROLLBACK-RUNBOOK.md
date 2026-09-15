@@ -194,7 +194,9 @@ Dla każdego przejścia:
 | published | needs review | needs_review | PASS |
 | needs_review | republish/update | published | PASS after review |
 | published | archive | archived | PASS |
+| published/needs_review/archived | withdraw | withdrawn | PASS with reason |
 | archived | direct publish | published | REJECT in v1; return to review flow first |
+| withdrawn | direct publish | published | REJECT; restore to review first |
 
 Testować również niedozwolone przejścia.
 
@@ -697,6 +699,7 @@ Minimum:
 - publish blocked with missing requirements,
 - schedule works,
 - archive works with deterministic public-detail policy,
+- withdraw requires reason and produces 410/zero distribution,
 - only admin can access newsroom resources/actions,
 - User audit actor differs from ContentAuthor author/reviewer identity,
 - stale article update rejected,
@@ -1006,9 +1009,12 @@ Nie cofamy migracji ani treści tylko po to, by wyłączyć publiczną ekspozycj
 
 Nie wymaga deploy:
 
-- archive,
 - correction,
-- remove breaking/featured.
+- remove breaking/featured,
+- archive, jeśli historyczny 200 jest bezpieczny,
+- withdraw, jeśli materiał musi natychmiast przestać być publicznie dostępny.
+
+Nie używamy archive jako substytutu takedownu.
 
 To jest główny powód rozdzielenia content state od kodu.
 
@@ -1287,7 +1293,7 @@ Na 2026-09-16:
 - wyrównano runbook z faktycznym SQLite CI przez wymagany additive newsroom-postgres gate,
 - preview v1 zmieniono na admin-only/private-no-store i dodano rozdzielenie User actor vs ContentAuthor identity,
 - dodano stale-write, placement concurrency, category/topic identity oraz block-format compatibility tests,
-- archive otrzymało deterministyczny historical-200 contract,
+- archive otrzymało deterministyczny historical-200 contract, a withdrawn jawny 410 takedown flow,
 - async queue assumptions zastąpiono dirty/version coordinator tests działającymi przy QUEUE_CONNECTION=sync,
 - NEWSROOM_PUBLIC_ENABLED stał się wymaganym dark-deploy/cutover/rollback gate,
 - newsroom browser E2E oddzielono od istniejącego product browser smoke.
