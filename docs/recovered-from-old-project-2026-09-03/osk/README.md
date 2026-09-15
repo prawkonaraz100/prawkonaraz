@@ -54,12 +54,12 @@ Zasada blueprintu „jeden Learning Engine” dotyczy nowego, formalnego silnika
 13. [Kontrakt postępu lekcji Etapu 5E](./OSK_V2_12_STAGE_5E_LESSON_PROGRESS.md) — odtwarzany kursor, append-only zdarzenia i granice wobec formalnego evidence.
 14. [Kontrakt rolloutu pilota Etapu 5F](./OSK_V2_12_STAGE_5F_PILOT_ROLLOUT.md) — globalna brama, allow-lista enrollmentów, audyt i runbook uruchomienia.
 15. [Kontrakt płynnego przejścia lekcji Etapu 5G](./OSK_V2_12_STAGE_5G_CONTINUOUS_LESSON_FLOW.md) — dynamiczny przycisk główny, przejście bez auto-close oraz granice wobec formalnego ukończenia.
-16. [Raport szkieletu treści Etapu 5H](./OSK_V2_12_STAGE_5H_DRAFT_CONTENT_SKELETON.md) — edytor, źródłowy draft kategorii B, zatwierdzanie treści, publikacja wersji i twarde granice dostępu kursanta.
-17. [Gotowość enrollmentu do pilota Etapu 5I](./OSK_V2_12_STAGE_5I_PILOT_READINESS.md) — wspólny preflight playera i panelu.
-18. [Dwa bezpieczne kanały zapisu Etapu 5J](./OSK_V2_12_STAGE_5J_ENROLLMENT_PROVISIONING.md) — osobny panel operatora OSK i administratora platformy, token aktywacyjny oraz audit.
+16. Raport szkieletu treści Etapu 5H **(plik nie został odzyskany; wymaga weryfikacji)** — edytor, źródłowy draft kategorii B, zatwierdzanie treści, publikacja wersji i twarde granice dostępu kursanta.
+17. Gotowość enrollmentu do pilota Etapu 5I **(plik nie został odzyskany; wymaga weryfikacji)** — wspólny preflight playera i panelu.
+18. Dwa bezpieczne kanały zapisu Etapu 5J **(plik nie został odzyskany; wymaga weryfikacji)** — osobny panel operatora OSK i administratora platformy, token aktywacyjny oraz audit.
 19. [Aktywacja kursu do lokalnego pilota Etapu 5K](./OSK_V2_12_STAGE_5K_COURSE_PILOT_ACTIVATION.md) — osobna brama kursu, runbook kontrolowanego smoke i rollback.
 20. [Katalog kursow kategorii B Etapu 5L](./OSK_V2_12_STAGE_5L_COURSE_CATALOG.md) — tworzenie, archiwum, skalowanie listy i granice innych kategorii.
-21. [Bezpieczny onboarding B2B Etapu 5M](./OSK_V2_12_STAGE_5M_SAFE_B2B_ONBOARDING.md) — rejestracja szkoły, e-mail, NIP, telefon, kolejka administratora i granice weryfikacji.
+21. Bezpieczny onboarding B2B Etapu 5M **(plik nie został odzyskany; wymaga weryfikacji)** — rejestracja szkoły, e-mail, NIP, telefon, kolejka administratora i granice weryfikacji.
 22. [Operacyjna obsługa zapisów Etapu 5N](./OSK_V2_12_STAGE_5N_ENROLLMENT_OPERATIONS.md) — lista, ponowne wydanie linku, anulowanie oczekującego zapisu i granice skali.
 23. [Konto gotowe przy biurku Etapu 5O](./OSK_V2_12_STAGE_5O_ACTIVATION_LINK_DELIVERY.md) — aktywne konto, wydruk lub bezpieczny e-mail bez zapisywania sekretu.
 24. [Gotowość do kontrolowanego pilota produkcyjnego Etapu 5P](./OSK_V2_12_STAGE_5P_PRODUCTION_PILOT_READINESS.md) — lokalna bramka mailera i wydruku; partner, monitoring i deploy pozostają osobnymi decyzjami.
@@ -73,6 +73,12 @@ Plik blueprintu jest przechowywany jako niezmieniony dokument źródłowy. Jego
 SHA-256 na dzień audytu: `BAC86136C7168D80BFF10D5B1F396FCDC4FC7DCC4895CCDC92129D70CB3D37C6`.
 Nie poprawiaj go w ramach implementacji; nowe interpretacje i decyzje zapisuj
 w planie lub raporcie audytowym.
+
+> **Uwaga o brakach odzyskania:** brak plików dokumentacyjnych Etapów 5H, 5I,
+> 5J i 5M w bieżącym snapshotcie nie jest dowodem, że historyczne prace nie
+> istniały. Oznacza wyłącznie, że wskazane pliki nie zostały odzyskane do
+> dostępnego drzewa repozytorium; ich treść i historyczne statusy wymagają
+> weryfikacji w rzeczywistym starym/local working tree.
 
 ## 3. Hierarchia źródeł i rozstrzyganie konfliktów
 
@@ -280,7 +286,7 @@ Jeżeli testy lub Docker nie działają, najpierw napraw środowisko albo wyjaś
 2. Draft zawiera moduł `Pierwszeństwo i obserwacja drogi` oraz trzy krótkie lekcje bez kroków i bez merytorycznej treści dla kursanta.
 3. Administrator może redagować robocze tytuły i opisy modułu oraz lekcji, a serwis domenowy odrzuca każdą próbę zmiany opublikowanej wersji.
 4. Nie ma publikacji, enrollmentu, kredytu, tokenu, maila, dostępu do pilota ani deployu. Lokalny draft został sprawdzony: jest nieaktywny, `DRAFT`, ma zero enrollmentów i zero kroków.
-5. Testy strony administratora oraz blokady programu: 10 testów / 59 asercji. Ręczny test z 2026-08-27 objął redakcję modułów, lekcji i sześciu formatów kroków; wykryty brak zapisu opcjonalnego kontekstu pytania został naprawiony i objęty regresją. Szczegóły znajdują się w [Etapie 5H](./OSK_V2_12_STAGE_5H_DRAFT_CONTENT_SKELETON.md).
+5. Testy strony administratora oraz blokady programu: 10 testów / 59 asercji. Ręczny test z 2026-08-27 objął redakcję modułów, lekcji i sześciu formatów kroków; wykryty brak zapisu opcjonalnego kontekstu pytania został naprawiony i objęty regresją. Szczegóły znajdują się w Etapie 5H **(plik nie został odzyskany; wymaga weryfikacji)**.
 
 ### Etap 5J — dwa bezpieczne kanały zapisu zakonczony lokalnie
 
@@ -289,7 +295,7 @@ Jeżeli testy lub Docker nie działają, najpierw napraw środowisko albo wyjaś
 3. Obie sciezki wykorzystuja ten sam `OrganizationEnrollmentService`: aktywny opublikowany kurs, kredyt OSK, `PENDING` access, jednorazowy token oraz blokada duplikatu dla tego samego OSK, kursanta i wersji kursu.
 4. Token OSK ma osobny ekran `/osk/aktywuj/{token}`. Nowe konto ustawia haslo, istniejace konto musi potwierdzic sie logowaniem na wlasciwy e-mail; B2C `/aktywuj-dostep` pozostaje nietkniete.
 5. Audit rozroznia dzialanie operatora OSK od administratora platformy. Wariant platformowy nie ma `organization_user_id`, ale zachowuje faktyczne `actor_user_id`.
-6. Lokalnie przeszly: 18 testow zapisu / 139 asercji, regresja OSK i obecnej nauki 94 / 1631, Pint, `view:cache`, lista tras oraz build Vite. Szczegoly sa w [Etapie 5J](./OSK_V2_12_STAGE_5J_ENROLLMENT_PROVISIONING.md).
+6. Lokalnie przeszly: 18 testow zapisu / 139 asercji, regresja OSK i obecnej nauki 94 / 1631, Pint, `view:cache`, lista tras oraz build Vite. Szczegoly sa w Etapie 5J **(plik nie został odzyskany; wymaga weryfikacji)**.
 7. W chwili zakończenia Etapu 5J źródłowy kurs B pozostawał nieaktywny. Późniejsza aktywacja oraz kontrolowany lokalny enrollment są opisane w Etapie 5K; nie wykonano deployu.
 
 ### Etap 5K — aktywacja kursu i kontrolowany pilot zakończone lokalnie
@@ -317,7 +323,7 @@ Jeżeli testy lub Docker nie działają, najpierw napraw środowisko albo wyjaś
 3. Administrator sprawdza kolejkę `/admin/rejestracje-osk`, zatwierdza szkołę albo zwraca ją do poprawy prostym komunikatem. Przed akceptacją właściciel musi potwierdzić e-mail.
 4. Tylko `is_active + APPROVED` pozwala na zarządzanie kursantami. Ta reguła działa także w serwisie zapisu, więc nie da się jej ominąć bezpośrednim wywołaniem endpointu.
 5. Zatwierdzenie uruchamia istniejący, idempotentny pakiet pięciu kredytów; nie tworzy automatycznie zapisu kursanta, aktywacji kursu, allow-listy ani dostępu do playera.
-6. Kolejka jest stronicowana po 25 wyników. Masowe decyzje nie są jeszcze implementowane, bo wymagają oddzielnej kolejki, limitów i audytu per OSK. Szczegóły i smoke checklist są w [Etapie 5M](./OSK_V2_12_STAGE_5M_SAFE_B2B_ONBOARDING.md).
+6. Kolejka jest stronicowana po 25 wyników. Masowe decyzje nie są jeszcze implementowane, bo wymagają oddzielnej kolejki, limitów i audytu per OSK. Szczegóły i smoke checklist są w Etapie 5M **(plik nie został odzyskany; wymaga weryfikacji)**.
 
 ### Etap 5N — operacyjna obsługa zapisów kursantów zakończona lokalnie
 
