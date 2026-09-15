@@ -338,6 +338,23 @@ Wymagane:
 
 Nie dodawać indeksów „na zapas” dla pól, których nie używamy w zapytaniach.
 
+### 7.1. Indeksy relacji pod reverse lookup
+
+Ponieważ newsroom renderuje także reverse links z istniejących encji, unique index zaczynający się od `article_id` nie wystarcza.
+
+Wymagane/przewidywane:
+
+- `content_article_topic(topic_id, sort_order, article_id)`,
+- `content_article_tag(tag_id, article_id)`,
+- `content_article_question(question_id, sort_order, article_id)`,
+- `content_article_legal_unit(legal_unit_id, sort_order, article_id)`,
+- `content_article_traffic_sign(traffic_sign_id, sort_order, article_id)`,
+- `content_article_sources(article_id, sort_order)`,
+- `content_home_placements(surface_key, slot_key, context_key, position, starts_at, ends_at)`,
+- `content_topics(status, published_at)`.
+
+Finalny PR migracyjny ma potwierdzić query plan/use case i nie dodawać dubli indeksów, które PostgreSQL już pokrywa przez unique prefix.
+
 ---
 
 ## 8. Tabela content_categories
@@ -1166,7 +1183,9 @@ V1 zawiera jawny status `withdrawn` dla materiału, który musi przestać być p
 - dawny canonical path zwraca `410 Gone`, jeśli nie ma realnego następcy,
 - jeśli istnieje rzeczywisty następca, jawny redirect może zwracać 301 zamiast 410,
 - treść/body/source pozostają dostępne wyłącznie w adminie dla audytu/ewentualnego review,
-- restore nie wraca bezpośrednio do published; przechodzi przez in_review/draft zgodnie z policy.
+- restore nie wraca bezpośrednio do published; przechodzi przez in_review zgodnie z policy,
+- podczas restore-to-review publiczny tombstone pozostaje nieaktywny jako treść; URL nie wraca do 200 article przed udanym Publish,
+- successful Publish po review czyści bieżący withdrawal disposition i aktualizuje `public_state_changed_at`; historyczny powód pozostaje w AuditLog.
 
 Hard delete jest dopuszczalny tylko administracyjnie dla błędnych/testowych rekordów bez historii publicznej.
 
