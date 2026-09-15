@@ -450,8 +450,8 @@ Pola:
 - podgląd cropów lead / standard / compact
 - OG image lub wygenerowany OG variant
 - OG image alt
-- image credit
-- image license note
+- image credit — publiczny, jeśli potrzebny
+- image license note — tylko backoffice, nigdy publicznie
 
 Wykorzystujemy istniejący media layer.
 
@@ -573,6 +573,7 @@ Record actions:
 - Apply public update — dla już publiclyVisible article
 - Mark needs review
 - Archive
+- Republish — tylko archived, po aktualnym review/checklist
 - Withdraw from public
 - Restore to review — tylko dla withdrawn
 - Preview
