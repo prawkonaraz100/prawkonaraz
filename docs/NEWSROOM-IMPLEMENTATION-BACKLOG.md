@@ -383,7 +383,8 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 
 ### Testy
 
-- manual placement wins,
+- manual placement wins tylko dla activelyDistributed target,
+- needs_review/archived/withdrawn target nie może pozostać aktywnym placementem; resolver przechodzi do fallbacku,
 - równoległe overlapping placement writes są serializowane i tylko jeden może wygrać,
 - expired/future placement ignored at current time,
 - future preview resolves scheduled article only after its publish time,
@@ -601,7 +602,7 @@ Computed blocking/warning items.
 - topic nie powstaje automatycznie z taga,
 - draft topic nie jest publiczny,
 - publish wymaga własnego opisu + min. 3 actively-distributed/indexable linked articles,
-- featured article, jeśli ustawiony, jest publiczny i należy do topicu,
+- featured article, jeśli ustawiony, jest actively-distributed + indexable i należy do topicu,
 - slug po pierwszej publikacji jest immutable.
 
 ---
@@ -755,10 +756,10 @@ Old article path -> 301 canonical.
 
 Re-use istniejącego `ContentAuthorController` i ProfilePage.
 
-- dodać opublikowane ContentArticle do publicznej listy publikacji autora,
+- dodać wyłącznie `activelyDistributed()` ContentArticle do publicznej listy publikacji autora,
 - ujednolicić ProfilePage mainEntity Person do stabilnego `/autorzy/{slug}#person`,
 - Person worksFor -> canonical `/#organization`,
-- author sitemap lastmod uwzględnia najnowszy publiczny newsroom article,
+- author sitemap lastmod uwzględnia zmianę outputu profilu wynikającą z publish/archive/needs-review/withdraw/restore przez public-state timestamps, nie techniczny updated_at,
 - article graph referuje dokładnie ten sam Person @id.
 
 ### DoD
@@ -767,7 +768,8 @@ Re-use istniejącego `ContentAuthorController` i ProfilePage.
 - article -> author URL działa,
 - author page -> article działa,
 - ProfilePage i Article mają identyczną identity autora,
-- nieopublikowane articles nie wpływają na publiczny profil/sitemap.
+- needs_review/archived/withdrawn/draft/scheduled nie są listowane jako bieżące publikacje autora,
+- zmiana public eligibility artykułu aktualizuje author-page/sitemap freshness bez fałszowania article dateModified.
 
 ---
 
