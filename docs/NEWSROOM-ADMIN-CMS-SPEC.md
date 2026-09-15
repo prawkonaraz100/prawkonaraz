@@ -34,6 +34,18 @@ W szczególności zachowujemy:
 
 Nie kopiujemy jednak 1:1 pól traffic signs.
 
+### 2.1. V1 auth / identity contract
+
+Aktualny panel `/admin` jest dostępny wyłącznie dla `User::isAdministrator()` przez `User::canAccessPanel()`. Newsroom v1 zachowuje ten kontrakt.
+
+Rozróżnienie bytów:
+
+- `User` — zalogowany administrator i actor operacji/audytu,
+- `ContentAuthor` — publiczna tożsamość autora/reviewera materiału,
+- przypisanie `author_id` albo `reviewer_id` nie nadaje dostępu do Filament.
+
+Nie dodajemy w newsroom v1 roli editor/reviewer/moderator do panelu. Jeśli w przyszłości wielu redaktorów ma logować się z ograniczonymi abilities, jest to osobny projekt RBAC.
+
 ---
 
 ## 3. Resources v1
@@ -67,9 +79,11 @@ Pages:
 - view
 - edit
 
-Optional później:
+Preview v1:
 
-- preview action bez osobnej Filament page, jeśli signed preview jest prostszy.
+- action korzysta z authenticated administrator-only route,
+- nie tworzymy shareable signed preview tokenów w v1,
+- renderer może być public-like, ale transport pozostaje prywatny/no-store.
 
 ---
 
@@ -608,7 +622,7 @@ Pola:
 - freshness_review_due_at
 - last_substantive_update_at
 - reviewed_at
-- review notes
+- `editorial_note` jako istniejące planowane pole wewnętrzne na notatki review/redakcyjne; nie tworzymy osobnego `review_notes` bez decyzji modelowej
 
 Status computed:
 
@@ -631,7 +645,7 @@ Minimum:
 - category
 - author
 - lead
-- body
+- co najmniej jeden renderowalny `body_blocks`
 - source
 - hero alt if hero
 - review if policy requires
@@ -652,7 +666,7 @@ Nie wszystko musi blokować.
 
 Blocking:
 
-- brak body,
+- brak renderowalnego `body_blocks`,
 - brak author,
 - brak category,
 - brak source dla news,
@@ -671,16 +685,24 @@ Warning:
 
 ## 32. Preview action
 
-Action otwiera:
+V1 używa wyłącznie authenticated administrator-only preview route.
 
-- signed preview URL lub authenticated preview route,
-- nowa karta opcjonalnie.
+Action może otwierać nową kartę, ale:
+
+- anonymous -> denied,
+- non-admin -> denied przez istniejący panel/auth contract,
+- response ma `Cache-Control: private, no-store`,
+- robots = `noindex,nofollow`,
+- preview URL nie trafia do publicznych linków, sitemap, feed ani analytics page-view liczonego jako publiczny artykuł.
+
+Nie projektujemy shareable signed preview tokenów w v1. Jeśli kiedyś będzie potrzebny external review, dostaje osobny threat model, TTL/revocation i audit.
 
 Preview banner zawiera:
 
 - status,
 - article id,
 - planned publish time,
+- informację „Podgląd — niepubliczne”,
 - link „Edytuj”.
 
 ---
@@ -745,7 +767,7 @@ Resolver preview uwzględnia:
 - fallbacki,
 - deduplikację modułów.
 
-Preview jest noindex i zabezpieczone jak zwykły preview artykułu.
+Preview jest authenticated admin-only, `private, no-store`, noindex/nofollow i zabezpieczone identycznie jak preview artykułu.
 
 ---
 
@@ -766,11 +788,19 @@ Publiczny route topicu:
 
 `/aktualnosci/temat/{topicSlug}`
 
-Publicacja topicu powinna ostrzegać/blokować, jeśli:
+Publicacja topicu blokuje, jeśli:
 
-- brak opisu,
-- brak odpowiedniego corpus,
-- featured article nie jest publiczny.
+- brak własnego opisu redakcyjnego,
+- mniej niż 3 publiczne, indeksowalne artykuły w corpus,
+- featured article jest ustawiony, ale nie jest publiczny lub nie należy do tego topicu.
+
+Dodatkowo:
+
+- slug można edytować w draft,
+- po pierwszej publikacji slug topicu jest read-only w v1,
+- spadek corpus poniżej baseline wymaga cofnięcia topicu do draft/archived zamiast pozostawiania thin public page.
+
+Próg 3 jest baseline jakości produktu v1, nie gwarancją rankingu Google.
 
 Tag creation pozostaje oddzielnym lekkim mechanizmem.
 
@@ -835,7 +865,13 @@ List:
 - published articles count
 - position
 
-Nie pozwala delete kategorii z artykułami.
+Nie pozwala:
+
+- delete kategorii z artykułami,
+- zmienić sluga kategorii po utworzeniu/seedzie w v1,
+- ustawić inactive, jeśli istnieją publicznie widoczne/aktywnie dystrybuowane artykuły w tej kategorii.
+
+Przed dezaktywacją administrator musi przepiąć lub wycofać zależne publiczne materiały.
 
 ---
 
@@ -860,11 +896,11 @@ Nie tworzyć tagów przez literówki typu:
 
 Select author używa ContentAuthor.
 
-W UI warto pokazać:
+W UI pokazujemy:
 
 - name
 - role/title
-- active/public state jeśli model ma pole
+- public state z istniejącego `ContentAuthor::isPubliclyVisible()`
 
 Nie tworzymy autora ad hoc w article form bez pełnego profilu, chyba że Filament flow create-related jest bezpieczny.
 
@@ -880,16 +916,24 @@ Policy logic pozostaje po stronie service/policy, nie tylko JS/Filament visibili
 
 ---
 
-## 41. Concurrent editing
+## 41. Concurrent editing / stale-write guard
 
-V1 minimum:
+V1 wymaga ochrony przed cichym nadpisaniem co najmniej dla:
 
-- pokaż updated_at,
-- ostrzeżenie jeśli rekord został zmieniony od otwarcia formularza, jeśli łatwe do wdrożenia.
+- ContentArticle edit,
+- NewsroomHomeComposer placement write.
 
-Nie jest akceptowalne ciche nadpisywanie istotnego materiału przy rosnącej redakcji.
+Przy otwarciu formularza zapamiętujemy wersję/timestamp rekordu. Przed zapisem backend porównuje bieżący `updated_at` (lub równoważny token) z wartością załadowaną przez edytora.
 
-Można wdrożyć optimistic lock później po realnej potrzebie.
+Jeśli rekord zmienił się w międzyczasie:
+
+- zapis jest odrzucony,
+- UI pokazuje komunikat „rekord został zmieniony przez inną operację/użytkownika”,
+- redaktor musi odświeżyć i świadomie ponowić zmiany.
+
+Nie dokładamy kolumny `lock_version`, jeśli `updated_at` wystarcza. Warning bez blokady nie spełnia v1.
+
+Dla placement overlap dodatkowo obowiązuje transakcyjny row/advisory lock opisany w Data Model; stale-write guard nie zastępuje concurrency locka.
 
 ---
 
@@ -907,13 +951,14 @@ Filament:
 
 Na view/edit:
 
-- created by
-- updated by
-- last publish actor
-- last review actor
-- slug change history opcjonalnie.
+- created by / updated by jako `User` actor,
+- author / reviewer jako osobne `ContentAuthor` identities,
+- ostatnia akcja publish/review/archive wyprowadzona z istniejącego `AuditLog`,
+- slug redirect history.
 
-Pełny audit może pozostać w istniejącym Audit Logs resource.
+Nie dodajemy `published_by` / `reviewed_by` tylko na potrzeby UI. Pełny audit pozostaje w istniejącym read-only Audit Logs resource.
+
+Audit metadata nie może zawierać pełnego `body_blocks`, leadu ani prywatnych notatek; panel ma pokazywać zmianę stanu/IDs, nie kopię treści.
 
 Nie projektujemy osobnego panelu snapshotów wersji/diff/restore artykułu. Jest to świadomie poza zakresem.
 
@@ -1033,14 +1078,14 @@ Panel newsroom v1 jest gotowy, gdy redaktor może:
 - podejrzeć bieżący lub przyszły stan całego `/aktualnosci`,
 - zobaczyć SEO fallback,
 - wysłać do review,
-- podejrzeć,
+- podejrzeć wyłącznie jako zalogowany administrator bez publicznego cache,
 - zaplanować,
 - opublikować,
 - poprawić,
 - oznaczyć freshness,
 - zarchiwizować,
 
-a wszystkie publiczne przejścia statusu przechodzą przez serwis domenowy.
+a wszystkie publiczne przejścia statusu przechodzą przez serwis domenowy, `User` actor trafia do AuditLog, stale-write jest odrzucany i panel nie rozszerza dostępu poza istniejących administratorów.
 
 ---
 
@@ -1060,8 +1105,14 @@ Feature/Livewire/Filament tests zależnie od obecnego test pattern:
 - publish blocked by missing fields,
 - schedule validation,
 - slug change redirect,
-- permissions,
-- preview action.
+- admin-only panel/abilities; moderator/student/non-admin denied,
+- User actor vs ContentAuthor author/reviewer identity,
+- AuditLog without body/private notes payload,
+- stale article edit rejected,
+- concurrent placement overlap cannot be committed,
+- category slug/deactivation guards,
+- topic slug/corpus guards,
+- preview action admin-only + private,no-store.
 
 E2E:
 
@@ -1096,14 +1147,25 @@ Na 2026-09-16:
 - [ ] wdrożyć focal-point/crop UX,
 - [ ] wdrożyć origin/regulatory fields,
 - [ ] wdrożyć relations pickers,
-- [ ] wdrożyć workflow actions,
+- [ ] wdrożyć workflow actions + AuditLog actor contract,
 - [ ] wdrożyć checklist computed state,
-- [ ] wdrożyć preview,
+- [ ] wdrożyć stale-write guard dla articles/home placements,
+- [ ] wdrożyć admin-only private preview,
+- [ ] wdrożyć category/topic identity guards,
 - [ ] wdrożyć tests.
 
 ---
 
 ## 55. Historia zmian
+
+### 2026-09-16 — v0.5
+
+- utrwalono admin-only V1: User jest aktorem auth/audytu, ContentAuthor publiczną tożsamością autora/reviewera,
+- signed/shareable preview usunięto z v1 na rzecz authenticated admin-only + private,no-store,
+- stale-write rejection awansowano z opcjonalnego warningu do gate'u v1,
+- dodano category/topic public-identity guards i minimalny topic corpus baseline,
+- ujednolicono wewnętrzne notatki do editorial_note oraz checklistę do body_blocks,
+- audit UI opiera się na istniejącym AuditLog bez nowych published_by/reviewed_by pól.
 
 ### 2026-09-16 — v0.4
 
