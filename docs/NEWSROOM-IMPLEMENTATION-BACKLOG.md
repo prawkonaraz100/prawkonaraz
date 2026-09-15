@@ -781,13 +781,15 @@ Wdrożyć publiczną warstwę bez natychmiastowego przełączania istniejących 
 
 - prosty config/env `NEWSROOM_PUBLIC_ENABLED`,
 - default bezpieczny dla wdrożenia przed rolloutem,
-- gdy wyłączony: admin/dane mogą działać, nowe public article/category/topic routes nie stają się indeksowalne, a istniejące top-level placeholder behavior nie jest przypadkowo usuwane,
-- włączenie dopiero w N6 release sequence.
+- gdy wyłączony: admin/dane/private preview mogą działać, nowe public article/category/topic routes nie stają się indeksowalne, a istniejące top-level placeholder behavior nie jest przypadkowo usuwane,
+- gate obejmuje również newsroom entries w author profiles/reverse links/feed/sitemaps/IndexNow; nie może istnieć crawlable „tylne wejście” do dark-deployed content,
+- włączenie dopiero w N6 release sequence i powoduje cache/distribution refresh.
 
 ### DoD
 
 - public switch nie wymaga rollbacku migracji,
-- test enabled/disabled,
+- disabled state ma zero public newsroom discovery leakage poza świadomie zachowanym placeholderem,
+- test enabled/disabled dla routes + author/reverse links + feed/sitemap/IndexNow,
 - config cache/deploy semantics udokumentowane.
 
 ---
@@ -924,7 +926,7 @@ Zaimplementować jawny internal-link graph bez tworzenia automatycznej link farm
 
 - każdy indexable article ma co najmniej jeden crawlable inbound link,
 - ważne/evergreen articles są zwykle <= 3 hops od właściwego top-level huba,
-- reverse links wynikają z jawnej relacji i mają bounded count,
+- reverse links wynikają z jawnej relacji, mają bounded count i pokazują tylko activelyDistributed targets przy globalnym public gate=true,
 - brak draft/noindex/redirect-source targets,
 - brak automatycznego sitewide reciprocal linking,
 - sitemap nie jest jedyną drogą discovery.
