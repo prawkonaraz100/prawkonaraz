@@ -522,7 +522,7 @@ N0-001 ma:
 - przenieść homepage na te same dane i IDs,
 - usunąć stare hardcoded logo/name/alt.
 
-Nie tworzymy równoległego `config/brand.php`, chyba że osobna decyzja architektoniczna świadomie migruje istniejący config.
+Nie tworzymy równoległego brand configu. Ewentualna migracja istniejącego `config/content.php['organization']` wymaga osobnej, jawnej decyzji architektonicznej.
 
 ### 21.3. Site name
 
