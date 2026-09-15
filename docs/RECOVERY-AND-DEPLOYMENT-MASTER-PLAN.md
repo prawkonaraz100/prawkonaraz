@@ -202,10 +202,12 @@ Historyczny wynik pierwszego PR:
   HTTP `429` od throttlingu zamiast oczekiwanych redirectów / error bag.
 - Czwarty failure dotyczył `TrafficSignPagesTest`: hub znaków nie zawierał
   oczekiwanego tekstu `Nauka`.
-- Dwa kolejne przebiegi dokumentacyjnego PR `#6`
-  (`34995086557` i `35000373557`) zakończyły się podczas inicjalizacji joba
-  `quality`: runner nie został przydzielony, a job miał **0 kroków**. Tych
-  przebiegów nie wolno traktować jako test evidence kodu ani dokumentacji.
+- Trzy przebiegi dokumentacyjnego PR `#6`
+  (`34995086557`, `35000373557` i bieżący `35001864938` na
+  `7f1b33e0fd23745183e9bc979e0b2380a65d31e5`) zakończyły się podczas
+  inicjalizacji joba `quality`: runner nie został przydzielony, a job miał
+  **0 kroków**. Tych przebiegów nie wolno traktować jako test evidence kodu
+  ani dokumentacji.
 - Bieżący PR `#6` zmienia wyłącznie dokumentację OSK/recovery. Powyższe
   runtime failures na `main` są odnotowane jako istniejący baseline i nie są
   naprawiane w tym dokumentacyjnym kroku.
