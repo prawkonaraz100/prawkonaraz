@@ -24,6 +24,31 @@ W razie konfliktu obowiązuje następująca kolejność:
 
 Dokument nie zmienia stacku i nie wprowadza nowej aplikacji. Projekt newsroomu ma być naturalnym rozwinięciem istniejącego systemu.
 
+### 2.1. Mapa dokumentacji wykonawczej newsroomu
+
+Ten dokument opisuje decyzje nadrzędne. Szczegóły implementacyjne są rozdzielone celowo:
+
+- [NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md](./NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md) — model domenowy, tabele, constraints, indeksy, serwisy, scheduling i redirecty.
+- [NEWSROOM-ADMIN-CMS-SPEC.md](./NEWSROOM-ADMIN-CMS-SPEC.md) — panel Filament, formularze, workflow actions, checklisty, preview i uprawnienia.
+- [NEWSROOM-EDITORIAL-OPERATIONS-AND-GOVERNANCE.md](./NEWSROOM-EDITORIAL-OPERATIONS-AND-GOVERNANCE.md) — proces redakcyjny, źródła, korekty, breaking, freshness, AI policy i governance.
+- [NEWSROOM-PUBLIC-UI-UX-SPEC.md](./NEWSROOM-PUBLIC-UI-UX-SPEC.md) — kontrakt publicznego layoutu, komponenty, mobile, accessibility i performance UI.
+- [NEWSROOM-SEO-DISTRIBUTION-AND-OBSERVABILITY.md](./NEWSROOM-SEO-DISTRIBUTION-AND-OBSERVABILITY.md) — canonical, schema, obrazy, news sitemap, feed, Discover, analytics i monitoring.
+- [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./NEWSROOM-IMPLEMENTATION-BACKLOG.md) — kolejność N0–N6, taski, zależności, granice PR-ów i Definition of Done.
+- [NEWSROOM-TEST-RELEASE-AND-ROLLBACK-RUNBOOK.md](./NEWSROOM-TEST-RELEASE-AND-ROLLBACK-RUNBOOK.md) — test matrix, E2E, release, smoke, incident handling i rollback.
+
+### 2.2. Jak rozstrzygać konflikt między dokumentami newsroomu
+
+1. decyzja architektoniczna i granica systemu — ten dokument,
+2. dane/invariants — Data Model and Domain Spec,
+3. zachowanie backoffice — Admin CMS Spec,
+4. reguły redakcyjne — Editorial Operations,
+5. zachowanie publicznego UI — Public UI/UX Spec,
+6. Search/dystrybucja/monitoring — SEO Distribution and Observability,
+7. kolejność implementacji — Implementation Backlog,
+8. test/deploy/rollback — Test Release and Rollback Runbook.
+
+Jeżeli kod wymusi zmianę decyzji nadrzędnej, najpierw aktualizujemy ten dokument. Jeżeli zmienia się tylko szczegół wykonawczy, aktualizujemy właściwą specyfikację bez przepisywania całej architektury.
+
 ---
 
 ## 3. Problem do rozwiązania
