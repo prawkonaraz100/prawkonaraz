@@ -1089,20 +1089,30 @@ Newsroom v1 jest ukończony, gdy:
 
 ---
 
-## 25. Otwarte decyzje przed kodowaniem
+## 25. Decyzje zamknięte i otwarte przed kodowaniem
 
-Poniższe kwestie wymagają jawnego rozstrzygnięcia przed lub w Etapie N1:
+### 25.1. Decyzje zamknięte przez pakiet projektowy
 
-1. Czy `guide` i `news` korzystają z tej samej tabeli — **rekomendacja: tak**.
-2. Czy źródła są osobną tabelą już w v1 — **rekomendacja: tak**, jeśli newsroom ma publikować zmiany prawa.
-3. Czy reviewer jest wymagany dla wszystkich newsów — **rekomendacja: nie**, obowiązkowy tylko dla wybranych typów/tematów.
-4. Czy lokalne strony WORD wchodzą do v1 — **rekomendacja: model gotowy, masowy rollout później**.
-5. Czy `/` zmienia się w home portalu — **rekomendacja: nie w v1**.
-6. Czy page builder jest potrzebny — **rekomendacja: nie; kontrolowane moduły wystarczą**.
-7. Czy komentarze użytkowników wchodzą do newsroomu — **rekomendacja: poza scope v1**.
+1. `guide`, `news`, `explainer`, `analysis` i `report` korzystają ze wspólnego agregatu `content_articles`.
+2. Źródła są osobną relacyjną tabelą `content_article_sources` już w v1.
+3. Reviewer nie jest wymagany dla wszystkich newsów; wymóg wynika z typu/ryzyka materiału.
+4. Lokalne huby WORD nie wchodzą do v1; model ma nie blokować ich późniejszego dodania.
+5. `/` pozostaje produktowym home w v1.
+6. Page builder nie wchodzi do v1; stosujemy kontrolowane moduły.
+7. Komentarze użytkowników są poza scope v1.
+8. Kategorie używają ścieżki `/aktualnosci/kategoria/{categorySlug}`.
+9. Feed v1 używa `/aktualnosci/feed.xml`.
+10. Publiczne strony newsroomu są SSR/Blade-first.
+
+### 25.2. Otwarte decyzje N0 wymagające domknięcia przed implementacją zależnych elementów
+
+- konkretny editor body i techniczna strategia sanitization (`NEWSROOM-N0-004`),
+- finalne źródło brand name/logo/publisher po usunięciu pozostałości „Orły na Drodze” (`NEWSROOM-N0-001`),
+- finalne wspólne design tokens używane przez newsroom po audycie obecnego publicznego UI.
+
+Pozostałe szczegóły nie powinny blokować N1, jeśli nie wpływają na schema, bezpieczeństwo body albo publiczny routing.
 
 ---
-
 ## 26. Ukończone prace związane z tym obszarem
 
 Na moment utworzenia dokumentu za ukończone uznajemy wyłącznie elementy rzeczywiście istniejące w kodzie:
@@ -1124,30 +1134,17 @@ Na moment utworzenia dokumentu za ukończone uznajemy wyłącznie elementy rzecz
 
 ## 27. Pozostałe zadania
 
-Najbliższy backlog:
+Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./NEWSROOM-IMPLEMENTATION-BACKLOG.md). Najbliższa kolejność:
 
-- [ ] uporządkowanie branding/publisher,
-- [ ] finalna taxonomy v1,
-- [ ] projekt migracji,
-- [ ] model `ContentArticle`,
-- [ ] model kategorii,
-- [ ] model źródeł,
-- [ ] relacje z pytaniami i legal units,
-- [ ] Filament resource,
-- [ ] preview,
-- [ ] publikacja/scheduling,
-- [ ] publiczny article renderer,
-- [ ] schema services,
-- [ ] `/aktualnosci` editorial hub,
-- [ ] strony kategorii,
-- [ ] `/poradniki`,
-- [ ] sitemap/feed,
-- [ ] analytics,
-- [ ] E2E,
-- [ ] monitoring produkcyjny.
+- [ ] `NEWSROOM-N0-001` — publisher branding source of truth,
+- [ ] `NEWSROOM-N0-002` — test/utrwalenie przyjętego route contract,
+- [ ] `NEWSROOM-N0-003` — deterministyczny taxonomy seed contract,
+- [ ] `NEWSROOM-N0-004` — editor + sanitization decision,
+- [ ] następnie N1 domain + database.
+
+Pozostałe elementy N2–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu checklistę.
 
 ---
-
 ## 28. Zasady utrzymania dokumentu
 
 Po każdej implementacji dotyczącej newsroomu dokument musi zostać zaktualizowany tak, aby osobno pokazywał:
