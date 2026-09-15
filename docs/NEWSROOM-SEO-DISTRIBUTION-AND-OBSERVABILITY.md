@@ -250,6 +250,8 @@ Repo ma równolegle statyczny `public/robots.txt` i route `RobotsController`. Zg
 
 Globalny `NEWSROOM_PUBLIC_ENABLED=false` musi wyłączyć newsroomowe URL-e nie tylko w controllers, ale też w sitemap/feed/IndexNow/author-publications/reverse-link discovery. Dark deploy nie może publikować linków do tras zwracających 404/placeholder.
 
+Ta flaga jest przede wszystkim **pre-launch/dark-deploy gate**. Po pierwszym publicznym rollout nie używamy długotrwale `false` jako technicznego rollbacku dla już indeksowanych article URLs, jeśli skutkiem byłyby masowe 404. Dla krótkiej awarii technicznej preferujemy kontrolowane 503/Retry-After lub rollback kodu zachowujący publiczne routes; dla pojedynczej błędnej treści używamy `withdrawn`.
+
 Newsroom nie usuwa kontrolera ani nie zmienia sposobu serwowania robots w zwykłym PR implementacyjnym. Osobny hardening może później usunąć duplikat dopiero po:
 
 - potwierdzeniu faktycznej produkcyjnej odpowiedzi,
@@ -682,11 +684,21 @@ Implementation contract:
 - główny `/sitemap.xml` wskazuje wynikowe shard files bezpośrednio; nie tworzymy zagnieżdżonego newsroom sitemap-index,
 - nie używać offset-based shardów powodujących masowe przesuwanie URL między plikami,
 - wszystkie `loc` są absolutne, HTTPS, canonical i indexable,
-- draft/noindex/redirect source/withdrawn nie trafia do article sitemap.
+- draft/noindex/redirect source/withdrawn nie trafia do article sitemap,
+- current canonical path nie może kolidować z historycznym reserved `from_path`.
 
 ---
 
-## 27. Sitemap index
+## 27. Sitemap index i coverage hubów
+
+Po rollout sitemap coverage obejmuje nie tylko detail articles, ale również publiczne/indexowalne:
+
+- `/aktualnosci`,
+- `/poradniki`,
+- aktywne category hubs,
+- published/indexable topic hubs.
+
+Mogą zostać dodane do istniejącego `static.xml`/buildera albo do jawnego newsroom-hub urlset; nie wolno zostawić ich wyłącznie w internal linking bez sitemap tylko przez przeoczenie implementacyjne.
 
 Istniejący główny sitemap index powinien po wdrożeniu wskazywać:
 
@@ -753,6 +765,8 @@ Newsroom sitemap rozszerza istniejący statyczny pipeline:
 
 Nie przenosimy produkcyjnego source of truth do runtime `SitemapController`.
 
+**Potwierdzony gap bieżącego kodu:** aktualny `SeoSitemapGenerator::prepareSitemapDirectory()` usuwa wszystkie `public/sitemaps/*.xml` przed pętlą zapisu, a `generate()` zapisuje `sitemap.xml` przed child files. Dzisiejszy pipeline ma więc przejściowe okno brakujących child XML podczas refreshu. N5-007 musi najpierw usunąć ten istniejący broken-set window, zanim zwiększymy częstotliwość refreshu dla newsroomu. Nie opisujemy atomic publication jako funkcji już zaimplementowanej.
+
 ### 30.2. Refresh po zmianie publicznego corpus — bez założenia o queue workerze
 
 Stan repo podczas audytu:
@@ -767,6 +781,7 @@ Zmiany wpływające na newsroom sitemap/feed:
 
 - publish,
 - archive/unarchive,
+- withdraw/restore/republish,
 - slug change,
 - substantive public update wpływający na lastmod/feed,
 - robots/indexability change,
@@ -1560,6 +1575,9 @@ Obecnie:
 - zastąpiono fikcyjne założenie o async queue jobie dirty/version coordinator + scheduler/lock zgodnym z aktualnym QUEUE_CONNECTION=sync,
 - doprecyzowano topic indexability baseline do min. 3 actively-distributed/indexable articles,
 - rozdzielono dateModified od sitemap lastmod przez public_state_changed_at,
+- udokumentowano potwierdzony istniejący gap generatora: delete-all child XML + zapis indexu przed childami,
+- dodano sitemap coverage dla newsroom/guides/category/topic hubs,
+- ograniczono NEWSROOM_PUBLIC_ENABLED=false do dark-deploy; po launch techniczny rollback nie może masowo zamieniać indeksowanych URL-i w 404,
 - poprawiono kolejność sekcji 4.3/4.4 i wyrównano current-state/remaining-work do faktycznego backendu.
 
 ### 2026-09-16 — v0.4
