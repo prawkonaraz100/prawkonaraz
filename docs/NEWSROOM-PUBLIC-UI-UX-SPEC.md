@@ -854,7 +854,7 @@ Nie używamy przypadkowego placeholder photo.
 
 ---
 
-## 43.1. Needs-review transparency
+### 43.1. Needs-review transparency
 
 Jeśli artykuł ma workflow `needs_review` i nadal zwraca 200:
 
