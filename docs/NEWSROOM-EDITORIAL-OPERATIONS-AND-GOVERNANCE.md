@@ -722,13 +722,15 @@ Złe przykłady:
 
 ### 26.1. Materiały prawne
 
-Trigger review:
+Trigger kolejki review:
 
 - nowelizacja aktu,
 - nowy komunikat organu,
 - zmiana daty wejścia w życie,
 - sygnał o błędzie,
 - osiągnięcie freshness_review_due_at.
+
+Sam termin `freshness_review_due_at` oznacza overdue i podnosi priorytet pracy, ale nie zmienia automatycznie workflow na `needs_review`. `needs_review` stosujemy, gdy istnieje konkretna przesłanka, że dalsza aktywna promocja bez ponownej weryfikacji jest niewłaściwa.
 
 ### 26.2. Guides
 
