@@ -234,8 +234,11 @@ Zasady:
 - source_checked_at: timestamptz nullable
 - freshness_review_due_at: timestamptz nullable
 - last_substantive_update_at: timestamptz nullable
+- public_state_changed_at: timestamptz nullable
 
-updated_at nie jest automatycznie równoważne istotnej aktualizacji merytorycznej.
+`updated_at` nie jest automatycznie równoważne istotnej aktualizacji merytorycznej.
+
+`public_state_changed_at` zmienia się tylko przy zmianie mającej wpływ na publiczną dyspozycję/SEO bez zmiany treści, np. archive/withdraw/restore, robots/indexability lub inna jawna zmiana public state. Nie zastępuje `last_substantive_update_at`.
 
 ### 5.8. Standardowe timestamps
 
@@ -912,7 +915,8 @@ Publiczne daty:
 
 - first_published_at: pierwsza publikacja; nigdy nie resetować przy zwykłej edycji,
 - published_at: timestamp ostatniego wejścia w stan published; nie jest źródłem daty pierwotnej ani automatycznego „najnowsze”,
-- last_substantive_update_at: istotna zmiana treści,
+- last_substantive_update_at: istotna zmiana treści/claimu/publicznej merytorycznej metadata,
+- public_state_changed_at: istotna zmiana publicznego stanu bez twierdzenia, że treść została merytorycznie zaktualizowana,
 - updated_at: techniczny timestamp rekordu.
 
 Structured data:
@@ -922,7 +926,9 @@ Structured data:
 
 Publiczny label „Aktualizacja” pojawia się tylko, gdy `last_substantive_update_at` rzeczywiście istnieje i jest późniejszy od pierwszej publikacji.
 
-Article sitemap `lastmod` i feed `updated` używają tej samej merytorycznej semantyki, nigdy technicznego `updated_at`.
+Structured data `dateModified` i feed `updated` używają merytorycznej semantyki `last_substantive_update_at ?? first_published_at`.
+
+Article sitemap `lastmod` może dodatkowo uwzględnić `public_state_changed_at`, ponieważ archive/restore/robots mogą realnie zmienić odpowiedź publiczną bez zmiany treści. Nigdy nie używa technicznego `updated_at`.
 
 Chronologia publicznych list „najnowsze”, kategorii i topiców używa `first_published_at DESC` (z deterministycznym tie-breakerem, np. id DESC). Ponowne wejście w published nie robi ze starego materiału nowego. Jeśli chcemy ponownie promować istotnie zaktualizowany materiał, robimy to przez placement/featured, nie przez fałszowanie daty pierwszej publikacji.
 
@@ -1075,6 +1081,23 @@ Rekomendowane migracje:
 12. create_content_home_placements_table
 
 Nie łączymy wszystkiego w jedną migrację, jeżeli utrudnia to rollback i review.
+
+### 30.1. FK / on-delete safety
+
+Nowe FK nie mogą pozwolić newsroomowi skasować istniejących bytów produktu.
+
+Docelowe zasady:
+
+- `content_articles.category_id -> content_categories`: restrict/no cascade,
+- `author_id/reviewer_id -> content_authors`: restrict/no cascade, aby nie utracić attribution/review identity,
+- `created_by_user_id/updated_by_user_id -> users`: nullable + nullOnDelete,
+- `content_topics.featured_article_id -> content_articles`: nullable + nullOnDelete,
+- child records należące wyłącznie do artykułu (`sources`, redirects, home placements, article-* pivots) mogą cascade-delete przy dopuszczalnym hard delete artykułu,
+- pivot FK do istniejącego question/legal/sign może cascade-delete wyłącznie **wiersz pivotu**, gdy target zostaje usunięty; nigdy nie ma ścieżki kasującej question/legal/sign z powodu usunięcia artykułu,
+- tag/topic membership pivots mogą cascade-delete własny pivot przy usunięciu jednego końca,
+- `content_home_placements.created_by_user_id/updated_by_user_id`: nullOnDelete.
+
+Migration tests muszą sprawdzać co najmniej krytyczne restrict/cascade directions na PostgreSQL.
 
 ---
 
@@ -1382,6 +1405,8 @@ Model danych jest gotowy, gdy:
 - AuditLog rozróżnia `User` actora od `ContentAuthor` author/reviewer identity i nie przechowuje pełnej treści artykułu,
 - public visibility i active distribution są osobnymi scope'ami; needs_review/archived nie są aktywnie promowane, archive ma deterministyczny 200-history policy, a withdrawn ma deterministyczny 410/tombstone policy,
 - public chronology używa first_published_at, nie ostatniego published_at/updated_at,
+- public_state_changed_at oddziela sitemap/public-state freshness od merytorycznego dateModified,
+- FK delete directions nie mogą kaskadować z newsroom article do istniejącego question/legal/sign/author/category,
 - category/topic identity nie może zostać złamana przez zmianę publicznego sluga/dezaktywację,
 - homepage placement overlap jest chroniony również przed równoległymi zapisami,
 - public side effecty są emitowane after-commit,
@@ -1431,6 +1456,8 @@ Na moment utworzenia dokumentu:
 - chronologię publiczną związano z first_published_at zamiast published_at,
 - poprawiono source model: URL może być null, a is_publicly_cited rozdziela public citation od wewnętrznego evidence,
 - dodano jawny status withdrawn z backoffice reason/timestamp i 410 public disposition, oddzielając historyczne archive od takedownu,
+- dodano public_state_changed_at dla uczciwego sitemap lastmod bez zanieczyszczania dateModified/updated_at,
+- zdefiniowano bezpieczne kierunki FK/on-delete, aby newsroom nie mógł kaskadowo usuwać istniejących bytów produktu,
 - dodano immutable public slugs/active-category guards i minimalny topic corpus baseline,
 - dodano serializację concurrent homepage placements przez DB/advisory lock,
 - zapisano transaction + after-commit contract dla publikacji i side effectów,
