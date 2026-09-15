@@ -1249,11 +1249,13 @@ Docs-only:
 
 - [ ] stable entity graph + site identity
 - [ ] visible/schema dates consistency
-- [ ] article sitemap + deterministic sharding readiness
-- [ ] news sitemap full required metadata
-- [ ] feed + discovery
-- [ ] sitemap/feed HTTP validators + 304
-- [ ] canonical
+- [ ] self-canonical + route-family exclusivity
+- [ ] article sitemap przez istniejący static generator + deterministic sharding readiness
+- [ ] news sitemap full required metadata + async/debounced refresh
+- [ ] child-before-index atomic static publication
+- [ ] istniejący SeoSitemapAuditor rozszerzony bez drugiego auditora
+- [ ] rzeczywisty static/Nginx/CDN delivery smoke (Content-Type/cache/Set-Cookie/validators)
+- [ ] feed + discovery + własny cache/validator contract
 - [ ] author ProfilePage / publisher / WebSite
 
 ### Operations
@@ -1324,9 +1326,9 @@ Mitigation: test actions + services as single write path.
 
 Mitigation: N6 scheduled smoke + monitoring.
 
-## R6 — sitemap/feed stale cache
+## R6 — news sitemap jest nieświeża po publikacji
 
-Mitigation: event-driven invalidation + tests.
+Mitigation: async/debounced refresh po commit + monitoring + istniejący daily seo:refresh-sitemaps jako safety net.
 
 ## R7 — duże obrazy degradują LCP
 
@@ -1360,9 +1362,21 @@ Mitigation: deterministic sharding + hard limits + duplicate audit.
 
 Mitigation: eligibility wyłącznie po first_published_at + boundary tests.
 
-## R15 — crawler otrzymuje kosztowne pełne XML przy każdym request
+## R15 — crawler odpala runtime XML albo dostaje niewłaściwą warstwę cache
 
-Mitigation: cache validators + conditional 304 + invalidation tests.
+Mitigation: zachować statyczny production pipeline z SEO-SITEMAP-REPAIR-PLAN; validators sprawdzać na Nginx/CDN/static delivery, nie tylko w Laravel controller.
+
+## R16 — sitemap index wskazuje child, który nie został jeszcze opublikowany
+
+Mitigation: generacja/validacja pełnego next set, child files first, main index last, obsolete shard cleanup dopiero po switch.
+
+## R17 — cleanup robots/sitemap controllerów psuje istniejący production routing
+
+Mitigation: newsroom nie usuwa istniejących controller routes; source-of-truth cleanup jest osobnym PR po production HTTP/CDN verification.
+
+## R18 — newsroom nadpisuje istniejący question graph
+
+Mitigation: content_article_question jest osobnym edge; brak write path do question_relations/question_seo_topics w newsroom taskach.
 
 ---
 
@@ -1390,8 +1404,10 @@ Na 2026-09-16:
 - niniejsze rozszerzenie doprecyzowuje editorial composition; implementacja newsroomu nadal nie rozpoczęta,
 - /aktualnosci i /poradniki nadal placeholder,
 - fundamenty ContentAuthor/legal/traffic signs/public SEO istnieją,
-- istnieją config/content.php organization, SchemaIds/SchemaRenderer, sitemap builder/auditor i IndexNow pipeline,
-- HomePageController nadal ma legacy „Orły na Drodze”, a sitemap responses nie mają jeszcze 304 validators.
+- istnieją config/content.php organization, SchemaIds/SchemaRenderer, statyczny SeoSitemapGenerator + builder/auditor, daily seo:refresh-sitemaps oraz IndexNow pipeline,
+- istnieją public/robots.txt i RobotsController; newsroom nie zmienia tej warstwy bez osobnego production-delivery audit,
+- HomePageController nadal ma legacy „Orły na Drodze”,
+- newsroom-triggered async refresh, atomic child-before-index publication i newsroom/news sitemap output jeszcze nie istnieją.
 
 ---
 
@@ -1401,7 +1417,7 @@ NEWSROOM-N0-001 — Publisher branding source of truth.
 
 Dopiero po jego zamknięciu:
 
-NEWSROOM-N0-002 / N0-003 / N0-004.
+NEWSROOM-N0-002 / N0-003 / N0-004 / N0-005.
 
 ---
 
