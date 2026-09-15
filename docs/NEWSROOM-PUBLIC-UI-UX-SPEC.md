@@ -385,6 +385,20 @@ Nie indeksujemy losowych kombinacji filtrów.
 
 ---
 
+## 18.1. Breadcrumb contract
+
+Newsroom article:
+
+`Home → Aktualności → Primary category → Artykuł`
+
+Guide:
+
+`Home → Poradniki → Guide`
+
+Primary category guide'a może być pokazana jako osobny link klasyfikacyjny, ale nie zmienia głównego breadcrumb/canonical hierarchy.
+
+---
+
 ## 19. Strona artykułu — desktop
 
 Rekomendowany shell:
@@ -425,6 +439,8 @@ Wymagania:
 
 Nie ustawiamy sztywnej wysokości kontenera H1.
 
+Dla newsów CMS może ostrzegać przy nadmiernie długim tytule, ale UI nie ucina H1 arbitralnie do historycznego limitu znaków. `news:title` bierze pełny widoczny title; wyszukiwarka może sama skrócić prezentację na urządzeniu.
+
 ---
 
 ## 21. Lead artykułu
@@ -442,15 +458,18 @@ Mobile:
 
 ---
 
-## 22. Byline i pochodzenie materiału
+## 22. Byline, daty i pochodzenie materiału
 
 Pokazuje:
 
 - avatar opcjonalnie,
 - nazwę autora jako link do /autorzy/{slug},
 - datePublished,
-- „Aktualizacja” tylko gdy last_substantive_update_at ma znaczenie,
+- dla typu news: wyraźny czas publikacji obok daty,
+- „Aktualizacja” + czas tylko gdy last_substantive_update_at ma znaczenie,
 - pochodzenie materiału tylko wtedy, gdy wnosi informację dla czytelnika.
+
+Widoczne daty/czasy muszą odpowiadać semantyce datePublished/dateModified w structured data. `effective_from` i daty wydarzeń są wizualnie oddzielone, aby crawler/czytelnik nie pomylił ich z datą publikacji.
 
 Przykładowe publiczne etykiety:
 
@@ -469,6 +488,7 @@ Wymagania:
 
 - width/height attributes,
 - alt,
+- opcjonalny caption renderowany jako semantyczny `<figcaption>`,
 - credit jeśli wymagany,
 - focal point,
 - eager/fetchpriority high tylko jeśli hero jest LCP,
@@ -483,6 +503,8 @@ Aspect ratios preferowane:
 - 1.91:1 / 1200x630 — OG, jeśli generujemy dedykowany wariant.
 
 Crop powinien respektować focal point. Dla tego samego source assetu nie wymagamy ręcznego uploadowania osobnego pliku do każdej karty.
+
+Caption opisuje kontekst/znaczenie obrazu dla czytelnika; alt pozostaje tekstem alternatywnym, a credit informacją o autorstwie/licencji. Nie łączymy tych trzech pól w jeden tekst.
 
 ---
 
@@ -1207,6 +1229,10 @@ Frontend newsroom v1 jest UI-complete, gdy:
 - long title nie rozwala layoutu,
 - breadcrumbs poprawne,
 - source block czytelny,
+- hero caption/alt/credit mają rozdzielone semantyczne role,
+- guide i newsroom article mają właściwy, różny breadcrumb path,
+- news ma widoczną datę i czas publikacji przy byline,
+- author link prowadzi do publicznego ProfilePage,
 - related/product modules działają,
 - homepage placements respektują fallback i deduplikację,
 - body blocks renderują się spójnie desktop/mobile,
@@ -1253,6 +1279,18 @@ Na moment utworzenia:
 ---
 
 ## 69. Historia zmian
+
+### 2026-09-16 — v0.4
+
+- doprecyzowano osobny breadcrumb contract dla newsroom article i guide,
+- dodano opcjonalny hero caption jako figcaption, oddzielony od alt i credit,
+- usunięto założenie o sztywnym limicie headline; pozostawiono redakcyjny warning dla nadmiernej długości.
+
+### 2026-09-16 — v0.3
+
+- doprecyzowano widoczne daty/czas dla newsów i ich zgodność z structured data,
+- rozdzielono datę publikacji od effective/event dates,
+- dodano publiczny author ProfilePage jako część UI DoD.
 
 ### 2026-09-15 — v0.2
 

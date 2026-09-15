@@ -19,8 +19,10 @@ W razie konfliktu obowiązuje następująca kolejność:
 1. [STACK-DECISION.md](./STACK-DECISION.md) — wybór stacku technologicznego.
 2. [ADR-001-MODULAR-MONOLITH.md](./ADR-001-MODULAR-MONOLITH.md) — granice architektury i decyzja o modularnym monolicie.
 3. [SEO-CONTENT-ROADMAP.md](./SEO-CONTENT-ROADMAP.md) — strategia publicznego contentu, SEO, trust layer i workflow redakcyjny.
-4. [MENU-SYSTEM-REFERENCE.md](./MENU-SYSTEM-REFERENCE.md) — kanoniczna referencja publicznej nawigacji.
-5. **Ten dokument** — szczegółowa architektura newsroomu, portalu informacyjnego i powiązania z produktem.
+4. [SEO-SITEMAP-REPAIR-PLAN.md](./SEO-SITEMAP-REPAIR-PLAN.md) — istniejący kanoniczny kontrakt produkcyjnego sitemap/robots delivery; newsroom rozszerza go bez zmiany istniejącego modelu.
+5. [SEO-ENTERPRISE-INTERNAL-LINKING-ROADMAP-V2.md](./SEO-ENTERPRISE-INTERNAL-LINKING-ROADMAP-V2.md) — istniejący graph/taksonomia pytań; newsroom nie tworzy jego drugiej wersji. Roadmapa odwołuje się historycznie do ADR V2, ale w aktualnym drzewie `docs/` nie ma pliku o tej nazwie, więc nie tworzymy martwego odnośnika.
+6. [MENU-SYSTEM-REFERENCE.md](./MENU-SYSTEM-REFERENCE.md) — kanoniczna referencja publicznej nawigacji.
+7. **Ten dokument** — szczegółowa architektura newsroomu, portalu informacyjnego i powiązania z produktem.
 
 Dokument nie zmienia stacku i nie wprowadza nowej aplikacji. Projekt newsroomu ma być naturalnym rozwinięciem istniejącego systemu.
 
@@ -101,7 +103,7 @@ Na pierwszym etapie nie budujemy:
 
 ## 5. Aktualny stan implementacji
 
-Stan sprawdzony na `main@4b10738705f3696bc2bcce730a707473eab8cd2b`.
+Stan sprawdzony ponownie na `main@4b8a48537ec8973d90c268650994eee46d1841cc` w dniu 2026-09-16.
 
 ### 5.1. Elementy już istniejące
 
@@ -121,9 +123,14 @@ Repo ma już istotny fundament:
   - JSON-LD,
 - modele i publiczne profile `ContentAuthor`,
 - route `/autorzy/{authorSlug}`,
-- rozbudowane sitemapy,
+- statyczny produkcyjny pipeline sitemap `SeoSitemapGenerator` + `SeoSitemapBuilder` + `SeoSitemapAuditor`, z codziennym `seo:refresh-sitemaps` jako istniejącym safety netem,
+- dynamiczny `SitemapController`, który współistnieje z generowanymi artefaktami i nie jest samodzielnym source of truth produkcyjnego XML,
+- statyczny `public/robots.txt` oraz istniejący `RobotsController`; produkcyjny kontrakt robots pozostaje zgodny z `SEO-SITEMAP-REPAIR-PLAN.md`,
 - breadcrumbs,
-- schema services dla treści prawnych,
+- `config/content.php['organization']` jako istniejące dane organizacji,
+- `SchemaIds` ze stabilnymi `/#organization` i `/#website`,
+- `SchemaRenderer` i istniejący graph pattern,
+- schema services dla treści prawnych i znaków,
 - publiczny klaster znaków drogowych,
 - publiczna baza pytań,
 - relacje z podstawami prawnymi,
@@ -169,7 +176,9 @@ Przed wdrożeniem schema `NewsArticle` należy uporządkować branding publisher
 
 W `HomePageController.php` występują jeszcze pozostałości marki „Orły na Drodze” w structured data i assetach, podczas gdy produkt działa jako PrawkoNaRaz.
 
-**Gate:** przed uruchomieniem newsroomu `Organization`, publisher, logo, nazwa i publiczny branding muszą mieć jedno kanoniczne źródło.
+Jednocześnie repo już ma właściwy fundament: `config/content.php['organization']`, `SchemaIds` i `SchemaRenderer`. Niespójność polega więc na tym, że homepage omija istniejący source of truth.
+
+**Gate:** przed uruchomieniem newsroomu `Organization`, `WebSite`, publisher, site name, logo, OG site name i publiczny branding muszą korzystać z jednego istniejącego source of truth oraz stabilnych graph IDs.
 
 ---
 
@@ -309,6 +318,82 @@ Nie tworzymy jednak pól/tabel ani publicznych controls tylko „na zapas”, do
 ### DEC-NR-011 — osobny system snapshotów wersji artykułu jest poza zakresem
 
 Na wyraźną decyzję produktową nie projektujemy dodatkowego revision history z diff/restore snapshotów. Pozostaje istniejący model audytu zmian i publiczna polityka korekt.
+
+### DEC-NR-012 — jeden site identity/entity graph w całym serwisie
+
+Newsroom nie tworzy własnego publisher graph ani własnego `WebSite`.
+
+Target wykorzystuje istniejące:
+
+- `config/content.php['organization']`,
+- `SchemaIds::organization()` -> `/#organization`,
+- `SchemaIds::website()` -> `/#website`,
+- `SchemaRenderer`.
+
+Article page składa spójny graph z WebSite, Organization, WebPage, Article/NewsArticle, Person, BreadcrumbList i ImageObject, połączony stabilnymi `@id`.
+
+Homepage pozostaje miejscem kanonicznego `WebSite name/url` dla domeny. `/aktualnosci` jako subdirectory nie ustanawia osobnego site name.
+
+### DEC-NR-013 — SEO distribution jest projektowane na skalowanie, nie na jeden plik
+
+Newsroom rozszerza istniejący sitemap subsystem zamiast tworzyć równoległy generator.
+
+Kontrakt obejmuje:
+
+- article sitemap z deterministic sharding readiness,
+- osobną news sitemap z pełnym news namespace,
+- istniejący główny sitemap index,
+- rozszerzenie istniejącego `SeoSitemapAuditor`,
+- ETag/Last-Modified i conditional 304 dla sitemap/feed,
+- feed discovery w publicznym HTML.
+
+Limity zewnętrzne są ponownie weryfikowane przy implementacji, ale architektura nie może zakładać, że corpus zawsze zmieści się w jednym pliku.
+
+
+### DEC-NR-014 — semantic silo = primary hierarchy + controlled cross-domain graph
+
+Każdy artykuł ma jedną primary category. Topic/dossier i tag są dodatkowymi wymiarami, nie konkurencyjnymi parentami canonical.
+
+Hierarchia bazowa:
+
+- `/aktualnosci -> category -> article`,
+- `/aktualnosci -> topic -> article`,
+- `/poradniki -> guide`.
+
+Nie izolujemy klastrów sztucznie. Jawne relacje article-question/legal/sign mogą tworzyć ograniczone dwukierunkowe linki publiczne, aby połączyć świeży newsroom z istniejącymi evergreen/source-of-truth klastrami.
+
+Relacja article ↔ question jest osobnym newsroomowym mostem do istniejącej encji pytania. Nie zmienia `question_relations`, rankingu V1/V2 ani taksonomii `question_seo_topics`.
+
+Sitemap nie zastępuje internal linking. Każdy ważny publiczny URL musi być osiągalny crawlable linkiem z innej publicznej strony.
+
+### DEC-NR-015 — newsroom rozszerza statyczny produkcyjny pipeline sitemap/robots
+
+Źródłem nadrzędnym dla sposobu dostarczania sitemap/robots jest istniejący `SEO-SITEMAP-REPAIR-PLAN.md`.
+
+Newsroom:
+
+- rozszerza `SeoSitemapGenerator`, `SeoSitemapBuilder` i `SeoSitemapAuditor`,
+- generuje newsroom/news XML jako statyczne artefakty do `public/`,
+- nie zastępuje tego pipeline osobnym runtime generatorem,
+- nie usuwa `SitemapController` ani `RobotsController` w tym samym zakresie implementacyjnym,
+- zachowuje istniejący `public/robots.txt` jako produkcyjny kontrakt do czasu osobnego, zweryfikowanego hardeningu warstwy webserver/CDN.
+
+Nagłówki cache/ETag/Last-Modified/304 dla statycznych sitemap są kontraktem warstwy Nginx/CDN/static delivery. Nie zakładamy, że zmiana tylko w Laravel controller wpłynie na produkcyjny artefakt.
+
+Publikacja newsroomu nie może blokować requestu pełnym generowaniem sitemap. Po commit wysyłany jest debounced/asynchroniczny refresh statycznych artefaktów; istniejący daily refresh pozostaje safety netem.
+
+### DEC-NR-016 — route family jest stabilne po pierwszej publikacji
+
+Typy dzielą się na dwie rodziny publicznego URL:
+
+- `newsroom`: news, explainer, analysis, report -> `/aktualnosci/{slug}`,
+- `guides`: guide -> `/poradniki/{slug}`.
+
+Przed pierwszą publikacją typ można zmieniać.
+
+Po ustawieniu `first_published_at` zwykła edycja może zmieniać typ tylko wewnątrz tej samej route family. Zmiana pomiędzy `newsroom` i `guides` jest zablokowana w v1, ponieważ zmieniałaby canonical path.
+
+Jeśli w przyszłości dopuścimy migrację route family, będzie to osobna uprzywilejowana operacja z pełnym 301 poprzedniego path, aktualizacją linków/sitemap i testem jednego hopu. Nie robimy tego przez zwykły Select ani ręczną zmianę w DB.
 
 ---
 
@@ -464,7 +549,7 @@ updated_by_user_id nullable
 title
 slug
 lead
-body
+body_blocks
 key_points nullable
 
 workflow_status
@@ -478,10 +563,10 @@ hero_image_alt nullable
 hero_image_width nullable
 hero_image_height nullable
 og_image_path nullable
+hero_image_caption nullable
 
 seo_title nullable
 seo_description nullable
-canonical_url nullable
 robots nullable
 
 scheduled_for nullable
@@ -932,7 +1017,8 @@ Każdy hero:
 - ma jawne wymiary,
 - ma zoptymalizowany format,
 - ma punkt zainteresowania/focal point,
-- ma wariant do OG,
+- ma wariant do OG i poprawny alt właściwy dla tego wariantu,
+- publiczny SEO image URL jest stabilny, crawlable i nie wymaga auth/signed expiry,
 - może otrzymać deterministyczne cropy do lead/standard/compact,
 - nie powoduje CLS,
 - jest dostarczany przez istniejący media layer.
@@ -961,7 +1047,9 @@ Newsroom powinien być projektowany pod wiele kanałów, ale źródłem treści 
 Kanały:
 
 - Google Search,
+- Google News / Top stories, jeśli zewnętrzne systemy zakwalifikują content,
 - Google Discover,
+- Google Preferred Sources jako opcja post-launch, jeśli domena jest dostępna w narzędziu,
 - social media,
 - newsletter w przyszłości,
 - RSS,
@@ -1041,6 +1129,12 @@ Publikacja lub aktualizacja artykułu musi unieważniać:
 - feed,
 - sitemap jeśli jest generowana/cachowana.
 
+### 20.3. Crawler-facing HTTP caching
+
+Sitemap i feed powinny mieć cache validators (`ETag` i/lub `Last-Modified`) i odpowiadać `304 Not Modified`, gdy reprezentacja się nie zmieniła.
+
+Aktualny `SitemapController` nie ma tej warstwy; jest to zaplanowana praca, nie stan istniejący.
+
 ---
 
 ## 21. Bezpieczeństwo i audyt
@@ -1067,8 +1161,11 @@ Testy:
 - canonical redirect,
 - unpublished 404/noindex behavior,
 - relacje article-question/legal,
-- sitemap inclusion,
-- feed inclusion,
+- sitemap inclusion + deterministic sharding,
+- news namespace / first_published_at eligibility,
+- feed inclusion + discovery,
+- conditional 304 dla sitemap/feed,
+- stabilne site identity graph IDs,
 - permission checks.
 
 ### 22.2. Frontend / rendering
@@ -1078,7 +1175,9 @@ Testy:
 - meta,
 - canonical,
 - OG,
-- structured data,
+- structured data graph i spójność @id,
+- WebSite/Organization/site name consistency,
+- visible dates zgodne z JSON-LD,
 - breadcrumbs,
 - hero dimensions,
 - related content,
@@ -1226,8 +1325,12 @@ Newsroom v1 jest ukończony, gdy:
 - `/aktualnosci` ma redakcyjną hierarchię, placements, fallback i deduplikację,
 - istnieje publiczna strona artykułu z regulatory context i focal-point-aware media,
 - publikowany topic/dossier ma własną wartość i nie jest aliasem taga,
-- canonical/meta/schema są poprawne,
-- sitemap/feed uwzględniają właściwe rekordy,
+- canonical/meta/schema graph są poprawne i spójne z domenowym site identity,
+- statyczny sitemap pipeline uwzględnia właściwe rekordy, pełne news metadata, deterministic sharding i bezpieczny child-before-index switch,
+- newsroom refresh sitemap działa asynchronicznie/debounced po zmianach publicznego corpus, a istniejący daily refresh pozostaje safety netem,
+- rzeczywista warstwa static/Nginx/CDN ma zweryfikowane nagłówki/cache validators bez zakładania, że Laravel controller serwuje produkcyjny XML,
+- feed ma własny poprawny cache/validator contract,
+- author ProfilePage/Person jest reużywany, nie duplikowany,
 - artykuł może być połączony z pytaniami i treścią prawną,
 - działa co najmniej jeden kontekstowy most do produktu,
 - są testy backend + rendering + E2E,
@@ -1257,11 +1360,21 @@ Newsroom v1 jest ukończony, gdy:
 15. Media używają focal point i deterministycznych cropów, jeśli pipeline je wspiera.
 16. Audio/AI są rozszerzeniami po v1, bez prealokowania schema.
 17. Osobny revision snapshot/diff/restore system pozostaje poza zakresem.
+18. Kanoniczne dane Organization pozostają w istniejącym `config/content.php['organization']`; nie tworzymy równoległego brand configu.
+19. Structured data newsroomu korzysta ze stabilnych `SchemaIds` i graph pattern zamiast izolowanych kopii encji.
+20. Sitemap subsystem rozszerza istniejące `SeoSitemapGenerator`/`SeoSitemapBuilder`/`SeoSitemapAuditor`; statyczny pipeline produkcyjny pozostaje nadrzędny.
+21. Domena ma jeden site name; `/aktualnosci` nie tworzy osobnego site name.
+22. Google Preferred Sources jest opcją post-launch, nie gate v1 ani obietnicą widoczności.
+23. Semantic silo ma jedną primary category per article; topics/tags nie tworzą konkurencyjnego canonical parent.
+24. Jawne relacje do pytań/przepisów/znaków mogą renderować kontrolowane reverse links, bez sitewide reciprocal-link farm i bez modyfikowania istniejącego question relation graphu.
+25. `canonical_url` override nie jest częścią newsroom v1: artykuły są self-canonical zgodnie z route contract.
+26. Po pierwszej publikacji route family artykułu jest stabilne; cross-family type change jest zablokowany w zwykłym CMS.
+27. Produkcyjne sitemap newsroomu są statycznymi artefaktami publikowanymi bez okna index -> brakujący child; controller routes pozostają kompatybilnością, nie drugim source of truth.
 
 ### 25.2. Otwarte decyzje N0 wymagające domknięcia przed implementacją zależnych elementów
 
 - konkretny komponent block editora, serializacja payloadów i techniczna strategia sanitization (`NEWSROOM-N0-004`),
-- finalne źródło brand name/logo/publisher po usunięciu pozostałości „Orły na Drodze” (`NEWSROOM-N0-001`),
+- techniczne wyekstrahowanie/reużycie wspólnego site identity buildera przy zachowaniu istniejącego `config/content.php['organization']` (`NEWSROOM-N0-001`),
 - finalne wspólne design tokens używane przez newsroom po audycie obecnego publicznego UI.
 
 Pozostałe szczegóły nie powinny blokować N1, jeśli nie wpływają na schema, bezpieczeństwo body albo publiczny routing.
@@ -1276,7 +1389,9 @@ Na moment utworzenia dokumentu za ukończone uznajemy wyłącznie elementy rzecz
 - publiczne profile autorów,
 - część warstwy trust/legal,
 - breadcrumbs,
-- sitemapy,
+- statyczny sitemap generator + builder/auditor + daily refresh,
+- statyczny public/robots.txt oraz istniejący RobotsController,
+- SchemaIds/SchemaRenderer i organization config,
 - routes `/aktualnosci` i `/poradniki`,
 - placeholdery tych tras,
 - publiczna nawigacja prowadząca do aktualności,
@@ -1321,6 +1436,24 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-16 — v0.5
+
+- po głębokim audycie zgodności z istniejącym backendem podporządkowano newsroom istniejącemu statycznemu pipeline sitemap/robots i question graphowi,
+- usunięto ze skrótu architektury stare `body` i ręczny `canonical_url`,
+- zdefiniowano stabilność route family po pierwszej publikacji,
+- zapisano kompatybilny kontrakt async/debounced sitemap refresh bez usuwania istniejących controller routes,
+- doprecyzowano, że newsroom reverse links nie modyfikują istniejącego question-question graphu.
+
+### 2026-09-16 — v0.4
+
+- wykonano enterprise SEO audit względem aktualnego main i oficjalnych wymagań Google,
+- skorygowano branding source of truth: istniejący config/content.php + SchemaIds/SchemaRenderer zamiast nowego równoległego configu,
+- przyjęto jeden stabilny entity graph dla domeny i newsroomu,
+- dodano sitemap sharding readiness, news namespace completeness, feed discovery i conditional 304,
+- doprecyzowano author ProfilePage reuse, stable SEO image URLs i visible/schema date consistency,
+- Google Preferred Sources zapisano jako opcję post-launch, nie wymóg,
+- stan implementacji nadal jawnie pozostaje przed newsroomem.
 
 ### 2026-09-15 — v0.3
 

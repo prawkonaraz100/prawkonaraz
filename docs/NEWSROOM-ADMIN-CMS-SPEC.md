@@ -7,7 +7,7 @@
 - Powiązane:
   - [NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md](./NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md)
   - [NEWSROOM-EDITORIAL-OPERATIONS-AND-GOVERNANCE.md](./NEWSROOM-EDITORIAL-OPERATIONS-AND-GOVERNANCE.md)
-- Data: 2026-09-15
+- Data: 2026-09-16
 - Cel: zdefiniować panel redakcyjny Filament na tyle dokładnie, aby implementacja nie wymagała projektowania workflow podczas kodowania.
 
 ---
@@ -183,6 +183,10 @@ Pola:
 - topics
 - author_id
 - reviewer_id
+
+Dla `type=news` UI pokazuje licznik znaków tytułu oraz redakcyjny warning dla nadmiernie długiego headline. Nie kodujemy twardego limitu znaków pochodzącego z zewnętrznej dokumentacji bez ponownej weryfikacji; aktualne wytyczne Google zalecają tytuł zwięzły, a nie stały limit 110.
+
+Po pierwszej publikacji zwykły Select `type` nie może przenieść rekordu pomiędzy route family `newsroom` i `guides`. Może nadal zmienić news/explainer/analysis/report wewnątrz rodziny `newsroom`, jeśli pozostałe invariants są spełnione.
 
 ### 11.1. Title
 
@@ -418,10 +422,12 @@ Pola:
 
 - hero image
 - hero alt
+- hero caption opcjonalnie
 - width/height metadata
 - focal point X/Y
 - podgląd cropów lead / standard / compact
 - OG image lub wygenerowany OG variant
+- OG image alt
 - image credit
 - image license note
 
@@ -440,13 +446,17 @@ Przy upload/wyborze:
 - format allowlist,
 - size policy zgodna z media system,
 - dimensions odczytywane automatycznie jeśli pipeline wspiera,
-- alt wymagany przed publish jeśli hero exists.
+- alt wymagany przed publish jeśli hero exists,
+- caption opcjonalny i widoczny jako figcaption; nie zastępuje alt ani credit.
 
 Dodatkowe warning:
 
-- szerokość < 1200 px dla materiału oznaczonego jako Discover-ready/featured, jeśli taki marker zostanie wdrożony.
+- szerokość < 1200 px dla materiału oznaczonego jako Discover-ready/featured, jeśli taki marker zostanie wdrożony,
+- dedicated OG image bez alt,
+- publiczny SEO image URL wymaga wygasającego podpisu/auth,
+- crop usuwa główny subject.
 
-Nie blokować wszystkich publikacji wyłącznie przez Discover recommendation.
+Nie blokować wszystkich publikacji wyłącznie przez Discover recommendation. Natomiast obraz wskazany w publicznym OG/schema musi mieć stabilny publiczny URL.
 
 ---
 
@@ -456,16 +466,22 @@ Pola:
 
 - seo_title
 - seo_description
-- canonical_url
 - robots
 
 UI pokazuje fallback preview:
 
 - final title,
 - final description,
-- canonical.
+- canonical wyliczony z route family + slug.
 
-canonical_url advanced field powinno być zwinięte/oznaczone jako wyjątkowe. Większość artykułów używa self-canonical.
+V1 nie ma edytowalnego canonical override. Redaktor nie może skierować artykułu na inny canonical URL z poziomu formularza.
+
+`seo_title` może różnić się od H1, ale:
+
+- nie może zmieniać znaczenia lub głównego claimu,
+- nie może obiecywać informacji nieobecnej w artykule,
+- nie może dodawać sztucznego clickbaitu/sensacyjności,
+- `news:title` w News Sitemap nadal bierze widoczny `title`, nie `seo_title`.
 
 ---
 
@@ -648,7 +664,8 @@ Warning:
 - brak hero,
 - brak manual SEO description,
 - brak related questions,
-- brak OG-specific image.
+- brak OG-specific image, jeśli hero daje poprawny fallback,
+- brak dedykowanego OG alt, gdy dedykowany OG asset semantycznie różni się od hero.
 
 ---
 
@@ -1058,7 +1075,7 @@ E2E:
 
 ## 53. Stan implementacji
 
-Na 2026-09-15:
+Na 2026-09-16:
 
 - TrafficSigns CMS daje wzorzec workflow/checklist,
 - ContentAuthors resource istnieje,
@@ -1087,6 +1104,19 @@ Na 2026-09-15:
 ---
 
 ## 55. Historia zmian
+
+### 2026-09-16 — v0.4
+
+- usunięto ręczny canonical override z CMS v1,
+- dodano licznik i warning długości headline bez sztucznego hard limitu,
+- zablokowano zmianę route family po pierwszej publikacji,
+- dodano hero caption i regułę seo_title vs H1,
+- doprecyzowano, że article-question picker nie modyfikuje istniejącego question graphu.
+
+### 2026-09-16 — v0.3
+
+- dodano OG image alt i kontrolę stabilności publicznych URL-i obrazów SEO,
+- doprecyzowano media warnings bez deklarowania nieistniejącej implementacji.
 
 ### 2026-09-15 — v0.2
 

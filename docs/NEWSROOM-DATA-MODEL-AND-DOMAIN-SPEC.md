@@ -6,7 +6,8 @@
 - Obszar: newsroom / media portal
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Bazowy stan repo przy projektowaniu: main@6a38c95ce76ee05997977d614d795ed8513462f1
-- Data: 2026-09-15
+- Ostatnia weryfikacja zgodności z kodem: main@4b8a48537ec8973d90c268650994eee46d1841cc (2026-09-16)
+- Data: 2026-09-16
 - Zakres: model domenowy, baza danych, invariants, serwisy aplikacyjne, routing domeny i kolejność migracji
 
 Ten dokument opisuje docelowy model danych newsroomu. Nie oznacza, że opisane tabele lub klasy już istnieją. Stan wdrożenia należy aktualizować po każdej zmianie kodu.
@@ -182,9 +183,8 @@ Zalecenie: w PostgreSQL używać timestamp with time zone dla zdarzeń publikacy
 - is_breaking: boolean default false
 - breaking_expires_at: timestamptz nullable
 - editorial_priority: smallint default 0
-- featured_position: smallint nullable
 
-Nie kodujemy layoutu strony głównej w rekordzie artykułu. Powyższe pola opisują priorytet treści, nie strukturę strony.
+Nie kodujemy layoutu strony głównej ani konkretnej pozycji w rekordzie artykułu. Konkretne sloty/pozycje są wyłącznie w `content_home_placements`. Powyższe pola opisują priorytet treści i fallback, nie strukturę strony.
 
 ### 5.5. Media
 
@@ -192,9 +192,11 @@ Nie kodujemy layoutu strony głównej w rekordzie artykułu. Powyższe pola opis
 - hero_image_alt: varchar(500) nullable
 - hero_image_width: unsigned integer nullable
 - hero_image_height: unsigned integer nullable
+- hero_image_caption: text nullable
 - hero_focal_x: numeric(5,4) nullable
 - hero_focal_y: numeric(5,4) nullable
 - og_image_path: varchar(1024) nullable
+- og_image_alt: varchar(500) nullable
 - og_image_width: unsigned integer nullable
 - og_image_height: unsigned integer nullable
 - image_credit: varchar(500) nullable
@@ -204,19 +206,26 @@ Storage i public URL rozwiązujemy przez istniejący media layer, nie przez ręc
 
 Focal point używa znormalizowanych współrzędnych 0..1. Brak wartości oznacza środek obrazu. Warianty lead/standard/compact/OG są pochodnymi assetu i nie powinny być ręcznie przechowywanymi, niezależnymi kopiami, jeśli media layer może wygenerować je deterministycznie.
 
+`og_image_alt` jest wymagany, gdy dedykowany OG asset przedstawia coś innego niż hero. Może odziedziczyć `hero_image_alt` tylko wtedy, gdy semantycznie jest to ten sam obraz/crop.
+
+Publiczny resolver obrazu używany przez OG/schema nie może zwracać wygasających signed URLs. URL musi być stabilny i publicznie crawlable.
+
 ### 5.6. SEO
 
 - seo_title: varchar(255) nullable
 - seo_description: varchar(320) nullable
-- canonical_url: varchar(2048) nullable
 - robots: varchar(128) nullable
 
-Domyślne zasady:
+V1 nie przechowuje ręcznego `canonical_url`.
 
-- brak canonical_url oznacza self-canonical,
+Zasady:
+
+- canonical jest zawsze wyliczany z route family + slug,
+- article page jest self-canonical,
 - brak robots oznacza policy wynikające ze statusu,
 - draft/in_review/scheduled preview nie jest indeksowalny,
-- published domyślnie index,follow,max-image-preview:large.
+- published domyślnie index,follow,max-image-preview:large,
+- cross-domain/cross-URL canonical override wymaga w przyszłości osobnej decyzji architektonicznej i nie może zostać dodany jako zwykłe pole redaktora.
 
 ### 5.7. Freshness
 
@@ -288,6 +297,23 @@ is_breaking = true wymaga:
 - breaking_expires_at != null.
 
 Po breaking_expires_at materiał nie powinien być renderowany w module „pilne”, nawet jeśli flaga nie została jeszcze fizycznie wyzerowana.
+
+### 6.6. Route family invariant
+
+`ContentArticleType` mapuje się do stabilnej rodziny publicznego URL:
+
+- `newsroom`: news, explainer, analysis, report,
+- `guides`: guide.
+
+Reguły:
+
+- draft bez `first_published_at`: type może zmienić route family,
+- po pierwszej publikacji: zwykła edycja type nie może zmienić route family,
+- zmiana news -> analysis/report/explainer jest dozwolona, bo canonical path pozostaje w `/aktualnosci/{slug}`,
+- guide <-> dowolny typ newsroom jest zablokowane po pierwszej publikacji,
+- manualny SQL omijający invariant nie jest wspieranym workflow.
+
+Przyszła uprzywilejowana migracja route family, jeśli kiedykolwiek zostanie dodana, musi utworzyć 301 starego pełnego path do nowego canonical i zaktualizować wszystkie istniejące redirecty tak, aby nie powstał chain.
 
 ---
 
@@ -477,7 +503,7 @@ Constraints:
 
 Publiczny renderer pokazuje tylko aktywne/publiczne pytania zgodnie z regułami domeny Questions.
 
-Newsroom nie może zmieniać stanu pytania.
+Newsroom nie może zmieniać stanu pytania, membershipów `question_seo_topics`, `question_relations`, rankingu V1/V2 ani źródeł dowodowych istniejącego question graphu. Pivot `content_article_question` opisuje wyłącznie relację artykuł ↔ istniejąca encja pytania.
 
 ---
 
@@ -558,6 +584,8 @@ Pola:
 ### 15.1. Reguły
 
 - zmiana sluga opublikowanego artykułu tworzy redirect,
+- v1 nie pozwala zwykłą edycją zmienić route family opublikowanego artykułu,
+- jeśli przyszła kontrolowana migracja route family zostanie kiedyś wdrożona, zapisuje poprzedni pełny path w tej samej tabeli,
 - nie tworzymy redirect chain; nowy wpis powinien wskazywać canonical destination,
 - to_path zawsze lokalny canonical path dla własnego contentu,
 - usunięcie artykułu nie oznacza automatycznego redirectu do huba,
@@ -741,7 +769,7 @@ Definicja published:
 
 Rekomendowane klasy w app/Support/Newsroom lub analogicznej, jasno wydzielonej przestrzeni nazw.
 
-### 19.1. ContentArticlePublishingService
+### 20.1. ContentArticlePublishingService
 
 Odpowiada za:
 
@@ -753,7 +781,7 @@ Odpowiada za:
 - walidację invariants,
 - dispatch domenowych eventów.
 
-### 19.2. ContentArticleSlugService
+### 20.2. ContentArticleSlugService
 
 Odpowiada za:
 
@@ -762,7 +790,7 @@ Odpowiada za:
 - zmianę sluga,
 - tworzenie redirect history.
 
-### 19.3. ContentArticleCatalogService
+### 20.3. ContentArticleCatalogService
 
 Odpowiada za read-side:
 
@@ -774,7 +802,7 @@ Odpowiada za read-side:
 
 Nie mieszać write workflow z katalogiem publicznym.
 
-### 19.4. ContentArticleSeoService
+### 20.4. ContentArticleSeoService
 
 Odpowiada za:
 
@@ -785,7 +813,7 @@ Odpowiada za:
 - published/modified metadata,
 - OG/Twitter meta model.
 
-### 19.5. ContentArticleSchemaService
+### 20.5. ContentArticleSchemaService
 
 Odpowiada za:
 
@@ -794,7 +822,7 @@ Odpowiada za:
 - publisher Organization,
 - BreadcrumbList.
 
-### 19.6. ContentArticleFreshnessService
+### 20.6. ContentArticleFreshnessService
 
 Odpowiada za:
 
@@ -810,7 +838,7 @@ Odpowiada za:
 Rekomendowane domain/application events:
 
 - ContentArticlePublished
-- ContentArticleUpdated
+- ContentArticleSubstantivelyUpdated
 - ContentArticleArchived
 - ContentArticleSlugChanged
 - ContentArticleBreakingChanged
@@ -821,6 +849,8 @@ Listenery mogą:
 - zgłaszać URL do IndexNow, jeśli policy to dopuszcza,
 - odświeżać feed cache,
 - odświeżać sitemap cache.
+
+`ContentArticleSubstantivelyUpdated` jest emitowany wyłącznie, gdy zmieniła się publiczna treść/meaningful metadata i ustawiono `last_substantive_update_at`. Techniczny zapis, audit note, cache touch lub pole niewidoczne publicznie nie emituje tego eventu tylko po to, by odświeżyć SEO freshness.
 
 Event nie powinien wykonywać ciężkiej logiki synchronicznie w request bez potrzeby.
 
@@ -837,7 +867,7 @@ Rekomendacja:
 - publikacja przechodzi przez ContentArticlePublishingService,
 - komenda jest idempotentna.
 
-### 21.1. Race safety
+### 22.1. Race safety
 
 Dwa równoległe uruchomienia nie mogą opublikować artykułu dwa razy ani nadpisać first_published_at.
 
@@ -858,8 +888,14 @@ Publiczne daty:
 - last_substantive_update_at: istotna zmiana treści,
 - updated_at: techniczny timestamp rekordu.
 
-Structured data datePublished bierze first_published_at.
-dateModified bierze last_substantive_update_at albo kontrolowany modified timestamp, nie dowolny touch rekordu.
+Structured data:
+
+- `datePublished = first_published_at`,
+- `dateModified = last_substantive_update_at ?? first_published_at`.
+
+Publiczny label „Aktualizacja” pojawia się tylko, gdy `last_substantive_update_at` rzeczywiście istnieje i jest późniejszy od pierwszej publikacji.
+
+Article sitemap `lastmod` i feed `updated` używają tej samej merytorycznej semantyki, nigdy technicznego `updated_at`.
 
 ---
 
@@ -968,6 +1004,15 @@ Przyjęty wariant:
 - /aktualnosci/{articleSlug}
 
 Jest jednoznaczny dla routingu i przyszłych zmian. Zmiana na krótsze category URLs wymaga zmiany decyzji architektonicznej, reserved-slug policy i testów konfliktów.
+
+### 29.2. Type -> route family
+
+Resolver canonical path:
+
+- guide -> `/poradniki/{slug}`,
+- news/explainer/analysis/report -> `/aktualnosci/{slug}`.
+
+Publiczny lookup musi dodatkowo sprawdzić, czy rekord należy do route family obsługiwanej przez dany controller. Ten sam rekord nie może odpowiadać 200 pod oboma adresami.
 
 ---
 
@@ -1251,11 +1296,16 @@ Model danych jest gotowy, gdy:
 - factories pokrywają główne statusy,
 - publikacja nie może stworzyć niekompletnego publicznego rekordu,
 - scheduling jest idempotentny,
+- technical update nie zmienia SEO freshness ani nie emituje substantive-update eventu,
+- cross-route-family type change po first publish jest zablokowany,
 - slug change zachowuje redirect history,
 - relations do questions/legal są jawne,
 - `body_blocks` przechodzą walidację per block type,
 - homepage placements mają fallback i deduplikację,
 - focal point ma poprawny zakres 0..1,
+- hero caption, jeśli istnieje, jest zwykłym tekstem redakcyjnym renderowanym jako figcaption i nie zastępuje alt/credit,
+- OG alt/fallback jest spójny z faktycznym assetem,
+- publiczne URL-e obrazów dla SEO nie wygasają,
 - topic nie powstaje automatycznie z taga,
 - admin policies nie opierają się wyłącznie na UI,
 - current DATABASE-SCHEMA.md odzwierciedla faktyczny kod.
@@ -1282,7 +1332,7 @@ Na moment utworzenia dokumentu:
 - [ ] domknąć N0-004: serializacja bloków + editor + sanitizer,
 - [ ] wdrożyć model topics,
 - [ ] wdrożyć home placements/composition service,
-- [ ] wdrożyć focal point w media contract,
+- [ ] wdrożyć focal point + OG alt/stable public URL w media contract,
 - [ ] wdrożyć origin/regulatory context fields,
 - [ ] wdrożyć migracje,
 - [ ] wdrożyć enumy,
@@ -1296,6 +1346,23 @@ Na moment utworzenia dokumentu:
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.4
+
+- usunięto `featured_position` z artykułu; konkretna pozycja należy wyłącznie do content_home_placements,
+- usunięto ręczny `canonical_url` z v1 i przyjęto twardy self-canonical,
+- dodano `hero_image_caption`,
+- nie zakodowano zmiennego zewnętrznego limitu długości headline jako DB/publish invariant; długość pozostaje kontrolą redakcyjną,
+- zablokowano zmianę route family po pierwszej publikacji,
+- jawnie odseparowano article-question pivot od istniejącego question relation graphu.
+
+### 2026-09-16 — v0.3
+
+- doprecyzowano dateModified/lastmod/feed timestamp semantics i substantive-update event,
+- poprawiono numerację race-safety subsection,
+- doprecyzowano media contract o og_image_alt i semantyczny fallback,
+- zabroniono wygasających signed URLs dla obrazów używanych w OG/schema,
+- dodano odpowiednie media invariants do DoD bez zmiany stanu implementacji.
 
 ### 2026-09-15 — v0.2
 
