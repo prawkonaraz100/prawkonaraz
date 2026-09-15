@@ -184,6 +184,10 @@ Pola:
 - author_id
 - reviewer_id
 
+Dla `type=news` UI pokazuje licznik znaków tytułu i blokuje publish powyżej 110 znaków.
+
+Po pierwszej publikacji zwykły Select `type` nie może przenieść rekordu pomiędzy route family `newsroom` i `guides`. Może nadal zmienić news/explainer/analysis/report wewnątrz rodziny `newsroom`, jeśli pozostałe invariants są spełnione.
+
 ### 11.1. Title
 
 - required
@@ -418,6 +422,7 @@ Pola:
 
 - hero image
 - hero alt
+- hero caption opcjonalnie
 - width/height metadata
 - focal point X/Y
 - podgląd cropów lead / standard / compact
@@ -441,7 +446,8 @@ Przy upload/wyborze:
 - format allowlist,
 - size policy zgodna z media system,
 - dimensions odczytywane automatycznie jeśli pipeline wspiera,
-- alt wymagany przed publish jeśli hero exists.
+- alt wymagany przed publish jeśli hero exists,
+- caption opcjonalny i widoczny jako figcaption; nie zastępuje alt ani credit.
 
 Dodatkowe warning:
 
@@ -460,16 +466,22 @@ Pola:
 
 - seo_title
 - seo_description
-- canonical_url
 - robots
 
 UI pokazuje fallback preview:
 
 - final title,
 - final description,
-- canonical.
+- canonical wyliczony z route family + slug.
 
-canonical_url advanced field powinno być zwinięte/oznaczone jako wyjątkowe. Większość artykułów używa self-canonical.
+V1 nie ma edytowalnego canonical override. Redaktor nie może skierować artykułu na inny canonical URL z poziomu formularza.
+
+`seo_title` może różnić się od H1, ale:
+
+- nie może zmieniać znaczenia lub głównego claimu,
+- nie może obiecywać informacji nieobecnej w artykule,
+- nie może dodawać sztucznego clickbaitu/sensacyjności,
+- `news:title` w News Sitemap nadal bierze widoczny `title`, nie `seo_title`.
 
 ---
 
@@ -1092,6 +1104,14 @@ Na 2026-09-16:
 ---
 
 ## 55. Historia zmian
+
+### 2026-09-16 — v0.4
+
+- usunięto ręczny canonical override z CMS v1,
+- dodano publish guard headline <=110 dla news,
+- zablokowano zmianę route family po pierwszej publikacji,
+- dodano hero caption i regułę seo_title vs H1,
+- doprecyzowano, że article-question picker nie modyfikuje istniejącego question graphu.
 
 ### 2026-09-16 — v0.3
 
