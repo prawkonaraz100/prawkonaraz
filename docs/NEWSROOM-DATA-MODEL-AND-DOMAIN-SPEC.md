@@ -326,13 +326,15 @@ Restore-to-review zmienia workflow_status na in_review, ale pozostawia withdrawn
 
 ### 6.5. Invariants breaking
 
-is_breaking = true wymaga:
+`is_breaking = true` wymaga:
 
 - status = published,
 - type = news,
 - breaking_expires_at != null.
 
-Po breaking_expires_at materiał nie powinien być renderowany w module „pilne”, nawet jeśli flaga nie została jeszcze fizycznie wyzerowana.
+Transition z `published` do `needs_review`, `archived` albo `withdrawn` automatycznie czyści `is_breaking=false` i `breaking_expires_at=null` w tej samej transakcji. Nie zostawiamy rekordu łamiącego własny invariant.
+
+Po `breaking_expires_at` materiał nie jest renderowany w module „pilne”, nawet zanim housekeeping fizycznie wyzeruje flagę.
 
 ### 6.6. Route family invariant
 
@@ -810,16 +812,20 @@ Model nie powinien:
 - key_points: array
 - hero_focal_x: decimal
 - hero_focal_y: decimal
+- body_schema_version: integer
 - effective_from: immutable_date
 - published_at: immutable_datetime
 - first_published_at: immutable_datetime
 - scheduled_for: immutable_datetime
 - reviewed_at: immutable_datetime
 - needs_review_at: immutable_datetime
+- archived_at: immutable_datetime
+- withdrawn_at: immutable_datetime
 - breaking_expires_at: immutable_datetime
 - source_checked_at: immutable_datetime
 - freshness_review_due_at: immutable_datetime
 - last_substantive_update_at: immutable_datetime
+- public_state_changed_at: immutable_datetime
 
 ### 19.2. Scopes / public visibility
 
@@ -953,6 +959,8 @@ Rekomendacja:
 
 - scheduler uruchamia komendę np. newsroom:publish-due,
 - query pobiera tylko workflow_status=scheduled i scheduled_for <= now(),
+- przed faktycznym publish serwis **ponownie** waliduje pełną checklistę/invariants w aktualnym stanie: aktywna category, publiczny author, reviewer/source policy, body/media/security,
+- jeśli record przestał być eligible między schedule a due time, pozostaje nieopublikowany, failure jest audytowalny/logowany i nie blokuje kolejnych rekordów,
 - publikacja przechodzi przez ContentArticlePublishingService,
 - komenda jest idempotentna.
 
@@ -1398,7 +1406,7 @@ Nie pobieramy całego corpusu i nie filtrujemy w PHP.
 
 ### 38.3. Article show
 
-- published by slug,
+- `resolvePublicPath(slug, routeFamily)` disposition,
 - author,
 - reviewer jeśli publiczny,
 - category,
