@@ -762,6 +762,31 @@ Re-use istniejącego `ContentAuthorController` i ProfilePage.
 
 ---
 
+## NEWSROOM-N4-008 — Semantic silo / reverse-link integration
+
+### Zakres
+
+Zaimplementować jawny internal-link graph bez tworzenia automatycznej link farmy.
+
+- primary category link dla każdego public article,
+- topic links tylko dla jawnych relacji,
+- article -> legal/question/sign/public related links,
+- ograniczone reverse links z legal/question/sign surfaces do wybranych public articles,
+- natural/descriptive anchors,
+- deterministic related resolver,
+- inbound-link/click-depth audit data.
+
+### DoD
+
+- każdy indexable article ma co najmniej jeden crawlable inbound link,
+- ważne/evergreen articles są zwykle <= 3 hops od właściwego top-level huba,
+- reverse links wynikają z jawnej relacji i mają bounded count,
+- brak draft/noindex/redirect-source targets,
+- brak automatycznego sitewide reciprocal linking,
+- sitemap nie jest jedyną drogą discovery.
+
+---
+
 # N5 — SEO, distribution and analytics
 
 ## NEWSROOM-N5-001 — Articles sitemap + deterministic sharding
@@ -1057,7 +1082,7 @@ N3 article public + author profile integration
 N4 newsroom hub
 
 ### PR K
-N4 categories/topics/guides/nav/cache
+N4 categories/topics/guides/nav/cache + semantic silo/reverse links
 
 ### PR L
 N5 article/news sitemap + sharding + feed/discovery + HTTP validators
@@ -1125,6 +1150,7 @@ Docs-only:
 - [ ] article + controlled block renderer
 - [ ] regulatory context box/provenance
 - [ ] author profile/newsroom publication integration
+- [ ] semantic silo + controlled reverse links
 - [ ] newsroom hub with placements/fallback/dedupe
 - [ ] category
 - [ ] topic/dossier
