@@ -442,9 +442,9 @@ Może być deferred do N3/N4.
 
 ## 18. Relation ordering
 
-Powiązania publiczne mają sort_order.
+Relacje, dla których publiczna kolejność jest redakcyjna (questions/legal/signs), mają `sort_order` i admin umożliwia reorder lub przynajmniej zachowuje kolejność dodania.
 
-Admin powinien umożliwiać reorder lub przynajmniej kolejność dodania.
+`content_article_topic` jest wyjątkiem: topic ma pojedynczy `featured_article_id`, a reszta corpus jest chronologiczna po `first_published_at`; nie utrzymujemy drugiego ręcznego rankingu topicu.
 
 ---
 
