@@ -6,7 +6,8 @@
 - Obszar: newsroom / media portal
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Bazowy stan repo przy projektowaniu: main@6a38c95ce76ee05997977d614d795ed8513462f1
-- Data: 2026-09-15
+- Ostatnia weryfikacja zgodności z kodem: main@4b8a48537ec8973d90c268650994eee46d1841cc (2026-09-16)
+- Data: 2026-09-16
 - Zakres: model domenowy, baza danych, invariants, serwisy aplikacyjne, routing domeny i kolejność migracji
 
 Ten dokument opisuje docelowy model danych newsroomu. Nie oznacza, że opisane tabele lub klasy już istnieją. Stan wdrożenia należy aktualizować po każdej zmianie kodu.
@@ -746,7 +747,7 @@ Definicja published:
 
 Rekomendowane klasy w app/Support/Newsroom lub analogicznej, jasno wydzielonej przestrzeni nazw.
 
-### 19.1. ContentArticlePublishingService
+### 20.1. ContentArticlePublishingService
 
 Odpowiada za:
 
@@ -758,7 +759,7 @@ Odpowiada za:
 - walidację invariants,
 - dispatch domenowych eventów.
 
-### 19.2. ContentArticleSlugService
+### 20.2. ContentArticleSlugService
 
 Odpowiada za:
 
@@ -767,7 +768,7 @@ Odpowiada za:
 - zmianę sluga,
 - tworzenie redirect history.
 
-### 19.3. ContentArticleCatalogService
+### 20.3. ContentArticleCatalogService
 
 Odpowiada za read-side:
 
@@ -779,7 +780,7 @@ Odpowiada za read-side:
 
 Nie mieszać write workflow z katalogiem publicznym.
 
-### 19.4. ContentArticleSeoService
+### 20.4. ContentArticleSeoService
 
 Odpowiada za:
 
@@ -790,7 +791,7 @@ Odpowiada za:
 - published/modified metadata,
 - OG/Twitter meta model.
 
-### 19.5. ContentArticleSchemaService
+### 20.5. ContentArticleSchemaService
 
 Odpowiada za:
 
@@ -799,7 +800,7 @@ Odpowiada za:
 - publisher Organization,
 - BreadcrumbList.
 
-### 19.6. ContentArticleFreshnessService
+### 20.6. ContentArticleFreshnessService
 
 Odpowiada za:
 
