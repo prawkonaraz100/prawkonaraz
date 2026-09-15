@@ -637,6 +637,7 @@ Pola:
 - source_checked_at
 - freshness_review_due_at
 - last_substantive_update_at read-only / service-controlled
+- public_state_changed_at read-only / service-controlled
 - reviewed_at read-only, ustawiane przez Mark reviewed/workflow service
 - `editorial_note` edytowalne jako planowane pole wewnętrzne na notatki review/redakcyjne; nie tworzymy osobnego `review_notes` bez decyzji modelowej
 
