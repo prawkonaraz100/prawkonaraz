@@ -733,6 +733,15 @@ Nie używamy technicznego `updated_at` ani czasu generacji XML.
 
 Sitemap-index child `lastmod`, jeśli emitowany, opisuje faktyczny moment zmiany zawartości danego child sitemap/shard, a nie każde odczytanie/generowanie requestu.
 
+Dynamiczne huby mają własną semantykę public-output `lastmod`:
+
+- article detail: `max(first_published_at, last_substantive_update_at, public_state_changed_at)`,
+- category/topic/guides listing: max z publicznej metadata huba oraz timestampów artykułów, których dodanie/usunięcie/zmiana eligibility zmieniła widoczny corpus,
+- newsroom home: max z publicznie znaczącej zmiany placements/composition oraz eligible article output,
+- nie ustawiamy hub `lastmod=now()` tylko dlatego, że generator właśnie się uruchomił.
+
+Implementacja może wyliczać te wartości read-modelem/builderem; nie wymaga osobnej kolumny na każdy hub, jeśli wynik jest deterministyczny.
+
 ---
 
 ## 29. RSS / Atom
@@ -744,8 +753,9 @@ V1 rekomendacja:
 Minimum:
 
 - title,
-- link,
-- guid stable,
+- canonical link,
+- stable opaque item id niezależny od sluga, np. `urn:prawkonaraz:content-article:{id}`; RSS używa go jako GUID z `isPermaLink=false`, Atom jako `id`,
+- zmiana sluga aktualizuje link, ale nie item id i nie tworzy „nowej publikacji” w czytniku,
 - published date = first_published_at,
 - updated date = last_substantive_update_at ?? first_published_at,
 - summary,
