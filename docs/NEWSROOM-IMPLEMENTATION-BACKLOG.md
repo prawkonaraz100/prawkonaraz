@@ -149,6 +149,7 @@ Po pierwszej publikacji zwykła edycja nie może przenieść rekordu pomiędzy t
 - brak ambiguity category vs article,
 - ten sam rekord nie odpowiada 200 pod oboma route families,
 - cross-family type change po first publish zablokowany,
+- pre-launch `/aktualnosci` i `/poradniki` placeholdery nie są pozostawione jako indeksowalne thin pages: przy public gate=false mają jawne `noindex` bez zmiany shared MarketingPlaceholder dla niepowiązanych routes,
 - dokumenty aktualizowane.
 
 ---
@@ -257,7 +258,8 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 - newsroom-specific upload adapter/service lub jawny Filament upload do wydzielonego prefixu,
 - reuse public disk/MediaUrlResolver conventions,
 - backend MIME/size/dimensions validation,
-- stabilne public paths; brak signed URL w modelu,
+- stabilne, immutable/unique public storage paths; replacement tworzy nowy path zamiast nadpisywać istniejący asset pod tym samym URL,
+- brak signed URL w modelu,
 - JPEG/PNG/WebP/AVIF baseline; SVG disabled unless separate security decision,
 - nie deklarować/generated crop variants, jeśli fizycznie nie istnieją.
 
@@ -823,7 +825,8 @@ Re-use istniejącego `ContentAuthorController` i route, ale wyekstrahować wspó
 - author page -> article działa,
 - ProfilePage i Article mają identyczną identity autora,
 - archived+indexable pozostaje crawlable przez author profile i jest oznaczone jako archiwalne; archived+noindex nie musi być listowane,
-- needs_review/withdrawn/draft/scheduled nie są listowane,
+- needs_review+indexable pozostaje w osobnej/oznaczonej sekcji autora jako „w trakcie weryfikacji”, aby zachować inbound bez aktywnej promocji,
+- withdrawn/draft/scheduled nie są listowane,
 - zmiana public eligibility artykułu aktualizuje author-page/sitemap freshness bez fałszowania article dateModified,
 - próba odpublikowania ContentAuthor z zależnymi indexable/publiclyVisible newsroom articles jest blokowana do reassignment/withdraw/noindex.
 
@@ -1134,6 +1137,16 @@ Nie implementować tego jako zwykłego `ShouldQueue`, dopóki produkcja ma `QUEU
 - `public/robots.txt` pozostaje preferowanym kontraktem zgodnie z SEO-SITEMAP-REPAIR-PLAN,
 - cleanup duplikatu tylko w osobnym późniejszym PR.
 
+### Topology gate
+
+Przed wdrożeniem częstego refreshu potwierdzić rzeczywistą topologię produkcji:
+
+- single web node + lokalny `public/` -> same-filesystem atomic replace jest wystarczającym modelem,
+- multiple web nodes -> wygenerowany set musi trafić atomowo/spójnie do współdzielonego volume, artifact distribution lub edge/origin wspólnego dla wszystkich node'ów,
+- `onOneServer()`/Redis lock zapobiega podwójnej generacji, ale **nie synchronizuje lokalnych plików pomiędzy node'ami**.
+
+N5-007 nie jest DONE bez tego dowodu.
+
 ### HTTP delivery
 
 Dla statycznych XML/TXT sprawdzić rzeczywistą warstwę serwującą:
@@ -1159,6 +1172,24 @@ Feed może mieć validators aplikacyjne osobno.
 ---
 
 # N6 — Production hardening and rollout
+
+## NEWSROOM-N6-000 — Repository merge-gate enforcement
+
+### Potwierdzony stan
+
+GitHub branch `main` jest obecnie niechroniony i nie ma required status checks. G0–G6 są więc proceduralne, dopóki repo rules tego nie egzekwują.
+
+### Gate przed publicznym rolloutem
+
+- włączyć branch protection/ruleset dla `main`,
+- wymagać PR zamiast direct push dla normalnej pracy,
+- required check co najmniej aktualny `CI / quality`,
+- po dodaniu joba PostgreSQL wymagać również newsroom-postgres dla PR-ów, które go uruchamiają albo ustawić workflow tak, by stabilny required check agregował oba,
+- nie wymagać manual `Browser Smoke` jako statusu, jeśli workflow_dispatch nie daje stabilnego required context; newsroom E2E pozostaje jawny release evidence do czasu automatyzacji.
+
+Nie zmieniamy ustawień repo w ramach docs PR; to osobny operational action.
+
+---
 
 ## NEWSROOM-N6-001 — E2E golden path
 
@@ -1603,6 +1634,22 @@ Przy braku revision/staging systemu jeden rekord jest jednocześnie publiczną w
 ## R31 — scheduled republish publicznego artykułu powoduje chwilowe zniknięcie URL
 
 Mitigation: v1 schedule tylko initial publish; istniejący publiczny artykuł aktualizujemy przez Apply public update.
+
+## R32 — needs_review staje się SEO orphanem
+
+Mitigation: jeśli nadal indexable, detail page ma publiczny review banner i crawlable inbound co najmniej z oznaczonej sekcji profilu autora.
+
+## R33 — nadpisany media object zostawia stale OG/CDN cache
+
+Mitigation: immutable/unique newsroom media paths; replacement = nowy path, nie overwrite.
+
+## R34 — sitemap wygenerowana na jednym node nie istnieje na pozostałych
+
+Mitigation: topology gate N5-007; shared filesystem/artifact distribution albo potwierdzony single-node.
+
+## R35 — wymagane gate'y można ominąć direct push do main
+
+Mitigation: N6-000 branch protection/ruleset + required CI checks przed public rollout.
 
 ---
 
