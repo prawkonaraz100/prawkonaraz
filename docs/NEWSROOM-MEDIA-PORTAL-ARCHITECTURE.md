@@ -574,9 +574,13 @@ published_at nullable
 first_published_at nullable
 reviewed_at nullable
 needs_review_at nullable
+archived_at nullable
+withdrawn_at nullable
+withdrawal_reason nullable
 source_checked_at nullable
 freshness_review_due_at nullable
 last_substantive_update_at nullable
+public_state_changed_at nullable
 
 created_at
 updated_at
@@ -631,7 +635,10 @@ z polami m.in.:
 - `url`,
 - `published_at`,
 - `accessed_at`,
-- `is_primary`.
+- `is_primary`,
+- `is_official`,
+- `is_publicly_cited`,
+- wewnętrzne `note`.
 
 To pozwala budować kontrolowany system aktualizacji i weryfikacji.
 
@@ -1021,7 +1028,9 @@ Każdy hero:
 - publiczny SEO image URL jest stabilny, crawlable i nie wymaga auth/signed expiry,
 - może otrzymać deterministyczne cropy do lead/standard/compact,
 - nie powoduje CLS,
-- jest dostarczany przez istniejący media layer.
+- publiczny URL jest rozwiązywany przez istniejący `MediaUrlResolver`/media config,
+- upload newsroomu ma własny adapter/service lub jawny Filament upload contract; obecny `AdminMediaUploadService` jest question-specific i nie jest genericznym uploaderem newsroomu,
+- nie deklaruje fizycznych crop variants, których system realnie nie wygenerował.
 
 ### 17.2. Prawa do materiałów
 
@@ -1377,6 +1386,10 @@ Newsroom v1 jest ukończony, gdy:
 30. Side effecty po publikacji nie mogą zależeć od nieistniejącego workera. Przy obecnym `QUEUE_CONNECTION=sync` v1 używa lekkiego dirty/version signal + scheduler/lock do coalesced refreshu albo dopiero po wdrożeniu monitorowanego async transportu może użyć queued job.
 31. Publiczny newsroom ma prosty config gate/feature flag. Do N6 można wdrażać dane, admin i renderer bez przełączania istniejących publicznych placeholderów/indeksacji; włączenie publiczne następuje dopiero po release gate. Gdy gate=false, wyłączone są także article discovery w author pages/reverse links, feed, newsroom sitemap entries i IndexNow — private admin preview pozostaje dostępne.
 32. `archived` oznacza historyczny canonical 200 poza aktywną dystrybucją; osobny `withdrawn` służy do jawnego takedownu i daje 410 bez treści (albo 301 przy realnym następcy).
+33. Historyczny publiczny article path jest trwałą rezerwacją względem innych artykułów; current slug uniqueness nie wystarcza bez sprawdzenia redirect history.
+34. Freshness overdue jest computed kolejką review, nie automatycznym `needs_review`; workflow zmienia się tylko przez jawną/audytowaną decyzję.
+35. Media URL resolution jest współdzielone, ale upload nie: question-specific `AdminMediaUploadService` nie może zostać użyty jako newsroom uploader bez osobnej adaptacji.
+36. Po pierwszym publicznym launch `NEWSROOM_PUBLIC_ENABLED=false` nie jest długotrwałym technicznym rollbackiem, jeśli tworzyłby masowe 404; awaria techniczna używa 503/Retry-After lub code rollback, a content takedown używa `withdrawn`.
 
 ### 25.2. Otwarte decyzje N0 wymagające domknięcia przed implementacją zależnych elementów
 
@@ -1453,6 +1466,8 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 - usunięto założenie o działającym queue workerze dla sitemap freshness,
 - dodano publiczny config gate dla bezpiecznego rollout/rollback obejmujący wszystkie kanały discovery,
 - oddzielono historyczne archived=200 od jawnego withdrawn=410 takedown,
+- zsynchronizowano nadrzędny model z body_schema_version/public_state/withdrawal/public-citation contracts,
+- doprecyzowano historyczne path reservation, overdue-vs-needs_review i faktyczną granicę media upload layer,
 - doprecyzowano, że N0 ma dependency gates, a nie sztuczną sekwencję blokującą każdy N1 task.
 
 ### 2026-09-16 — v0.5
