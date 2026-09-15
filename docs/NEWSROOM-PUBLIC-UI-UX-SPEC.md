@@ -848,7 +848,15 @@ Nie używamy przypadkowego placeholder photo.
 
 ---
 
-## 44. Error states
+## 44. Error and archive states
+
+Archived article, jeśli był wcześniej opublikowany:
+
+- canonical detail URL pozostaje 200,
+- nie pojawia się w aktywnych listingach,
+- może pokazać dyskretną informację „Materiał archiwalny”, jeśli pomaga uniknąć wrażenia aktualności,
+- data publikacji/aktualizacji pozostaje widoczna,
+- renderer nie może przedstawiać archiwalnego materiału jako breaking/current tylko dlatego, że stary body używa czasu teraźniejszego.
 
 404 article:
 
@@ -869,12 +877,15 @@ Nie redirectujemy każdego 404 do homepage.
 
 Preview:
 
+- dostępne wyłącznie w authenticated admin flow,
 - pasek u góry „PODGLĄD — materiał nieopublikowany”,
 - informacja o statusie,
-- opcjonalny link do edycji dla zalogowanego admina,
-- noindex.
+- link do edycji dla zalogowanego admina,
+- noindex,nofollow,
+- `Cache-Control: private, no-store`,
+- brak public analytics article-view.
 
-Preview nie może być pomylony z produkcyjną stroną przez redaktora.
+Preview nie może być pomylony z produkcyjną stroną przez redaktora ani zostać udostępniony jako publiczny signed link w v1.
 
 ---
 
@@ -1279,6 +1290,11 @@ Na moment utworzenia:
 ---
 
 ## 69. Historia zmian
+
+### 2026-09-16 — v0.5
+
+- dodano UI contract dla archived historical 200 page,
+- preview v1 wyrównano do admin-only/private-no-store/noindex-nofollow bez shareable signed URL.
 
 ### 2026-09-16 — v0.4
 
