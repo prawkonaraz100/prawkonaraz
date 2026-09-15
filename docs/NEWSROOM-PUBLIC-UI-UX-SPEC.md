@@ -385,6 +385,20 @@ Nie indeksujemy losowych kombinacji filtrów.
 
 ---
 
+## 18.1. Breadcrumb contract
+
+Newsroom article:
+
+`Home → Aktualności → Primary category → Artykuł`
+
+Guide:
+
+`Home → Poradniki → Guide`
+
+Primary category guide'a może być pokazana jako osobny link klasyfikacyjny, ale nie zmienia głównego breadcrumb/canonical hierarchy.
+
+---
+
 ## 19. Strona artykułu — desktop
 
 Rekomendowany shell:
@@ -424,6 +438,8 @@ Wymagania:
 - line-height umożliwiający długie polskie tytuły.
 
 Nie ustawiamy sztywnej wysokości kontenera H1.
+
+Dla newsów CMS może ostrzegać przy nadmiernie długim tytule, ale UI nie ucina H1 arbitralnie do historycznego limitu znaków. `news:title` bierze pełny widoczny title; wyszukiwarka może sama skrócić prezentację na urządzeniu.
 
 ---
 
@@ -472,6 +488,7 @@ Wymagania:
 
 - width/height attributes,
 - alt,
+- opcjonalny caption renderowany jako semantyczny `<figcaption>`,
 - credit jeśli wymagany,
 - focal point,
 - eager/fetchpriority high tylko jeśli hero jest LCP,
@@ -486,6 +503,8 @@ Aspect ratios preferowane:
 - 1.91:1 / 1200x630 — OG, jeśli generujemy dedykowany wariant.
 
 Crop powinien respektować focal point. Dla tego samego source assetu nie wymagamy ręcznego uploadowania osobnego pliku do każdej karty.
+
+Caption opisuje kontekst/znaczenie obrazu dla czytelnika; alt pozostaje tekstem alternatywnym, a credit informacją o autorstwie/licencji. Nie łączymy tych trzech pól w jeden tekst.
 
 ---
 
@@ -1210,6 +1229,8 @@ Frontend newsroom v1 jest UI-complete, gdy:
 - long title nie rozwala layoutu,
 - breadcrumbs poprawne,
 - source block czytelny,
+- hero caption/alt/credit mają rozdzielone semantyczne role,
+- guide i newsroom article mają właściwy, różny breadcrumb path,
 - news ma widoczną datę i czas publikacji przy byline,
 - author link prowadzi do publicznego ProfilePage,
 - related/product modules działają,
@@ -1258,6 +1279,12 @@ Na moment utworzenia:
 ---
 
 ## 69. Historia zmian
+
+### 2026-09-16 — v0.4
+
+- doprecyzowano osobny breadcrumb contract dla newsroom article i guide,
+- dodano opcjonalny hero caption jako figcaption, oddzielony od alt i credit,
+- usunięto założenie o sztywnym limicie headline; pozostawiono redakcyjny warning dla nadmiernej długości.
 
 ### 2026-09-16 — v0.3
 
