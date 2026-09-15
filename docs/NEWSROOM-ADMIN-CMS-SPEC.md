@@ -184,7 +184,7 @@ Pola:
 - author_id
 - reviewer_id
 
-Dla `type=news` UI pokazuje licznik znaków tytułu i blokuje publish powyżej 110 znaków.
+Dla `type=news` UI pokazuje licznik znaków tytułu oraz redakcyjny warning dla nadmiernie długiego headline. Nie kodujemy twardego limitu znaków pochodzącego z zewnętrznej dokumentacji bez ponownej weryfikacji; aktualne wytyczne Google zalecają tytuł zwięzły, a nie stały limit 110.
 
 Po pierwszej publikacji zwykły Select `type` nie może przenieść rekordu pomiędzy route family `newsroom` i `guides`. Może nadal zmienić news/explainer/analysis/report wewnątrz rodziny `newsroom`, jeśli pozostałe invariants są spełnione.
 
@@ -1108,7 +1108,7 @@ Na 2026-09-16:
 ### 2026-09-16 — v0.4
 
 - usunięto ręczny canonical override z CMS v1,
-- dodano publish guard headline <=110 dla news,
+- dodano licznik i warning długości headline bez sztucznego hard limitu,
 - zablokowano zmianę route family po pierwszej publikacji,
 - dodano hero caption i regułę seo_title vs H1,
 - doprecyzowano, że article-question picker nie modyfikuje istniejącego question graphu.
