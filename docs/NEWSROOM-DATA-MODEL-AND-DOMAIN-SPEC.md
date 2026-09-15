@@ -195,6 +195,7 @@ Nie kodujemy layoutu strony głównej w rekordzie artykułu. Powyższe pola opis
 - hero_focal_x: numeric(5,4) nullable
 - hero_focal_y: numeric(5,4) nullable
 - og_image_path: varchar(1024) nullable
+- og_image_alt: varchar(500) nullable
 - og_image_width: unsigned integer nullable
 - og_image_height: unsigned integer nullable
 - image_credit: varchar(500) nullable
@@ -203,6 +204,10 @@ Nie kodujemy layoutu strony głównej w rekordzie artykułu. Powyższe pola opis
 Storage i public URL rozwiązujemy przez istniejący media layer, nie przez ręczne sklejanie URL.
 
 Focal point używa znormalizowanych współrzędnych 0..1. Brak wartości oznacza środek obrazu. Warianty lead/standard/compact/OG są pochodnymi assetu i nie powinny być ręcznie przechowywanymi, niezależnymi kopiami, jeśli media layer może wygenerować je deterministycznie.
+
+`og_image_alt` jest wymagany, gdy dedykowany OG asset przedstawia coś innego niż hero. Może odziedziczyć `hero_image_alt` tylko wtedy, gdy semantycznie jest to ten sam obraz/crop.
+
+Publiczny resolver obrazu używany przez OG/schema nie może zwracać wygasających signed URLs. URL musi być stabilny i publicznie crawlable.
 
 ### 5.6. SEO
 
@@ -1256,6 +1261,8 @@ Model danych jest gotowy, gdy:
 - `body_blocks` przechodzą walidację per block type,
 - homepage placements mają fallback i deduplikację,
 - focal point ma poprawny zakres 0..1,
+- OG alt/fallback jest spójny z faktycznym assetem,
+- publiczne URL-e obrazów dla SEO nie wygasają,
 - topic nie powstaje automatycznie z taga,
 - admin policies nie opierają się wyłącznie na UI,
 - current DATABASE-SCHEMA.md odzwierciedla faktyczny kod.
@@ -1282,7 +1289,7 @@ Na moment utworzenia dokumentu:
 - [ ] domknąć N0-004: serializacja bloków + editor + sanitizer,
 - [ ] wdrożyć model topics,
 - [ ] wdrożyć home placements/composition service,
-- [ ] wdrożyć focal point w media contract,
+- [ ] wdrożyć focal point + OG alt/stable public URL w media contract,
 - [ ] wdrożyć origin/regulatory context fields,
 - [ ] wdrożyć migracje,
 - [ ] wdrożyć enumy,
@@ -1296,6 +1303,12 @@ Na moment utworzenia dokumentu:
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.3
+
+- doprecyzowano media contract o og_image_alt i semantyczny fallback,
+- zabroniono wygasających signed URLs dla obrazów używanych w OG/schema,
+- dodano odpowiednie media invariants do DoD bez zmiany stanu implementacji.
 
 ### 2026-09-15 — v0.2
 
