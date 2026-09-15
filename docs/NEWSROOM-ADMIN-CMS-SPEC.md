@@ -337,6 +337,16 @@ Legal reference, question group i traffic sign group wybierają istniejące reko
 
 Product CTA wybiera kontrolowany typ akcji/destination zamiast dowolnego HTML buttona.
 
+### 13.6. Key points
+
+`key_points` jest publiczną, strukturalną listą „W skrócie”:
+
+- 2–5 krótkich punktów,
+- każdy punkt plain text / bez arbitralnego HTML,
+- opcjonalne dla artykułu,
+- kolejność edytowalna,
+- nie generujemy automatycznie z body.
+
 ---
 
 ## 14. Autosave
@@ -660,6 +670,23 @@ V1:
 - is_featured opisuje rekomendację redakcyjną,
 - editorial_priority pomaga fallbackom,
 - konkretne miejsce na `/aktualnosci` ustawia NewsroomHomeComposer.
+
+---
+
+## 28.1. Correction action
+
+`correction_note` nie jest zwykłym polem roboczym obok `editorial_note`.
+
+Dla istotnej korekty publicznego artykułu action `Apply correction`:
+
+- wymaga krótkiego publicznego `correction_note`,
+- wymaga aktualnego review zgodnie z policy,
+- korzysta z tego samego atomowego `Apply public update`,
+- ustawia `last_substantive_update_at`,
+- zapisuje AuditLog bez pełnego body,
+- publikuje note i zmianę treści w jednym commit.
+
+Drobna korekta bez wpływu na sens może użyć `Apply public update` bez public correction note, ale nadal ma audit.
 
 ---
 
@@ -1126,6 +1153,7 @@ Panel newsroom v1 jest gotowy, gdy redaktor może:
 - ustawić typ/kategorię/autora,
 - wpisać lead i zbudować body z kontrolowanych bloków,
 - ustawić pochodzenie i kontekst regulacyjny, jeśli dotyczy,
+- dodać key points,
 - dodać publiczne lub wewnętrzne źródła, w tym źródło bez URL, bez wycieku `is_publicly_cited=false`,
 - powiązać pytania/legal,
 - dodać hero, alt i focal point,
@@ -1151,6 +1179,8 @@ Feature/Livewire/Filament tests zależnie od obecnego test pattern:
 
 - create draft,
 - validation,
+- key_points 0 albo 2–5 ordered plain-text items,
+- correction action atomically updates correction_note + substantive timestamp + content,
 - source repeater persistence + nullable URL + public/internal citation behavior,
 - newsroom media upload MIME/size/dimensions/stable-path validation bez użycia question-specific upload service,
 - body blocks validation/persistence,
