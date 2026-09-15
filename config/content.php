@@ -3,13 +3,16 @@
 return [
     'organization' => [
         'name' => env('CONTENT_ORGANIZATION_NAME', 'PrawkoNaRaz'),
+        'alternate_name' => env('CONTENT_ORGANIZATION_ALTERNATE_NAME', 'prawkonaraz.pl'),
         'legal_name' => env('CONTENT_ORGANIZATION_LEGAL_NAME'),
         'description' => env(
             'CONTENT_ORGANIZATION_DESCRIPTION',
             'Nowoczesna platforma edukacyjna dla kierowców, łącząca oficjalną bazę pytań WORD z algorytmami powtórek i mechanizmami gamifikacji.',
         ),
         'email' => env('CONTENT_CONTACT_EMAIL', 'kontakt@prawkonaraz.pl'),
-        'logo_url' => env('CONTENT_ORGANIZATION_LOGO_URL', rtrim((string) env('APP_URL', 'http://localhost'), '/').'/favicon.png'),
+        'logo_url' => env('CONTENT_ORGANIZATION_LOGO_URL', rtrim((string) env('APP_URL', 'http://localhost'), '/').'/images/site-header-logo-20260728.png'),
+        'logo_width' => (int) env('CONTENT_ORGANIZATION_LOGO_WIDTH', 1150),
+        'logo_height' => (int) env('CONTENT_ORGANIZATION_LOGO_HEIGHT', 310),
         'same_as' => array_values(array_filter([
             env('CONTENT_ORGANIZATION_LINKEDIN_URL'),
             env('CONTENT_ORGANIZATION_FACEBOOK_URL'),
