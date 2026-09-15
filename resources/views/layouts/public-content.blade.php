@@ -1,5 +1,6 @@
 @php
     $meta = $meta ?? [];
+    $siteName = trim((string) config('content.organization.name', config('app.name', 'PrawkoNaRaz'))) ?: 'PrawkoNaRaz';
     $title = $meta['title'] ?? config('app.name', 'prawkonaraz.pl');
     $description = $meta['description'] ?? null;
     $canonical = $meta['canonical'] ?? url()->current();
@@ -46,6 +47,7 @@
         @endif
         <link rel="canonical" href="{{ $canonical }}">
         <meta property="og:locale" content="pl_PL">
+        <meta property="og:site_name" content="{{ $siteName }}">
         <meta property="og:type" content="{{ $ogType }}">
         <meta property="og:title" content="{{ $title }}">
         @if ($description)
