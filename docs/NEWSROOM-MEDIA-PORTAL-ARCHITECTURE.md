@@ -121,7 +121,9 @@ Repo ma już istotny fundament:
   - JSON-LD,
 - modele i publiczne profile `ContentAuthor`,
 - route `/autorzy/{authorSlug}`,
-- rozbudowane sitemapy oraz `SeoSitemapBuilder` / `SeoSitemapAuditor`,
+- statyczny produkcyjny pipeline sitemap `SeoSitemapGenerator` + `SeoSitemapBuilder` + `SeoSitemapAuditor`, z codziennym `seo:refresh-sitemaps` jako istniejącym safety netem,
+- dynamiczny `SitemapController`, który współistnieje z generowanymi artefaktami i nie jest samodzielnym source of truth produkcyjnego XML,
+- statyczny `public/robots.txt` oraz istniejący `RobotsController`; produkcyjny kontrakt robots pozostaje zgodny z `SEO-SITEMAP-REPAIR-PLAN.md`,
 - breadcrumbs,
 - `config/content.php['organization']` jako istniejące dane organizacji,
 - `SchemaIds` ze stabilnymi `/#organization` i `/#website`,
@@ -358,7 +360,38 @@ Hierarchia bazowa:
 
 Nie izolujemy klastrów sztucznie. Jawne relacje article-question/legal/sign mogą tworzyć ograniczone dwukierunkowe linki publiczne, aby połączyć świeży newsroom z istniejącymi evergreen/source-of-truth klastrami.
 
+Relacja article ↔ question jest osobnym newsroomowym mostem do istniejącej encji pytania. Nie zmienia `question_relations`, rankingu V1/V2 ani taksonomii `question_seo_topics`.
+
 Sitemap nie zastępuje internal linking. Każdy ważny publiczny URL musi być osiągalny crawlable linkiem z innej publicznej strony.
+
+### DEC-NR-015 — newsroom rozszerza statyczny produkcyjny pipeline sitemap/robots
+
+Źródłem nadrzędnym dla sposobu dostarczania sitemap/robots jest istniejący `SEO-SITEMAP-REPAIR-PLAN.md`.
+
+Newsroom:
+
+- rozszerza `SeoSitemapGenerator`, `SeoSitemapBuilder` i `SeoSitemapAuditor`,
+- generuje newsroom/news XML jako statyczne artefakty do `public/`,
+- nie zastępuje tego pipeline osobnym runtime generatorem,
+- nie usuwa `SitemapController` ani `RobotsController` w tym samym zakresie implementacyjnym,
+- zachowuje istniejący `public/robots.txt` jako produkcyjny kontrakt do czasu osobnego, zweryfikowanego hardeningu warstwy webserver/CDN.
+
+Nagłówki cache/ETag/Last-Modified/304 dla statycznych sitemap są kontraktem warstwy Nginx/CDN/static delivery. Nie zakładamy, że zmiana tylko w Laravel controller wpłynie na produkcyjny artefakt.
+
+Publikacja newsroomu nie może blokować requestu pełnym generowaniem sitemap. Po commit wysyłany jest debounced/asynchroniczny refresh statycznych artefaktów; istniejący daily refresh pozostaje safety netem.
+
+### DEC-NR-016 — route family jest stabilne po pierwszej publikacji
+
+Typy dzielą się na dwie rodziny publicznego URL:
+
+- `newsroom`: news, explainer, analysis, report -> `/aktualnosci/{slug}`,
+- `guides`: guide -> `/poradniki/{slug}`.
+
+Przed pierwszą publikacją typ można zmieniać.
+
+Po ustawieniu `first_published_at` zwykła edycja może zmieniać typ tylko wewnątrz tej samej route family. Zmiana pomiędzy `newsroom` i `guides` jest zablokowana w v1, ponieważ zmieniałaby canonical path.
+
+Jeśli w przyszłości dopuścimy migrację route family, będzie to osobna uprzywilejowana operacja z pełnym 301 poprzedniego path, aktualizacją linków/sitemap i testem jednego hopu. Nie robimy tego przez zwykły Select ani ręczną zmianę w DB.
 
 ---
 
@@ -514,7 +547,7 @@ updated_by_user_id nullable
 title
 slug
 lead
-body
+body_blocks
 key_points nullable
 
 workflow_status
@@ -528,10 +561,10 @@ hero_image_alt nullable
 hero_image_width nullable
 hero_image_height nullable
 og_image_path nullable
+hero_image_caption nullable
 
 seo_title nullable
 seo_description nullable
-canonical_url nullable
 robots nullable
 
 scheduled_for nullable
@@ -1325,11 +1358,14 @@ Newsroom v1 jest ukończony, gdy:
 17. Osobny revision snapshot/diff/restore system pozostaje poza zakresem.
 18. Kanoniczne dane Organization pozostają w istniejącym `config/content.php['organization']`; nie tworzymy równoległego brand configu.
 19. Structured data newsroomu korzysta ze stabilnych `SchemaIds` i graph pattern zamiast izolowanych kopii encji.
-20. Sitemap subsystem rozszerza istniejące `SeoSitemapBuilder`/`SeoSitemapAuditor`, z deterministic sharding readiness i HTTP 304.
+20. Sitemap subsystem rozszerza istniejące `SeoSitemapGenerator`/`SeoSitemapBuilder`/`SeoSitemapAuditor`; statyczny pipeline produkcyjny pozostaje nadrzędny.
 21. Domena ma jeden site name; `/aktualnosci` nie tworzy osobnego site name.
 22. Google Preferred Sources jest opcją post-launch, nie gate v1 ani obietnicą widoczności.
 23. Semantic silo ma jedną primary category per article; topics/tags nie tworzą konkurencyjnego canonical parent.
-24. Jawne relacje do pytań/przepisów/znaków mogą renderować kontrolowane reverse links, bez sitewide reciprocal-link farm.
+24. Jawne relacje do pytań/przepisów/znaków mogą renderować kontrolowane reverse links, bez sitewide reciprocal-link farm i bez modyfikowania istniejącego question relation graphu.
+25. `canonical_url` override nie jest częścią newsroom v1: artykuły są self-canonical zgodnie z route contract.
+26. Po pierwszej publikacji route family artykułu jest stabilne; cross-family type change jest zablokowany w zwykłym CMS.
+27. Produkcyjne sitemap newsroomu są statycznymi artefaktami publikowanymi bez okna index -> brakujący child; controller routes pozostają kompatybilnością, nie drugim source of truth.
 
 ### 25.2. Otwarte decyzje N0 wymagające domknięcia przed implementacją zależnych elementów
 
@@ -1395,6 +1431,14 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-16 — v0.5
+
+- po głębokim audycie zgodności z istniejącym backendem podporządkowano newsroom istniejącemu statycznemu pipeline sitemap/robots i question graphowi,
+- usunięto ze skrótu architektury stare `body` i ręczny `canonical_url`,
+- zdefiniowano stabilność route family po pierwszej publikacji,
+- zapisano kompatybilny kontrakt async/debounced sitemap refresh bez usuwania istniejących controller routes,
+- doprecyzowano, że newsroom reverse links nie modyfikują istniejącego question-question graphu.
 
 ### 2026-09-16 — v0.4
 
