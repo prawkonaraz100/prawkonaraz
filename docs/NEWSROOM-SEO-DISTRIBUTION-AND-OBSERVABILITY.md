@@ -703,7 +703,11 @@ Istniejący produkcyjny pipeline `SeoSitemapGenerator` + `SeoSitemapBuilder` + `
 
 Article sitemap URL `lastmod`:
 
-`last_substantive_update_at ?? first_published_at`
+`max(first_published_at, last_substantive_update_at, public_state_changed_at)`
+
+z pominięciem wartości null.
+
+`dateModified` pozostaje merytoryczne i NIE bierze `public_state_changed_at`. Dzięki temu archive/restore/robots/indexability mogą prawidłowo zmienić sitemap lastmod bez udawania aktualizacji treści.
 
 Nie używamy technicznego `updated_at` ani czasu generacji XML.
 
@@ -1550,6 +1554,7 @@ Obecnie:
 - ustalono deterministyczną archive policy: historyczny canonical 200, oraz osobny withdrawn=410 dla jawnego takedownu,
 - zastąpiono fikcyjne założenie o async queue jobie dirty/version coordinator + scheduler/lock zgodnym z aktualnym QUEUE_CONNECTION=sync,
 - doprecyzowano topic indexability baseline do min. 3 actively-distributed/indexable articles,
+- rozdzielono dateModified od sitemap lastmod przez public_state_changed_at,
 - poprawiono kolejność sekcji 4.3/4.4 i wyrównano current-state/remaining-work do faktycznego backendu.
 
 ### 2026-09-16 — v0.4
