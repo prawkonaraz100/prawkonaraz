@@ -1390,6 +1390,7 @@ Newsroom v1 jest ukończony, gdy:
 34. Freshness overdue jest computed kolejką review, nie automatycznym `needs_review`; workflow zmienia się tylko przez jawną/audytowaną decyzję.
 35. Media URL resolution jest współdzielone, ale upload nie: question-specific `AdminMediaUploadService` nie może zostać użyty jako newsroom uploader bez osobnej adaptacji.
 36. Po pierwszym publicznym launch `NEWSROOM_PUBLIC_ENABLED=false` nie jest długotrwałym technicznym rollbackiem, jeśli tworzyłby masowe 404; awaria techniczna używa 503/Retry-After lub code rollback, a content takedown używa `withdrawn`.
+37. Ponieważ v1 świadomie nie ma revision/staging systemu, zwykły Save nie może po cichu modyfikować publicznych pól już opublikowanego artykułu. Publiczna zmiana istniejącego 200 przechodzi przez dedykowany atomowy use case `Apply public update`; review-before-live dla takich zmian wymaga w przyszłości osobnej decyzji o staging/revisions.
 
 ### 25.2. Otwarte decyzje N0 wymagające domknięcia przed implementacją zależnych elementów
 
@@ -1467,6 +1468,7 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 - dodano publiczny config gate dla bezpiecznego rollout/rollback obejmujący wszystkie kanały discovery,
 - oddzielono historyczne archived=200 od jawnego withdrawn=410 takedown,
 - zsynchronizowano nadrzędny model z body_schema_version/public_state/withdrawal/public-citation contracts,
+- zamknięto lukę „Save zmienia live content” przy braku revision systemu przez dedykowany atomic Apply public update contract,
 - doprecyzowano historyczne path reservation, overdue-vs-needs_review i faktyczną granicę media upload layer,
 - doprecyzowano, że N0 ma dependency gates, a nie sztuczną sekwencję blokującą każdy N1 task.
 
