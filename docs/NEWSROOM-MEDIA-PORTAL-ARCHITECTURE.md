@@ -1375,7 +1375,8 @@ Newsroom v1 jest ukończony, gdy:
 28. V1 nie rozszerza dostępu do Filament: `/admin` pozostaje dostępne wyłącznie dla istniejących administratorów. `User` jest aktorem operacji/audytu, a `ContentAuthor` jest publiczną tożsamością autora/reviewera.
 29. Workflow `archived` oznacza wycofanie z aktywnej dystrybucji, nie automatyczne usunięcie URL. Wcześniej opublikowany artykuł archiwalny pozostaje pod canonical URL jako 200; 301/404/410 wymagają osobnego, jawnego use case.
 30. Side effecty po publikacji nie mogą zależeć od nieistniejącego workera. Przy obecnym `QUEUE_CONNECTION=sync` v1 używa lekkiego dirty/version signal + scheduler/lock do coalesced refreshu albo dopiero po wdrożeniu monitorowanego async transportu może użyć queued job.
-31. Publiczny newsroom ma prosty config gate/feature flag. Do N6 można wdrażać dane, admin i renderer bez przełączania istniejących publicznych placeholderów/indeksacji; włączenie publiczne następuje dopiero po release gate.
+31. Publiczny newsroom ma prosty config gate/feature flag. Do N6 można wdrażać dane, admin i renderer bez przełączania istniejących publicznych placeholderów/indeksacji; włączenie publiczne następuje dopiero po release gate. Gdy gate=false, wyłączone są także article discovery w author pages/reverse links, feed, newsroom sitemap entries i IndexNow — private admin preview pozostaje dostępne.
+32. `archived` oznacza historyczny canonical 200 poza aktywną dystrybucją; osobny `withdrawn` służy do jawnego takedownu i daje 410 bez treści (albo 301 przy realnym następcy).
 
 ### 25.2. Otwarte decyzje N0 wymagające domknięcia przed implementacją zależnych elementów
 
@@ -1450,7 +1451,8 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 - rozdzielono tożsamość `User` (aktor/admin) od `ContentAuthor` (autor/reviewer),
 - zdefiniowano deterministic archive URL policy zamiast pozostawiania 200/404/410 do decyzji podczas kodowania,
 - usunięto założenie o działającym queue workerze dla sitemap freshness,
-- dodano publiczny config gate dla bezpiecznego rollout/rollback,
+- dodano publiczny config gate dla bezpiecznego rollout/rollback obejmujący wszystkie kanały discovery,
+- oddzielono historyczne archived=200 od jawnego withdrawn=410 takedown,
 - doprecyzowano, że N0 ma dependency gates, a nie sztuczną sekwencję blokującą każdy N1 task.
 
 ### 2026-09-16 — v0.5
