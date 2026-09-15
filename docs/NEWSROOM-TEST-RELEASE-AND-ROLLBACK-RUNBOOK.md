@@ -1407,7 +1407,7 @@ Na 2026-09-16:
 - dodano route-family/canonical exclusivity tests,
 - dodano gwarancję, że newsroom article-question edges nie modyfikują istniejącego question graphu,
 - zastąpiono controller-centric sitemap validator tests testami rzeczywistego statycznego delivery,
-- dodano child-before-index atomic publication, async/debounced refresh i daily recovery tests,
+- historycznie dodano child-before-index atomic publication, async/debounced refresh i daily recovery tests; **async/debounced model zastąpiono później** dirty/version coordinator tests,
 - dodano produkcyjny robots/static sitemap smoke bez usuwania istniejącego backendu.
 
 ### 2026-09-16 — v0.3
