@@ -356,31 +356,35 @@ Pola per source:
 - source_type
 - publisher
 - title
-- url
+- url nullable
 - published_at
 - accessed_at
 - is_primary
 - is_official
-- note
+- is_publicly_cited
+- note wewnętrzne
 - sort_order
 
 UI:
 
 - akcja „Dodaj źródło”
-- przycisk otwarcia URL
-- validation URL
-- badge primary/official
+- przycisk otwarcia URL tylko gdy URL istnieje
+- validation URL tylko dla niepustej wartości
+- badge primary/official/public citation
+- wyraźne oznaczenie „tylko wewnętrzne” dla `is_publicly_cited=false`
 
 ---
 
 ## 16. Source warnings
 
-Panel ostrzega:
+Panel ostrzega/blokuje zgodnie z policy:
 
 - news bez żadnego źródła,
-- news w kategorii Przepisy bez official/legislation source,
+- news w kategorii Przepisy bez publicznie cytowalnego official/legislation source z URL, jeśli takie źródło istnieje,
 - dwa primary source nie są błędem globalnym, ale UI powinno pokazać stan,
-- źródło bez title/url jest niekompletne.
+- source bez title jest niekompletny,
+- brak URL jest dozwolony dla interview/direct evidence/other bez publicznego linku,
+- `is_publicly_cited=false` oznacza, że title/publisher/url nie mogą wyciec do publicznego renderera.
 
 Publish service ma finalną walidację, niezależnie od ostrzeżeń UI.
 
@@ -517,10 +521,10 @@ index,follow wynika z published/default policy.
 
 Pola/actions:
 
-- workflow_status
-- scheduled_for
-- first_published_at readonly po pierwszym publish
-- published_at
+- workflow_status jako badge/action-driven
+- scheduled_for ustawiane przez Schedule action
+- first_published_at read-only
+- published_at read-only / service-controlled
 - is_featured
 - editorial_priority
 - is_breaking
@@ -620,9 +624,9 @@ Pola:
 
 - source_checked_at
 - freshness_review_due_at
-- last_substantive_update_at
-- reviewed_at
-- `editorial_note` jako istniejące planowane pole wewnętrzne na notatki review/redakcyjne; nie tworzymy osobnego `review_notes` bez decyzji modelowej
+- last_substantive_update_at read-only / service-controlled
+- reviewed_at read-only, ustawiane przez Mark reviewed/workflow service
+- `editorial_note` edytowalne jako planowane pole wewnętrzne na notatki review/redakcyjne; nie tworzymy osobnego `review_notes` bez decyzji modelowej
 
 Status computed:
 
@@ -933,6 +937,8 @@ Jeśli rekord zmienił się w międzyczasie:
 
 Nie dokładamy kolumny `lock_version`, jeśli `updated_at` wystarcza. Warning bez blokady nie spełnia v1.
 
+Aby guard był wiarygodny, każda zmiana article-owned child data wykonywana z tego edytora (sources, topics, relations, media metadata) musi w tej samej operacji dotknąć/bumpnąć parent `ContentArticle.updated_at` albo równoważny edit token. Relation manager nie może zmienić istotnego child recordu „za plecami” wersji formularza.
+
 Dla placement overlap dodatkowo obowiązuje transakcyjny row/advisory lock opisany w Data Model; stale-write guard nie zastępuje concurrency locka.
 
 ---
@@ -1070,7 +1076,7 @@ Panel newsroom v1 jest gotowy, gdy redaktor może:
 - ustawić typ/kategorię/autora,
 - wpisać lead i zbudować body z kontrolowanych bloków,
 - ustawić pochodzenie i kontekst regulacyjny, jeśli dotyczy,
-- dodać źródła,
+- dodać publiczne lub wewnętrzne źródła, w tym źródło bez URL, bez wycieku `is_publicly_cited=false`,
 - powiązać pytania/legal,
 - dodać hero, alt i focal point,
 - zarządzać topicami,
@@ -1095,7 +1101,7 @@ Feature/Livewire/Filament tests zależnie od obecnego test pattern:
 
 - create draft,
 - validation,
-- source repeater persistence,
+- source repeater persistence + nullable URL + public/internal citation behavior,
 - body blocks validation/persistence,
 - origin/regulatory context persistence,
 - relation persistence,
@@ -1165,7 +1171,9 @@ Na 2026-09-16:
 - stale-write rejection awansowano z opcjonalnego warningu do gate'u v1,
 - dodano category/topic public-identity guards i minimalny topic corpus baseline,
 - ujednolicono wewnętrzne notatki do editorial_note oraz checklistę do body_blocks,
-- audit UI opiera się na istniejącym AuditLog bez nowych published_by/reviewed_by pól.
+- audit UI opiera się na istniejącym AuditLog bez nowych published_by/reviewed_by pól,
+- źródła wspierają nullable URL oraz jawne is_publicly_cited, aby prywatny evidence nie wyciekał publicznie,
+- service-owned timestamps są read-only, a article-owned child writes muszą bumpować parent edit token dla stale-write guard.
 
 ### 2026-09-16 — v0.4
 
