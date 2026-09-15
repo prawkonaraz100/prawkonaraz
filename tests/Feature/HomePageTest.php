@@ -45,8 +45,47 @@ test('home page renders the public landing page', function () {
         ->assertSeeText('Przygotuj się do egzaminu teoretycznego krok po kroku.')
         ->assertSee("<title>Testy na prawo jazdy {$seoYear} – oficjalna baza pytań | PrawkoNaRaz</title>", false)
         ->assertSee('przygotuj się do egzaminu teoretycznego na prawo jazdy', false)
+        ->assertSee('<meta property="og:site_name" content="PrawkoNaRaz">', false)
+        ->assertSee('<meta name="application-name" content="PrawkoNaRaz">', false)
         ->assertSee('data-home-contact-dialog', false)
         ->assertDontSeeText('Wybierz dostęp i zacznij naukę');
+});
+
+test('home page uses the canonical site identity graph', function () {
+    config()->set('content.organization.name', 'Canonical Test Brand');
+    config()->set('content.organization.alternate_name', 'canonical.example');
+    config()->set('content.organization.logo_url', 'https://cdn.example.test/brand.png');
+    config()->set('content.organization.logo_width', 1200);
+    config()->set('content.organization.logo_height', 320);
+
+    $response = $this->get(route('home'))
+        ->assertOk()
+        ->assertViewHas('meta', fn (array $meta): bool => $meta['image_alt'] === 'Widok platformy Canonical Test Brand'
+            && str_ends_with($meta['title'], '| Canonical Test Brand'))
+        ->assertSee('<meta property="og:site_name" content="Canonical Test Brand">', false)
+        ->assertSee('<meta name="application-name" content="Canonical Test Brand">', false)
+        ->assertDontSee('Orły na Drodze');
+
+    $structuredData = $response->viewData('structuredData');
+    expect($structuredData['@context'])->toBe('https://schema.org');
+
+    $graph = collect($structuredData['@graph']);
+    $organization = $graph->firstWhere('@type', 'Organization');
+    $website = $graph->firstWhere('@type', 'WebSite');
+
+    expect($organization)
+        ->not->toBeNull()
+        ->and($organization['@id'])->toEndWith('/#organization')
+        ->and($organization['name'])->toBe('Canonical Test Brand')
+        ->and($organization['alternateName'])->toBe('canonical.example')
+        ->and($organization['logo']['url'])->toBe('https://cdn.example.test/brand.png')
+        ->and($organization['logo']['width'])->toBe(1200)
+        ->and($organization['logo']['height'])->toBe(320)
+        ->and($website)
+        ->not->toBeNull()
+        ->and($website['@id'])->toEndWith('/#website')
+        ->and($website['name'])->toBe('Canonical Test Brand')
+        ->and($website['publisher']['@id'])->toBe($organization['@id']);
 });
 
 test('open access mode hides public friend invitation entry points', function () {
