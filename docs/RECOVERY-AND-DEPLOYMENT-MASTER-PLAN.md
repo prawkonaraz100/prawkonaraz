@@ -176,7 +176,7 @@ zawiera sekretów ani danych produkcyjnych.
 - [x] Nie przechowywać pełnej kopii produkcji ani wielkich paczek wdrożeniowych
   jako artefaktów GitHub Actions.
 
-Aktualny wynik pierwszego PR:
+Historyczny wynik pierwszego PR:
 
 - pull request `#1` naprawia uruchamianie odzyskanej bazy w CI oraz rozbieżności
   ujawnione przez pierwszy przebieg,
@@ -188,8 +188,28 @@ Aktualny wynik pierwszego PR:
   9 min 14 s,
 - lokalny Docker montuje teraz także katalog `scripts`, dzięki czemu Pint nie
   sprawdza już jego nieaktualnej kopii zapisanej w obrazie,
-- PR pozostaje otwarty; jego połączenie z `main` wymaga osobnej decyzji
-  użytkownika i nie uruchamia automatycznego deploymentu.
+- PR `#1` został połączony z `main` 2026-09-03 w commicie
+  `5e795b05a36a0d03469fff0ea846e23f70a12729`; sam merge nie uruchomił
+  automatycznego deploymentu.
+
+### Aktualna weryfikacja CI — 2026-09-15
+
+- `main@4b10738705f3696bc2bcce730a707473eab8cd2b` nie ma obecnie zielonego
+  wyniku CI. Run `34348998381` z 2026-09-09 doszedł do pełnego backendowego
+  test suite i zakończył się wynikiem **830 passed / 4 failed / 2 skipped
+  (18226 assertions)**.
+- Trzy failure'y dotyczyły `ContactMessageTest`: żądania testowe otrzymały
+  HTTP `429` od throttlingu zamiast oczekiwanych redirectów / error bag.
+- Czwarty failure dotyczył `TrafficSignPagesTest`: hub znaków nie zawierał
+  oczekiwanego tekstu `Nauka`.
+- Dwa kolejne przebiegi dokumentacyjnego PR `#6`
+  (`34995086557` i `35000373557`) zakończyły się podczas inicjalizacji joba
+  `quality`: runner nie został przydzielony, a job miał **0 kroków**. Tych
+  przebiegów nie wolno traktować jako test evidence kodu ani dokumentacji.
+- Bieżący PR `#6` zmienia wyłącznie dokumentację OSK/recovery. Powyższe
+  runtime failures na `main` są odnotowane jako istniejący baseline i nie są
+  naprawiane w tym dokumentacyjnym kroku.
+
 
 Warunek zakończenia: zielony CI potwierdza, że świeży checkout można zbudować i
 przetestować bez dostępu do sekretów produkcyjnych.
