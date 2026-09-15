@@ -1054,7 +1054,7 @@ Rozszerzyć istniejący `SeoSitemapGenerator` / `SeoSitemapBuilder`, nie tworzy�
 ## NEWSROOM-N5-003 — RSS/Atom feed + discovery
 
 - latest items,
-- stable GUID/Atom id = dokładnie `urn:prawkonaraz:content-article:{content_articles.id}`; identyfikator nie zależy od sluga, canonical URL ani timestampów,
+- stable GUID/Atom id = dokładnie `urn:prawkonaraz:content-article:{id}` (gdzie `{id}` = `content_articles.id`); identyfikator nie zależy od sluga, canonical URL ani timestampów,
 - slug change zmienia item link, ale nie GUID/id i nie tworzy nowego feed item,
 - correct content type,
 - cache/invalidation,
