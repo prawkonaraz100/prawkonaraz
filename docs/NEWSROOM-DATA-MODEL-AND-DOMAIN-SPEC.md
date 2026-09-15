@@ -322,9 +322,9 @@ Przyszła uprzywilejowana migracja route family, jeśli kiedykolwiek zostanie do
 Wymagane:
 
 - unique index na slug
-- index(workflow_status, published_at desc)
-- index(category_id, workflow_status, published_at desc)
-- index(type, workflow_status, published_at desc)
+- index(workflow_status, first_published_at desc)
+- index(category_id, workflow_status, first_published_at desc)
+- index(type, workflow_status, first_published_at desc)
 - index(is_featured, workflow_status, editorial_priority desc)
 - index(is_breaking, breaking_expires_at)
 - index(freshness_review_due_at)
@@ -428,7 +428,7 @@ content_article_topic
 Reguły:
 
 - publiczny topic wymaga własnego, niepustego opisu redakcyjnego i statusu published,
-- v1 baseline publikacji topicu: co najmniej 3 publiczne, indeksowalne artykuły przypięte do topicu; to reguła jakości produktu, nie gwarancja SEO,
+- v1 baseline publikacji topicu: co najmniej 3 `activelyDistributed()` i indeksowalne artykuły przypięte do topicu; to reguła jakości produktu, nie gwarancja SEO,
 - samo przypięcie taga nie tworzy topicu,
 - `featured_article_id`, jeśli ustawione, musi wskazywać publiczny artykuł należący do tego samego topicu,
 - slug topicu może zmieniać się w draft; po pierwszej publikacji jest immutable w v1, ponieważ nie mamy topic redirect history,
