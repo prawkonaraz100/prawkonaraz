@@ -277,7 +277,9 @@ Jeśli jeden rekord nie może się opublikować, strategia ma być jawna:
 ## 11. Slug and redirect tests
 
 - initial slug unique,
-- duplicate rejected/resolved zgodnie z service,
+- duplicate current slug rejected/resolved zgodnie z service,
+- canonical path colliding with another article historical `from_path` rejected,
+- same-article historical path reclaim rewrites/removes conflicting redirect and leaves all old paths one-hop to current canonical,
 - draft slug change no public redirect required,
 - published slug change creates redirect,
 - old path -> 301,
@@ -323,10 +325,12 @@ Expected:
 - unsafe markup removed/escaped/rejected zgodnie z wybraną strategią,
 - no arbitrary HTML/CSS/JS execution,
 - allowed rich text/formatting preserved,
+- server-side sanitizer/structured renderer testowany niezależnie od browser/Filament,
 - allowlisted embed only.
 
 Format-evolution tests:
 
+- `body_schema_version` jest wymagany/obsługiwany zgodnie z kontraktem,
 - zapisany payload starszej wspieranej wersji nadal się renderuje,
 - nowy block type nie może być tworzony przez editor przed dostępnością renderera,
 - unknown future block failuje bezpiecznie, bez wykonywania HTML,
@@ -581,16 +585,18 @@ Assert:
 - article graph author @id == ProfilePage Person @id,
 - publish/archive/needs-review/withdraw/restore zmienia author profile output i właściwy author sitemap lastmod,
 - techniczny article updated_at bez public output change nie zmienia author sitemap lastmod,
-- NEWSROOM_PUBLIC_ENABLED=false usuwa newsroom publications z author page i author sitemap freshness contribution.
+- NEWSROOM_PUBLIC_ENABLED=false usuwa newsroom publications z author page i author sitemap freshness contribution,
+- ContentAuthor unpublish is rejected while dependent indexable/publiclyVisible newsroom articles exist.
 
 ---
 
 ## 24. Sitemap tests
 
-### articles sitemap
+### articles + hub sitemap
 
 - newsroom rozszerza istniejący statyczny `SeoSitemapGenerator`,
 - published indexable article included,
+- /aktualnosci, /poradniki, active category hubs i published/indexable topic hubs mają sitemap coverage,
 - draft/noindex/redirect-source excluded,
 - archived policy honored,
 - absolute HTTPS canonical URL,
@@ -619,6 +625,8 @@ Tests based on verified rules:
 - old news excluded from news sitemap but still in articles sitemap if indexable.
 
 ### Static publication safety
+
+Regression test najpierw odtwarza/chroni przed potwierdzonym obecnym problemem: existing generator nie może delete-all `public/sitemaps/*.xml` i publikować main indexu zanim replacement child files są gotowe.
 
 - generation builds/validates complete next set before switch,
 - child files are published before new main index,
@@ -663,6 +671,7 @@ Application cache:
 Sitemap refresh coordinator:
 
 - successful public-state commit ustawia dirty/version signal dopiero after commit,
+- freshness overdue bez osobnego workflow trigger nie ustawia article na needs_review ani nie usuwa go z active distribution,
 - rollbacked DB transaction nie ustawia public sitemap change,
 - scheduler przy braku dirty marker kończy się tanio,
 - burst kilku publikacji coalescuje się do ograniczonej liczby pełnych refreshy,
@@ -894,7 +903,7 @@ Istniejący `browser-smoke.yml` dotyczy produktu i nie jest dowodem przejścia n
 
 ### 37.1. Public gate integration tests
 
-Przy `NEWSROOM_PUBLIC_ENABLED=false`:
+Przy pre-launch `NEWSROOM_PUBLIC_ENABLED=false`:
 
 - article/category/topic public routes nie ujawniają newsroom content,
 - existing top-level placeholder behavior pozostaje zgodne z decyzją rollout,
@@ -985,7 +994,9 @@ Jeśli Phase A failuje, publiczny newsroom nadal jest wyłączony.
 22. sprawdź scheduler/coordinator logs/locks/failures
 23. Search Console actions po stabilnym production
 
-Rollback publiczny w pierwszej kolejności: `NEWSROOM_PUBLIC_ENABLED=false`, następnie config/cache invalidation + statyczny sitemap/feed refresh usuwający newsroom discovery URLs, bez cofania danych/migracji.
+Przed pierwszym launch rollback dark-deploy może użyć `NEWSROOM_PUBLIC_ENABLED=false`.
+
+Po pierwszym publicznym/indexowanym launch nie używamy długiego `false` jako technicznego rollbacku powodującego masowe 404. Temporary technical incident -> 503/Retry-After lub rollback kodu zachowujący URL-e. Zła pojedyncza treść -> withdrawn.
 
 ---
 
@@ -1038,8 +1049,8 @@ Prosty config gate `NEWSROOM_PUBLIC_ENABLED` jest wymaganym elementem v1 release
 - wyłącza publiczny newsroom/article/category/topic rollout bez usuwania admin/data,
 - nie wymaga rozbudowanego feature flag service,
 - jest sprawdzany w config cache/deploy smoke,
-- przy false blokuje też author/reverse-link/feed/sitemap/IndexNow discovery,
-- rollback publiczny zaczyna się od ustawienia false i refreshu publicznych artefaktów.
+- przed launch przy false blokuje też author/reverse-link/feed/sitemap/IndexNow discovery,
+- po launch emergency procedure rozróżnia technical 503/code rollback od content withdrawn; nie masowo 404 przez flagę.
 
 Nie cofamy migracji ani treści tylko po to, by wyłączyć publiczną ekspozycję.
 
@@ -1331,6 +1342,9 @@ Na 2026-09-16:
 ### 2026-09-16 — v0.5
 
 - wyrównano runbook z faktycznym SQLite CI przez wymagany additive newsroom-postgres gate,
+- dodano historical full-path collision/reclaim, backend sanitizer/body version, newsroom-specific media i author-unpublish tests,
+- static publication regression jawnie obejmuje istniejący delete-all/index-first generator gap,
+- dark-deploy false oddzielono od post-launch temporary rollback 503/code rollback,
 - preview v1 zmieniono na admin-only/private-no-store i dodano rozdzielenie User actor vs ContentAuthor identity,
 - dodano stale-write, placement concurrency, category/topic identity oraz block-format compatibility tests,
 - archive otrzymało deterministyczny historical-200 contract, a withdrawn jawny 410 takedown flow,
