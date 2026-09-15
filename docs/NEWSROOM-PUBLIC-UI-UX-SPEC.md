@@ -126,9 +126,11 @@ Kod definiuje layout i sloty. Redaktor obsadza sloty w CMS.
 
 Priorytet rozwiązywania:
 
-1. aktywne ręczne placement,
-2. fallback redakcyjny na podstawie published/type/category/featured/priority,
+1. aktywne ręczne placement wskazujące `activelyDistributed()` article,
+2. fallback redakcyjny wyłącznie z `activelyDistributed()` na podstawie type/category/featured/priority,
 3. brak kandydata -> krótszy moduł zamiast sztucznego placeholdera.
+
+`needs_review` i `archived` mogą nadal mieć publiczny canonical detail URL, ale nie są kandydatami do lead/latest/category promotion.
 
 ### 7.2. Deduplikacja
 
@@ -272,7 +274,7 @@ Lead musi być czytelny bez poziomego przewijania całej strony.
 
 ## 13. Latest stream
 
-Sekcja „Najnowsze” ma być chronologiczna.
+Sekcja „Najnowsze” ma być chronologiczna po `first_published_at DESC`, z deterministycznym tie-breakerem. Ponowne publish/unarchive nie przesuwa starego materiału na początek listy; istotna aktualizacja może być oznaczona osobnym „Aktualizacja”, ale nie udaje nowej daty publikacji.
 
 Row desktop:
 
@@ -666,11 +668,13 @@ Wygląd:
 
 - heading „Źródła”,
 - numerowana lub zwykła lista,
+- tylko rekordy `is_publicly_cited=true`,
 - publisher/title,
-- link,
+- link tylko jeśli source URL istnieje,
+- bez-URL interview/direct citation może być pokazana jako tekst,
 - opcjonalna data.
 
-Nie ukrywamy źródeł w małym szarym tekście.
+`is_publicly_cited=false` oraz wewnętrzne `note` nigdy nie są renderowane. Nie ukrywamy publicznych źródeł w małym szarym tekście.
 
 ---
 
@@ -1239,7 +1243,7 @@ Frontend newsroom v1 jest UI-complete, gdy:
 - brak hero ma poprawny wariant,
 - long title nie rozwala layoutu,
 - breadcrumbs poprawne,
-- source block czytelny,
+- source block czytelny i nie ujawnia internal evidence/notes,
 - hero caption/alt/credit mają rozdzielone semantyczne role,
 - guide i newsroom article mają właściwy, różny breadcrumb path,
 - news ma widoczną datę i czas publikacji przy byline,
@@ -1290,6 +1294,11 @@ Na moment utworzenia:
 ---
 
 ## 69. Historia zmian
+
+### 2026-09-16 — v0.6
+
+- latest/category/home chronology związano z activelyDistributed + first_published_at, bez sztucznego odświeżania po republish,
+- source block rozróżnia public citation, citation bez URL i internal evidence.
 
 ### 2026-09-16 — v0.5
 
