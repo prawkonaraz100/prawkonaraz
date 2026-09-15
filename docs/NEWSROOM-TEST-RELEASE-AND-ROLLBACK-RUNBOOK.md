@@ -190,7 +190,8 @@ Dla każdego przejścia:
 | --- | --- | --- | --- |
 | draft | submit review | in_review | PASS if minimum draft complete |
 | in_review | return draft | draft | PASS |
-| in_review | schedule | scheduled | PASS if publish checklist complete |
+| in_review + first_published_at=null | schedule | scheduled | PASS if publish checklist complete |
+| already-public article | schedule republish | scheduled | REJECT in v1; use Apply public update |
 | in_review | publish | published | PASS if checklist complete |
 | scheduled | publish due | published | PASS when due |
 | published | needs review | needs_review | PASS; clears breaking flag/expiry |
@@ -208,7 +209,7 @@ Testować również niedozwolone przejścia.
 
 ## 8. Publishing invariants tests
 
-Publish blokuje:
+Initial Publish / Apply public update blokuje odpowiednio:
 
 - brak title,
 - brak slug,
@@ -249,9 +250,10 @@ Publish blokuje:
 
 ## 10. Scheduler tests
 
-### Due publish
+### Due initial publish
 
 - scheduled_for <= now + current checklist/invariants still valid -> published.
+- never-published scheduled article nie ma first_published_at/published_at ustawionych przed due publish.
 - category became inactive / author unpublished / required source or reviewer invalidated after scheduling -> not published; logged/audited failure.
 
 ### Future
@@ -287,6 +289,21 @@ Jeśli jeden rekord nie może się opublikować, strategia ma być jawna:
 - new path -> 200,
 - no redirect chain,
 - sitemap only new URL.
+
+---
+
+### 11.1. Published edit safety tests
+
+Given publiclyVisible article:
+
+- zwykły low-level Filament save public field jest blocked/read-only albo routed do dedicated use case,
+- zmiana title/lead/body/source/hero przez `Apply public update` commit atomowo,
+- invalid payload nie zmienia żadnego public field,
+- stale token -> reject bez partial update,
+- meaningful update ustawia `last_substantive_update_at`,
+- internal-only note update nie ustawia substantive timestamp i nie zmienia public output,
+- scheduled republish publicznego 200 jest rejected,
+- audit nie przechowuje pełnego body.
 
 ---
 
