@@ -599,9 +599,9 @@ News sitemap:
 
 Niezależnie od news sitemap potrzebujemy długoterminowej sitemap artykułów.
 
-Rekomendacja:
+Rekomendacja przy corpus mieszczącym się w jednym pliku:
 
-/sitemaps/articles.xml
+`/sitemaps/articles.xml`
 
 Zawiera wszystkie indeksowalne:
 
@@ -620,7 +620,8 @@ Każda zwykła sitemap przestrzega zewnętrznych limitów zweryfikowanych przy i
 Implementation contract:
 
 - builder nie może zakładać, że `articles.xml` zawsze zmieści cały corpus,
-- sharding ma być deterministyczny i stabilny, np. rok publikacji + sekwencja dopiero gdy shard przekroczy limit,
+- sharding ma być deterministyczny i stabilny, np. `articles-2026-001.xml`,
+- główny `/sitemap.xml` wskazuje wynikowe shard files bezpośrednio; nie tworzymy zagnieżdżonego newsroom sitemap-index,
 - nie używać offset-based shardów powodujących masowe przesuwanie URL między plikami,
 - wszystkie `loc` są absolutne, HTTPS, canonical i indexable,
 - draft/noindex/redirect source nie trafia do article sitemap.
@@ -629,12 +630,12 @@ Implementation contract:
 
 ## 27. Sitemap index
 
-Istniejący sitemap index powinien po wdrożeniu wskazywać:
+Istniejący główny sitemap index powinien po wdrożeniu wskazywać:
 
-- articles.xml
-- news.xml
+- `articles.xml` i `news.xml`, dopóki każdy typ mieści się w jednym pliku,
+- bezpośrednie article/news shard files po przekroczeniu limitów.
 
-Nie tworzymy kolejnego niezależnego sitemap index dla newsroomu.
+Nie tworzymy kolejnego ani zagnieżdżonego sitemap index dla newsroomu.
 
 Istniejący `SeoSitemapBuilder` i `SeoSitemapAuditor` są rozszerzane o newsroom. Nie budujemy równoległego systemu sitemap, jeśli obecna abstrakcja może zostać rozszerzona bez utraty czytelności.
 
