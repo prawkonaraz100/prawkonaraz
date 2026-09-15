@@ -487,13 +487,14 @@ Visual breadcrumb i BreadcrumbList są zgodne; URLs absolute/canonical zgodnie z
 ## 18. Source rendering tests
 
 - `is_publicly_cited=true` source visible,
-- public citation with null URL renders as text without broken anchor,
-- `is_publicly_cited=false` source title/publisher/url/note never leaks,
-- URL escaped,
-- title escaped,
-- external link safe,
-- internal editorial note not rendered,
-- private metadata not leaked.
+- public citation with URL renders one crawlable `<a href>` to the validated source URL; URL/title are escaped and no `javascript:`/invalid scheme can survive validation/rendering,
+- public citation with null URL renders as text without empty/broken anchor,
+- official/public source links are **not** given `nofollow`, `ugc` or `sponsored` by default; takie rel pojawia się tylko przy jawnej, uzasadnionej policy,
+- jeśli renderer używa `target="_blank"`, link ma co najmniej `rel="noopener noreferrer"`; brak target=_blank nie wymaga sztucznego noopener,
+- `is_publicly_cited=false` source title/publisher/url/note never leaks — także przez JSON-LD, serialized props, HTML comments ani analytics payload,
+- internal editorial/source note not rendered,
+- private metadata such as `image_license_note`/internal source evidence not leaked,
+- regression sprawdza kolejność/publiczną etykietę sources oraz brak przypadkowego `nofollow` na oficjalnym źródle.
 
 ---
 
@@ -679,13 +680,32 @@ Regression test najpierw odtwarza/chroni przed potwierdzonym obecnym problemem: 
 
 - XML valid,
 - content type,
-- stable guid,
-- pub date,
+- RSS GUID / Atom id = dokładnie `urn:prawkonaraz:content-article:{content_articles.id}` i nie zależy od sluga/canonical/timestampów,
+- slug change zmienia item link na nowy canonical, ale GUID/id pozostaje identyczny i czytnik nie widzi „nowego” wpisu,
+- pub date = `first_published_at`,
+- updated date = `last_substantive_update_at ?? first_published_at`,
 - latest order,
-- draft excluded,
+- draft/needs_review/archived excluded zgodnie z `activelyDistributed()`,
 - absolute canonical item URLs,
 - HTML head discovery link points to correct feed,
-- cache invalidated after publish.
+- cache invalidated after publish/substantive update.
+
+
+### 25.1. IndexNow integration tests
+
+- first publish commituje publiczny canonical `200` zanim pojawi się queue row z lokalnym `EVENT_CREATED`,
+- substantive public update / republish enqueue'uje canonical po commit jako lokalny `EVENT_UPDATED`,
+- rollback publish/update/withdraw/slug-change nie tworzy ani nie mutuje newsroom submission row,
+- withdrawn: przed enqueue URL już zwraca `410`, a queue row używa lokalnego `EVENT_DELETED`,
+- restore withdrawn -> review pozostawia `410` i nie enqueue'uje; dopiero skuteczny republish po przywróceniu `200` zgłasza URL,
+- slug change: old URL zwraca `301` do new, new zwraca `200` + self-canonical; after commit oba URL-e są enqueue'owane, old z lokalnym `EVENT_UPDATED` i **nigdy** `EVENT_DELETED`,
+- archive utrzymujący detail `200` nie jest delete; brak enqueue, jeśli zmieniła się wyłącznie dystrybucja, albo `EVENT_UPDATED` jeśli publiczny detail/robots faktycznie się zmienił,
+- draft/in_review/preview/scheduled-before-time/noindex oraz `NEWSROOM_PUBLIC_ENABLED=false` nie trafiają do newsroom automation/collector,
+- HTTP submission payload nadal zawiera tylko `host`, `key`, opcjonalne `keyLocation` i `urlList`; lokalny `event_type` nie jest serializowany jako protocol verb,
+- istniejące canonical-host/HTTPS/query/private-path filters, dedupe po URL hash, debounce/retry i 10k batching pozostają bez regresji,
+- IndexNow 200/202 oznacza accepted request; test nie interpretuje tego jako dowodu indeksacji,
+- failure/retry IndexNow nie cofa ani nie blokuje zakończonej transakcji publikacyjnej.
+
 
 ---
 
@@ -1388,6 +1408,12 @@ Na 2026-09-16:
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-16 — v0.6
+
+- doprecyzowano source-link regression: public/private citation leakage, crawlable href, bez przypadkowego nofollow i bezpieczny external-link contract,
+- przypięto feed identity do `content_articles.id` i dodano test niezmienności GUID/id przy slug change,
+- dodano pełny IndexNow transition matrix testujący commit-before-enqueue, withdrawn=410/deleted, slug-old=301/updated oraz brak event verb w HTTP payload.
 
 ### 2026-09-16 — v0.5
 
