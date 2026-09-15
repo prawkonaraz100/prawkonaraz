@@ -852,6 +852,18 @@ Nie używamy przypadkowego placeholder photo.
 
 ---
 
+## 43.1. Needs-review transparency
+
+Jeśli artykuł ma workflow `needs_review` i nadal zwraca 200:
+
+- nad treścią/byline pokazujemy dyskretny, ale czytelny komunikat „Materiał jest w trakcie ponownej weryfikacji”,
+- pokazujemy datę ostatniej merytorycznej aktualizacji / „stan informacji”, jeśli dostępna,
+- nie oznaczamy go jako breaking/featured/current,
+- jeśli pozostaje indexable, musi zachować crawlable inbound link (fallback przez profil autora),
+- banner nie zmienia `dateModified` sam z siebie; public-state change może zmienić sitemap lastmod.
+
+---
+
 ## 44. Error and archive states
 
 Archived article, jeśli był wcześniej opublikowany:
@@ -1306,6 +1318,7 @@ Na moment utworzenia:
 ### 2026-09-16 — v0.6
 
 - latest/category/home chronology związano z activelyDistributed + first_published_at, bez sztucznego odświeżania po republish,
+- dodano transparentny publiczny needs_review banner i inbound requirement dla indexable review-state content,
 - source block rozróżnia public citation, citation bez URL i internal evidence.
 
 ### 2026-09-16 — v0.5
