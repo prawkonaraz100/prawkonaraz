@@ -601,9 +601,11 @@ Computed blocking/warning items.
 
 - topic nie powstaje automatycznie z taga,
 - draft topic nie jest publiczny,
-- publish wymaga własnego opisu + min. 3 actively-distributed/indexable linked articles,
+- publish/republish wymaga własnego opisu + min. 3 actively-distributed/indexable linked articles,
 - featured article, jeśli ustawiony, jest actively-distributed + indexable i należy do topicu,
-- slug po pierwszej publikacji jest immutable.
+- slug po pierwszej publikacji jest immutable,
+- spadek corpus poniżej baseline po publikacji daje warning/wyłączenie z promocji, ale nie automatyczny HTTP flip,
+- explicit topic archive usuwa go z sitemap/nav i zwraca 410 dla wcześniej publicznego URL.
 
 ---
 
@@ -756,7 +758,7 @@ Old article path -> 301 canonical.
 
 Re-use istniejącego `ContentAuthorController` i ProfilePage.
 
-- dodać wyłącznie `activelyDistributed()` ContentArticle do publicznej listy publikacji autora,
+- publiczny profil autora pokazuje activelyDistributed publications oraz osobno/oznaczone archived+indexable publications; needs_review/withdrawn/draft/scheduled są wykluczone,
 - ujednolicić ProfilePage mainEntity Person do stabilnego `/autorzy/{slug}#person`,
 - Person worksFor -> canonical `/#organization`,
 - author sitemap lastmod uwzględnia zmianę outputu profilu wynikającą z publish/archive/needs-review/withdraw/restore przez public-state timestamps, nie techniczny updated_at,
@@ -768,7 +770,8 @@ Re-use istniejącego `ContentAuthorController` i ProfilePage.
 - article -> author URL działa,
 - author page -> article działa,
 - ProfilePage i Article mają identyczną identity autora,
-- needs_review/archived/withdrawn/draft/scheduled nie są listowane jako bieżące publikacje autora,
+- archived+indexable pozostaje crawlable przez author profile i jest oznaczone jako archiwalne; archived+noindex nie musi być listowane,
+- needs_review/withdrawn/draft/scheduled nie są listowane,
 - zmiana public eligibility artykułu aktualizuje author-page/sitemap freshness bez fałszowania article dateModified.
 
 ---
