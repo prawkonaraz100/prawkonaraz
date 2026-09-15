@@ -862,6 +862,14 @@ Archived article, jeśli był wcześniej opublikowany:
 - data publikacji/aktualizacji pozostaje widoczna,
 - renderer nie może przedstawiać archiwalnego materiału jako breaking/current tylko dlatego, że stary body używa czasu teraźniejszego.
 
+Withdrawn article:
+
+- standardowa publiczna 410/Gone surface,
+- bez renderowania treści artykułu/body/source,
+- bez related/product modules z wycofanego materiału,
+- może zawierać neutralny link do /aktualnosci,
+- bez automatycznego przekierowania do homepage.
+
 404 article:
 
 - standardowa publiczna 404,
@@ -1302,7 +1310,7 @@ Na moment utworzenia:
 
 ### 2026-09-16 — v0.5
 
-- dodano UI contract dla archived historical 200 page,
+- dodano UI contract dla archived historical 200 page oraz withdrawn 410 bez renderowania treści,
 - preview v1 wyrównano do admin-only/private-no-store/noindex-nofollow bez shareable signed URL.
 
 ### 2026-09-16 — v0.4
