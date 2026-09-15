@@ -6,7 +6,7 @@
 - Obszar: newsroom / media portal
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Bazowy stan repo przy projektowaniu: main@6a38c95ce76ee05997977d614d795ed8513462f1
-- Ostatnia weryfikacja zgodności z kodem: main@4b8a48537ec8973d90c268650994eee46d1841cc (2026-09-16)
+- Ostatnia weryfikacja zgodności z kodem: main@37dbfafa2ec491054429d1151d2de16b2470647b (2026-09-16)
 - Data: 2026-09-16
 - Zakres: model domenowy, baza danych, invariants, serwisy aplikacyjne, routing domeny i kolejność migracji
 
@@ -360,8 +360,10 @@ Kategorie v1:
 
 ### 8.1. Invariants
 
-- slug stabilny po publikacji kategorii,
-- kategoria nie może być usunięta, jeśli ma artykuły; użyć is_active=false,
+- w v1 slug kategorii jest immutable po utworzeniu/seedzie; nie mamy category redirect history,
+- kategoria nie może być usunięta, jeśli ma artykuły,
+- `is_active=false` jest dozwolone tylko, gdy kategoria nie ma publicznie widocznych/aktywnie dystrybuowanych artykułów; najpierw należy je przepiąć lub wycofać,
+- publikacja/scheduling artykułu wymaga aktywnej primary category,
 - jedna kategoria główna na artykuł w v1.
 
 ---
@@ -425,10 +427,12 @@ content_article_topic
 
 Reguły:
 
-- publiczny topic wymaga własnego opisu i statusu published,
+- publiczny topic wymaga własnego, niepustego opisu redakcyjnego i statusu published,
+- v1 baseline publikacji topicu: co najmniej 3 publiczne, indeksowalne artykuły przypięte do topicu; to reguła jakości produktu, nie gwarancja SEO,
 - samo przypięcie taga nie tworzy topicu,
-- featured_article_id musi wskazywać publiczny artykuł przy renderowaniu,
-- brak wystarczającego corpus oznacza, że topic pozostaje draftem.
+- `featured_article_id`, jeśli ustawione, musi wskazywać publiczny artykuł należący do tego samego topicu,
+- slug topicu może zmieniać się w draft; po pierwszej publikacji jest immutable w v1, ponieważ nie mamy topic redirect history,
+- spadek corpus poniżej baseline po archiwizacji/usunięciu relacji wymaga cofnięcia topicu do draft/archived przed kolejnym publicznym renderem.
 
 ---
 
@@ -453,7 +457,7 @@ Pola:
 - created_at
 - updated_at
 
-### 10.1. source_type v1
+### 11.1. source_type v1
 
 - official
 - legislation
@@ -464,7 +468,7 @@ Pola:
 - media
 - other
 
-### 10.2. Reguły
+### 11.2. Reguły
 
 - news o zmianie prawa powinien mieć co najmniej jedno źródło official lub legislation, jeśli takie istnieje,
 - media konkurencyjne nie są domyślnym źródłem pierwotnym,
@@ -646,7 +650,11 @@ Application service nie pozwala na nierozstrzygnięte nakładanie się dwóch ak
 - context_key,
 - position.
 
-Nie próbujemy modelować przedziałów czasowych przez skomplikowany DB exclusion constraint w pierwszej wersji; invariant ma testy domenowe i transakcyjne.
+Nie próbujemy modelować przedziałów czasowych przez skomplikowany DB exclusion constraint w pierwszej wersji.
+
+Application service musi jednak serializować zapis dla danego `surface_key + slot_key + context_key + position`: transakcja + row lock na istniejących kandydackich rekordach albo PostgreSQL advisory lock, następnie walidacja overlap wewnątrz locka. Dwa równoległe requesty nie mogą oba przejść walidacji i utworzyć kolizji.
+
+Invariant ma test domenowy/transakcyjny oraz test konkurencji na PostgreSQL.
 
 ### 16.4. Fallback i deduplikacja
 
@@ -747,21 +755,24 @@ Model nie powinien:
 - freshness_review_due_at: immutable_datetime
 - last_substantive_update_at: immutable_datetime
 
-### 18.2. Scopes
+### 19.2. Scopes / public visibility
 
-- published()
-- scheduled()
-- latestPublished()
-- forCategory()
-- featured()
-- activeBreaking()
-- needsFreshnessReview()
+Nazwy scope'ów nie mogą utożsamiać `workflow_status=published` z całą widocznością publiczną, bo `needs_review` pozostaje publiczne, a `archived` zachowuje historyczny canonical URL.
 
-Definicja published:
+Wymagane rozróżnienie:
 
-- workflow_status = published
-- published_at != null
-- published_at <= now()
+- `publiclyVisible()` — artykuł po pierwszej publikacji, którego workflow dopuszcza publiczny detail URL: `published`, `needs_review` oraz `archived`,
+- `activelyDistributed()` — `published` lub `needs_review`, z poprawnym `published_at <= now()`; używane przez home/category/topic/latest/feed,
+- `indexable()` — publiclyVisible + aktualna robots/SEO policy nie jest noindex,
+- `scheduled()`,
+- `forCategory()`,
+- `featured()`,
+- `activeBreaking()`,
+- `needsFreshnessReview()`.
+
+Zwykłe read modele list/hubów nie mogą używać `publiclyVisible()` zamiast `activelyDistributed()`.
+
+Artykuł `archived`, który nigdy nie był publiczny (`first_published_at=null`), nie uzyskuje publicznego detail URL tylko dlatego, że ma status archived.
 
 ---
 
@@ -779,7 +790,10 @@ Odpowiada za:
 - archive,
 - timestamps,
 - walidację invariants,
+- zapis wymaganych zdarzeń AuditLog,
 - dispatch domenowych eventów.
+
+Transakcja stanu publicznego obejmuje co najmniej rekord artykułu, krytyczne timestampy/invariants i audit opisujący tę zmianę. Eventy uruchamiające zewnętrzne side effecty (cache invalidation, sitemap dirty signal, IndexNow, notification) są dispatchowane dopiero po udanym commit. Rollback transakcji nie może zostawić „ghost publish” w cache/sitemap/IndexNow.
 
 ### 20.2. ContentArticleSlugService
 
@@ -843,12 +857,14 @@ Rekomendowane domain/application events:
 - ContentArticleSlugChanged
 - ContentArticleBreakingChanged
 
-Listenery mogą:
+Listenery po commit mogą:
 
 - czyścić cache,
-- zgłaszać URL do IndexNow, jeśli policy to dopuszcza,
+- zgłaszać URL do istniejącego IndexNow pipeline, jeśli policy to dopuszcza,
 - odświeżać feed cache,
-- odświeżać sitemap cache.
+- oznaczać statyczne sitemap jako wymagające refreshu.
+
+Nie zakładamy, że `ShouldQueue` oznacza asynchroniczność: aktualny repo contract ma `QUEUE_CONNECTION=sync`. Pełny refresh sitemap nie może wykonywać się w request publikacji.
 
 `ContentArticleSubstantivelyUpdated` jest emitowany wyłącznie, gdy zmieniła się publiczna treść/meaningful metadata i ustawiono `last_substantive_update_at`. Techniczny zapis, audit note, cache touch lub pole niewidoczne publicznie nie emituje tego eventu tylko po to, by odświeżyć SEO freshness.
 
@@ -899,20 +915,23 @@ Article sitemap `lastmod` i feed `updated` używają tej samej merytorycznej sem
 
 ---
 
-## 24. Author i reviewer
+## 24. Author, reviewer i actor
 
-Używamy istniejącego ContentAuthor.
+Używamy istniejącego `ContentAuthor` jako publicznej/redakcyjnej tożsamości autora i reviewera. Nie tworzymy `NewsroomAuthor`.
 
-Nie tworzymy NewsroomAuthor.
+Osobnym bytem jest `User`:
+
+- tylko istniejący administrator może wejść do Filament v1,
+- `User` jest aktorem create/update/review/publish/archive i trafia do `AuditLog.actor_user_id`,
+- `ContentAuthor.author_id/reviewer_id` nie nadaje dostępu do panelu i nie jest kontem logowania.
 
 Wymagania do publikacji:
 
-- author aktywny/publiczny,
-- author ma slug,
-- publiczny profil autora dostępny pod istniejącym route,
-- reviewer opcjonalny zależnie od policy.
+- author jest `isPubliclyVisible()`,
+- author ma slug i publiczny profil pod istniejącym route,
+- reviewer opcjonalny zależnie od policy; jeśli jest pokazywany publicznie, również musi być publiczny.
 
-Dla treści prawnie wrażliwych reviewer może być wymagany przez Editorial Policy, nie przez wszystkie typy globalnie.
+Dla treści prawnie wrażliwych policy może wymagać `reviewer_id + reviewed_at`. V1 nie udaje jednak kryptograficznej separacji obowiązków: bez osobnego RBAC/linku ContentAuthor↔User system nie może dowieść, że reviewer był innym zalogowanym człowiekiem. AuditLog pokazuje faktycznego administratora, który wykonał akcję.
 
 ---
 
@@ -987,7 +1006,7 @@ V1:
 - GET /poradniki
 - GET /poradniki/{slug}
 - GET /aktualnosci/feed.xml
-- sitemap endpoints zgodne z istniejącym SitemapController pattern
+- newsroom/news sitemap jako statyczne artefakty rozszerzające istniejący `SeoSitemapGenerator`; istniejące controller routes mogą pozostać kompatybilnością, ale nie są produkcyjnym source of truth
 
 ### 29.1. Konflikt slug vs category
 
@@ -1078,12 +1097,21 @@ Factories mają umożliwiać czytelne testy workflow.
 
 ---
 
-## 33. Deletion policy
+## 33. Archive / deletion policy
 
-Artykuł opublikowany:
+`archived` w v1 jest stanem dystrybucji, nie stanem HTTP „gone”.
 
-- domyślnie archiwizujemy zamiast hard delete,
-- hard delete tylko administracyjnie dla błędnych/testowych rekordów bez historii publicznej.
+Artykuł wcześniej opublikowany po archive:
+
+- znika z home/latest/category/topic active listings, feed i news sitemap,
+- canonical detail URL nadal zwraca 200,
+- pozostaje w standardowej article sitemap tylko jeśli nadal jest indexable,
+- może mieć `noindex` przez kontrolowaną robots policy, jeśli istnieje merytoryczny powód,
+- nie dostaje automatycznego 301/404/410.
+
+301 wymaga rzeczywistego następcy. 404/410 jest osobnym jawnie zaprojektowanym use case dla usunięcia/wycofania URL, nie skutkiem samego `archive`.
+
+Hard delete jest dopuszczalny tylko administracyjnie dla błędnych/testowych rekordów bez historii publicznej.
 
 Category:
 
@@ -1101,7 +1129,9 @@ Redirect history:
 
 ## 34. Audit
 
-Istniejący AuditLog powinien być użyty tam, gdzie pasuje do architektury.
+Istniejący `AuditLog` / `AuditLogService` jest kanoniczną warstwą audytu. Nie dodajemy do `content_articles` pól `published_by` / `reviewed_by` tylko po to, by powielać historię aktorów.
+
+`actor_user_id` wskazuje zalogowanego `User` administratora; scheduled/system action może mieć actor=null z jawnym metadata `trigger=scheduler`.
 
 Minimum audit events:
 
@@ -1115,13 +1145,17 @@ Minimum audit events:
 - source removal po publikacji,
 - author/reviewer change po publikacji.
 
-Audit nie zastępuje zwykłego updated_at.
+Audit nie zastępuje zwykłego updated_at ani revision history.
+
+Metadata audytu ma być małe i allowlistowane: IDs, status before/after, timestamps, reason/trigger, powiązane entity IDs. Nie zapisujemy w metadata pełnego `body_blocks`, leadu, notatek źródłowych, raw source payloadów ani dużych fragmentów treści.
 
 ---
 
 ## 35. Uprawnienia
 
-N1 może korzystać z istniejącej roli administratora, ale kod ma przygotować policies.
+V1 zachowuje aktualny kontrakt `User::canAccessPanel()`: panel Filament jest admin-only. Newsroom nie rozszerza dostępu moderatorom ani nie tworzy roli editor/reviewer w tym module.
+
+Policies nadal są wymagane jako backendowe zabezpieczenie operacji newsroomu oraz przygotowanie pod ewentualny przyszły RBAC.
 
 Docelowe abilities:
 
@@ -1135,7 +1169,7 @@ Docelowe abilities:
 - manage categories
 - manage sources
 
-Nie zakładamy roli wyłącznie na podstawie ukrycia przycisku Filament. Backend policy jest źródłem autoryzacji.
+W v1 wszystkie te abilities mapują się do istniejącego administratora. Nie zakładamy uprawnienia wyłącznie na podstawie ukrycia przycisku Filament. Backend policy/service jest źródłem autoryzacji. Rozszerzenie panelu na nie-adminów wymaga osobnego projektu auth/RBAC i nie jest częścią newsroom v1.
 
 ---
 
@@ -1307,7 +1341,12 @@ Model danych jest gotowy, gdy:
 - OG alt/fallback jest spójny z faktycznym assetem,
 - publiczne URL-e obrazów dla SEO nie wygasają,
 - topic nie powstaje automatycznie z taga,
-- admin policies nie opierają się wyłącznie na UI,
+- admin policies nie opierają się wyłącznie na UI i nie rozszerzają dostępu poza istniejących administratorów,
+- AuditLog rozróżnia `User` actora od `ContentAuthor` author/reviewer identity i nie przechowuje pełnej treści artykułu,
+- public visibility i active distribution są osobnymi scope'ami; archive ma deterministyczny 200-history policy,
+- category/topic identity nie może zostać złamana przez zmianę publicznego sluga/dezaktywację,
+- homepage placement overlap jest chroniony również przed równoległymi zapisami,
+- public side effecty są emitowane after-commit,
 - current DATABASE-SCHEMA.md odzwierciedla faktyczny kod.
 
 ---
@@ -1346,6 +1385,16 @@ Na moment utworzenia dokumentu:
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.5
+
+- po finalnym audycie rozdzielono `User` actora od `ContentAuthor` author/reviewer identity i uszczelniono audit metadata,
+- zdefiniowano publicVisible vs activelyDistributed oraz deterministyczne zachowanie archive,
+- dodano immutable public slugs/active-category guards i minimalny topic corpus baseline,
+- dodano serializację concurrent homepage placements przez DB/advisory lock,
+- zapisano transaction + after-commit contract dla publikacji i side effectów,
+- usunięto założenie o async queue workerze przy `QUEUE_CONNECTION=sync`,
+- poprawiono numerację source/scopes oraz kontrakt statycznych sitemap routes.
 
 ### 2026-09-16 — v0.4
 
