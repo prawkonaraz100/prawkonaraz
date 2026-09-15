@@ -875,6 +875,23 @@ Istniejący `browser-smoke.yml` dotyczy produktu i nie jest dowodem przejścia n
 
 ---
 
+### 37.1. Public gate integration tests
+
+Przy `NEWSROOM_PUBLIC_ENABLED=false`:
+
+- article/category/topic public routes nie ujawniają newsroom content,
+- existing top-level placeholder behavior pozostaje zgodne z decyzją rollout,
+- author page nie pokazuje newsroom publications,
+- existing question/legal/sign pages nie pokazują newsroom reverse links,
+- feed nie ujawnia newsroom items,
+- sitemap generator nie dodaje newsroom URLs,
+- IndexNow collector nie zgłasza newsroom URLs,
+- admin resource + private preview nadal działają.
+
+Przy `true` te powierzchnie działają zgodnie z public eligibility.
+
+---
+
 ## 38. Pre-merge checklist
 
 - [ ] diff ograniczony do task scope
@@ -951,7 +968,7 @@ Jeśli Phase A failuje, publiczny newsroom nadal jest wyłączony.
 22. sprawdź scheduler/coordinator logs/locks/failures
 23. Search Console actions po stabilnym production
 
-Rollback publiczny w pierwszej kolejności: `NEWSROOM_PUBLIC_ENABLED=false`, bez cofania danych/migracji.
+Rollback publiczny w pierwszej kolejności: `NEWSROOM_PUBLIC_ENABLED=false`, następnie config/cache invalidation + statyczny sitemap/feed refresh usuwający newsroom discovery URLs, bez cofania danych/migracji.
 
 ---
 
@@ -1004,7 +1021,8 @@ Prosty config gate `NEWSROOM_PUBLIC_ENABLED` jest wymaganym elementem v1 release
 - wyłącza publiczny newsroom/article/category/topic rollout bez usuwania admin/data,
 - nie wymaga rozbudowanego feature flag service,
 - jest sprawdzany w config cache/deploy smoke,
-- rollback publiczny zaczyna się od ustawienia false.
+- przy false blokuje też author/reverse-link/feed/sitemap/IndexNow discovery,
+- rollback publiczny zaczyna się od ustawienia false i refreshu publicznych artefaktów.
 
 Nie cofamy migracji ani treści tylko po to, by wyłączyć publiczną ekspozycję.
 
