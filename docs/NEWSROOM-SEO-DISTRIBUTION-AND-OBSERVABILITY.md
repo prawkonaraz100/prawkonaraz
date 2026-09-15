@@ -904,12 +904,47 @@ Nie potrzebujemy framework runtime do czytania article page.
 
 ---
 
-## 44. Internal linking graph
+## 44. Semantic silo i internal linking graph
+
+Nie budujemy „sztywnego silo”, w którym klastry są sztucznie odizolowane. Targetem jest czytelny semantic graph: stabilna hierarchia główna + kontekstowe cross-links tam, gdzie realnie pomagają użytkownikowi.
+
+### 44.1. Kanoniczna hierarchia
+
+Dla zwykłego newsa/analysis/report/explainer:
+
+`/aktualnosci -> primary category -> article`
+
+Topic/dossier jest dodatkowym hubem tematycznym:
+
+`/aktualnosci -> topic -> article`
+
+i nie zastępuje primary category.
+
+Dla guide:
+
+`/poradniki -> guide article`
+
+Guide nadal ma dokładnie jedną primary category w modelu domenowym i może linkować do jej huba, ale nie tworzymy drugiego canonical URL pod kategorią.
+
+### 44.2. Primary category invariant
+
+Każdy opublikowany artykuł ma dokładnie jedną primary category.
+
+Primary category odpowiada za:
+
+- articleSection,
+- główny breadcrumb dla newsroom article,
+- podstawowy category hub,
+- bazowy kontekst related-content.
+
+Tag i topic nie mogą stać się alternatywną primary category.
+
+### 44.3. Linki poziome i pionowe
 
 Każdy article może linkować do:
 
-- category,
-- topic/dossier,
+- primary category,
+- 0..n topic/dossier,
 - author,
 - legal content,
 - questions,
@@ -917,7 +952,56 @@ Każdy article może linkować do:
 - related articles,
 - product CTA.
 
-Monitorować orphan articles.
+Nie wymuszamy linku do każdego typu relacji. Link istnieje tylko przy rzeczywistej zależności semantycznej.
+
+### 44.4. Dwukierunkowe mosty do istniejących klastrów
+
+Najważniejsze relacje newsroomu powinny działać w obie strony:
+
+- article -> legal page/unit,
+- relevant legal page -> najważniejsze/aktualne article(s),
+- article -> question/topic,
+- question/topic hub -> wybrane powiązane newsroom article(s), gdy wnosi to kontekst,
+- article -> traffic sign,
+- traffic sign/supporting page -> wybrane article(s), gdy istnieje bezpośredni związek.
+
+To nie jest sitewide reciprocal linking. Reverse link jest renderowany tylko dla jawnej relacji i ograniczonej, istotnej listy.
+
+Cel:
+
+- nowy article nie jest orphan,
+- evergreen/source-of-truth pages przekazują kontekst do świeżych materiałów,
+- świeże newsy wzmacniają istniejące zasoby edukacyjne i prawne,
+- użytkownik może przejść od „co się zmieniło” do „jak działa reguła” i do praktyki/testu.
+
+### 44.5. Anchor text policy
+
+- crawlable `<a href>`,
+- anchor opisowy i naturalny,
+- title artykułu jest dobrym anchor dla kart/list,
+- w body preferujemy kontekstowy fragment zdania zamiast „kliknij tutaj”,
+- nie wymuszamy exact-match keyword anchor,
+- nie generujemy bloków dziesiątek słabo związanych linków.
+
+### 44.6. Click depth / discoverability
+
+Operacyjny target:
+
+- aktywne, ważne i evergreen article: zwykle <= 3 crawlable hops od `/aktualnosci` lub odpowiedniego top-level huba,
+- każdy indexable article ma co najmniej jeden crawlable inbound link z publicznej strony,
+- starsze materiały pozostają osiągalne przez category/topic pagination i nie polegają wyłącznie na sitemapie,
+- sitemap wspiera discovery, ale nie zastępuje linkowania wewnętrznego.
+
+### 44.7. Deduplikacja related content
+
+Related resolver:
+
+- preferuje tę samą primary category/topic i jawne entity relations,
+- nie powtarza tego samego URL w kilku modułach jednego viewportu bez powodu,
+- nie linkuje do draft/noindex/redirect source,
+- nie tworzy łańcuchów „related” wyłącznie na podstawie podobnego title.
+
+Monitorować orphan articles i nadmiernie odizolowane klastry.
 
 ---
 
