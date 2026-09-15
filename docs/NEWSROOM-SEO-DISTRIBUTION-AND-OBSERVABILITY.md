@@ -1352,7 +1352,7 @@ Może być indeksowalny tylko gdy:
 
 - status = published,
 - ma własny, niepusty opis redakcyjny i sensowne meta/fallback,
-- v1 baseline to co najmniej 3 publiczne, indeksowalne artykuły w corpus,
+- v1 baseline to co najmniej 3 actively-distributed, indeksowalne artykuły w corpus,
 - nie duplikuje kategorii/tag page,
 - featured article, jeśli ustawiony, jest publiczny i należy do topicu.
 
@@ -1537,7 +1537,7 @@ Obecnie:
 
 - ustalono deterministyczną archive policy: historyczny canonical 200, brak aktywnej dystrybucji, 301/404/410 tylko jako osobne use case,
 - zastąpiono fikcyjne założenie o async queue jobie dirty/version coordinator + scheduler/lock zgodnym z aktualnym QUEUE_CONNECTION=sync,
-- doprecyzowano topic indexability baseline do min. 3 publicznych/indexable articles,
+- doprecyzowano topic indexability baseline do min. 3 actively-distributed/indexable articles,
 - poprawiono kolejność sekcji 4.3/4.4 i wyrównano current-state/remaining-work do faktycznego backendu.
 
 ### 2026-09-16 — v0.4
