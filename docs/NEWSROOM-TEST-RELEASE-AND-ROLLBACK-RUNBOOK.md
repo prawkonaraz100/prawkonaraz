@@ -10,7 +10,7 @@
   - [CI-CD.md](./CI-CD.md)
   - [RUNBOOK-OPS.md](./RUNBOOK-OPS.md)
   - [NEWSROOM-SEO-DISTRIBUTION-AND-OBSERVABILITY.md](./NEWSROOM-SEO-DISTRIBUTION-AND-OBSERVABILITY.md)
-- Data: 2026-09-15
+- Data: 2026-09-16
 - Cel: zapewnić, że newsroom jest wdrażany i wycofywany bez zgadywania.
 
 ---
@@ -282,14 +282,10 @@ Payloads:
 Expected:
 
 - unknown/invalid block rejected or safely ignored according to contract,
+- unsafe markup removed/escaped/rejected zgodnie z wybraną strategią,
 - no arbitrary HTML/CSS/JS execution,
-- allowed rich text preserved,
+- allowed rich text/formatting preserved,
 - allowlisted embed only.
-
-Expected:
-
-- removed/escaped/rejected zgodnie z wybraną strategy,
-- allowed formatting retained.
 
 ---
 
@@ -330,12 +326,14 @@ Assertions:
 - canonical,
 - robots,
 - og:type,
+- og:site_name,
 - og:title,
 - og:url,
 - og:image when available,
 - article:published_time,
 - article:modified_time when applicable,
-- twitter card.
+- twitter card,
+- RSS/Atom discovery link.
 
 ---
 
@@ -357,19 +355,34 @@ Assertions:
 
 ## 16. Structured data tests
 
-Decode JSON-LD and assert:
+Decode JSON-LD graph and assert:
 
 - valid JSON,
+- exactly one canonical WebSite identity for the domain graph,
+- WebSite @id = canonical root + /#website,
+- Organization @id = canonical root + /#organization,
+- Article/NewsArticle @id stable for canonical URL,
+- WebPage @id stable for canonical URL,
+- Person author @id references public /autorzy/{slug}#person,
 - @type correct per article type,
 - headline,
-- datePublished,
+- datePublished = first_published_at,
 - dateModified policy,
-- author name/url,
-- publisher canonical identity,
-- mainEntityOfPage,
-- image,
+- visible dates match equivalent structured dates,
+- timezone/offset correct for Europe/Warsaw,
+- author name is only author name, not role/brand suffix,
+- publisher references canonical Organization @id,
+- mainEntityOfPage references WebPage @id,
+- image references only real, public assets,
 - articleSection,
 - inLanguage.
+
+Homepage-specific:
+
+- WebSite name/url present on homepage,
+- no competing newsroom-specific WebSite/site-name node,
+- Organization logo URL is public/crawlable and dimensions baseline is satisfied,
+- legacy „Orły na Drodze” absent after N0-001.
 
 Nie snapshotować dynamicznych pól bez stabilizacji czasu/config.
 
@@ -471,13 +484,17 @@ Assert:
 
 ## 24. Sitemap tests
 
-### articles.xml
+### articles sitemap
 
 - published indexable article included,
-- draft excluded,
+- draft/noindex/redirect-source excluded,
 - archived policy honored,
-- canonical URL,
-- meaningful lastmod.
+- absolute HTTPS canonical URL,
+- meaningful lastmod based on substantive public change,
+- deterministic shard assignment,
+- no URL duplicated across shards,
+- shard remains within current URL-count and uncompressed-size limits,
+- crossing a shard boundary does not reshuffle unrelated historical URLs.
 
 ### news.xml
 
@@ -485,10 +502,24 @@ At implementation reverify Google requirements.
 
 Tests based on verified rules:
 
-- only news,
-- only recent window,
-- required news fields,
-- old news excluded from news sitemap but still in articles sitemap.
+- only type=news,
+- only published/indexable,
+- recent window determined by first_published_at,
+- old article with recent substantive update remains excluded if first_published_at is outside window,
+- required news namespace,
+- news:name exactly from canonical publication identity,
+- news:language = pl,
+- news:publication_date = original first_published_at in allowed format,
+- news:title = visible title without author/publication/date additions,
+- split before current news-entry limit,
+- old news excluded from news sitemap but still in articles sitemap if indexable.
+
+### Existing auditor integration
+
+- extend `SeoSitemapAuditor`,
+- duplicate loc checks cover newsroom shards,
+- canonical-host rules cover newsroom,
+- invalid news metadata produces audit failure.
 
 ---
 
@@ -500,17 +531,29 @@ Tests based on verified rules:
 - pub date,
 - latest order,
 - draft excluded,
+- absolute canonical item URLs,
+- HTML head discovery link points to correct feed,
 - cache invalidated after publish.
 
 ---
 
-## 26. Cache tests
+## 26. Cache and crawler HTTP validator tests
+
+Application cache:
 
 - home cache hit possible,
 - publish invalidates,
 - archive invalidates,
 - category affected invalidated,
 - unrelated category not necessarily invalidated if granular design supports.
+
+Sitemap/feed HTTP:
+
+- initial request returns 200 + Content-Type + ETag and/or Last-Modified,
+- matching If-None-Match / If-Modified-Since returns 304 with no stale body requirement,
+- publish/archive/slug change that changes representation rotates validator and returns fresh 200,
+- unchanged corpus keeps stable validator,
+- no validator may cause a changed sitemap/feed to remain incorrectly 304.
 
 Nie testować implementation detail cache key jeśli kontrakt może być testowany przez rezultat.
 
@@ -764,8 +807,10 @@ Nie kopiować sekretów ani DB dump do repo.
 8. public /aktualnosci smoke
 9. sample article smoke
 10. sitemap/feed smoke
-11. logs check
-12. Search Console actions after stable production
+11. sitemap/feed conditional 304 smoke
+12. homepage site-name/Organization graph smoke
+13. logs check
+14. Search Console actions after stable production
 
 ---
 
@@ -865,15 +910,16 @@ Recovery:
 
 Symptom:
 
-/sitemaps/news.xml 500 lub invalid.
+/sitemaps/news.xml lub article shard zwraca 500, invalid XML, duplicate URL albo błędne news metadata.
 
 Actions:
 
-1. remove/disable only broken sitemap endpoint from index if necessary,
+1. remove/disable only broken sitemap endpoint/shard from index if necessary,
 2. public articles remain available,
-3. fix generator,
-4. validate XML,
-5. restore index reference.
+3. fix generator/auditor failure,
+4. validate XML + namespace + limits,
+5. verify HTTP validators are not serving stale content,
+6. restore index reference.
 
 Sitemap failure nie powinien wyłączać publicznego newsroomu.
 
@@ -943,11 +989,17 @@ Jeśli draft stał się publiczny:
 
 - [ ] canonical
 - [ ] robots
-- [ ] JSON-LD
-- [ ] OG image
-- [ ] articles sitemap
-- [ ] news sitemap
-- [ ] feed
+- [ ] JSON-LD graph @id consistency
+- [ ] homepage WebSite/site name + Organization
+- [ ] no legacy Orły na Drodze identity
+- [ ] author Person/ProfilePage reference
+- [ ] visible dates == structured date semantics
+- [ ] OG image + alt + stable public URL
+- [ ] og:site_name
+- [ ] articles sitemap/shard
+- [ ] news sitemap required metadata
+- [ ] feed + head discovery
+- [ ] sitemap/feed 304 validators
 
 ### Admin
 
@@ -980,8 +1032,10 @@ Nie oczekujemy pełnych danych SEO w 24h.
 
 Check:
 
-- Search Console discovery/indexing,
+- Search Console discovery/indexing by newsroom segment,
+- submitted vs indexed per sitemap/shard,
 - crawl errors,
+- declared vs Google-selected canonical sample,
 - impressions/clicks initial,
 - Core Web Vitals field data może jeszcze nie być kompletne,
 - editorial friction,
@@ -1033,6 +1087,8 @@ Runbook jest spełniony, gdy:
 - CI obejmuje newsroom,
 - first release ma backup/smoke/rollback plan,
 - scheduler ma monitoring,
+- entity graph/site identity ma regression coverage,
+- sitemap scaling/news metadata/304 mają regression coverage,
 - content może być cofnięty bez deploy,
 - draft/XSS/canonical incidents mają procedurę,
 - test/release docs są aktualizowane po faktycznej zmianie pipeline.
@@ -1041,13 +1097,15 @@ Runbook jest spełniony, gdy:
 
 ## 58. Stan implementacji
 
-Na 2026-09-15:
+Na 2026-09-16:
 
 - istnieją globalne backend tests,
 - istnieje Playwright smoke dla produktu,
 - istnieją ops backup/restore/health commands,
 - newsroom-specific tests i E2E jeszcze nie istnieją,
-- homepage placement/topic/block editor tests jeszcze nie istnieją.
+- homepage placement/topic/block editor tests jeszcze nie istnieją,
+- newsroom entity graph/news sitemap/sharding/feed-discovery/304 tests jeszcze nie istnieją,
+- istniejący SeoSitemapAuditor nie obsługuje jeszcze newsroom/news namespace.
 
 ---
 
@@ -1057,12 +1115,24 @@ Na 2026-09-15:
 - [ ] podłączyć do CI,
 - [ ] stworzyć newsroom E2E,
 - [ ] dodać block/composition/topic/focal-point tests,
+- [ ] dodać site-identity/entity-graph/date-consistency tests,
+- [ ] dodać news namespace + sitemap sharding + 304/feed-discovery tests,
+- [ ] rozszerzyć istniejący SeoSitemapAuditor,
 - [ ] stworzyć production smoke checklist w praktyce,
 - [ ] po pierwszym release wpisać rzeczywiste wyniki i ewentualne różnice od planu.
 
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-16 — v0.3
+
+- usunięto zduplikowany Expected w security test contract,
+- rozszerzono structured data tests do pełnego stabilnego entity graphu i site-name identity,
+- dodano visible/schema date consistency oraz author ProfilePage reference tests,
+- rozbudowano sitemap tests o full News Sitemap metadata, deterministic sharding i istniejący SeoSitemapAuditor,
+- dodano feed discovery i conditional ETag/Last-Modified/304 tests,
+- rozszerzono production smoke i Search Console review o enterprise SEO checks.
 
 ### 2026-09-15 — v0.2
 
