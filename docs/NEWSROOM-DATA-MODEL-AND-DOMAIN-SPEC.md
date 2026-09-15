@@ -216,6 +216,7 @@ Target:
 - URL-e publiczne rozwiązujemy przez istniejący `MediaUrlResolver` / public media config,
 - newsroom dostaje własny bezpieczny upload adapter/service lub jawnie skonfigurowany Filament upload do newsroom prefix; **nie reużywa question-specific AdminMediaUploadService**,
 - storage path, MIME, bytes i rzeczywiste dimensions są walidowane po stronie backendu przed uznaniem assetu za gotowy,
+- newsroom media path jest unikalny/immutable (np. ULID/hash w nazwie); replacement zapisuje nowy object/path zamiast overwrite pod istniejącym publicznym URL,
 - dozwolone obrazy v1: raster MIME zgodny z security/media config (JPEG/PNG/WebP/AVIF); SVG nie jest domyślnie dopuszczone dla newsroom upload,
 - crop/variant jest deklarowany w schema/SEO tylko jeśli rzeczywisty plik został wygenerowany i jest publicznie osiągalny.
 
@@ -845,7 +846,7 @@ Wymagane rozróżnienie:
 - `activeBreaking()`,
 - `needsFreshnessReview()`.
 
-Zwykłe read modele list/hubów nie mogą używać `publiclyVisible()` zamiast `activelyDistributed()`. `needs_review` pozostaje osiągalne pod canonical URL, ale świadomie znika z aktywnej promocji do czasu ponownego review.
+Zwykłe read modele list/hubów nie mogą używać `publiclyVisible()` zamiast `activelyDistributed()`. `needs_review` pozostaje osiągalne pod canonical URL, ale świadomie znika z aktywnej promocji do czasu ponownego review. Jeśli nadal jest `indexable()`, musi zachować crawlable inbound; fallback v1 to oznaczona sekcja „w trakcie weryfikacji” na publicznym profilu autora.
 
 Artykuł `archived`, który nigdy nie był publiczny (`first_published_at=null`), nie uzyskuje publicznego detail URL tylko dlatego, że ma status archived.
 
