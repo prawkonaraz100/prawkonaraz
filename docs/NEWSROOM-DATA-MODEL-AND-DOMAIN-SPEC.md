@@ -144,7 +144,7 @@ Dozwolone typy v1:
 
 Payload każdego typu ma osobny kontrakt walidacyjny. Arbitrary HTML/JS/CSS nie jest typem bloku.
 
-### 5.2.1. Kontekst regulacyjny / egzaminacyjny
+#### 5.2.1. Kontekst regulacyjny / egzaminacyjny
 
 Dla materiałów, w których ma to zastosowanie:
 
@@ -995,9 +995,11 @@ Publiczny controller nie powinien polegać tylko na implicit binding, jeśli mus
 
 Preferowany publiczny lookup:
 
-ContentArticleCatalogService::findPublishedBySlug($slug)
+`ContentArticleCatalogService::findPubliclyVisibleBySlug($slug, $routeFamily)`
 
-Preview używa oddzielnej ścieżki i policy.
+Listy/home/feed używają osobnych `activelyDistributed()` queries. Controller nie może utożsamić publicznego detail URL z aktywną dystrybucją.
+
+Preview używa oddzielnej ścieżki i admin-only policy.
 
 ---
 
