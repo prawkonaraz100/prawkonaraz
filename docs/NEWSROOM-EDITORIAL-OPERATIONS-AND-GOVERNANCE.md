@@ -587,14 +587,15 @@ Jeśli cytat pochodzi z publicznej publikacji, przestrzegamy praw autorskich i n
 Przed publikacją hero:
 
 - [ ] źródło/licencja znane,
-- [ ] alt opisuje obraz,
+- [ ] alt opisuje obraz jako tekst alternatywny,
+- [ ] caption dodany, jeśli obraz wymaga kontekstu dla czytelnika,
 - [ ] credit zapisany, jeśli wymagany,
 - [ ] focal point ustawiony sensownie dla ważnych zdjęć,
 - [ ] preview lead/standard/compact nie ucina kluczowej informacji,
 - [ ] nie używamy zdjęcia sugerującego wydarzenie, którego obraz faktycznie nie przedstawia,
 - [ ] nie używamy AI image jako „fotografii dokumentalnej” bez jasnego oznaczenia kontekstu.
 
-Focal point opisuje kompozycję obrazu, nie jest narzędziem do manipulowania znaczeniem fotografii.
+Focal point opisuje kompozycję obrazu, nie jest narzędziem do manipulowania znaczeniem fotografii. Caption, alt i credit mają różne role i nie powinny być kopiowane automatycznie między sobą.
 
 ---
 
@@ -796,6 +797,7 @@ Przed publish publisher potwierdza:
 - [ ] OG alt poprawny dla dedykowanego OG assetu, jeśli różni się od hero
 - [ ] publiczne URL-e assetów SEO nie wymagają auth/wygasającego podpisu
 - [ ] SEO title/description lub poprawny fallback
+- [ ] seo_title, jeśli różny od H1, zachowuje ten sam główny sens/claim i nie jest clickbaitem
 - [ ] canonical
 - [ ] preview desktop
 - [ ] preview mobile
@@ -806,6 +808,7 @@ Przed publish publisher potwierdza:
 - [ ] reviewer, jeśli wymagany
 - [ ] publiczny profil autora istnieje i odpowiada wskazanemu authorowi
 - [ ] materiał nie jest thin/scaled duplicate
+- [ ] article-question links korzystają z istniejących encji/graphu pytań bez tworzenia drugiej taksonomii lub rankingu
 - [ ] brak draft links
 - [ ] brak nieautoryzowanych assetów
 
@@ -1098,6 +1101,13 @@ Na 2026-09-16:
 ---
 
 ## 49. Historia zmian
+
+### 2026-09-16 — v0.4
+
+- dodano rozdzielenie hero alt/caption/credit,
+- dodano seo_title vs H1 editorial guard,
+- zapisano stabilność route family po pierwszej publikacji,
+- potwierdzono, że newsroom links do pytań nie tworzą drugiej taksonomii/rankingu.
 
 ### 2026-09-16 — v0.3
 
