@@ -193,6 +193,7 @@ Publisher sprawdza checklistę, ale nie zastępuje autora i reviewera.
 | Publish | I | C | I | R |
 | Correction | R | R | C | A |
 | Archive | C | R | C | A |
+| Withdraw | C | R | C | A |
 
 Legenda:
 
@@ -261,7 +262,18 @@ Dla wcześniej opublikowanego materiału v1:
 - może pozostać indexable albo otrzymać kontrolowane noindex z merytorycznego powodu,
 - archive samo w sobie nie oznacza 301/404/410.
 
-Jeśli materiał ma faktycznie zniknąć albo ma następcę, stosujemy osobny use case remove/gone/redirect zamiast przeciążać workflow `archived`.
+Jeśli materiał ma faktycznie zniknąć albo ma następcę, nie przeciążamy workflow `archived`.
+
+### 7.7. Withdrawn
+
+Używamy tylko dla jawnego takedownu:
+
+- poważny błąd, którego nie można bezpiecznie pozostawić publicznie,
+- wymóg prawny,
+- naruszenie praw/licencji,
+- przypadkowa publikacja materiału, który nie powinien być publiczny.
+
+Wymaga `withdrawal_reason` i audit trail. Publiczny dawny URL zwraca 410, chyba że istnieje rzeczywisty następca z 301. Restore zawsze wraca do review, nie bezpośrednio do published.
 
 ---
 
@@ -861,7 +873,8 @@ Dla ważnego materiału:
 Jeśli opublikowano potencjalnie szkodliwy błąd:
 
 1. publisher może natychmiast zdjąć featured/breaking,
-2. poprawa lub tymczasowe archive,
+2. jeśli pozostawienie URL 200 jest ryzykowne, administrator używa Withdraw from public zamiast zwykłego archive,
+3. poprawa lub tymczasowe archive,
 3. weryfikacja źródła,
 4. correction note,
 5. audit,
@@ -1142,7 +1155,7 @@ Na 2026-09-16:
 - rozdzielono pojęciowe role redakcyjne od auth/RBAC; v1 Filament pozostaje admin-only,
 - ContentAuthor reviewer/author oddzielono od User actora w AuditLog,
 - preview v1 zamknięto do authenticated admin + private,no-store,
-- archive otrzymało deterministyczną historyczną semantykę 200 zamiast decyzji 200/404/410 podczas implementacji,
+- archive otrzymało deterministyczną historyczną semantykę 200, a osobny withdrawn obsługuje jawny takedown 410,
 - checklistę in-review wyrównano do body_blocks.
 
 ### 2026-09-16 — v0.4
