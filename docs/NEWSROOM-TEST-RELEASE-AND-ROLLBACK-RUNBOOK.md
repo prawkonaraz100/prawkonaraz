@@ -680,7 +680,7 @@ Regression test najpierw odtwarza/chroni przed potwierdzonym obecnym problemem: 
 
 - XML valid,
 - content type,
-- RSS GUID / Atom id = dokładnie `urn:prawkonaraz:content-article:{content_articles.id}` i nie zależy od sluga/canonical/timestampów,
+- RSS GUID / Atom id = dokładnie `urn:prawkonaraz:content-article:{id}` (gdzie `{id}` = `content_articles.id`) i nie zależy od sluga/canonical/timestampów,
 - slug change zmienia item link na nowy canonical, ale GUID/id pozostaje identyczny i czytnik nie widzi „nowego” wpisu,
 - pub date = `first_published_at`,
 - updated date = `last_substantive_update_at ?? first_published_at`,
