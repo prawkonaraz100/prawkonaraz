@@ -217,7 +217,7 @@ Publish blokuje:
 
 ---
 
-## 8.1. Transaction / audit / after-commit tests
+### 8.1. Transaction / audit / after-commit tests
 
 - publish state + timestamps + AuditLog commit atomowo,
 - AuditLog actor = authenticated `User`, author/reviewer = `ContentAuthor`,
@@ -378,7 +378,7 @@ Assertions:
 
 ---
 
-## 15.1. Provenance, regulatory context and media tests
+### 15.1. Provenance, regulatory context and media tests
 
 Assertions:
 
@@ -467,7 +467,7 @@ Visual breadcrumb i BreadcrumbList są zgodne; URLs absolute/canonical zgodnie z
 
 ---
 
-## 19.1. Semantic silo / internal-link graph tests
+### 19.1. Semantic silo / internal-link graph tests
 
 Fixtures:
 
