@@ -442,15 +442,18 @@ Mobile:
 
 ---
 
-## 22. Byline i pochodzenie materiału
+## 22. Byline, daty i pochodzenie materiału
 
 Pokazuje:
 
 - avatar opcjonalnie,
 - nazwę autora jako link do /autorzy/{slug},
 - datePublished,
-- „Aktualizacja” tylko gdy last_substantive_update_at ma znaczenie,
+- dla typu news: wyraźny czas publikacji obok daty,
+- „Aktualizacja” + czas tylko gdy last_substantive_update_at ma znaczenie,
 - pochodzenie materiału tylko wtedy, gdy wnosi informację dla czytelnika.
+
+Widoczne daty/czasy muszą odpowiadać semantyce datePublished/dateModified w structured data. `effective_from` i daty wydarzeń są wizualnie oddzielone, aby crawler/czytelnik nie pomylił ich z datą publikacji.
 
 Przykładowe publiczne etykiety:
 
@@ -1207,6 +1210,8 @@ Frontend newsroom v1 jest UI-complete, gdy:
 - long title nie rozwala layoutu,
 - breadcrumbs poprawne,
 - source block czytelny,
+- news ma widoczną datę i czas publikacji przy byline,
+- author link prowadzi do publicznego ProfilePage,
 - related/product modules działają,
 - homepage placements respektują fallback i deduplikację,
 - body blocks renderują się spójnie desktop/mobile,
@@ -1253,6 +1258,12 @@ Na moment utworzenia:
 ---
 
 ## 69. Historia zmian
+
+### 2026-09-16 — v0.3
+
+- doprecyzowano widoczne daty/czas dla newsów i ich zgodność z structured data,
+- rozdzielono datę publikacji od effective/event dates,
+- dodano publiczny author ProfilePage jako część UI DoD.
 
 ### 2026-09-15 — v0.2
 
