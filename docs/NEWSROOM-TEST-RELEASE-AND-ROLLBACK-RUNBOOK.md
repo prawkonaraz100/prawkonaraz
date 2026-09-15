@@ -174,7 +174,7 @@ PR C/N1 musi dodać addytywny job `newsroom-postgres` z usługą PostgreSQL (lub
 ### Topic
 
 - draft/published/archived scopes,
-- publish requires own description + min. 3 public/indexable linked articles,
+- publish requires own description + min. 3 actively-distributed/indexable linked articles,
 - featured article if set belongs to topic and is public,
 - slug immutable after first publication.
 
@@ -446,7 +446,9 @@ Visual breadcrumb i BreadcrumbList są zgodne; URLs absolute/canonical zgodnie z
 
 ## 18. Source rendering tests
 
-- published source visible,
+- `is_publicly_cited=true` source visible,
+- public citation with null URL renders as text without broken anchor,
+- `is_publicly_cited=false` source title/publisher/url/note never leaks,
 - URL escaped,
 - title escaped,
 - external link safe,
@@ -525,7 +527,7 @@ Assert:
 ## 21. Category tests
 
 - only actively distributed category articles,
-- published/needs_review included according to policy, archived excluded from active listing,
+- only activelyDistributed (`published`) included; needs_review/archived keep detail URL but are excluded from active listing,
 - descending published order,
 - pagination,
 - page 2 self-canonical,
@@ -544,7 +546,7 @@ Assert:
 - only public linked articles rendered,
 - tag creation does not create topic URL,
 - pagination/canonical correct,
-- publish blocked below 3 public/indexable linked articles,
+- publish blocked below 3 actively-distributed/indexable linked articles,
 - featured article, if set, belongs to topic and is public,
 - published topic slug change blocked,
 - corpus falling below baseline forces draft/archive before public render.
