@@ -1,5 +1,18 @@
 # PrawkoNaRaz OSK V2.12 — start i przekazanie pracy
 
+> **Biezaca weryfikacja repozytorium — 2026-09-15:** ten katalog jest
+> odzyskanym snapshotem dokumentacji starego projektu. Statusy implementacyjne
+> ponizej opisujа historycznie zweryfikowany local worktree z 2026-08-26..30,
+> a nie potwierdzony stan aktualnego
+> `prawkonaraz100/prawkonaraz@main`. Biezacy `main` nie zawiera runtime'u
+> `/osk/nauka`, `LessonPlayer.vue`, `TheoryLearningController` ani
+> `PublishedCourseProgramPayloadBuilder` opisanych w etapach 4B/5D/5E/5G.
+> Nie usuwamy tej historii ani nie zmieniamy decyzji architektonicznych, ale
+> przed dalsza implementacja trzeba wskazac rzeczywisty working tree uruchamiany
+> lokalnie. Szczegolowa rozbieznosc dla przeplywu ostatniego kroku jest zapisana
+> w [Etapie 5G](./OSK_V2_12_STAGE_5G_CONTINUOUS_LESSON_FLOW.md#7-biezaca-weryfikacja-po-odzyskaniu-repozytorium--2026-09-15).
+
+
 **Status:** Etapy 1–3, Etap 4A, techniczna warstwa Etapu 4B, Etapy 5A–5P oraz przygotowanie danych Etapu 6A — organizacje, enrollment, kredyty, wersjonowane wymagania, program, odizolowany player, źródłowe sesje czasu, walidacja przedziałów, warstwa HTTP, integracja sesji z playerem, izolowany kursor postępu, kontrolowany rollout, płynne przejście między lekcjami, profesjonalny edytor, źródłowy kurs kategorii B, publikacja V1, kontrola gotowości enrollmentu, dwa kanały zapisu kursanta, brama aktywacji pilota, katalog B, onboarding B2B, operacyjna lista zapisów, konto gotowe przy biurku OSK, fail-closed preflight e-maila z hasłem oraz immutable dane robocze PAPER — wdrożone i zweryfikowane lokalnie. Jeden kontrolowany pilot lokalny źródłowej wersji B przeszedł pełny smoke HTTP oraz ręczny smoke B2B.
 **Ostatnia weryfikacja:** 2026-08-30. Etap 5P: końcowa regresja OSK, paneli administratora, logowania i dashboardu `147` testów / `1278` asercji. Po niej ponowiony mały pilot DEMO potwierdził pięć bram dostępu, logowanie kursanta, player, blokadę operatora bez enrollmentu oraz niezależność `/nauka`; regresja pilota: `61` testów / `674` asercje. Przeszły również build Vite, cache konfiguracji i widoków Blade oraz kontrola diffu. Docker i wszystkie migracje OSK są gotowe lokalnie.
 **Stan smoke B2B:** pełny przebieg lokalny jest zakończony na oddzielnych danych: onboarding szkoły, pięć miejsc startowych, utworzenie dwóch zapisów, ponowne wydanie linku i odwołanie starego, anulowanie drugiego zapisu ze zwrotem miejsca, aktywacja pierwszego kursanta, allow-lista pilota oraz pozytywny i negatywny test dostępu.
