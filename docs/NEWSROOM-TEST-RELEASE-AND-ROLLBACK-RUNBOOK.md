@@ -193,10 +193,10 @@ Dla każdego przejścia:
 | in_review | schedule | scheduled | PASS if publish checklist complete |
 | in_review | publish | published | PASS if checklist complete |
 | scheduled | publish due | published | PASS when due |
-| published | needs review | needs_review | PASS |
+| published | needs review | needs_review | PASS; clears breaking flag/expiry |
 | needs_review | republish/update | published | PASS after review |
-| published | archive | archived | PASS |
-| published/needs_review/archived | withdraw | withdrawn | PASS with reason |
+| published | archive | archived | PASS; clears breaking flag/expiry |
+| published/needs_review/archived | withdraw | withdrawn | PASS with reason; breaking cleared |
 | archived | direct publish | published | REJECT in v1; return to review flow first |
 | withdrawn | direct publish | published | REJECT; restore to review first |
 | withdrawn | restore to review | in_review | PASS; withdrawal tombstone remains active and public URL stays 410 |
@@ -251,7 +251,8 @@ Publish blokuje:
 
 ### Due publish
 
-- scheduled_for <= now -> published.
+- scheduled_for <= now + current checklist/invariants still valid -> published.
+- category became inactive / author unpublished / required source or reviewer invalidated after scheduling -> not published; logged/audited failure.
 
 ### Future
 
@@ -578,6 +579,7 @@ Assert:
 
 ### 23.1. Author profile integration tests
 
+- shared author ProfilePage schema builder preserves existing traffic-sign/legal behavior and adds stable Person @id/worksFor,
 - author profile pokazuje activelyDistributed newsroom articles,
 - archived+indexable pozostaje dostępne jako oznaczona publikacja archiwalna i daje crawlable inbound do artykułu,
 - archived+noindex może być pominięte,
@@ -585,6 +587,7 @@ Assert:
 - article graph author @id == ProfilePage Person @id,
 - publish/archive/needs-review/withdraw/restore zmienia author profile output i właściwy author sitemap lastmod,
 - techniczny article updated_at bez public output change nie zmienia author sitemap lastmod,
+- author with only newsroom public/indexable content is included in authors.xml,
 - NEWSROOM_PUBLIC_ENABLED=false usuwa newsroom publications z author page i author sitemap freshness contribution,
 - ContentAuthor unpublish is rejected while dependent indexable/publiclyVisible newsroom articles exist.
 
@@ -675,7 +678,7 @@ Sitemap refresh coordinator:
 - rollbacked DB transaction nie ustawia public sitemap change,
 - scheduler przy braku dirty marker kończy się tanio,
 - burst kilku publikacji coalescuje się do ograniczonej liczby pełnych refreshy,
-- distributed lock/withoutOverlapping blokuje równoległy pełny refresh,
+- shared Redis/distributed lock blokuje równoległy pełny refresh; multi-node scheduler ma `onOneServer()` lub równoważny single-run guard,
 - zmiana version podczas generacji pozostawia wymagany kolejny pass,
 - publish request nie wywołuje pełnego `SeoSitemapGenerator::generate`,
 - test działa przy `QUEUE_CONNECTION=sync`; nie wymaga worker process,
