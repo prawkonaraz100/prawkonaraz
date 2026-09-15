@@ -550,7 +550,7 @@ Można pokazać pole status jako read-only badge i osobne actions.
 
 ---
 
-## 23.1. Published-content edit safety without revisions
+### 23.1. Published-content edit safety without revisions
 
 V1 nie ma revision/staging copy. Dlatego normalny Filament Edit nie może sugerować, że można zmienić opublikowany body i „zapisać draft”, gdy publiczna strona czyta ten sam rekord.
 
@@ -673,7 +673,7 @@ V1:
 
 ---
 
-## 28.1. Correction action
+### 28.1. Correction action
 
 `correction_note` nie jest zwykłym polem roboczym obok `editorial_note`.
 
