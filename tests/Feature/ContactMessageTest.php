@@ -5,6 +5,10 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Mail;
 
+beforeEach(function (): void {
+    $this->withServerVariables(['REMOTE_ADDR' => '198.51.100.77']);
+});
+
 test('homepage rotates the contact advisor with the Warsaw weekday', function () {
     Carbon::setTestNow(Carbon::parse('2026-09-07 12:00:00', 'Europe/Warsaw'));
 
