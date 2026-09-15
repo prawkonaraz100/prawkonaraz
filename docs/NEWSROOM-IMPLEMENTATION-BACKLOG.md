@@ -32,23 +32,24 @@ Nie łączymy kilku dużych etapów w jeden PR.
 
 ---
 
-## 3. Gate hierarchy
+## 3. Gate hierarchy i hard dependencies
 
-~~~text
-N0 FOUNDATION
-  ↓
-N1 DOMAIN + DB
-  ↓
-N2 CMS + PUBLISHING
-  ↓
-N3 PUBLIC ARTICLE
-  ↓
-N4 NEWSROOM HUB + CATEGORIES + TOPICS + GUIDES
-  ↓
-N5 SEO + FEEDS + ANALYTICS
-  ↓
-N6 PRODUCTION HARDENING + CONTENT ROLLOUT
-~~~
+N0–N6 pozostają etapami organizacyjnymi, ale nie stosujemy fałszywego „wszystko N0 blokuje wszystko N1”. Obowiązują konkretne hard gates:
+
+| Gate | Musi być zamknięte przed | Dowód zamknięcia |
+| --- | --- | --- |
+| G0-A Routing/taxonomy: N0-002 + N0-003 | N1 slug/category invariants, N3 public routes | route tests + seed contract |
+| G0-B Body format: N0-004 | N1 publish validation, N2 editor, N3 renderer | schema blocków + sanitizer + format-version strategy |
+| G0-C Brand identity: N0-001 | N3 structured data i N5 SEO launch | regression tests Organization/WebSite/site name |
+| G0-D Existing SEO compatibility: N0-005 | N5 sitemap/robots changes | docs contract + baseline regression tests |
+| G1 Domain/DB | N2 workflow/CMS writes | migrations/models/services green na PostgreSQL |
+| G2 Admin/workflow | użycie redakcyjne N2 i public rollout | admin-only policy, AuditLog actor, stale-write, private preview |
+| G3 Public article | N4 reverse links i final N5 article SEO | public HTTP/schema/canonical tests |
+| G4 IA/hubs | final internal-link/sitemap audit | category/topic/guide/hub tests |
+| G5 SEO distribution | włączenie indeksowalnego newsroomu | static sitemap/feed/robots/IndexNow regression |
+| G6 Release | `NEWSROOM_PUBLIC_ENABLED=true` | backup + E2E + production SEO/scheduler/static-delivery smoke |
+
+Prace niezależne mogą iść po zamknięciu własnych prerequisites, ale **publiczny rollout jest liniowo blokowany przez G1→G6**.
 
 ---
 
@@ -190,18 +191,25 @@ Domknąć techniczny sposób edycji kanonicznego `body_blocks`.
 - link handling,
 - image/embed handling,
 - unknown block behavior,
+- dokument/block schema version strategy,
+- zasada ewolucji payloadów: renderer backward-compatible lub jawna migracja danych,
+- renderer dla nowego block type musi zostać wdrożony przed umożliwieniem jego tworzenia w CMS,
+- rollback code nie może zostać wykonany do wersji, która nie potrafi bezpiecznie odczytać już zapisanych blocków bez osobnego data planu,
 - XSS tests.
 
 ### DoD
 
 - brak „ustalimy podczas formularza”,
 - nie powstaje równoległe edytowalne `body_html`,
-- wszystkie v1 block types mają kontrakt.
+- wszystkie v1 block types mają kontrakt,
+- istnieje jawna strategia compatibility/migration przy zmianie formatu bez wprowadzania revision history.
 
 ---
 
 
 ## NEWSROOM-N0-005 — Existing SEO delivery compatibility contract
+
+**Decision status:** zamknięty dokumentacyjnie; nie oznacza to wdrożenia N5.
 
 ### Cel
 
@@ -248,16 +256,20 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 - brak `featured_position` w content_articles; pozycja wyłącznie w content_home_placements
 - tables zgodne z data spec.
 
-### Testy
+### Testy / CI
 
 - migrate fresh PostgreSQL,
 - rollback,
 - constraints,
-- indexes.
+- indexes,
+- zachować istniejący szybki CI na SQLite,
+- w tym PR albo przed jego merge dodać addytywny job `newsroom-postgres` (PostgreSQL service) obejmujący newsroom migration/domain tests.
 
 ### DoD
 
 - schema rzeczywiście odpowiada docs,
+- istniejący ogólny CI nadal przechodzi,
+- PostgreSQL gate ma automatyczny job albo równoważny, zapisany dowód uruchomienia; samo „full CI green” na SQLite nie spełnia gate,
 - DATABASE-SCHEMA.md zaktualizowane tylko po merge.
 
 ---
@@ -278,7 +290,10 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 
 ### Testy
 
-- published scope,
+- publiclyVisible vs activelyDistributed vs indexable scopes,
+- archived historical URL vs active listings,
+- category active/publication invariant,
+- topic corpus/publication invariant,
 - category scope,
 - active breaking,
 - source relations,
@@ -319,14 +334,20 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 - publish,
 - schedule,
 - archive,
-- needs review.
+- needs review,
+- transaction boundary dla state/timestamps/AuditLog,
+- User actor w AuditLog oddzielony od ContentAuthor author/reviewer,
+- public side effects wyłącznie after commit.
 
 ### Testy
 
 - invalid transition,
 - missing requirements,
 - first_published_at stable,
-- date semantics.
+- date semantics,
+- rollback nie emituje cache/sitemap/IndexNow side effect,
+- audit actor/metadata bez pełnej treści,
+- archived previously-published article zachowuje public 200, ale znika z active distribution.
 
 ---
 
@@ -360,6 +381,7 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 ### Testy
 
 - manual placement wins,
+- równoległe overlapping placement writes są serializowane i tylko jeden może wygrać,
 - expired/future placement ignored at current time,
 - future preview resolves scheduled article only after its publish time,
 - duplicate article excluded from later card modules,
@@ -367,6 +389,7 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 
 ### DoD
 
+- overlap validation wykonuje się wewnątrz transakcyjnego row/advisory locka,
 - public controller nie implementuje composition logic ręcznie,
 - breaking strip może wskazać lead jako jedyny jawny wyjątek dedupe.
 
@@ -385,7 +408,9 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 
 ### DoD
 
-- nie można skasować kategorii używanej przez artykuły.
+- nie można skasować kategorii używanej przez artykuły,
+- slug kategorii jest immutable w v1,
+- active=false blokowane, jeśli istnieją publiczne/aktywnie dystrybuowane artykuły.
 
 ---
 
@@ -401,7 +426,9 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 
 ### DoD
 
-- draft can be created,
+- draft can be created przez istniejącego administratora,
+- moderator/student/non-admin nie uzyskuje dostępu do panelu newsroom,
+- User actor i ContentAuthor identity nie są utożsamiane,
 - list filters/search work,
 - eager loading no N+1.
 
@@ -474,7 +501,8 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 ### DoD
 
 - actions call services,
-- UI does not duplicate transition logic.
+- UI does not duplicate transition logic,
+- każda istotna akcja zapisuje istniejący AuditLog z User actorem i bez pełnego body/private notes payload.
 
 ---
 
@@ -495,16 +523,19 @@ Computed blocking/warning items.
 
 ### Zakres
 
-- signed/authenticated route,
-- noindex,
+- authenticated administrator-only route,
+- `Cache-Control: private, no-store`,
+- noindex,nofollow,
 - public-like renderer,
 - preview banner.
 
 ### Security tests
 
-- anonymous without valid token denied,
-- expired token denied,
-- no sitemap/feed exposure.
+- anonymous denied,
+- moderator/student/non-admin denied,
+- admin allowed,
+- brak shareable signed tokenów w v1,
+- no sitemap/feed/public analytics exposure.
 
 ---
 
@@ -522,7 +553,9 @@ Computed blocking/warning items.
 ### DoD
 
 - redaktor nie tworzy nowych layout modules,
-- preview korzysta z tego samego composition service co publiczny hub,
+- stale-write jest odrzucany,
+- overlap zapis chroniony row/advisory lockiem,
+- preview jest admin-only/private/no-store i korzysta z tego samego composition service co publiczny hub,
 - future preview uwzględnia scheduled publishing.
 
 ---
@@ -560,7 +593,27 @@ Computed blocking/warning items.
 
 - topic nie powstaje automatycznie z taga,
 - draft topic nie jest publiczny,
-- publish waliduje minimalny corpus/description.
+- publish wymaga własnego opisu + min. 3 publicznych/indexable linked articles,
+- featured article, jeśli ustawiony, jest publiczny i należy do topicu,
+- slug po pierwszej publikacji jest immutable.
+
+---
+
+## NEWSROOM-N2-012 — Admin stale-write + audit identity hardening
+
+### Zakres
+
+- ContentArticle edit zapisuje/porównuje loaded `updated_at` lub równoważny token,
+- konflikt = reject + czytelny komunikat, bez last-write-wins,
+- NewsroomHomeComposer ma analogiczny stale-write guard,
+- `User` actor trafia do AuditLog; `ContentAuthor` pozostaje author/reviewer identity,
+- audit metadata allowlistuje stan/IDs i nie przechowuje body_blocks/lead/private notes.
+
+### DoD
+
+- ciche nadpisanie rekordu jest niemożliwe w testowanym flow,
+- brak nowych pól published_by/reviewed_by,
+- istniejący AuditLog resource pozostaje źródłem historii operacyjnej.
 
 ---
 
@@ -570,13 +623,17 @@ Computed blocking/warning items.
 
 ### Zakres
 
-- findPublishedBySlug,
+- findPubliclyVisibleBySlug z route-family guard,
+- osobny activelyDistributed query dla hubów/list,
 - related data,
 - eager load policy.
 
 ### DoD
 
-- draft/scheduled hidden.
+- draft/scheduled/never-published archived hidden,
+- previously-published archived detail URL = 200,
+- archived excluded z active listings/feed/news sitemap,
+- needs_review pozostaje publiczne zgodnie z policy.
 
 ---
 
@@ -703,6 +760,27 @@ Re-use istniejącego `ContentAuthorController` i ProfilePage.
 - author page -> article działa,
 - ProfilePage i Article mają identyczną identity autora,
 - nieopublikowane articles nie wpływają na publiczny profil/sitemap.
+
+---
+
+## NEWSROOM-N3-008 — Public rollout config gate
+
+### Cel
+
+Wdrożyć publiczną warstwę bez natychmiastowego przełączania istniejących placeholderów/indeksacji.
+
+### Zakres
+
+- prosty config/env `NEWSROOM_PUBLIC_ENABLED`,
+- default bezpieczny dla wdrożenia przed rolloutem,
+- gdy wyłączony: admin/dane mogą działać, nowe public article/category/topic routes nie stają się indeksowalne, a istniejące top-level placeholder behavior nie jest przypadkowo usuwane,
+- włączenie dopiero w N6 release sequence.
+
+### DoD
+
+- public switch nie wymaga rollbacku migracji,
+- test enabled/disabled,
+- config cache/deploy semantics udokumentowane.
 
 ---
 
@@ -923,7 +1001,8 @@ Re-use existing IndexNow pipeline if appropriate.
 
 ### DoD
 
-- publish/update can submit asynchronously,
+- publish/update/archive/slug-change integruje się z istniejącym IndexNow queue/submission pipeline po commit,
+- nie zakładamy Laravel queue workera,
 - failure does not block article publication.
 
 ---
@@ -963,8 +1042,12 @@ Nie zmieniamy produkcyjnego modelu na runtime generation.
 4. atomowo podmieniać child files,
 5. podmieniać główny `sitemap.xml` dopiero na końcu,
 6. stare, nieużywane shardy usuwać po przełączeniu indexu,
-7. po publicznym publish/archive/slug/substantive update dispatchować async debounced refresh po commit,
-8. istniejący daily `seo:refresh-sitemaps` zachować jako safety net.
+7. po commit ustawić tani dirty/version signal zamiast uruchamiać pełny generator w request,
+8. dodać częstą scheduler command, która przy dirty signal bierze distributed lock i uruchamia refresh,
+9. czyścić marker tylko gdy version nie zmieniła się podczas generacji,
+10. istniejący daily `seo:refresh-sitemaps` zachować jako niezależny safety net.
+
+Nie implementować tego jako zwykłego `ShouldQueue`, dopóki produkcja ma `QUEUE_CONNECTION=sync` i brak monitorowanego workera.
 
 ### Robots compatibility
 
@@ -991,7 +1074,8 @@ Feed może mieć validators aplikacyjne osobno.
 - nie istnieje okno, w którym nowy index wskazuje brakujący child,
 - publiczny publish nie czeka synchronicznie na pełną generację sitemap,
 - fresh news trafia do statycznego news XML w docelowym SLA kilku minut,
-- awaria async refresh jest monitorowana, a daily cron zachowuje recovery path,
+- publish request nie uruchamia pełnego generatora,
+- awaria coordinator/scheduled refresh pozostawia dirty state i jest monitorowana, a daily cron zachowuje recovery path,
 - istniejące question/sign/legal/author sitemap pozostają bez regresji.
 
 ---
@@ -1015,7 +1099,7 @@ hub -> article -> related question -> product.
 - create scheduled sample,
 - verify not visible before,
 - verify visible after scheduler,
-- verify async sitemap/feed refresh,
+- verify dirty/version coordinator + scheduled sitemap/feed refresh,
 - verify news sitemap artifact becomes fresh without waiting for next daily cron.
 
 ---
@@ -1060,13 +1144,16 @@ Check:
 
 ---
 
-## NEWSROOM-N6-005 — Security pass
+## NEWSROOM-N6-005 — Security and rollout-gate pass
 
 - XSS,
-- preview auth,
-- admin policy,
+- preview admin-only/private-no-store,
+- admin policy / no access widening,
+- stale-write/concurrency,
+- AuditLog data minimization,
 - upload validation,
-- source URL no server-side fetch.
+- source URL no server-side fetch,
+- verify `NEWSROOM_PUBLIC_ENABLED=false` before cutover and controlled enable during release.
 
 ---
 
@@ -1143,10 +1230,10 @@ Rekomendacja:
 N0 branding
 
 ### PR B
-N0 routes/taxonomy/editor decision docs + small code if needed
+N0 routes/taxonomy/editor format-evolution decision + SEO compatibility docs
 
 ### PR C
-N1 migrations/enums
+N1 migrations/enums + additive newsroom-postgres CI job
 
 ### PR D
 N1 models/factories
@@ -1161,10 +1248,10 @@ N2 categories + topics CMS
 N2 article CMS + controlled block editor
 
 ### PR H
-N2 sources/relations/workflow/provenance/media + article/home preview
+N2 sources/relations/workflow/provenance/media + admin-only preview + stale-write/audit hardening
 
 ### PR I
-N3 article public + author profile integration
+N3 article public + author profile integration + public rollout config gate
 
 ### PR J
 N4 newsroom hub
@@ -1173,7 +1260,7 @@ N4 newsroom hub
 N4 categories/topics/guides/nav/cache + semantic silo/reverse links
 
 ### PR L
-N5 article/news sitemap + sharding + feed/discovery + HTTP validators
+N5 article/news sitemap + sharding + feed/discovery + dirty/version refresh coordinator + static delivery
 
 ### PR M
 N5 analytics/IndexNow/existing-auditor extension
@@ -1200,7 +1287,10 @@ Frontend/public:
 
 DB:
 
-- PostgreSQL, nie tylko sqlite.
+- istniejący CI pozostaje szybki na SQLite,
+- newsroom migration/domain DB gate musi przejść na PostgreSQL,
+- od PR C/N1 wymagany jest additive `newsroom-postgres` job albo równoważny jawny dowód do czasu jego dodania,
+- „full CI green” na obecnym SQLite nie zastępuje PostgreSQL gate.
 
 Docs-only:
 
@@ -1232,6 +1322,9 @@ Docs-only:
 - [ ] home composer + future preview
 - [ ] checklist
 - [ ] workflow
+- [ ] admin-only authorization bez rozszerzenia panel access
+- [ ] stale-write rejection
+- [ ] AuditLog User actor / ContentAuthor identity separation
 
 ### Public
 
@@ -1251,7 +1344,7 @@ Docs-only:
 - [ ] visible/schema dates consistency
 - [ ] self-canonical + route-family exclusivity
 - [ ] article sitemap przez istniejący static generator + deterministic sharding readiness
-- [ ] news sitemap full required metadata + async/debounced refresh
+- [ ] news sitemap full required metadata + dirty/version scheduled refresh bez queue-worker assumption
 - [ ] child-before-index atomic static publication
 - [ ] istniejący SeoSitemapAuditor rozszerzony bez drugiego auditora
 - [ ] rzeczywisty static/Nginx/CDN delivery smoke (Content-Type/cache/Set-Cookie/validators)
@@ -1260,6 +1353,7 @@ Docs-only:
 
 ### Operations
 
+- [ ] NEWSROOM_PUBLIC_ENABLED controlled rollout/rollback gate
 - [ ] publisher transparency/contact/editorial principles gate
 - [ ] scheduler monitored
 - [ ] audit
@@ -1328,7 +1422,7 @@ Mitigation: N6 scheduled smoke + monitoring.
 
 ## R6 — news sitemap jest nieświeża po publikacji
 
-Mitigation: async/debounced refresh po commit + monitoring + istniejący daily seo:refresh-sitemaps jako safety net.
+Mitigation: after-commit dirty/version signal + frequent scheduled coordinator/lock + monitoring + istniejący daily seo:refresh-sitemaps jako safety net. Nie opierać v1 na QUEUE_CONNECTION=sync.
 
 ## R7 — duże obrazy degradują LCP
 
@@ -1378,6 +1472,26 @@ Mitigation: newsroom nie usuwa istniejących controller routes; source-of-truth 
 
 Mitigation: content_article_question jest osobnym edge; brak write path do question_relations/question_seo_topics w newsroom taskach.
 
+## R19 — admin workflow rozszerza dostęp do Filament albo miesza User z ContentAuthor
+
+Mitigation: v1 admin-only; User=actor, ContentAuthor=author/reviewer; policy + audit tests.
+
+## R20 — równoległe edycje nadpisują treść/placement
+
+Mitigation: stale-write reject na article/home composer + row/advisory lock dla overlap invariant.
+
+## R21 — SQLite CI maskuje błąd PostgreSQL migration/lock
+
+Mitigation: additive newsroom-postgres CI job od PR C.
+
+## R22 — block schema evolution łamie rollback/odczyt starych artykułów
+
+Mitigation: versioned/compatible block contract; renderer-first; data migration plan przed breaking format change.
+
+## R23 — publiczny moduł zostaje włączony przed SEO/smoke gate
+
+Mitigation: NEWSROOM_PUBLIC_ENABLED i jawny N6 cutover.
+
 ---
 
 # 9. Aktualizacja dokumentacji podczas wdrożenia
@@ -1407,7 +1521,10 @@ Na 2026-09-16:
 - istnieją config/content.php organization, SchemaIds/SchemaRenderer, statyczny SeoSitemapGenerator + builder/auditor, daily seo:refresh-sitemaps oraz IndexNow pipeline,
 - istnieją public/robots.txt i RobotsController; newsroom nie zmienia tej warstwy bez osobnego production-delivery audit,
 - HomePageController nadal ma legacy „Orły na Drodze”,
-- newsroom-triggered async refresh, atomic child-before-index publication i newsroom/news sitemap output jeszcze nie istnieją.
+- newsroom dirty/version refresh coordinator, atomic child-before-index publication i newsroom/news sitemap output jeszcze nie istnieją,
+- canonical CI nadal używa SQLite; dedykowany PostgreSQL job dla newsroomu jeszcze nie istnieje,
+- QUEUE_CONNECTION w env example jest sync; stały queue worker nie jest gwarantowany,
+- panel Filament jest obecnie admin-only i ten kontrakt pozostaje wymaganiem v1.
 
 ---
 
@@ -1415,13 +1532,21 @@ Na 2026-09-16:
 
 NEWSROOM-N0-001 — Publisher branding source of truth.
 
-Dopiero po jego zamknięciu:
-
-NEWSROOM-N0-002 / N0-003 / N0-004 / N0-005.
+N0-002/N0-003/N0-004 można następnie zamykać według macierzy hard dependencies. N0-005 jest już decyzją dokumentacyjną; jego kodowy regression gate wykonuje się w N5.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.5
+
+- zastąpiono liniowy „wszystko N0 blokuje N1” jawną macierzą hard dependencies G0–G6,
+- dodano obowiązkowy PostgreSQL CI gate bez usuwania szybkiego SQLite CI,
+- dodano admin-only auth, User-vs-ContentAuthor audit identity, stale-write i placement concurrency gates,
+- preview v1 zamknięto do authenticated admin + private,no-store,
+- dodano block schema evolution/rollback compatibility,
+- usunięto założenie o queue workerze; N5 używa dirty/version signal + scheduled lock/coalescing,
+- dodano deterministyczny archive/public visibility plan i public rollout config flag.
 
 ### 2026-09-16 — v0.4
 
