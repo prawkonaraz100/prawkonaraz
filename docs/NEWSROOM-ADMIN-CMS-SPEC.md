@@ -681,7 +681,8 @@ Panel pokazuje stałe sekcje/sloty zdefiniowane przez kod:
 - lead,
 - secondary 1..N,
 - category leads,
-- guides lead.
+- guides lead,
+- important_now 1..N.
 
 Każdy slot pokazuje:
 
@@ -698,6 +699,7 @@ Redaktor może:
 - przypisać go do slotu,
 - ustawić `starts_at`,
 - ustawić `ends_at`,
+- ustawić pozycję dla slotów wieloelementowych,
 - usunąć ręczne przypisanie i wrócić do fallbacku.
 
 Nie może:
@@ -742,6 +744,10 @@ Pola:
 - articles/relation ordering
 - SEO title/description
 - published_at
+
+Publiczny route topicu:
+
+`/aktualnosci/temat/{topicSlug}`
 
 Publicacja topicu powinna ostrzegać/blokować, jeśli:
 
