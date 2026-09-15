@@ -116,6 +116,7 @@ Pola:
 - slug: varchar(255), unique
 - lead: text, wymagane przy publikacji
 - body_blocks: jsonb, wymagane przy publikacji
+- body_schema_version: smallint default 1
 - key_points: jsonb nullable
 - correction_note: text nullable
 - editorial_note: text nullable, tylko backoffice
@@ -177,6 +178,15 @@ Te pola nie zastępują body ani źródeł. Służą do kontroli redakcyjnej i r
 - withdrawn_at: timestamptz nullable
 - withdrawal_reason: text nullable, tylko backoffice
 
+Semantyka aktywnych timestampów:
+
+- `scheduled_for` jest aktywne tylko w statusie `scheduled`; po successful publish jest czyszczone,
+- `needs_review_at` ustawiamy przy wejściu w `needs_review`; po successful republish wraca do null, historia pozostaje w AuditLog,
+- `archived_at` ustawiamy przy archive; po dedykowanym Republish wraca do null,
+- `withdrawn_at` + `withdrawal_reason` pozostają aktywnym tombstonem aż do successful publish po restore-to-review,
+- `reviewed_at` oznacza ostatnie zatwierdzenie review i może pozostać jako historyczny timestamp,
+- `first_published_at` nigdy nie jest czyszczone po pierwszej publikacji.
+
 Zalecenie: w PostgreSQL używać timestamp with time zone dla zdarzeń publikacyjnych. Warstwa aplikacyjna prezentuje daty publiczne w Europe/Warsaw.
 
 ### 5.4. Ekspozycja redakcyjna
@@ -201,8 +211,8 @@ Nie kodujemy layoutu strony głównej ani konkretnej pozycji w rekordzie artyku�
 - og_image_alt: varchar(500) nullable
 - og_image_width: unsigned integer nullable
 - og_image_height: unsigned integer nullable
-- image_credit: varchar(500) nullable
-- image_license_note: text nullable
+- image_credit: varchar(500) nullable, publiczny credit jeśli potrzebny
+- image_license_note: text nullable, tylko backoffice
 
 Stan kodu podczas audytu:
 
@@ -320,6 +330,16 @@ Status scheduled wymaga:
 - v1 pozwala schedule dla never-published article; scheduled republish istniejącego publicznego 200 nie jest wspierany bez staging/revision systemu,
 - wyjątek: withdrawn article może zostać przygotowany w review, ale publiczny tombstone pozostaje 410 aż do jawnego publish; v1 nie potrzebuje scheduled restore.
 
+Status `needs_review` wymaga:
+
+- first_published_at != null,
+- needs_review_at != null.
+
+Status `archived` wymaga:
+
+- first_published_at != null,
+- archived_at != null.
+
 Status withdrawn wymaga:
 
 - first_published_at != null,
@@ -327,6 +347,8 @@ Status withdrawn wymaga:
 - niepustego withdrawal_reason.
 
 Restore-to-review zmienia workflow_status na in_review, ale pozostawia withdrawn_at/withdrawal_reason jako aktywny tombstone do czasu udanego ponownego Publish. Publish po review zapisuje historię w AuditLog, a następnie czyści bieżące withdrawn_at/withdrawal_reason w tej samej transakcji.
+
+Archiwalny artykuł nie przechodzi przez `in_review`, jeśli miałoby to zamienić historyczny 200 w chwilowe 404. V1 ma dedykowany `Republish` z `archived -> published`, który wymaga aktualnego review/checklisty i czyści `archived_at` w tej samej transakcji.
 
 ### 6.5. Invariants breaking
 
