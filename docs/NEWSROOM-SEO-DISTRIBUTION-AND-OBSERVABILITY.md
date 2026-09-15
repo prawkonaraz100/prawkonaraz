@@ -291,6 +291,14 @@ V1 ma jedną deterministyczną semantykę:
 
 Artykuł, który nigdy nie był publiczny, nie staje się publicznym URL tylko przez ustawienie archived.
 
+### Withdrawn
+
+- rekord pozostaje w backoffice,
+- dawny canonical path zwraca 410 Gone, jeśli nie istnieje rzeczywisty następca,
+- URL znika ze wszystkich sitemap/feed/internal distribution,
+- nie emitujemy Article/NewsArticle schema z wycofaną treścią na stronie 410,
+- 301 jest używany zamiast 410 tylko przy realnym następcy.
+
 ---
 
 ## 10. Page title
@@ -672,7 +680,7 @@ Implementation contract:
 - główny `/sitemap.xml` wskazuje wynikowe shard files bezpośrednio; nie tworzymy zagnieżdżonego newsroom sitemap-index,
 - nie używać offset-based shardów powodujących masowe przesuwanie URL między plikami,
 - wszystkie `loc` są absolutne, HTTPS, canonical i indexable,
-- draft/noindex/redirect source nie trafia do article sitemap.
+- draft/noindex/redirect source/withdrawn nie trafia do article sitemap.
 
 ---
 
@@ -1539,7 +1547,7 @@ Obecnie:
 
 ### 2026-09-16 — v0.5
 
-- ustalono deterministyczną archive policy: historyczny canonical 200, brak aktywnej dystrybucji, 301/404/410 tylko jako osobne use case,
+- ustalono deterministyczną archive policy: historyczny canonical 200, oraz osobny withdrawn=410 dla jawnego takedownu,
 - zastąpiono fikcyjne założenie o async queue jobie dirty/version coordinator + scheduler/lock zgodnym z aktualnym QUEUE_CONNECTION=sync,
 - doprecyzowano topic indexability baseline do min. 3 actively-distributed/indexable articles,
 - poprawiono kolejność sekcji 4.3/4.4 i wyrównano current-state/remaining-work do faktycznego backendu.
