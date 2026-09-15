@@ -219,6 +219,8 @@ Po pierwszej publikacji zwykły Select `type` nie może przenieść rekordu pomi
 
 Zmiana opublikowanego sluga musi przejść przez ContentArticleSlugService.
 
+Walidacja pola `unique(ignoreRecord)` jest tylko UX. Service dodatkowo rezerwuje/checkuje pełny canonical path wobec historycznych `content_article_redirects.from_path`, aby nowy artykuł nie przejął starego publicznego URL innego artykułu.
+
 Form nie może po prostu zapisać nowego sluga z pominięciem redirect history.
 
 ---
@@ -655,6 +657,8 @@ Status computed:
 - due soon
 - overdue
 - not scheduled
+
+`overdue` jest filtrem/kolejką pracy, **nie** automatycznym workflow transition. Upływ `freshness_review_due_at` nie może sam wyrzucić artykułu z home/category/feed. Akcja `Mark needs review` pozostaje oddzielną, audytowaną decyzją.
 
 ---
 
@@ -1125,6 +1129,7 @@ Feature/Livewire/Filament tests zależnie od obecnego test pattern:
 - create draft,
 - validation,
 - source repeater persistence + nullable URL + public/internal citation behavior,
+- newsroom media upload MIME/size/dimensions/stable-path validation bez użycia question-specific upload service,
 - body blocks validation/persistence,
 - origin/regulatory context persistence,
 - relation persistence,
@@ -1140,6 +1145,8 @@ Feature/Livewire/Filament tests zależnie od obecnego test pattern:
 - stale article edit rejected,
 - concurrent placement overlap cannot be committed,
 - category slug/deactivation guards,
+- historical article-path reservation / same-article reclaim tests,
+- ContentAuthor unpublish blocked while dependent public/indexable newsroom articles exist,
 - topic slug/corpus guards,
 - preview action admin-only + private,no-store.
 
@@ -1197,6 +1204,10 @@ Na 2026-09-16:
 - ujednolicono wewnętrzne notatki do editorial_note oraz checklistę do body_blocks,
 - audit UI opiera się na istniejącym AuditLog bez nowych published_by/reviewed_by pól,
 - źródła wspierają nullable URL oraz jawne is_publicly_cited, aby prywatny evidence nie wyciekał publicznie,
+- freshness overdue oddzielono od jawnego needs_review transition,
+- slug service waliduje historyczne public paths, nie tylko current unique(slug),
+- media uploader opisano zgodnie z kodem: resolver jest wspólny, ale istniejący upload service jest question-specific,
+- dodano ContentAuthor unpublish guard dla zależnych publicznych artykułów,
 - service-owned timestamps są read-only, a article-owned child writes muszą bumpować parent edit token dla stale-write guard.
 
 ### 2026-09-16 — v0.4
