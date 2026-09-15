@@ -316,6 +316,18 @@ Preferowane:
 
 Tier 3 może naprowadzać na temat, ale dla zmian regulacyjnych należy szukać Tier 1/2.
 
+### 9.1. Public citation vs internal evidence
+
+Nie każde prawdziwe źródło ma publiczny URL.
+
+- official/legislation/institution/report/media zwykle powinny mieć publiczny URL, jeśli taki istnieje,
+- interview, odpowiedź bezpośrednia lub inne evidence może nie mieć URL,
+- `is_publicly_cited=true` oznacza zgodę/redakcyjną decyzję na pokazanie citation,
+- `is_publicly_cited=false` przechowuje źródło jako wewnętrzny evidence i nie ujawnia title/publisher/url publicznie,
+- source `note` jest zawsze wewnętrzne.
+
+Dla newsa prawnego, jeśli istnieje jawne źródło Tier 1, co najmniej jedno takie źródło powinno być publicznie cytowalne z linkiem.
+
 ---
 
 ## 10. Research checklist
@@ -1120,6 +1132,10 @@ Na 2026-09-16:
 ---
 
 ## 49. Historia zmian
+
+### 2026-09-16 — v0.6
+
+- rozdzielono public citation od internal evidence i dopuszczono wiarygodne źródła bez URL bez wycieku prywatnych danych.
 
 ### 2026-09-16 — v0.5
 
