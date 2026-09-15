@@ -103,7 +103,7 @@ Na pierwszym etapie nie budujemy:
 
 ## 5. Aktualny stan implementacji
 
-Stan sprawdzony ponownie na `main@4b8a48537ec8973d90c268650994eee46d1841cc` w dniu 2026-09-16.
+Stan sprawdzony ponownie na `main@37dbfafa2ec491054429d1151d2de16b2470647b` w dniu 2026-09-16.
 
 ### 5.1. Elementy już istniejące
 
@@ -1218,9 +1218,11 @@ Szczegółowy tasking i granice PR-ów są kanonicznie utrzymywane w [NEWSROOM-I
 - publisher/Organization branding source of truth,
 - finalny route contract,
 - taxonomy v1,
-- block editor + serialization + sanitization decision.
+- block editor + serialization + sanitization + format-evolution decision,
+- existing SEO delivery compatibility contract,
+- admin identity/authorization contract.
 
-**Exit criteria:** nie ma nierozstrzygniętej decyzji, która zmieniałaby schema, routing albo bezpieczeństwo body.
+**Exit criteria:** wszystkie decyzje wymagane przez konkretny downstream gate są zamknięte. N0 nie jest sztuczną barierą „wszystko albo nic”; szczegółową macierz zależności utrzymuje backlog.
 
 ### Etap N1 — domain + database
 
@@ -1327,7 +1329,7 @@ Newsroom v1 jest ukończony, gdy:
 - publikowany topic/dossier ma własną wartość i nie jest aliasem taga,
 - canonical/meta/schema graph są poprawne i spójne z domenowym site identity,
 - statyczny sitemap pipeline uwzględnia właściwe rekordy, pełne news metadata, deterministic sharding i bezpieczny child-before-index switch,
-- newsroom refresh sitemap działa asynchronicznie/debounced po zmianach publicznego corpus, a istniejący daily refresh pozostaje safety netem,
+- newsroom refresh sitemap jest coalesced/debounced bez założenia o działającym Laravel queue workerze; istniejący daily refresh pozostaje safety netem,
 - rzeczywista warstwa static/Nginx/CDN ma zweryfikowane nagłówki/cache validators bez zakładania, że Laravel controller serwuje produkcyjny XML,
 - feed ma własny poprawny cache/validator contract,
 - author ProfilePage/Person jest reużywany, nie duplikowany,
@@ -1370,6 +1372,10 @@ Newsroom v1 jest ukończony, gdy:
 25. `canonical_url` override nie jest częścią newsroom v1: artykuły są self-canonical zgodnie z route contract.
 26. Po pierwszej publikacji route family artykułu jest stabilne; cross-family type change jest zablokowany w zwykłym CMS.
 27. Produkcyjne sitemap newsroomu są statycznymi artefaktami publikowanymi bez okna index -> brakujący child; controller routes pozostają kompatybilnością, nie drugim source of truth.
+28. V1 nie rozszerza dostępu do Filament: `/admin` pozostaje dostępne wyłącznie dla istniejących administratorów. `User` jest aktorem operacji/audytu, a `ContentAuthor` jest publiczną tożsamością autora/reviewera.
+29. Workflow `archived` oznacza wycofanie z aktywnej dystrybucji, nie automatyczne usunięcie URL. Wcześniej opublikowany artykuł archiwalny pozostaje pod canonical URL jako 200; 301/404/410 wymagają osobnego, jawnego use case.
+30. Side effecty po publikacji nie mogą zależeć od nieistniejącego workera. Przy obecnym `QUEUE_CONNECTION=sync` v1 używa lekkiego dirty/version signal + scheduler/lock do coalesced refreshu albo dopiero po wdrożeniu monitorowanego async transportu może użyć queued job.
+31. Publiczny newsroom ma prosty config gate/feature flag. Do N6 można wdrażać dane, admin i renderer bez przełączania istniejących publicznych placeholderów/indeksacji; włączenie publiczne następuje dopiero po release gate.
 
 ### 25.2. Otwarte decyzje N0 wymagające domknięcia przed implementacją zależnych elementów
 
@@ -1408,8 +1414,9 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [ ] `NEWSROOM-N0-001` — publisher branding source of truth,
 - [ ] `NEWSROOM-N0-002` — test/utrwalenie przyjętego route contract,
 - [ ] `NEWSROOM-N0-003` — deterministyczny taxonomy seed contract,
-- [ ] `NEWSROOM-N0-004` — block editor + serialization + sanitization decision,
-- [ ] następnie N1 domain + database.
+- [ ] `NEWSROOM-N0-004` — block editor + serialization + sanitization + format-evolution decision,
+- [ ] `NEWSROOM-N0-005` — utrwalić compatibility contract istniejącego SEO delivery,
+- [ ] następnie wykonywać N1 zgodnie z macierzą hard gates z backlogu.
 
 Pozostałe elementy N2–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu checklistę.
 
@@ -1436,6 +1443,15 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-16 — v0.6
+
+- wykonano finalny audyt planu implementacji, admin panelu, gate'ów i SEO względem aktualnego main,
+- rozdzielono tożsamość `User` (aktor/admin) od `ContentAuthor` (autor/reviewer),
+- zdefiniowano deterministic archive URL policy zamiast pozostawiania 200/404/410 do decyzji podczas kodowania,
+- usunięto założenie o działającym queue workerze dla sitemap freshness,
+- dodano publiczny config gate dla bezpiecznego rollout/rollback,
+- doprecyzowano, że N0 ma dependency gates, a nie sztuczną sekwencję blokującą każdy N1 task.
 
 ### 2026-09-16 — v0.5
 
