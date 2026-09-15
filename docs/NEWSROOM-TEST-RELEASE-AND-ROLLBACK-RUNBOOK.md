@@ -157,6 +157,7 @@ PR C/N1 musi dodać addytywny job `newsroom-postgres` z usługą PostgreSQL (lub
 - publiclyVisible / activelyDistributed / indexable scopes,
 - archived historical 200 vs active distribution,
 - needs_review public visibility,
+- active-state timestamps set/cleared consistently with workflow status,
 - scheduled scope,
 - category relation,
 - author/reviewer relation,
@@ -198,7 +199,7 @@ Dla każdego przejścia:
 | needs_review | republish/update | published | PASS after review |
 | published | archive | archived | PASS; clears breaking flag/expiry |
 | published/needs_review/archived | withdraw | withdrawn | PASS with reason; breaking cleared |
-| archived | direct publish | published | REJECT in v1; return to review flow first |
+| archived | Republish | published | PASS only after current review/checklist; archived URL stays 200 until atomic transition |
 | withdrawn | direct publish | published | REJECT; restore to review first |
 | withdrawn | restore to review | in_review | PASS; withdrawal tombstone remains active and public URL stays 410 |
 | in_review + active withdrawal tombstone | publish | published | PASS if checklist complete; clears current tombstone after audit |
@@ -377,7 +378,9 @@ Archived:
 - included in standard article sitemap only when indexable,
 - archived + controlled noindex -> 200 noindex and absent from article sitemap,
 - never-published archived record -> 404,
-- archive itself never implies 301/404/410.
+- archive itself never implies 301/404/410,
+- archived review/correction flow never causes temporary 404,
+- Republish clears archived_at atomically and returns article to active distribution.
 
 Unknown slug:
 
