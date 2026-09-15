@@ -393,9 +393,11 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 
 ### Zakres
 
-- newsroom:publish-due,
+- newsroom:publish-due dla initial publish,
 - scheduler registration,
-- idempotency.
+- idempotency,
+- pełna rewalidacja eligibility w due time,
+- brak scheduled republish publicznego 200 w v1.
 
 ### Testy
 
@@ -546,6 +548,7 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 ### DoD
 
 - actions call services,
+- publiclyVisible article nie ma low-level public-field Save; używa Apply public update,
 - UI does not duplicate transition logic,
 - każda istotna akcja zapisuje istniejący AuditLog z User actorem i bez pełnego body/private notes payload.
 
@@ -654,6 +657,7 @@ Computed blocking/warning items.
 ### Zakres
 
 - ContentArticle edit zapisuje/porównuje loaded `updated_at` lub równoważny token,
+- Apply public update dla publiclyVisible content ma ten sam stale-write guard i pełną service validation,
 - konflikt = reject + czytelny komunikat, bez last-write-wins,
 - NewsroomHomeComposer ma analogiczny stale-write guard,
 - `User` actor trafia do AuditLog; `ContentAuthor` pozostaje author/reviewer identity,
@@ -1591,6 +1595,14 @@ Mitigation: guard ContentAuthor unpublish przy zależnych public/indexable newsr
 ## R29 — po launch feature flag false masowo tworzy 404
 
 Mitigation: false służy do dark deploy; po indeksacji temporary technical rollback używa 503/Retry-After lub code rollback, a content takedown używa withdrawn.
+
+## R30 — zwykły Save zmienia live content przed review
+
+Przy braku revision/staging systemu jeden rekord jest jednocześnie publiczną wersją. Mitigation: public fields publiclyVisible article zapisuje wyłącznie atomowy `Apply public update`; zwykły draft Save jest niedostępny. Review-before-live późniejszych zmian wymaga osobnego staging/revision scope.
+
+## R31 — scheduled republish publicznego artykułu powoduje chwilowe zniknięcie URL
+
+Mitigation: v1 schedule tylko initial publish; istniejący publiczny artykuł aktualizujemy przez Apply public update.
 
 ---
 
