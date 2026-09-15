@@ -65,6 +65,9 @@ Jesli zaczynasz od zera, rekomendowana kolejnosc jest taka:
 - [STACK-DECISION.md](C:/Users/xxx/Desktop/serwistestyprawojazdy/docs/STACK-DECISION.md)
   Formalizuje finalny wybor Laravel + Inertia + Vue + PostgreSQL + Filament.
 
+- [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
+  Kanoniczna specyfikacja publicznego pionu medialnego: newsroom, aktualnosci, poradniki, model artykulu i zrodel, workflow redakcyjny, Filament, architektura informacji, SEO/schema, dystrybucja, integracja z pytaniami i przepisami oraz etapy wdrozenia N0-N6. Rozdziela stan obecny od projektu docelowego i nie traktuje placeholderow `/aktualnosci` oraz `/poradniki` jako gotowego newsroomu.
+
 - [DATABASE-SCHEMA.md](C:/Users/xxx/Desktop/serwistestyprawojazdy/docs/DATABASE-SCHEMA.md)
   Definiuje model danych, relacje, indeksy i granice MVP/V2.
 
