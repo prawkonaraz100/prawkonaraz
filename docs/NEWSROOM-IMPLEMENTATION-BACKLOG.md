@@ -334,6 +334,7 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 - publish,
 - schedule,
 - archive,
+- withdraw + restore-to-review,
 - needs review,
 - transaction boundary dla state/timestamps/AuditLog,
 - User actor w AuditLog oddzielony od ContentAuthor author/reviewer,
@@ -347,7 +348,8 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 - date semantics,
 - rollback nie emituje cache/sitemap/IndexNow side effect,
 - audit actor/metadata bez pełnej treści,
-- archived previously-published article zachowuje public 200, ale znika z active distribution.
+- archived previously-published article zachowuje public 200, ale znika z active distribution,
+- withdrawn wymaga reason, zwraca 410 bez contentu i nie trafia do dystrybucji/sitemap.
 
 ---
 
@@ -498,6 +500,7 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 - schedule,
 - publish,
 - archive,
+- withdraw,
 - featured,
 - breaking.
 
@@ -635,6 +638,7 @@ Computed blocking/warning items.
 
 - draft/scheduled/never-published archived hidden,
 - previously-published archived detail URL = 200,
+- withdrawn resolved explicitly as 410 (or 301 only when redirect successor exists),
 - archived excluded z active listings/feed/news sitemap,
 - needs_review pozostaje publiczne zgodnie z policy.
 
@@ -1311,7 +1315,7 @@ Docs-only:
 - [ ] models/factories
 - [ ] publishing service
 - [ ] scheduling
-- [ ] redirects
+- [ ] redirects / withdrawn 410 disposition
 
 ### CMS
 
@@ -1496,6 +1500,10 @@ Mitigation: versioned/compatible block contract; renderer-first; data migration 
 ## R23 — publiczny moduł zostaje włączony przed SEO/smoke gate
 
 Mitigation: NEWSROOM_PUBLIC_ENABLED i jawny N6 cutover.
+
+## R24 — archive jest używane jako takedown, ale URL nadal zwraca 200
+
+Mitigation: osobny withdrawn workflow z reason + AuditLog + 410; archive pozostaje historycznym 200.
 
 ---
 
