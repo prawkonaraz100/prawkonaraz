@@ -480,7 +480,9 @@ Wymaga:
 Jeśli cały materiał jest nieprawdziwy lub nie powinien być publiczny:
 
 - natychmiast zdejmujemy z modułów,
-- publisher podejmuje decyzję o archive/404/410/redirect,
+- używamy `Withdraw from public`, co daje 410 i zachowuje rekord/audit w backoffice,
+- jeśli istnieje rzeczywisty następca, zamiast 410 stosujemy jawny 301,
+- `archive` nie jest takedownem — zachowuje historyczny 200,
 - dokumentujemy przyczynę,
 - nie zostawiamy fałszywego tekstu tylko „dla SEO”.
 
@@ -875,12 +877,14 @@ Dla ważnego materiału:
 Jeśli opublikowano potencjalnie szkodliwy błąd:
 
 1. publisher może natychmiast zdjąć featured/breaking,
-2. jeśli pozostawienie URL 200 jest ryzykowne, administrator używa Withdraw from public zamiast zwykłego archive,
-3. poprawa lub tymczasowe archive,
-3. weryfikacja źródła,
-4. correction note,
-5. audit,
-6. ponowne opublikowanie po review.
+2. jeśli pozostawienie URL 200 jest ryzykowne, administrator używa Withdraw from public,
+3. weryfikujemy źródło i zakres błędu,
+4. przygotowujemy poprawę poza publicznym low-level Save,
+5. dodajemy correction note, jeśli korekta jest istotna,
+6. zapisujemy audit,
+7. po review używamy Apply public update albo — po wcześniejszym Withdraw — Restore to review + Publish.
+
+`Archive` stosujemy tylko wtedy, gdy historyczny 200 jest świadomie właściwym rezultatem, nie jako „tymczasowe ukrycie” fałszywej treści.
 
 Nie czekamy na pełny cykl redakcyjny, jeśli błędna informacja jest publiczna.
 
