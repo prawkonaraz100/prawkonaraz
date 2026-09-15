@@ -491,6 +491,7 @@ Assertions:
 - article ma crawlable primary-category link,
 - category/topic pages linkują do public article przez zwykłe `<a href>`,
 - indexable article ma co najmniej jeden public inbound link w fixture graph,
+- archived+indexable article nadal ma inbound co najmniej z author profile archive surface,
 - reverse link pojawia się tylko dla jawnej public relation i activelyDistributed target przy NEWSROOM_PUBLIC_ENABLED=true,
 - article-question write nie zmienia rekordów `question_relations`, `question_seo_topics` ani aktywnego rankingu V1/V2,
 - reverse link list ma bounded count i deterministic order,
@@ -558,7 +559,8 @@ Assert:
 - publish blocked below 3 actively-distributed/indexable linked articles,
 - featured article, if set, belongs to topic and is public,
 - published topic slug change blocked,
-- corpus falling below baseline forces draft/archive before public render.
+- corpus falling below baseline po wcześniejszym publish nie powoduje automatycznego 404/410; topic pozostaje 200, CMS/audit sygnalizuje health warning i topic nie jest promowany,
+- explicit archived topic -> 410 jeśli był wcześniej publiczny, absent from sitemap/nav.
 
 ---
 
@@ -572,8 +574,10 @@ Assert:
 
 ### 23.1. Author profile integration tests
 
-- author profile pokazuje tylko activelyDistributed newsroom articles,
-- needs_review/archived/withdrawn/draft/scheduled nie pojawiają się na bieżącej liście publikacji,
+- author profile pokazuje activelyDistributed newsroom articles,
+- archived+indexable pozostaje dostępne jako oznaczona publikacja archiwalna i daje crawlable inbound do artykułu,
+- archived+noindex może być pominięte,
+- needs_review/withdrawn/draft/scheduled nie pojawiają się na publicznej liście,
 - article graph author @id == ProfilePage Person @id,
 - publish/archive/needs-review/withdraw/restore zmienia author profile output i właściwy author sitemap lastmod,
 - techniczny article updated_at bez public output change nie zmienia author sitemap lastmod,
