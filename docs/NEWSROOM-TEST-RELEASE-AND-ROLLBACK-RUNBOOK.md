@@ -599,6 +599,7 @@ Assert:
 - shared author ProfilePage schema builder preserves existing traffic-sign/legal behavior and adds stable Person @id/worksFor,
 - author profile pokazuje activelyDistributed newsroom articles,
 - archived+indexable pozostaje dostępne jako oznaczona publikacja archiwalna i daje crawlable inbound do artykułu,
+- needs_review+indexable pozostaje w oznaczonej sekcji „w trakcie weryfikacji”, a detail page pokazuje review banner,
 - archived+noindex może być pominięte,
 - needs_review/withdrawn/draft/scheduled nie pojawiają się na publicznej liście,
 - article graph author @id == ProfilePage Person @id,
@@ -701,6 +702,13 @@ Sitemap refresh coordinator:
 - test działa przy `QUEUE_CONNECTION=sync`; nie wymaga worker process,
 - failed refresh nie cofa publikacji, pozostawia recovery signal/log,
 - daily scheduled `seo:refresh-sitemaps` nadal działa jako recovery path.
+
+Topology:
+
+- test/deploy evidence określa single-node vs multi-node,
+- single-node: wszystkie requesty widzą ten sam atomowo przełączany set,
+- multi-node: smoke z każdego origin/node albo warstwy wspólnej potwierdza identyczny sitemap artifact generation/version,
+- Redis lock/onOneServer bez synchronizacji plików nie zalicza topology gate.
 
 Static HTTP delivery:
 
@@ -926,7 +934,7 @@ Istniejący `browser-smoke.yml` dotyczy produktu i nie jest dowodem przejścia n
 Przy pre-launch `NEWSROOM_PUBLIC_ENABLED=false`:
 
 - article/category/topic public routes nie ujawniają newsroom content,
-- existing top-level placeholder behavior pozostaje zgodne z decyzją rollout,
+- /aktualnosci i /poradniki zachowują placeholder UX, ale mają jawne noindex; test potwierdza, że shared MarketingPlaceholder innych routes nie został globalnie zmieniony przez przypadek,
 - author page nie pokazuje newsroom publications,
 - existing question/legal/sign pages nie pokazują newsroom reverse links,
 - feed nie ujawnia newsroom items,
@@ -935,6 +943,18 @@ Przy pre-launch `NEWSROOM_PUBLIC_ENABLED=false`:
 - admin resource + private preview nadal działają.
 
 Przy `true` te powierzchnie działają zgodnie z public eligibility.
+
+---
+
+### 37.2. Repository gate status
+
+Aktualny `main` nie ma branch protection/required checks. Przed publicznym rolloutem:
+
+- branch protection/ruleset aktywne,
+- normalny direct push zablokowany,
+- stabilny CI quality check required,
+- newsroom-postgres objęty required/aggregate check po jego dodaniu,
+- wyjątki administracyjne, jeśli istnieją, są świadome i audytowalne.
 
 ---
 
