@@ -274,7 +274,6 @@ W pierwszej wersji walidacja może być aplikacyjna przez PHP enum. Jeżeli doda
 Status published wymaga:
 
 - title != empty,
-- jeśli type=news: mb_strlen(title) <= 110,
 - slug != empty,
 - lead != empty,
 - body_blocks zawiera co najmniej jeden renderowalny blok,
@@ -1298,7 +1297,6 @@ Model danych jest gotowy, gdy:
 - publikacja nie może stworzyć niekompletnego publicznego rekordu,
 - scheduling jest idempotentny,
 - technical update nie zmienia SEO freshness ani nie emituje substantive-update eventu,
-- news headline >110 znaków nie przechodzi publish validation,
 - cross-route-family type change po first publish jest zablokowany,
 - slug change zachowuje redirect history,
 - relations do questions/legal są jawne,
@@ -1354,7 +1352,7 @@ Na moment utworzenia dokumentu:
 - usunięto `featured_position` z artykułu; konkretna pozycja należy wyłącznie do content_home_placements,
 - usunięto ręczny `canonical_url` z v1 i przyjęto twardy self-canonical,
 - dodano `hero_image_caption`,
-- dodano publish invariant headline <=110 dla news,
+- nie zakodowano zmiennego zewnętrznego limitu długości headline jako DB/publish invariant; długość pozostaje kontrolą redakcyjną,
 - zablokowano zmianę route family po pierwszej publikacji,
 - jawnie odseparowano article-question pivot od istniejącego question relation graphu.
 
