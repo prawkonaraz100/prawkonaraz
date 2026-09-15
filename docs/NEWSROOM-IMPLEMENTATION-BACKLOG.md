@@ -39,7 +39,7 @@ N0–N6 pozostają etapami organizacyjnymi, ale nie stosujemy fałszywego „wsz
 | Gate | Musi być zamknięte przed | Dowód zamknięcia |
 | --- | --- | --- |
 | G0-A Routing/taxonomy: N0-002 + N0-003 | N1 slug/category invariants, N3 public routes | route tests + seed contract |
-| G0-B Body format: N0-004 | N1 publish validation, N2 editor, N3 renderer | schema blocków + sanitizer + format-version strategy |
+| G0-B Body format: N0-004 | N1 publish validation, N2 editor, N3 renderer | schema blocków + backend sanitizer/structured format + body_schema_version strategy |
 | G0-C Brand identity: N0-001 | N3 structured data i N5 SEO launch | regression tests Organization/WebSite/site name |
 | G0-D Existing SEO compatibility: N0-005 | N5 sitemap/robots changes | docs contract + baseline regression tests |
 | G1 Domain/DB | N2 workflow/CMS writes | migrations/models/services green na PostgreSQL |
@@ -238,6 +238,30 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 
 ---
 
+## NEWSROOM-N0-006 — Media upload/storage contract
+
+### Potwierdzony stan
+
+- `MediaUrlResolver` i media disk config są wspólne,
+- `AdminMediaUploadService` jest question-specific i zapisuje QuestionMedia,
+- brak potwierdzonego generic newsroom uploader/crop pipeline.
+
+### Decyzja do zamknięcia przed N2 media editor
+
+- newsroom-specific upload adapter/service lub jawny Filament upload do wydzielonego prefixu,
+- reuse public disk/MediaUrlResolver conventions,
+- backend MIME/size/dimensions validation,
+- stabilne public paths; brak signed URL w modelu,
+- JPEG/PNG/WebP/AVIF baseline; SVG disabled unless separate security decision,
+- nie deklarować/generated crop variants, jeśli fizycznie nie istnieją.
+
+### DoD
+
+- implementator nie reużywa question-specific service przez przypadek,
+- storage/public URL contract jest przetestowany przed hero uploaderem.
+
+---
+
 # N1 — Domain and database
 
 ## NEWSROOM-N1-001 — Enums + migrations
@@ -251,7 +275,7 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 - ContentArticleRegulatoryStatus
 - content topics
 - content home placements
-- body_blocks + hero caption + focal point + regulatory fields + public_state_changed_at
+- body_blocks + body_schema_version + hero caption + focal point + regulatory fields + public_state_changed_at
 - brak `canonical_url` override w v1
 - brak `featured_position` w content_articles; pozycja wyłącznie w content_home_placements
 - tables zgodne z data spec.
@@ -310,6 +334,8 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 - unique handling,
 - published slug change,
 - redirect record,
+- historyczne full paths są reserved przed innym article,
+- same-article historical path reclaim tylko przez service,
 - no chains,
 - type -> route family resolver,
 - block cross-family type change after first publication.
@@ -319,7 +345,9 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 - draft slug change,
 - published slug change,
 - old path redirect,
-- duplicate slug reject,
+- duplicate current slug reject,
+- new/current canonical path colliding with another article historical from_path reject,
+- same article can intentionally reclaim own historical path with redirects rewritten one-hop,
 - draft guide -> news allowed before first publish,
 - published guide -> news blocked,
 - published news -> analysis keeps same canonical family,
@@ -574,13 +602,16 @@ Computed blocking/warning items.
 
 - origin_type,
 - regulatory_status/effective_from/change_summary/applies_to/exam_impact,
+- newsroom media upload zgodny z N0-006,
 - focal point control,
-- crop previews,
+- crop previews bez deklarowania nieistniejących fizycznych wariantów,
 - publish checklist warnings.
 
 ### DoD
 
 - prawny/regulacyjny news ma spójny status i źródło,
+- uploader nie używa question-specific AdminMediaUploadService,
+- backend sprawdza MIME/size/dimensions i zapisuje stabilny path,
 - redaktor widzi efekt cropu przed publikacją,
 - origin type jest kontrolowanym enumem.
 
@@ -772,7 +803,8 @@ Re-use istniejącego `ContentAuthorController` i ProfilePage.
 - ProfilePage i Article mają identyczną identity autora,
 - archived+indexable pozostaje crawlable przez author profile i jest oznaczone jako archiwalne; archived+noindex nie musi być listowane,
 - needs_review/withdrawn/draft/scheduled nie są listowane,
-- zmiana public eligibility artykułu aktualizuje author-page/sitemap freshness bez fałszowania article dateModified.
+- zmiana public eligibility artykułu aktualizuje author-page/sitemap freshness bez fałszowania article dateModified,
+- próba odpublikowania ContentAuthor z zależnymi indexable/publiclyVisible newsroom articles jest blokowana do reassignment/withdraw/noindex.
 
 ---
 
@@ -940,11 +972,12 @@ Zaimplementować jawny internal-link graph bez tworzenia automatycznej link farm
 
 # N5 — SEO, distribution and analytics
 
-## NEWSROOM-N5-001 — Extend static generator: articles sitemap + deterministic sharding
+## NEWSROOM-N5-001 — Extend static generator: articles + hub sitemap coverage + deterministic sharding
 
 Rozszerzyć istniejący `SeoSitemapGenerator` / `SeoSitemapBuilder`, nie tworzyć osobnego generatora.
 
 - wszystkie publiczne indexable articles,
+- `/aktualnosci`, `/poradniki`, active categories i published/indexable topics mają jawne sitemap coverage,
 - meaningful lastmod,
 - absolute canonical HTTPS URLs,
 - exclude noindex/draft/redirect-source,
@@ -1018,7 +1051,9 @@ Re-use existing IndexNow pipeline if appropriate.
 
 ### DoD
 
-- publish/update/archive/slug-change integruje się z istniejącym IndexNow queue/submission pipeline po commit,
+- publish/substantive-update/archive integruje się jako updated URL, withdraw jako deleted URL, republish jako created/updated URL,
+- slug change zgłasza stary path jako deleted i nowy canonical jako created/updated, po commit,
+- integracja używa istniejącego IndexNow queue/submission pipeline,
 - nie zakładamy Laravel queue workera,
 - failure does not block article publication.
 
@@ -1053,16 +1088,17 @@ Można dodać newsroom-specific `newsroom:audit-links` dla graph/link checks, al
 
 Nie zmieniamy produkcyjnego modelu na runtime generation.
 
-1. rozszerzyć istniejący statyczny generator o newsroom/news,
-2. generować komplet payloadów przed publikacją,
-3. walidować przed przełączeniem,
-4. atomowo podmieniać child files,
-5. podmieniać główny `sitemap.xml` dopiero na końcu,
-6. stare, nieużywane shardy usuwać po przełączeniu indexu,
-7. po commit ustawić tani dirty/version signal zamiast uruchamiać pełny generator w request,
-8. dodać częstą scheduler command, która przy dirty signal bierze distributed lock i uruchamia refresh,
-9. czyścić marker tylko gdy version nie zmieniła się podczas generacji,
-10. istniejący daily `seo:refresh-sitemaps` zachować jako niezależny safety net.
+1. najpierw usunąć potwierdzony existing gap: `prepareSitemapDirectory()` nie może delete-all istniejących child XML przed gotowym replacement set, a main index nie może być zapisywany przed childami,
+2. rozszerzyć istniejący statyczny generator o newsroom/news,
+3. generować komplet payloadów przed publikacją,
+4. walidować przed przełączeniem,
+5. atomowo podmieniać child files,
+6. podmieniać główny `sitemap.xml` dopiero na końcu,
+7. stare, nieużywane shardy usuwać po przełączeniu indexu,
+8. po commit ustawić tani dirty/version signal zamiast uruchamiać pełny generator w request,
+9. dodać częstą scheduler command, która przy dirty signal bierze distributed lock i uruchamia refresh,
+10. czyścić marker tylko gdy version nie zmieniła się podczas generacji,
+11. istniejący daily `seo:refresh-sitemaps` zachować jako niezależny safety net.
 
 Nie implementować tego jako zwykłego `ShouldQueue`, dopóki produkcja ma `QUEUE_CONNECTION=sync` i brak monitorowanego workera.
 
@@ -1479,7 +1515,9 @@ Mitigation: zachować statyczny production pipeline z SEO-SITEMAP-REPAIR-PLAN; v
 
 ## R16 — sitemap index wskazuje child, który nie został jeszcze opublikowany
 
-Mitigation: generacja/validacja pełnego next set, child files first, main index last, obsolete shard cleanup dopiero po switch.
+Potwierdzony stan: obecny generator usuwa child XML przed zapisem i zapisuje main index przed child files.
+
+Mitigation: refactor istniejącego generatora do generacji/validacji pełnego next set, child files first, main index last, obsolete shard cleanup dopiero po switch; dopiero potem zwiększać frequency refresh.
 
 ## R17 — cleanup robots/sitemap controllerów psuje istniejący production routing
 
@@ -1512,6 +1550,26 @@ Mitigation: NEWSROOM_PUBLIC_ENABLED i jawny N6 cutover.
 ## R24 — archive jest używane jako takedown, ale URL nadal zwraca 200
 
 Mitigation: osobny withdrawn workflow z reason + AuditLog + 410; archive pozostaje historycznym 200.
+
+## R25 — historyczny slug zostaje przejęty przez inny artykuł
+
+Mitigation: full-path reservation przeciw `content_article_redirects.from_path` + service-only same-article reclaim + one-hop redirect rewrite.
+
+## R26 — freshness cron wyłącza promocję artykułów tylko dlatego, że minął termin
+
+Mitigation: overdue jest computed work-queue state; `needs_review` to osobna audytowana decyzja.
+
+## R27 — newsroom próbuje użyć question-specific media uploader
+
+Mitigation: N0-006 media contract + newsroom adapter/service; reuse resolver/storage conventions, nie QuestionMedia workflow.
+
+## R28 — autor zostaje odpublikowany i psuje publiczne article schema/profile
+
+Mitigation: guard ContentAuthor unpublish przy zależnych public/indexable newsroom articles.
+
+## R29 — po launch feature flag false masowo tworzy 404
+
+Mitigation: false służy do dark deploy; po indeksacji temporary technical rollback używa 503/Retry-After lub code rollback, a content takedown używa withdrawn.
 
 ---
 
@@ -1553,7 +1611,7 @@ Na 2026-09-16:
 
 NEWSROOM-N0-001 — Publisher branding source of truth.
 
-N0-002/N0-003/N0-004 można następnie zamykać według macierzy hard dependencies. N0-005 jest już decyzją dokumentacyjną; jego kodowy regression gate wykonuje się w N5.
+N0-002/N0-003/N0-004/N0-006 można następnie zamykać według macierzy hard dependencies. N0-005 jest już decyzją dokumentacyjną; jego kodowy regression gate wykonuje się w N5.
 
 ---
 
@@ -1562,6 +1620,10 @@ N0-002/N0-003/N0-004 można następnie zamykać według macierzy hard dependenci
 ### 2026-09-16 — v0.5
 
 - zastąpiono liniowy „wszystko N0 blokuje N1” jawną macierzą hard dependencies G0–G6,
+- dodano N0-006 media contract, bo istniejący uploader jest question-specific,
+- dodano historyczne full-path reservation, author-unpublish guard oraz overdue-vs-needs_review gate,
+- N5-007 jawnie zaczyna od naprawy istniejącego delete-all/index-first sitemap window,
+- sitemap coverage obejmuje również hub/category/topic URLs,
 - dodano obowiązkowy PostgreSQL CI gate bez usuwania szybkiego SQLite CI,
 - dodano admin-only auth, User-vs-ContentAuthor audit identity, stale-write i placement concurrency gates,
 - preview v1 zamknięto do authenticated admin + private,no-store,
