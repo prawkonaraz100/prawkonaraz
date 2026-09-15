@@ -596,6 +596,7 @@ Kod, nie baza, definiuje dozwolone sloty:
 - secondary
 - category_lead
 - guides_lead
+- important_now
 
 `context_key` służy np. do rozróżnienia kategorii przy `category_lead`.
 
@@ -667,6 +668,14 @@ Rekomendowane enumy:
 - ContentArticleOriginType
 - ContentArticleRegulatoryStatus
 
+`ContentArticleOriginType` v1:
+
+- original
+- compiled
+- official_source
+- data_analysis
+- licensed_agency
+
 Enum ma być jedynym źródłem listy wartości w logice aplikacyjnej.
 
 Filament Select, request validation i serwisy korzystają z enumów zamiast powtarzać magic strings.
@@ -728,7 +737,7 @@ Definicja published:
 
 ---
 
-## 19. Serwisy domenowe / application services
+## 20. Serwisy domenowe / application services
 
 Rekomendowane klasy w app/Support/Newsroom lub analogicznej, jasno wydzielonej przestrzeni nazw.
 
@@ -796,7 +805,7 @@ Odpowiada za:
 
 ---
 
-## 20. Events
+## 21. Events
 
 Rekomendowane domain/application events:
 
@@ -817,7 +826,7 @@ Event nie powinien wykonywać ciężkiej logiki synchronicznie w request bez pot
 
 ---
 
-## 21. Scheduling
+## 22. Scheduling
 
 Scheduled publishing wymaga deterministycznego procesu.
 
@@ -840,7 +849,7 @@ Rekomendacja:
 
 ---
 
-## 22. Time semantics
+## 23. Time semantics
 
 Publiczne daty:
 
@@ -854,7 +863,7 @@ dateModified bierze last_substantive_update_at albo kontrolowany modified timest
 
 ---
 
-## 23. Author i reviewer
+## 24. Author i reviewer
 
 Używamy istniejącego ContentAuthor.
 
@@ -871,7 +880,7 @@ Dla treści prawnie wrażliwych reviewer może być wymagany przez Editorial Pol
 
 ---
 
-## 24. Walidacja i sanitization body_blocks
+## 25. Walidacja i sanitization body_blocks
 
 Dokładny komponent edytora i serializacja wewnętrzna są decyzją N0-004, ale kontrakt domenowy jest stały:
 
@@ -888,7 +897,7 @@ Nie utrzymujemy pełnego `body_html` i `body_blocks` jako dwóch edytowalnych ź
 
 ---
 
-## 25. Search w adminie
+## 26. Search w adminie
 
 N1:
 
@@ -900,7 +909,7 @@ Publiczna wyszukiwarka artykułów nie jest wymogiem newsroom v1.
 
 ---
 
-## 26. Cache model
+## 27. Cache model
 
 Cache keys powinny być oparte o publiczne read models, np.:
 
@@ -915,7 +924,7 @@ Nie cache’ujemy preview jako publicznej strony.
 
 ---
 
-## 27. Route binding
+## 28. Route binding
 
 ContentArticle:
 
@@ -931,19 +940,20 @@ Preview używa oddzielnej ścieżki i policy.
 
 ---
 
-## 28. Publiczne route contracts
+## 29. Publiczne route contracts
 
 V1:
 
 - GET /aktualnosci
 - GET /aktualnosci/{slug}
 - GET /aktualnosci/kategoria/{categorySlug}
+- GET /aktualnosci/temat/{topicSlug}
 - GET /poradniki
 - GET /poradniki/{slug}
 - GET /aktualnosci/feed.xml
 - sitemap endpoints zgodne z istniejącym SitemapController pattern
 
-### 28.1. Konflikt slug vs category
+### 29.1. Konflikt slug vs category
 
 Nie wolno pozostawić niejednoznaczności:
 
@@ -961,7 +971,7 @@ Jest jednoznaczny dla routingu i przyszłych zmian. Zmiana na krótsze category 
 
 ---
 
-## 29. Migracje — kolejność
+## 30. Migracje — kolejność
 
 Rekomendowane migracje:
 
@@ -982,7 +992,7 @@ Nie łączymy wszystkiego w jedną migrację, jeżeli utrudnia to rollback i rev
 
 ---
 
-## 30. Seed danych systemowych
+## 31. Seed danych systemowych
 
 Kategorie v1 mogą być seedowane deterministycznie.
 
@@ -998,7 +1008,7 @@ Test fixtures pozostają w factories/seed smoke data.
 
 ---
 
-## 31. Factories
+## 32. Factories
 
 Potrzebne:
 
@@ -1023,7 +1033,7 @@ Factories mają umożliwiać czytelne testy workflow.
 
 ---
 
-## 32. Deletion policy
+## 33. Deletion policy
 
 Artykuł opublikowany:
 
@@ -1044,7 +1054,7 @@ Redirect history:
 
 ---
 
-## 33. Audit
+## 34. Audit
 
 Istniejący AuditLog powinien być użyty tam, gdzie pasuje do architektury.
 
@@ -1064,7 +1074,7 @@ Audit nie zastępuje zwykłego updated_at.
 
 ---
 
-## 34. Uprawnienia
+## 35. Uprawnienia
 
 N1 może korzystać z istniejącej roli administratora, ale kod ma przygotować policies.
 
@@ -1084,7 +1094,7 @@ Nie zakładamy roli wyłącznie na podstawie ukrycia przycisku Filament. Backend
 
 ---
 
-## 35. Polityka zmian modelu
+## 36. Polityka zmian modelu
 
 Każde nowe pole musi mieć odpowiedź na:
 
@@ -1100,7 +1110,7 @@ Nie dodajemy pól „może kiedyś się przyda”.
 
 ---
 
-## 36. Mapa plików — target
+## 37. Mapa plików — target
 
 Przykładowa struktura zgodna z obecnym repo:
 
@@ -1154,9 +1164,9 @@ Nazwy można dostosować do konwencji repo, ale granice odpowiedzialności powin
 
 ---
 
-## 37. Data query contracts
+## 38. Data query contracts
 
-### 37.1. Newsroom home
+### 38.1. Newsroom home
 
 Musi zwrócić gotowy, ograniczony read model:
 
@@ -1171,7 +1181,7 @@ Musi zwrócić gotowy, ograniczony read model:
 
 Nie pobieramy całego corpusu i nie filtrujemy w PHP.
 
-### 37.2. Category page
+### 38.2. Category page
 
 - published only,
 - category_id,
@@ -1179,7 +1189,7 @@ Nie pobieramy całego corpusu i nie filtrujemy w PHP.
 - stabilna paginacja,
 - eager load author + minimal media metadata.
 
-### 37.3. Article show
+### 38.3. Article show
 
 - published by slug,
 - author,
@@ -1194,7 +1204,7 @@ Nie pobieramy całego corpusu i nie filtrujemy w PHP.
 
 ---
 
-## 38. Related content
+## 39. Related content
 
 V1:
 
@@ -1205,7 +1215,7 @@ Nie wdrażamy ML recommendera.
 
 ---
 
-## 39. Freshness defaults
+## 40. Freshness defaults
 
 Wartości są policy, nie twardym invariant DB.
 
@@ -1220,7 +1230,7 @@ Finalne wartości definiuje dokument Editorial Operations.
 
 ---
 
-## 40. Wpływ na DATABASE-SCHEMA.md
+## 41. Wpływ na DATABASE-SCHEMA.md
 
 Ten dokument jest specyfikacją przed implementacją.
 
@@ -1232,7 +1242,7 @@ Po merge migracji N1 należy:
 
 ---
 
-## 41. Definition of Done modelu danych
+## 42. Definition of Done modelu danych
 
 Model danych jest gotowy, gdy:
 
@@ -1252,7 +1262,7 @@ Model danych jest gotowy, gdy:
 
 ---
 
-## 42. Stan implementacji
+## 43. Stan implementacji
 
 Na moment utworzenia dokumentu:
 
@@ -1266,7 +1276,7 @@ Na moment utworzenia dokumentu:
 
 ---
 
-## 43. Pozostałe zadania
+## 44. Pozostałe zadania
 
 - [ ] finalizować naming tabel i klas,
 - [ ] domknąć N0-004: serializacja bloków + editor + sanitizer,
@@ -1285,7 +1295,7 @@ Na moment utworzenia dokumentu:
 
 ---
 
-## 44. Historia zmian
+## 45. Historia zmian
 
 ### 2026-09-15 — v0.2
 
