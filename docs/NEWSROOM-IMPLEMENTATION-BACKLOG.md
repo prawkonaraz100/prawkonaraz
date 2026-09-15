@@ -629,6 +629,28 @@ Old article path -> 301 canonical.
 
 ---
 
+## NEWSROOM-N3-007 — Author profile integration
+
+### Zakres
+
+Re-use istniejącego `ContentAuthorController` i ProfilePage.
+
+- dodać opublikowane ContentArticle do publicznej listy publikacji autora,
+- ujednolicić ProfilePage mainEntity Person do stabilnego `/autorzy/{slug}#person`,
+- Person worksFor -> canonical `/#organization`,
+- author sitemap lastmod uwzględnia najnowszy publiczny newsroom article,
+- article graph referuje dokładnie ten sam Person @id.
+
+### DoD
+
+- nie istnieje drugi newsroom author/profile model,
+- article -> author URL działa,
+- author page -> article działa,
+- ProfilePage i Article mają identyczną identity autora,
+- nieopublikowane articles nie wpływają na publiczny profil/sitemap.
+
+---
+
 # N4 — Hub, categories and guides
 
 ## NEWSROOM-N4-001 — /aktualnosci editorial composition read model
@@ -1004,7 +1026,7 @@ N2 article CMS + controlled block editor
 N2 sources/relations/workflow/provenance/media + article/home preview
 
 ### PR I
-N3 article public
+N3 article public + author profile integration
 
 ### PR J
 N4 newsroom hub
@@ -1077,6 +1099,7 @@ Docs-only:
 
 - [ ] article + controlled block renderer
 - [ ] regulatory context box/provenance
+- [ ] author profile/newsroom publication integration
 - [ ] newsroom hub with placements/fallback/dedupe
 - [ ] category
 - [ ] topic/dossier
