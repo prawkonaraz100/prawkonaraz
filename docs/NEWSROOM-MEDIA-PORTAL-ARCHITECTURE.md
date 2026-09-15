@@ -543,13 +543,12 @@ type
 category_id
 author_id
 reviewer_id nullable
-created_by_user_id nullable
-updated_by_user_id nullable
 
 title
 slug
 lead
 body_blocks
+body_schema_version
 key_points nullable
 
 workflow_status
@@ -1477,7 +1476,7 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 - po głębokim audycie zgodności z istniejącym backendem podporządkowano newsroom istniejącemu statycznemu pipeline sitemap/robots i question graphowi,
 - usunięto ze skrótu architektury stare `body` i ręczny `canonical_url`,
 - zdefiniowano stabilność route family po pierwszej publikacji,
-- zapisano kompatybilny kontrakt async/debounced sitemap refresh bez usuwania istniejących controller routes,
+- historycznie zapisano kontrakt async/debounced sitemap refresh bez usuwania controller routes; **zastąpiony w v0.6** przez dirty/version + scheduler/lock po audycie `QUEUE_CONNECTION=sync`,
 - doprecyzowano, że newsroom reverse links nie modyfikują istniejącego question-question graphu.
 
 ### 2026-09-16 — v0.4
