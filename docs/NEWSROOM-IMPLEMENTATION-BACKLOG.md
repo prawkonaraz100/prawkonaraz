@@ -251,7 +251,7 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 - ContentArticleRegulatoryStatus
 - content topics
 - content home placements
-- body_blocks + hero caption + focal point + regulatory fields
+- body_blocks + hero caption + focal point + regulatory fields + public_state_changed_at
 - brak `canonical_url` override w v1
 - brak `featured_position` w content_articles; pozycja wyłącznie w content_home_placements
 - tables zgodne z data spec.
@@ -262,6 +262,7 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 - rollback,
 - constraints,
 - indexes,
+- krytyczne FK/on-delete directions (no cascade from article into existing product entities),
 - zachować istniejący szybki CI na SQLite,
 - w tym PR albo przed jego merge dodać addytywny job `newsroom-postgres` (PostgreSQL service) obejmujący newsroom migration/domain tests.
 
@@ -345,7 +346,7 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 - invalid transition,
 - missing requirements,
 - first_published_at stable,
-- date semantics,
+- date semantics: dateModified vs public_state_changed_at/sitemap lastmod,
 - rollback nie emituje cache/sitemap/IndexNow side effect,
 - audit actor/metadata bez pełnej treści,
 - archived previously-published article zachowuje public 200, ale znika z active distribution,
