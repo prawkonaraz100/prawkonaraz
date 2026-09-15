@@ -20,7 +20,7 @@ W razie konfliktu obowiązuje następująca kolejność:
 2. [ADR-001-MODULAR-MONOLITH.md](./ADR-001-MODULAR-MONOLITH.md) — granice architektury i decyzja o modularnym monolicie.
 3. [SEO-CONTENT-ROADMAP.md](./SEO-CONTENT-ROADMAP.md) — strategia publicznego contentu, SEO, trust layer i workflow redakcyjny.
 4. [SEO-SITEMAP-REPAIR-PLAN.md](./SEO-SITEMAP-REPAIR-PLAN.md) — istniejący kanoniczny kontrakt produkcyjnego sitemap/robots delivery; newsroom rozszerza go bez zmiany istniejącego modelu.
-5. [SEO-ENTERPRISE-INTERNAL-LINKING-ROADMAP-V2.md](./SEO-ENTERPRISE-INTERNAL-LINKING-ROADMAP-V2.md) i [ADR-SEO-RELATION-GRAPH-V2.md](./ADR-SEO-RELATION-GRAPH-V2.md) — istniejący graph/taksonomia pytań; newsroom nie tworzy ich drugiej wersji.
+5. [SEO-ENTERPRISE-INTERNAL-LINKING-ROADMAP-V2.md](./SEO-ENTERPRISE-INTERNAL-LINKING-ROADMAP-V2.md) — istniejący graph/taksonomia pytań; newsroom nie tworzy jego drugiej wersji. Roadmapa odwołuje się historycznie do ADR V2, ale w aktualnym drzewie `docs/` nie ma pliku o tej nazwie, więc nie tworzymy martwego odnośnika.
 6. [MENU-SYSTEM-REFERENCE.md](./MENU-SYSTEM-REFERENCE.md) — kanoniczna referencja publicznej nawigacji.
 7. **Ten dokument** — szczegółowa architektura newsroomu, portalu informacyjnego i powiązania z produktem.
 
