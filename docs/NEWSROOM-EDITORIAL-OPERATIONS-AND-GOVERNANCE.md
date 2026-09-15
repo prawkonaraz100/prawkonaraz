@@ -5,7 +5,7 @@
 - Status: Proposed / implementation-ready operating model
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Powiązany model danych: [NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md](./NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md)
-- Data: 2026-09-15
+- Data: 2026-09-16
 - Cel: zdefiniować sposób pracy redakcji tak, aby wdrożony CMS nie był tylko formularzem do wpisywania tekstu, ale kontrolowanym procesem publikacji.
 
 ---
@@ -793,6 +793,8 @@ Przed publish publisher potwierdza:
 - [ ] status prawny/regulatory status, jeśli dotyczy
 - [ ] effective_from / kogo dotyczy / wpływ na egzamin, jeśli wymagane
 - [ ] hero/alt/focal point lub jawna decyzja bez hero
+- [ ] OG alt poprawny dla dedykowanego OG assetu, jeśli różni się od hero
+- [ ] publiczne URL-e assetów SEO nie wymagają auth/wygasającego podpisu
 - [ ] SEO title/description lub poprawny fallback
 - [ ] canonical
 - [ ] preview desktop
@@ -802,6 +804,8 @@ Przed publish publisher potwierdza:
 - [ ] product bridge
 - [ ] spelling/copy
 - [ ] reviewer, jeśli wymagany
+- [ ] publiczny profil autora istnieje i odpowiada wskazanemu authorowi
+- [ ] materiał nie jest thin/scaled duplicate
 - [ ] brak draft links
 - [ ] brak nieautoryzowanych assetów
 
@@ -918,6 +922,31 @@ Usuwamy/noindex/410 tylko, gdy:
 - jest duplikatem bez wartości,
 - wymaga tego prawo,
 - nie da się go naprawić i pozostawienie szkodzi użytkownikowi.
+
+---
+
+## 40.1. Anti-scaled-content / programmatic publishing policy
+
+Automatyzacja nie może tworzyć indeksowalnych stron wyłącznie dlatego, że istnieje kombinacja słów kluczowych, taga, miasta albo rekordu w bazie.
+
+Każdy nowy publiczny URL musi mieć:
+
+- jasno określoną intencję użytkownika,
+- samodzielną wartość informacyjną,
+- źródła lub jawne pochodzenie danych,
+- redakcyjnego ownera,
+- możliwość utrzymania/freshness,
+- sensowne linkowanie w strukturze serwisu.
+
+Niedozwolone bez osobnej decyzji jakościowej:
+
+- automatyczny tag -> public page,
+- masowe WORD/miasto pages z szablonowym tekstem bez unikalnych danych,
+- seryjne parafrazy jednego newsa,
+- AI-generated articles publikowane bez własnego researchu/review,
+- strony tworzone wyłącznie po to, by złapać wariant frazy.
+
+AI i generowanie programmatic mogą przyspieszać workflow, ale nie zastępują kryterium unikalnej wartości.
 
 ---
 
@@ -1040,7 +1069,7 @@ Proces jest gotowy, gdy:
 
 ## 47. Stan implementacji
 
-Na 2026-09-15:
+Na 2026-09-16:
 
 - istnieje ContentAuthor,
 - istnieją mechanizmy review/freshness w innych modułach,
@@ -1069,6 +1098,12 @@ Na 2026-09-15:
 ---
 
 ## 49. Historia zmian
+
+### 2026-09-16 — v0.3
+
+- dodano anti-scaled-content policy dla tags/topics/local WORD/AI,
+- rozszerzono checklistę o OG alt, stabilne publiczne asset URLs i publiczny profil autora,
+- doprecyzowano, że automatyzacja nie zastępuje unikalnej wartości redakcyjnej.
 
 ### 2026-09-15 — v0.2
 
