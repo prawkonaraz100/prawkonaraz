@@ -438,9 +438,11 @@ Nigdy:
 
 ## 18. dateModified
 
-Źródło:
+Kontrakt v1:
 
-last_substantive_update_at lub kontrolowany fallback.
+`dateModified = last_substantive_update_at ?? first_published_at`
+
+Widoczny label „Aktualizacja” renderujemy tylko, jeśli `last_substantive_update_at` istnieje i oznacza zmianę późniejszą od pierwszej publikacji.
 
 Nie zmieniać dateModified tylko dlatego, że:
 
@@ -643,11 +645,13 @@ Istniejący `SeoSitemapBuilder` i `SeoSitemapAuditor` są rozszerzane o newsroom
 
 ## 28. lastmod
 
-lastmod:
+Article sitemap URL `lastmod`:
 
-- only if meaningful,
-- oparty o ostatnią istotną zmianę publicznej treści,
-- nie o generation time.
+`last_substantive_update_at ?? first_published_at`
+
+Nie używamy technicznego `updated_at` ani czasu generacji XML.
+
+Sitemap-index child `lastmod`, jeśli emitowany, opisuje faktyczny moment zmiany zawartości danego child sitemap/shard, a nie każde odczytanie/generowanie requestu.
 
 ---
 
@@ -662,8 +666,8 @@ Minimum:
 - title,
 - link,
 - guid stable,
-- published date,
-- updated date,
+- published date = first_published_at,
+- updated date = last_substantive_update_at ?? first_published_at,
 - summary,
 - author jeśli format wspiera.
 
@@ -1054,20 +1058,26 @@ Alert-worthy:
 Przed pierwszym production launch:
 
 - [ ] publisher branding ujednolicony
+- [ ] homepage WebSite/site name i Organization używają tego samego identity
+- [ ] Organization logo publiczne/crawlable i >= 112x112
+- [ ] `og:site_name` spójne z identity
 - [ ] canonical domain prawkonaraz.pl
-- [ ] robots pozwala crawl
+- [ ] robots pozwala crawl i wskazuje główny sitemap index
 - [ ] /aktualnosci 200
 - [ ] sample article 200
 - [ ] draft unavailable publicly
 - [ ] title/meta
-- [ ] OG
-- [ ] NewsArticle
+- [ ] OG image + alt + stabilny publiczny URL
+- [ ] Article/NewsArticle graph + stabilne @id
 - [ ] BreadcrumbList
-- [ ] author URL
-- [ ] sitemap articles
-- [ ] news sitemap
-- [ ] feed
-- [ ] Search Console sitemap submit
+- [ ] author URL + ProfilePage Person identity
+- [ ] visible published/updated dates zgodne z schema
+- [ ] publication/publisher/contact transparency widoczna
+- [ ] articles sitemap/shard
+- [ ] news sitemap required tags i first_published_at eligibility
+- [ ] feed + head auto-discovery
+- [ ] sitemap/feed HTTP validator + 304 sample
+- [ ] Search Console main sitemap index submit
 - [ ] URL Inspection sample
 - [ ] max-image-preview:large
 - [ ] hero >= recommended baseline dla sample Discover-target article
@@ -1078,8 +1088,9 @@ Przed pierwszym production launch:
 
 Przed launch co najmniej kilka realnych article pages testujemy:
 
-- Rich Results Test, jeśli typ jest wspierany w narzędziu,
-- schema validator,
+- Rich Results Test dla wspieranych typów Article,
+- Schema Markup Validator dla pełnego graphu,
+- homepage site-name WebSite w Schema Markup Validator + URL Inspection (site name nie jest walidowany przez Rich Results Test),
 - URL Inspection po produkcyjnym deploy.
 
 Nie uznajemy samego „JSON parsuje się” za pełne SEO QA.
