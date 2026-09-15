@@ -1111,6 +1111,7 @@ Operacyjny target:
 
 - aktywne, ważne i evergreen article: zwykle <= 3 crawlable hops od `/aktualnosci` lub odpowiedniego top-level huba,
 - każdy indexable article ma co najmniej jeden crawlable inbound link z publicznej strony,
+- archived+indexable article nadal podlega tej regule; v1 gwarantuje fallback inbound przez publiczny profil autora z oznaczeniem materiału archiwalnego,
 - starsze materiały pozostają osiągalne przez category/topic pagination i nie polegają wyłącznie na sitemapie,
 - sitemap wspiera discovery, ale nie zastępuje linkowania wewnętrznego.
 
@@ -1377,6 +1378,8 @@ Może być indeksowalny tylko gdy:
 Próg 3 to wewnętrzny quality gate produktu, nie sygnał ani gwarancja Google.
 
 Topic nie powstaje automatycznie z taga.
+
+Próg corpus jest gate'em publikacyjnym, nie dynamicznym przełącznikiem HTTP. Jeśli już opublikowany topic później spadnie poniżej baseline, pozostaje 200 do jawnej decyzji redakcyjnej, ale wypada z redakcyjnej promocji i trafia do health warning/audytu. Jawne `archived` topicu usuwa go z sitemap/nav i dla wcześniej publicznego URL zwraca 410 (albo 301 przy realnym następcy).
 
 ---
 
