@@ -438,6 +438,7 @@ Assertions:
 - category/topic pages linkują do public article przez zwykłe `<a href>`,
 - indexable article ma co najmniej jeden public inbound link w fixture graph,
 - reverse link pojawia się tylko dla jawnej public relation,
+- article-question write nie zmienia rekordów `question_relations`, `question_seo_topics` ani aktywnego rankingu V1/V2,
 - reverse link list ma bounded count i deterministic order,
 - draft/noindex/redirect-source nie pojawia się w related/reverse modules,
 - related anchors są opisowe; nie generujemy pustych/„kliknij tutaj” anchors jako domyślnego UI,
@@ -512,6 +513,7 @@ Assert:
 
 ### articles sitemap
 
+- newsroom rozszerza istniejący statyczny `SeoSitemapGenerator`,
 - published indexable article included,
 - draft/noindex/redirect-source excluded,
 - archived policy honored,
@@ -540,6 +542,15 @@ Tests based on verified rules:
 - split before current news-entry limit,
 - old news excluded from news sitemap but still in articles sitemap if indexable.
 
+### Static publication safety
+
+- generation builds/validates complete next set before switch,
+- child files are published before new main index,
+- failure before index switch leaves previous complete set active,
+- obsolete shards are removed only after index switch,
+- no index entry points to a missing child at any observable checkpoint,
+- existing question/sign/legal/author sitemap files remain present and semantically unchanged unless their own data changed.
+
 ### Existing auditor integration
 
 - extend `SeoSitemapAuditor`,
@@ -563,7 +574,7 @@ Tests based on verified rules:
 
 ---
 
-## 26. Cache and crawler HTTP validator tests
+## 26. Cache, async refresh and crawler delivery tests
 
 Application cache:
 
@@ -573,13 +584,25 @@ Application cache:
 - category affected invalidated,
 - unrelated category not necessarily invalidated if granular design supports.
 
-Sitemap/feed HTTP:
+Async sitemap refresh:
 
-- initial request returns 200 + Content-Type + ETag and/or Last-Modified,
-- matching If-None-Match / If-Modified-Since returns 304 with no stale body requirement,
-- publish/archive/slug change that changes representation rotates validator and returns fresh 200,
-- unchanged corpus keeps stable validator,
-- no validator may cause a changed sitemap/feed to remain incorrectly 304.
+- successful public-state commit enqueues refresh after commit,
+- rollbacked DB transaction does not enqueue public sitemap change,
+- burst kilku publikacji jest debounced/unique do ograniczonej liczby pełnych refreshy,
+- publish request nie czeka na pełne `SeoSitemapGenerator::generate`,
+- failed async refresh nie cofa publikacji, ale generuje monitorowalny failure,
+- daily scheduled `seo:refresh-sitemaps` nadal działa jako recovery path.
+
+Static HTTP delivery:
+
+- production-like test/HTTP smoke odczytuje faktyczny statyczny `sitemap.xml` / child files,
+- poprawny Content-Type,
+- brak Set-Cookie,
+- jeśli Nginx/CDN ma validators: matching conditional request zwraca 304,
+- zmiana artefaktu zmienia validator,
+- test nie uznaje headerów `SitemapController` za wystarczające, jeśli statyczny plik ma pierwszeństwo.
+
+Feed może mieć oddzielny test validators na warstwie aplikacyjnej.
 
 Nie testować implementation detail cache key jeśli kontrakt może być testowany przez rezultat.
 
@@ -612,7 +635,8 @@ Minimum:
 - source persistence,
 - origin/regulatory persistence,
 - topic relation persistence,
-- focal point persistence,
+- hero caption/focal point persistence,
+- brak edytowalnego canonical override,
 - relation persistence,
 - publish blocked with missing requirements,
 - schedule works,
@@ -832,11 +856,15 @@ Nie kopiować sekretów ani DB dump do repo.
 7. admin resource smoke
 8. public /aktualnosci smoke
 9. sample article smoke
-10. sitemap/feed smoke
-11. sitemap/feed conditional 304 smoke
-12. homepage site-name/Organization graph smoke
-13. logs check
-14. Search Console actions after stable production
+10. uruchom/zweryfikuj statyczny sitemap refresh + audit
+11. sprawdź main index -> wszystkie child files 200
+12. sprawdź brak regresji istniejących question/sign/legal/author sitemap
+13. sitemap static HTTP headers / conditional 304 smoke, jeśli skonfigurowane
+14. feed smoke/validators
+15. homepage site-name/Organization graph smoke
+16. robots HTTP response + Sitemap directive
+17. logs/queue refresh failures check
+18. Search Console actions after stable production
 
 ---
 
@@ -1011,14 +1039,16 @@ Jeśli draft stał się publiczny:
 - [ ] /o-nas
 - [ ] /kontakt
 - [ ] /metodologia
+- [ ] /robots.txt — rzeczywista odpowiedź zawiera canonical Sitemap directive
 - [ ] related question link
 - [ ] related legal link
 - [ ] reverse link z co najmniej jednej istniejącej entity/content page do newsroom article
 
 ### SEO
 
-- [ ] canonical
-- [ ] robots
+- [ ] self-canonical bez CMS override
+- [ ] route family exclusivity
+- [ ] robots — statyczny/produkcyjny response zweryfikowany HTTP
 - [ ] JSON-LD graph @id consistency
 - [ ] homepage WebSite/site name + Organization
 - [ ] no legacy Orły na Drodze identity
@@ -1028,10 +1058,12 @@ Jeśli draft stał się publiczny:
 - [ ] visible dates == structured date semantics
 - [ ] OG image + alt + stable public URL
 - [ ] og:site_name
-- [ ] articles sitemap/shard
-- [ ] news sitemap required metadata
+- [ ] articles sitemap/shard z istniejącego static generatora
+- [ ] news sitemap required metadata + fresh async refresh
+- [ ] child-before-index atomic publication
 - [ ] feed + head discovery
-- [ ] sitemap/feed 304 validators
+- [ ] sitemap static delivery headers/304 na faktycznej warstwie
+- [ ] brak regresji istniejących question/sign/legal/author sitemap
 
 ### Admin
 
@@ -1120,8 +1152,10 @@ Runbook jest spełniony, gdy:
 - first release ma backup/smoke/rollback plan,
 - scheduler ma monitoring,
 - entity graph/site identity ma regression coverage,
-- semantic silo/orphan/reverse-link rules mają regression coverage,
-- sitemap scaling/news metadata/304 mają regression coverage,
+- route-family/canonical exclusivity ma regression coverage,
+- semantic silo/orphan/reverse-link rules mają regression coverage bez modyfikacji question graphu,
+- static sitemap atomic publication/async refresh/news metadata ma regression coverage,
+- rzeczywista warstwa static delivery/robots ma production smoke,
 - content może być cofnięty bez deploy,
 - draft/XSS/canonical incidents mają procedurę,
 - test/release docs są aktualizowane po faktycznej zmianie pipeline.
@@ -1137,7 +1171,8 @@ Na 2026-09-16:
 - istnieją ops backup/restore/health commands,
 - newsroom-specific tests i E2E jeszcze nie istnieją,
 - homepage placement/topic/block editor tests jeszcze nie istnieją,
-- newsroom entity graph/news sitemap/sharding/feed-discovery/304 tests jeszcze nie istnieją,
+- newsroom entity graph/news sitemap/sharding/feed-discovery/static-delivery tests jeszcze nie istnieją,
+- atomic static publication i async newsroom refresh jeszcze nie istnieją,
 - istniejący SeoSitemapAuditor nie obsługuje jeszcze newsroom/news namespace.
 
 ---
@@ -1150,7 +1185,9 @@ Na 2026-09-16:
 - [ ] dodać block/composition/topic/focal-point tests,
 - [ ] dodać site-identity/entity-graph/date-consistency tests,
 - [ ] dodać semantic silo/orphan/reverse-link/click-depth tests,
-- [ ] dodać news namespace + sitemap sharding + 304/feed-discovery tests,
+- [ ] dodać route-family/canonical exclusivity tests,
+- [ ] dodać news namespace + sitemap sharding + atomic publish + async refresh/feed-discovery tests,
+- [ ] dodać production-like static robots/sitemap delivery smoke,
 - [ ] rozszerzyć istniejący SeoSitemapAuditor,
 - [ ] stworzyć production smoke checklist w praktyce,
 - [ ] po pierwszym release wpisać rzeczywiste wyniki i ewentualne różnice od planu.
@@ -1158,6 +1195,14 @@ Na 2026-09-16:
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-16 — v0.4
+
+- dodano route-family/canonical exclusivity tests,
+- dodano gwarancję, że newsroom article-question edges nie modyfikują istniejącego question graphu,
+- zastąpiono controller-centric sitemap validator tests testami rzeczywistego statycznego delivery,
+- dodano child-before-index atomic publication, async/debounced refresh i daily recovery tests,
+- dodano produkcyjny robots/static sitemap smoke bez usuwania istniejącego backendu.
 
 ### 2026-09-16 — v0.3
 
