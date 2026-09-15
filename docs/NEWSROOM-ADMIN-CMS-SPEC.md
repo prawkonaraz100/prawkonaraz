@@ -550,6 +550,7 @@ Record actions:
 - Mark needs review
 - Archive
 - Withdraw from public
+- Restore to review — tylko dla withdrawn
 - Preview
 
 Każda action:
@@ -564,6 +565,13 @@ Każda action:
 - pokazuje, że URL stanie się 410 i zniknie z dystrybucji,
 - nie jest bulk action,
 - jeśli istnieje realny następca, administrator zamiast tego używa kontrolowanego redirect flow.
+
+`Restore to review`:
+
+- nie przywraca publicznej treści,
+- zmienia workflow do in_review,
+- dawny URL nadal daje 410, dopóki ponowny Publish nie przejdzie pełnej walidacji,
+- ponowny Publish czyści aktywny withdrawal tombstone po zapisaniu historii w AuditLog.
 
 ---
 
@@ -745,7 +753,7 @@ Każdy slot pokazuje:
 - aktualnie przypisany artykuł,
 - okres aktywności,
 - fallback, który zostałby użyty bez ręcznego przypisania,
-- warning, jeśli artykuł jest archiwalny, draftem lub nie będzie publiczny w wybranym czasie.
+- warning i brak możliwości aktywnego zapisu, jeśli artykuł nie będzie `activelyDistributed()` w wybranym czasie; dotyczy m.in. needs_review, archived, active-withdrawal tombstone, draft i future scheduled poza wybranym czasem.
 
 ### 33.2. Obsługa placementu
 
@@ -809,7 +817,7 @@ Publicacja topicu blokuje, jeśli:
 
 - brak własnego opisu redakcyjnego,
 - mniej niż 3 actively-distributed, indeksowalne artykuły w corpus,
-- featured article jest ustawiony, ale nie jest publiczny lub nie należy do tego topicu.
+- featured article jest ustawiony, ale nie jest actively-distributed + indexable albo nie należy do tego topicu.
 
 Dodatkowo:
 
