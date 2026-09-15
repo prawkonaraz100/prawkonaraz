@@ -1721,7 +1721,7 @@ N0-002/N0-003/N0-004/N0-006 można następnie zamykać według macierzy hard dep
 - dodano N0 compatibility contract chroniący istniejący sitemap/robots/question graph backend,
 - zablokowano cross-route-family type changes po first publish,
 - usunięto canonical override i featured_position z planowanego v1,
-- rozszerzono N5 o istniejący statyczny SeoSitemapGenerator, atomowy publication switch i async/debounced refresh,
+- historycznie rozszerzono N5 o istniejący statyczny SeoSitemapGenerator, atomowy publication switch i async/debounced refresh; **refresh model zastąpiono później** dirty/version + scheduler/lock po audycie realnego queue contract,
 - przeniesiono HTTP validator verification na faktyczną warstwę static/Nginx/CDN,
 - robots cleanup oddzielono od newsroom implementation, aby nie ryzykować regresji serwisu.
 
