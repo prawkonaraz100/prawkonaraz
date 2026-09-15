@@ -106,8 +106,6 @@ Pola:
 - category_id: FK -> content_categories, wymagane
 - author_id: FK -> content_authors, wymagane przy publikacji
 - reviewer_id: FK -> content_authors, nullable
-- created_by_user_id: FK -> users, nullable
-- updated_by_user_id: FK -> users, nullable
 - origin_type: varchar(32), default original
 
 ### 5.2. Treść
@@ -1204,7 +1202,6 @@ Docelowe zasady:
 
 - `content_articles.category_id -> content_categories`: restrict/no cascade,
 - `author_id/reviewer_id -> content_authors`: restrict/no cascade, aby nie utracić attribution/review identity,
-- `created_by_user_id/updated_by_user_id -> users`: nullable + nullOnDelete,
 - `content_topics.featured_article_id -> content_articles`: nullable + nullOnDelete,
 - child records należące wyłącznie do artykułu (`sources`, redirects, home placements, article-* pivots) mogą cascade-delete przy dopuszczalnym hard delete artykułu,
 - pivot FK do istniejącego question/legal/sign może cascade-delete wyłącznie **wiersz pivotu**, gdy target zostaje usunięty; nigdy nie ma ścieżki kasującej question/legal/sign z powodu usunięcia artykułu,
@@ -1303,7 +1300,7 @@ Redirect history:
 
 ## 34. Audit
 
-Istniejący `AuditLog` / `AuditLogService` jest kanoniczną warstwą audytu. Nie dodajemy do `content_articles` pól `published_by` / `reviewed_by` tylko po to, by powielać historię aktorów.
+Istniejący `AuditLog` / `AuditLogService` jest kanoniczną warstwą audytu. Nie dodajemy do `content_articles` pól `created_by_user_id`, `updated_by_user_id`, `published_by` ani `reviewed_by` tylko po to, by powielać historię aktorów. Bieżącego/pierwszego aktora UI wyprowadza z audytu.
 
 `actor_user_id` wskazuje zalogowanego `User` administratora; scheduled/system action może mieć actor=null z jawnym metadata `trigger=scheduler`.
 
@@ -1575,6 +1572,7 @@ Na moment utworzenia dokumentu:
 - dodano jawny status withdrawn z backoffice reason/timestamp i 410 public disposition, oddzielając historyczne archive od takedownu,
 - dodano public_state_changed_at dla uczciwego sitemap lastmod bez zanieczyszczania dateModified/updated_at,
 - zdefiniowano bezpieczne kierunki FK/on-delete, aby newsroom nie mógł kaskadowo usuwać istniejących bytów produktu,
+- usunięto redundantne created_by/updated_by z ContentArticle; AuditLog pozostaje jedynym źródłem aktorów artykułu,
 - dodano immutable public slugs/active-category guards, trwałą rezerwację historycznych article paths i minimalny topic corpus baseline,
 - rozdzielono freshness overdue od jawnego workflow needs_review,
 - doprecyzowano faktyczny media baseline: resolver/config istnieją, ale uploader jest question-specific; newsroom wymaga własnego bezpiecznego adaptera,
