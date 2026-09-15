@@ -127,11 +127,21 @@ Preferowany:
 - sprawdzić conflicts z istniejącymi routes,
 - reserved slug list,
 - route naming convention,
+- jawnie zmapować type -> route family,
 - test route matching.
+
+### Route family
+
+- news/explainer/analysis/report -> `/aktualnosci/{slug}`
+- guide -> `/poradniki/{slug}`
+
+Po pierwszej publikacji zwykła edycja nie może przenieść rekordu pomiędzy tymi rodzinami.
 
 ### DoD
 
 - brak ambiguity category vs article,
+- ten sam rekord nie odpowiada 200 pod oboma route families,
+- cross-family type change po first publish zablokowany,
 - dokumenty aktualizowane.
 
 ---
@@ -190,6 +200,36 @@ Domknąć techniczny sposób edycji kanonicznego `body_blocks`.
 
 ---
 
+
+## NEWSROOM-N0-005 — Existing SEO delivery compatibility contract
+
+### Cel
+
+Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed rozpoczęciem N5.
+
+### Potwierdzony fundament
+
+- `SEO-SITEMAP-REPAIR-PLAN.md` preferuje statyczne artefakty w `public/`,
+- istnieją `SeoSitemapGenerator`, `SeoSitemapBuilder`, `SeoSitemapAuditor`,
+- działa daily `seo:refresh-sitemaps`,
+- istnieją równolegle route `SitemapController` oraz statyczne XML,
+- istnieją statyczny `public/robots.txt` i `RobotsController`,
+- istniejący question relation graph/taksonomia jest osobnym nadrzędnym subsystemem.
+
+### Decyzja
+
+- newsroom rozszerza statyczny generator/auditor zamiast tworzyć drugi sitemap engine,
+- nie usuwa kontrolerów ani nie zmienia Nginx/Cloudflare w PR-ach N1-N4,
+- newsroom article-question relation nie edytuje `question_relations` ani `question_seo_topics`,
+- produkcyjny robots/sitemap source musi być zweryfikowany HTTP przed jakimkolwiek cleanupem duplikatu.
+
+### DoD
+
+- implementacja N1-N4 nie zmienia zachowania istniejących sitemap/robots/question graph,
+- N5 ma osobny rollback i regression suite dla starego SEO backendu.
+
+---
+
 # N1 — Domain and database
 
 ## NEWSROOM-N1-001 — Enums + migrations
@@ -203,7 +243,9 @@ Domknąć techniczny sposób edycji kanonicznego `body_blocks`.
 - ContentArticleRegulatoryStatus
 - content topics
 - content home placements
-- body_blocks + focal point + regulatory fields
+- body_blocks + hero caption + focal point + regulatory fields
+- brak `canonical_url` override w v1
+- brak `featured_position` w content_articles; pozycja wyłącznie w content_home_placements
 - tables zgodne z data spec.
 
 ### Testy
@@ -252,14 +294,20 @@ Domknąć techniczny sposób edycji kanonicznego `body_blocks`.
 - unique handling,
 - published slug change,
 - redirect record,
-- no chains.
+- no chains,
+- type -> route family resolver,
+- block cross-family type change after first publication.
 
 ### Testy
 
 - draft slug change,
 - published slug change,
 - old path redirect,
-- duplicate slug reject.
+- duplicate slug reject,
+- draft guide -> news allowed before first publish,
+- published guide -> news blocked,
+- published news -> analysis keeps same canonical family,
+- same record never returns 200 under both route families.
 
 ---
 
@@ -538,10 +586,17 @@ Computed blocking/warning items.
 
 - title,
 - description,
-- canonical,
+- self-canonical wyliczony z route family + slug,
+- brak CMS canonical override,
 - robots,
 - OG/Twitter,
 - dates.
+
+### DoD
+
+- canonical/og:url/schema url są zgodne,
+- stary redirect path nie pozostaje 200,
+- guide i newsroom article nie mają konkurencyjnych canonical URLs.
 
 ---
 
@@ -582,9 +637,9 @@ Dodatkowo:
 
 ### Zakres
 
-- breadcrumbs,
+- breadcrumbs zależne od route family,
 - H1/lead/byline/provenance,
-- hero + focal-point crops,
+- hero + alt/caption/credit + focal-point crops,
 - regulatory/exam context box,
 - body block renderer,
 - sources,
@@ -771,6 +826,7 @@ Zaimplementować jawny internal-link graph bez tworzenia automatycznej link farm
 - primary category link dla każdego public article,
 - topic links tylko dla jawnych relacji,
 - article -> legal/question/sign/public related links,
+- article-question edge zapisany wyłącznie w newsroom pivot bez modyfikowania `question_relations` / `question_seo_topics`,
 - ograniczone reverse links z legal/question/sign surfaces do wybranych public articles,
 - natural/descriptive anchors,
 - deterministic related resolver,
@@ -789,7 +845,9 @@ Zaimplementować jawny internal-link graph bez tworzenia automatycznej link farm
 
 # N5 — SEO, distribution and analytics
 
-## NEWSROOM-N5-001 — Articles sitemap + deterministic sharding
+## NEWSROOM-N5-001 — Extend static generator: articles sitemap + deterministic sharding
+
+Rozszerzyć istniejący `SeoSitemapGenerator` / `SeoSitemapBuilder`, nie tworzyć osobnego generatora.
 
 - wszystkie publiczne indexable articles,
 - meaningful lastmod,
@@ -819,7 +877,9 @@ Zaimplementować jawny internal-link graph bez tworzenia automatycznej link farm
 - news:publication_date = original first_published_at,
 - news:title = visible title bez author/brand/date,
 - split powyżej aktualnego limitu entry,
-- sitemap index integration.
+- sitemap index integration,
+- statyczny output generowany przez istniejący generator,
+- `news:name` po launch porównane z nazwą publikacji widoczną w Google News.
 
 ### Testy
 
@@ -883,32 +943,56 @@ Raportuje/testuje m.in.:
 - broken related relation,
 - draft target,
 - source URL empty,
-- expired breaking.
+- expired breaking,
+- index wskazujący brakujący child,
+- duplicate/stale obsolete shard po publication switch.
 
 Można dodać newsroom-specific `newsroom:audit-links` dla graph/link checks, ale sitemap rules pozostają w istniejącym audytorze.
 
 ---
 
-## NEWSROOM-N5-007 — Crawler-facing HTTP caching
+## NEWSROOM-N5-007 — Static sitemap publication + freshness + delivery hardening
 
 ### Zakres
 
-Sitemap + feed responses:
+Nie zmieniamy produkcyjnego modelu na runtime generation.
 
-- ETag i/lub Last-Modified,
-- conditional request -> 304, gdy representation unchanged,
-- Cache-Control zgodny z invalidation,
-- zmiana corpus -> nowy validator / 200 z nowym outputem.
+1. rozszerzyć istniejący statyczny generator o newsroom/news,
+2. generować komplet payloadów przed publikacją,
+3. walidować przed przełączeniem,
+4. atomowo podmieniać child files,
+5. podmieniać główny `sitemap.xml` dopiero na końcu,
+6. stare, nieużywane shardy usuwać po przełączeniu indexu,
+7. po publicznym publish/archive/slug/substantive update dispatchować async debounced refresh po commit,
+8. istniejący daily `seo:refresh-sitemaps` zachować jako safety net.
 
-### Stan istniejący
+### Robots compatibility
 
-Obecny `SitemapController` ustawia Content-Type, ale nie ma jeszcze validators/304.
+- nie usuwać `RobotsController` w tym tasku,
+- zweryfikować produkcyjny `/robots.txt` przez HTTP i warstwę Nginx/Cloudflare,
+- `public/robots.txt` pozostaje preferowanym kontraktem zgodnie z SEO-SITEMAP-REPAIR-PLAN,
+- cleanup duplikatu tylko w osobnym późniejszym PR.
+
+### HTTP delivery
+
+Dla statycznych XML/TXT sprawdzić rzeczywistą warstwę serwującą:
+
+- Content-Type,
+- public Cache-Control,
+- brak Set-Cookie,
+- ETag/Last-Modified/304, jeśli wspierane przez Nginx/CDN.
+
+Nie zaliczamy tasku przez dodanie headerów tylko do `SitemapController`.
+
+Feed może mieć validators aplikacyjne osobno.
 
 ### DoD
 
-- 304 działa dla unchanged response,
-- publish/archive/slug-change nie zostawia stale XML/feed,
-- testy HTTP headers i body.
+- nie istnieje okno, w którym nowy index wskazuje brakujący child,
+- publiczny publish nie czeka synchronicznie na pełną generację sitemap,
+- fresh news trafia do statycznego news XML w docelowym SLA kilku minut,
+- awaria async refresh jest monitorowana, a daily cron zachowuje recovery path,
+- istniejące question/sign/legal/author sitemap pozostają bez regresji.
 
 ---
 
@@ -931,7 +1015,8 @@ hub -> article -> related question -> product.
 - create scheduled sample,
 - verify not visible before,
 - verify visible after scheduler,
-- verify sitemap/feed.
+- verify async sitemap/feed refresh,
+- verify news sitemap artifact becomes fresh without waiting for next daily cron.
 
 ---
 
@@ -948,8 +1033,11 @@ hub -> article -> related question -> product.
 - child sitemap/shard diagnostics where useful,
 - news sitemap sample,
 - feed discovery,
-- robots,
-- conditional 304 sample for sitemap/feed,
+- rzeczywisty produkcyjny robots response + Sitemap directive,
+- statyczny sitemap index/child consistency,
+- brak Set-Cookie na statycznym XML/TXT,
+- conditional 304 sample na faktycznej warstwie static/CDN, jeśli skonfigurowane,
+- feed validators osobno,
 - Search Console segmentation articles/categories/topics/guides.
 
 ---
@@ -1318,6 +1406,15 @@ NEWSROOM-N0-002 / N0-003 / N0-004.
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.4
+
+- dodano N0 compatibility contract chroniący istniejący sitemap/robots/question graph backend,
+- zablokowano cross-route-family type changes po first publish,
+- usunięto canonical override i featured_position z planowanego v1,
+- rozszerzono N5 o istniejący statyczny SeoSitemapGenerator, atomowy publication switch i async/debounced refresh,
+- przeniesiono HTTP validator verification na faktyczną warstwę static/Nginx/CDN,
+- robots cleanup oddzielono od newsroom implementation, aby nie ryzykować regresji serwisu.
 
 ### 2026-09-16 — v0.3
 
