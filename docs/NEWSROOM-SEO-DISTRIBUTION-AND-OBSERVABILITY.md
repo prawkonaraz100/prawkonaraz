@@ -144,6 +144,16 @@ Domyślnie:
 
 Canonical nie służy jako metoda maskowania źle zaprojektowanego routingu.
 
+Enterprise rule: sygnały muszą być zbieżne. Dla canonical URL:
+
+- internal links wskazują canonical,
+- sitemap zawiera canonical,
+- redirect source nie pozostaje równoległym 200,
+- OG url i schema url/mainEntityOfPage zgadzają się z canonical,
+- nie tworzymy sprzecznego noindex/canonical/sitemap zestawu.
+
+Rel=canonical jest sygnałem, nie gwarancją wyboru przez wyszukiwarkę; po rollout porównujemy declared i Google-selected canonical w Search Console.
+
 ---
 
 ## 6. URL policy
@@ -167,7 +177,15 @@ Alternatywa krótsza wymaga reserved-slug policy.
 
 Topic jest jawnie opublikowanym hubem redakcyjnym, nie automatyczną stroną taga.
 
-### 6.4. Slug
+### 6.4. Język / hreflang
+
+V1 jest polskojęzyczne.
+
+- HTML/schema używają właściwego języka `pl` / `pl-PL` zależnie od kontraktu,
+- nie dodajemy pustych ani sztucznych hreflang variants,
+- hreflang pojawia się dopiero, gdy istnieją realne, równoważne wersje językowe z własnymi canonical URLs.
+
+### 6.5. Slug
 
 Slug:
 
@@ -383,6 +401,19 @@ Opcjonalnie tylko gdy odpowiada treści:
 
 Nie deklarujemy properties tylko dlatego, że istnieją w schema.org; markup musi odpowiadać widocznym i prawdziwym danym.
 
+### 16.1. CollectionPage graph dla hubów
+
+`/aktualnosci`, category pages, topic/dossier i `/poradniki` korzystają z istniejącego graph pattern analogicznego do innych publicznych hubów:
+
+- WebSite / Organization przez stabilne @id,
+- CollectionPage/WebPage dla bieżącego canonical,
+- BreadcrumbList,
+- ItemList dla widocznego, crawlable zestawu artykułów, gdy jest semantycznie użyteczny.
+
+Hub nie udaje `NewsArticle`. ItemList references prowadzą do canonical article URLs i odpowiadają faktycznie widocznym elementom strony.
+
+Nie traktujemy CollectionPage/ItemList jako obietnicy rich result; celem jest spójna semantyka entity graph.
+
 ---
 
 ## 17. datePublished
@@ -441,6 +472,8 @@ ProfilePage / Person może zawierać wyłącznie prawdziwe dane istniejącego au
 Nie tworzymy fikcyjnych autorów typu „Redakcja”, jeśli nie ma publicznej strony i jasnej odpowiedzialności. Nie dopisujemy credentials/ekspertyzy, których system i publiczny profil nie potwierdzają.
 
 Po wdrożeniu newsroomu publiczny profil autora i sitemap lastmod autorów muszą uwzględniać również opublikowane ContentArticle, a nie tylko starsze moduły contentowe.
+
+Stan obecny: `ContentAuthorController` i `TrafficSignSchemaService::author()` już renderują publiczny ProfilePage, ale podczas integracji newsroomu jego `mainEntity Person` należy wyrównać do tego samego stabilnego `/autorzy/{slug}#person` i `worksFor -> /#organization`, którego używa article graph. Nie tworzymy drugiego ProfilePage.
 
 ---
 
