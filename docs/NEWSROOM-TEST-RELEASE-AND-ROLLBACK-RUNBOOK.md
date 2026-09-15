@@ -42,7 +42,12 @@ Dla:
 - schema builder,
 - checklist computation,
 - slug normalization,
-- freshness policy.
+- freshness policy,
+- body block validation,
+- homepage placement resolution,
+- homepage deduplication,
+- regulatory/origin labels,
+- focal-point normalization.
 
 ### 3.2. Feature / integration
 
@@ -52,6 +57,9 @@ Dla:
 - publishing workflow,
 - scheduling,
 - redirects,
+- topics,
+- homepage placements,
+- future homepage preview,
 - routes,
 - sitemap/feed,
 - admin policies,
@@ -63,8 +71,13 @@ Dla:
 
 - meta,
 - structured data,
-- body sanitization,
+- body block rendering/sanitization,
+- regulatory context,
+- provenance/byline,
+- focal-point-aware media variants,
 - article modules,
+- homepage composition/deduplication,
+- topic page,
 - breadcrumbs,
 - category pagination.
 
@@ -92,13 +105,18 @@ tests/Feature/Newsroom/
   ContentArticleFeedTest.php
   ContentArticleSecurityTest.php
   ContentArticlePolicyTest.php
+  ContentTopicTest.php
+  ContentHomePlacementTest.php
   NewsroomHomeTest.php
+  NewsroomHomePreviewTest.php
 
 tests/Unit/Newsroom/
   ContentArticleSeoServiceTest.php
   ContentArticleSchemaServiceTest.php
   ContentArticleChecklistTest.php
   ContentArticleFreshnessTest.php
+  ContentArticleBlockValidationTest.php
+  NewsroomHomeCompositionServiceTest.php
 
 tests/e2e/
   newsroom-editorial.spec.ts
@@ -174,7 +192,8 @@ Publish blokuje:
 - brak title,
 - brak slug,
 - brak lead,
-- brak body,
+- brak renderowalnego body_blocks,
+- invalid block payload,
 - brak category,
 - brak author,
 - brak wymaganych źródeł,
@@ -246,17 +265,26 @@ Jeśli jeden rekord nie może się opublikować, strategia ma być jawna:
 
 ---
 
-## 13. Sanitization security tests
+## 13. Block validation and sanitization security tests
 
 Payloads:
 
-- script tag,
+- unknown block type,
+- malformed block payload,
+- script tag inside rich_text,
 - onclick attribute,
 - javascript: URL,
 - iframe unknown host,
 - style injection,
 - malformed HTML,
 - SVG payload if editor allows image markup.
+
+Expected:
+
+- unknown/invalid block rejected or safely ignored according to contract,
+- no arbitrary HTML/CSS/JS execution,
+- allowed rich text preserved,
+- allowlisted embed only.
 
 Expected:
 
@@ -308,6 +336,22 @@ Assertions:
 - article:published_time,
 - article:modified_time when applicable,
 - twitter card.
+
+---
+
+## 15.1. Provenance, regulatory context and media tests
+
+Assertions:
+
+- origin label rendered only for supported origin type,
+- internal origin notes never leak,
+- regulatory box shows only applicable non-empty fields,
+- proposal/consultation is not rendered as in_force,
+- effective_from uses expected public date format,
+- focal point stays within 0..1 contract,
+- generated/card image variant uses focal metadata,
+- missing focal point falls back to center,
+- hero dimensions remain present.
 
 ---
 
@@ -365,22 +409,30 @@ URLs absolute/canonical zgodnie z istniejącym schema pattern.
 
 ---
 
-## 20. Newsroom home tests
+## 20. Newsroom home composition tests
 
 Given fixtures:
 
-- one lead/featured,
-- secondary,
+- manual lead placement,
+- secondary placements,
 - latest,
 - category content,
-- guide.
+- guide,
+- fallback candidates,
+- scheduled future article.
 
 Assert:
 
-- no drafts,
-- no future scheduled,
-- correct order,
+- active manual placement wins,
+- expired placement ignored,
+- future placement ignored for current render,
+- future preview resolves scheduled article only after selected publication time,
+- no drafts in current public render,
+- same article not repeated across card modules,
+- fallback fills empty slot deterministically,
+- insufficient unique candidates shorten section instead of duplicating,
 - expired breaking not shown,
+- breaking may point to lead as explicit alert exception,
 - empty category block omitted.
 
 ---
@@ -393,6 +445,19 @@ Assert:
 - pagination,
 - page 2 self-canonical,
 - invalid category 404.
+
+---
+
+## 22. Topic / dossier tests
+
+- draft topic public route -> 404,
+- published topic -> 200,
+- description rendered,
+- featured article must be public,
+- only public linked articles rendered,
+- tag creation does not create topic URL,
+- pagination/canonical correct,
+- empty/thin topic publish validation according to CMS policy.
 
 ---
 
@@ -474,7 +539,11 @@ Minimum:
 - unauthorized user denied,
 - create draft,
 - update draft,
+- body block persistence/reorder/validation,
 - source persistence,
+- origin/regulatory persistence,
+- topic relation persistence,
+- focal point persistence,
 - relation persistence,
 - publish blocked with missing requirements,
 - schedule works,
@@ -488,10 +557,13 @@ Minimum:
 login admin
 → open Content Articles
 → create draft
-→ type/category/author
-→ title/lead/body
+→ type/category/author/origin
+→ title/lead
+→ add/reorder body blocks
+→ add regulatory context if applicable
 → add source
-→ link question
+→ link question/topic
+→ set hero focal point
 → save
 → preview
 → submit review
@@ -516,6 +588,23 @@ create complete article
 ~~~
 
 Production smoke nie używa sztucznego time travel; używa bezpiecznego realnego test record lub staging.
+
+---
+
+## 29.1. E2E Golden Path — editorial homepage composition
+
+~~~text
+publish several articles
+→ open Newsroom Home Composer
+→ assign lead/secondary/category lead
+→ schedule one future placement
+→ preview current /aktualnosci
+→ verify no duplicate cards
+→ preview future timestamp
+→ verify future scheduled article appears only after its publish time
+→ open public /aktualnosci
+→ verify current composition
+~~~
 
 ---
 
@@ -843,7 +932,8 @@ Jeśli draft stał się publiczny:
 - [ ] /
 - [ ] /aktualnosci
 - [ ] one category
-- [ ] one news
+- [ ] one topic/dossier
+- [ ] one news with multiple block types
 - [ ] one guide
 - [ ] /autorzy/{author}
 - [ ] related question link
@@ -863,7 +953,9 @@ Jeśli draft stał się publiczny:
 
 - [ ] list
 - [ ] edit
-- [ ] preview
+- [ ] article preview
+- [ ] home composer
+- [ ] future home preview
 - [ ] save draft
 
 ---
@@ -954,7 +1046,8 @@ Na 2026-09-15:
 - istnieją globalne backend tests,
 - istnieje Playwright smoke dla produktu,
 - istnieją ops backup/restore/health commands,
-- newsroom-specific tests i E2E jeszcze nie istnieją.
+- newsroom-specific tests i E2E jeszcze nie istnieją,
+- homepage placement/topic/block editor tests jeszcze nie istnieją.
 
 ---
 
@@ -963,12 +1056,21 @@ Na 2026-09-15:
 - [ ] dodać test files w trakcie N1–N5,
 - [ ] podłączyć do CI,
 - [ ] stworzyć newsroom E2E,
+- [ ] dodać block/composition/topic/focal-point tests,
 - [ ] stworzyć production smoke checklist w praktyce,
 - [ ] po pierwszym release wpisać rzeczywiste wyniki i ewentualne różnice od planu.
 
 ---
 
 ## 58. Historia zmian
+
+### 2026-09-15 — v0.2
+
+- rozszerzono test matrix o body blocks, homepage placements, future preview i deduplikację,
+- dodano topic/dossier, provenance/regulatory i focal-point testy,
+- rozszerzono golden path CMS i dodano golden path kompozycji strony głównej,
+- doprecyzowano security/performance smoke dla nowych mechanizmów,
+- nie dodano testów revision snapshot/diff/restore, ponieważ funkcja jest poza zakresem.
 
 ### 2026-09-15 — v0.1
 
