@@ -1119,7 +1119,7 @@ Szczegółowy tasking i granice PR-ów są kanonicznie utrzymywane w [NEWSROOM-I
 - publisher/Organization branding source of truth,
 - finalny route contract,
 - taxonomy v1,
-- decyzja editor + sanitization.
+- block editor + serialization + sanitization decision.
 
 **Exit criteria:** nie ma nierozstrzygniętej decyzji, która zmieniałaby schema, routing albo bezpieczeństwo body.
 
@@ -1128,22 +1128,29 @@ Szczegółowy tasking i granice PR-ów są kanonicznie utrzymywane w [NEWSROOM-I
 - migrations,
 - enumy,
 - models/factories,
+- topics,
+- home placements,
 - slug redirects,
 - publishing service,
-- scheduler.
+- scheduler,
+- home composition service.
 
 **Exit criteria:** domena może bezpiecznie przechować i deterministycznie opublikować artykuł bez CMS i publicznego renderera.
 
 ### Etap N2 — CMS + workflow
 
 - ContentCategoryResource,
+- ContentTopicResource,
 - ContentArticleResource,
-- body editor,
+- controlled block editor,
+- origin/regulatory context,
+- media focal point/crop preview,
 - źródła,
 - relacje,
 - workflow actions,
 - checklist,
-- preview.
+- article preview,
+- NewsroomHomeComposer + future preview.
 
 **Exit criteria:** redaktor może przygotować, sprawdzić, podejrzeć, zaplanować i opublikować artykuł bez edycji kodu.
 
@@ -1152,16 +1159,20 @@ Szczegółowy tasking i granice PR-ów są kanonicznie utrzymywane w [NEWSROOM-I
 - public catalog service,
 - SEO/schema services,
 - Blade article page,
+- controlled block renderer,
+- provenance + regulatory context,
+- focal-point-aware media,
 - sources/byline,
 - product bridge,
 - old-slug redirects.
 
 **Exit criteria:** pojedynczy opublikowany artykuł jest poprawnie renderowany, indeksowalny i połączony z istniejącym produktem.
 
-### Etap N4 — hub + kategorie + poradniki
+### Etap N4 — hub + kategorie + topics + poradniki
 
-- editorial home `/aktualnosci`,
+- editorial home `/aktualnosci` z placements/fallback/dedupe,
 - category pages,
+- topic/dossier pages,
 - `/poradniki`,
 - navigation integration,
 - cache/invalidation.
@@ -1207,11 +1218,14 @@ Dopiero po realnym ruchu i obserwacji:
 Newsroom v1 jest ukończony, gdy:
 
 - artykuł powstaje bez zmiany kodu,
-- ma autora, kategorię, źródła i workflow,
-- preview działa bez publicznej indeksacji,
+- ma autora, kategorię, origin, źródła i workflow,
+- treść korzysta z kontrolowanego body_blocks,
+- preview artykułu działa bez publicznej indeksacji,
+- home composer i future preview działają na tym samym resolverze co publiczny hub,
 - publikacja i scheduling działają deterministycznie,
-- `/aktualnosci` ma redakcyjną hierarchię,
-- istnieje publiczna strona artykułu,
+- `/aktualnosci` ma redakcyjną hierarchię, placements, fallback i deduplikację,
+- istnieje publiczna strona artykułu z regulatory context i focal-point-aware media,
+- publikowany topic/dossier ma własną wartość i nie jest aliasem taga,
 - canonical/meta/schema są poprawne,
 - sitemap/feed uwzględniają właściwe rekordy,
 - artykuł może być połączony z pytaniami i treścią prawną,
@@ -1234,12 +1248,19 @@ Newsroom v1 jest ukończony, gdy:
 6. Page builder nie wchodzi do v1; stosujemy kontrolowane moduły.
 7. Komentarze użytkowników są poza scope v1.
 8. Kategorie używają ścieżki `/aktualnosci/kategoria/{categorySlug}`.
-9. Feed v1 używa `/aktualnosci/feed.xml`.
-10. Publiczne strony newsroomu są SSR/Blade-first.
+9. Topic/dossier używa ścieżki `/aktualnosci/temat/{topicSlug}`.
+10. Feed v1 używa `/aktualnosci/feed.xml`.
+11. Publiczne strony newsroomu są SSR/Blade-first.
+12. Strona główna korzysta z kontrolowanych placements i fallbacków, nie z pełnego page buildera.
+13. Body artykułu jest kontrolowanym dokumentem blokowym; szczegół serializacji domyka N0-004.
+14. Topic jest odrębnym bytem od taga.
+15. Media używają focal point i deterministycznych cropów, jeśli pipeline je wspiera.
+16. Audio/AI są rozszerzeniami po v1, bez prealokowania schema.
+17. Osobny revision snapshot/diff/restore system pozostaje poza zakresem.
 
 ### 25.2. Otwarte decyzje N0 wymagające domknięcia przed implementacją zależnych elementów
 
-- konkretny editor body i techniczna strategia sanitization (`NEWSROOM-N0-004`),
+- konkretny komponent block editora, serializacja payloadów i techniczna strategia sanitization (`NEWSROOM-N0-004`),
 - finalne źródło brand name/logo/publisher po usunięciu pozostałości „Orły na Drodze” (`NEWSROOM-N0-001`),
 - finalne wspólne design tokens używane przez newsroom po audycie obecnego publicznego UI.
 
@@ -1272,7 +1293,7 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [ ] `NEWSROOM-N0-001` — publisher branding source of truth,
 - [ ] `NEWSROOM-N0-002` — test/utrwalenie przyjętego route contract,
 - [ ] `NEWSROOM-N0-003` — deterministyczny taxonomy seed contract,
-- [ ] `NEWSROOM-N0-004` — editor + sanitization decision,
+- [ ] `NEWSROOM-N0-004` — block editor + serialization + sanitization decision,
 - [ ] następnie N1 domain + database.
 
 Pozostałe elementy N2–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu checklistę.
