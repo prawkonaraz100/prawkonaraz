@@ -10,7 +10,7 @@
   - [NEWSROOM-PUBLIC-UI-UX-SPEC.md](./NEWSROOM-PUBLIC-UI-UX-SPEC.md)
   - [NEWSROOM-EDITORIAL-OPERATIONS-AND-GOVERNANCE.md](./NEWSROOM-EDITORIAL-OPERATIONS-AND-GOVERNANCE.md)
   - [NEWSROOM-SEO-DISTRIBUTION-AND-OBSERVABILITY.md](./NEWSROOM-SEO-DISTRIBUTION-AND-OBSERVABILITY.md)
-- Data: 2026-09-15
+- Data: 2026-09-16
 - Cel: rozbić newsroom na małe, weryfikowalne PR-y z jasnymi zależnościami i Definition of Done.
 
 ---
@@ -60,27 +60,46 @@ N6 PRODUCTION HARDENING + CONTENT ROLLOUT
 
 Usunąć niespójność PrawkoNaRaz / Orły na Drodze w structured data.
 
+### Potwierdzony stan repo
+
+Istnieją już:
+
+- `config/content.php['organization']`,
+- `SchemaIds::organization()` i `SchemaIds::website()`,
+- `SchemaRenderer`,
+- Organization/WebSite/Person graph pattern w istniejących schema services.
+
+Problemem jest `HomePageController`, który nadal hardcoduje „Orły na Drodze” i stare logo.
+
 ### Zakres
 
 - audit HomePageController,
-- audit Organization schema w publicznym content,
-- audit logo references,
-- ustalić canonical brand config/service,
-- przenieść name/url/logo do jednego źródła,
-- test Organization schema.
+- audit Organization/WebSite schema w publicznym content,
+- audit logo references i dimensions,
+- zachować istniejący organization config jako source of truth,
+- wyekstrahować/reużyć wspólny site identity schema builder, jeśli obecna logika jest zduplikowana,
+- zachować stabilne `/#organization` i `/#website`,
+- dodać homepage WebSite name/url oraz sensowny alternateName/fallback,
+- ujednolicić `og:site_name`,
+- przenieść homepage name/url/logo na istniejący source of truth,
+- test Organization + WebSite/site-name consistency.
 
 ### Expected files
 
-- config/brand.php lub równoważny
-- app/Support/...Organization...
+- config/content.php tylko jeśli kontrakt wymaga uzupełnienia danych; nie tworzyć równoległego config/brand.php
+- app/SEO/Schema/SchemaIds.php, jeśli potrzebne są newsroom IDs
+- współdzielony SiteIdentity/Organization schema service albo refactor istniejącego schema service
 - HomePageController.php
+- resources/views/layouts/public-content.blade.php dla og:site_name/feed discovery contract
 - schema services
 - tests
 
 ### DoD
 
 - nie ma przypadkowego publisher „Orły na Drodze”,
-- homepage i przyszły newsroom korzystają z tego samego źródła,
+- homepage i przyszły newsroom korzystają z `config/content.php['organization']` i stabilnych graph IDs,
+- domena ma jeden WebSite/site name, bez osobnego site name dla /aktualnosci,
+- Organization logo jest publiczne, crawlable i spełnia ustalone dimensions baseline,
 - test blokuje regresję.
 
 ### Dokumentacja
@@ -526,17 +545,35 @@ Computed blocking/warning items.
 
 ---
 
-## NEWSROOM-N3-003 — Article schema service
+## NEWSROOM-N3-003 — Article schema graph service
 
 ### Zakres
 
-- NewsArticle/Article,
-- Person author,
-- Organization publisher,
-- BreadcrumbList.
+Re-use istniejących `SchemaIds` / `SchemaRenderer`.
+
+Graph:
+
+- WebSite `/#website`,
+- Organization `/#organization`,
+- WebPage `{canonical}#webpage`,
+- NewsArticle/Article `{canonical}#article`,
+- Person `/autorzy/{slug}#person`,
+- BreadcrumbList,
+- ImageObject nodes.
+
+Dodatkowo:
+
+- mainEntityOfPage -> WebPage,
+- publisher/author przez @id,
+- articleSection/inLanguage,
+- datePublished/dateModified policy,
+- realne image variants, jeśli istnieją.
 
 ### DoD
 
+- nie ma literalnych, rozjeżdżających się kopii publishera/authora,
+- IDs są stabilne,
+- visible dates i schema dates są spójne,
 - snapshot/unit tests.
 
 ---
@@ -705,27 +742,55 @@ Old article path -> 301 canonical.
 
 # N5 — SEO, distribution and analytics
 
-## NEWSROOM-N5-001 — Articles sitemap
+## NEWSROOM-N5-001 — Articles sitemap + deterministic sharding
 
-- all public indexable articles,
-- meaningful lastmod.
+- wszystkie publiczne indexable articles,
+- meaningful lastmod,
+- absolute canonical HTTPS URLs,
+- exclude noindex/draft/redirect-source,
+- istniejący sitemap index jako parent,
+- deterministic sharding readiness przed limitami pojedynczego pliku,
+- żadnego niestabilnego offset-shardingu.
+
+### Testy
+
+- single shard,
+- boundary crossing,
+- stable shard assignment,
+- no duplicate URL across shards,
+- XML size/URL-count guard.
 
 ---
 
 ## NEWSROOM-N5-002 — News sitemap
 
-- recent news only,
 - current Google constraints reverified at implementation,
+- recent news eligibility po `first_published_at`, nie po updated/published refresh,
+- tylko type=news + published + indexable,
+- news:name = canonical publication name,
+- news:language = pl,
+- news:publication_date = original first_published_at,
+- news:title = visible title bez author/brand/date,
+- split powyżej aktualnego limitu entry,
 - sitemap index integration.
+
+### Testy
+
+- old updated article nie wraca do news sitemap,
+- required namespace/tags,
+- publication date timezone/format,
+- 1000-entry boundary zgodnie z aktualną specyfikacją.
 
 ---
 
-## NEWSROOM-N5-003 — RSS/Atom feed
+## NEWSROOM-N5-003 — RSS/Atom feed + discovery
 
 - latest items,
 - stable GUID,
 - correct content type,
-- cache/invalidation.
+- cache/invalidation,
+- `<link rel="alternate" type="application/rss+xml|application/atom+xml">` w publicznym layoutcie,
+- public absolute canonical links.
 
 ---
 
@@ -756,17 +821,47 @@ Re-use existing IndexNow pipeline if appropriate.
 
 ---
 
-## NEWSROOM-N5-006 — Link/content audit command
+## NEWSROOM-N5-006 — Extend existing SEO/sitemap audits
 
-Optional but recommended before rollout.
+Rozszerzyć istniejący `SeoSitemapAuditor` zamiast tworzyć równoległy sitemap validator.
 
-Reports:
+Raportuje/testuje m.in.:
 
+- duplicate/canonical sitemap loc,
+- article/news shard limits,
+- required news namespace/tags,
+- old article in news sitemap,
+- noindex/draft/redirect source in sitemap,
 - orphan article,
 - broken related relation,
 - draft target,
 - source URL empty,
 - expired breaking.
+
+Można dodać newsroom-specific `newsroom:audit-links` dla graph/link checks, ale sitemap rules pozostają w istniejącym audytorze.
+
+---
+
+## NEWSROOM-N5-007 — Crawler-facing HTTP caching
+
+### Zakres
+
+Sitemap + feed responses:
+
+- ETag i/lub Last-Modified,
+- conditional request -> 304, gdy representation unchanged,
+- Cache-Control zgodny z invalidation,
+- zmiana corpus -> nowy validator / 200 z nowym outputem.
+
+### Stan istniejący
+
+Obecny `SitemapController` ustawia Content-Type, ale nie ma jeszcze validators/304.
+
+### DoD
+
+- 304 działa dla unchanged response,
+- publish/archive/slug-change nie zostawia stale XML/feed,
+- testy HTTP headers i body.
 
 ---
 
@@ -793,13 +888,22 @@ hub -> article -> related question -> product.
 
 ---
 
-## NEWSROOM-N6-003 — SEO production validation
+## NEWSROOM-N6-003 — Enterprise SEO production validation
 
-- URL Inspection sample,
-- schema validation,
-- canonical,
-- sitemap submit,
-- robots.
+- homepage site name/WebSite validation,
+- Organization logo crawlability/dimensions,
+- URL Inspection sample per article/category/topic,
+- Rich Results/Schema validator,
+- graph @id consistency,
+- visible dates vs datePublished/dateModified,
+- canonical + Google-selected canonical sample,
+- main sitemap index submit,
+- child sitemap/shard diagnostics where useful,
+- news sitemap sample,
+- feed discovery,
+- robots,
+- conditional 304 sample for sitemap/feed,
+- Search Console segmentation articles/categories/topics/guides.
 
 ---
 
@@ -848,13 +952,26 @@ Nie zaczynamy od 100 artykułów.
 
 Po rollout:
 
-- index status,
+- submitted vs indexed,
 - crawl,
-- impressions,
-- canonical,
-- structured data.
+- impressions/clicks,
+- declared vs Google-selected canonical,
+- structured data,
+- Discover, jeśli raport się pojawi,
+- osobna obserwacja newsroom paths i sitemap/shards.
 
 Nie zmieniamy architektury po 48 godzinach bez danych.
+
+---
+
+## NEWSROOM-N6-008 — Preferred Sources eligibility check
+
+Po ustabilizowaniu domenowego publisher/site identity:
+
+- sprawdzić, czy `prawkonaraz.pl` jest dostępne w Google Preferred Sources tool,
+- jeśli tak, ocenić button/deeplink jako kontrolowany eksperyment UX,
+- nie wdrażać agresywnego popupu,
+- brak eligibility nie blokuje newsroomu.
 
 ---
 
@@ -896,10 +1013,10 @@ N4 newsroom hub
 N4 categories/topics/guides/nav/cache
 
 ### PR L
-N5 sitemap/feed
+N5 article/news sitemap + sharding + feed/discovery + HTTP validators
 
 ### PR M
-N5 analytics/IndexNow/audits
+N5 analytics/IndexNow/existing-auditor extension
 
 ### PR N
 N6 tests/hardening
@@ -968,12 +1085,14 @@ Docs-only:
 
 ### SEO
 
-- [ ] schema
-- [ ] article sitemap
-- [ ] news sitemap
-- [ ] feed
+- [ ] stable entity graph + site identity
+- [ ] visible/schema dates consistency
+- [ ] article sitemap + deterministic sharding readiness
+- [ ] news sitemap full required metadata
+- [ ] feed + discovery
+- [ ] sitemap/feed HTTP validators + 304
 - [ ] canonical
-- [ ] author/publisher
+- [ ] author ProfilePage / publisher / WebSite
 
 ### Operations
 
@@ -1066,6 +1185,22 @@ Mitigation: focal point + preview wariantów + testy media contract.
 
 Mitigation: ręczna publikacja topicu, minimalny corpus, własny opis i brak automatycznego mapowania tag -> topic.
 
+## R12 — site identity rozjeżdża się między homepage i newsroomem
+
+Mitigation: jeden config/content.php organization + stabilne SchemaIds + test graph consistency.
+
+## R13 — sitemap przestaje skalować lub przesuwa URL między shardami
+
+Mitigation: deterministic sharding + hard limits + duplicate audit.
+
+## R14 — news sitemap fałszuje świeżość po aktualizacji starego artykułu
+
+Mitigation: eligibility wyłącznie po first_published_at + boundary tests.
+
+## R15 — crawler otrzymuje kosztowne pełne XML przy każdym request
+
+Mitigation: cache validators + conditional 304 + invalidation tests.
+
 ---
 
 # 9. Aktualizacja dokumentacji podczas wdrożenia
@@ -1086,12 +1221,14 @@ Nie oznaczać tasku DONE przed merge + green verification.
 
 # 10. Aktualny stan
 
-Na 2026-09-15:
+Na 2026-09-16:
 
 - pakiet projektowy newsroomu obejmuje architekturę, model danych, CMS, UI, governance, SEO, backlog i runbook,
 - niniejsze rozszerzenie doprecyzowuje editorial composition; implementacja newsroomu nadal nie rozpoczęta,
 - /aktualnosci i /poradniki nadal placeholder,
-- fundamenty ContentAuthor/legal/traffic signs/public SEO istnieją.
+- fundamenty ContentAuthor/legal/traffic signs/public SEO istnieją,
+- istnieją config/content.php organization, SchemaIds/SchemaRenderer, sitemap builder/auditor i IndexNow pipeline,
+- HomePageController nadal ma legacy „Orły na Drodze”, a sitemap responses nie mają jeszcze 304 validators.
 
 ---
 
@@ -1106,6 +1243,15 @@ NEWSROOM-N0-002 / N0-003 / N0-004.
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.3
+
+- skorygowano N0-001 do realnego istniejącego site identity/schema infrastructure,
+- rozbudowano N3 schema task do stabilnego graphu z @id,
+- dodano deterministic sitemap sharding, pełny News Sitemap contract i istniejący auditor reuse,
+- dodano feed discovery oraz crawler-facing ETag/Last-Modified/304,
+- rozszerzono production SEO validation i Search Console segmentation,
+- dodano post-launch Preferred Sources eligibility check oraz nowe ryzyka enterprise SEO.
 
 ### 2026-09-15 — v0.2
 
