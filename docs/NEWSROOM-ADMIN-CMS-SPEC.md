@@ -215,7 +215,8 @@ Po pierwszej publikacji zwykły Select `type` nie może przenieść rekordu pomi
 - generowany z title przy create,
 - po ręcznej zmianie nie nadpisuje się sam po każdej edycji title,
 - unique(ignoreRecord),
-- ostrzeżenie przy zmianie opublikowanego sluga.
+- ostrzeżenie przy zmianie opublikowanego sluga,
+- reserved segments route family (minimum `kategoria`, `temat` dla newsroom) blokowane przez backend/service, nie tylko UI.
 
 Zmiana opublikowanego sluga musi przejść przez ContentArticleSlugService.
 
