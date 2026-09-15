@@ -161,9 +161,9 @@ Quick filters mile widziane:
 
 ## 9. Default sort
 
-updated_at desc lub published_at desc zależnie od filtra.
+updated_at desc lub first_published_at desc zależnie od filtra.
 
-Dla standardowego panelu redakcyjnego preferujemy updated_at desc, aby ostatnia praca była na górze.
+Dla standardowego panelu redakcyjnego preferujemy updated_at desc, aby ostatnia praca była na górze. Widok chronologii publikacji używa first_published_at, nie ostatniego wejścia w workflow published.
 
 ---
 
@@ -795,7 +795,7 @@ Publiczny route topicu:
 Publicacja topicu blokuje, jeśli:
 
 - brak własnego opisu redakcyjnego,
-- mniej niż 3 publiczne, indeksowalne artykuły w corpus,
+- mniej niż 3 actively-distributed, indeksowalne artykuły w corpus,
 - featured article jest ustawiony, ale nie jest publiczny lub nie należy do tego topicu.
 
 Dodatkowo:
