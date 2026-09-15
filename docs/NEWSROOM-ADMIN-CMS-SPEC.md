@@ -540,6 +540,26 @@ Można pokazać pole status jako read-only badge i osobne actions.
 
 ---
 
+## 23.1. Published-content edit safety without revisions
+
+V1 nie ma revision/staging copy. Dlatego normalny Filament Edit nie może sugerować, że można zmienić opublikowany body i „zapisać draft”, gdy publiczna strona czyta ten sam rekord.
+
+Dla `publiclyVisible()` article:
+
+- publiczne pola są w zwykłym formularzu read-only albo ich Save jest przechwycony przez dedykowany use case,
+- UI ma jawny action/mode `Apply public update`,
+- przed commit pokazuje checklistę i informację „ta zmiana stanie się publiczna natychmiast po zapisie”,
+- backend ponownie waliduje całość i stale-write token,
+- cały public payload zapisuje się atomowo,
+- meaningful update ustawia `last_substantive_update_at`,
+- cancellation/validation failure pozostawia publiczną wersję bez zmian.
+
+Pola wewnętrzne (np. editorial_note, freshness due) mogą mieć osobny save bez publicznej zmiany.
+
+Jeśli organizacja potrzebuje edycji + review + przyszłego publish **bez zmiany aktualnej publicznej wersji**, jest to jawny future staging/revision scope i nie może zostać zasymulowany tym jednym rekordem.
+
+---
+
 ## 24. Preferred workflow actions
 
 Record actions:
@@ -550,6 +570,7 @@ Record actions:
 - Mark reviewed
 - Schedule
 - Publish now
+- Apply public update — dla już publiclyVisible article
 - Mark needs review
 - Archive
 - Withdraw from public
@@ -1200,6 +1221,7 @@ Na 2026-09-16:
 - utrwalono admin-only V1: User jest aktorem auth/audytu, ContentAuthor publiczną tożsamością autora/reviewera,
 - signed/shareable preview usunięto z v1 na rzecz authenticated admin-only + private,no-store,
 - stale-write rejection awansowano z opcjonalnego warningu do gate'u v1,
+- przy braku revisions zablokowano zwykły live Save publicznych pól i dodano jawny Apply public update contract,
 - dodano high-friction Withdraw from public z obowiązkowym reason i bez bulk action,
 - dodano category/topic public-identity guards i minimalny topic corpus baseline,
 - ujednolicono wewnętrzne notatki do editorial_note oraz checklistę do body_blocks,
