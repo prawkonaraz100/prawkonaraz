@@ -416,7 +416,7 @@ Kolejność:
 3. H1
 4. lead
 5. byline + provenance + datePublished/dateModified
-6. hero + credit
+6. hero + public credit
 7. key points opcjonalnie
 8. regulatory/exam context box, jeśli ma zastosowanie
 9. body blocks
@@ -675,6 +675,8 @@ Wygląd:
 - opcjonalna data.
 
 `is_publicly_cited=false` oraz wewnętrzne `note` nigdy nie są renderowane. Nie ukrywamy publicznych źródeł w małym szarym tekście.
+
+`image_license_note` jest polem backoffice i nigdy nie jest renderowane publicznie; publiczny hero może pokazać wyłącznie `image_credit`.
 
 ---
 
