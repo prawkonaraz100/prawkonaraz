@@ -118,6 +118,7 @@ workflow_status:
 - published -> success
 - needs_review -> warning/danger zależnie od overdue
 - archived -> gray
+- withdrawn -> danger
 
 Kolor jest wsparciem, nie jedynym nośnikiem informacji.
 
@@ -548,6 +549,7 @@ Record actions:
 - Publish now
 - Mark needs review
 - Archive
+- Withdraw from public
 - Preview
 
 Każda action:
@@ -555,6 +557,13 @@ Każda action:
 - ma confirmation, jeśli jest destrukcyjna/publiczna,
 - wywołuje application service,
 - pokazuje błędy checklisty.
+
+`Withdraw from public` jest high-friction action:
+
+- wymaga niepustego `withdrawal_reason`,
+- pokazuje, że URL stanie się 410 i zniknie z dystrybucji,
+- nie jest bulk action,
+- jeśli istnieje realny następca, administrator zamiast tego używa kontrolowanego redirect flow.
 
 ---
 
@@ -1172,6 +1181,7 @@ Na 2026-09-16:
 - utrwalono admin-only V1: User jest aktorem auth/audytu, ContentAuthor publiczną tożsamością autora/reviewera,
 - signed/shareable preview usunięto z v1 na rzecz authenticated admin-only + private,no-store,
 - stale-write rejection awansowano z opcjonalnego warningu do gate'u v1,
+- dodano high-friction Withdraw from public z obowiązkowym reason i bez bulk action,
 - dodano category/topic public-identity guards i minimalny topic corpus baseline,
 - ujednolicono wewnętrzne notatki do editorial_note oraz checklistę do body_blocks,
 - audit UI opiera się na istniejącym AuditLog bez nowych published_by/reviewed_by pól,
