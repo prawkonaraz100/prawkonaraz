@@ -823,7 +823,9 @@ Dodatkowo:
 
 - slug można edytować w draft,
 - po pierwszej publikacji slug topicu jest read-only w v1,
-- spadek corpus poniżej baseline wymaga cofnięcia topicu do draft/archived zamiast pozostawiania thin public page.
+- próg >=3 jest blocking przy publish/republish,
+- jeśli już opublikowany topic później spadnie poniżej 3, CMS pokazuje `corpus below baseline` warning i wyłącza go z redakcyjnej promocji/featured-topic selection, ale nie zmienia automatycznie statusu ani HTTP,
+- administrator uzupełnia corpus albo jawnie archiwizuje topic; archived topic po wcześniejszej publikacji daje 410.
 
 Próg 3 jest baseline jakości produktu v1, nie gwarancją rankingu Google.
 
