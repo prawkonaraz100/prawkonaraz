@@ -49,6 +49,25 @@ test('home page renders the public landing page', function () {
         ->assertDontSeeText('Wybierz dostęp i zacznij naukę');
 });
 
+test('home page structured data uses canonical organization branding', function () {
+    config()->set('content.organization.name', 'Canonical Test Brand');
+    config()->set('content.organization.logo_url', 'https://cdn.example.test/prawkonaraz-brand.png');
+
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertViewHas('meta', fn (array $meta): bool => $meta['image_alt'] === 'Widok platformy Canonical Test Brand'
+            && str_ends_with($meta['title'], '| Canonical Test Brand'))
+        ->assertViewHas('structuredData', function (array $structuredData): bool {
+            $website = collect($structuredData)->firstWhere('@type', 'WebSite');
+            $organization = collect($structuredData)->firstWhere('@type', 'Organization');
+
+            return $website['name'] === 'Canonical Test Brand'
+                && $organization['name'] === 'Canonical Test Brand'
+                && $organization['logo'] === 'https://cdn.example.test/prawkonaraz-brand.png';
+        })
+        ->assertDontSee('Orły na Drodze');
+});
+
 test('open access mode hides public friend invitation entry points', function () {
     app(PaymentRequirementService::class)->setRequiresPayment(false);
 
