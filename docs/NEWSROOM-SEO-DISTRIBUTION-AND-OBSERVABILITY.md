@@ -248,6 +248,8 @@ Nie publikować:
 
 Repo ma równolegle statyczny `public/robots.txt` i route `RobotsController`. Zgodnie z `SEO-SITEMAP-REPAIR-PLAN.md` produkcyjnie preferowany jest statyczny plik oraz jawna weryfikacja Nginx/Cloudflare.
 
+Globalny `NEWSROOM_PUBLIC_ENABLED=false` musi wyłączyć newsroomowe URL-e nie tylko w controllers, ale też w sitemap/feed/IndexNow/author-publications/reverse-link discovery. Dark deploy nie może publikować linków do tras zwracających 404/placeholder.
+
 Newsroom nie usuwa kontrolera ani nie zmienia sposobu serwowania robots w zwykłym PR implementacyjnym. Osobny hardening może później usunąć duplikat dopiero po:
 
 - potwierdzeniu faktycznej produkcyjnej odpowiedzi,
