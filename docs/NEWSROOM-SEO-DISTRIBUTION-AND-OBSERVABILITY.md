@@ -58,6 +58,8 @@ Aktualne źródła oficjalne:
   https://developers.google.com/crawling/docs/crawl-budget
 - Google Preferred Sources:
   https://developers.google.com/search/docs/appearance/preferred-sources
+- IndexNow protocol:
+  https://www.indexnow.org/documentation
 - Schema.org NewsArticle:
   https://schema.org/NewsArticle
 - Schema.org Article:
@@ -919,18 +921,29 @@ Canonical ignoruje parametry kampanii.
 
 ## 49. IndexNow
 
-Repo ma już model IndexNowUrlSubmission.
+Repo ma już `IndexNowUrlSubmission`, `IndexNowSubmissionService`, `IndexNowQueueService` i `IndexNowUrlCollector`.
 
-Po analizie istniejącego pipeline można podłączyć publish/update artykułu do IndexNow.
+Potwierdzony aktualny pipeline już obsługuje:
 
-Wymagania:
+- canonical-host filtering,
+- HTTPS,
+- key/keyLocation,
+- batching do maks. 10 000 URL per request zgodnie z aktualnym protokołem,
+- 200/202 jako accepted states,
+- rozróżnienie 400/403/422/429/5xx.
 
-- idempotentne,
-- queue/retry,
+Newsroom ma REUSE ten pipeline.
+
+Wymagania integracji newsroomu:
+
+- publish/update/archive/slug change zgłasza tylko właściwe publiczne canonical URLs,
+- idempotentne queue/retry,
 - nie blokuje publikacji,
-- nie zgłasza preview/draft.
+- nie zgłasza preview/draft/noindex,
+- usunięty/stary URL może zostać zgłoszony po zmianie stanu zgodnie z protocol use case,
+- collector zostaje rozszerzony o newsroom zamiast tworzenia osobnego klienta.
 
-Nie zakładamy, że IndexNow steruje Google indexing.
+IndexNow jest sygnałem zmiany URL do uczestniczących wyszukiwarek; nie traktujemy przyjęcia requestu jako gwarancji crawl/index/ranking ani jako mechanizmu sterującego Google indexing.
 
 ---
 
