@@ -204,7 +204,22 @@ Nie kodujemy layoutu strony głównej ani konkretnej pozycji w rekordzie artyku�
 - image_credit: varchar(500) nullable
 - image_license_note: text nullable
 
-Storage i public URL rozwiązujemy przez istniejący media layer, nie przez ręczne sklejanie URL.
+Stan kodu podczas audytu:
+
+- istnieje `MediaUrlResolver` i wspólna konfiguracja public/upload disk,
+- istniejący `AdminMediaUploadService` jest **question-specific** i zapisuje `QuestionMedia`; nie jest gotowym uploaderem newsroomu,
+- Traffic Signs/ContentAuthor przechowują obecnie ścieżki assetów bez wspólnego newsroom asset modelu,
+- nie ma potwierdzonego automatycznego pipeline'u cropów 1:1/4:3/16:9 dla newsroomu.
+
+Target:
+
+- URL-e publiczne rozwiązujemy przez istniejący `MediaUrlResolver` / public media config,
+- newsroom dostaje własny bezpieczny upload adapter/service lub jawnie skonfigurowany Filament upload do newsroom prefix; **nie reużywa question-specific AdminMediaUploadService**,
+- storage path, MIME, bytes i rzeczywiste dimensions są walidowane po stronie backendu przed uznaniem assetu za gotowy,
+- dozwolone obrazy v1: raster MIME zgodny z security/media config (JPEG/PNG/WebP/AVIF); SVG nie jest domyślnie dopuszczone dla newsroom upload,
+- crop/variant jest deklarowany w schema/SEO tylko jeśli rzeczywisty plik został wygenerowany i jest publicznie osiągalny.
+
+Nie sklejamy ręcznie publicznych URL-i i nie zapisujemy signed/temporary URLs jako hero/OG.
 
 Focal point używa znormalizowanych współrzędnych 0..1. Brak wartości oznacza środek obrazu. Warianty lead/standard/compact/OG są pochodnymi assetu i nie powinny być ręcznie przechowywanymi, niezależnymi kopiami, jeśli media layer może wygenerować je deterministycznie.
 
@@ -235,6 +250,10 @@ Zasady:
 - freshness_review_due_at: timestamptz nullable
 - last_substantive_update_at: timestamptz nullable
 - public_state_changed_at: timestamptz nullable
+
+`freshness_review_due_at <= now()` tworzy **computed overdue state / kolejkę pracy**, ale samo w sobie NIE zmienia `workflow_status`.
+
+`needs_review` jest jawną decyzją workflow, że materiał ma pozostać pod publicznym URL-em, ale ma wypaść z aktywnej dystrybucji do czasu review. Może zostać ustawione przez administratora albo przez przyszłą, jawnie zdefiniowaną regułę bezpieczeństwa (np. potwierdzona utrata wiarygodności primary source), ale nie przez sam upływ terminu.
 
 `updated_at` nie jest automatycznie równoważne istotnej aktualizacji merytorycznej.
 
@@ -336,6 +355,7 @@ Przyszła uprzywilejowana migracja route family, jeśli kiedykolwiek zostanie do
 Wymagane:
 
 - unique index na slug
+- canonical path wyliczony z route family + slug nie może kolidować z żadnym `content_article_redirects.from_path` należącym do innego artykułu
 - index(workflow_status, first_published_at desc)
 - index(category_id, workflow_status, first_published_at desc)
 - index(type, workflow_status, first_published_at desc)
@@ -625,6 +645,10 @@ Pola:
 ### 15.1. Reguły
 
 - zmiana sluga opublikowanego artykułu tworzy redirect,
+- każdy wcześniej publiczny `from_path` jest trwałą rezerwacją ścieżki przed użyciem przez **inny** artykuł,
+- create/slug change sprawdza kolizję nie tylko z bieżącymi slugami, ale też z historycznymi `from_path`,
+- ponowne użycie własnego historycznego path przez **ten sam** artykuł jest dozwolone tylko przez `ContentArticleSlugService`: usuwa/aktualizuje kolidujący redirect dla odzyskanego path i przepisuje wszystkie pozostałe historyczne redirecty bezpośrednio do nowego canonical,
+- zwykły Filament unique(slug) nie jest wystarczającym zabezpieczeniem historycznej ścieżki,
 - v1 nie pozwala zwykłą edycją zmienić route family opublikowanego artykułu,
 - jeśli przyszła kontrolowana migracja route family zostanie kiedyś wdrożona, zapisuje poprzedni pełny path w tej samej tabeli,
 - nie tworzymy redirect chain; nowy wpis powinien wskazywać canonical destination,
@@ -881,10 +905,13 @@ Odpowiada za:
 
 Odpowiada za:
 
-- due dates,
-- needs_review transitions,
+- wyliczanie due dates,
+- computed states fresh/due-soon/overdue,
 - listę materiałów przeterminowanych,
-- politykę freshness per type/category.
+- politykę freshness per type/category,
+- jawne rekomendowanie/wywołanie transition do `needs_review` tylko gdy istnieje osobny trigger bezpieczeństwa.
+
+**Nie** zmienia automatycznie każdego overdue rekordu na `needs_review` tylko dlatego, że minął termin.
 
 ---
 
@@ -976,6 +1003,7 @@ Wymagania do publikacji:
 
 - author jest `isPubliclyVisible()`,
 - author ma slug i publiczny profil pod istniejącym route,
+- po wdrożeniu relacji newsroomu nie wolno odpublikować ContentAuthor, jeśli istnieje zależny indexable/publiclyVisible artykuł, dopóki artykuły nie zostaną przepisane do innego publicznego autora albo wycofane/noindex zgodnie z policy,
 - reviewer opcjonalny zależnie od policy; jeśli jest pokazywany publicznie, również musi być publiczny.
 
 Dla treści prawnie wrażliwych policy może wymagać `reviewer_id + reviewed_at`. V1 nie udaje jednak kryptograficznej separacji obowiązków: bez osobnego RBAC/linku ContentAuthor↔User system nie może dowieść, że reviewer był innym zalogowanym człowiekiem. AuditLog pokazuje faktycznego administratora, który wykonał akcję.
@@ -987,8 +1015,10 @@ Dla treści prawnie wrażliwych policy może wymagać `reviewer_id + reviewed_at
 Dokładny komponent edytora i serializacja wewnętrzna są decyzją N0-004, ale kontrakt domenowy jest stały:
 
 - `body_blocks` jest jednym kanonicznym źródłem body,
-- każdy `type` ma allowlistowany schema payloadu,
-- rich_text sanitizuje HTML/doc nodes,
+- dokument body ma jawny `body_schema_version`,
+- każdy `type` bloku ma allowlistowany schema payloadu,
+- rich_text sanitizuje HTML/doc nodes po stronie serwera; nie polegamy wyłącznie na Filament/browser sanitization,
+- aktualny composer nie zawiera jawnej backendowej biblioteki HTML sanitizer, więc N0-004 musi wybrać i przetestować konkretny sanitizer albo format strukturalny niewymagający arbitralnego HTML,
 - script/style/event handlers są zabronione,
 - embed przyjmuje tylko allowlisted providers/URL,
 - linki z `target=_blank` otrzymują bezpieczne `rel`,
@@ -1425,7 +1455,7 @@ Model danych jest gotowy, gdy:
 - slug change zachowuje redirect history,
 - relations do questions/legal są jawne,
 - sources rozróżniają public citation od wewnętrznego evidence i wspierają źródło bez URL,
-- `body_blocks` przechodzą walidację per block type,
+- `body_blocks` + `body_schema_version` przechodzą walidację i compatibility policy per block type,
 - homepage placements mają fallback i deduplikację,
 - focal point ma poprawny zakres 0..1,
 - hero caption, jeśli istnieje, jest zwykłym tekstem redakcyjnym renderowanym jako figcaption i nie zastępuje alt/credit,
@@ -1489,7 +1519,11 @@ Na moment utworzenia dokumentu:
 - dodano jawny status withdrawn z backoffice reason/timestamp i 410 public disposition, oddzielając historyczne archive od takedownu,
 - dodano public_state_changed_at dla uczciwego sitemap lastmod bez zanieczyszczania dateModified/updated_at,
 - zdefiniowano bezpieczne kierunki FK/on-delete, aby newsroom nie mógł kaskadowo usuwać istniejących bytów produktu,
-- dodano immutable public slugs/active-category guards i minimalny topic corpus baseline,
+- dodano immutable public slugs/active-category guards, trwałą rezerwację historycznych article paths i minimalny topic corpus baseline,
+- rozdzielono freshness overdue od jawnego workflow needs_review,
+- doprecyzowano faktyczny media baseline: resolver/config istnieją, ale uploader jest question-specific; newsroom wymaga własnego bezpiecznego adaptera,
+- dodano body_schema_version i wymóg rzeczywistego backend sanitizera/structured format,
+- dodano guard przed odpublikowaniem autora zależnych publicznych artykułów,
 - dodano serializację concurrent homepage placements przez DB/advisory lock,
 - zapisano transaction + after-commit contract dla publikacji i side effectów,
 - usunięto założenie o async queue workerze przy `QUEUE_CONNECTION=sync`,
