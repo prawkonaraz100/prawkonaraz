@@ -380,7 +380,7 @@ Newsroom:
 
 Nagłówki cache/ETag/Last-Modified/304 dla statycznych sitemap są kontraktem warstwy Nginx/CDN/static delivery. Nie zakładamy, że zmiana tylko w Laravel controller wpłynie na produkcyjny artefakt.
 
-Publikacja newsroomu nie może blokować requestu pełnym generowaniem sitemap. Po commit wysyłany jest debounced/asynchroniczny refresh statycznych artefaktów; istniejący daily refresh pozostaje safety netem.
+Publikacja newsroomu nie może blokować requestu pełnym generowaniem sitemap. Po commit zapisywany jest tani dirty/version signal we współdzielonym store; częsty scheduler z distributed lockiem coalescuje zmiany i odświeża statyczne artefakty poza requestem. Nie zakładamy asynchronicznego Laravel queue workera; istniejący daily refresh pozostaje niezależnym safety netem.
 
 ### DEC-NR-016 — route family jest stabilne po pierwszej publikacji
 
