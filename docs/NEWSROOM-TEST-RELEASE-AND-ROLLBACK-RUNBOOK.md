@@ -286,6 +286,7 @@ Jeśli jeden rekord nie może się opublikować, strategia ma być jawna:
 - duplicate current slug rejected/resolved zgodnie z service,
 - canonical path colliding with another article historical `from_path` rejected,
 - same-article historical path reclaim rewrites/removes conflicting redirect and leaves all old paths one-hop to current canonical,
+- two concurrent mutations targeting same current/historical full path cannot both commit; PostgreSQL lock test,
 - draft slug change no public redirect required,
 - published slug change creates redirect,
 - old path -> 301,
@@ -349,7 +350,8 @@ Expected:
 - no arbitrary HTML/CSS/JS execution,
 - allowed rich text/formatting preserved,
 - server-side sanitizer/structured renderer testowany niezależnie od browser/Filament,
-- allowlisted embed only.
+- embed disabled by default unless provider allowlist + sandbox/referrerpolicy + production CSP/frame-src gate passes,
+- when enabled, allowlisted embed only and unknown provider rejected.
 
 Format-evolution tests:
 
@@ -628,7 +630,8 @@ Assert:
 - draft/noindex/redirect-source excluded,
 - archived policy honored,
 - absolute HTTPS canonical URL,
-- meaningful lastmod = max(first_published_at, last_substantive_update_at, public_state_changed_at),
+- meaningful article lastmod = max(first_published_at, last_substantive_update_at, public_state_changed_at),
+- home/category/topic/guides hub lastmod changes only when visible public output/corpus/composition meaningfully changes, never just generator run time,
 - deterministic shard assignment,
 - no URL duplicated across shards,
 - shard remains within current URL-count and uncompressed-size limits,
