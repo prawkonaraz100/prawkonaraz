@@ -997,6 +997,31 @@ Po ustabilizowaniu domenowego publisher/site identity:
 
 ---
 
+## NEWSROOM-N6-009 — Publisher transparency production gate
+
+### Zakres
+
+Audit publicznych powierzchni przed regularnym rolloutem:
+
+- article headline/date+time/byline,
+- author profile,
+- publication/publisher/company identity,
+- contact information,
+- correction/editorial principles discoverability,
+- sponsorship disclosure contract.
+
+Preferować istniejące Organization/Contact/Methodology pages. Nowy publiczny dokument/page tylko gdy istniejące powierzchnie nie pokrywają realnego wymagania.
+
+### DoD
+
+- czytelnik może łatwo ustalić kto napisał i kto publikuje materiał,
+- kontakt jest publicznie dostępny,
+- news ma jasną datę/czas/byline,
+- publishingPrinciples nie jest emitowane bez realnej publicznej strony,
+- brak założenia, że Publisher Center enrollment gwarantuje/warunkuje Google News.
+
+---
+
 # 4. PR boundaries
 
 Rekomendacja:
@@ -1119,6 +1144,7 @@ Docs-only:
 
 ### Operations
 
+- [ ] publisher transparency/contact/editorial principles gate
 - [ ] scheduler monitored
 - [ ] audit
 - [ ] correction flow
