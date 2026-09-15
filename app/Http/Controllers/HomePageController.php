@@ -23,12 +23,13 @@ class HomePageController extends Controller
         $updatedAt = now('Europe/Warsaw')->locale('pl');
         $canonical = route('home');
         $heroImage = Vite::asset('resources/images/home/hero-composite-v3.webp');
-        $logoImage = asset('images/orly-na-drodze-logo-tight.png');
+        $organizationName = (string) config('content.organization.name', config('app.name', 'PrawkoNaRaz'));
+        $organizationLogo = (string) config('content.organization.logo_url', asset('favicon.png'));
         $contactAdvisorDay = (int) $updatedAt->format('N');
         $contactAdvisor = self::CONTACT_ADVISORS[$contactAdvisorDay];
         $contactAdvisor['day_index'] = $contactAdvisorDay;
         $seoYear = (int) $updatedAt->format('Y');
-        $title = "Testy na prawo jazdy {$seoYear} – oficjalna baza pytań | PrawkoNaRaz";
+        $title = "Testy na prawo jazdy {$seoYear} – oficjalna baza pytań | {$organizationName}";
         $description = "Testy na prawo jazdy {$seoYear} z oficjalnej bazy pytań. Ucz się teorii z wyjaśnieniami i przygotuj się do egzaminu teoretycznego na prawo jazdy.";
 
         return view('home.index', [
@@ -37,14 +38,14 @@ class HomePageController extends Controller
                 'description' => $description,
                 'canonical' => $canonical,
                 'image' => $heroImage,
-                'image_alt' => 'Widok platformy Orły na Drodze',
+                'image_alt' => "Widok platformy {$organizationName}",
                 'og_type' => 'website',
             ],
             'structuredData' => [
                 [
                     '@context' => 'https://schema.org',
                     '@type' => 'WebSite',
-                    'name' => 'Orły na Drodze',
+                    'name' => $organizationName,
                     'url' => $canonical,
                     'description' => $description,
                     'inLanguage' => 'pl-PL',
@@ -52,9 +53,9 @@ class HomePageController extends Controller
                 [
                     '@context' => 'https://schema.org',
                     '@type' => 'Organization',
-                    'name' => 'Orły na Drodze',
+                    'name' => $organizationName,
                     'url' => $canonical,
-                    'logo' => $logoImage,
+                    'logo' => $organizationLogo,
                 ],
                 [
                     '@context' => 'https://schema.org',
