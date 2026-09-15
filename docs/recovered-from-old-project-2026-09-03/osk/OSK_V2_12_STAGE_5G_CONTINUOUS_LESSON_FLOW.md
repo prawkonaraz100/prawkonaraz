@@ -1,8 +1,8 @@
 # OSK V2.12 - Etap 5G: plynne przejscie miedzy lekcjami
 
-**Status:** zaimplementowany i zweryfikowany lokalnie; bez deployu.
-**Data weryfikacji:** 2026-08-26.
-**Branch implementacyjny:** `codex/osk-learning-dashboard-ui`.
+**Historyczny status local worktree:** zaimplementowany i zweryfikowany lokalnie; bez deployu.
+**Historyczna data weryfikacji:** 2026-08-26.
+**Historyczny branch implementacyjny:** `codex/osk-learning-dashboard-ui`.
 
 Ten etap usuwa niepotrzebny przystanek po ostatnim kroku lekcji. Nie zmienia
 znaczenia czasu, postepu ani formalnego ukonczenia kursu OSK.
@@ -59,7 +59,7 @@ oznacza formalnego ukonczenia kursu, modulu ani wymagania prawnego.
   egzaminie B2C;
 - deploy lub wlaczenie pilota produkcyjnego.
 
-## 5. Weryfikacja lokalna
+## 5. Historyczna weryfikacja lokalna — 2026-08-26
 
 Automatycznie:
 
@@ -68,7 +68,7 @@ docker exec -i -w /var/www/html serwistestyprawojazdy-app-1 php artisan test tes
 docker exec -i -w /app serwistestyprawojazdy-vite-1 npm run build
 ```
 
-Wynik aktualnej weryfikacji: **60 testow / 606 asercje**, a `vue-tsc` i
+Wynik historycznej weryfikacji z 2026-08-26: **60 testow / 606 asercje**, a `vue-tsc` i
 `vite build` przeszly bez bledu.
 
 Testy celu obejmuja:
@@ -79,7 +79,7 @@ Testy celu obejmuja:
 - zachowanie fail-closed dla cudzych enrollmentow, uszkodzonych snapshotow i
   zamknietej sesji.
 
-Manualny smoke na lokalnym pilocie powinien potwierdzic kolejno:
+Historyczny manualny smoke dla tego local worktree mial potwierdzic kolejno:
 
 1. ostatni krok pierwszej lekcji pokazuje `Przejdz do nastepnej lekcji`;
 2. klikniecie otwiera kolejna lekcje bez bramki startu i bez `close` sesji;
