@@ -188,7 +188,8 @@ Domknąć techniczny sposób edycji kanonicznego `body_blocks`.
 - format payloadu rich_text,
 - schema payloadu każdego block type,
 - sanitizer,
-- allowlisted embeds.
+- aktualny security-header/CSP state,
+- allowlisted embeds lub jawne wyłączenie embed v1.
 
 ### Decyzja musi opisać
 
@@ -197,6 +198,7 @@ Domknąć techniczny sposób edycji kanonicznego `body_blocks`.
 - allowed nodes/elements,
 - link handling,
 - image/embed handling,
+- embed default-off dopóki provider allowlist + sandbox/referrerpolicy + CSP/frame-src nie są wdrożone i przetestowane,
 - unknown block behavior,
 - dokument/block schema version strategy,
 - zasada ewolucji payloadów: renderer backward-compatible lub jawna migracja danych,
@@ -208,7 +210,7 @@ Domknąć techniczny sposób edycji kanonicznego `body_blocks`.
 
 - brak „ustalimy podczas formularza”,
 - nie powstaje równoległe edytowalne `body_html`,
-- wszystkie v1 block types mają kontrakt,
+- wszystkie włączone v1 block types mają kontrakt; `embed` może pozostać feature-disabled bez blokowania reszty newsroomu,
 - istnieje jawna strategia compatibility/migration przy zmianie formatu bez wprowadzania revision history.
 
 ---
@@ -356,6 +358,7 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 - duplicate current slug reject,
 - new/current canonical path colliding with another article historical from_path reject,
 - same article can intentionally reclaim own historical path with redirects rewritten one-hop,
+- concurrent create/slug-change for same historical/current full path is serialized by PostgreSQL advisory/row-lock strategy,
 - draft guide -> news allowed before first publish,
 - published guide -> news blocked,
 - published news -> analysis keeps same canonical family,
