@@ -897,7 +897,7 @@ Odpowiada za:
 
 Transakcja stanu publicznego obejmuje co najmniej rekord artykułu, krytyczne timestampy/invariants i audit opisujący tę zmianę. Eventy uruchamiające zewnętrzne side effecty (cache invalidation, sitemap dirty signal, IndexNow, notification) są dispatchowane dopiero po udanym commit. Rollback transakcji nie może zostawić „ghost publish” w cache/sitemap/IndexNow.
 
-### 20.1.1. Edycja już opublikowanego artykułu bez revisions
+#### 20.1.1. Edycja już opublikowanego artykułu bez revisions
 
 V1 nie ma staged revision/snapshot systemu. Dlatego:
 
