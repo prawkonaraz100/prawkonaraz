@@ -241,7 +241,7 @@ Nie jest to page builder. Kod definiuje skończony zestaw powierzchni i slotów,
 - secondary,
 - category lead,
 - guides lead,
-- ważne teraz.
+- important_now / „Ważne teraz”.
 
 Redaktor może przypisać artykuł do slotu oraz ustawić czas początku i końca ekspozycji. Brak ręcznego przypisania uruchamia deterministyczny fallback oparty o aktualnie opublikowane treści.
 
@@ -324,7 +324,8 @@ Na wyraźną decyzję produktową nie projektujemy dodatkowego revision history 
 │   ├── kategoria/przepisy/
 │   ├── kategoria/word/
 │   ├── kategoria/kierowcy/
-│   └── kategoria/osk/
+│   ├── kategoria/osk/
+│   └── temat/{topicSlug}/
 ├── poradniki/
 ├── przepisy/
 ├── znaki-drogowe/
@@ -353,7 +354,13 @@ Rekomendowany i przyjęty do backlogu wykonawczego wariant:
 
 Jawny segment `kategoria` usuwa kolizję routingu między slugiem kategorii i slugiem artykułu. Slug kategorii jest stabilny i zarządzany centralnie. Każda zmiana tej decyzji wymaga aktualizacji architektury i testu konfliktów route.
 
-### 7.4. Redirect governance
+### 7.4. URL topicu / dossier
+
+`/aktualnosci/temat/{topicSlug}`
+
+Topic ma własny publiczny URL dopiero po publikacji i spełnieniu warunków jakości opisanych w governance/SEO. Tag nie otrzymuje tego URL automatycznie.
+
+### 7.5. Redirect governance
 
 Zmiana opublikowanego sluga:
 
