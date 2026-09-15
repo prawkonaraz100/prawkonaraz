@@ -58,6 +58,12 @@ Aktualne źródła oficjalne:
   https://developers.google.com/crawling/docs/crawl-budget
 - Google Preferred Sources:
   https://developers.google.com/search/docs/appearance/preferred-sources
+- Google News policies / transparency:
+  https://support.google.com/news/publisher-center/answer/6204050
+- Google News article page best practices:
+  https://support.google.com/news/publisher-center/answer/9607104
+- Google News automatically generated publication pages:
+  https://support.google.com/news/publisher-center/answer/15898024
 - IndexNow protocol:
   https://www.indexnow.org/documentation
 - Schema.org NewsArticle:
@@ -686,17 +692,26 @@ Aktualny `SitemapController` zwraca tylko Content-Type; 304/validators są braku
 
 ---
 
-## 31. Google News eligibility
+## 31. Google News eligibility i transparency
 
-Nie projektujemy feature flag „Google News accepted”.
+Nie projektujemy feature flag „Google News accepted” ani starego procesu ręcznego tworzenia publication page w Publisher Center.
 
-Eligibility/visibility jest kontrolowana zewnętrznie i może się zmieniać.
+Na dzień 2026-09-16 Google News używa automatycznie generowanych publication pages; content zgodny z policies jest automatycznie kwalifikowany do rozważenia, ale widoczność nie jest gwarantowana.
 
-System ma:
+System ma zapewniać:
 
-- spełniać techniczne standardy,
-- publikować jakościowy content,
-- umożliwiać monitoring.
+- jasny widoczny headline,
+- dla newsów wyraźną datę i czas publikacji blisko headline/byline,
+- jawny byline autora,
+- publiczny profil autora,
+- informacje o publikacji/publisherze i podmiocie stojącym za serwisem,
+- łatwo dostępne dane kontaktowe,
+- jasne oznaczenie sponsoringu/paid content, jeśli kiedykolwiek wystąpi,
+- jakościowy i oryginalny wkład redakcyjny,
+- techniczne standardy Search/News,
+- monitoring.
+
+Wykorzystujemy istniejące publiczne powierzchnie Organization/Contact/Methodology tam, gdzie spełniają wymaganie. Jeśli audyt przed rolloutem wykaże lukę, uzupełniamy istniejącą powierzchnię albo tworzymy celową stronę zasad redakcyjnych/korekt — nie deklarujemy `publishingPrinciples` w schema bez realnego publicznego URL.
 
 Nie obiecujemy pojawienia się w Google News/Top stories/Discover.
 
