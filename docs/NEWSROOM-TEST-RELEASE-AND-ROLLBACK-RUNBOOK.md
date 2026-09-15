@@ -461,7 +461,7 @@ Assert:
 
 ---
 
-## 22. Guides tests
+## 23. Guides tests
 
 - only guide type according to product decision,
 - published,
@@ -469,7 +469,7 @@ Assert:
 
 ---
 
-## 23. Sitemap tests
+## 24. Sitemap tests
 
 ### articles.xml
 
@@ -492,7 +492,7 @@ Tests based on verified rules:
 
 ---
 
-## 24. Feed tests
+## 25. Feed tests
 
 - XML valid,
 - content type,
@@ -504,7 +504,7 @@ Tests based on verified rules:
 
 ---
 
-## 25. Cache tests
+## 26. Cache tests
 
 - home cache hit possible,
 - publish invalidates,
@@ -516,7 +516,7 @@ Nie testować implementation detail cache key jeśli kontrakt może być testowa
 
 ---
 
-## 26. Analytics tests
+## 27. Analytics tests
 
 Server/render tests:
 
@@ -531,7 +531,7 @@ JS tests/E2E:
 
 ---
 
-## 27. Filament/CMS tests
+## 28. Filament/CMS tests
 
 Minimum:
 
@@ -551,7 +551,7 @@ Minimum:
 
 ---
 
-## 28. E2E Golden Path A — editorial
+## 29. E2E Golden Path A — editorial
 
 ~~~text
 login admin
@@ -574,7 +574,7 @@ login admin
 
 ---
 
-## 29. E2E Golden Path B — scheduled
+## 30. E2E Golden Path B — scheduled
 
 ~~~text
 create complete article
@@ -591,7 +591,7 @@ Production smoke nie używa sztucznego time travel; używa bezpiecznego realnego
 
 ---
 
-## 29.1. E2E Golden Path — editorial homepage composition
+## 31. E2E Golden Path — editorial homepage composition
 
 ~~~text
 publish several articles
@@ -608,7 +608,7 @@ publish several articles
 
 ---
 
-## 30. E2E Golden Path C — slug change
+## 32. E2E Golden Path C — slug change
 
 ~~~text
 publish article
@@ -622,7 +622,7 @@ publish article
 
 ---
 
-## 31. Responsive browser matrix
+## 33. Responsive browser matrix
 
 Minimum public visual/functional QA:
 
@@ -645,7 +645,7 @@ Sprawdzić:
 
 ---
 
-## 32. Accessibility QA
+## 34. Accessibility QA
 
 Automated + manual:
 
@@ -664,7 +664,7 @@ Nie uznajemy samego Lighthouse score za pełny accessibility test.
 
 ---
 
-## 33. Performance QA
+## 35. Performance QA
 
 Local/staging:
 
@@ -683,7 +683,7 @@ Production after rollout:
 
 ---
 
-## 34. Security QA
+## 36. Security QA
 
 - authz policies,
 - preview signed/auth,
@@ -696,7 +696,7 @@ Production after rollout:
 
 ---
 
-## 35. CI integration
+## 37. CI integration
 
 Nie tworzymy osobnego CI tylko dla newsroomu, jeśli obecne pipeline’y mogą go objąć.
 
@@ -712,7 +712,7 @@ Nowe testy muszą wejść do istniejących jobs, nie być lokalną instrukcją b
 
 ---
 
-## 36. Pre-merge checklist
+## 38. Pre-merge checklist
 
 - [ ] diff ograniczony do task scope
 - [ ] tests added/updated
@@ -725,7 +725,7 @@ Nowe testy muszą wejść do istniejących jobs, nie być lokalną instrukcją b
 
 ---
 
-## 37. First production release prerequisites
+## 39. First production release prerequisites
 
 - N0 done,
 - N1–N5 required scope done,
@@ -738,7 +738,7 @@ Nowe testy muszą wejść do istniejących jobs, nie być lokalną instrukcją b
 
 ---
 
-## 38. Backup before first newsroom migrations
+## 40. Backup before first newsroom migrations
 
 Use existing ops process.
 
@@ -752,7 +752,7 @@ Nie kopiować sekretów ani DB dump do repo.
 
 ---
 
-## 39. Deployment sequence — first release
+## 41. Deployment sequence — first release
 
 1. backup verification
 2. deploy code
@@ -769,7 +769,7 @@ Nie kopiować sekretów ani DB dump do repo.
 
 ---
 
-## 40. Migration safety
+## 42. Migration safety
 
 Przed produkcją:
 
@@ -782,7 +782,7 @@ Newsroom v1 tworzy głównie nowe tabele, więc ryzyko dla istniejących danych 
 
 ---
 
-## 41. Rollback layers
+## 43. Rollback layers
 
 ### Layer A — feature/content rollback
 
@@ -811,7 +811,7 @@ Nie uruchamiać migrate:rollback automatycznie po tym, jak redakcja stworzyła d
 
 ---
 
-## 42. Emergency disable strategy
+## 44. Emergency disable strategy
 
 Rekomendowane rozwiązanie minimalne:
 
@@ -826,7 +826,7 @@ Nie dodawać rozbudowanego feature flag service tylko dla newsroomu, jeśli pros
 
 ---
 
-## 43. Rollback of bad content
+## 45. Rollback of bad content
 
 Nie wymaga deploy:
 
@@ -838,7 +838,7 @@ To jest główny powód rozdzielenia content state od kodu.
 
 ---
 
-## 44. Scheduler failure procedure
+## 46. Scheduler failure procedure
 
 Symptom:
 
@@ -861,7 +861,7 @@ Recovery:
 
 ---
 
-## 45. Sitemap failure procedure
+## 47. Sitemap failure procedure
 
 Symptom:
 
@@ -879,7 +879,7 @@ Sitemap failure nie powinien wyłączać publicznego newsroomu.
 
 ---
 
-## 46. Feed failure procedure
+## 48. Feed failure procedure
 
 Feed może być tymczasowo wyłączony bez wyłączania articles.
 
@@ -887,7 +887,7 @@ Nie pozwalamy, aby błąd feed serialization powodował 500 na article publish r
 
 ---
 
-## 47. Bad canonical procedure
+## 49. Bad canonical procedure
 
 High priority.
 
@@ -901,7 +901,7 @@ If production article canonical points to wrong host/path:
 
 ---
 
-## 48. Draft leak incident
+## 50. Draft leak incident
 
 Jeśli draft stał się publiczny:
 
@@ -914,7 +914,7 @@ Jeśli draft stał się publiczny:
 
 ---
 
-## 49. XSS incident
+## 51. XSS incident
 
 1. disable affected article/public renderer if needed,
 2. sanitize/remove payload,
@@ -925,7 +925,7 @@ Jeśli draft stał się publiczny:
 
 ---
 
-## 50. Production smoke checklist
+## 52. Production smoke checklist
 
 ### Core
 
@@ -960,7 +960,7 @@ Jeśli draft stał się publiczny:
 
 ---
 
-## 51. Post-release 24h review
+## 53. Post-release 24h review
 
 Check:
 
@@ -976,7 +976,7 @@ Nie oczekujemy pełnych danych SEO w 24h.
 
 ---
 
-## 52. Post-release 7d review
+## 54. Post-release 7d review
 
 Check:
 
@@ -990,7 +990,7 @@ Check:
 
 ---
 
-## 53. Post-release 30d review
+## 55. Post-release 30d review
 
 Ocenić:
 
@@ -1010,7 +1010,7 @@ Dopiero wtedy rozważać:
 
 ---
 
-## 54. Release record
+## 56. Release record
 
 Każdy większy release newsroomu powinien zanotować:
 
@@ -1025,7 +1025,7 @@ Może być w PR/release notes; nie potrzebujemy nowej tabeli tylko do tego.
 
 ---
 
-## 55. Definition of Done runbook
+## 57. Definition of Done runbook
 
 Runbook jest spełniony, gdy:
 
@@ -1039,7 +1039,7 @@ Runbook jest spełniony, gdy:
 
 ---
 
-## 56. Stan implementacji
+## 58. Stan implementacji
 
 Na 2026-09-15:
 
@@ -1051,7 +1051,7 @@ Na 2026-09-15:
 
 ---
 
-## 57. Pozostałe zadania
+## 59. Pozostałe zadania
 
 - [ ] dodać test files w trakcie N1–N5,
 - [ ] podłączyć do CI,
@@ -1062,7 +1062,7 @@ Na 2026-09-15:
 
 ---
 
-## 58. Historia zmian
+## 60. Historia zmian
 
 ### 2026-09-15 — v0.2
 
