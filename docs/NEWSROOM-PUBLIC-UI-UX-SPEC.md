@@ -118,6 +118,34 @@ Kolejność:
 
 Nie wszystkie sekcje muszą być widoczne, jeśli nie mają wystarczającej liczby opublikowanych materiałów.
 
+### 7.1. Editorial composition
+
+Zawartość strony jest rozwiązywana przez stałe placements i fallbacki, a nie przez prosty sort po jednym `priority`.
+
+Kod definiuje layout i sloty. Redaktor obsadza sloty w CMS.
+
+Priorytet rozwiązywania:
+
+1. aktywne ręczne placement,
+2. fallback redakcyjny na podstawie published/type/category/featured/priority,
+3. brak kandydata -> krótszy moduł zamiast sztucznego placeholdera.
+
+### 7.2. Deduplikacja
+
+Ten sam artykuł nie powinien pojawiać się wielokrotnie jako karta na tej samej stronie.
+
+Resolver prowadzi exclusion set w kolejności:
+
+- lead,
+- secondary,
+- latest,
+- category blocks,
+- guides.
+
+Jeśli kolejna sekcja nie ma wystarczającej liczby unikalnych materiałów, renderuje mniej pozycji.
+
+Breaking strip jest wyjątkiem: jako alert może wskazywać artykuł, który równocześnie jest leadem.
+
 ---
 
 ## 8. Newsroom subnavigation
@@ -371,16 +399,17 @@ Kolejność:
 2. kategoria
 3. H1
 4. lead
-5. byline + datePublished/dateModified
+5. byline + provenance + datePublished/dateModified
 6. hero + credit
 7. key points opcjonalnie
-8. body
-9. sources
-10. correction note, jeśli istnieje
-11. related legal/questions/signs
-12. product bridge
-13. author box
-14. related articles
+8. regulatory/exam context box, jeśli ma zastosowanie
+9. body blocks
+10. sources
+11. correction note, jeśli istnieje
+12. related legal/questions/signs
+13. product bridge
+14. author box
+15. related articles
 
 ---
 
@@ -413,35 +442,47 @@ Mobile:
 
 ---
 
-## 22. Byline
+## 22. Byline i pochodzenie materiału
 
 Pokazuje:
 
 - avatar opcjonalnie,
 - nazwę autora jako link do /autorzy/{slug},
 - datePublished,
-- „Aktualizacja” tylko gdy last_substantive_update_at ma znaczenie.
+- „Aktualizacja” tylko gdy last_substantive_update_at ma znaczenie,
+- pochodzenie materiału tylko wtedy, gdy wnosi informację dla czytelnika.
 
-Nie pokazujemy technicznego updated_at użytkownikowi.
+Przykładowe publiczne etykiety:
+
+- „Materiał własny”
+- „Opracowanie na podstawie oficjalnych źródeł”
+- „Analiza własna”
+- „Na podstawie materiału agencyjnego” — wyłącznie gdy istnieje odpowiednia licencja.
+
+Nie pokazujemy technicznego updated_at użytkownikowi ani wewnętrznych notatek redakcyjnych.
 
 ---
 
-## 23. Hero
+## 23. Hero i art direction
 
 Wymagania:
 
 - width/height attributes,
 - alt,
 - credit jeśli wymagany,
+- focal point,
 - eager/fetchpriority high tylko jeśli hero jest LCP,
 - responsive srcset, jeśli istniejący pipeline to wspiera,
 - nie rozciągać małego assetu.
 
 Aspect ratios preferowane:
 
-- 16:9,
-- 4:3 w wybranych kartach,
-- osobny OG crop jeśli potrzebny.
+- 16:9 — lead/article hero,
+- 4:3 — wybrane standard cards,
+- 1:1 lub zbliżony — compact cards, jeśli projekt tego wymaga,
+- 1.91:1 / 1200x630 — OG, jeśli generujemy dedykowany wariant.
+
+Crop powinien respektować focal point. Dla tego samego source assetu nie wymagamy ręcznego uploadowania osobnego pliku do każdej karty.
 
 ---
 
@@ -458,7 +499,87 @@ Nie generować automatycznie z pierwszych zdań.
 
 ---
 
-## 25. Body typography
+## 25. Regulatory / exam context box
+
+Dla materiałów, w których ma zastosowanie, publiczna strona może pokazać uporządkowany box:
+
+- Status: projekt / konsultacje / przyjęte / obowiązuje
+- Co się zmienia?
+- Od kiedy?
+- Kogo dotyczy?
+- Co to oznacza na egzaminie?
+
+Box korzysta z pól strukturalnych artykułu, nie z automatycznego streszczenia body.
+
+Nie renderujemy pustych wierszy.
+
+---
+
+## 26. Biblioteka bloków body
+
+Body artykułu jest sekwencją kontrolowanych komponentów.
+
+### 26.1. Rich text
+
+Renderuje:
+
+- p
+- H2/H3
+- listy
+- links
+- inline emphasis
+
+### 26.2. Image
+
+- asset
+- alt
+- caption
+- credit
+- dimensions
+- focal point/crop policy
+
+### 26.3. Quote
+
+- cytat
+- attribution
+- source link opcjonalnie
+
+### 26.4. Table
+
+- caption
+- semantic headers
+- responsive overflow
+
+### 26.5. Context/callout
+
+Kontrolowane warianty:
+
+- Dlaczego to ważne?
+- Co się zmienia?
+- Uwaga
+- Metodologia
+
+### 26.6. Domain blocks
+
+- Related article
+- Legal reference
+- Question group
+- Traffic sign group
+- Product CTA
+
+Te komponenty pobierają publiczne dane wskazanego rekordu; nie są ręcznie skopiowanymi kartami HTML.
+
+### 26.7. Embed
+
+Tylko allowlisted providers i bezpieczny wrapper responsywny.
+
+Brak arbitralnego iframe/HTML.
+
+---
+
+---
+
+## 27. Body typography
 
 Wymagania:
 
@@ -474,7 +595,7 @@ Nie używamy font-size 14–15 px dla głównego artykułu.
 
 ---
 
-## 26. H2/H3
+## 28. H2/H3
 
 H2:
 
@@ -491,7 +612,7 @@ Zakaz:
 
 ---
 
-## 27. Cytat
+## 29. Cytat
 
 Blockquote:
 
@@ -501,7 +622,7 @@ Blockquote:
 
 ---
 
-## 28. Tabele
+## 30. Tabele
 
 Dla opłat/statystyk:
 
@@ -515,7 +636,7 @@ Tabel nie renderujemy jako obraz.
 
 ---
 
-## 29. Sources block
+## 31. Sources block
 
 Na końcu treści lub przed related modules.
 
@@ -531,7 +652,7 @@ Nie ukrywamy źródeł w małym szarym tekście.
 
 ---
 
-## 30. Correction note
+## 32. Correction note
 
 Jeśli istotna korekta:
 
@@ -543,7 +664,7 @@ Nie stylizować jak błąd systemu.
 
 ---
 
-## 31. Related questions
+## 33. Related questions
 
 Komponent powinien wykorzystywać istniejące publiczne dane pytania.
 
@@ -560,7 +681,7 @@ Maksymalnie 3–5 pozycji na artykule v1.
 
 ---
 
-## 32. Related legal content
+## 34. Related legal content
 
 Dla artykułów prawnych:
 
@@ -572,7 +693,7 @@ Nie kopiujemy pełnego official excerpt do news article.
 
 ---
 
-## 33. Related signs
+## 35. Related signs
 
 Karta:
 
@@ -585,7 +706,7 @@ Nie pokazujemy, jeśli relacja jest tylko luźna.
 
 ---
 
-## 34. Product CTA na artykule
+## 36. Product CTA na artykule
 
 CTA wynika z typu.
 
@@ -602,7 +723,7 @@ CTA nie może przykrywać treści sticky popupem v1.
 
 ---
 
-## 35. Author box
+## 37. Author box
 
 Elementy:
 
@@ -615,7 +736,7 @@ Dane pochodzą z ContentAuthor.
 
 ---
 
-## 36. Related articles
+## 38. Related articles
 
 2–4 materiały.
 
@@ -627,7 +748,7 @@ Priorytet:
 
 ---
 
-## 37. Share controls
+## 39. Share controls
 
 V1 optional.
 
@@ -639,7 +760,7 @@ Jeśli wdrażamy:
 
 ---
 
-## 38. Reading time
+## 40. Reading time
 
 Nie jest wymagane.
 
@@ -651,7 +772,7 @@ Jeśli wdrożone:
 
 ---
 
-## 39. Ads
+## 40.1. Ads
 
 Poza v1.
 
@@ -661,9 +782,30 @@ Nie projektujemy pustych reklamowych dziur w v1.
 
 ---
 
-## 40. Empty states
+## 41. Topic / dossier page
 
-### 40.1. Brak materiałów kategorii
+Topic nie jest stroną zwykłego taga.
+
+Struktura:
+
+1. breadcrumbs
+2. H1 topicu
+3. opis redakcyjny
+4. featured article opcjonalnie
+5. lista materiałów topicu
+6. powiązane przepisy/pytania, jeśli redakcyjnie uzasadnione
+7. paginacja przy większym corpus
+8. footer
+
+Topic draft nie ma publicznego URL indeksowalnego.
+
+Jeśli corpus jest zbyt mały, topic nie powinien być publikowany tylko dla SEO.
+
+---
+
+## 42. Empty states
+
+### 42.1. Brak materiałów kategorii
 
 Nie renderujemy pustej sekcji na homepage.
 
@@ -673,14 +815,14 @@ Na category page:
 - link do aktualności,
 - noindex rozważyć, jeśli strona nie ma unikalnej wartości.
 
-### 40.2. Brak hero
+### 42.2. Brak hero
 
 Karta ma wariant bez obrazu.
 Nie używamy przypadkowego placeholder photo.
 
 ---
 
-## 41. Error states
+## 43. Error states
 
 404 article:
 
@@ -697,7 +839,7 @@ Nie redirectujemy każdego 404 do homepage.
 
 ---
 
-## 42. Preview UI
+## 44. Preview UI
 
 Preview:
 
@@ -710,7 +852,7 @@ Preview nie może być pomylony z produkcyjną stroną przez redaktora.
 
 ---
 
-## 43. Scheduled preview
+## 45. Scheduled preview
 
 Pokazuje:
 
@@ -720,7 +862,7 @@ Pokazuje:
 
 ---
 
-## 44. Accessibility
+## 46. Accessibility
 
 Minimum:
 
@@ -737,7 +879,7 @@ Minimum:
 
 ---
 
-## 45. Link targets
+## 47. Link targets
 
 Wewnętrzne:
 
@@ -751,7 +893,7 @@ Nie stosujemy target=_blank mechanicznie dla każdego linku.
 
 ---
 
-## 46. Mobile touch targets
+## 48. Mobile touch targets
 
 Minimum praktyczne:
 
@@ -761,7 +903,7 @@ Minimum praktyczne:
 
 ---
 
-## 47. Sticky behavior
+## 49. Sticky behavior
 
 Global header może zachować istniejącą politykę.
 
@@ -769,7 +911,7 @@ Nie wdrażamy sticky sidebar/CTA w N3, jeśli nie ma danych, że pomaga.
 
 ---
 
-## 48. Performance budgets UI
+## 50. Performance budgets UI
 
 Newsroom page nie powinien dołączać dużych bibliotek tylko dla prostych interakcji.
 
@@ -785,7 +927,7 @@ Docelowe metryki są w SEO/Observability spec.
 
 ---
 
-## 49. CSS architecture
+## 51. CSS architecture
 
 Preferowane:
 
@@ -797,7 +939,7 @@ Nie dodajemy inline style bloków per każdy article partial, jeśli można utrz
 
 ---
 
-## 50. Blade component map
+## 52. Blade component map
 
 Rekomendowane komponenty/partials:
 
@@ -808,7 +950,14 @@ Rekomendowane komponenty/partials:
 - newsroom.lead-story
 - newsroom.category-section
 - newsroom.article-byline
+- newsroom.article-provenance
 - newsroom.key-points
+- newsroom.regulatory-context
+- newsroom.block-rich-text
+- newsroom.block-image
+- newsroom.block-quote
+- newsroom.block-table
+- newsroom.block-context
 - newsroom.sources
 - newsroom.related-questions
 - newsroom.related-legal
@@ -821,7 +970,7 @@ Komponent nie powinien mieć dziesiątek wariantów sterowanych stringami.
 
 ---
 
-## 51. Karty — warianty v1
+## 53. Karty — warianty v1
 
 Dozwolone:
 
@@ -836,17 +985,18 @@ Nie tworzymy osobnego komponentu dla każdej sekcji homepage.
 
 ---
 
-## 52. Image behavior w kartach
+## 54. Image behavior w kartach
 
 - lead: 16:9
 - standard: 16:9 lub 4:3 zgodnie z finalnym systemem
 - compact: opcjonalny square/4:3 thumbnail
+- crop respektuje zapisany focal point
 - object-fit cover tylko dla zdjęć, które można kadrować
 - dla znaków drogowych nie używać agresywnego cover crop
 
 ---
 
-## 53. Typ badges
+## 55. Typ badges
 
 Dozwolone:
 
@@ -859,7 +1009,7 @@ Nie pokazujemy badge NEWS przy każdym newsie, jeśli kategoria już daje kontek
 
 ---
 
-## 54. Responsive breakpoints
+## 56. Responsive breakpoints
 
 Preferować obecne breakpoints Tailwind.
 
@@ -877,7 +1027,7 @@ Nie projektujemy tylko pod 1920 desktop.
 
 ---
 
-## 55. Header integration
+## 57. Header integration
 
 PublicNavigation jest źródłem linków.
 
@@ -891,7 +1041,7 @@ Newsroom subnav jest drugim poziomem, a nie alternatywnym globalnym menu.
 
 ---
 
-## 56. Footer integration
+## 58. Footer integration
 
 Używać istniejącego public footer.
 
@@ -899,7 +1049,7 @@ Można dodać linki newsroomowe przez PublicFooter/PublicNavigation po decyzji m
 
 ---
 
-## 57. SEO content visibility
+## 59. SEO content visibility
 
 Główna treść:
 
@@ -911,7 +1061,7 @@ Pagination links są prawdziwymi href.
 
 ---
 
-## 58. Loading states
+## 60. Loading states
 
 Public SSR pages nie wymagają skeletonów initial load.
 
@@ -922,7 +1072,27 @@ Jeśli przyszłe dynamic modules fetchują dane:
 
 ---
 
-## 59. Analytics hooks
+## 60.1. Future audio / AI controls
+
+Architektura UI rezerwuje logiczne miejsce pod przyszłe funkcje, ale v1 ich nie renderuje.
+
+Przyszłe controls mogą pojawić się w okolicy byline/lead:
+
+- Odsłuchaj artykuł
+- Skróć artykuł
+- Zapytaj o ten artykuł
+
+Warunki przed uruchomieniem:
+
+- funkcja ma gotowe dane/derivative po stronie backendu,
+- stan loading/error jest zaprojektowany,
+- AI nie tworzy alternatywnego indeksowalnego URL z duplikatem artykułu,
+- odpowiedź AI jasno wynika z treści artykułu i/lub jawnych źródeł,
+- brak funkcji nie zostawia pustego miejsca w layoutcie.
+
+---
+
+## 61. Analytics hooks
 
 Komponenty mogą mieć data attributes:
 
@@ -934,7 +1104,7 @@ Nie wkładamy logiki analitycznej do każdego Blade partiala ręcznie; public-co
 
 ---
 
-## 60. Wireframe /aktualnosci desktop
+## 62. Wireframe /aktualnosci desktop
 
 ~~~text
 ┌──────────────────────────────────────────────────────────────────────────┐
@@ -971,7 +1141,7 @@ Nie wkładamy logiki analitycznej do każdego Blade partiala ręcznie; public-co
 
 ---
 
-## 61. Wireframe article mobile
+## 63. Wireframe article mobile
 
 ~~~text
 [GLOBAL HEADER]
@@ -996,11 +1166,14 @@ credit
 • ...
 • ...
 
-Body...
-H2
-Body...
-H2
-Body...
+[STATUS / OD KIEDY / KOGO DOTYCZY]
+jeśli dotyczy
+
+[block: rich text]
+[block: context]
+[block: image]
+[block: legal reference]
+[block: question group]
 
 ŹRÓDŁA
 1. ...
@@ -1019,7 +1192,7 @@ CZYTAJ TAKŻE
 
 ---
 
-## 62. UI Definition of Done
+## 64. UI Definition of Done
 
 Frontend newsroom v1 jest UI-complete, gdy:
 
@@ -1031,6 +1204,11 @@ Frontend newsroom v1 jest UI-complete, gdy:
 - breadcrumbs poprawne,
 - source block czytelny,
 - related/product modules działają,
+- homepage placements respektują fallback i deduplikację,
+- body blocks renderują się spójnie desktop/mobile,
+- regulatory context nie pokazuje pustych danych,
+- cropy respektują focal point,
+- topic page działa dla opublikowanego topicu,
 - focus/keyboard działa,
 - 360/390/430 nie mają horizontal overflow,
 - obrazy mają dimensions,
@@ -1039,7 +1217,7 @@ Frontend newsroom v1 jest UI-complete, gdy:
 
 ---
 
-## 63. Stan implementacji
+## 65. Stan implementacji
 
 Na moment utworzenia:
 
@@ -1051,10 +1229,15 @@ Na moment utworzenia:
 
 ---
 
-## 64. Pozostałe zadania
+## 66. Pozostałe zadania
 
 - [ ] zatwierdzić design tokens N0,
 - [ ] przygotować low-fidelity implementation layout,
+- [ ] zdefiniować finalny visual contract stałych homepage slots,
+- [ ] zbudować renderer kontrolowanych body blocks,
+- [ ] zbudować regulatory context box,
+- [ ] zbudować focal-point-aware image variants,
+- [ ] zbudować topic page,
 - [ ] zbudować Blade components,
 - [ ] zbudować hub,
 - [ ] zbudować category page,
@@ -1065,7 +1248,15 @@ Na moment utworzenia:
 
 ---
 
-## 65. Historia zmian
+## 67. Historia zmian
+
+### 2026-09-15 — v0.2
+
+- doprecyzowano homepage composition, fallback i globalną deduplikację kart,
+- dodano rendering kontrolowanych bloków artykułu i branżowy regulatory/exam context box,
+- dodano publiczne pochodzenie materiału, topic/dossier page i focal-point-aware crops,
+- zapisano przyszłe miejsce dla audio/AI bez włączania tych funkcji do v1,
+- nie dodano UI historii snapshotów wersji artykułu.
 
 ### 2026-09-15 — v0.1
 
