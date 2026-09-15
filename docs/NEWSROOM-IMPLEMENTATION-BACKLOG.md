@@ -1054,7 +1054,8 @@ Rozszerzyć istniejący `SeoSitemapGenerator` / `SeoSitemapBuilder`, nie tworzy�
 ## NEWSROOM-N5-003 — RSS/Atom feed + discovery
 
 - latest items,
-- stable GUID,
+- stable GUID/Atom id = dokładnie `urn:prawkonaraz:content-article:{content_articles.id}`; identyfikator nie zależy od sluga, canonical URL ani timestampów,
+- slug change zmienia item link, ale nie GUID/id i nie tworzy nowego feed item,
 - correct content type,
 - cache/invalidation,
 - `<link rel="alternate" type="application/rss+xml|application/atom+xml">` w publicznym layoutcie,
@@ -1080,15 +1081,23 @@ Rozszerzyć istniejący `SeoSitemapGenerator` / `SeoSitemapBuilder`, nie tworzy�
 
 ### Cel
 
-Re-use existing IndexNow pipeline if appropriate.
+Re-use existing IndexNow queue/submission pipeline; nie tworzyć drugiego klienta ani traktować lokalnego `event_type` jak pola protokołu.
 
 ### DoD
 
-- publish/substantive-update/archive integruje się jako updated URL, withdraw jako deleted URL, republish jako created/updated URL,
-- slug change zgłasza stary path jako deleted i nowy canonical jako created/updated, po commit,
-- integracja używa istniejącego IndexNow queue/submission pipeline,
-- nie zakładamy Laravel queue workera,
-- failure does not block article publication.
+- payload pozostaje zgodny z istniejącym `IndexNowSubmissionService`: `host` + `key` + opcjonalne `keyLocation` + `urlList`; brak własnego created/updated/deleted verb w HTTP payload,
+- first publish po commit -> canonical `200` + lokalny `EVENT_CREATED`,
+- substantive public update / republish po commit -> canonical `200` + lokalny `EVENT_UPDATED`,
+- archive zachowujący detail `200` nie jest lokalnym delete; enqueue updated tylko jeśli publiczna reprezentacja/robots detail page faktycznie się zmieniła,
+- withdraw najpierw ustanawia `410`, a dopiero after commit enqueue tego samego URL z lokalnym `EVENT_DELETED`,
+- slug change najpierw ustanawia old `301 -> new` i new `200`; after commit enqueue obu URL-i, old jako lokalny `EVENT_UPDATED` (nie deleted), new jako created/updated,
+- restore-to-review pozostawia `410` i nie enqueue'uje; republish zgłasza URL dopiero po przywróceniu `200`,
+- preview/draft/in_review/scheduled-before-time/noindex nie trafiają do kolejki,
+- `NEWSROOM_PUBLIC_ENABLED=false` wyłącza newsroom collector/automation,
+- rollback transakcji nie tworzy submission row,
+- integracja używa istniejącego IndexNow queue/submission pipeline i jego URL safety filters/dedupe/retry,
+- failure does not block article publication/state transaction,
+- 200/202 oznacza tylko przyjęcie zgłoszenia, nie gwarancję crawl/index/ranking.
 
 ---
 
@@ -1701,6 +1710,12 @@ N0-002/N0-003/N0-004/N0-006 można następnie zamykać według macierzy hard dep
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.6
+
+- doprecyzowano N5 feed GUID do immutable article ID i dodano regression dla slug change bez zmiany item identity,
+- wyrównano N5 IndexNow do istniejącego queue/submission pipeline oraz realnego protokołu bez HTTP event verbów,
+- poprawiono transition semantics: withdrawn=410 + local deleted, slug-old=301 + local updated, enqueue wyłącznie after commit.
 
 ### 2026-09-16 — v0.5
 
