@@ -982,6 +982,9 @@ Jeśli draft stał się publiczny:
 - [ ] one news with multiple block types
 - [ ] one guide
 - [ ] /autorzy/{author}
+- [ ] /o-nas
+- [ ] /kontakt
+- [ ] /metodologia
 - [ ] related question link
 - [ ] related legal link
 
@@ -993,6 +996,8 @@ Jeśli draft stał się publiczny:
 - [ ] homepage WebSite/site name + Organization
 - [ ] no legacy Orły na Drodze identity
 - [ ] author Person/ProfilePage reference
+- [ ] news visible date + time + byline
+- [ ] publication/publisher/company/contact information discoverable
 - [ ] visible dates == structured date semantics
 - [ ] OG image + alt + stable public URL
 - [ ] og:site_name
