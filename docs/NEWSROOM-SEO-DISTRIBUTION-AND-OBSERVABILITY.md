@@ -8,7 +8,7 @@
   - [SEO-CONTENT-ROADMAP.md](./SEO-CONTENT-ROADMAP.md)
   - [NEWSROOM-PUBLIC-UI-UX-SPEC.md](./NEWSROOM-PUBLIC-UI-UX-SPEC.md)
   - [NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md](./NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md)
-- Data weryfikacji źródeł zewnętrznych: 2026-09-15
+- Data weryfikacji źródeł zewnętrznych: 2026-09-16
 - Cel: zdefiniować techniczny i redakcyjny kontrakt Search/Discover/News/sitemap/feed/analytics przed implementacją.
 
 ---
@@ -44,6 +44,20 @@ Aktualne źródła oficjalne:
   https://developers.google.com/search/docs/appearance/google-discover
 - Google canonicalization:
   https://developers.google.com/search/docs/crawling-indexing/canonicalization
+- Google sitemap limits / best practices:
+  https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap
+- Google site names:
+  https://developers.google.com/search/docs/appearance/site-names
+- Google Organization structured data:
+  https://developers.google.com/search/docs/appearance/structured-data/organization
+- Google ProfilePage structured data:
+  https://developers.google.com/search/docs/appearance/structured-data/profile-page
+- Google publication dates:
+  https://developers.google.com/search/docs/appearance/publication-dates
+- Google crawl efficiency / HTTP caching:
+  https://developers.google.com/crawling/docs/crawl-budget
+- Google Preferred Sources:
+  https://developers.google.com/search/docs/appearance/preferred-sources
 - Schema.org NewsArticle:
   https://schema.org/NewsArticle
 - Schema.org Article:
@@ -53,7 +67,7 @@ Nie utrwalamy w kodzie założeń o zewnętrznych limitach bez testu i dokumenta
 
 ---
 
-## 4. Aktualnie potwierdzone zasady Google — 2026-09-15
+## 4. Aktualnie potwierdzone zasady Google — 2026-09-16
 
 ### 4.1. Article structured data
 
@@ -82,9 +96,21 @@ Na dzień weryfikacji Google zaleca:
 - umieszczać w news sitemap tylko artykuły utworzone w ostatnich 2 dniach,
 - po 2 dniach usunąć URL z news sitemap albo usunąć news metadata,
 - jedna news sitemap może mieć do 1000 news entries,
-- publication_date ma być oryginalną datą publikacji na stronie, nie datą dodania do sitemap.
+- publication_date ma być oryginalną datą publikacji na stronie, nie datą dodania do sitemap,
+- wymagane są news:name, news:language, news:publication_date i news:title,
+- news:title ma odpowiadać widocznemu tytułowi artykułu i nie zawierać nazwy autora/publikacji/daty.
 
 Te parametry muszą być ponownie sprawdzone w oficjalnej dokumentacji przy wdrożeniu.
+
+### 4.4. Site name / Organization / crawl efficiency
+
+Na dzień weryfikacji:
+
+- site name jest sygnałem domeny/subdomeny, nie osobnego katalogu /aktualnosci,
+- WebSite z name/url powinien mieć kanoniczne źródło na homepage i nie należy tworzyć konkurencyjnych WebSite nodes,
+- Organization logo powinno być crawlable/indexable i mieć co najmniej 112x112 px,
+- pojedyncza sitemap ma limit 50 000 URL lub 50 MB nieskompresowanego XML,
+- serwis przy wzroście powinien wspierać HTTP conditional requests / 304 dla niezmienionych zasobów, szczególnie sitemap/feed.
 
 ### 4.3. Discover
 
@@ -133,7 +159,13 @@ Rekomendowany wariant technicznie jednoznaczny:
 
 Alternatywa krótsza wymaga reserved-slug policy.
 
-### 6.3. Slug
+### 6.3. Topics / dossier
+
+- /aktualnosci/temat/{topicSlug}
+
+Topic jest jawnie opublikowanym hubem redakcyjnym, nie automatyczną stroną taga.
+
+### 6.4. Slug
 
 Slug:
 
@@ -230,6 +262,7 @@ Brand pattern powinien mieć jedno źródło konfiguracyjne.
 Minimum:
 
 - og:locale pl_PL
+- og:site_name z kanonicznego site identity
 - og:type article
 - og:title
 - og:description
@@ -276,6 +309,16 @@ Preferowane cropy:
 
 Nie blokujemy v1 koniecznością ręcznego przygotowania wszystkich cropów. Preferowany jest deterministyczny pipeline generujący warianty z jednego źródła i focal point.
 
+Publiczne URL-e obrazów używane w OG/schema muszą być:
+
+- stabilne,
+- bez wygasających podpisów,
+- dostępne bez auth/cookies,
+- crawlable i indexable,
+- w formacie obsługiwanym przez wyszukiwarki.
+
+Dla structured data, jeśli istnieją faktycznie wygenerowane warianty, preferujemy zestaw reprezentatywnych obrazów 1:1, 4:3 i 16:9 zamiast jednego przypadkowego cropu. Nie deklarujemy wariantu, który fizycznie nie istnieje.
+
 ---
 
 ## 15. Discover image baseline
@@ -292,31 +335,51 @@ Jeżeli asset nie spełnia baseline, artykuł nadal może być publikowany; jest
 
 ---
 
-## 16. Structured data — NewsArticle
+## 16. Structured data — NewsArticle / Article graph
 
-Rekomendowany JSON-LD:
+Nie budujemy isolated JSON-LD object z kopiami publishera/autora. Newsroom korzysta z istniejącego wzorca graph oraz stabilnych @id.
 
-- @context
-- @type: NewsArticle
-- headline
-- description
-- image
-- datePublished
-- dateModified
-- mainEntityOfPage
-- author Person
-- publisher Organization
-- articleSection
-- inLanguage
-- url
+Minimalny graph article page:
 
-Opcjonalnie:
+- WebSite -> `https://prawkonaraz.pl/#website`
+- Organization -> `https://prawkonaraz.pl/#organization`
+- WebPage -> `{canonical}#webpage`
+- NewsArticle lub Article -> `{canonical}#article`
+- Person autora -> `/autorzy/{slug}#person`
+- BreadcrumbList -> `{canonical}#breadcrumb`
+- ImageObject dla realnych obrazów
+
+Article node:
+
+- @type: NewsArticle dla news albo Article dla pozostałych właściwych typów,
+- headline,
+- description,
+- image jako references/URL-e realnych wariantów,
+- datePublished,
+- dateModified,
+- mainEntityOfPage -> WebPage @id,
+- author -> Person @id,
+- publisher -> Organization @id,
+- articleSection,
+- inLanguage: pl-PL,
+- url,
+- isPartOf -> WebSite @id.
+
+WebPage:
+
+- url canonical,
+- isPartOf -> WebSite,
+- breadcrumb -> BreadcrumbList,
+- primaryImageOfPage, jeśli istnieje,
+- mainEntity -> Article.
+
+Opcjonalnie tylko gdy odpowiada treści:
 
 - about,
 - keywords,
-- isPartOf,
-- publishingPrinciples,
-- correction, jeśli schema support/policy jest potwierdzone na moment implementacji.
+- publishingPrinciples.
+
+Nie deklarujemy properties tylko dlatego, że istnieją w schema.org; markup musi odpowiadać widocznym i prawdziwym danym.
 
 ---
 
@@ -346,19 +409,36 @@ Nie zmieniać dateModified tylko dlatego, że:
 - zmieniono niewidoczne pole techniczne,
 - wykonano touch rekordu.
 
+### 18.1. Spójność dat
+
+- visible publication/update date i JSON-LD muszą opisywać ten sam moment,
+- serializacja structured data używa poprawnego offsetu strefy Europe/Warsaw wraz z DST,
+- future date jest niedozwolona na publicznym artykule,
+- `effective_from`/data wydarzenia nie może zostać pomylona z datePublished/dateModified.
+
 ---
 
-## 19. Author schema
+## 19. Author schema i ProfilePage
 
-Author:
+Newsroom reużywa istniejący `ContentAuthor`, route `/autorzy/{slug}` oraz istniejący wzorzec `ProfilePage -> Person`.
 
-- @type Person,
-- name,
-- url do /autorzy/{slug}.
+Article author:
 
-Profil autora powinien być publiczny i spójny.
+- @type Person przez stabilny @id `/autorzy/{slug}#person`,
+- name = samo imię/nazwisko autora, bez roli/brandingu w name,
+- url = publiczny profil autora.
 
-Nie tworzymy fikcyjnych autorów typu „Redakcja”, jeśli nie ma publicznej strony i jasnej odpowiedzialności. Jeśli istnieje author organizacyjny, modelujemy go jawnie jako Organization zgodnie z realnym stanem.
+ProfilePage / Person może zawierać wyłącznie prawdziwe dane istniejącego autora:
+
+- jobTitle,
+- bio/description,
+- image,
+- sameAs,
+- worksFor -> canonical Organization.
+
+Nie tworzymy fikcyjnych autorów typu „Redakcja”, jeśli nie ma publicznej strony i jasnej odpowiedzialności. Nie dopisujemy credentials/ekspertyzy, których system i publiczny profil nie potwierdzają.
+
+Po wdrożeniu newsroomu publiczny profil autora i sitemap lastmod autorów muszą uwzględniać również opublikowane ContentArticle, a nie tylko starsze moduły contentowe.
 
 ---
 
@@ -377,19 +457,49 @@ Nie może równolegle występować „Orły na Drodze” jako publisher tego sam
 
 ---
 
-## 21. Organization source of truth
+## 21. Site identity i Organization source of truth
 
-Rekomendacja:
+### 21.1. Stan istniejący w repo
 
-utworzyć jeden serwis/config np. SiteOrganizationSchema lub config/brand.php, używany przez:
+Repo już posiada:
 
-- homepage,
-- article schema,
-- author pages,
-- legal content,
-- future organization metadata.
+- `config/content.php -> organization` jako dane organizacji,
+- `SchemaIds::organization()` -> root `/#organization`,
+- `SchemaIds::website()` -> root `/#website`,
+- `SchemaRenderer` i graph pattern,
+- Organization/WebSite/Person graph używany przez istniejące publiczne moduły.
 
-Nie kopiować nazwy/logo w wielu kontrolerach.
+Jednocześnie `HomePageController` nadal ma stare hardcoded „Orły na Drodze”. To jest realna niespójność kodu, nie powód do tworzenia drugiego configu.
+
+### 21.2. Target
+
+N0-001 ma:
+
+- zachować `config/content.php['organization']` jako istniejące kanoniczne dane brand/organization,
+- wyekstrahować/reużyć wspólny site identity/schema builder, jeśli potrzeba, zamiast kopiować metody pomiędzy modułami,
+- zachować stabilne IDs `/#organization` i `/#website`,
+- przenieść homepage na te same dane i IDs,
+- usunąć stare hardcoded logo/name/alt.
+
+Nie tworzymy równoległego `config/brand.php`, chyba że osobna decyzja architektoniczna świadomie migruje istniejący config.
+
+### 21.3. Site name
+
+Kanoniczny `WebSite` z name/url jest emitowany na domenowym homepage. Może mieć `alternateName` tylko gdy istnieje rzeczywiście używana alternatywa; sensownym fallbackiem może być `prawkonaraz.pl`.
+
+`/aktualnosci` jest subdirectory i nie próbuje ustanawiać osobnego site name.
+
+Publiczny header, homepage, WebSite, Organization, OG site_name i article publisher muszą używać tej samej tożsamości.
+
+### 21.4. Logo
+
+Canonical Organization logo:
+
+- publiczny i stabilny URL,
+- min. 112x112,
+- crawlable/indexable,
+- poprawny na białym tle,
+- ImageObject z url/contentUrl oraz width/height, jeśli znane.
 
 ---
 
@@ -431,9 +541,15 @@ Dodany do istniejącego /sitemap.xml index.
 News sitemap:
 
 - tylko type=news,
-- tylko status published,
-- published w oknie zgodnym z aktualnym Google requirement,
-- max entries zgodnie z aktualną dokumentacją,
+- tylko indexable + status published,
+- kwalifikacja czasowa wyłącznie po `first_published_at`,
+- artykuł po istotnej aktualizacji NIE wraca do news sitemap, jeśli jego first_published_at jest starsze niż aktualne okno,
+- `news:name` = kanoniczna nazwa publikacji,
+- `news:language` = `pl`,
+- `news:publication_date` = first_published_at w W3C format,
+- `news:title` = widoczny title artykułu bez autora/brandingu/daty,
+- max 1000 news entries per plik na dzień weryfikacji,
+- po przekroczeniu limitu deterministic split + wpisy w głównym sitemap index,
 - generation cache krótkie.
 
 ---
@@ -456,6 +572,18 @@ Zawiera wszystkie indeksowalne:
 
 Starszy news znika z news sitemap, ale zostaje w normalnej sitemap, jeśli nadal indeksowalny.
 
+### 26.1. Skalowanie sitemap
+
+Każda zwykła sitemap przestrzega zewnętrznych limitów zweryfikowanych przy implementacji. Na dzień 2026-09-16 jest to 50 000 URL albo 50 MB nieskompresowanego XML na plik.
+
+Implementation contract:
+
+- builder nie może zakładać, że `articles.xml` zawsze zmieści cały corpus,
+- sharding ma być deterministyczny i stabilny, np. rok publikacji + sekwencja dopiero gdy shard przekroczy limit,
+- nie używać offset-based shardów powodujących masowe przesuwanie URL między plikami,
+- wszystkie `loc` są absolutne, HTTPS, canonical i indexable,
+- draft/noindex/redirect source nie trafia do article sitemap.
+
 ---
 
 ## 27. Sitemap index
@@ -466,6 +594,8 @@ Istniejący sitemap index powinien po wdrożeniu wskazywać:
 - news.xml
 
 Nie tworzymy kolejnego niezależnego sitemap index dla newsroomu.
+
+Istniejący `SeoSitemapBuilder` i `SeoSitemapAuditor` są rozszerzane o newsroom. Nie budujemy równoległego systemu sitemap, jeśli obecna abstrakcja może zostać rozszerzona bez utraty czytelności.
 
 ---
 
@@ -497,14 +627,27 @@ Minimum:
 
 Feed zawiera najnowsze publiczne artykuły newsowe i ewentualnie inne typy po jawnej decyzji.
 
+Publiczny newsroom/article layout wystawia feed discovery:
+
+`<link rel="alternate" type="application/rss+xml" ...>`
+
+lub Atom odpowiednio do wybranego formatu.
+
 ---
 
-## 30. Feed caching
+## 30. Feed i sitemap HTTP caching
 
-- cache 5–15 min jako punkt startowy,
-- invalidate po publish/archive,
+Dla feedu i generowanych sitemap:
+
+- cache 5–15 min dla feedu jako punkt startowy,
+- sitemap cache zależne od kosztu generacji + invalidation po zmianie publicznego corpus,
+- invalidate po publish/archive/slug change/istotnej aktualizacji tam, gdzie wpływa na output,
 - poprawny content-type,
-- ETag/Last-Modified, jeśli łatwo wspierane.
+- ETag i/lub Last-Modified,
+- conditional GET ma zwracać 304 gdy reprezentacja się nie zmieniła,
+- nagłówki nie mogą powodować serwowania starego outputu po publikacji.
+
+Aktualny `SitemapController` zwraca tylko Content-Type; 304/validators są brakującym elementem implementacji newsroom/enterprise SEO, nie istniejącą funkcją.
 
 ---
 
@@ -528,12 +671,15 @@ Nie obiecujemy pojawienia się w Google News/Top stories/Discover.
 
 Po rollout:
 
-- submit sitemap index,
-- monitor pages/indexing,
+- submit główny sitemap index,
+- monitor Pages/Indexing,
 - monitor article URLs,
 - Rich Results/URL Inspection sample,
 - Discover report jeśli dane się pojawią,
-- Search Performance per newsroom path.
+- Search Performance per newsroom path,
+- segmentować diagnostykę co najmniej na articles / categories / topics / guides,
+- przy sharding można submitować/obserwować wybrane child sitemaps osobno dla łatwiejszej diagnozy,
+- monitorować submitted vs indexed i Google-selected canonical vs declared canonical.
 
 ---
 
@@ -689,13 +835,17 @@ Nie potrzebujemy framework runtime do czytania article page.
 
 ---
 
-## 43. Crawlability
+## 43. Crawlability i crawl efficiency
 
 - links jako href,
 - body w HTML,
 - pagination SSR,
-- category links crawlable,
-- no JS-only navigation.
+- category/topic links crawlable,
+- no JS-only navigation,
+- canonical/noindex/redirect/sitemap signals nie mogą sobie przeczyć,
+- nie generujemy nieskończonych crawlable kombinacji parametrów,
+- 304/HTTP caching dla niezmienionych zasobów ogranicza niepotrzebne transfery,
+- crawl-budget optimizations traktujemy jako skalowalność, nie rytuał dla małego corpus.
 
 ---
 
@@ -1010,7 +1160,38 @@ Zasady:
 
 ---
 
-## 65. Preferred source references w dokumentacji
+## 65. Google Preferred Sources — post-launch opportunity
+
+Google udostępnia globalnie mechanizm Preferred Sources dla domen/subdomen. `prawkonaraz.pl` może być potencjalnym kandydatem jako domena, ale `/aktualnosci` nie jest osobnym źródłem na poziomie subdirectory.
+
+To nie jest warunek indeksacji ani Google News.
+
+Po uruchomieniu newsroomu i ustabilizowaniu publisher identity:
+
+1. sprawdzić, czy prawkonaraz.pl pojawia się w Google source preferences tool,
+2. jeśli tak, rozważyć oficjalny button/deeplink „Dodaj jako preferowane źródło”,
+3. wdrożyć go bez agresywnego popupu i dopiero po pomiarze UX.
+
+Nie kopiujemy kodu integracji na zapas przed potwierdzeniem dostępności dla domeny.
+
+---
+
+## 65.1. Anti-scaled-content guard
+
+Nie tworzymy masowych stron tylko po to, by pokryć warianty fraz.
+
+W szczególności bez osobnej decyzji jakościowej nie wolno:
+
+- publikować strony dla każdego taga,
+- generować setek WORD/miasto landingów z minimalnie zmienionym tekstem,
+- generować AI articles bez własnej wartości, źródeł i review,
+- składać treści z cudzych źródeł bez istotnego wkładu redakcyjnego.
+
+Automation może wspierać redakcję, ale każde indeksowalne URL musi mieć samodzielną wartość dla użytkownika.
+
+---
+
+## 66. Preferred source references w dokumentacji
 
 Każdy zewnętrzny wymóg Google w kodzie powinien mieć:
 
@@ -1021,15 +1202,16 @@ Nie linkujemy do przypadkowego SEO bloga jako źródła normatywnego.
 
 ---
 
-## 66. Definition of Done SEO/Distribution v1
+## 67. Definition of Done SEO/Distribution v1
 
 - canonical URLs stabilne,
 - article metadata kompletne,
-- NewsArticle/Article semantycznie poprawne,
-- publisher/author spójni,
-- articles sitemap działa,
-- news sitemap działa zgodnie z aktualnymi wymaganiami,
-- feed działa,
+- NewsArticle/Article graph semantycznie poprawny i używa stabilnych @id,
+- publisher/WebSite/site name/author spójni,
+- articles sitemap działa i ma deterministic sharding readiness,
+- news sitemap ma poprawne news:name/language/publication_date/title i działa zgodnie z aktualnymi wymaganiami,
+- feed działa i ma discovery link,
+- sitemap/feed wspierają cache validators i 304,
 - images spełniają ustalone baseline i respektują focal point/crop policy,
 - opublikowane topic pages spełniają kryteria jakości,
 - max-image-preview:large włączone dla indeksowalnych artykułów,
@@ -1040,36 +1222,54 @@ Nie linkujemy do przypadkowego SEO bloga jako źródła normatywnego.
 
 ---
 
-## 67. Stan implementacji
+## 68. Stan implementacji
 
 Obecnie:
 
 - public-content layout ma canonical/OG/Twitter/article times support,
 - istnieją sitemapy innych content types,
 - istnieje IndexNowUrlSubmission,
-- author pages istnieją,
+- author pages istnieją i mają istniejący ProfilePage pattern,
+- `config/content.php['organization']`, `SchemaIds` i `SchemaRenderer` są istniejącym fundamentem entity graph,
+- HomePageController nadal hardcoduje „Orły na Drodze”, więc site identity jest obecnie niespójne,
+- obecny SitemapController nie ma conditional 304/ETag/Last-Modified,
 - newsroom-specific Article schema/news sitemap/feed nie istnieją,
 - /aktualnosci jest placeholderem.
 
 ---
 
-## 68. Pozostałe zadania
+## 69. Pozostałe zadania
 
-- [ ] ujednolicić Organization/publisher,
+- [ ] ujednolicić Organization/WebSite/site name na istniejącym config/schema infrastructure,
+- [ ] dodać `og:site_name` i feed discovery do wspólnego public layout contract,
 - [ ] wdrożyć ContentArticleSeoService,
 - [ ] wdrożyć ContentArticleSchemaService,
-- [ ] wdrożyć article sitemap,
-- [ ] wdrożyć news sitemap,
-- [ ] wdrożyć feed,
+- [ ] wdrożyć article sitemap z deterministic sharding readiness,
+- [ ] wdrożyć news sitemap z pełnymi wymaganymi news tags,
+- [ ] rozszerzyć istniejący sitemap auditor o newsroom/news namespace checks,
+- [ ] wdrożyć sitemap/feed conditional HTTP caching,
+- [ ] wdrożyć feed + auto-discovery,
 - [ ] wdrożyć analytics hooks/events,
 - [ ] wdrożyć topic SEO dla faktycznie publikowanych dossier,
 - [ ] zweryfikować crop/OG output z focal point,
 - [ ] podłączyć monitoring,
-- [ ] wykonać production Search Console verification.
+- [ ] wykonać production Search Console verification,
+- [ ] po launch sprawdzić eligibility domeny w Google Preferred Sources.
 
 ---
 
-## 69. Historia zmian
+## 70. Historia zmian
+
+### 2026-09-16 — v0.3
+
+- wykonano ponowny audit względem aktualnego kodu i oficjalnej dokumentacji Google,
+- skorygowano site identity source of truth do istniejącego config/content.php + SchemaIds/SchemaRenderer,
+- zdefiniowano stabilny Organization/WebSite/Person/Article/WebPage graph,
+- doprecyzowano site name, Organization logo, author ProfilePage reuse i date consistency,
+- doprecyzowano wymagane pola news sitemap oraz first_published_at eligibility,
+- dodano enterprise sitemap sharding, HTTP 304/cache validators i RSS discovery,
+- dodano Search Console segmentation, anti-scaled-content guard i post-launch Google Preferred Sources,
+- opisano istniejące braki kodu bez oznaczania ich jako wdrożonych.
 
 ### 2026-09-15 — v0.2
 
