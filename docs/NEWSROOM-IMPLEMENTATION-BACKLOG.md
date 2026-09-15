@@ -387,6 +387,7 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 - rollback nie emituje cache/sitemap/IndexNow side effect,
 - audit actor/metadata bez pełnej treści,
 - archived previously-published article zachowuje public 200, ale znika z active distribution,
+- archived Republish wymaga fresh review/checklist i nie przechodzi przez publiczne 404,
 - withdrawn wymaga reason, zwraca 410 bez contentu i nie trafia do dystrybucji/sitemap.
 
 ---
@@ -542,6 +543,7 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 - review,
 - schedule,
 - publish,
+- republish archived,
 - archive,
 - withdraw,
 - featured,
