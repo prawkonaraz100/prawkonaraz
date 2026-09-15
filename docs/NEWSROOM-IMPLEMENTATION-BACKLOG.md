@@ -98,6 +98,7 @@ Preferowany:
 
 - /aktualnosci
 - /aktualnosci/kategoria/{categorySlug}
+- /aktualnosci/temat/{topicSlug}
 - /aktualnosci/{articleSlug}
 - /poradniki
 - /poradniki/{articleSlug}
@@ -874,16 +875,16 @@ N1 migrations/enums
 N1 models/factories
 
 ### PR E
-N1 publishing/slug/scheduler
+N1 publishing/slug/scheduler/home composition service
 
 ### PR F
-N2 categories CMS
+N2 categories + topics CMS
 
 ### PR G
-N2 article CMS basic
+N2 article CMS + controlled block editor
 
 ### PR H
-N2 sources/relations/workflow/preview
+N2 sources/relations/workflow/provenance/media + article/home preview
 
 ### PR I
 N3 article public
@@ -892,7 +893,7 @@ N3 article public
 N4 newsroom hub
 
 ### PR K
-N4 categories/guides/nav/cache
+N4 categories/topics/guides/nav/cache
 
 ### PR L
 N5 sitemap/feed
@@ -1053,6 +1054,18 @@ Mitigation: image baseline + perf pass.
 
 Mitigation: editorial source/status policy + reviewer gate.
 
+## R9 — homepage powtarza te same materiały w wielu modułach
+
+Mitigation: jeden NewsroomHomeCompositionService + exclusion set + testy deduplikacji.
+
+## R10 — crop obrazu ucina istotny subject
+
+Mitigation: focal point + preview wariantów + testy media contract.
+
+## R11 — topic pages stają się thin SEO pages
+
+Mitigation: ręczna publikacja topicu, minimalny corpus, własny opis i brak automatycznego mapowania tag -> topic.
+
 ---
 
 # 9. Aktualizacja dokumentacji podczas wdrożenia
@@ -1075,8 +1088,8 @@ Nie oznaczać tasku DONE przed merge + green verification.
 
 Na 2026-09-15:
 
-- projekt dokumentacyjny jest w toku,
-- implementacja newsroomu nie rozpoczęta,
+- pakiet projektowy newsroomu obejmuje architekturę, model danych, CMS, UI, governance, SEO, backlog i runbook,
+- niniejsze rozszerzenie doprecyzowuje editorial composition; implementacja newsroomu nadal nie rozpoczęta,
 - /aktualnosci i /poradniki nadal placeholder,
 - fundamenty ContentAuthor/legal/traffic signs/public SEO istnieją.
 
