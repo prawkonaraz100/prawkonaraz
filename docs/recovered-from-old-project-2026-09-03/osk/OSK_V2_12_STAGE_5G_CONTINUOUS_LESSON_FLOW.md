@@ -93,3 +93,89 @@ Manualny smoke na lokalnym pilocie powinien potwierdzic kolejno:
 Nie zamieniaj `Zakoncz nauke` na `Zakoncz kurs` i nie dodawaj automatycznego
 uznania ukonczenia tylko dlatego, ze kursant dotarl do konca listy krokow.
 Ta decyzja wymaga osobnego kontraktu formalnego, polityki i testow.
+
+## 7. Biezaca weryfikacja po odzyskaniu repozytorium — 2026-09-15
+
+### 7.1. Decyzja architektoniczna
+
+Kontrakt opisany w sekcjach 1-4 pozostaje decyzja projektowa dla przeplywu
+Learning Engine: `Zakoncz sesje` jest akcja swiadomego przerwania nauki, a nie
+obowiazkowa bramka pomiedzy poprawnie ukonczona lekcja i kolejnym dozwolonym
+elementem. Nie zmieniac tej decyzji tylko dlatego, ze aktualnie uruchomiony
+lokalny build zachowuje sie inaczej.
+
+### 7.2. Aktualny stan implementacji potwierdzony w dostepnym repozytorium
+
+Stan `zaimplementowany i zweryfikowany lokalnie` z poczatku tego dokumentu
+jest **historycznym wynikiem z 2026-08-26** dla branchu
+`codex/osk-learning-dashboard-ui`. Nie jest sam w sobie dowodem, ze ta
+implementacja znajduje sie obecnie na `main`.
+
+Weryfikacja GitHub z 2026-09-15 wykazala, ze aktualny
+`prawkonaraz100/prawkonaraz@main`:
+
+- nie zawiera trasy `/osk/nauka/{...}` ani osobnego `routes/osk.php`;
+- nie zawiera katalogu `resources/js/Pages/Osk` z historycznym
+  `LessonPlayer.vue`;
+- nie zawiera potwierdzonych w tym dokumencie klas
+  `TheoryLearningController` i
+  `PublishedCourseProgramPayloadBuilder`;
+- przechowuje ten plik jako odzyskana dokumentacje historyczna w
+  `docs/recovered-from-old-project-2026-09-03/osk/`.
+
+Branch `codex/osk-learning-dashboard-ui` nie jest obecnie dostepny wsrod
+aktywnych branchy tego repozytorium. Z tego powodu nie wolno oznaczac Etapu 5G
+jako potwierdzonego elementu aktualnego `main` bez odzyskania lub wskazania
+rzeczywistego drzewa kodu, z ktorego dziala lokalny adres `/osk/nauka/...`.
+
+### 7.3. Zaobserwowana rozbieznosc runtime
+
+W lokalnym runtime zaobserwowano obecnie przeplyw:
+
+```text
+ostatni Step
+-> Dalej staje sie nieaktywne
+-> wymagane Zakoncz sesje
+-> ekran Sesja zakonczona
+-> Plan kursu / Rozpocznij ponownie
+```
+
+Ten stan jest **rozbiezny z kontraktem Etapu 5G**, ale bez dostepu do
+rzeczywistego kodu tego lokalnego builda nie wiadomo jeszcze, czy przyczyna jest:
+
+- regresja w `LessonPlayer`;
+- uruchomienie starszego checkoutu/branchu;
+- brak historycznej implementacji 5G w aktualnym drzewie;
+- zmiana backendowego payloadu/nawigacji;
+- inna konfiguracja lokalnego srodowiska.
+
+Nie dopasowywac decyzji architektonicznej do tej rozbieznosci. Najpierw
+zidentyfikowac rzeczywiste zrodlo uruchomionego kodu.
+
+### 7.4. Ukończone w ramach wznowienia 2026-09-15
+
+- sprawdzono aktualne branche i `main` dostepnych repozytoriow GitHub;
+- sprawdzono aktualny `routes/web.php` oraz drzewo plikow
+  `prawkonaraz100/prawkonaraz@main`;
+- potwierdzono, ze bieżący `main` nie zawiera runtime'u OSK opisanego w tym
+  dokumencie;
+- nie zmieniono kodu runtime, kontraktu czasu ani logiki sesji;
+- zachowano historyczne wyniki testow jako evidence historyczne, a nie jako
+  nowa walidacje aktualnego `main`.
+
+### 7.5. Pozostala praca przed jakakolwiek zmiana UX
+
+1. Ustalic dokladny working tree / commit / branch uruchamiany pod lokalnym
+   `http://localhost:8000/osk/nauka/...`.
+2. W tym drzewie prześledzic end-to-end:
+   `LessonPlayer` -> zapis ostatniego kroku -> progress -> session close /
+   heartbeat -> wyznaczenie kolejnej lekcji lub dzialu.
+3. Zidentyfikowac wszystkie side effects `Zakoncz sesje` przed jego
+   oddzieleniem od normalnej nawigacji.
+4. Dodac lub uruchomic testy regresyjne obecnego zachowania sesji i postepu.
+5. Dopiero potem wykonac najmniejszy refactor przywracajacy glowny CTA zgodny
+   z kontraktem 5G / Continuation Contract.
+
+Do czasu wykonania punktow 1-4 status bieżącej implementacji tego przeplywu
+nalezy traktowac jako **WYMAGA WERYFIKACJI W RZECZYWISTYM LOCAL WORKTREE**.
+
