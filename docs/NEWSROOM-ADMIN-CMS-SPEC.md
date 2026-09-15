@@ -463,7 +463,7 @@ Pola:
 - image credit — publiczny, jeśli potrzebny
 - image license note — tylko backoffice, nigdy publicznie
 
-Wykorzystujemy istniejący media layer.
+Reużywamy istniejących reguł storage/media URL, allowlist i size policy, ale **nie** reużywamy bezpośrednio `AdminMediaUploadService`: jest question-specific (`Question`/`QuestionMedia`). Newsroom potrzebuje własnego adaptera/service zapisującego newsroom asset metadata i generującego immutable/unique public paths.
 
 Focal point powinien być ustawiany wizualnie na obrazie, jeśli komponent na to pozwala, z fallbackiem do pól liczbowych/środka. Redaktor nie uploaduje ręcznie osobnych kopii dla każdej karty, jeśli system może wygenerować crop z tego samego źródła.
 
