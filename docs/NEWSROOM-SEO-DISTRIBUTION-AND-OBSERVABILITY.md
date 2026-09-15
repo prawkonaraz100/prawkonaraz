@@ -931,6 +931,10 @@ Tag służy lekkiej klasyfikacji.
 
 Topic jest osobnym, ręcznie zarządzanym hubem.
 
+Canonical route v1:
+
+`/aktualnosci/temat/{topicSlug}`
+
 Może być indeksowalny tylko gdy:
 
 - status = published,
@@ -992,7 +996,7 @@ Po slug change:
 
 ---
 
-## 63.1. Audio i AI derivatives — SEO policy
+## 64. Audio i AI derivatives — SEO policy
 
 Przyszły odsłuch, transkrypcja, skrót AI lub „zapytaj o artykuł” nie tworzą automatycznie osobnych indeksowalnych stron.
 
@@ -1006,7 +1010,7 @@ Zasady:
 
 ---
 
-## 64. Preferred source references w dokumentacji
+## 65. Preferred source references w dokumentacji
 
 Każdy zewnętrzny wymóg Google w kodzie powinien mieć:
 
@@ -1017,7 +1021,7 @@ Nie linkujemy do przypadkowego SEO bloga jako źródła normatywnego.
 
 ---
 
-## 65. Definition of Done SEO/Distribution v1
+## 66. Definition of Done SEO/Distribution v1
 
 - canonical URLs stabilne,
 - article metadata kompletne,
@@ -1036,7 +1040,7 @@ Nie linkujemy do przypadkowego SEO bloga jako źródła normatywnego.
 
 ---
 
-## 66. Stan implementacji
+## 67. Stan implementacji
 
 Obecnie:
 
@@ -1049,7 +1053,7 @@ Obecnie:
 
 ---
 
-## 67. Pozostałe zadania
+## 68. Pozostałe zadania
 
 - [ ] ujednolicić Organization/publisher,
 - [ ] wdrożyć ContentArticleSeoService,
@@ -1065,7 +1069,7 @@ Obecnie:
 
 ---
 
-## 68. Historia zmian
+## 69. Historia zmian
 
 ### 2026-09-15 — v0.2
 
