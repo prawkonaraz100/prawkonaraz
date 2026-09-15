@@ -253,6 +253,24 @@ kontrolowanego deploymentu z dysku F.
 
 ### Etap 6 — odzyskanie niedokończonego modułu OSK
 
+**Stan weryfikacji 2026-09-15 — aktualna implementacja, bez zmiany decyzji architektonicznych:**
+
+- [x] Zweryfikowano aktualne `main@4b10738705f3696bc2bcce730a707473eab8cd2b`
+  oraz branch `docs/osk-learning-flow-verification-2026-09-15`.
+- [x] Potwierdzono, że dostępne drzewo kodu nie zawiera runtime'u OSK opisanego
+  w odzyskanych dokumentach: brak trasy `/osk/nauka/{...}`, katalogu
+  `resources/js/Pages/Osk`, `LessonPlayer.vue`, `TheoryLearningController`
+  i `PublishedCourseProgramPayloadBuilder`.
+- [x] Potwierdzono, że dokumentacja w
+  `docs/recovered-from-old-project-2026-09-03/osk` pozostaje historycznym
+  snapshotem; jej sierpniowe statusy implementacyjne nie są dowodem stanu
+  aktualnego `main`.
+- [!] Ta weryfikacja nie oznacza odzyskania kodu OSK ani zakończenia Etapu 6.
+  Nie wolno rekonstruować bieżącego statusu implementacji wyłącznie z dokumentacji.
+- [ ] Nadal trzeba wskazać rzeczywisty working tree / commit uruchamiany lokalnie
+  dla `/osk/nauka/...`, zanim będzie można porównać zachowanie runtime z
+  kontraktami Etapów 4B/5D/5E/5G.
+
 - [ ] Utworzyć gałąź `recovery/osk-after-crash` z aktualnego `main`.
 - [ ] Sporządzić inwentarz możliwych do odzyskania commitów, obiektów i plików ze
   starego repozytorium na G.
@@ -320,13 +338,20 @@ Przed pierwszym wdrożeniem zmian wykonanych po odzyskaniu muszą być spełnion
 
 ## 9. Najbliższy następny krok
 
-**Przejrzeć zakres PR `#1`, włączyć ochronę gałęzi `main`, a następnie połączyć
-PR dopiero po jawnej decyzji użytkownika.**
+**Bieżący krok po weryfikacji z 2026-09-15:** zidentyfikować rzeczywisty working
+tree / commit uruchamiający lokalny `/osk/nauka/...`. Dopiero w tym drzewie
+należy prześledzić `LessonPlayer -> zapis ostatniego kroku -> progress ->
+session close / heartbeat -> następna lekcja lub dział` i porównać zachowanie
+z odzyskanymi kontraktami OSK.
 
-Zielony CI nie jest zgodą na deployment. Przed pierwszym wdrożeniem nadal trzeba
-przygotować zweryfikowany backup, wersjonowane wydania, procedurę rollbacku oraz
-osobnego użytkownika `deploy`. Odzyskiwanie OSK powinno otrzymać osobną gałąź po
-ustabilizowaniu bazy w `main`.
+Do tego czasu nie odzyskiwać ani nie promować modułu OSK do `main` na podstawie
+samej dokumentacji historycznej.
+
+**Historia:** 2026-09-03 najbliższym krokiem był przegląd i merge PR `#1`.
+PR `#1` został później połączony do `main` w commicie
+`5e795b05a36a0d03469fff0ea846e23f70a12729`, więc ten punkt nie jest już
+bieżącym zadaniem. Zielony CI nadal nie jest zgodą na deployment; wymagania
+backup/rollback i osobnej decyzji o wdrożeniu pozostają bez zmian.
 
 ## 10. Jak aktualizować ten dokument
 
@@ -350,6 +375,7 @@ Po zakończeniu zadania agent powinien:
 | 2026-09-03 | Zweryfikowano historię przed publikacją i świeże klonowanie | Gitleaks 8.30.1, `git fsck --full --strict` |
 | 2026-09-03 | Uruchomiono pierwszy PR i ujawniono stan testów odzyskanej bazy | PR `#1`, 743 zaliczone / 69 niezaliczonych / 2 pominięte |
 | 2026-09-03 | Doprowadzono główny pipeline PR do stanu zielonego | PR `#1`, commit `2d64b73`, run `33803149375`, 814 testów, Pint 922 pliki, build OK |
+| 2026-09-15 | Zweryfikowano bieżący stan odzyskanego modułu OSK względem dostępnego kodu; potwierdzono brak runtime'u OSK w aktualnym `main` i pozostawiono status odzyskania jako otwarty | `main@4b107387`, branch `docs/osk-learning-flow-verification-2026-09-15`, audyt drzewa 3209 wpisów |
 
 ## 12. Dokumenty powiązane
 
