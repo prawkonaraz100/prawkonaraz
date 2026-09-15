@@ -244,7 +244,7 @@ Nie publikować:
 
 ---
 
-## 8.1. Robots/sitemap delivery compatibility
+### 8.1. Robots/sitemap delivery compatibility
 
 Repo ma równolegle statyczny `public/robots.txt` i route `RobotsController`. Zgodnie z `SEO-SITEMAP-REPAIR-PLAN.md` produkcyjnie preferowany jest statyczny plik oraz jawna weryfikacja Nginx/Cloudflare.
 
@@ -267,11 +267,15 @@ index,follow,max-image-preview:large
 
 ### Draft / in_review / preview
 
-noindex,nofollow lub noindex,follow zależnie od preview transportu; przede wszystkim brak publicznego crawlable URL.
+Draft/in_review nie mają publicznego crawlable URL. Admin preview jest authenticated-only, `private, no-store` i ma `noindex,nofollow`.
 
 ### Scheduled
 
 Nie pojawia się publicznie przed czasem.
+
+### Needs review
+
+Canonical detail URL pozostaje publiczny i może pozostać indexable zgodnie z robots policy, ale materiał jest wyłączony z aktywnej dystrybucji (home/category/topic latest/feed/news sitemap) do czasu ponownego review.
 
 ### Archived
 
@@ -715,7 +719,7 @@ Minimum:
 - summary,
 - author jeśli format wspiera.
 
-Feed zawiera najnowsze publiczne artykuły newsowe i ewentualnie inne typy po jawnej decyzji.
+Feed zawiera najnowsze `activelyDistributed()` artykuły newsowe i ewentualnie inne typy po jawnej decyzji. `needs_review` i `archived` nie są dystrybuowane w feedzie mimo publicznego detail URL.
 
 Publiczny newsroom/article layout wystawia feed discovery:
 
@@ -1441,7 +1445,7 @@ Nie kopiujemy kodu integracji na zapas przed potwierdzeniem dostępności dla do
 
 ---
 
-## 65.1. Anti-scaled-content guard
+### 65.1. Anti-scaled-content guard
 
 Nie tworzymy masowych stron tylko po to, by pokryć warianty fraz.
 
