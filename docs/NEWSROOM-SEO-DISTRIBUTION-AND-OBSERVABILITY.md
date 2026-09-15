@@ -754,7 +754,7 @@ Minimum:
 
 - title,
 - canonical link,
-- stable opaque item id niezależny od sluga, np. `urn:prawkonaraz:content-article:{id}`; RSS używa go jako GUID z `isPermaLink=false`, Atom jako `id`,
+- stable opaque item id oparty wyłącznie na niezmiennym `content_articles.id`, niezależny od sluga/canonical/timestampów, dokładnie w formacie `urn:prawkonaraz:content-article:{id}`; RSS używa go jako GUID z `isPermaLink=false`, Atom jako `id`,
 - zmiana sluga aktualizuje link, ale nie item id i nie tworzy „nowej publikacji” w czytniku,
 - published date = first_published_at,
 - updated date = last_substantive_update_at ?? first_published_at,
@@ -1231,24 +1231,38 @@ Repo ma już `IndexNowUrlSubmission`, `IndexNowSubmissionService`, `IndexNowQueu
 Potwierdzony aktualny pipeline już obsługuje:
 
 - canonical-host filtering,
-- HTTPS,
+- lokalną politykę safety wymagającą HTTPS i odrzucającą query string/private/technical/non-page paths,
 - key/keyLocation,
-- batching do maks. 10 000 URL per request zgodnie z aktualnym protokołem,
+- batching do maks. 10 000 URL per request,
 - 200/202 jako accepted states,
-- rozróżnienie 400/403/422/429/5xx.
+- rozróżnienie 400/403/422/429/5xx,
+- deduplikację kolejki per dokładny URL przez `url_hash` i debounce/retry.
 
-Newsroom ma REUSE ten pipeline.
+Newsroom ma **REUSE** ten pipeline. Nie tworzymy osobnego klienta ani drugiej kolejki.
 
-Wymagania integracji newsroomu:
+### 49.1. Semantyka protokołu vs lokalny `event_type`
 
-- publish/update/archive/slug change zgłasza tylko właściwe publiczne canonical URLs,
-- idempotentne queue/retry,
-- nie blokuje publikacji,
-- nie zgłasza preview/draft/noindex,
-- usunięty/stary URL może zostać zgłoszony po zmianie stanu zgodnie z protocol use case,
-- collector zostaje rozszerzony o newsroom zamiast tworzenia osobnego klienta.
+IndexNow POST wysyła `host`, `key`, opcjonalne `keyLocation` i `urlList`. Protokół nie ma osobnego pola/verb `created|updated|deleted`. `IndexNowUrlSubmission.event_type` jest wyłącznie lokalnym metadanym kolejki/audytu i **nie może być serializowany jako rzekoma komenda protokołu**.
 
-IndexNow jest sygnałem zmiany URL do uczestniczących wyszukiwarek; nie traktujemy przyjęcia requestu jako gwarancji crawl/index/ranking ani jako mechanizmu sterującego Google indexing.
+Dokładna semantyka newsroomu po udanym commit:
+
+- pierwsza publikacja: canonical już odpowiada `200` -> enqueue canonical z lokalnym `EVENT_CREATED`,
+- merytoryczna publiczna aktualizacja / republish: finalny canonical odpowiada `200` -> enqueue canonical z lokalnym `EVENT_UPDATED`,
+- archive: canonical historycznego artykułu nadal odpowiada `200`; enqueue `EVENT_UPDATED` tylko wtedy, gdy archive realnie zmieniło publiczną reprezentację/robots detail page. Samo usunięcie z home/feed/sitemap nie udaje „delete” URL,
+- withdrawn: transakcja najpierw ustanawia finalny publiczny stan `410 Gone`; dopiero after commit enqueue tego samego dawnego canonical z lokalnym `EVENT_DELETED`,
+- zmiana sluga: transakcja najpierw ustanawia stary URL jako `301 -> new canonical` i nowy canonical jako `200`; dopiero after commit enqueue obu URL-i. Stary URL dostaje lokalny `EVENT_UPDATED` (jego publiczna odpowiedź zmieniła się na redirect), **nie `EVENT_DELETED`**; nowy canonical dostaje `EVENT_CREATED` albo `EVENT_UPDATED` zgodnie z use case,
+- restore withdrawn -> review nie enqueue'uje publicznego URL, bo pozostaje `410`; dopiero skuteczny republish zgłasza ponownie canonical po przywróceniu `200`.
+
+Dodatkowe invariants:
+
+- żadnego enqueue przed commit; rollback nie zostawia submission row,
+- nie zgłaszamy preview/draft/in_review/scheduled-before-time ani URL z `noindex`,
+- `NEWSROOM_PUBLIC_ENABLED=false` wyłącza newsroom collector/automation,
+- failure/retry IndexNow nie blokuje publish/withdraw/slug transaction,
+- collector zostaje rozszerzony o newsroom zamiast tworzenia osobnego klienta,
+- 200/202 oznacza wyłącznie przyjęcie zgłoszenia przez usługę; nie jest gwarancją crawl/index/ranking.
+
+Oficjalny protokół opisuje jeden `url-changed` dla URL dodanego, zaktualizowanego lub usuniętego. Stan docelowy wyszukiwarka poznaje przez ponowne pobranie zgłoszonego URL; dlatego kolejność **public state commit -> enqueue** jest częścią kontraktu, a nie detalem implementacyjnym.
 
 ---
 
@@ -1596,6 +1610,12 @@ Obecnie:
 ---
 
 ## 70. Historia zmian
+
+### 2026-09-16 — v0.6
+
+- doprecyzowano stabilny feed GUID do dokładnego `urn:prawkonaraz:content-article:{content_articles.id}`, niezależnego od sluga i timestampów,
+- wyrównano IndexNow do faktycznego kodu i protokołu: `event_type` jest lokalnym metadanym, a payload wysyła URL listę bez verbów created/updated/deleted,
+- zdefiniowano kolejność commit -> enqueue dla publish/update/withdraw/slug change oraz poprawiono slug-change semantics: stary URL po 301 jest updated, nie deleted.
 
 ### 2026-09-16 — v0.5
 
