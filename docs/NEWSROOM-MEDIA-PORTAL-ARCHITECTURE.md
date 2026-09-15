@@ -1149,7 +1149,7 @@ Aktualny `SitemapController` nie ma tej warstwy; jest to zaplanowana praca, nie 
 
 - publiczne endpointy są read-only,
 - zapis wyłącznie przez autoryzowany backoffice,
-- preview wymaga autoryzacji lub podpisanego, krótkotrwałego URL,
+- preview v1 wymaga istniejącej autoryzacji administratora, jest `private, no-store` i nie używa shareable signed URL; ewentualny przyszły signed preview wymaga osobnego threat modelu,
 - body i embed content muszą być sanityzowane,
 - audytujemy publikację i istotne edycje,
 - uploady przechodzą istniejące zasady mediów,
