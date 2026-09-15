@@ -160,6 +160,7 @@ PR C/N1 musi dodać addytywny job `newsroom-postgres` z usługą PostgreSQL (lub
 - active-state timestamps set/cleared consistently with workflow status,
 - scheduled scope,
 - category relation,
+- brak redundantnych article created_by/updated_by actor columns; actor history comes from AuditLog,
 - author/reviewer relation,
 - sources,
 - tags,
@@ -217,6 +218,7 @@ Initial Publish / Apply public update blokuje odpowiednio:
 - brak lead,
 - brak renderowalnego body_blocks,
 - invalid block payload,
+- key_points jeśli ustawione: 2–5 plain-text items,
 - brak category,
 - brak author,
 - brak wymaganych źródeł,
@@ -303,6 +305,8 @@ Given publiclyVisible article:
 - stale token -> reject bez partial update,
 - meaningful update ustawia `last_substantive_update_at`,
 - internal-only note update nie ustawia substantive timestamp i nie zmienia public output,
+- significant correction atomically commits correction_note + changed public content + last_substantive_update_at,
+- failed correction validation leaves previous public content/note unchanged,
 - scheduled republish publicznego 200 jest rejected,
 - audit nie przechowuje pełnego body.
 
