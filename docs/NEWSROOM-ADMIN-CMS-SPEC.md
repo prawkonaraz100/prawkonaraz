@@ -7,7 +7,7 @@
 - Powiązane:
   - [NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md](./NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md)
   - [NEWSROOM-EDITORIAL-OPERATIONS-AND-GOVERNANCE.md](./NEWSROOM-EDITORIAL-OPERATIONS-AND-GOVERNANCE.md)
-- Data: 2026-09-15
+- Data: 2026-09-16
 - Cel: zdefiniować panel redakcyjny Filament na tyle dokładnie, aby implementacja nie wymagała projektowania workflow podczas kodowania.
 
 ---
@@ -422,6 +422,7 @@ Pola:
 - focal point X/Y
 - podgląd cropów lead / standard / compact
 - OG image lub wygenerowany OG variant
+- OG image alt
 - image credit
 - image license note
 
@@ -444,9 +445,12 @@ Przy upload/wyborze:
 
 Dodatkowe warning:
 
-- szerokość < 1200 px dla materiału oznaczonego jako Discover-ready/featured, jeśli taki marker zostanie wdrożony.
+- szerokość < 1200 px dla materiału oznaczonego jako Discover-ready/featured, jeśli taki marker zostanie wdrożony,
+- dedicated OG image bez alt,
+- publiczny SEO image URL wymaga wygasającego podpisu/auth,
+- crop usuwa główny subject.
 
-Nie blokować wszystkich publikacji wyłącznie przez Discover recommendation.
+Nie blokować wszystkich publikacji wyłącznie przez Discover recommendation. Natomiast obraz wskazany w publicznym OG/schema musi mieć stabilny publiczny URL.
 
 ---
 
@@ -648,7 +652,8 @@ Warning:
 - brak hero,
 - brak manual SEO description,
 - brak related questions,
-- brak OG-specific image.
+- brak OG-specific image, jeśli hero daje poprawny fallback,
+- brak dedykowanego OG alt, gdy dedykowany OG asset semantycznie różni się od hero.
 
 ---
 
@@ -1058,7 +1063,7 @@ E2E:
 
 ## 53. Stan implementacji
 
-Na 2026-09-15:
+Na 2026-09-16:
 
 - TrafficSigns CMS daje wzorzec workflow/checklist,
 - ContentAuthors resource istnieje,
@@ -1087,6 +1092,11 @@ Na 2026-09-15:
 ---
 
 ## 55. Historia zmian
+
+### 2026-09-16 — v0.3
+
+- dodano OG image alt i kontrolę stabilności publicznych URL-i obrazów SEO,
+- doprecyzowano media warnings bez deklarowania nieistniejącej implementacji.
 
 ### 2026-09-15 — v0.2
 
