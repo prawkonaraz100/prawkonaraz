@@ -795,10 +795,10 @@ V1:
 
 - GET /aktualnosci
 - GET /aktualnosci/{slug}
-- GET /aktualnosci/{categorySlug} lub alternatywna kolejność rozstrzygnięta przed kodem
+- GET /aktualnosci/kategoria/{categorySlug}
 - GET /poradniki
 - GET /poradniki/{slug}
-- GET /feed lub /aktualnosci/feed
+- GET /aktualnosci/feed.xml
 - sitemap endpoints zgodne z istniejącym SitemapController pattern
 
 ### 28.1. Konflikt slug vs category
@@ -809,15 +809,13 @@ Nie wolno pozostawić niejednoznaczności:
 
 nie może równocześnie oznaczać kategorii i artykułu bez jawnej reguły.
 
-Rekomendowany wariant:
+Przyjęty wariant:
 
 - /aktualnosci
 - /aktualnosci/kategoria/{categorySlug}
 - /aktualnosci/{articleSlug}
 
-Jest bardziej jednoznaczny dla routingu i przyszłych zmian.
-
-Jeżeli produkt wybierze krótsze category URLs, trzeba utrzymywać reserved slugs i test konfliktów.
+Jest jednoznaczny dla routingu i przyszłych zmian. Zmiana na krótsze category URLs wymaga zmiany decyzji architektonicznej, reserved-slug policy i testów konfliktów.
 
 ---
 
