@@ -387,7 +387,7 @@ Nie indeksujemy losowych kombinacji filtrów.
 
 ---
 
-## 18.1. Breadcrumb contract
+### 18.1. Breadcrumb contract
 
 Newsroom article:
 
