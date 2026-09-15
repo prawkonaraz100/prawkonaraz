@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import AuthBrand from '@/Components/Auth/AuthBrand.vue';
+import AuthTrustPanel from '@/Components/Auth/AuthTrustPanel.vue';
 import { Link } from '@inertiajs/vue3';
 import { ArrowLeft } from '@lucide/vue';
-import authScene from '../../../images/auth/auth-reference-road-car.png';
 
 defineProps<{
     title: string;
@@ -12,12 +13,11 @@ defineProps<{
 <template>
     <main class="auth-recovery-page font-[system-ui,-apple-system,'Segoe_UI',Roboto,Helvetica,Arial,sans-serif]">
         <section class="auth-recovery-shell" aria-labelledby="auth-recovery-title">
-            <figure class="auth-recovery-shell__visual" aria-hidden="true">
-                <img :src="authScene" alt="" class="auth-recovery-shell__visual-image">
-            </figure>
+            <AuthTrustPanel />
 
             <section class="auth-recovery-shell__panel">
                 <div class="auth-recovery-shell__content">
+                    <AuthBrand />
                     <Link
                         :href="route('login')"
                         class="auth-recovery-shell__back"

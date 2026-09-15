@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import InputError from '@/Components/InputError.vue';
+import AuthBrand from '@/Components/Auth/AuthBrand.vue';
+import AuthTrustPanel from '@/Components/Auth/AuthTrustPanel.vue';
 import { refreshCsrfSession } from '@/lib/csrfSession';
 import { trackAnalyticsEvent } from '@/utils/analytics';
 import type { PageProps, StudyContextCategory } from '@/types';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
 import { computed, onUnmounted, ref, watch } from 'vue';
-import authScene from '../../../images/home/hero-composite-v3.webp';
 
 const props = withDefaults(
     defineProps<{
@@ -236,12 +237,13 @@ onUnmounted(() => {
 <template>
     <Teleport to="body">
         <div
-            v-if="open || retainVisual"
+            v-show="open || retainVisual"
             class="auth-dialog-overlay fixed inset-0 z-[90] flex font-[system-ui,-apple-system,'Segoe_UI',Roboto,Helvetica,Arial,sans-serif]"
             :class="{
                 'auth-dialog-overlay--retain-visual': retainVisual,
                 'auth-dialog-overlay--form-layer': open && hideVisual,
                 'auth-dialog-overlay--standalone': standalone,
+                'auth-dialog-overlay--page': standalone,
             }"
             :data-auth-dialog-open="open ? 'true' : undefined"
             @click.self="close"
@@ -264,13 +266,12 @@ onUnmounted(() => {
                     </svg>
                 </button>
 
-                <figure class="auth-dialog__visual" aria-hidden="true">
-                    <img :src="authScene" alt="" class="auth-dialog__visual-image">
-                </figure>
+                <AuthTrustPanel />
 
                 <div class="auth-dialog__panel">
                     <div class="auth-register-drawer-body auth-dialog__content auth-dialog__content--register">
                         <header class="auth-register-drawer-header auth-dialog__header">
+                            <AuthBrand />
                             <p
                                 v-if="isGoogleIdentityRegistration"
                                 class="auth-register-drawer-eyebrow auth-dialog__eyebrow"
@@ -281,11 +282,17 @@ onUnmounted(() => {
                                 id="register-drawer-title"
                                 class="auth-register-drawer-title auth-dialog__title"
                             >
-                                {{ drawerTitle }}
+                                <template v-if="isGoogleIdentityRegistration">{{ drawerTitle }}</template>
+                                <template v-else>Ucz się teorii szybciej i zdaj prawo jazdy <span>na raz!</span></template>
                             </h2>
                             <p class="auth-register-drawer-lead auth-dialog__lead">
-                                {{ drawerLead }}
+                                {{ isGoogleIdentityRegistration
+                                    ? drawerLead
+                                    : 'Oficjalne pytania, szczegółowe wyjaśnienia i wygodna nauka — wszystko w jednym miejscu.' }}
                             </p>
+                    </header>
+
+                    <div v-if="!isGoogleIdentityRegistration" class="auth-dialog__switcher-row">
                             <div class="auth-switcher" role="tablist" aria-label="Wybierz formularz konta">
                                 <button
                                     type="button"
@@ -305,7 +312,7 @@ onUnmounted(() => {
                                     Rejestracja
                                 </button>
                             </div>
-                    </header>
+                    </div>
 
                     <form class="auth-register-drawer-form auth-dialog__form space-y-4" @submit.prevent="submit">
                         <div
@@ -518,7 +525,7 @@ onUnmounted(() => {
                     <div v-if="socialProviders.length > 0 && !isGoogleIdentityRegistration" class="auth-register-social mt-6">
                         <div class="flex items-center gap-4">
                             <div class="h-px flex-1 bg-[#e2e7ee]" />
-                            <span class="text-[0.82rem] font-normal text-[#8b95a1]">Szybki start</span>
+                            <span class="text-[0.82rem] font-normal text-[#8b95a1]">LUB</span>
                             <div class="h-px flex-1 bg-[#e2e7ee]" />
                         </div>
 
@@ -569,15 +576,12 @@ onUnmounted(() => {
                                 Wpisz kod zaproszenia
                             </Link>
                         </p>
-                        <p
-                            v-if="socialProviders.some((provider) => provider.key === 'google')"
-                            class="auth-dialog__legal-consent"
-                        >
+                        <p class="auth-dialog__legal-consent">
                             <span class="auth-dialog__legal-line">
-                                Kontynuując z Google, akceptujesz <a :href="route('legal.terms')">Regulamin</a>
+                                Zakładając konto, akceptujesz <a :href="route('legal.terms')">regulamin serwisu</a>
                             </span>
                             <span class="auth-dialog__legal-line">
-                                i potwierdzasz zapoznanie się z <a :href="route('legal.privacy')">Polityką prywatności</a>.
+                                oraz <a :href="route('legal.privacy')">politykę prywatności</a>.
                             </span>
                         </p>
                     </footer>

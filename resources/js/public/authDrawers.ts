@@ -693,6 +693,11 @@ export const createPublicAuthDrawers = (root: HTMLElement) => {
             detail: { name },
         }));
 
+        // Load the alternate form in the background. Its first display is then an
+        // immediate in-place swap instead of a visible network wait.
+        const alternateName: AuthDrawerName = name === 'login' ? 'register' : 'login';
+        void ensureDrawer(alternateName).catch(() => undefined);
+
         if (name === 'login') {
             void setupGoogleButton(drawer);
         }

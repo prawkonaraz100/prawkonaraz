@@ -5,6 +5,8 @@
             $katarzynaQuoteAuthor = $learningQuoteAuthors->get('katarzyna-wisniewska');
         @endphp
 
+        @include('home.partials.learning-paths')
+
         <section
             class="home-learning__quote"
             aria-labelledby="home-expert-opinions-title"
