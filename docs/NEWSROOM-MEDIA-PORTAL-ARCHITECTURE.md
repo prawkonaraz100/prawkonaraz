@@ -345,6 +345,21 @@ Kontrakt obejmuje:
 
 Limity zewnętrzne są ponownie weryfikowane przy implementacji, ale architektura nie może zakładać, że corpus zawsze zmieści się w jednym pliku.
 
+
+### DEC-NR-014 — semantic silo = primary hierarchy + controlled cross-domain graph
+
+Każdy artykuł ma jedną primary category. Topic/dossier i tag są dodatkowymi wymiarami, nie konkurencyjnymi parentami canonical.
+
+Hierarchia bazowa:
+
+- `/aktualnosci -> category -> article`,
+- `/aktualnosci -> topic -> article`,
+- `/poradniki -> guide`.
+
+Nie izolujemy klastrów sztucznie. Jawne relacje article-question/legal/sign mogą tworzyć ograniczone dwukierunkowe linki publiczne, aby połączyć świeży newsroom z istniejącymi evergreen/source-of-truth klastrami.
+
+Sitemap nie zastępuje internal linking. Każdy ważny publiczny URL musi być osiągalny crawlable linkiem z innej publicznej strony.
+
 ---
 
 ## 7. Architektura informacji
@@ -1313,6 +1328,8 @@ Newsroom v1 jest ukończony, gdy:
 20. Sitemap subsystem rozszerza istniejące `SeoSitemapBuilder`/`SeoSitemapAuditor`, z deterministic sharding readiness i HTTP 304.
 21. Domena ma jeden site name; `/aktualnosci` nie tworzy osobnego site name.
 22. Google Preferred Sources jest opcją post-launch, nie gate v1 ani obietnicą widoczności.
+23. Semantic silo ma jedną primary category per article; topics/tags nie tworzą konkurencyjnego canonical parent.
+24. Jawne relacje do pytań/przepisów/znaków mogą renderować kontrolowane reverse links, bez sitewide reciprocal-link farm.
 
 ### 25.2. Otwarte decyzje N0 wymagające domknięcia przed implementacją zależnych elementów
 
