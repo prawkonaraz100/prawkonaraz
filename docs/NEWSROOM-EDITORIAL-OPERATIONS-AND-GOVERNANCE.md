@@ -532,7 +532,7 @@ Wyjątkiem jest breaking strip, który pełni rolę alertu, nie kolejnej karty.
 
 ---
 
-## 19.3. Topic / dossier governance
+### 19.3. Topic / dossier governance
 
 Topic tworzymy, gdy temat:
 
