@@ -19,8 +19,10 @@ W razie konfliktu obowiązuje następująca kolejność:
 1. [STACK-DECISION.md](./STACK-DECISION.md) — wybór stacku technologicznego.
 2. [ADR-001-MODULAR-MONOLITH.md](./ADR-001-MODULAR-MONOLITH.md) — granice architektury i decyzja o modularnym monolicie.
 3. [SEO-CONTENT-ROADMAP.md](./SEO-CONTENT-ROADMAP.md) — strategia publicznego contentu, SEO, trust layer i workflow redakcyjny.
-4. [MENU-SYSTEM-REFERENCE.md](./MENU-SYSTEM-REFERENCE.md) — kanoniczna referencja publicznej nawigacji.
-5. **Ten dokument** — szczegółowa architektura newsroomu, portalu informacyjnego i powiązania z produktem.
+4. [SEO-SITEMAP-REPAIR-PLAN.md](./SEO-SITEMAP-REPAIR-PLAN.md) — istniejący kanoniczny kontrakt produkcyjnego sitemap/robots delivery; newsroom rozszerza go bez zmiany istniejącego modelu.
+5. [SEO-ENTERPRISE-INTERNAL-LINKING-ROADMAP-V2.md](./SEO-ENTERPRISE-INTERNAL-LINKING-ROADMAP-V2.md) i [ADR-SEO-RELATION-GRAPH-V2.md](./ADR-SEO-RELATION-GRAPH-V2.md) — istniejący graph/taksonomia pytań; newsroom nie tworzy ich drugiej wersji.
+6. [MENU-SYSTEM-REFERENCE.md](./MENU-SYSTEM-REFERENCE.md) — kanoniczna referencja publicznej nawigacji.
+7. **Ten dokument** — szczegółowa architektura newsroomu, portalu informacyjnego i powiązania z produktem.
 
 Dokument nie zmienia stacku i nie wprowadza nowej aplikacji. Projekt newsroomu ma być naturalnym rozwinięciem istniejącego systemu.
 
@@ -1324,8 +1326,10 @@ Newsroom v1 jest ukończony, gdy:
 - istnieje publiczna strona artykułu z regulatory context i focal-point-aware media,
 - publikowany topic/dossier ma własną wartość i nie jest aliasem taga,
 - canonical/meta/schema graph są poprawne i spójne z domenowym site identity,
-- sitemap/feed uwzględniają właściwe rekordy, pełne news metadata i są gotowe do shardowania,
-- sitemap/feed wspierają conditional HTTP caching,
+- statyczny sitemap pipeline uwzględnia właściwe rekordy, pełne news metadata, deterministic sharding i bezpieczny child-before-index switch,
+- newsroom refresh sitemap działa asynchronicznie/debounced po zmianach publicznego corpus, a istniejący daily refresh pozostaje safety netem,
+- rzeczywista warstwa static/Nginx/CDN ma zweryfikowane nagłówki/cache validators bez zakładania, że Laravel controller serwuje produkcyjny XML,
+- feed ma własny poprawny cache/validator contract,
 - author ProfilePage/Person jest reużywany, nie duplikowany,
 - artykuł może być połączony z pytaniami i treścią prawną,
 - działa co najmniej jeden kontekstowy most do produktu,
@@ -1385,7 +1389,8 @@ Na moment utworzenia dokumentu za ukończone uznajemy wyłącznie elementy rzecz
 - publiczne profile autorów,
 - część warstwy trust/legal,
 - breadcrumbs,
-- sitemapy + builder/auditor,
+- statyczny sitemap generator + builder/auditor + daily refresh,
+- statyczny public/robots.txt oraz istniejący RobotsController,
 - SchemaIds/SchemaRenderer i organization config,
 - routes `/aktualnosci` i `/poradniki`,
 - placeholdery tych tras,
