@@ -231,15 +231,18 @@ Publiczny resolver obrazu używany przez OG/schema nie może zwracać wygasając
 
 - seo_title: varchar(255) nullable
 - seo_description: varchar(320) nullable
-- robots: varchar(128) nullable
+- robots: varchar(128) nullable, ale zapisywane wyłącznie z allowlistowanej policy
 
 V1 nie przechowuje ręcznego `canonical_url`.
 
 Zasady:
 
 - canonical jest zawsze wyliczany z route family + slug,
+- article slug nie może być reserved segmentem swojej route family,
 - article page jest self-canonical,
 - brak robots oznacza policy wynikające ze statusu,
+- CMS nie przyjmuje dowolnego free-text robots; v1 używa kontrolowanych wartości/policy, np. default index policy albo `noindex,follow`,
+- sprzeczne/nieobsługiwane kombinacje są odrzucane,
 - draft/in_review/scheduled preview nie jest indeksowalny,
 - published domyślnie index,follow,max-image-preview:large,
 - cross-domain/cross-URL canonical override wymaga w przyszłości osobnej decyzji architektonicznej i nie może zostać dodany jako zwykłe pole redaktora.
@@ -356,6 +359,7 @@ Wymagane:
 
 - unique index na slug
 - canonical path wyliczony z route family + slug nie może kolidować z żadnym `content_article_redirects.from_path` należącym do innego artykułu
+- slug nie może należeć do reserved segments określonych przez route contract
 - index(workflow_status, first_published_at desc)
 - index(category_id, workflow_status, first_published_at desc)
 - index(type, workflow_status, first_published_at desc)
@@ -1094,7 +1098,7 @@ V1:
 - GET /aktualnosci/feed.xml
 - newsroom/news sitemap jako statyczne artefakty rozszerzające istniejący `SeoSitemapGenerator`; istniejące controller routes mogą pozostać kompatybilnością, ale nie są produkcyjnym source of truth
 
-### 29.1. Konflikt slug vs category
+### 29.1. Konflikt slug vs category / reserved segments
 
 Nie wolno pozostawić niejednoznaczności:
 
@@ -1108,7 +1112,11 @@ Przyjęty wariant:
 - /aktualnosci/kategoria/{categorySlug}
 - /aktualnosci/{articleSlug}
 
-Jest jednoznaczny dla routingu i przyszłych zmian. Zmiana na krótsze category URLs wymaga zmiany decyzji architektonicznej, reserved-slug policy i testów konfliktów.
+Jest jednoznaczny dla routingu i przyszłych zmian.
+
+V1 route params używają slug regex `[a-z0-9-]+`. Dla article sluga w rodzinie newsroom rezerwujemy co najmniej segmenty `kategoria` i `temat`, aby nie tworzyć mylących URL-i będących jednocześnie namespace hubów. Route `/aktualnosci/feed.xml` jest deklarowany przed catch-all article route i nie pasuje do slug regex z powodu kropki.
+
+Zmiana na krótsze category URLs wymaga zmiany decyzji architektonicznej, reserved-slug policy i testów konfliktów.
 
 ### 29.2. Type -> route family
 
