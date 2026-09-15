@@ -174,6 +174,8 @@ Te pola nie zastępują body ani źródeł. Służą do kontroli redakcyjnej i r
 - reviewed_at: timestamptz nullable
 - needs_review_at: timestamptz nullable
 - archived_at: timestamptz nullable
+- withdrawn_at: timestamptz nullable
+- withdrawal_reason: text nullable, tylko backoffice
 
 Zalecenie: w PostgreSQL używać timestamp with time zone dla zdarzeń publikacyjnych. Warstwa aplikacyjna prezentuje daty publiczne w Europe/Warsaw.
 
@@ -268,6 +270,7 @@ W pierwszej wersji walidacja może być aplikacyjna przez PHP enum. Jeżeli doda
 - published
 - needs_review
 - archived
+- withdrawn
 
 ### 6.4. Invariants publikacji
 
@@ -778,6 +781,8 @@ Zwykłe read modele list/hubów nie mogą używać `publiclyVisible()` zamiast `
 
 Artykuł `archived`, który nigdy nie był publiczny (`first_published_at=null`), nie uzyskuje publicznego detail URL tylko dlatego, że ma status archived.
 
+`withdrawn` nigdy nie jest `publiclyVisible()`: rekord i historia pozostają w backoffice, ale jego kanoniczny dawny path jest rozpoznawany przez resolver jako celowe `410 Gone`, chyba że istnieje jawny redirect do rzeczywistego następcy.
+
 ---
 
 ## 20. Serwisy domenowe / application services
@@ -792,6 +797,7 @@ Odpowiada za:
 - schedule,
 - unpublish do in_review/draft zgodnie z policy,
 - archive,
+- withdraw/restore-to-review,
 - timestamps,
 - walidację invariants,
 - zapis wymaganych zdarzeń AuditLog,
@@ -858,6 +864,7 @@ Rekomendowane domain/application events:
 - ContentArticlePublished
 - ContentArticleSubstantivelyUpdated
 - ContentArticleArchived
+- ContentArticleWithdrawn
 - ContentArticleSlugChanged
 - ContentArticleBreakingChanged
 
@@ -993,9 +1000,16 @@ ContentArticle:
 
 Publiczny controller nie powinien polegać tylko na implicit binding, jeśli musimy rozróżnić opublikowany vs nieopublikowany rekord.
 
-Preferowany publiczny lookup:
+Preferowany publiczny lookup nie jest surowym route bindingiem, lecz resolverem dyspozycji:
 
-`ContentArticleCatalogService::findPubliclyVisibleBySlug($slug, $routeFamily)`
+`ContentArticleCatalogService::resolvePublicPath($slug, $routeFamily)`
+
+Resolver rozstrzyga jawnie:
+
+- visible article -> 200,
+- redirect history -> 301 do canonical,
+- withdrawn article bez następcy -> 410,
+- draft/scheduled/never-public/unknown -> 404.
 
 Listy/home/feed używają osobnych `activelyDistributed()` queries. Controller nie może utożsamić publicznego detail URL z aktywną dystrybucją.
 
@@ -1117,7 +1131,19 @@ Artykuł wcześniej opublikowany po archive:
 - może mieć `noindex` przez kontrolowaną robots policy, jeśli istnieje merytoryczny powód,
 - nie dostaje automatycznego 301/404/410.
 
-301 wymaga rzeczywistego następcy. 404/410 jest osobnym jawnie zaprojektowanym use case dla usunięcia/wycofania URL, nie skutkiem samego `archive`.
+301 wymaga rzeczywistego następcy.
+
+### 33.1. Withdrawn / takedown
+
+V1 zawiera jawny status `withdrawn` dla materiału, który musi przestać być publicznie dostępny, ale którego nie chcemy kasować z historii administracyjnej.
+
+- transition wymaga confirmation + `withdrawal_reason`,
+- ustawia `withdrawn_at`,
+- usuwa URL z home/list/topic/feed/news/article sitemap oraz reverse-link modules,
+- dawny canonical path zwraca `410 Gone`, jeśli nie ma realnego następcy,
+- jeśli istnieje rzeczywisty następca, jawny redirect może zwracać 301 zamiast 410,
+- treść/body/source pozostają dostępne wyłącznie w adminie dla audytu/ewentualnego review,
+- restore nie wraca bezpośrednio do published; przechodzi przez in_review/draft zgodnie z policy.
 
 Hard delete jest dopuszczalny tylko administracyjnie dla błędnych/testowych rekordów bez historii publicznej.
 
@@ -1354,7 +1380,7 @@ Model danych jest gotowy, gdy:
 - topic nie powstaje automatycznie z taga,
 - admin policies nie opierają się wyłącznie na UI i nie rozszerzają dostępu poza istniejących administratorów,
 - AuditLog rozróżnia `User` actora od `ContentAuthor` author/reviewer identity i nie przechowuje pełnej treści artykułu,
-- public visibility i active distribution są osobnymi scope'ami; needs_review/archived nie są aktywnie promowane, a archive ma deterministyczny 200-history policy,
+- public visibility i active distribution są osobnymi scope'ami; needs_review/archived nie są aktywnie promowane, archive ma deterministyczny 200-history policy, a withdrawn ma deterministyczny 410/tombstone policy,
 - public chronology używa first_published_at, nie ostatniego published_at/updated_at,
 - category/topic identity nie może zostać złamana przez zmianę publicznego sluga/dezaktywację,
 - homepage placement overlap jest chroniony również przed równoległymi zapisami,
@@ -1404,6 +1430,7 @@ Na moment utworzenia dokumentu:
 - zdefiniowano publicVisible vs activelyDistributed (needs_review pozostaje URL-em, ale nie aktywną dystrybucją) oraz deterministyczne zachowanie archive,
 - chronologię publiczną związano z first_published_at zamiast published_at,
 - poprawiono source model: URL może być null, a is_publicly_cited rozdziela public citation od wewnętrznego evidence,
+- dodano jawny status withdrawn z backoffice reason/timestamp i 410 public disposition, oddzielając historyczne archive od takedownu,
 - dodano immutable public slugs/active-category guards i minimalny topic corpus baseline,
 - dodano serializację concurrent homepage placements przez DB/advisory lock,
 - zapisano transaction + after-commit contract dla publikacji i side effectów,
