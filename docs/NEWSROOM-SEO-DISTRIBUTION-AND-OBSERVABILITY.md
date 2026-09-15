@@ -114,7 +114,7 @@ Na dzień weryfikacji Google zaleca:
 
 Te parametry muszą być ponownie sprawdzone w oficjalnej dokumentacji przy wdrożeniu.
 
-### 4.4. Site name / Organization / crawl efficiency
+### 4.3. Site name / Organization / crawl efficiency
 
 Na dzień weryfikacji:
 
@@ -124,7 +124,7 @@ Na dzień weryfikacji:
 - pojedyncza sitemap ma limit 50 000 URL lub 50 MB nieskompresowanego XML,
 - serwis przy wzroście powinien wspierać HTTP conditional requests / 304 dla niezmienionych zasobów, szczególnie sitemap/feed.
 
-### 4.3. Discover
+### 4.4. Discover
 
 Na dzień weryfikacji:
 
@@ -275,12 +275,17 @@ Nie pojawia się publicznie przed czasem.
 
 ### Archived
 
-Decyzja per materiał:
+V1 ma jedną deterministyczną semantykę:
 
-- 200 + index dla wartości archiwalnej,
-- 200 + noindex tylko gdy istnieje uzasadnienie,
-- 404/410 dla usuniętego contentu,
-- 301 tylko do rzeczywistego następcy.
+- jeśli artykuł był wcześniej opublikowany, canonical detail URL pozostaje `200`,
+- archive usuwa materiał z aktywnej dystrybucji: home/latest/category/topic listings, feed i news sitemap,
+- domyślnie historyczny artykuł pozostaje indexable; kontrolowane `noindex` można ustawić tylko z merytorycznego powodu,
+- standardowa article sitemap zawiera archived URL tylko jeśli nadal jest indexable,
+- archive samo w sobie nigdy nie generuje 301/404/410.
+
+301 jest osobnym use case dla rzeczywistego następcy. 404/410 jest osobnym use case dla faktycznie usuniętego/gone URL i nie jest wyprowadzane z workflow_status=archived.
+
+Artykuł, który nigdy nie był publiczny, nie staje się publicznym URL tylko przez ustawienie archived.
 
 ---
 
@@ -650,7 +655,7 @@ Zawiera wszystkie indeksowalne:
 - analysis,
 - report.
 
-Starszy news znika z news sitemap, ale zostaje w normalnej sitemap, jeśli nadal indeksowalny.
+Starszy news znika z news sitemap, ale zostaje w normalnej sitemap, jeśli nadal indeksowalny. To samo dotyczy wcześniej opublikowanego archived article: pozostaje w article sitemap wyłącznie przy `200 + indexable`.
 
 ### 26.1. Skalowanie sitemap
 
@@ -730,23 +735,36 @@ Newsroom sitemap rozszerza istniejący statyczny pipeline:
 
 Nie przenosimy produkcyjnego source of truth do runtime `SitemapController`.
 
-### 30.2. Refresh po zmianie publicznego corpus
+### 30.2. Refresh po zmianie publicznego corpus — bez założenia o queue workerze
+
+Stan repo podczas audytu:
+
+- `.env.example` ma `QUEUE_CONNECTION=sync`,
+- nie ma kontraktu zawsze działającego Laravel queue workera,
+- scheduler istnieje i już utrzymuje `seo:refresh-sitemaps`.
+
+Dlatego v1 NIE dispatchuje pełnego generatora jako zwykłego queued joba i nie nazywa tego asynchronicznym, dopóki produkcja nie ma rzeczywistego async transportu + workera + monitoringu.
 
 Zmiany wpływające na newsroom sitemap/feed:
 
 - publish,
-- archive/unarchive do publicznego stanu,
+- archive/unarchive,
 - slug change,
 - substantive public update wpływający na lastmod/feed,
-- route/publication-state change.
+- robots/indexability change,
+- topic/category public-state change wpływający na sitemap.
 
 Po udanym commit:
 
-1. request publikacji kończy się bez synchronicznego pełnego generowania XML,
-2. dispatchujemy asynchroniczny, debounced/unique refresh istniejącego generatora,
-3. wiele zmian w krótkim oknie składa się do jednego refreshu,
-4. istniejący daily `seo:refresh-sitemaps` pozostaje safety netem,
-5. failure refreshu nie cofa poprawnie opublikowanego artykułu, ale jest monitorowany/alertowany.
+1. zapisujemy tani `dirty/version signal` dla SEO artifacts w współdzielonym cache/store,
+2. scheduler np. co minutę uruchamia lekką komendę `newsroom:refresh-seo-artifacts-if-dirty`,
+3. komenda bierze distributed lock / `withoutOverlapping`,
+4. wiele zmian coalescuje się do jednego pełnego `seo:refresh-sitemaps`,
+5. po udanej generacji dirty marker jest czyszczony tylko jeśli wersja nie zmieniła się w trakcie pracy; inaczej kolejny pass pozostaje wymagany,
+6. failure pozostawia dirty state i jest logowany/monitorowany,
+7. istniejący daily `seo:refresh-sitemaps` pozostaje niezależnym safety netem na wypadek utraty cache markeru.
+
+Jeśli w przyszłości wdrożymy realny non-sync queue worker, coordinator może używać queued joba, ale dopiero po osobnym deploy/monitoring gate.
 
 Target operacyjny dla news sitemap: świeży statyczny artefakt powinien pojawić się w ciągu kilku minut od publikacji, nie dopiero przy następnym daily cron.
 
@@ -1333,10 +1351,12 @@ Canonical route v1:
 Może być indeksowalny tylko gdy:
 
 - status = published,
-- ma własny opis i meta,
-- ma wystarczający, realny corpus,
+- ma własny, niepusty opis redakcyjny i sensowne meta/fallback,
+- v1 baseline to co najmniej 3 publiczne, indeksowalne artykuły w corpus,
 - nie duplikuje kategorii/tag page,
-- featured article i lista materiałów są publiczne.
+- featured article, jeśli ustawiony, jest publiczny i należy do topicu.
+
+Próg 3 to wewnętrzny quality gate produktu, nie sygnał ani gwarancja Google.
 
 Topic nie powstaje automatycznie z taga.
 
@@ -1456,7 +1476,7 @@ Nie linkujemy do przypadkowego SEO bloga jako źródła normatywnego.
 - statyczny articles sitemap działa przez istniejący generator i ma deterministic sharding readiness,
 - statyczny news sitemap ma poprawne news:name/language/publication_date/title i działa zgodnie z aktualnymi wymaganiami,
 - child files są publikowane przed nowym głównym sitemap index,
-- async/debounced refresh utrzymuje news sitemap świeżą, a daily cron pozostaje recovery path,
+- dirty/version coordinator + scheduler utrzymuje news sitemap świeżą bez zależności od queue workera, a daily cron pozostaje recovery path,
 - rzeczywisty static/Nginx/CDN delivery ma zweryfikowany Content-Type/cache/Set-Cookie/validators contract,
 - feed działa, ma discovery link i własny validator/cache contract,
 - images spełniają ustalone baseline i respektują focal point/crop policy,
@@ -1483,7 +1503,8 @@ Obecnie:
 - HomePageController nadal hardcoduje „Orły na Drodze”, więc site identity jest obecnie niespójne,
 - istnieje również runtime `SitemapController`, ale statyczne pliki są nadrzędnym produkcyjnym modelem; samo dodanie headerów do kontrolera nie rozwiązuje static delivery,
 - newsroom-specific Article schema/news sitemap/feed nie istnieją,
-- newsroom-triggered async/debounced static sitemap refresh i atomowy child-before-index switch nie istnieją,
+- newsroom dirty/version refresh coordinator i atomowy child-before-index switch nie istnieją,
+- repo nie gwarantuje async Laravel queue workera (`QUEUE_CONNECTION=sync` w env example), więc newsroom nie może opierać freshness na ShouldQueue,
 - /aktualnosci jest placeholderem.
 
 ---
@@ -1497,7 +1518,7 @@ Obecnie:
 - [ ] rozszerzyć istniejący statyczny generator o article sitemap z deterministic sharding readiness,
 - [ ] wdrożyć statyczny news sitemap z pełnymi wymaganymi news tags,
 - [ ] wdrożyć child-before-index atomic publication i cleanup obsolete shards po switchu,
-- [ ] wdrożyć async/debounced newsroom-triggered static refresh; zachować daily cron jako safety net,
+- [ ] wdrożyć dirty/version refresh coordinator + frequent scheduler lock; zachować daily cron jako safety net i nie wymagać queue workera,
 - [ ] rozszerzyć istniejący sitemap auditor o newsroom/news namespace checks,
 - [ ] zweryfikować rzeczywiste static/Nginx/CDN headers/304 bez przenoszenia source of truth do SitemapController,
 - [ ] wdrożyć feed + auto-discovery + własne validators,
@@ -1511,6 +1532,13 @@ Obecnie:
 ---
 
 ## 70. Historia zmian
+
+### 2026-09-16 — v0.5
+
+- ustalono deterministyczną archive policy: historyczny canonical 200, brak aktywnej dystrybucji, 301/404/410 tylko jako osobne use case,
+- zastąpiono fikcyjne założenie o async queue jobie dirty/version coordinator + scheduler/lock zgodnym z aktualnym QUEUE_CONNECTION=sync,
+- doprecyzowano topic indexability baseline do min. 3 publicznych/indexable articles,
+- poprawiono kolejność sekcji 4.3/4.4 i wyrównano current-state/remaining-work do faktycznego backendu.
 
 ### 2026-09-16 — v0.4
 
