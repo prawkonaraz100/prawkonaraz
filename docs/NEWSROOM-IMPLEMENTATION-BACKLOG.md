@@ -43,7 +43,7 @@ N2 CMS + PUBLISHING
   ↓
 N3 PUBLIC ARTICLE
   ↓
-N4 NEWSROOM HUB + CATEGORIES + GUIDES
+N4 NEWSROOM HUB + CATEGORIES + TOPICS + GUIDES
   ↓
 N5 SEO + FEEDS + ANALYTICS
   ↓
@@ -86,7 +86,7 @@ Problemem jest `HomePageController`, który nadal hardcoduje „Orły na Drodze�
 
 ### Expected files
 
-- config/content.php tylko jeśli kontrakt wymaga uzupełnienia danych; nie tworzyć równoległego config/brand.php
+- config/content.php tylko jeśli kontrakt wymaga uzupełnienia istniejących danych; nie tworzyć równoległego brand configu
 - app/SEO/Schema/SchemaIds.php, jeśli potrzebne są newsroom IDs
 - współdzielony SiteIdentity/Organization schema service albo refactor istniejącego schema service
 - HomePageController.php
@@ -1018,7 +1018,7 @@ Preferować istniejące Organization/Contact/Methodology pages. Nowy publiczny d
 - kontakt jest publicznie dostępny,
 - news ma jasną datę/czas/byline,
 - publishingPrinciples nie jest emitowane bez realnej publicznej strony,
-- brak założenia, że Publisher Center enrollment gwarantuje/warunkuje Google News.
+- brak założenia o ręcznym Publisher Center enrollment jako warunku lub gwarancji Google News.
 
 ---
 
