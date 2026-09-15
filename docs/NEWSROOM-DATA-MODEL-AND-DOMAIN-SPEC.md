@@ -402,7 +402,7 @@ Ponieważ newsroom renderuje także reverse links z istniejących encji, unique 
 
 Wymagane/przewidywane:
 
-- `content_article_topic(topic_id, sort_order, article_id)`,
+- `content_article_topic(topic_id, article_id)`,
 - `content_article_tag(tag_id, article_id)`,
 - `content_article_question(question_id, sort_order, article_id)`,
 - `content_article_legal_unit(legal_unit_id, sort_order, article_id)`,
@@ -502,9 +502,10 @@ content_article_topic
 
 - article_id
 - topic_id
-- sort_order smallint default 0
 - created_at
 - unique(article_id, topic_id)
+
+V1 nie ma ręcznego rankingu całego corpus topicu. `featured_article_id` daje pojedynczy lead, a pozostała lista jest chronologiczna po `ContentArticle.first_published_at DESC`.
 
 Reguły:
 
