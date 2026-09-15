@@ -11,6 +11,7 @@ use App\Models\QuestionLegalReference;
 use App\Models\QuestionTopic;
 use App\SEO\Schema\SchemaIds;
 use App\SEO\Schema\SchemaRenderer;
+use App\SEO\Schema\SiteIdentitySchema;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -20,9 +21,9 @@ class PublicQuestionSchemaService
         protected PublicQuestionBreadcrumbs $publicQuestionBreadcrumbs,
         protected QuestionTextFormatter $questionTextFormatter,
         protected QuestionVideoSeoDescriptionService $questionVideoSeoDescriptionService,
-        protected PublicUrlResolver $publicUrlResolver,
         protected SchemaIds $schemaIds,
         protected SchemaRenderer $schemaRenderer,
+        protected SiteIdentitySchema $siteIdentitySchema,
     ) {}
 
     /**
@@ -45,8 +46,8 @@ class PublicQuestionSchemaService
             ->all();
 
         return $this->schemaRenderer->graph([
-            $this->organizationSchema($organizationId),
-            $this->websiteSchema($websiteId, $organizationId),
+            $this->organizationSchema(),
+            $this->websiteSchema(),
             $this->breadcrumbSchema($breadcrumbs, $breadcrumbId),
             [
                 '@id' => $webPageId,
@@ -95,8 +96,8 @@ class PublicQuestionSchemaService
         $questionReferences = $this->questionReferencesFromListItems($questions);
 
         return $this->schemaRenderer->graph([
-            $this->organizationSchema($organizationId),
-            $this->websiteSchema($websiteId, $organizationId),
+            $this->organizationSchema(),
+            $this->websiteSchema(),
             $this->breadcrumbSchema($breadcrumbs, $breadcrumbId),
             [
                 '@id' => $webPageId,
@@ -289,8 +290,8 @@ class PublicQuestionSchemaService
         }
 
         $graph = [
-            $this->organizationSchema($organizationId),
-            $this->websiteSchema($websiteId, $organizationId),
+            $this->organizationSchema(),
+            $this->websiteSchema(),
             $this->breadcrumbSchema($breadcrumbs, $breadcrumbId),
             $webPageSchema,
             $this->datasetSchema(
@@ -952,48 +953,21 @@ class PublicQuestionSchemaService
     /**
      * @return array<string, mixed>
      */
-    protected function organizationSchema(string $organizationId): array
+    protected function organizationSchema(): array
     {
-        $sameAs = (array) config('content.organization.same_as', []);
-        $email = (string) config('content.organization.email', '');
-        $logoUrl = $this->publicUrlResolver->normalize((string) config('content.organization.logo_url', '/favicon.png'));
-        $legalName = trim((string) config('content.organization.legal_name', ''));
-
-        return array_filter([
-            '@id' => $organizationId,
-            '@type' => 'Organization',
-            'name' => (string) config('content.organization.name', 'PrawkoNaRaz'),
-            'legalName' => $legalName !== '' ? $legalName : null,
-            'url' => $this->publicUrlResolver->currentRoot(),
-            'description' => (string) config('content.organization.description'),
-            'logo' => $logoUrl !== null ? [
-                '@type' => 'ImageObject',
-                'url' => $logoUrl,
-            ] : null,
-            'email' => $email !== '' ? $email : null,
-            'sameAs' => $sameAs === [] ? null : $sameAs,
-        ], fn (mixed $value): bool => $value !== null && $value !== '' && $value !== []);
+        return $this->siteIdentitySchema->organization();
     }
 
     /**
      * @return array<string, mixed>
      */
-    protected function websiteSchema(string $websiteId, string $organizationId): array
+    protected function websiteSchema(): array
     {
-        return [
-            '@id' => $websiteId,
-            '@type' => 'WebSite',
-            'url' => $this->publicUrlResolver->currentRoot(),
-            'name' => (string) config('content.organization.name', 'PrawkoNaRaz'),
-            'publisher' => [
-                '@id' => $organizationId,
-            ],
-            'potentialAction' => [
-                '@type' => 'SearchAction',
-                'target' => route('public.questions.hub').'?q={search_term_string}',
-                'query-input' => 'required name=search_term_string',
-            ],
-        ];
+        return $this->siteIdentitySchema->website([
+            '@type' => 'SearchAction',
+            'target' => route('public.questions.hub').'?q={search_term_string}',
+            'query-input' => 'required name=search_term_string',
+        ]);
     }
 
     /**
