@@ -468,7 +468,10 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 
 ### DoD
 
-- news cannot publish without required source policy.
+- news cannot publish without required source policy,
+- source URL może być null dla interview/direct evidence,
+- `is_publicly_cited=false` source nie wycieka do publicznego renderera,
+- prawny news wymaga publicznie cytowalnego official/legislation URL, jeśli taki primary source istnieje.
 
 ---
 
@@ -593,7 +596,7 @@ Computed blocking/warning items.
 
 - topic nie powstaje automatycznie z taga,
 - draft topic nie jest publiczny,
-- publish wymaga własnego opisu + min. 3 publicznych/indexable linked articles,
+- publish wymaga własnego opisu + min. 3 actively-distributed/indexable linked articles,
 - featured article, jeśli ustawiony, jest publiczny i należy do topicu,
 - slug po pierwszej publikacji jest immutable.
 
