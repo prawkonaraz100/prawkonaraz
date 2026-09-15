@@ -138,6 +138,8 @@ Minimum na PostgreSQL:
 - foreign keys,
 - unique slug,
 - indexes istnieją zgodnie z migration,
+- FK delete directions: article delete nie może skasować category/author/question/legal/sign,
+- expected child/pivot cascade usuwa wyłącznie newsroom-owned rows,
 - rollback świeżej migracji w środowisku testowym.
 
 Nie uznajemy sqlite-only za wystarczające dla tabel docelowo działających na PostgreSQL.
@@ -236,6 +238,9 @@ Publish blokuje:
 - późniejsza edycja nie zmienia first_published_at,
 - scheduled_for nie staje się datePublished,
 - last_substantive_update_at steruje dateModified policy,
+- public_state_changed_at nie zmienia dateModified,
+- archive/withdraw/robots public-state change aktualizuje sitemap lastmod semantics,
+- techniczny updated_at nie zmienia dateModified/lastmod,
 - timezone serializacja poprawna.
 
 ---
@@ -572,7 +577,7 @@ Assert:
 - draft/noindex/redirect-source excluded,
 - archived policy honored,
 - absolute HTTPS canonical URL,
-- meaningful lastmod based on substantive public change,
+- meaningful lastmod = max(first_published_at, last_substantive_update_at, public_state_changed_at),
 - deterministic shard assignment,
 - no URL duplicated across shards,
 - shard remains within current URL-count and uncompressed-size limits,
