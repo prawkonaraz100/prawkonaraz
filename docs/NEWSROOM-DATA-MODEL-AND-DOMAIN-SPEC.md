@@ -815,7 +815,7 @@ Odpowiada za:
 Rekomendowane domain/application events:
 
 - ContentArticlePublished
-- ContentArticleUpdated
+- ContentArticleSubstantivelyUpdated
 - ContentArticleArchived
 - ContentArticleSlugChanged
 - ContentArticleBreakingChanged
@@ -826,6 +826,8 @@ Listenery mogą:
 - zgłaszać URL do IndexNow, jeśli policy to dopuszcza,
 - odświeżać feed cache,
 - odświeżać sitemap cache.
+
+`ContentArticleSubstantivelyUpdated` jest emitowany wyłącznie, gdy zmieniła się publiczna treść/meaningful metadata i ustawiono `last_substantive_update_at`. Techniczny zapis, audit note, cache touch lub pole niewidoczne publicznie nie emituje tego eventu tylko po to, by odświeżyć SEO freshness.
 
 Event nie powinien wykonywać ciężkiej logiki synchronicznie w request bez potrzeby.
 
@@ -842,7 +844,7 @@ Rekomendacja:
 - publikacja przechodzi przez ContentArticlePublishingService,
 - komenda jest idempotentna.
 
-### 21.1. Race safety
+### 22.1. Race safety
 
 Dwa równoległe uruchomienia nie mogą opublikować artykułu dwa razy ani nadpisać first_published_at.
 
@@ -863,8 +865,14 @@ Publiczne daty:
 - last_substantive_update_at: istotna zmiana treści,
 - updated_at: techniczny timestamp rekordu.
 
-Structured data datePublished bierze first_published_at.
-dateModified bierze last_substantive_update_at albo kontrolowany modified timestamp, nie dowolny touch rekordu.
+Structured data:
+
+- `datePublished = first_published_at`,
+- `dateModified = last_substantive_update_at ?? first_published_at`.
+
+Publiczny label „Aktualizacja” pojawia się tylko, gdy `last_substantive_update_at` rzeczywiście istnieje i jest późniejszy od pierwszej publikacji.
+
+Article sitemap `lastmod` i feed `updated` używają tej samej merytorycznej semantyki, nigdy technicznego `updated_at`.
 
 ---
 
@@ -1256,6 +1264,7 @@ Model danych jest gotowy, gdy:
 - factories pokrywają główne statusy,
 - publikacja nie może stworzyć niekompletnego publicznego rekordu,
 - scheduling jest idempotentny,
+- technical update nie zmienia SEO freshness ani nie emituje substantive-update eventu,
 - slug change zachowuje redirect history,
 - relations do questions/legal są jawne,
 - `body_blocks` przechodzą walidację per block type,
@@ -1306,6 +1315,8 @@ Na moment utworzenia dokumentu:
 
 ### 2026-09-16 — v0.3
 
+- doprecyzowano dateModified/lastmod/feed timestamp semantics i substantive-update event,
+- poprawiono numerację race-safety subsection,
 - doprecyzowano media contract o og_image_alt i semantyczny fallback,
 - zabroniono wygasających signed URLs dla obrazów używanych w OG/schema,
 - dodano odpowiednie media invariants do DoD bez zmiany stanu implementacji.
