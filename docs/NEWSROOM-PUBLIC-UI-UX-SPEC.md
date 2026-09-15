@@ -178,7 +178,7 @@ Zasady:
 
 Nie jest równoważny breaking.
 
-Może zawierać 3–6 ręcznie lub systemowo wybranych tematów/linków.
+Może zawierać 3–6 pozycji z kontrolowanych placementów `important_now`. W v1 targetem placementu jest artykuł; topic/dossier może wejść do tego stripu dopiero po rozszerzeniu kontraktu targetów.
 
 Przykład:
 
@@ -772,7 +772,7 @@ Jeśli wdrożone:
 
 ---
 
-## 40.1. Ads
+## 41. Ads
 
 Poza v1.
 
@@ -782,7 +782,11 @@ Nie projektujemy pustych reklamowych dziur w v1.
 
 ---
 
-## 41. Topic / dossier page
+## 42. Topic / dossier page
+
+Route v1:
+
+`/aktualnosci/temat/{topicSlug}`
 
 Topic nie jest stroną zwykłego taga.
 
@@ -803,9 +807,9 @@ Jeśli corpus jest zbyt mały, topic nie powinien być publikowany tylko dla SEO
 
 ---
 
-## 42. Empty states
+## 43. Empty states
 
-### 42.1. Brak materiałów kategorii
+### 43.1. Brak materiałów kategorii
 
 Nie renderujemy pustej sekcji na homepage.
 
@@ -815,14 +819,14 @@ Na category page:
 - link do aktualności,
 - noindex rozważyć, jeśli strona nie ma unikalnej wartości.
 
-### 42.2. Brak hero
+### 43.2. Brak hero
 
 Karta ma wariant bez obrazu.
 Nie używamy przypadkowego placeholder photo.
 
 ---
 
-## 43. Error states
+## 44. Error states
 
 404 article:
 
@@ -839,7 +843,7 @@ Nie redirectujemy każdego 404 do homepage.
 
 ---
 
-## 44. Preview UI
+## 45. Preview UI
 
 Preview:
 
@@ -852,7 +856,7 @@ Preview nie może być pomylony z produkcyjną stroną przez redaktora.
 
 ---
 
-## 45. Scheduled preview
+## 46. Scheduled preview
 
 Pokazuje:
 
@@ -862,7 +866,7 @@ Pokazuje:
 
 ---
 
-## 46. Accessibility
+## 47. Accessibility
 
 Minimum:
 
@@ -879,7 +883,7 @@ Minimum:
 
 ---
 
-## 47. Link targets
+## 48. Link targets
 
 Wewnętrzne:
 
@@ -893,7 +897,7 @@ Nie stosujemy target=_blank mechanicznie dla każdego linku.
 
 ---
 
-## 48. Mobile touch targets
+## 49. Mobile touch targets
 
 Minimum praktyczne:
 
@@ -903,7 +907,7 @@ Minimum praktyczne:
 
 ---
 
-## 49. Sticky behavior
+## 50. Sticky behavior
 
 Global header może zachować istniejącą politykę.
 
@@ -911,7 +915,7 @@ Nie wdrażamy sticky sidebar/CTA w N3, jeśli nie ma danych, że pomaga.
 
 ---
 
-## 50. Performance budgets UI
+## 51. Performance budgets UI
 
 Newsroom page nie powinien dołączać dużych bibliotek tylko dla prostych interakcji.
 
@@ -927,7 +931,7 @@ Docelowe metryki są w SEO/Observability spec.
 
 ---
 
-## 51. CSS architecture
+## 52. CSS architecture
 
 Preferowane:
 
@@ -939,7 +943,7 @@ Nie dodajemy inline style bloków per każdy article partial, jeśli można utrz
 
 ---
 
-## 52. Blade component map
+## 53. Blade component map
 
 Rekomendowane komponenty/partials:
 
@@ -970,7 +974,7 @@ Komponent nie powinien mieć dziesiątek wariantów sterowanych stringami.
 
 ---
 
-## 53. Karty — warianty v1
+## 54. Karty — warianty v1
 
 Dozwolone:
 
@@ -985,7 +989,7 @@ Nie tworzymy osobnego komponentu dla każdej sekcji homepage.
 
 ---
 
-## 54. Image behavior w kartach
+## 55. Image behavior w kartach
 
 - lead: 16:9
 - standard: 16:9 lub 4:3 zgodnie z finalnym systemem
@@ -996,7 +1000,7 @@ Nie tworzymy osobnego komponentu dla każdej sekcji homepage.
 
 ---
 
-## 55. Typ badges
+## 56. Typ badges
 
 Dozwolone:
 
@@ -1009,7 +1013,7 @@ Nie pokazujemy badge NEWS przy każdym newsie, jeśli kategoria już daje kontek
 
 ---
 
-## 56. Responsive breakpoints
+## 57. Responsive breakpoints
 
 Preferować obecne breakpoints Tailwind.
 
@@ -1027,7 +1031,7 @@ Nie projektujemy tylko pod 1920 desktop.
 
 ---
 
-## 57. Header integration
+## 58. Header integration
 
 PublicNavigation jest źródłem linków.
 
@@ -1041,7 +1045,7 @@ Newsroom subnav jest drugim poziomem, a nie alternatywnym globalnym menu.
 
 ---
 
-## 58. Footer integration
+## 59. Footer integration
 
 Używać istniejącego public footer.
 
@@ -1049,7 +1053,7 @@ Można dodać linki newsroomowe przez PublicFooter/PublicNavigation po decyzji m
 
 ---
 
-## 59. SEO content visibility
+## 60. SEO content visibility
 
 Główna treść:
 
@@ -1061,7 +1065,7 @@ Pagination links są prawdziwymi href.
 
 ---
 
-## 60. Loading states
+## 61. Loading states
 
 Public SSR pages nie wymagają skeletonów initial load.
 
@@ -1072,7 +1076,7 @@ Jeśli przyszłe dynamic modules fetchują dane:
 
 ---
 
-## 60.1. Future audio / AI controls
+## 62. Future audio / AI controls
 
 Architektura UI rezerwuje logiczne miejsce pod przyszłe funkcje, ale v1 ich nie renderuje.
 
@@ -1092,7 +1096,7 @@ Warunki przed uruchomieniem:
 
 ---
 
-## 61. Analytics hooks
+## 63. Analytics hooks
 
 Komponenty mogą mieć data attributes:
 
@@ -1104,7 +1108,7 @@ Nie wkładamy logiki analitycznej do każdego Blade partiala ręcznie; public-co
 
 ---
 
-## 62. Wireframe /aktualnosci desktop
+## 64. Wireframe /aktualnosci desktop
 
 ~~~text
 ┌──────────────────────────────────────────────────────────────────────────┐
@@ -1141,7 +1145,7 @@ Nie wkładamy logiki analitycznej do każdego Blade partiala ręcznie; public-co
 
 ---
 
-## 63. Wireframe article mobile
+## 65. Wireframe article mobile
 
 ~~~text
 [GLOBAL HEADER]
@@ -1192,7 +1196,7 @@ CZYTAJ TAKŻE
 
 ---
 
-## 64. UI Definition of Done
+## 66. UI Definition of Done
 
 Frontend newsroom v1 jest UI-complete, gdy:
 
@@ -1217,7 +1221,7 @@ Frontend newsroom v1 jest UI-complete, gdy:
 
 ---
 
-## 65. Stan implementacji
+## 67. Stan implementacji
 
 Na moment utworzenia:
 
@@ -1229,7 +1233,7 @@ Na moment utworzenia:
 
 ---
 
-## 66. Pozostałe zadania
+## 68. Pozostałe zadania
 
 - [ ] zatwierdzić design tokens N0,
 - [ ] przygotować low-fidelity implementation layout,
@@ -1248,7 +1252,7 @@ Na moment utworzenia:
 
 ---
 
-## 67. Historia zmian
+## 69. Historia zmian
 
 ### 2026-09-15 — v0.2
 
