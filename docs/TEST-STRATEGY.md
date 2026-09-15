@@ -324,6 +324,8 @@ Nie chcemy:
 - testow opartych o niestabilne sleepy,
 - testow API bez kontroli payloadu,
 - testow bazy zaleznych od recznego stanu developera,
+- testow endpointow z throttlingiem, ktore przypadkowo wspoldziela domyslny adres IP lub stan limitera z wczesniejszym smoke/suite; test logiki endpointu powinien miec deterministycznie odseparowana tozsamosc klienta, a sam rate limit powinien byc sprawdzany w osobnym tescie celu,
+- assertionow wspolnego publicznego shella opartych o historyczne etykiety po zmianie canonical komponentu nawigacji; oczekiwania maja wynikac z faktycznie renderowanego wspolnego headera,
 - sztucznie ogromnej liczby testow komponentow bez wartosci biznesowej.
 
 ## 14. Priorytet narzedziowy
