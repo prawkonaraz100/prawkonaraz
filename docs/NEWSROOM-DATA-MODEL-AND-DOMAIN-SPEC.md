@@ -463,7 +463,9 @@ Reguły:
 - samo przypięcie taga nie tworzy topicu,
 - `featured_article_id`, jeśli ustawione, musi wskazywać `activelyDistributed()` i indeksowalny artykuł należący do tego samego topicu,
 - slug topicu może zmieniać się w draft; po pierwszej publikacji jest immutable w v1, ponieważ nie mamy topic redirect history,
-- spadek corpus poniżej baseline po archiwizacji/usunięciu relacji wymaga cofnięcia topicu do draft/archived przed kolejnym publicznym renderem.
+- baseline >=3 jest gate'em przy pierwszym publish/ponownym publish topicu; chwilowy późniejszy spadek corpus nie zmienia automatycznie HTTP/indexability,
+- published topic poniżej baseline dostaje health warning w CMS/audycie i nie powinien być promowany jako featured topic do czasu naprawy,
+- jeśli corpus trwale utraci wartość, administrator ustawia status archived; archived topic jest usuwany z nawigacji/sitemap i jego wcześniej publiczny URL zwraca 410, chyba że istnieje realny następca.
 
 ---
 
@@ -1174,10 +1176,11 @@ Factories mają umożliwiać czytelne testy workflow.
 
 Artykuł wcześniej opublikowany po archive:
 
-- znika z home/latest/category/topic active listings, feed i news sitemap,
+- znika z home/latest/category/topic active listings, feed, reverse-link promotion i news sitemap,
 - canonical detail URL nadal zwraca 200,
 - pozostaje w standardowej article sitemap tylko jeśli nadal jest indexable,
-- może mieć `noindex` przez kontrolowaną robots policy, jeśli istnieje merytoryczny powód,
+- jeśli pozostaje indexable, musi zachować co najmniej jeden crawlable inbound link; gwarantowanym fallbackiem v1 jest publiczny profil autora, który może listować archived+indexable publikacje z jawnym oznaczeniem „archiwalne”,
+- może mieć `noindex` przez kontrolowaną robots policy, jeśli istnieje merytoryczny powód; wtedy nie wymagamy obecności w author archive/public sitemap,
 - nie dostaje automatycznego 301/404/410.
 
 301 wymaga rzeczywistego następcy.
