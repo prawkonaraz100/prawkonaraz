@@ -107,18 +107,62 @@ Pola:
 - reviewer_id: FK -> content_authors, nullable
 - created_by_user_id: FK -> users, nullable
 - updated_by_user_id: FK -> users, nullable
+- origin_type: varchar(32), default original
 
 ### 5.2. Treść
 
 - title: varchar(255), wymagane
 - slug: varchar(255), unique
 - lead: text, wymagane przy publikacji
-- body: longText, wymagane przy publikacji
+- body_blocks: jsonb, wymagane przy publikacji
 - key_points: jsonb nullable
 - correction_note: text nullable
 - editorial_note: text nullable, tylko backoffice
 
-Body nie może zawierać niekontrolowanego JavaScriptu.
+`body_blocks` jest kanonicznym, uporządkowanym dokumentem artykułu. Nie utrzymujemy równolegle drugiego pełnego źródła `body_html` albo `body_markdown`.
+
+Każdy blok ma co najmniej:
+
+- `type`,
+- `data`,
+- opcjonalne stabilne `key`/ID techniczne potrzebne do edycji.
+
+Dozwolone typy v1:
+
+- rich_text
+- image
+- quote
+- table
+- context
+- related_article
+- legal_reference
+- question_group
+- traffic_sign_group
+- product_cta
+- embed
+
+Payload każdego typu ma osobny kontrakt walidacyjny. Arbitrary HTML/JS/CSS nie jest typem bloku.
+
+### 5.2.1. Kontekst regulacyjny / egzaminacyjny
+
+Dla materiałów, w których ma to zastosowanie:
+
+- regulatory_status: varchar(32), default not_applicable
+- effective_from: date nullable
+- change_summary: text nullable
+- applies_to: text nullable
+- exam_impact: text nullable
+
+Dozwolone `regulatory_status` v1:
+
+- not_applicable
+- proposal
+- consultation
+- official_announcement
+- adopted_future
+- in_force
+
+Te pola nie zastępują body ani źródeł. Służą do kontroli redakcyjnej i renderowania powtarzalnego boxu „co się zmienia / od kiedy / kogo dotyczy / wpływ na egzamin”.
 
 ### 5.3. Publikacja
 
@@ -148,6 +192,8 @@ Nie kodujemy layoutu strony głównej w rekordzie artykułu. Powyższe pola opis
 - hero_image_alt: varchar(500) nullable
 - hero_image_width: unsigned integer nullable
 - hero_image_height: unsigned integer nullable
+- hero_focal_x: numeric(5,4) nullable
+- hero_focal_y: numeric(5,4) nullable
 - og_image_path: varchar(1024) nullable
 - og_image_width: unsigned integer nullable
 - og_image_height: unsigned integer nullable
@@ -155,6 +201,8 @@ Nie kodujemy layoutu strony głównej w rekordzie artykułu. Powyższe pola opis
 - image_license_note: text nullable
 
 Storage i public URL rozwiązujemy przez istniejący media layer, nie przez ręczne sklejanie URL.
+
+Focal point używa znormalizowanych współrzędnych 0..1. Brak wartości oznacza środek obrazu. Warianty lead/standard/compact/OG są pochodnymi assetu i nie powinny być ręcznie przechowywanymi, niezależnymi kopiami, jeśli media layer może wygenerować je deterministycznie.
 
 ### 5.6. SEO
 
@@ -219,7 +267,7 @@ Status published wymaga:
 - title != empty,
 - slug != empty,
 - lead != empty,
-- body != empty,
+- body_blocks zawiera co najmniej jeden renderowalny blok,
 - category_id != null,
 - author_id != null,
 - first_published_at != null,
@@ -315,7 +363,50 @@ Tagi nie tworzą automatycznie stron indeksowalnych. Publiczne tag pages wymagaj
 
 ---
 
-## 10. Tabela content_article_sources
+## 10. Tabela content_topics
+
+Topic/dossier jest ręcznie zarządzanym hubem redakcyjnym. Nie jest aliasem taga.
+
+Pola:
+
+- id
+- title varchar(180)
+- slug varchar(200) unique
+- description text
+- status varchar(32) default draft
+- featured_article_id FK -> content_articles nullable
+- seo_title varchar(255) nullable
+- seo_description varchar(320) nullable
+- published_at timestamptz nullable
+- created_at
+- updated_at
+
+Dozwolone statusy v1:
+
+- draft
+- published
+- archived
+
+Pivot:
+
+content_article_topic
+
+- article_id
+- topic_id
+- sort_order smallint default 0
+- created_at
+- unique(article_id, topic_id)
+
+Reguły:
+
+- publiczny topic wymaga własnego opisu i statusu published,
+- samo przypięcie taga nie tworzy topicu,
+- featured_article_id musi wskazywać publiczny artykuł przy renderowaniu,
+- brak wystarczającego corpus oznacza, że topic pozostaje draftem.
+
+---
+
+## 11. Tabela content_article_sources
 
 Każdy materiał informacyjny musi wspierać wiele źródeł.
 
@@ -356,7 +447,7 @@ Pola:
 
 ---
 
-## 11. Relacja artykuł -> pytania
+## 12. Relacja artykuł -> pytania
 
 Tabela:
 
@@ -390,7 +481,7 @@ Newsroom nie może zmieniać stanu pytania.
 
 ---
 
-## 12. Relacja artykuł -> legal units
+## 13. Relacja artykuł -> legal units
 
 Tabela:
 
@@ -422,7 +513,7 @@ Newsroom nie duplikuje official_excerpt ani treści aktu prawnego.
 
 ---
 
-## 13. Relacja artykuł -> traffic signs
+## 14. Relacja artykuł -> traffic signs
 
 Tabela:
 
@@ -448,7 +539,7 @@ Wdrożenie może zostać przesunięte do N3/N4, jeśli N1 wymaga ograniczenia sc
 
 ---
 
-## 14. Historia slugów i redirecty
+## 15. Historia slugów i redirecty
 
 Tabela:
 
@@ -464,7 +555,7 @@ Pola:
 - created_at
 - updated_at
 
-### 14.1. Reguły
+### 15.1. Reguły
 
 - zmiana sluga opublikowanego artykułu tworzy redirect,
 - nie tworzymy redirect chain; nowy wpis powinien wskazywać canonical destination,
@@ -474,31 +565,77 @@ Pola:
 
 ---
 
-## 15. Ekspozycja strony głównej
+## 16. Ekspozycja strony głównej — content_home_placements
 
-V1 nie wymaga page buildera.
+Kontrolowane placements wchodzą do newsroom v1. Nie jest to page builder.
 
-Jeżeli pola is_featured/editorial_priority okażą się niewystarczające, dopiero wtedy dodajemy:
+Tabela:
 
-content_home_slots
+content_home_placements
 
-Pola potencjalne:
+Pola:
 
 - id
-- slot_key
-- article_id
-- starts_at
-- ends_at
-- position
-- created_by_user_id
+- surface_key varchar(64), default newsroom_home
+- slot_key varchar(64)
+- context_key varchar(120) nullable
+- position smallint default 0
+- article_id FK -> content_articles
+- starts_at timestamptz nullable
+- ends_at timestamptz nullable
+- created_by_user_id FK -> users nullable
+- updated_by_user_id FK -> users nullable
 - created_at
 - updated_at
 
-Nie implementować tej tabeli w N1 bez potrzeby.
+### 16.1. Stałe sloty v1
+
+Kod, nie baza, definiuje dozwolone sloty:
+
+- lead
+- secondary
+- category_lead
+- guides_lead
+- important_now
+
+`context_key` służy np. do rozróżnienia kategorii przy `category_lead`.
+
+Nie pozwalamy administratorowi tworzyć dowolnych nowych nazw modułów w bazie.
+
+### 16.2. Czas ekspozycji
+
+- null starts_at oznacza aktywność od razu po spełnieniu innych warunków,
+- null ends_at oznacza brak automatycznego końca,
+- artykuł musi być publiczny w czasie, dla którego rozwiązujemy kompozycję,
+- scheduled article może być widoczny w future preview, ale nie w bieżącej stronie przed publikacją.
+
+### 16.3. Kolizje placements
+
+Application service nie pozwala na nierozstrzygnięte nakładanie się dwóch aktywnych rekordów dla tego samego:
+
+- surface_key,
+- slot_key,
+- context_key,
+- position.
+
+Nie próbujemy modelować przedziałów czasowych przez skomplikowany DB exclusion constraint w pierwszej wersji; invariant ma testy domenowe i transakcyjne.
+
+### 16.4. Fallback i deduplikacja
+
+NewsroomHomeCompositionService:
+
+1. rozwiązuje aktywne ręczne placementy,
+2. waliduje, że wskazane artykuły są publiczne dla czasu renderowania,
+3. uzupełnia puste sloty deterministycznym fallbackiem,
+4. prowadzi zbiór wykorzystanych article IDs,
+5. nie powtarza artykułu w kolejnych card modules,
+6. jeśli brakuje unikalnego kandydata, zwraca krótszą sekcję zamiast duplikatu.
+
+Breaking strip jest niezależnym alertem i może wskazywać ten sam artykuł co lead, ponieważ nie jest kolejną kartą contentową.
 
 ---
 
-## 16. Lokalność i WORD
+## 17. Lokalność i WORD
 
 V1 modeluje kategorię WORD, ale nie tworzy masowo lokalnych hubów.
 
@@ -519,7 +656,7 @@ Ta część jest deferred i nie blokuje newsroom v1.
 
 ---
 
-## 17. PHP enums
+## 18. PHP enums
 
 Rekomendowane enumy:
 
@@ -528,6 +665,16 @@ Rekomendowane enumy:
 - ContentArticleSourceType
 - ContentArticleQuestionRelationType
 - ContentArticleLegalRelationType
+- ContentArticleOriginType
+- ContentArticleRegulatoryStatus
+
+`ContentArticleOriginType` v1:
+
+- original
+- compiled
+- official_source
+- data_analysis
+- licensed_agency
 
 Enum ma być jedynym źródłem listy wartości w logice aplikacyjnej.
 
@@ -535,7 +682,7 @@ Filament Select, request validation i serwisy korzystają z enumów zamiast powt
 
 ---
 
-## 18. Model Eloquent ContentArticle
+## 19. Model Eloquent ContentArticle
 
 Odpowiedzialności modelu:
 
@@ -553,11 +700,15 @@ Model nie powinien:
 - generować feedu,
 - zarządzać redirectami w observerze bez use-case layer.
 
-### 18.1. Casts
+### 19.1. Casts
 
 - is_featured: boolean
 - is_breaking: boolean
+- body_blocks: array
 - key_points: array
+- hero_focal_x: decimal
+- hero_focal_y: decimal
+- effective_from: immutable_date
 - published_at: immutable_datetime
 - first_published_at: immutable_datetime
 - scheduled_for: immutable_datetime
@@ -586,7 +737,7 @@ Definicja published:
 
 ---
 
-## 19. Serwisy domenowe / application services
+## 20. Serwisy domenowe / application services
 
 Rekomendowane klasy w app/Support/Newsroom lub analogicznej, jasno wydzielonej przestrzeni nazw.
 
@@ -654,7 +805,7 @@ Odpowiada za:
 
 ---
 
-## 20. Events
+## 21. Events
 
 Rekomendowane domain/application events:
 
@@ -675,7 +826,7 @@ Event nie powinien wykonywać ciężkiej logiki synchronicznie w request bez pot
 
 ---
 
-## 21. Scheduling
+## 22. Scheduling
 
 Scheduled publishing wymaga deterministycznego procesu.
 
@@ -698,7 +849,7 @@ Rekomendacja:
 
 ---
 
-## 22. Time semantics
+## 23. Time semantics
 
 Publiczne daty:
 
@@ -712,7 +863,7 @@ dateModified bierze last_substantive_update_at albo kontrolowany modified timest
 
 ---
 
-## 23. Author i reviewer
+## 24. Author i reviewer
 
 Używamy istniejącego ContentAuthor.
 
@@ -729,24 +880,24 @@ Dla treści prawnie wrażliwych reviewer może być wymagany przez Editorial Pol
 
 ---
 
-## 24. Sanitization body
+## 25. Walidacja i sanitization body_blocks
 
-Wybór edytora jest decyzją implementacyjną N1, ale kontrakt danych jest stały:
+Dokładny komponent edytora i serializacja wewnętrzna są decyzją N0-004, ale kontrakt domenowy jest stały:
 
-- zapisujemy canonical body,
-- renderujemy tylko allowlisted markup,
-- usuwamy script/style/event handlers,
-- external embeds są allowlisted,
-- linki z target=_blank otrzymują bezpieczne rel.
+- `body_blocks` jest jednym kanonicznym źródłem body,
+- każdy `type` ma allowlistowany schema payloadu,
+- rich_text sanitizuje HTML/doc nodes,
+- script/style/event handlers są zabronione,
+- embed przyjmuje tylko allowlisted providers/URL,
+- linki z `target=_blank` otrzymują bezpieczne `rel`,
+- block renderer ignoruje/odrzuca nieznany typ zamiast wykonywać go jako HTML,
+- publiczny renderer nie interpretuje arbitralnych klas CSS przekazanych z CMS.
 
-Jeśli body jest Markdown, pipeline ma deterministycznie generować bezpieczny HTML.
-Jeśli body jest rich HTML, sanitization następuje przed zapisem lub przed renderem zgodnie z jedną jasno wybraną strategią.
-
-Nie utrzymujemy dwóch równoległych źródeł body bez potrzeby.
+Nie utrzymujemy pełnego `body_html` i `body_blocks` jako dwóch edytowalnych źródeł prawdy.
 
 ---
 
-## 25. Search w adminie
+## 26. Search w adminie
 
 N1:
 
@@ -758,7 +909,7 @@ Publiczna wyszukiwarka artykułów nie jest wymogiem newsroom v1.
 
 ---
 
-## 26. Cache model
+## 27. Cache model
 
 Cache keys powinny być oparte o publiczne read models, np.:
 
@@ -773,7 +924,7 @@ Nie cache’ujemy preview jako publicznej strony.
 
 ---
 
-## 27. Route binding
+## 28. Route binding
 
 ContentArticle:
 
@@ -789,19 +940,20 @@ Preview używa oddzielnej ścieżki i policy.
 
 ---
 
-## 28. Publiczne route contracts
+## 29. Publiczne route contracts
 
 V1:
 
 - GET /aktualnosci
 - GET /aktualnosci/{slug}
 - GET /aktualnosci/kategoria/{categorySlug}
+- GET /aktualnosci/temat/{topicSlug}
 - GET /poradniki
 - GET /poradniki/{slug}
 - GET /aktualnosci/feed.xml
 - sitemap endpoints zgodne z istniejącym SitemapController pattern
 
-### 28.1. Konflikt slug vs category
+### 29.1. Konflikt slug vs category
 
 Nie wolno pozostawić niejednoznaczności:
 
@@ -819,25 +971,28 @@ Jest jednoznaczny dla routingu i przyszłych zmian. Zmiana na krótsze category 
 
 ---
 
-## 29. Migracje — kolejność
+## 30. Migracje — kolejność
 
 Rekomendowane migracje:
 
 1. create_content_categories_table
 2. create_content_tags_table
 3. create_content_articles_table
-4. create_content_article_tag_table
-5. create_content_article_sources_table
-6. create_content_article_question_table
-7. create_content_article_legal_unit_table
-8. create_content_article_traffic_sign_table
-9. create_content_article_redirects_table
+4. create_content_topics_table
+5. create_content_article_tag_table
+6. create_content_article_topic_table
+7. create_content_article_sources_table
+8. create_content_article_question_table
+9. create_content_article_legal_unit_table
+10. create_content_article_traffic_sign_table
+11. create_content_article_redirects_table
+12. create_content_home_placements_table
 
 Nie łączymy wszystkiego w jedną migrację, jeżeli utrudnia to rollback i review.
 
 ---
 
-## 30. Seed danych systemowych
+## 31. Seed danych systemowych
 
 Kategorie v1 mogą być seedowane deterministycznie.
 
@@ -853,7 +1008,7 @@ Test fixtures pozostają w factories/seed smoke data.
 
 ---
 
-## 31. Factories
+## 32. Factories
 
 Potrzebne:
 
@@ -861,6 +1016,8 @@ Potrzebne:
 - ContentArticleFactory
 - ContentArticleSourceFactory
 - ContentTagFactory
+- ContentTopicFactory
+- ContentHomePlacementFactory
 
 Stany factory:
 
@@ -876,7 +1033,7 @@ Factories mają umożliwiać czytelne testy workflow.
 
 ---
 
-## 32. Deletion policy
+## 33. Deletion policy
 
 Artykuł opublikowany:
 
@@ -897,7 +1054,7 @@ Redirect history:
 
 ---
 
-## 33. Audit
+## 34. Audit
 
 Istniejący AuditLog powinien być użyty tam, gdzie pasuje do architektury.
 
@@ -917,7 +1074,7 @@ Audit nie zastępuje zwykłego updated_at.
 
 ---
 
-## 34. Uprawnienia
+## 35. Uprawnienia
 
 N1 może korzystać z istniejącej roli administratora, ale kod ma przygotować policies.
 
@@ -937,7 +1094,7 @@ Nie zakładamy roli wyłącznie na podstawie ukrycia przycisku Filament. Backend
 
 ---
 
-## 35. Polityka zmian modelu
+## 36. Polityka zmian modelu
 
 Każde nowe pole musi mieć odpowiedź na:
 
@@ -953,7 +1110,7 @@ Nie dodajemy pól „może kiedyś się przyda”.
 
 ---
 
-## 36. Mapa plików — target
+## 37. Mapa plików — target
 
 Przykładowa struktura zgodna z obecnym repo:
 
@@ -963,7 +1120,9 @@ app/
     ContentArticle.php
     ContentCategory.php
     ContentTag.php
+    ContentTopic.php
     ContentArticleSource.php
+    ContentHomePlacement.php
 
   Support/
     Newsroom/
@@ -973,6 +1132,8 @@ app/
       ContentArticleSeoService.php
       ContentArticleSchemaService.php
       ContentArticleFreshnessService.php
+      NewsroomHomeCompositionService.php
+      ContentTopicCatalogService.php
 
   Http/Controllers/
     NewsroomHomeController.php
@@ -984,6 +1145,7 @@ app/
   Filament/Resources/
     ContentArticles/
     ContentCategories/
+    ContentTopics/
 
 resources/views/
   newsroom/
@@ -1002,22 +1164,24 @@ Nazwy można dostosować do konwencji repo, ale granice odpowiedzialności powin
 
 ---
 
-## 37. Data query contracts
+## 38. Data query contracts
 
-### 37.1. Newsroom home
+### 38.1. Newsroom home
 
-Musi zwrócić ograniczony zestaw:
+Musi zwrócić gotowy, ograniczony read model:
 
 - lead story,
-- secondary featured,
+- secondary stories,
 - latest N,
 - per-category N,
 - guides N,
 - opcjonalny breaking strip.
 
+Źródłem kompozycji jest `NewsroomHomeCompositionService`, który łączy ręczne placements z fallbackami i deduplikacją.
+
 Nie pobieramy całego corpusu i nie filtrujemy w PHP.
 
-### 37.2. Category page
+### 38.2. Category page
 
 - published only,
 - category_id,
@@ -1025,13 +1189,14 @@ Nie pobieramy całego corpusu i nie filtrujemy w PHP.
 - stabilna paginacja,
 - eager load author + minimal media metadata.
 
-### 37.3. Article show
+### 38.3. Article show
 
 - published by slug,
 - author,
 - reviewer jeśli publiczny,
 - category,
 - tags,
+- topics,
 - sources,
 - related questions,
 - legal units,
@@ -1039,7 +1204,7 @@ Nie pobieramy całego corpusu i nie filtrujemy w PHP.
 
 ---
 
-## 38. Related content
+## 39. Related content
 
 V1:
 
@@ -1050,7 +1215,7 @@ Nie wdrażamy ML recommendera.
 
 ---
 
-## 39. Freshness defaults
+## 40. Freshness defaults
 
 Wartości są policy, nie twardym invariant DB.
 
@@ -1065,7 +1230,7 @@ Finalne wartości definiuje dokument Editorial Operations.
 
 ---
 
-## 40. Wpływ na DATABASE-SCHEMA.md
+## 41. Wpływ na DATABASE-SCHEMA.md
 
 Ten dokument jest specyfikacją przed implementacją.
 
@@ -1077,7 +1242,7 @@ Po merge migracji N1 należy:
 
 ---
 
-## 41. Definition of Done modelu danych
+## 42. Definition of Done modelu danych
 
 Model danych jest gotowy, gdy:
 
@@ -1088,12 +1253,16 @@ Model danych jest gotowy, gdy:
 - scheduling jest idempotentny,
 - slug change zachowuje redirect history,
 - relations do questions/legal są jawne,
+- `body_blocks` przechodzą walidację per block type,
+- homepage placements mają fallback i deduplikację,
+- focal point ma poprawny zakres 0..1,
+- topic nie powstaje automatycznie z taga,
 - admin policies nie opierają się wyłącznie na UI,
 - current DATABASE-SCHEMA.md odzwierciedla faktyczny kod.
 
 ---
 
-## 42. Stan implementacji
+## 43. Stan implementacji
 
 Na moment utworzenia dokumentu:
 
@@ -1107,11 +1276,14 @@ Na moment utworzenia dokumentu:
 
 ---
 
-## 43. Pozostałe zadania
+## 44. Pozostałe zadania
 
 - [ ] finalizować naming tabel i klas,
-- [ ] zatwierdzić route strategy dla kategorii,
-- [ ] zatwierdzić source model,
+- [ ] domknąć N0-004: serializacja bloków + editor + sanitizer,
+- [ ] wdrożyć model topics,
+- [ ] wdrożyć home placements/composition service,
+- [ ] wdrożyć focal point w media contract,
+- [ ] wdrożyć origin/regulatory context fields,
 - [ ] wdrożyć migracje,
 - [ ] wdrożyć enumy,
 - [ ] wdrożyć modele i factories,
@@ -1123,7 +1295,16 @@ Na moment utworzenia dokumentu:
 
 ---
 
-## 44. Historia zmian
+## 45. Historia zmian
+
+### 2026-09-15 — v0.2
+
+- zastąpiono plan pojedynczego `body` kanonicznym `body_blocks`,
+- dodano kontrolowaną bibliotekę typów bloków i pola kontekstu regulacyjnego,
+- dodano `origin_type`, focal point oraz model topics/dossier,
+- awansowano `content_home_placements` do zakresu v1 wraz z fallbackiem i deduplikacją,
+- nie dodano systemu revision snapshots zgodnie z decyzją produktową,
+- audio/AI pozostają rozszerzeniem bez prealokowania pól w bazie.
 
 ### 2026-09-15 — v0.1
 

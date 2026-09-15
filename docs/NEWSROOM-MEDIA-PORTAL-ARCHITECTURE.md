@@ -231,6 +231,85 @@ Obecne `/` pozostaje stroną produktową.
 
 Po uruchomieniu i zebraniu danych można dodać blok „Najnowsze informacje” na stronie głównej. Pełna zmiana `/` w portal hybrydowy wymaga osobnej decyzji opartej o dane.
 
+### DEC-NR-006 — redakcja steruje stałymi slotami strony głównej
+
+Newsroom v1 ma kontrolowany system ekspozycji redakcyjnej dla `/aktualnosci`.
+
+Nie jest to page builder. Kod definiuje skończony zestaw powierzchni i slotów, np.:
+
+- lead,
+- secondary,
+- category lead,
+- guides lead,
+- important_now / „Ważne teraz”.
+
+Redaktor może przypisać artykuł do slotu oraz ustawić czas początku i końca ekspozycji. Brak ręcznego przypisania uruchamia deterministyczny fallback oparty o aktualnie opublikowane treści.
+
+Układ DOM, liczba sekcji i typ komponentu pozostają pod kontrolą kodu.
+
+### DEC-NR-007 — artykuł korzysta z kontrolowanej biblioteki bloków
+
+Treść artykułu nie może ograniczać się do niekontrolowanego jednego pola HTML, jeżeli chcemy bezpiecznie i konsekwentnie renderować materiały redakcyjne.
+
+Newsroom v1 przewiduje uporządkowany dokument z kontrolowanymi typami bloków, m.in.:
+
+- rich text,
+- image,
+- quote,
+- table,
+- context/callout,
+- related article,
+- legal reference,
+- question group,
+- traffic sign group,
+- product CTA,
+- allowlisted embed.
+
+To nadal nie jest uniwersalny page builder: redaktor nie definiuje dowolnego HTML, CSS, layoutu ani nowych typów komponentów.
+
+Dokładna serializacja i komponent edytora są domykane w `NEWSROOM-N0-004`, ale jeden uporządkowany dokument blokowy ma być kanonicznym źródłem treści body.
+
+### DEC-NR-008 — topic jest innym bytem niż tag
+
+Tag służy lekkiej klasyfikacji i nie tworzy automatycznie publicznego URL.
+
+Topic/dossier jest ręcznie zarządzanym hubem redakcyjnym o własnym:
+
+- tytule,
+- slugu,
+- opisie,
+- statusie publikacji,
+- materiale wyróżnionym,
+- zestawie powiązanych artykułów.
+
+Model topics może wejść w v1, natomiast publiczne uruchomienie konkretnego huba wymaga realnego corpus i wartości dla użytkownika. Nie generujemy masowych thin pages z tagów.
+
+### DEC-NR-009 — media mają art direction, nie tylko jedną ścieżkę obrazu
+
+Hero ma przechowywać punkt zainteresowania/focal point. Media layer może generować kontrolowane warianty/cropy potrzebne dla:
+
+- lead,
+- standard card,
+- compact card,
+- social/OG.
+
+Redaktor nie powinien ręcznie uploadować wielu niezależnych kopii tego samego obrazu, jeśli pipeline może przygotować warianty deterministycznie.
+
+### DEC-NR-010 — audio i funkcje AI są zaplanowanym rozszerzeniem, nie gate v1
+
+Architektura artykułu ma nie blokować późniejszego:
+
+- odsłuchu artykułu,
+- transkrypcji,
+- kontrolowanego streszczenia,
+- funkcji „zapytaj o ten artykuł”.
+
+Nie tworzymy jednak pól/tabel ani publicznych controls tylko „na zapas”, dopóki nie rozpocznie się odpowiedni etap implementacji. Takie pochodne treści nie mogą samodzielnie publikować ani zmieniać faktów źródłowego artykułu.
+
+### DEC-NR-011 — osobny system snapshotów wersji artykułu jest poza zakresem
+
+Na wyraźną decyzję produktową nie projektujemy dodatkowego revision history z diff/restore snapshotów. Pozostaje istniejący model audytu zmian i publiczna polityka korekt.
+
 ---
 
 ## 7. Architektura informacji
@@ -245,7 +324,8 @@ Po uruchomieniu i zebraniu danych można dodać blok „Najnowsze informacje” 
 │   ├── kategoria/przepisy/
 │   ├── kategoria/word/
 │   ├── kategoria/kierowcy/
-│   └── kategoria/osk/
+│   ├── kategoria/osk/
+│   └── temat/{topicSlug}/
 ├── poradniki/
 ├── przepisy/
 ├── znaki-drogowe/
@@ -274,7 +354,13 @@ Rekomendowany i przyjęty do backlogu wykonawczego wariant:
 
 Jawny segment `kategoria` usuwa kolizję routingu między slugiem kategorii i slugiem artykułu. Slug kategorii jest stabilny i zarządzany centralnie. Każda zmiana tej decyzji wymaga aktualizacji architektury i testu konfliktów route.
 
-### 7.4. Redirect governance
+### 7.4. URL topicu / dossier
+
+`/aktualnosci/temat/{topicSlug}`
+
+Topic ma własny publiczny URL dopiero po publikacji i spełnieniu warunków jakości opisanych w governance/SEO. Tag nie otrzymuje tego URL automatycznie.
+
+### 7.5. Redirect governance
 
 Zmiana opublikowanego sluga:
 
@@ -599,16 +685,21 @@ Portal ma mieć **hierarchię redakcyjną**, nie zwykłą siatkę kart.
 - brak infinite scroll w v1,
 - brak autoplay video na listach.
 
-### 12.3. Moduły muszą być konfigurowalne
+### 12.3. Moduły muszą być konfigurowalne przez kontrolowane placements
 
-Redakcja powinna móc sterować:
+Redakcja steruje zawartością stałych powierzchni zdefiniowanych przez kod:
 
 - lead story,
-- featured stories,
-- kolejnością sekcji,
-- priorytetem w obrębie sekcji.
+- secondary stories,
+- category leads,
+- guides lead,
+- wybrane linki „Ważne teraz”.
 
-Nie projektujemy jednak w v1 pełnego page buildera.
+Placement może mieć przedział aktywności. Resolver kompozycji strony wybiera aktywne ręczne przypisanie albo deterministyczny fallback.
+
+Publiczny resolver ma również prowadzić zbiór już użytych artykułów, tak aby ten sam materiał nie był przypadkowo powtarzany w leadzie, secondary, latest i kolejnych sekcjach. Jeśli brakuje unikalnych kandydatów, sekcja może być krótsza zamiast powielać materiał.
+
+Nie projektujemy pełnego page buildera: redaktor nie zmienia struktury layoutu, tylko obsadza z góry znane sloty.
 
 ---
 
@@ -631,7 +722,25 @@ Nie projektujemy jednak w v1 pełnego page buildera.
 - informacje o autorze,
 - link do metodologii / zasad redakcyjnych.
 
-### 13.2. W skrócie
+### 13.2. Kontrolowane bloki artykułu
+
+Body jest renderowane z kontrolowanej biblioteki bloków. Pozwala to zachować ten sam standard na desktopie, mobile, preview i przyszłych kanałach bez dopuszczania dowolnego HTML/CSS.
+
+Bloki v1 obejmują co najmniej:
+
+- rich text,
+- image,
+- quote,
+- table,
+- context/callout,
+- related article,
+- legal reference,
+- question group,
+- traffic sign group,
+- product CTA,
+- allowlisted embed.
+
+### 13.3. W skrócie i kontekst branżowy
 
 Dla dłuższych materiałów można stosować blok „W skrócie”, ale:
 
@@ -639,7 +748,17 @@ Dla dłuższych materiałów można stosować blok „W skrócie”, ale:
 - nie może powtarzać całego leadu,
 - nie może być ukrytym tekstem SEO.
 
-### 13.3. Product bridge
+Dla newsów regulacyjnych i egzaminacyjnych model powinien dodatkowo wspierać strukturalne informacje:
+
+- co się zmienia,
+- status zmiany/prawa,
+- od kiedy,
+- kogo dotyczy,
+- wpływ na egzamin.
+
+Dane te mają być używane do czytelnego boxu publicznego oraz kontroli redakcyjnej, a nie do automatycznego wymyślania treści.
+
+### 13.4. Product bridge
 
 Przykłady:
 
@@ -660,6 +779,7 @@ Największą przewagą PrawkoNaRaz ma być połączenie newsroomu z istniejącą
 ARTICLE
 ├── CATEGORY
 ├── TAGS
+├── TOPICS
 ├── AUTHOR
 ├── SOURCES
 ├── LEGAL UNITS
@@ -676,9 +796,20 @@ ARTICLE
 - nie tworzymy linków tylko dla SEO,
 - link musi mieć wartość dla czytelnika.
 
-### 14.2. Kierunek przyszły
+### 14.2. Huby topic/dossier
 
-Z czasem można tworzyć publiczne huby tematyczne łączące:
+Publiczny topic jest świadomie utworzoną powierzchnią redakcyjną, a nie automatyczną stroną tagu.
+
+Może łączyć:
+
+- newsy,
+- poradniki,
+- przepisy,
+- pytania,
+- znaki,
+- analizy danych.
+
+Publicacja topicu wymaga własnego opisu, odpowiedniego corpus i review. Z czasem można tworzyć huby tematyczne łączące:
 
 - newsy,
 - poradniki,
@@ -800,7 +931,9 @@ Każdy hero:
 - ma alt,
 - ma jawne wymiary,
 - ma zoptymalizowany format,
+- ma punkt zainteresowania/focal point,
 - ma wariant do OG,
+- może otrzymać deterministyczne cropy do lead/standard/compact,
 - nie powoduje CLS,
 - jest dostarczany przez istniejący media layer.
 
@@ -986,7 +1119,7 @@ Szczegółowy tasking i granice PR-ów są kanonicznie utrzymywane w [NEWSROOM-I
 - publisher/Organization branding source of truth,
 - finalny route contract,
 - taxonomy v1,
-- decyzja editor + sanitization.
+- block editor + serialization + sanitization decision.
 
 **Exit criteria:** nie ma nierozstrzygniętej decyzji, która zmieniałaby schema, routing albo bezpieczeństwo body.
 
@@ -995,22 +1128,29 @@ Szczegółowy tasking i granice PR-ów są kanonicznie utrzymywane w [NEWSROOM-I
 - migrations,
 - enumy,
 - models/factories,
+- topics,
+- home placements,
 - slug redirects,
 - publishing service,
-- scheduler.
+- scheduler,
+- home composition service.
 
 **Exit criteria:** domena może bezpiecznie przechować i deterministycznie opublikować artykuł bez CMS i publicznego renderera.
 
 ### Etap N2 — CMS + workflow
 
 - ContentCategoryResource,
+- ContentTopicResource,
 - ContentArticleResource,
-- body editor,
+- controlled block editor,
+- origin/regulatory context,
+- media focal point/crop preview,
 - źródła,
 - relacje,
 - workflow actions,
 - checklist,
-- preview.
+- article preview,
+- NewsroomHomeComposer + future preview.
 
 **Exit criteria:** redaktor może przygotować, sprawdzić, podejrzeć, zaplanować i opublikować artykuł bez edycji kodu.
 
@@ -1019,16 +1159,20 @@ Szczegółowy tasking i granice PR-ów są kanonicznie utrzymywane w [NEWSROOM-I
 - public catalog service,
 - SEO/schema services,
 - Blade article page,
+- controlled block renderer,
+- provenance + regulatory context,
+- focal-point-aware media,
 - sources/byline,
 - product bridge,
 - old-slug redirects.
 
 **Exit criteria:** pojedynczy opublikowany artykuł jest poprawnie renderowany, indeksowalny i połączony z istniejącym produktem.
 
-### Etap N4 — hub + kategorie + poradniki
+### Etap N4 — hub + kategorie + topics + poradniki
 
-- editorial home `/aktualnosci`,
+- editorial home `/aktualnosci` z placements/fallback/dedupe,
 - category pages,
+- topic/dossier pages,
 - `/poradniki`,
 - navigation integration,
 - cache/invalidation.
@@ -1074,11 +1218,14 @@ Dopiero po realnym ruchu i obserwacji:
 Newsroom v1 jest ukończony, gdy:
 
 - artykuł powstaje bez zmiany kodu,
-- ma autora, kategorię, źródła i workflow,
-- preview działa bez publicznej indeksacji,
+- ma autora, kategorię, origin, źródła i workflow,
+- treść korzysta z kontrolowanego body_blocks,
+- preview artykułu działa bez publicznej indeksacji,
+- home composer i future preview działają na tym samym resolverze co publiczny hub,
 - publikacja i scheduling działają deterministycznie,
-- `/aktualnosci` ma redakcyjną hierarchię,
-- istnieje publiczna strona artykułu,
+- `/aktualnosci` ma redakcyjną hierarchię, placements, fallback i deduplikację,
+- istnieje publiczna strona artykułu z regulatory context i focal-point-aware media,
+- publikowany topic/dossier ma własną wartość i nie jest aliasem taga,
 - canonical/meta/schema są poprawne,
 - sitemap/feed uwzględniają właściwe rekordy,
 - artykuł może być połączony z pytaniami i treścią prawną,
@@ -1101,12 +1248,19 @@ Newsroom v1 jest ukończony, gdy:
 6. Page builder nie wchodzi do v1; stosujemy kontrolowane moduły.
 7. Komentarze użytkowników są poza scope v1.
 8. Kategorie używają ścieżki `/aktualnosci/kategoria/{categorySlug}`.
-9. Feed v1 używa `/aktualnosci/feed.xml`.
-10. Publiczne strony newsroomu są SSR/Blade-first.
+9. Topic/dossier używa ścieżki `/aktualnosci/temat/{topicSlug}`.
+10. Feed v1 używa `/aktualnosci/feed.xml`.
+11. Publiczne strony newsroomu są SSR/Blade-first.
+12. Strona główna korzysta z kontrolowanych placements i fallbacków, nie z pełnego page buildera.
+13. Body artykułu jest kontrolowanym dokumentem blokowym; szczegół serializacji domyka N0-004.
+14. Topic jest odrębnym bytem od taga.
+15. Media używają focal point i deterministycznych cropów, jeśli pipeline je wspiera.
+16. Audio/AI są rozszerzeniami po v1, bez prealokowania schema.
+17. Osobny revision snapshot/diff/restore system pozostaje poza zakresem.
 
 ### 25.2. Otwarte decyzje N0 wymagające domknięcia przed implementacją zależnych elementów
 
-- konkretny editor body i techniczna strategia sanitization (`NEWSROOM-N0-004`),
+- konkretny komponent block editora, serializacja payloadów i techniczna strategia sanitization (`NEWSROOM-N0-004`),
 - finalne źródło brand name/logo/publisher po usunięciu pozostałości „Orły na Drodze” (`NEWSROOM-N0-001`),
 - finalne wspólne design tokens używane przez newsroom po audycie obecnego publicznego UI.
 
@@ -1139,7 +1293,7 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [ ] `NEWSROOM-N0-001` — publisher branding source of truth,
 - [ ] `NEWSROOM-N0-002` — test/utrwalenie przyjętego route contract,
 - [ ] `NEWSROOM-N0-003` — deterministyczny taxonomy seed contract,
-- [ ] `NEWSROOM-N0-004` — editor + sanitization decision,
+- [ ] `NEWSROOM-N0-004` — block editor + serialization + sanitization decision,
 - [ ] następnie N1 domain + database.
 
 Pozostałe elementy N2–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu checklistę.
@@ -1167,6 +1321,15 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-15 — v0.3
+
+- przyjęto kontrolowane homepage placements jako część newsroom v1,
+- przyjęto kontrolowany dokument blokowy artykułu zamiast nieograniczonego HTML,
+- rozdzielono topic/dossier od tagów,
+- dodano art direction przez focal point i generowane warianty obrazu,
+- zaplanowano audio/AI jako rozszerzenia po v1 bez prealokowania schema,
+- zapisano decyzję o braku osobnego revision-history snapshot systemu.
 
 ### 2026-09-15 — v0.2
 

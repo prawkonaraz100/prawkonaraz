@@ -42,6 +42,8 @@ Wymagane:
 
 1. ContentArticleResource
 2. ContentCategoryResource
+3. ContentTopicResource
+4. NewsroomHomeComposer — custom Filament page do obsadzania stałych slotów `/aktualnosci`
 
 Tagi mogą być zarządzane inline lub przez osobny resource zależnie od prostoty implementacji.
 
@@ -156,15 +158,16 @@ Dla standardowego panelu redakcyjnego preferujemy updated_at desc, aby ostatnia 
 Kolejność:
 
 1. Tożsamość i klasyfikacja
-2. Treść
-3. Źródła
-4. Powiązania
-5. Media
-6. SEO
-7. Workflow i publikacja
-8. Freshness / review
-9. Notatki wewnętrzne
-10. Checklista publikacyjna
+2. Pochodzenie i kontekst
+3. Treść blokowa
+4. Źródła
+5. Powiązania
+6. Media / art direction
+7. SEO
+8. Workflow i publikacja
+9. Freshness / review
+10. Notatki wewnętrzne
+11. Checklista publikacyjna
 
 ---
 
@@ -177,6 +180,7 @@ Pola:
 - title
 - slug
 - tags
+- topics
 - author_id
 - reviewer_id
 
@@ -200,32 +204,89 @@ Form nie może po prostu zapisać nowego sluga z pominięciem redirect history.
 
 ---
 
-## 12. Sekcja „Treść”
+## 12. Sekcja „Pochodzenie i kontekst”
 
 Pola:
 
-- lead
-- key_points
-- body
+- origin_type
+- regulatory_status
+- effective_from
+- change_summary
+- applies_to
+- exam_impact
 
-### 12.1. Lead
+### 12.1. origin_type
 
-Textarea:
+Opcje zgodne z enumem domenowym, np.:
 
-- 2–4 zdania sugerowane,
-- required przed review/publish.
+- original
+- compiled
+- official_source
+- data_analysis
+- licensed_agency
 
-### 12.2. Key points
+`licensed_agency` jest dostępne wyłącznie, jeśli istnieje faktyczne prawo/licencja do takiego użycia. CMS nie sugeruje, że samo wskazanie medium jako źródła czyni materiał „agencyjnym”.
 
-Repeater:
+### 12.2. Kontekst regulacyjny
 
-- max 5,
-- krótkie teksty,
-- optional.
+Pola są pokazywane warunkowo dla tematów, w których mają sens.
 
-### 12.3. Body editor
+Panel powinien zadawać redaktorowi konkretne pytania:
 
-Wymagania funkcjonalne:
+- Jaki jest status zmiany?
+- Od kiedy obowiązuje?
+- Co dokładnie się zmienia?
+- Kogo dotyczy?
+- Czy wpływa na egzamin?
+
+Brak `regulatory_status != not_applicable` bez odpowiedniego źródła powinien generować warning/blocking zgodnie z Editorial Policy.
+
+---
+
+## 13. Sekcja „Treść blokowa”
+
+CMS nie udostępnia jednego dowolnego pola HTML jako całego artykułu.
+
+Edytor pracuje na uporządkowanym `body_blocks`.
+
+### 13.1. Dozwolone bloki v1
+
+- Rich text
+- Image
+- Quote
+- Table
+- Context / callout
+- Related article
+- Legal reference
+- Question group
+- Traffic sign group
+- Product CTA
+- Allowlisted embed
+
+### 13.2. Builder UX
+
+Preferowany jest Filament Builder lub równoważny komponent, jeżeli po weryfikacji N0-004 spełni wymagania.
+
+Redaktor powinien móc:
+
+- dodać blok,
+- zmienić kolejność,
+- zduplikować bezpieczny blok treściowy, jeśli komponent na to pozwala,
+- usunąć blok z confirmation dla bloków z większą ilością treści,
+- zobaczyć czytelną etykietę typu,
+- edytować payload wyłącznie przez pola przewidziane dla danego typu.
+
+Nie pozwalamy na:
+
+- dowolne klasy CSS,
+- dowolny HTML block,
+- własny JS,
+- własne iframe poza allowlistą,
+- zmianę szerokości/layoutu przez redaktora.
+
+### 13.3. Rich text block
+
+Wymagane funkcje:
 
 - H2
 - H3
@@ -234,22 +295,29 @@ Wymagania funkcjonalne:
 - italic
 - ordered/unordered lists
 - links
-- blockquote
-- tables tylko jeśli editor bezpiecznie wspiera
-- controlled embeds później
 
-Niedozwolone:
+Blockquote ma osobny typ, jeśli zapewnia to lepszą kontrolę prezentacji.
 
-- arbitrary script
-- arbitrary iframe
-- inline event handlers
-- dowolny style injection
+### 13.4. Context block
 
-Wybór konkretnego Filament editor component musi być zgodny z sanitization strategy.
+Kontrolowane warianty prezentacyjne, np.:
+
+- dlaczego_to_wazne
+- co_sie_zmienia
+- uwaga
+- metodologia
+
+Wariant wpływa na semantykę i styl komponentu, ale nie pozwala redaktorowi wprowadzać dowolnego koloru/layoutu.
+
+### 13.5. Domain blocks
+
+Legal reference, question group i traffic sign group wybierają istniejące rekordy przez wyszukiwarkę, nie kopiują ich treści ręcznie.
+
+Product CTA wybiera kontrolowany typ akcji/destination zamiast dowolnego HTML buttona.
 
 ---
 
-## 13. Autosave
+## 14. Autosave
 
 Nie jest wymagane w pierwszym PR.
 
@@ -261,7 +329,7 @@ Jeśli wdrażamy później:
 
 ---
 
-## 14. Sekcja „Źródła”
+## 15. Sekcja „Źródła”
 
 Źródła jako repeater/relationship records.
 
@@ -287,7 +355,7 @@ UI:
 
 ---
 
-## 15. Source warnings
+## 16. Source warnings
 
 Panel ostrzega:
 
@@ -300,11 +368,11 @@ Publish service ma finalną walidację, niezależnie od ostrzeżeń UI.
 
 ---
 
-## 16. Sekcja „Powiązania”
+## 17. Sekcja „Powiązania”
 
 Podsekcje:
 
-### 16.1. Pytania
+### 17.1. Pytania
 
 Searchable multi-select lub relation manager.
 
@@ -317,7 +385,7 @@ Pokazujemy:
 
 Nie wybieramy po samym internal ID bez kontekstu.
 
-### 16.2. Legal units
+### 17.2. Legal units
 
 Search:
 
@@ -325,7 +393,7 @@ Search:
 - label art./§,
 - title/summary.
 
-### 16.3. Traffic signs
+### 17.3. Traffic signs
 
 Search:
 
@@ -336,7 +404,7 @@ Może być deferred do N3/N4.
 
 ---
 
-## 17. Relation ordering
+## 18. Relation ordering
 
 Powiązania publiczne mają sort_order.
 
@@ -344,24 +412,28 @@ Admin powinien umożliwiać reorder lub przynajmniej kolejność dodania.
 
 ---
 
-## 18. Sekcja „Media”
+## 19. Sekcja „Media / art direction”
 
 Pola:
 
 - hero image
 - hero alt
 - width/height metadata
-- OG image
+- focal point X/Y
+- podgląd cropów lead / standard / compact
+- OG image lub wygenerowany OG variant
 - image credit
 - image license note
 
 Wykorzystujemy istniejący media layer.
 
+Focal point powinien być ustawiany wizualnie na obrazie, jeśli komponent na to pozwala, z fallbackiem do pól liczbowych/środka. Redaktor nie uploaduje ręcznie osobnych kopii dla każdej karty, jeśli system może wygenerować crop z tego samego źródła.
+
 Nie przechowujemy raw binary w bazie.
 
 ---
 
-## 19. Image validation
+## 20. Image validation
 
 Przy upload/wyborze:
 
@@ -378,7 +450,7 @@ Nie blokować wszystkich publikacji wyłącznie przez Discover recommendation.
 
 ---
 
-## 20. Sekcja „SEO”
+## 21. Sekcja „SEO”
 
 Pola:
 
@@ -397,7 +469,7 @@ canonical_url advanced field powinno być zwinięte/oznaczone jako wyjątkowe. W
 
 ---
 
-## 21. Robots control
+## 22. Robots control
 
 Nie dajemy redaktorowi przypadkowego free-text robots bez zabezpieczeń.
 
@@ -411,7 +483,7 @@ index,follow wynika z published/default policy.
 
 ---
 
-## 22. Sekcja „Workflow i publikacja”
+## 23. Sekcja „Workflow i publikacja”
 
 Pola/actions:
 
@@ -430,7 +502,7 @@ Można pokazać pole status jako read-only badge i osobne actions.
 
 ---
 
-## 23. Preferred workflow actions
+## 24. Preferred workflow actions
 
 Record actions:
 
@@ -452,7 +524,7 @@ Każda action:
 
 ---
 
-## 24. Publish action
+## 25. Publish action
 
 Po kliknięciu:
 
@@ -467,7 +539,7 @@ Filament resource nie duplikuje logiki publish.
 
 ---
 
-## 25. Schedule action
+## 26. Schedule action
 
 Modal:
 
@@ -482,7 +554,7 @@ Nie pozwala scheduled_for <= now bez jawnej konwersji na „Publish now”.
 
 ---
 
-## 26. Breaking action
+## 27. Breaking action
 
 Warunki:
 
@@ -498,20 +570,21 @@ Default expiry może być np. kilka godzin, ale nie hardcodujemy bez uzgodnienia
 
 ---
 
-## 27. Featured action
+## 28. Featured action
 
 Może być toggle/action.
 
-Jeśli featured slots zostaną dodane później, ten action może rozszerzyć się o pozycję.
+Featured nie zastępuje homepage placement.
 
 V1:
 
-- is_featured
-- editorial_priority
+- is_featured opisuje rekomendację redakcyjną,
+- editorial_priority pomaga fallbackom,
+- konkretne miejsce na `/aktualnosci` ustawia NewsroomHomeComposer.
 
 ---
 
-## 28. Freshness section
+## 29. Freshness section
 
 Pola:
 
@@ -530,7 +603,7 @@ Status computed:
 
 ---
 
-## 29. Checklista publikacyjna w adminie
+## 30. Checklista publikacyjna w adminie
 
 Panel pokazuje live/read-only listę.
 
@@ -559,7 +632,7 @@ Nie wszystko musi blokować.
 
 ---
 
-## 30. Severity checklist
+## 31. Severity checklist
 
 Blocking:
 
@@ -579,7 +652,7 @@ Warning:
 
 ---
 
-## 31. Preview action
+## 32. Preview action
 
 Action otwiera:
 
@@ -595,7 +668,98 @@ Preview banner zawiera:
 
 ---
 
-## 32. View/Infolist
+## 33. NewsroomHomeComposer
+
+To jest custom Filament page do redakcyjnego układania `/aktualnosci`.
+
+Nie jest page builderem.
+
+### 33.1. Widok
+
+Panel pokazuje stałe sekcje/sloty zdefiniowane przez kod:
+
+- lead,
+- secondary 1..N,
+- category leads,
+- guides lead,
+- important_now 1..N.
+
+Każdy slot pokazuje:
+
+- aktualnie przypisany artykuł,
+- okres aktywności,
+- fallback, który zostałby użyty bez ręcznego przypisania,
+- warning, jeśli artykuł jest archiwalny, draftem lub nie będzie publiczny w wybranym czasie.
+
+### 33.2. Obsługa placementu
+
+Redaktor może:
+
+- wyszukać artykuł,
+- przypisać go do slotu,
+- ustawić `starts_at`,
+- ustawić `ends_at`,
+- ustawić pozycję dla slotów wieloelementowych,
+- usunąć ręczne przypisanie i wrócić do fallbacku.
+
+Nie może:
+
+- stworzyć nowego typu slotu,
+- zmienić gridu,
+- wkleić dowolnego HTML,
+- ustawić tego samego artykułu w kilku card slots dla tego samego czasu bez warningu/blokady wynikającej z reguł kompozycji.
+
+### 33.3. Future preview całej strony
+
+Panel ma akcję:
+
+`Podgląd /aktualnosci`
+
+z opcjonalnym parametrem czasu.
+
+Przykład:
+
+`Pokaż stan strony: 2026-09-16 08:00 Europe/Warsaw`
+
+Resolver preview uwzględnia:
+
+- placements aktywne w wybranym czasie,
+- artykuły scheduled, które do tego czasu będą już opublikowane,
+- fallbacki,
+- deduplikację modułów.
+
+Preview jest noindex i zabezpieczone jak zwykły preview artykułu.
+
+---
+
+## 34. ContentTopicResource
+
+Pola:
+
+- title
+- slug
+- description
+- status
+- featured article
+- articles/relation ordering
+- SEO title/description
+- published_at
+
+Publiczny route topicu:
+
+`/aktualnosci/temat/{topicSlug}`
+
+Publicacja topicu powinna ostrzegać/blokować, jeśli:
+
+- brak opisu,
+- brak odpowiedniego corpus,
+- featured article nie jest publiczny.
+
+Tag creation pozostaje oddzielnym lekkim mechanizmem.
+
+---
+
+## 35. View/Infolist
 
 Sekcje:
 
@@ -613,7 +777,7 @@ Infolist jest miejscem szybkiego read-only review bez wchodzenia do pełnego edy
 
 ---
 
-## 33. Table bulk actions
+## 36. Table bulk actions
 
 Bezpieczne v1:
 
@@ -633,7 +797,7 @@ Publikacja powinna być świadoma per record, przynajmniej do czasu stabilnego w
 
 ---
 
-## 34. Categories resource
+## 37. Categories resource
 
 Fields:
 
@@ -658,7 +822,7 @@ Nie pozwala delete kategorii z artykułami.
 
 ---
 
-## 35. Tags UX
+## 38. Tags UX
 
 Jeśli inline:
 
@@ -675,7 +839,7 @@ Nie tworzyć tagów przez literówki typu:
 
 ---
 
-## 36. Author integration
+## 39. Author integration
 
 Select author używa ContentAuthor.
 
@@ -689,7 +853,7 @@ Nie tworzymy autora ad hoc w article form bez pełnego profilu, chyba że Filame
 
 ---
 
-## 37. Reviewer policy hints
+## 40. Reviewer policy hints
 
 Przy wybraniu kategorii/type admin może pokazać:
 
@@ -699,7 +863,7 @@ Policy logic pozostaje po stronie service/policy, nie tylko JS/Filament visibili
 
 ---
 
-## 38. Concurrent editing
+## 41. Concurrent editing
 
 V1 minimum:
 
@@ -712,7 +876,7 @@ Można wdrożyć optimistic lock później po realnej potrzebie.
 
 ---
 
-## 39. Draft leakage prevention
+## 42. Draft leakage prevention
 
 Filament:
 
@@ -722,7 +886,7 @@ Filament:
 
 ---
 
-## 40. Audit visibility
+## 43. Audit visibility
 
 Na view/edit:
 
@@ -734,9 +898,11 @@ Na view/edit:
 
 Pełny audit może pozostać w istniejącym Audit Logs resource.
 
+Nie projektujemy osobnego panelu snapshotów wersji/diff/restore artykułu. Jest to świadomie poza zakresem.
+
 ---
 
-## 41. Keyboard/editor UX
+## 44. Keyboard/editor UX
 
 Edytor musi wspierać:
 
@@ -749,7 +915,7 @@ Filament custom widgets nie mogą pogarszać accessibility.
 
 ---
 
-## 42. Error handling
+## 45. Error handling
 
 Validation:
 
@@ -769,7 +935,7 @@ Unexpected error:
 
 ---
 
-## 43. Admin performance
+## 46. Admin performance
 
 List page:
 
@@ -784,7 +950,7 @@ Selects:
 
 ---
 
-## 44. Question relation picker performance
+## 47. Question relation picker performance
 
 Nie preloadujemy całej bazy pytań.
 
@@ -796,7 +962,7 @@ Pokazujemy kontekst, aby redaktor nie podpiął złego pytania.
 
 ---
 
-## 45. Legal unit picker performance
+## 48. Legal unit picker performance
 
 Search po:
 
@@ -810,7 +976,7 @@ Nie preloadujemy wszystkich legal units.
 
 ---
 
-## 46. Content source URL UX
+## 49. Content source URL UX
 
 Po wpisaniu URL:
 
@@ -822,7 +988,7 @@ Metadata source redaktor wpisuje ręcznie.
 
 ---
 
-## 47. File uploads security
+## 50. File uploads security
 
 Uploads korzystają z istniejących allowlist/size rules.
 
@@ -834,16 +1000,20 @@ Nie pozwalamy:
 
 ---
 
-## 48. CMS Definition of Done
+## 51. CMS Definition of Done
 
 Panel newsroom v1 jest gotowy, gdy redaktor może:
 
 - utworzyć draft,
 - ustawić typ/kategorię/autora,
-- wpisać lead/body,
+- wpisać lead i zbudować body z kontrolowanych bloków,
+- ustawić pochodzenie i kontekst regulacyjny, jeśli dotyczy,
 - dodać źródła,
 - powiązać pytania/legal,
-- dodać hero i alt,
+- dodać hero, alt i focal point,
+- zarządzać topicami,
+- obsadzić stałe sloty strony głównej,
+- podejrzeć bieżący lub przyszły stan całego `/aktualnosci`,
 - zobaczyć SEO fallback,
 - wysłać do review,
 - podejrzeć,
@@ -857,14 +1027,19 @@ a wszystkie publiczne przejścia statusu przechodzą przez serwis domenowy.
 
 ---
 
-## 49. Testy CMS
+## 52. Testy CMS
 
 Feature/Livewire/Filament tests zależnie od obecnego test pattern:
 
 - create draft,
 - validation,
 - source repeater persistence,
+- body blocks validation/persistence,
+- origin/regulatory context persistence,
 - relation persistence,
+- topic persistence,
+- home placement overlap/fallback/dedupe,
+- future home preview,
 - publish blocked by missing fields,
 - schedule validation,
 - slug change redirect,
@@ -881,7 +1056,7 @@ E2E:
 
 ---
 
-## 50. Stan implementacji
+## 53. Stan implementacji
 
 Na 2026-09-15:
 
@@ -893,12 +1068,16 @@ Na 2026-09-15:
 
 ---
 
-## 51. Pozostałe zadania
+## 54. Pozostałe zadania
 
-- [ ] zatwierdzić editor component i sanitization,
+- [ ] zatwierdzić block editor component, serializację i sanitization,
 - [ ] wdrożyć ContentArticleResource,
 - [ ] wdrożyć Form/Table/Infolist,
 - [ ] wdrożyć ContentCategoryResource,
+- [ ] wdrożyć ContentTopicResource,
+- [ ] wdrożyć NewsroomHomeComposer + future preview,
+- [ ] wdrożyć focal-point/crop UX,
+- [ ] wdrożyć origin/regulatory fields,
 - [ ] wdrożyć relations pickers,
 - [ ] wdrożyć workflow actions,
 - [ ] wdrożyć checklist computed state,
@@ -907,7 +1086,15 @@ Na 2026-09-15:
 
 ---
 
-## 52. Historia zmian
+## 55. Historia zmian
+
+### 2026-09-15 — v0.2
+
+- rozszerzono CMS o kontrolowany block editor zamiast jednego dowolnego body,
+- dodano origin/regulatory context, topics oraz art direction obrazu,
+- dodano NewsroomHomeComposer ze stałymi placements, fallbackami i future preview,
+- rozdzielono featured od konkretnego placementu strony głównej,
+- potwierdzono brak osobnego revision snapshot/diff/restore UI.
 
 ### 2026-09-15 — v0.1
 

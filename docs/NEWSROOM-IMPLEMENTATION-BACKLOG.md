@@ -98,6 +98,7 @@ Preferowany:
 
 - /aktualnosci
 - /aktualnosci/kategoria/{categorySlug}
+- /aktualnosci/temat/{topicSlug}
 - /aktualnosci/{articleSlug}
 - /poradniki
 - /poradniki/{articleSlug}
@@ -138,28 +139,35 @@ Zatwierdzić kategorie v1:
 
 ---
 
-## NEWSROOM-N0-004 — Editor + sanitization decision
+## NEWSROOM-N0-004 — Block editor + serialization + sanitization decision
 
 ### Cel
 
-Wybrać sposób przechowywania body.
+Domknąć techniczny sposób edycji kanonicznego `body_blocks`.
 
-### Opcje do sprawdzenia
+### Do sprawdzenia
 
-- Filament rich editor + sanitization,
-- Markdown + render pipeline.
+- Filament Builder lub równoważny komponent,
+- format payloadu rich_text,
+- schema payloadu każdego block type,
+- sanitizer,
+- allowlisted embeds.
 
 ### Decyzja musi opisać
 
-- canonical source,
-- allowed elements,
+- `body_blocks` jako jedyne źródło body,
+- serializację,
+- allowed nodes/elements,
 - link handling,
 - image/embed handling,
+- unknown block behavior,
 - XSS tests.
 
 ### DoD
 
-- brak „ustalimy podczas formularza”.
+- brak „ustalimy podczas formularza”,
+- nie powstaje równoległe edytowalne `body_html`,
+- wszystkie v1 block types mają kontrakt.
 
 ---
 
@@ -172,6 +180,11 @@ Wybrać sposób przechowywania body.
 - ContentArticleType
 - ContentArticleWorkflowStatus
 - ContentArticleSourceType
+- ContentArticleOriginType
+- ContentArticleRegulatoryStatus
+- content topics
+- content home placements
+- body_blocks + focal point + regulatory fields
 - tables zgodne z data spec.
 
 ### Testy
@@ -195,7 +208,9 @@ Wybrać sposób przechowywania body.
 - ContentArticle
 - ContentCategory
 - ContentTag
+- ContentTopic
 - ContentArticleSource
+- ContentHomePlacement
 - relations
 - scopes
 - factories.
@@ -265,6 +280,31 @@ Wybrać sposób przechowywania body.
 
 ---
 
+## NEWSROOM-N1-006 — Home composition service
+
+### Zakres
+
+- resolve active placements,
+- validate publication-at-preview-time,
+- deterministic fallback,
+- global card deduplication,
+- context-aware category leads.
+
+### Testy
+
+- manual placement wins,
+- expired/future placement ignored at current time,
+- future preview resolves scheduled article only after its publish time,
+- duplicate article excluded from later card modules,
+- missing unique candidate shortens module.
+
+### DoD
+
+- public controller nie implementuje composition logic ręcznie,
+- breaking strip może wskazać lead jako jedyny jawny wyjątek dedupe.
+
+---
+
 # N2 — CMS and editorial workflow
 
 ## NEWSROOM-N2-001 — ContentCategoryResource
@@ -300,12 +340,15 @@ Wybrać sposób przechowywania body.
 
 ---
 
-## NEWSROOM-N2-003 — Body editor and sanitization
+## NEWSROOM-N2-003 — Block editor and sanitization
 
 ### Zakres
 
-- final editor component,
-- safe storage/render,
+- final Builder/editor component,
+- body_blocks ordering,
+- schema per block type,
+- safe rich-text storage/render,
+- allowlisted embeds,
 - XSS validation.
 
 ### Test cases
@@ -314,7 +357,10 @@ Wybrać sposób przechowywania body.
 - onclick,
 - javascript: links,
 - unsafe iframe,
-- allowed H2/list/link/blockquote.
+- allowed H2/list/link,
+- unknown block type,
+- invalid block payload,
+- unsafe embed provider.
 
 ---
 
@@ -332,13 +378,14 @@ Wybrać sposób przechowywania body.
 
 ---
 
-## NEWSROOM-N2-005 — Relations editor
+## NEWSROOM-N2-005 — Relations and topics editor
 
 ### Zakres
 
 - questions searchable picker,
 - legal units picker,
-- optional traffic signs.
+- optional traffic signs,
+- topics picker/order.
 
 ### Performance
 
@@ -377,7 +424,7 @@ Computed blocking/warning items.
 
 ---
 
-## NEWSROOM-N2-008 — Preview
+## NEWSROOM-N2-008 — Article preview
 
 ### Zakres
 
@@ -391,6 +438,62 @@ Computed blocking/warning items.
 - anonymous without valid token denied,
 - expired token denied,
 - no sitemap/feed exposure.
+
+---
+
+## NEWSROOM-N2-009 — NewsroomHomeComposer + future preview
+
+### Zakres
+
+- fixed slot UI,
+- article search,
+- starts_at / ends_at,
+- fallback visibility,
+- duplicate warnings,
+- preview entire `/aktualnosci` at selected timestamp.
+
+### DoD
+
+- redaktor nie tworzy nowych layout modules,
+- preview korzysta z tego samego composition service co publiczny hub,
+- future preview uwzględnia scheduled publishing.
+
+---
+
+## NEWSROOM-N2-010 — Provenance, regulatory context and media art direction
+
+### Zakres
+
+- origin_type,
+- regulatory_status/effective_from/change_summary/applies_to/exam_impact,
+- focal point control,
+- crop previews,
+- publish checklist warnings.
+
+### DoD
+
+- prawny/regulacyjny news ma spójny status i źródło,
+- redaktor widzi efekt cropu przed publikacją,
+- origin type jest kontrolowanym enumem.
+
+---
+
+## NEWSROOM-N2-011 — ContentTopicResource
+
+### Zakres
+
+- topic CRUD,
+- status,
+- description,
+- featured article,
+- article ordering,
+- SEO metadata.
+
+### DoD
+
+- topic nie powstaje automatycznie z taga,
+- draft topic nie jest publiczny,
+- publish waliduje minimalny corpus/description.
 
 ---
 
@@ -438,14 +541,15 @@ Computed blocking/warning items.
 
 ---
 
-## NEWSROOM-N3-004 — Article Blade page
+## NEWSROOM-N3-004 — Article Blade page + block renderer
 
 ### Zakres
 
 - breadcrumbs,
-- H1/lead/byline,
-- hero,
-- body,
+- H1/lead/byline/provenance,
+- hero + focal-point crops,
+- regulatory/exam context box,
+- body block renderer,
 - sources,
 - correction,
 - related modules,
@@ -490,16 +594,19 @@ Old article path -> 301 canonical.
 
 # N4 — Hub, categories and guides
 
-## NEWSROOM-N4-001 — /aktualnosci home query model
+## NEWSROOM-N4-001 — /aktualnosci editorial composition read model
 
 ### Zakres
 
+- fixed placements,
 - lead,
 - secondary,
 - latest,
 - category blocks,
 - guides,
-- breaking.
+- breaking,
+- fallback,
+- global card deduplication.
 
 ### Performance
 
@@ -565,13 +672,34 @@ Old article path -> 301 canonical.
 
 - home,
 - category,
+- topic,
 - feed later,
 - invalidation events.
 
 ### Test
 
 - publish shows article after invalidation,
+- placement change invalidates home,
 - archive removes article from cached sections.
+
+---
+
+## NEWSROOM-N4-007 — Topic / dossier pages
+
+### Zakres
+
+- public topic route,
+- intro/description,
+- featured article,
+- ordered/latest topic corpus,
+- pagination,
+- SEO.
+
+### DoD
+
+- only published topics public,
+- no automatic tag pages,
+- thin/empty topic not launched.
 
 ---
 
@@ -747,16 +875,16 @@ N1 migrations/enums
 N1 models/factories
 
 ### PR E
-N1 publishing/slug/scheduler
+N1 publishing/slug/scheduler/home composition service
 
 ### PR F
-N2 categories CMS
+N2 categories + topics CMS
 
 ### PR G
-N2 article CMS basic
+N2 article CMS + controlled block editor
 
 ### PR H
-N2 sources/relations/workflow/preview
+N2 sources/relations/workflow/provenance/media + article/home preview
 
 ### PR I
 N3 article public
@@ -765,7 +893,7 @@ N3 article public
 N4 newsroom hub
 
 ### PR K
-N4 categories/guides/nav/cache
+N4 categories/topics/guides/nav/cache
 
 ### PR L
 N5 sitemap/feed
@@ -817,17 +945,24 @@ Docs-only:
 
 - [ ] article resource
 - [ ] category resource
+- [ ] topic resource
+- [ ] controlled block editor
 - [ ] sources
 - [ ] relations
-- [ ] preview
+- [ ] origin/regulatory fields
+- [ ] focal point/crop preview
+- [ ] article preview
+- [ ] home composer + future preview
 - [ ] checklist
 - [ ] workflow
 
 ### Public
 
-- [ ] article
-- [ ] newsroom hub
+- [ ] article + controlled block renderer
+- [ ] regulatory context box/provenance
+- [ ] newsroom hub with placements/fallback/dedupe
 - [ ] category
+- [ ] topic/dossier
 - [ ] guides
 - [ ] responsive/accessibility
 
@@ -851,6 +986,21 @@ Docs-only:
 
 ---
 
+# 6.1. Planned post-v1 extensions
+
+Te elementy są architektonicznie przewidziane, ale nie blokują newsroom v1:
+
+- audio/TTS article derivative,
+- transcript lifecycle,
+- AI summary,
+- „zapytaj o ten artykuł”.
+
+Przed rozpoczęciem każdego z nich wymagany jest osobny task z kontraktem bezpieczeństwa, UX, danych i SEO.
+
+Nie implementujemy z wyprzedzeniem pustych tabel/pól tylko dla tych rozszerzeń.
+
+---
+
 # 7. No-go rules
 
 Nie robimy podczas v1:
@@ -858,7 +1008,8 @@ Nie robimy podczas v1:
 - osobnego WordPressa,
 - mikroserwisu CMS,
 - Elasticsearch tylko dla newsroomu,
-- page buildera,
+- dowolnego page buildera (kontrolowane body blocks i stałe homepage placements są częścią v1),
+- revision snapshot/diff/restore systemu,
 - komentarzy,
 - newslettera,
 - automatycznego AI publish,
@@ -903,6 +1054,18 @@ Mitigation: image baseline + perf pass.
 
 Mitigation: editorial source/status policy + reviewer gate.
 
+## R9 — homepage powtarza te same materiały w wielu modułach
+
+Mitigation: jeden NewsroomHomeCompositionService + exclusion set + testy deduplikacji.
+
+## R10 — crop obrazu ucina istotny subject
+
+Mitigation: focal point + preview wariantów + testy media contract.
+
+## R11 — topic pages stają się thin SEO pages
+
+Mitigation: ręczna publikacja topicu, minimalny corpus, własny opis i brak automatycznego mapowania tag -> topic.
+
 ---
 
 # 9. Aktualizacja dokumentacji podczas wdrożenia
@@ -925,8 +1088,8 @@ Nie oznaczać tasku DONE przed merge + green verification.
 
 Na 2026-09-15:
 
-- projekt dokumentacyjny jest w toku,
-- implementacja newsroomu nie rozpoczęta,
+- pakiet projektowy newsroomu obejmuje architekturę, model danych, CMS, UI, governance, SEO, backlog i runbook,
+- niniejsze rozszerzenie doprecyzowuje editorial composition; implementacja newsroomu nadal nie rozpoczęta,
 - /aktualnosci i /poradniki nadal placeholder,
 - fundamenty ContentAuthor/legal/traffic signs/public SEO istnieją.
 
@@ -943,6 +1106,15 @@ NEWSROOM-N0-002 / N0-003 / N0-004.
 ---
 
 # 12. Historia zmian
+
+### 2026-09-15 — v0.2
+
+- rozszerzono N0-004 o kontrolowany block editor i serializację body_blocks,
+- dodano home composition service, NewsroomHomeComposer/future preview oraz topic resource/pages,
+- dodano provenance, regulatory context i focal-point/crop work,
+- rozszerzono publiczny renderer o bloki, context box i deduplikowaną kompozycję huba,
+- audio/AI zapisano jako post-v1 extensions,
+- revision snapshot/diff/restore świadomie pozostawiono poza zakresem.
 
 ### 2026-09-15 — v0.1
 

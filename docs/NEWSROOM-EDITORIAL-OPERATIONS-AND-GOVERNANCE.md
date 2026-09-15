@@ -113,6 +113,25 @@ Wymaga:
 - liczebności próby, jeśli ma zastosowanie,
 - wyraźnego rozdzielenia korelacji i przyczynowości.
 
+### 4.6. Pochodzenie materiału (origin)
+
+Typ artykułu opisuje jego formę. `origin_type` opisuje, skąd pochodzi praca redakcyjna.
+
+Dozwolone znaczenia operacyjne:
+
+- original — materiał własny oparty na własnym researchu/reportingu,
+- compiled — opracowanie kilku jawnych źródeł,
+- official_source — materiał oparty przede wszystkim na komunikacie/dokumencie instytucji,
+- data_analysis — analiza własna danych,
+- licensed_agency — materiał wykorzystujący treść agencyjną na podstawie rzeczywistej licencji.
+
+Zasady:
+
+- origin nie zastępuje listy źródeł,
+- `licensed_agency` nie może być użyte tylko dlatego, że inny portal cytował agencję,
+- publiczna etykieta ma być zgodna z rzeczywistym sposobem powstania materiału,
+- autor PrawkoNaRaz pozostaje odpowiedzialny za finalną publikację, nawet gdy materiał jest opracowaniem.
+
 ---
 
 ## 5. Role redakcyjne
@@ -484,6 +503,57 @@ Może być:
 
 Featured jest decyzją redakcyjną, nie metryką popularności.
 
+### 19.1. Homepage placements
+
+Konkretne miejsce na `/aktualnosci` jest osobną decyzją od `is_featured`.
+
+Redaktor może ręcznie obsadzić stały slot na określony czas.
+
+Zasady:
+
+- lead powinien reprezentować najważniejszy aktualny materiał, a nie tylko najnowszy,
+- secondary powinny uzupełniać lead, nie powtarzać tego samego tematu bez potrzeby,
+- category lead musi rzeczywiście należeć do danej kategorii lub mieć jawne uzasadnienie redakcyjne,
+- nie używamy ręcznych placementów do utrzymywania nieaktualnego artykułu na górze bez powodu,
+- wygasające placementy mają mieć sensowny `ends_at`, jeśli wydarzenie jest czasowe,
+- resolver może wypełnić pusty slot fallbackiem.
+
+### 19.2. Deduplikacja strony głównej
+
+Na jednej stronie unikamy powtarzania tej samej karty w kilku modułach.
+
+Jeśli materiał jest leadem:
+
+- nie trafia ponownie do secondary,
+- nie trafia ponownie do latest,
+- nie powinien być powtarzany w category block na tej samej stronie.
+
+Wyjątkiem jest breaking strip, który pełni rolę alertu, nie kolejnej karty.
+
+---
+
+### 19.3. Topic / dossier governance
+
+Topic tworzymy, gdy temat:
+
+- ma znaczenie dłuższe niż jeden news,
+- ma lub będzie miał wystarczający corpus,
+- pomaga użytkownikowi zrozumieć ciąg zdarzeń albo zagadnienie,
+- wymaga własnego opisu redakcyjnego.
+
+Nie tworzymy topicu:
+
+- dla każdego taga,
+- dla jednego artykułu tylko po to, by uzyskać dodatkowy URL,
+- bez osoby odpowiedzialnej za utrzymanie.
+
+Przykłady sensownych topiców:
+
+- Zmiany w egzaminie 2027
+- PKK
+- Punkty karne
+- WORD Warszawa — dopiero gdy istnieje wystarczająca, aktualizowalna zawartość.
+
 ---
 
 ## 20. Źródła w artykule
@@ -512,15 +582,19 @@ Jeśli cytat pochodzi z publicznej publikacji, przestrzegamy praw autorskich i n
 
 ---
 
-## 22. Obrazy i kredyt
+## 22. Obrazy, kredyt i art direction
 
 Przed publikacją hero:
 
 - [ ] źródło/licencja znane,
 - [ ] alt opisuje obraz,
 - [ ] credit zapisany, jeśli wymagany,
+- [ ] focal point ustawiony sensownie dla ważnych zdjęć,
+- [ ] preview lead/standard/compact nie ucina kluczowej informacji,
 - [ ] nie używamy zdjęcia sugerującego wydarzenie, którego obraz faktycznie nie przedstawia,
 - [ ] nie używamy AI image jako „fotografii dokumentalnej” bez jasnego oznaczenia kontekstu.
+
+Focal point opisuje kompozycję obrazu, nie jest narzędziem do manipulowania znaczeniem fotografii.
 
 ---
 
@@ -547,6 +621,35 @@ AI nie może samodzielnie:
 - przedstawiać wygenerowanego tekstu jako wypowiedzi instytucji.
 
 Autor/publisher odpowiada za finalny materiał.
+
+### 23.1. Przyszłe funkcje AI dla czytelnika
+
+Po v1 można rozważyć:
+
+- skrócenie artykułu,
+- pytania do artykułu,
+- wyjaśnienie pojęcia.
+
+Warunki:
+
+- AI pracuje na aktualnej treści i jawnych źródłach,
+- odpowiedź nie zmienia statusu prawa ani faktów źródłowego artykułu,
+- użytkownik widzi, że odpowiedź jest generowana,
+- funkcja nie publikuje osobnej, indeksowalnej kopii artykułu,
+- błędna odpowiedź AI nie może automatycznie aktualizować artykułu.
+
+### 23.2. Przyszły odsłuch
+
+Audio może być generowaną pochodną zatwierdzonego artykułu.
+
+Wymagania przed wdrożeniem:
+
+- jednoznaczne powiązanie z wersją aktualnej publikowanej treści,
+- możliwość ponownego wygenerowania po istotnej korekcie,
+- player dostępny klawiaturą,
+- brak autoplay.
+
+Nie jest to wymaganie newsroom v1.
 
 ---
 
@@ -684,14 +787,17 @@ Przed publish publisher potwierdza:
 - [ ] type
 - [ ] category
 - [ ] author
+- [ ] origin type
 - [ ] sources
 - [ ] prawidłowe daty
-- [ ] status prawny
-- [ ] hero/alt lub jawna decyzja bez hero
+- [ ] status prawny/regulatory status, jeśli dotyczy
+- [ ] effective_from / kogo dotyczy / wpływ na egzamin, jeśli wymagane
+- [ ] hero/alt/focal point lub jawna decyzja bez hero
 - [ ] SEO title/description lub poprawny fallback
 - [ ] canonical
 - [ ] preview desktop
 - [ ] preview mobile
+- [ ] crop preview dla kluczowego hero
 - [ ] related content
 - [ ] product bridge
 - [ ] spelling/copy
@@ -864,6 +970,8 @@ Lista artykułów powinna pokazywać:
 - autor,
 - reviewer,
 - published_at / scheduled_for,
+- origin type,
+- regulatory status,
 - źródła count,
 - featured/breaking,
 - freshness due.
@@ -871,6 +979,8 @@ Lista artykułów powinna pokazywać:
 W formularzu powinny być ostrzeżenia:
 
 - brak primary source dla prawnego newsa,
+- regulatory status bez spójnego źródła/daty,
+- origin_type niezgodny z realnymi źródłami,
 - scheduled_for w przeszłości,
 - breaking bez expiry,
 - published bez hero alt, jeśli hero istnieje,
@@ -880,7 +990,7 @@ W formularzu powinny być ostrzeżenia:
 
 ## 44. Preview
 
-Preview musi:
+Preview artykułu musi:
 
 - wyglądać możliwie identycznie jak publiczna strona,
 - mieć noindex,
@@ -888,6 +998,8 @@ Preview musi:
 - nie pojawiać się w publicznych hubach,
 - wymagać auth lub signed URL,
 - nie ujawniać nieopublikowanych materiałów przypadkowym użytkownikom.
+
+Preview całego `/aktualnosci` powinien dodatkowo pozwalać wybrać przyszły czas i zobaczyć zaplanowane placements/fallbacki przed publikacją.
 
 ---
 
@@ -915,6 +1027,9 @@ Proces jest gotowy, gdy:
 - preview istnieje,
 - scheduling jest bezpieczny,
 - corrections mają workflow,
+- homepage placements mają jawne zasady redakcyjne,
+- topics nie są automatycznymi stronami tagów,
+- origin/provenance jest spójny ze źródłami,
 - reviewer policy da się egzekwować,
 - breaking wygasa,
 - freshness backlog jest widoczny,
@@ -941,6 +1056,10 @@ Na 2026-09-15:
 - [ ] wdrożyć role/policies przynajmniej na poziomie admina,
 - [ ] odwzorować mandatory checklist w walidacji,
 - [ ] wdrożyć source model,
+- [ ] wdrożyć origin/regulatory governance w CMS,
+- [ ] wdrożyć homepage placements i future home preview,
+- [ ] wdrożyć topic governance,
+- [ ] wdrożyć focal-point review,
 - [ ] wdrożyć preview,
 - [ ] wdrożyć scheduling,
 - [ ] wdrożyć corrections,
@@ -950,6 +1069,14 @@ Na 2026-09-15:
 ---
 
 ## 49. Historia zmian
+
+### 2026-09-15 — v0.2
+
+- dodano jawny model pochodzenia materiału i zasady publicznej atrybucji,
+- dodano governance dla homepage placements, deduplikacji i topic/dossier,
+- rozszerzono media review o focal point i crop preview,
+- opisano przyszłe audio/AI jako pochodne zatwierdzonego artykułu, poza v1,
+- nie dodano procesu revision snapshot/diff/restore zgodnie z decyzją produktową.
 
 ### 2026-09-15 — v0.1
 
