@@ -565,9 +565,12 @@ Po kliknięciu:
 1. ContentArticlePublishingService waliduje record,
 2. jeśli braki -> nie publikuje,
 3. UI pokazuje listę braków,
-4. jeśli OK -> transakcja publish,
-5. redirect/notification do view/edit,
-6. event dispatch.
+4. jeśli OK -> transakcja publish + wymagany AuditLog,
+5. commit,
+6. dopiero after commit dispatch public side effects/events,
+7. redirect/notification do view/edit.
+
+Rollback transakcji nie może wyemitować cache/sitemap/IndexNow side effect.
 
 Filament resource nie duplikuje logiki publish.
 
