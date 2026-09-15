@@ -485,7 +485,7 @@ Dodatkowe warning:
 
 - szerokość < 1200 px dla materiału oznaczonego jako Discover-ready/featured, jeśli taki marker zostanie wdrożony,
 - dedicated OG image bez alt,
-- publiczny SEO image URL wymaga wygasającego podpisu/auth,
+- publiczny SEO image URL wymaga auth lub wygasającego podpisu — blocking; OG/schema asset musi mieć stabilny publiczny URL bez auth,
 - crop usuwa główny subject.
 
 Nie blokować wszystkich publikacji wyłącznie przez Discover recommendation. Natomiast obraz wskazany w publicznym OG/schema musi mieć stabilny publiczny URL.
