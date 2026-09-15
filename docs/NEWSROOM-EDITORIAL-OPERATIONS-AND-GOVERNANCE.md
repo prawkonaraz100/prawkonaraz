@@ -203,6 +203,10 @@ Legenda:
 
 W małym zespole jedna osoba może pełnić kilka ról, ale checklisty i audit trail nadal obowiązują.
 
+Ważne: role Author/Editor/Reviewer/Publisher w tym dokumencie są rolami procesu redakcyjnego, nie osobnymi rolami logowania Filament. V1 panel pozostaje admin-only. `ContentAuthor` opisuje autora/reviewera treści, a `User` z AuditLog opisuje faktycznego zalogowanego administratora wykonującego akcję.
+
+Dlatego v1 może wymagać reviewer identity + reviewed_at, ale bez osobnego RBAC/linku ContentAuthor↔User nie twierdzimy, że system technicznie wymusza „four eyes” jako dwie różne zalogowane osoby.
+
 ---
 
 ## 7. Workflow
@@ -221,7 +225,7 @@ Warunki wejścia:
 
 - tytuł,
 - lead,
-- body,
+- renderowalne body_blocks,
 - kategoria,
 - autor,
 - źródła,
@@ -248,9 +252,16 @@ Nie należy automatycznie noindexować materiału tylko dlatego, że data review
 
 ### 7.6. Archived
 
-Materiał wycofany z normalnej dystrybucji.
+Materiał wycofany z normalnej dystrybucji, ale nie automatycznie usunięty z historii.
 
-Decyzja o 200/404/410/redirect zależy od konkretnego przypadku i jest opisana w release/SEO docs.
+Dla wcześniej opublikowanego materiału v1:
+
+- canonical URL nadal zwraca 200,
+- znika z aktywnych hubów/latest/feed/news sitemap,
+- może pozostać indexable albo otrzymać kontrolowane noindex z merytorycznego powodu,
+- archive samo w sobie nie oznacza 301/404/410.
+
+Jeśli materiał ma faktycznie zniknąć albo ma następcę, stosujemy osobny use case remove/gone/redirect zamiast przeciążać workflow `archived`.
 
 ---
 
@@ -1022,14 +1033,18 @@ W formularzu powinny być ostrzeżenia:
 
 ## 44. Preview
 
-Preview artykułu musi:
+Preview v1:
 
-- wyglądać możliwie identycznie jak publiczna strona,
-- mieć noindex,
-- nie wejść do sitemap/feed,
-- nie pojawiać się w publicznych hubach,
-- wymagać auth lub signed URL,
-- nie ujawniać nieopublikowanych materiałów przypadkowym użytkownikom.
+- wygląda możliwie identycznie jak publiczna strona,
+- jest dostępne wyłącznie dla zalogowanego administratora,
+- ma `Cache-Control: private, no-store`,
+- ma noindex,nofollow,
+- nie wchodzi do sitemap/feed,
+- nie pojawia się w publicznych hubach,
+- nie jest liczone jako public article view,
+- nie ma shareable signed tokenu.
+
+Jeśli kiedyś potrzebny będzie external reviewer preview, wymaga osobnego threat modelu, TTL/revocation i audytu.
 
 Preview całego `/aktualnosci` powinien dodatkowo pozwalać wybrać przyszły czas i zobaczyć zaplanowane placements/fallbacki przed publikacją.
 
@@ -1037,9 +1052,11 @@ Preview całego `/aktualnosci` powinien dodatkowo pozwalać wybrać przyszły cz
 
 ## 45. Audit trail
 
-Audit powinien odpowiedzieć:
+Audit używa istniejącego `AuditLog`.
 
-- kto utworzył,
+Powinien odpowiedzieć:
+
+- który `User` administrator utworzył,
 - kto edytował,
 - kto zmienił status,
 - kto opublikował,
@@ -1047,6 +1064,8 @@ Audit powinien odpowiedzieć:
 - kto usunął źródło,
 - kto ustawił breaking/featured,
 - kiedy wykonano istotną korektę.
+
+Author/reviewer to osobne `ContentAuthor` identities. Audit metadata przechowuje stan/IDs/timestamps/reason, nie pełny body, lead ani prywatne notatki.
 
 ---
 
@@ -1085,14 +1104,14 @@ Na 2026-09-16:
 
 ## 48. Pozostałe zadania
 
-- [ ] wdrożyć role/policies przynajmniej na poziomie admina,
+- [ ] wdrożyć admin-only policies bez rozszerzania panel access i spiąć AuditLog User actor,
 - [ ] odwzorować mandatory checklist w walidacji,
 - [ ] wdrożyć source model,
 - [ ] wdrożyć origin/regulatory governance w CMS,
 - [ ] wdrożyć homepage placements i future home preview,
 - [ ] wdrożyć topic governance,
 - [ ] wdrożyć focal-point review,
-- [ ] wdrożyć preview,
+- [ ] wdrożyć admin-only private/no-store preview,
 - [ ] wdrożyć scheduling,
 - [ ] wdrożyć corrections,
 - [ ] wdrożyć freshness filters,
@@ -1101,6 +1120,14 @@ Na 2026-09-16:
 ---
 
 ## 49. Historia zmian
+
+### 2026-09-16 — v0.5
+
+- rozdzielono pojęciowe role redakcyjne od auth/RBAC; v1 Filament pozostaje admin-only,
+- ContentAuthor reviewer/author oddzielono od User actora w AuditLog,
+- preview v1 zamknięto do authenticated admin + private,no-store,
+- archive otrzymało deterministyczną historyczną semantykę 200 zamiast decyzji 200/404/410 podczas implementacji,
+- checklistę in-review wyrównano do body_blocks.
 
 ### 2026-09-16 — v0.4
 
