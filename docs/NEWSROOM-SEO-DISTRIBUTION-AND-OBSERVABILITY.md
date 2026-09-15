@@ -248,7 +248,7 @@ Nie publikować:
 
 Repo ma równolegle statyczny `public/robots.txt` i route `RobotsController`. Zgodnie z `SEO-SITEMAP-REPAIR-PLAN.md` produkcyjnie preferowany jest statyczny plik oraz jawna weryfikacja Nginx/Cloudflare.
 
-Globalny `NEWSROOM_PUBLIC_ENABLED=false` musi wyłączyć newsroomowe URL-e nie tylko w controllers, ale też w sitemap/feed/IndexNow/author-publications/reverse-link discovery. Dark deploy nie może publikować linków do tras zwracających 404/placeholder.
+Globalny `NEWSROOM_PUBLIC_ENABLED=false` musi wyłączyć newsroomowe URL-e nie tylko w controllers, ale też w sitemap/feed/IndexNow/author-publications/reverse-link discovery. Dark deploy nie może publikować linków do nowych detail routes. Potwierdzony istniejący wyjątek: `/aktualnosci` i `/poradniki` są już linkowanymi MarketingPlaceholder pages i obecny komponent emituje tylko title, bez jawnego noindex. Newsroom rollout ma dla tych dwóch route'ów dodać pre-launch `noindex`/placeholder containment zamiast pozostawiać indeksowalne thin pages. Nie zmieniamy globalnie wszystkich MarketingPlaceholder routes bez osobnego audytu.
 
 Ta flaga jest przede wszystkim **pre-launch/dark-deploy gate**. Po pierwszym publicznym rollout nie używamy długotrwale `false` jako technicznego rollbacku dla już indeksowanych article URLs, jeśli skutkiem byłyby masowe 404. Dla krótkiej awarii technicznej preferujemy kontrolowane 503/Retry-After lub rollback kodu zachowujący publiczne routes; dla pojedynczej błędnej treści używamy `withdrawn`.
 
@@ -280,6 +280,12 @@ Nie pojawia się publicznie przed czasem.
 ### Needs review
 
 Canonical detail URL pozostaje publiczny i może pozostać indexable zgodnie z robots policy, ale materiał jest wyłączony z aktywnej dystrybucji (home/category/topic latest/feed/news sitemap) do czasu ponownego review.
+
+Jeśli pozostaje indexable:
+
+- public page pokazuje transparentny review-state banner,
+- musi zachować crawlable inbound (v1: oznaczona sekcja author profile),
+- nie trafia do promotional reverse-link modules.
 
 ### Archived
 
@@ -816,7 +822,19 @@ Bezpieczna kolejność:
 
 Przy błędzie przed krokiem 5 stary kompletny zestaw pozostaje aktywny.
 
-### 30.4. HTTP validators na właściwej warstwie
+### 30.4. Topologia publikacji statycznych artefaktów
+
+Atomic rename jest wystarczające tylko w obrębie filesystemu widzianego przez requesty.
+
+Przed N5 release trzeba potwierdzić:
+
+- czy produkcja ma jeden web node,
+- czy `public/` jest współdzielone między node'ami,
+- czy CDN/origin publikuje jeden wspólny artifact set.
+
+Przy wielu node'ach generator uruchomiony na jednym hostcie nie może zostawić pozostałych z inną wersją sitemap. Redis lock/`onOneServer` rozwiązuje concurrency generatora, ale nie dystrybucję plików.
+
+### 30.5. HTTP validators na właściwej warstwie
 
 Dla statycznych XML oraz `public/robots.txt` preferowane:
 
