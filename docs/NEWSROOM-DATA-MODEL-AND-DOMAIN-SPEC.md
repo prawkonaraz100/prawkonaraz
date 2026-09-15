@@ -183,9 +183,8 @@ Zalecenie: w PostgreSQL używać timestamp with time zone dla zdarzeń publikacy
 - is_breaking: boolean default false
 - breaking_expires_at: timestamptz nullable
 - editorial_priority: smallint default 0
-- featured_position: smallint nullable
 
-Nie kodujemy layoutu strony głównej w rekordzie artykułu. Powyższe pola opisują priorytet treści, nie strukturę strony.
+Nie kodujemy layoutu strony głównej ani konkretnej pozycji w rekordzie artykułu. Konkretne sloty/pozycje są wyłącznie w `content_home_placements`. Powyższe pola opisują priorytet treści i fallback, nie strukturę strony.
 
 ### 5.5. Media
 
@@ -193,6 +192,7 @@ Nie kodujemy layoutu strony głównej w rekordzie artykułu. Powyższe pola opis
 - hero_image_alt: varchar(500) nullable
 - hero_image_width: unsigned integer nullable
 - hero_image_height: unsigned integer nullable
+- hero_image_caption: text nullable
 - hero_focal_x: numeric(5,4) nullable
 - hero_focal_y: numeric(5,4) nullable
 - og_image_path: varchar(1024) nullable
@@ -214,15 +214,18 @@ Publiczny resolver obrazu używany przez OG/schema nie może zwracać wygasając
 
 - seo_title: varchar(255) nullable
 - seo_description: varchar(320) nullable
-- canonical_url: varchar(2048) nullable
 - robots: varchar(128) nullable
 
-Domyślne zasady:
+V1 nie przechowuje ręcznego `canonical_url`.
 
-- brak canonical_url oznacza self-canonical,
+Zasady:
+
+- canonical jest zawsze wyliczany z route family + slug,
+- article page jest self-canonical,
 - brak robots oznacza policy wynikające ze statusu,
 - draft/in_review/scheduled preview nie jest indeksowalny,
-- published domyślnie index,follow,max-image-preview:large.
+- published domyślnie index,follow,max-image-preview:large,
+- cross-domain/cross-URL canonical override wymaga w przyszłości osobnej decyzji architektonicznej i nie może zostać dodany jako zwykłe pole redaktora.
 
 ### 5.7. Freshness
 
@@ -271,6 +274,7 @@ W pierwszej wersji walidacja może być aplikacyjna przez PHP enum. Jeżeli doda
 Status published wymaga:
 
 - title != empty,
+- jeśli type=news: mb_strlen(title) <= 110,
 - slug != empty,
 - lead != empty,
 - body_blocks zawiera co najmniej jeden renderowalny blok,
@@ -294,6 +298,23 @@ is_breaking = true wymaga:
 - breaking_expires_at != null.
 
 Po breaking_expires_at materiał nie powinien być renderowany w module „pilne”, nawet jeśli flaga nie została jeszcze fizycznie wyzerowana.
+
+### 6.6. Route family invariant
+
+`ContentArticleType` mapuje się do stabilnej rodziny publicznego URL:
+
+- `newsroom`: news, explainer, analysis, report,
+- `guides`: guide.
+
+Reguły:
+
+- draft bez `first_published_at`: type może zmienić route family,
+- po pierwszej publikacji: zwykła edycja type nie może zmienić route family,
+- zmiana news -> analysis/report/explainer jest dozwolona, bo canonical path pozostaje w `/aktualnosci/{slug}`,
+- guide <-> dowolny typ newsroom jest zablokowane po pierwszej publikacji,
+- manualny SQL omijający invariant nie jest wspieranym workflow.
+
+Przyszła uprzywilejowana migracja route family, jeśli kiedykolwiek zostanie dodana, musi utworzyć 301 starego pełnego path do nowego canonical i zaktualizować wszystkie istniejące redirecty tak, aby nie powstał chain.
 
 ---
 
@@ -483,7 +504,7 @@ Constraints:
 
 Publiczny renderer pokazuje tylko aktywne/publiczne pytania zgodnie z regułami domeny Questions.
 
-Newsroom nie może zmieniać stanu pytania.
+Newsroom nie może zmieniać stanu pytania, membershipów `question_seo_topics`, `question_relations`, rankingu V1/V2 ani źródeł dowodowych istniejącego question graphu. Pivot `content_article_question` opisuje wyłącznie relację artykuł ↔ istniejąca encja pytania.
 
 ---
 
@@ -564,6 +585,8 @@ Pola:
 ### 15.1. Reguły
 
 - zmiana sluga opublikowanego artykułu tworzy redirect,
+- v1 nie pozwala zwykłą edycją zmienić route family opublikowanego artykułu,
+- jeśli przyszła kontrolowana migracja route family zostanie kiedyś wdrożona, zapisuje poprzedni pełny path w tej samej tabeli,
 - nie tworzymy redirect chain; nowy wpis powinien wskazywać canonical destination,
 - to_path zawsze lokalny canonical path dla własnego contentu,
 - usunięcie artykułu nie oznacza automatycznego redirectu do huba,
@@ -983,6 +1006,15 @@ Przyjęty wariant:
 
 Jest jednoznaczny dla routingu i przyszłych zmian. Zmiana na krótsze category URLs wymaga zmiany decyzji architektonicznej, reserved-slug policy i testów konfliktów.
 
+### 29.2. Type -> route family
+
+Resolver canonical path:
+
+- guide -> `/poradniki/{slug}`,
+- news/explainer/analysis/report -> `/aktualnosci/{slug}`.
+
+Publiczny lookup musi dodatkowo sprawdzić, czy rekord należy do route family obsługiwanej przez dany controller. Ten sam rekord nie może odpowiadać 200 pod oboma adresami.
+
 ---
 
 ## 30. Migracje — kolejność
@@ -1266,11 +1298,14 @@ Model danych jest gotowy, gdy:
 - publikacja nie może stworzyć niekompletnego publicznego rekordu,
 - scheduling jest idempotentny,
 - technical update nie zmienia SEO freshness ani nie emituje substantive-update eventu,
+- news headline >110 znaków nie przechodzi publish validation,
+- cross-route-family type change po first publish jest zablokowany,
 - slug change zachowuje redirect history,
 - relations do questions/legal są jawne,
 - `body_blocks` przechodzą walidację per block type,
 - homepage placements mają fallback i deduplikację,
 - focal point ma poprawny zakres 0..1,
+- hero caption, jeśli istnieje, jest zwykłym tekstem redakcyjnym renderowanym jako figcaption i nie zastępuje alt/credit,
 - OG alt/fallback jest spójny z faktycznym assetem,
 - publiczne URL-e obrazów dla SEO nie wygasają,
 - topic nie powstaje automatycznie z taga,
@@ -1313,6 +1348,15 @@ Na moment utworzenia dokumentu:
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.4
+
+- usunięto `featured_position` z artykułu; konkretna pozycja należy wyłącznie do content_home_placements,
+- usunięto ręczny `canonical_url` z v1 i przyjęto twardy self-canonical,
+- dodano `hero_image_caption`,
+- dodano publish invariant headline <=110 dla news,
+- zablokowano zmianę route family po pierwszej publikacji,
+- jawnie odseparowano article-question pivot od istniejącego question relation graphu.
 
 ### 2026-09-16 — v0.3
 
