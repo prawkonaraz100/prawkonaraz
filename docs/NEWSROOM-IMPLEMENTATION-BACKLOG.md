@@ -830,7 +830,8 @@ Wdrożyć publiczną warstwę bez natychmiastowego przełączania istniejących 
 ### Zakres
 
 - category header,
-- chronological list,
+- activelyDistributed-only chronological list,
+- order by first_published_at desc + deterministic tie-breaker,
 - pagination,
 - SEO.
 
@@ -886,7 +887,8 @@ Wdrożyć publiczną warstwę bez natychmiastowego przełączania istniejących 
 - public topic route,
 - intro/description,
 - featured article,
-- ordered/latest topic corpus,
+- activelyDistributed/indexable topic corpus,
+- latest ordering by first_published_at,
 - pagination,
 - SEO.
 
