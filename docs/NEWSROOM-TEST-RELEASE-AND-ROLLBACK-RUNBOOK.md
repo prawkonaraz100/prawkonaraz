@@ -199,6 +199,8 @@ Dla każdego przejścia:
 | published/needs_review/archived | withdraw | withdrawn | PASS with reason |
 | archived | direct publish | published | REJECT in v1; return to review flow first |
 | withdrawn | direct publish | published | REJECT; restore to review first |
+| withdrawn | restore to review | in_review | PASS; withdrawal tombstone remains active and public URL stays 410 |
+| in_review + active withdrawal tombstone | publish | published | PASS if checklist complete; clears current tombstone after audit |
 
 Testować również niedozwolone przejścia.
 
@@ -489,10 +491,10 @@ Assertions:
 - article ma crawlable primary-category link,
 - category/topic pages linkują do public article przez zwykłe `<a href>`,
 - indexable article ma co najmniej jeden public inbound link w fixture graph,
-- reverse link pojawia się tylko dla jawnej public relation,
+- reverse link pojawia się tylko dla jawnej public relation i activelyDistributed target przy NEWSROOM_PUBLIC_ENABLED=true,
 - article-question write nie zmienia rekordów `question_relations`, `question_seo_topics` ani aktywnego rankingu V1/V2,
 - reverse link list ma bounded count i deterministic order,
-- draft/noindex/redirect-source nie pojawia się w related/reverse modules,
+- draft/needs_review/archived/withdrawn/noindex/redirect-source nie pojawia się w related/reverse modules,
 - related anchors są opisowe; nie generujemy pustych/„kliknij tutaj” anchors jako domyślnego UI,
 - ten sam URL nie jest bez potrzeby powielany w kilku related modules,
 - audit wykrywa orphan i nadmierny click depth dla ważnych fixtures.
@@ -515,11 +517,11 @@ Given fixtures:
 
 Assert:
 
-- active manual placement wins,
+- active manual placement wins only for activelyDistributed target,
 - expired placement ignored,
 - future placement ignored for current render,
 - future preview resolves scheduled article only after selected publication time,
-- no drafts in current public render,
+- no draft/needs_review/archived/withdrawn targets in current public card slots,
 - same article not repeated across card modules,
 - fallback fills empty slot deterministically,
 - insufficient unique candidates shorten section instead of duplicating,
@@ -535,7 +537,7 @@ Assert:
 
 - only actively distributed category articles,
 - only activelyDistributed (`published`) included; needs_review/archived keep detail URL but are excluded from active listing,
-- descending published order,
+- first_published_at DESC + deterministic tie-breaker,
 - pagination,
 - page 2 self-canonical,
 - invalid category 404,
@@ -549,8 +551,8 @@ Assert:
 - draft topic public route -> 404,
 - published topic -> 200,
 - description rendered,
-- featured article must be public,
-- only public linked articles rendered,
+- featured article must be activelyDistributed + indexable and belong to topic,
+- only activelyDistributed + indexable linked articles rendered,
 - tag creation does not create topic URL,
 - pagination/canonical correct,
 - publish blocked below 3 actively-distributed/indexable linked articles,
@@ -565,6 +567,17 @@ Assert:
 - only guide type according to product decision,
 - published,
 - no accidental news mixing unless explicitly designed.
+
+---
+
+### 23.1. Author profile integration tests
+
+- author profile pokazuje tylko activelyDistributed newsroom articles,
+- needs_review/archived/withdrawn/draft/scheduled nie pojawiają się na bieżącej liście publikacji,
+- article graph author @id == ProfilePage Person @id,
+- publish/archive/needs-review/withdraw/restore zmienia author profile output i właściwy author sitemap lastmod,
+- techniczny article updated_at bez public output change nie zmienia author sitemap lastmod,
+- NEWSROOM_PUBLIC_ENABLED=false usuwa newsroom publications z author page i author sitemap freshness contribution.
 
 ---
 
