@@ -313,8 +313,11 @@ Status published wymaga:
 Status scheduled wymaga:
 
 - scheduled_for != null,
-- kompletności jak dla publikacji,
-- scheduled_for > moment przyjęcia komendy schedule.
+- kompletności pól treści/źródeł/autora/kategorii jak dla publikacji,
+- **nie wymaga** ustawienia `first_published_at` ani `published_at` przed faktycznym publish,
+- scheduled_for > moment przyjęcia komendy schedule,
+- v1 pozwala schedule dla never-published article; scheduled republish istniejącego publicznego 200 nie jest wspierany bez staging/revision systemu,
+- wyjątek: withdrawn article może zostać przygotowany w review, ale publiczny tombstone pozostaje 410 aż do jawnego publish; v1 nie potrzebuje scheduled restore.
 
 Status withdrawn wymaga:
 
@@ -858,8 +861,9 @@ Rekomendowane klasy w app/Support/Newsroom lub analogicznej, jasno wydzielonej p
 
 Odpowiada za:
 
-- publish,
-- schedule,
+- initial publish,
+- atomic public update dla już publicznego artykułu,
+- schedule wyłącznie initial publish v1,
 - unpublish do in_review/draft zgodnie z policy,
 - archive,
 - withdraw/restore-to-review,
@@ -869,6 +873,19 @@ Odpowiada za:
 - dispatch domenowych eventów.
 
 Transakcja stanu publicznego obejmuje co najmniej rekord artykułu, krytyczne timestampy/invariants i audit opisujący tę zmianę. Eventy uruchamiające zewnętrzne side effecty (cache invalidation, sitemap dirty signal, IndexNow, notification) są dispatchowane dopiero po udanym commit. Rollback transakcji nie może zostawić „ghost publish” w cache/sitemap/IndexNow.
+
+### 20.1.1. Edycja już opublikowanego artykułu bez revisions
+
+V1 nie ma staged revision/snapshot systemu. Dlatego:
+
+- zwykły CRUD Save może edytować publiczne pola swobodnie tylko przed pierwszą publikacją albo gdy article jest aktywnie withdrawn/tombstoned,
+- dla `publiclyVisible()` article publiczne pola (`title`, `slug`, `lead`, `body_blocks`, public source/citation, author/category, hero/SEO/public context`) nie mogą być zapisywane przez zwykły low-level Filament save,
+- dedykowany `applyPublicUpdate(payload, actor)` waliduje cały nowy publiczny stan i zapisuje go atomowo,
+- meaningful public change ustawia `last_substantive_update_at`; zmiana tylko public-state/robots używa właściwej semantyki `public_state_changed_at`,
+- audit zapisuje typy/IDs/summary zmiany, ale nie pełny body,
+- wewnętrzne pola niepubliczne mogą mieć osobny, bezpieczny save path bez fałszowania SEO freshness.
+
+Konsekwencja: v1 **nie zapewnia review-before-live dla zmian już opublikowanego 200**. Jeśli taki workflow stanie się wymagany, należy świadomie dodać staging/revision model; nie wolno udawać go statusem na jednym rekordzie.
 
 ### 20.2. ContentArticleSlugService
 
