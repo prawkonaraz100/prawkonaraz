@@ -6,6 +6,8 @@
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Powiązane:
   - [SEO-CONTENT-ROADMAP.md](./SEO-CONTENT-ROADMAP.md)
+  - [SEO-SITEMAP-REPAIR-PLAN.md](./SEO-SITEMAP-REPAIR-PLAN.md) — nadrzędny dla sposobu produkcyjnego dostarczania sitemap/robots
+  - [SEO-ENTERPRISE-INTERNAL-LINKING-ROADMAP-V2.md](./SEO-ENTERPRISE-INTERNAL-LINKING-ROADMAP-V2.md) — nadrzędny dla istniejącego question relation graphu
   - [NEWSROOM-PUBLIC-UI-UX-SPEC.md](./NEWSROOM-PUBLIC-UI-UX-SPEC.md)
   - [NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md](./NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md)
 - Data weryfikacji źródeł zewnętrznych: 2026-09-16
@@ -96,6 +98,8 @@ Dla newsroomu preferujemy:
 - Article dla analysis/report/explainer, jeśli NewsArticle nie jest semantycznie właściwe,
 - BlogPosting nie jest domyślnym typem portalu informacyjnego.
 
+Aktualna dokumentacja Google Article zaleca zwięzły `headline`, ponieważ długie tytuły mogą być skracane na urządzeniach; nie podaje obecnie stałego limitu 110 znaków. Dlatego długość headline jest kontrolą redakcyjną/warningiem, a nie trwałym DB invariantem.
+
 ### 4.2. News sitemap
 
 Na dzień weryfikacji Google zaleca:
@@ -140,7 +144,7 @@ Na dzień weryfikacji:
 
 Każdy publiczny artykuł ma dokładnie jeden canonical URL.
 
-Domyślnie:
+V1 używa twardego self-canonical wyliczanego z route family + slug. CMS nie ma ręcznego canonical override.
 
 - self-canonical,
 - HTTPS,
@@ -159,6 +163,8 @@ Enterprise rule: sygnały muszą być zbieżne. Dla canonical URL:
 - nie tworzymy sprzecznego noindex/canonical/sitemap zestawu.
 
 Rel=canonical jest sygnałem, nie gwarancją wyboru przez wyszukiwarkę; po rollout porównujemy declared i Google-selected canonical w Search Console.
+
+Cross-domain/cross-URL canonical, jeśli kiedyś będzie potrzebny dla syndication, wymaga osobnej decyzji i dedykowanego workflow. Nie dodajemy go jako pole redaktora „na zapas”.
 
 ---
 
@@ -191,7 +197,16 @@ V1 jest polskojęzyczne.
 - nie dodajemy pustych ani sztucznych hreflang variants,
 - hreflang pojawia się dopiero, gdy istnieją realne, równoważne wersje językowe z własnymi canonical URLs.
 
-### 6.5. Slug
+### 6.5. Route family
+
+- news/explainer/analysis/report -> `/aktualnosci/{slug}`
+- guide -> `/poradniki/{slug}`
+
+Po pierwszej publikacji zwykła zmiana typu nie może przenieść artykułu między tymi rodzinami URL. Wewnętrzna zmiana typu w rodzinie newsroom nie zmienia canonical path.
+
+Przyszła kontrolowana migracja route family musi być traktowana jak site move pojedynczego URL: jeden 301, zaktualizowane internal links, sitemap tylko nowego URL, brak chain.
+
+### 6.6. Slug
 
 Slug:
 
@@ -226,6 +241,19 @@ Nie publikować:
 - osobnych stron tylko dla wariantu title,
 - filtrowanych category pages jako indeksowalne kombinacje parametrów,
 - paginacji z niepoprawnym canonical do page 1.
+
+---
+
+## 8.1. Robots/sitemap delivery compatibility
+
+Repo ma równolegle statyczny `public/robots.txt` i route `RobotsController`. Zgodnie z `SEO-SITEMAP-REPAIR-PLAN.md` produkcyjnie preferowany jest statyczny plik oraz jawna weryfikacja Nginx/Cloudflare.
+
+Newsroom nie usuwa kontrolera ani nie zmienia sposobu serwowania robots w zwykłym PR implementacyjnym. Osobny hardening może później usunąć duplikat dopiero po:
+
+- potwierdzeniu faktycznej produkcyjnej odpowiedzi,
+- testach webserver/CDN,
+- sprawdzeniu Sitemap directive,
+- bezpiecznym deploy/rollback.
 
 ---
 
@@ -548,12 +576,20 @@ Canonical Organization logo:
 
 ## 22. Breadcrumb schema
 
-Newsroom:
+Newsroom article:
 
 - Home
 - Aktualności
-- Kategoria opcjonalnie
+- Primary category
 - Artykuł
+
+Guide:
+
+- Home
+- Poradniki
+- Guide
+
+Primary category guide'a może być widoczna jako klasyfikacja/link kontekstowy, ale nie jest wciskana do głównego breadcrumb pomiędzy `Poradniki` i guide.
 
 Breadcrumb visual i BreadcrumbList muszą opisywać ten sam logiczny path.
 
@@ -593,7 +629,8 @@ News sitemap:
 - `news:title` = widoczny title artykułu bez autora/brandingu/daty,
 - max 1000 news entries per plik na dzień weryfikacji,
 - po przekroczeniu limitu deterministic split + wpisy w głównym sitemap index,
-- generation cache krótkie.
+- `news:name` bierze canonical publication identity z jednego source of truth; po uruchomieniu sprawdzamy, czy odpowiada nazwie publikacji pokazywanej przez Google News,
+- statyczny artefakt jest odświeżany po publikacji świeżych newsów; daily cron nie jest jedynym mechanizmem freshness.
 
 ---
 
@@ -639,7 +676,9 @@ Istniejący główny sitemap index powinien po wdrożeniu wskazywać:
 
 Nie tworzymy kolejnego ani zagnieżdżonego sitemap index dla newsroomu.
 
-Istniejący `SeoSitemapBuilder` i `SeoSitemapAuditor` są rozszerzane o newsroom. Nie budujemy równoległego systemu sitemap, jeśli obecna abstrakcja może zostać rozszerzona bez utraty czytelności.
+Istniejący produkcyjny pipeline `SeoSitemapGenerator` + `SeoSitemapBuilder` + `SeoSitemapAuditor` jest rozszerzany o newsroom. Nie budujemy równoległego systemu sitemap.
+
+`SEO-SITEMAP-REPAIR-PLAN.md` pozostaje nadrzędny: na produkcji preferujemy gotowe XML w `public/`, serwowane bez kosztownego runtime query. Istniejący `SitemapController` może pozostać dla kompatybilności/testów, ale nie jest drugim źródłem prawdy dla produkcyjnego XML.
 
 ---
 
@@ -681,19 +720,64 @@ lub Atom odpowiednio do wybranego formatu.
 
 ---
 
-## 30. Feed i sitemap HTTP caching
+## 30. Static sitemap publication, freshness i HTTP caching
 
-Dla feedu i generowanych sitemap:
+### 30.1. Produkcyjny source of truth
 
-- cache 5–15 min dla feedu jako punkt startowy,
-- sitemap cache zależne od kosztu generacji + invalidation po zmianie publicznego corpus,
-- invalidate po publish/archive/slug change/istotnej aktualizacji tam, gdzie wpływa na output,
-- poprawny content-type,
+Newsroom sitemap rozszerza istniejący statyczny pipeline:
+
+`SeoSitemapGenerator -> public/sitemap.xml + public/sitemaps/*.xml`
+
+Nie przenosimy produkcyjnego source of truth do runtime `SitemapController`.
+
+### 30.2. Refresh po zmianie publicznego corpus
+
+Zmiany wpływające na newsroom sitemap/feed:
+
+- publish,
+- archive/unarchive do publicznego stanu,
+- slug change,
+- substantive public update wpływający na lastmod/feed,
+- route/publication-state change.
+
+Po udanym commit:
+
+1. request publikacji kończy się bez synchronicznego pełnego generowania XML,
+2. dispatchujemy asynchroniczny, debounced/unique refresh istniejącego generatora,
+3. wiele zmian w krótkim oknie składa się do jednego refreshu,
+4. istniejący daily `seo:refresh-sitemaps` pozostaje safety netem,
+5. failure refreshu nie cofa poprawnie opublikowanego artykułu, ale jest monitorowany/alertowany.
+
+Target operacyjny dla news sitemap: świeży statyczny artefakt powinien pojawić się w ciągu kilku minut od publikacji, nie dopiero przy następnym daily cron.
+
+### 30.3. Publikacja zestawu bez broken-index window
+
+Generator nie może publikować nowego `sitemap.xml`, który wskazuje jeszcze nieistniejące child files.
+
+Bezpieczna kolejność:
+
+1. zbuduj wszystkie payloady,
+2. zapisz je do plików tymczasowych na tym samym filesystemie,
+3. zwaliduj XML, limity i duplikaty,
+4. atomowo podmień nowe/zmienione child files,
+5. atomowo podmień `sitemap.xml` na końcu,
+6. dopiero po przełączeniu indexu usuń stare, już nie referencjonowane shardy.
+
+Przy błędzie przed krokiem 5 stary kompletny zestaw pozostaje aktywny.
+
+### 30.4. HTTP validators na właściwej warstwie
+
+Dla statycznych XML oraz `public/robots.txt` preferowane:
+
+- poprawny Content-Type,
+- public Cache-Control zgodny z deployment/CDN policy,
 - ETag i/lub Last-Modified,
-- conditional GET ma zwracać 304 gdy reprezentacja się nie zmieniła,
-- nagłówki nie mogą powodować serwowania starego outputu po publikacji.
+- conditional request -> 304, gdy warstwa Nginx/CDN/static delivery to wspiera,
+- brak Set-Cookie/session.
 
-Aktualny `SitemapController` zwraca tylko Content-Type; 304/validators są brakującym elementem implementacji newsroom/enterprise SEO, nie istniejącą funkcją.
+Nie uznajemy dodania headerów wyłącznie do Laravel `SitemapController` za spełnienie tego wymagania, jeśli produkcja serwuje statyczny plik przed wejściem do PHP.
+
+Feed może pozostać dynamiczny/cachowany aplikacyjnie i mieć własne validators.
 
 ---
 
@@ -956,6 +1040,8 @@ Nie wymuszamy linku do każdego typu relacji. Link istnieje tylko przy rzeczywis
 
 ### 44.4. Dwukierunkowe mosty do istniejących klastrów
 
+Newsroom nie tworzy drugiego `question_relations` ani drugiej taksonomii pytań. `content_article_question` jest nowym edge article ↔ question i może zasilać osobny moduł „Powiązane aktualności” na stronie pytania bez ingerencji w ranking „Powiązane pytania”.
+
 Najważniejsze relacje newsroomu powinny działać w obie strony:
 
 - article -> legal page/unit,
@@ -1013,9 +1099,11 @@ newsroom:audit-links
 
 Raportuje:
 
-- published article bez wejściowego linku z huba/category,
-- broken related links,
-- draft link targets,
+- published article bez crawlable inbound linku,
+- ważny article z nadmiernym click depth,
+- broken related/reverse links,
+- draft/noindex/redirect-source targets,
+- duplicate URL w kilku related modules,
 - redirect chains.
 
 Może wejść w N5/N6.
@@ -1416,6 +1504,17 @@ Obecnie:
 ---
 
 ## 70. Historia zmian
+
+### 2026-09-16 — v0.4
+
+- podporządkowano newsroom istniejącemu statycznemu pipeline SeoSitemapGenerator i SEO-SITEMAP-REPAIR-PLAN,
+- dodano asynchroniczny/debounced refresh po zmianach publicznego corpus oraz daily cron jako safety net,
+- dodano bezpieczną publikację child files przed sitemap index i sprzątanie starych shardów po przełączeniu,
+- przeniesiono ETag/304 contract na faktyczną warstwę static/Nginx/CDN zamiast zakładać runtime controller,
+- zapisano kompatybilność statycznego robots.txt i istniejącego RobotsController bez usuwania backendu,
+- przyjęto twardy self-canonical i stabilność route family,
+- doprecyzowano guide breadcrumbs, seo_title vs H1 oraz izolację newsroom edges od question graphu,
+- skorygowano wcześniejsze założenie o 110 znakach headline zgodnie z aktualną dokumentacją Google.
 
 ### 2026-09-16 — v0.3
 
