@@ -422,6 +422,32 @@ URLs absolute/canonical zgodnie z istniejącym schema pattern.
 
 ---
 
+## 19.1. Semantic silo / internal-link graph tests
+
+Fixtures:
+
+- article z jedną primary category,
+- article z topic relation,
+- article -> legal/question/sign relations,
+- reverse-link eligible entity pages,
+- draft/noindex/redirected article targets.
+
+Assertions:
+
+- article ma crawlable primary-category link,
+- category/topic pages linkują do public article przez zwykłe `<a href>`,
+- indexable article ma co najmniej jeden public inbound link w fixture graph,
+- reverse link pojawia się tylko dla jawnej public relation,
+- reverse link list ma bounded count i deterministic order,
+- draft/noindex/redirect-source nie pojawia się w related/reverse modules,
+- related anchors są opisowe; nie generujemy pustych/„kliknij tutaj” anchors jako domyślnego UI,
+- ten sam URL nie jest bez potrzeby powielany w kilku related modules,
+- audit wykrywa orphan i nadmierny click depth dla ważnych fixtures.
+
+Sitemap inclusion sama nie spełnia inbound-link assertion.
+
+---
+
 ## 20. Newsroom home composition tests
 
 Given fixtures:
@@ -987,6 +1013,7 @@ Jeśli draft stał się publiczny:
 - [ ] /metodologia
 - [ ] related question link
 - [ ] related legal link
+- [ ] reverse link z co najmniej jednej istniejącej entity/content page do newsroom article
 
 ### SEO
 
@@ -1093,6 +1120,7 @@ Runbook jest spełniony, gdy:
 - first release ma backup/smoke/rollback plan,
 - scheduler ma monitoring,
 - entity graph/site identity ma regression coverage,
+- semantic silo/orphan/reverse-link rules mają regression coverage,
 - sitemap scaling/news metadata/304 mają regression coverage,
 - content może być cofnięty bez deploy,
 - draft/XSS/canonical incidents mają procedurę,
@@ -1121,6 +1149,7 @@ Na 2026-09-16:
 - [ ] stworzyć newsroom E2E,
 - [ ] dodać block/composition/topic/focal-point tests,
 - [ ] dodać site-identity/entity-graph/date-consistency tests,
+- [ ] dodać semantic silo/orphan/reverse-link/click-depth tests,
 - [ ] dodać news namespace + sitemap sharding + 304/feed-discovery tests,
 - [ ] rozszerzyć istniejący SeoSitemapAuditor,
 - [ ] stworzyć production smoke checklist w praktyce,
