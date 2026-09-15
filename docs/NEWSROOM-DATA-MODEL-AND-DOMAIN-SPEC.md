@@ -447,11 +447,12 @@ Pola:
 - source_type varchar(32)
 - publisher varchar(255) nullable
 - title varchar(500)
-- url varchar(2048)
+- url varchar(2048) nullable
 - published_at timestamptz nullable
 - accessed_at timestamptz nullable
 - is_primary boolean default false
 - is_official boolean default false
+- is_publicly_cited boolean default true
 - note text nullable
 - sort_order smallint default 0
 - created_at
@@ -470,9 +471,12 @@ Pola:
 
 ### 11.2. Reguły
 
-- news o zmianie prawa powinien mieć co najmniej jedno źródło official lub legislation, jeśli takie istnieje,
+- news o zmianie prawa powinien mieć co najmniej jedno publicznie cytowalne źródło official lub legislation z URL, jeśli takie istnieje,
 - media konkurencyjne nie są domyślnym źródłem pierwotnym,
-- URL źródła publicznego jest renderowany tylko jeśli redakcja oznaczy go jako bezpieczny do publikacji,
+- `url` może być null dla interview/direct evidence/źródła bez publicznego linku,
+- `is_publicly_cited=true` oznacza, że publiczny renderer może pokazać citation; jeśli URL istnieje, renderuje bezpieczny link, a jeśli nie — tekstową citation bez linku,
+- `is_publicly_cited=false` zachowuje source jako wewnętrzny dowód i nigdy nie renderuje jego title/publisher/url,
+- `note` jest zawsze wewnętrzne i nigdy nie jest częścią publicznej citation,
 - accessed_at zapisujemy dla źródeł webowych, gdy ma znaczenie weryfikacyjne.
 
 ---
@@ -762,7 +766,7 @@ Nazwy scope'ów nie mogą utożsamiać `workflow_status=published` z całą wido
 Wymagane rozróżnienie:
 
 - `publiclyVisible()` — artykuł po pierwszej publikacji, którego workflow dopuszcza publiczny detail URL: `published`, `needs_review` oraz `archived`,
-- `activelyDistributed()` — `published` lub `needs_review`, z poprawnym `published_at <= now()`; używane przez home/category/topic/latest/feed,
+- `activelyDistributed()` — wyłącznie `workflow_status=published` z poprawnym `published_at <= now()`; używane przez home/category/topic/latest/feed/news sitemap,
 - `indexable()` — publiclyVisible + aktualna robots/SEO policy nie jest noindex,
 - `scheduled()`,
 - `forCategory()`,
@@ -770,7 +774,7 @@ Wymagane rozróżnienie:
 - `activeBreaking()`,
 - `needsFreshnessReview()`.
 
-Zwykłe read modele list/hubów nie mogą używać `publiclyVisible()` zamiast `activelyDistributed()`.
+Zwykłe read modele list/hubów nie mogą używać `publiclyVisible()` zamiast `activelyDistributed()`. `needs_review` pozostaje osiągalne pod canonical URL, ale świadomie znika z aktywnej promocji do czasu ponownego review.
 
 Artykuł `archived`, który nigdy nie był publiczny (`first_published_at=null`), nie uzyskuje publicznego detail URL tylko dlatego, że ma status archived.
 
@@ -900,7 +904,7 @@ Rekomendacja:
 Publiczne daty:
 
 - first_published_at: pierwsza publikacja; nigdy nie resetować przy zwykłej edycji,
-- published_at: bieżący timestamp aktywnej publikacji; w v1 może równać się first_published_at po pierwszym publish,
+- published_at: timestamp ostatniego wejścia w stan published; nie jest źródłem daty pierwotnej ani automatycznego „najnowsze”,
 - last_substantive_update_at: istotna zmiana treści,
 - updated_at: techniczny timestamp rekordu.
 
@@ -912,6 +916,8 @@ Structured data:
 Publiczny label „Aktualizacja” pojawia się tylko, gdy `last_substantive_update_at` rzeczywiście istnieje i jest późniejszy od pierwszej publikacji.
 
 Article sitemap `lastmod` i feed `updated` używają tej samej merytorycznej semantyki, nigdy technicznego `updated_at`.
+
+Chronologia publicznych list „najnowsze”, kategorii i topiców używa `first_published_at DESC` (z deterministycznym tie-breakerem, np. id DESC). Ponowne wejście w published nie robi ze starego materiału nowego. Jeśli chcemy ponownie promować istotnie zaktualizowany materiał, robimy to przez placement/featured, nie przez fałszowanie daty pierwszej publikacji.
 
 ---
 
@@ -1247,7 +1253,9 @@ Nazwy można dostosować do konwencji repo, ale granice odpowiedzialności powin
 
 ### 38.1. Newsroom home
 
-Musi zwrócić gotowy, ograniczony read model:
+Musi zwrócić gotowy, ograniczony read model z `activelyDistributed()`; `needs_review` i `archived` nie są kandydatami do promocji:
+
+
 
 - lead story,
 - secondary stories,
@@ -1262,9 +1270,9 @@ Nie pobieramy całego corpusu i nie filtrujemy w PHP.
 
 ### 38.2. Category page
 
-- published only,
+- activelyDistributed only,
 - category_id,
-- ordered by published_at desc,
+- ordered by first_published_at desc + deterministic tie-breaker,
 - stabilna paginacja,
 - eager load author + minimal media metadata.
 
@@ -1334,6 +1342,7 @@ Model danych jest gotowy, gdy:
 - cross-route-family type change po first publish jest zablokowany,
 - slug change zachowuje redirect history,
 - relations do questions/legal są jawne,
+- sources rozróżniają public citation od wewnętrznego evidence i wspierają źródło bez URL,
 - `body_blocks` przechodzą walidację per block type,
 - homepage placements mają fallback i deduplikację,
 - focal point ma poprawny zakres 0..1,
@@ -1343,7 +1352,8 @@ Model danych jest gotowy, gdy:
 - topic nie powstaje automatycznie z taga,
 - admin policies nie opierają się wyłącznie na UI i nie rozszerzają dostępu poza istniejących administratorów,
 - AuditLog rozróżnia `User` actora od `ContentAuthor` author/reviewer identity i nie przechowuje pełnej treści artykułu,
-- public visibility i active distribution są osobnymi scope'ami; archive ma deterministyczny 200-history policy,
+- public visibility i active distribution są osobnymi scope'ami; needs_review/archived nie są aktywnie promowane, a archive ma deterministyczny 200-history policy,
+- public chronology używa first_published_at, nie ostatniego published_at/updated_at,
 - category/topic identity nie może zostać złamana przez zmianę publicznego sluga/dezaktywację,
 - homepage placement overlap jest chroniony również przed równoległymi zapisami,
 - public side effecty są emitowane after-commit,
@@ -1389,7 +1399,9 @@ Na moment utworzenia dokumentu:
 ### 2026-09-16 — v0.5
 
 - po finalnym audycie rozdzielono `User` actora od `ContentAuthor` author/reviewer identity i uszczelniono audit metadata,
-- zdefiniowano publicVisible vs activelyDistributed oraz deterministyczne zachowanie archive,
+- zdefiniowano publicVisible vs activelyDistributed (needs_review pozostaje URL-em, ale nie aktywną dystrybucją) oraz deterministyczne zachowanie archive,
+- chronologię publiczną związano z first_published_at zamiast published_at,
+- poprawiono source model: URL może być null, a is_publicly_cited rozdziela public citation od wewnętrznego evidence,
 - dodano immutable public slugs/active-category guards i minimalny topic corpus baseline,
 - dodano serializację concurrent homepage placements przez DB/advisory lock,
 - zapisano transaction + after-commit contract dla publikacji i side effectów,
