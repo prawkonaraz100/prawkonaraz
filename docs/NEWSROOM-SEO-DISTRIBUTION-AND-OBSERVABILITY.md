@@ -260,9 +260,11 @@ Nie wymagamy integracji z X API.
 
 ## 14. Preferred image strategy
 
-Każdy ważny artykuł powinien mieć image variants nadające się do:
+Każdy ważny artykuł powinien mieć source asset, focal point i image variants nadające się do:
 
 - page hero,
+- lead card,
+- standard/compact cards,
 - OpenGraph,
 - structured data.
 
@@ -272,7 +274,7 @@ Preferowane cropy:
 - 4:3,
 - 1:1, jeśli pipeline to uzasadnia.
 
-Nie blokujemy v1 koniecznością wszystkich trzech cropów, ale storage/model powinien pozwolić rozwinąć pipeline bez zmiany artykułu.
+Nie blokujemy v1 koniecznością ręcznego przygotowania wszystkich cropów. Preferowany jest deterministyczny pipeline generujący warianty z jednego źródła i focal point.
 
 ---
 
@@ -702,6 +704,7 @@ Nie potrzebujemy framework runtime do czytania article page.
 Każdy article może linkować do:
 
 - category,
+- topic/dossier,
 - author,
 - legal content,
 - questions,
@@ -914,19 +917,29 @@ Category/list pages:
 
 ---
 
-## 59. Tag pages
+## 59. Tags i topics
+
+### Tags
 
 V1:
 
 - brak indeksowalnych tag pages domyślnie.
 
-Tag służy wewnętrznej klasyfikacji.
+Tag służy lekkiej klasyfikacji.
 
-Publiczne tag huby wymagają:
+### Topics / dossier
 
-- unikalnej wartości,
-- minimalnego corpus,
-- osobnej decyzji.
+Topic jest osobnym, ręcznie zarządzanym hubem.
+
+Może być indeksowalny tylko gdy:
+
+- status = published,
+- ma własny opis i meta,
+- ma wystarczający, realny corpus,
+- nie duplikuje kategorii/tag page,
+- featured article i lista materiałów są publiczne.
+
+Topic nie powstaje automatycznie z taga.
 
 ---
 
@@ -979,6 +992,20 @@ Po slug change:
 
 ---
 
+## 63.1. Audio i AI derivatives — SEO policy
+
+Przyszły odsłuch, transkrypcja, skrót AI lub „zapytaj o artykuł” nie tworzą automatycznie osobnych indeksowalnych stron.
+
+Zasady:
+
+- canonical pozostaje na źródłowym artykule,
+- generowany skrót nie może być alternatywnym thin URL,
+- audio player nie blokuje crawlable HTML body,
+- transkrypcja audio pochodzącego z tego samego artykułu nie powinna dublować pełnego body w osobnym URL,
+- funkcje AI nie zmieniają dateModified artykułu, jeśli sam artykuł nie został merytorycznie zaktualizowany.
+
+---
+
 ## 64. Preferred source references w dokumentacji
 
 Każdy zewnętrzny wymóg Google w kodzie powinien mieć:
@@ -999,7 +1026,8 @@ Nie linkujemy do przypadkowego SEO bloga jako źródła normatywnego.
 - articles sitemap działa,
 - news sitemap działa zgodnie z aktualnymi wymaganiami,
 - feed działa,
-- images spełniają ustalone baseline,
+- images spełniają ustalone baseline i respektują focal point/crop policy,
+- opublikowane topic pages spełniają kryteria jakości,
 - max-image-preview:large włączone dla indeksowalnych artykułów,
 - analytics event model działa,
 - produkcyjne 5xx/scheduler/sitemap są monitorowane,
@@ -1030,12 +1058,21 @@ Obecnie:
 - [ ] wdrożyć news sitemap,
 - [ ] wdrożyć feed,
 - [ ] wdrożyć analytics hooks/events,
+- [ ] wdrożyć topic SEO dla faktycznie publikowanych dossier,
+- [ ] zweryfikować crop/OG output z focal point,
 - [ ] podłączyć monitoring,
 - [ ] wykonać production Search Console verification.
 
 ---
 
 ## 68. Historia zmian
+
+### 2026-09-15 — v0.2
+
+- rozdzielono nieindeksowalne tags od ręcznie publikowanych topic/dossier,
+- rozszerzono image strategy o focal point i warianty kart,
+- zapisano SEO policy dla przyszłych audio/AI derivatives bez tworzenia duplikujących URL,
+- doprecyzowano topic/crop checks w Definition of Done.
 
 ### 2026-09-15 — v0.1
 
