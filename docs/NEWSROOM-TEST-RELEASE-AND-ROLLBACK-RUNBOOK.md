@@ -19,15 +19,17 @@
 
 Newsroom nie ma obniżać jakości istniejącego produktu.
 
-Każdy etap musi przejść:
+Każdy etap musi przejść odpowiednie do ryzyka:
 
 - testy domenowe,
 - testy HTTP/render,
 - testy bezpieczeństwa,
 - build frontendu,
-- PostgreSQL,
+- PostgreSQL dla newsroom DB/concurrency paths,
 - odpowiednie browser E2E,
 - pełny istniejący CI przed merge.
+
+Stan wejściowy: kanoniczny `ci.yml` używa SQLite. Dlatego od PR C/N1 dokładamy osobny PostgreSQL gate zamiast udawać, że obecny „full CI green” już go obejmuje.
 
 ---
 
@@ -140,6 +142,8 @@ Minimum na PostgreSQL:
 
 Nie uznajemy sqlite-only za wystarczające dla tabel docelowo działających na PostgreSQL.
 
+PR C/N1 musi dodać addytywny job `newsroom-postgres` z usługą PostgreSQL (lub równoważny automatyczny job w istniejącym workflow). Nie usuwamy szybkiego SQLite CI. Do czasu dodania joba PR musi mieć jawny, powtarzalny PostgreSQL evidence; po dodaniu joba ręczny evidence nie zastępuje jego wyniku.
+
 ---
 
 ## 6. Model tests
@@ -148,7 +152,9 @@ Nie uznajemy sqlite-only za wystarczające dla tabel docelowo działających na 
 
 - casts,
 - route key slug,
-- published scope,
+- publiclyVisible / activelyDistributed / indexable scopes,
+- archived historical 200 vs active distribution,
+- needs_review public visibility,
 - scheduled scope,
 - category relation,
 - author/reviewer relation,
@@ -161,7 +167,16 @@ Nie uznajemy sqlite-only za wystarczające dla tabel docelowo działających na 
 
 - active scope,
 - articles relation,
-- delete restriction policy.
+- delete restriction policy,
+- immutable slug v1,
+- deactivate blocked while public/actively-distributed articles depend on category.
+
+### Topic
+
+- draft/published/archived scopes,
+- publish requires own description + min. 3 public/indexable linked articles,
+- featured article if set belongs to topic and is public,
+- slug immutable after first publication.
 
 ---
 
@@ -179,7 +194,7 @@ Dla każdego przejścia:
 | published | needs review | needs_review | PASS |
 | needs_review | republish/update | published | PASS after review |
 | published | archive | archived | PASS |
-| archived | direct publish | published | policy decision; default reject until reviewed |
+| archived | direct publish | published | REJECT in v1; return to review flow first |
 
 Testować również niedozwolone przejścia.
 
@@ -199,6 +214,17 @@ Publish blokuje:
 - brak wymaganych źródeł,
 - reviewer missing when policy requires,
 - invalid media state, jeśli dany warunek jest blocking.
+
+---
+
+## 8.1. Transaction / audit / after-commit tests
+
+- publish state + timestamps + AuditLog commit atomowo,
+- AuditLog actor = authenticated `User`, author/reviewer = `ContentAuthor`,
+- audit metadata nie zawiera `body_blocks`, leadu ani prywatnych notes,
+- rolled-back publish nie czyści public cache, nie ustawia sitemap dirty signal i nie enqueue'uje IndexNow,
+- scheduler/system publish zapisuje jawny system/scheduler trigger i nie fałszuje user actor,
+- source/author/reviewer/slug/public-state changes po publikacji mają wymagane audit events.
 
 ---
 
@@ -254,14 +280,17 @@ Jeśli jeden rekord nie może się opublikować, strategia ma być jawna:
 
 ## 12. Preview security tests
 
-- anonymous no token -> denied,
-- valid signed preview -> allowed jeśli taki model wybrany,
-- expired signed preview -> denied,
+V1 nie ma shareable signed preview.
+
+- anonymous -> denied,
+- non-admin authenticated user -> denied,
 - admin authenticated -> allowed,
-- preview meta noindex,
+- response `Cache-Control: private, no-store`,
+- preview meta noindex,nofollow,
 - preview URL absent from sitemap,
 - preview absent from feed,
-- preview absent from newsroom home/category.
+- preview absent from newsroom home/category,
+- preview event nie jest liczony jako public article view.
 
 ---
 
@@ -287,6 +316,13 @@ Expected:
 - allowed rich text/formatting preserved,
 - allowlisted embed only.
 
+Format-evolution tests:
+
+- zapisany payload starszej wspieranej wersji nadal się renderuje,
+- nowy block type nie może być tworzony przez editor przed dostępnością renderera,
+- unknown future block failuje bezpiecznie, bez wykonywania HTML,
+- breaking schema migration ma jawny migrator/test; revision-history snapshot nie jest do tego wymagany.
+
 ---
 
 ## 14. Public article HTTP tests
@@ -305,7 +341,12 @@ Scheduled future:
 
 Archived:
 
-- according to chosen archive policy; test explicit.
+- previously published archived article -> 200 canonical detail,
+- excluded from home/latest/category/topic active listings, feed and news sitemap,
+- included in standard article sitemap only when indexable,
+- archived + controlled noindex -> 200 noindex and absent from article sitemap,
+- never-published archived record -> 404,
+- archive itself never implies 301/404/410.
 
 Unknown slug:
 
@@ -390,14 +431,16 @@ Nie snapshotować dynamicznych pól bez stabilizacji czasu/config.
 
 ## 17. Breadcrumb tests
 
-Article:
+Newsroom article:
 
-- home,
-- aktualności/poradniki,
-- category if part of visual path,
-- article.
+- Home -> Aktualności -> primary category -> article.
 
-URLs absolute/canonical zgodnie z istniejącym schema pattern.
+Guide:
+
+- Home -> Poradniki -> guide,
+- primary category może być osobnym linkiem klasyfikacyjnym, ale nie elementem głównego breadcrumb.
+
+Visual breadcrumb i BreadcrumbList są zgodne; URLs absolute/canonical zgodnie z istniejącym schema pattern.
 
 ---
 
@@ -473,18 +516,22 @@ Assert:
 - insufficient unique candidates shorten section instead of duplicating,
 - expired breaking not shown,
 - breaking may point to lead as explicit alert exception,
-- empty category block omitted.
+- empty category block omitted,
+- dwa równoległe zapisy overlapping placement nie mogą oba przejść,
+- stale home-composer write jest odrzucony przed nadpisaniem cudzej zmiany.
 
 ---
 
 ## 21. Category tests
 
-- only category articles,
-- only published,
+- only actively distributed category articles,
+- published/needs_review included according to policy, archived excluded from active listing,
 - descending published order,
 - pagination,
 - page 2 self-canonical,
-- invalid category 404.
+- invalid category 404,
+- category slug edit blocked in v1,
+- active=false blocked when public/actively-distributed articles depend on category.
 
 ---
 
@@ -497,7 +544,10 @@ Assert:
 - only public linked articles rendered,
 - tag creation does not create topic URL,
 - pagination/canonical correct,
-- empty/thin topic publish validation according to CMS policy.
+- publish blocked below 3 public/indexable linked articles,
+- featured article, if set, belongs to topic and is public,
+- published topic slug change blocked,
+- corpus falling below baseline forces draft/archive before public render.
 
 ---
 
@@ -574,7 +624,7 @@ Tests based on verified rules:
 
 ---
 
-## 26. Cache, async refresh and crawler delivery tests
+## 26. Cache, dirty-marker refresh and crawler delivery tests
 
 Application cache:
 
@@ -584,13 +634,17 @@ Application cache:
 - category affected invalidated,
 - unrelated category not necessarily invalidated if granular design supports.
 
-Async sitemap refresh:
+Sitemap refresh coordinator:
 
-- successful public-state commit enqueues refresh after commit,
-- rollbacked DB transaction does not enqueue public sitemap change,
-- burst kilku publikacji jest debounced/unique do ograniczonej liczby pełnych refreshy,
-- publish request nie czeka na pełne `SeoSitemapGenerator::generate`,
-- failed async refresh nie cofa publikacji, ale generuje monitorowalny failure,
+- successful public-state commit ustawia dirty/version signal dopiero after commit,
+- rollbacked DB transaction nie ustawia public sitemap change,
+- scheduler przy braku dirty marker kończy się tanio,
+- burst kilku publikacji coalescuje się do ograniczonej liczby pełnych refreshy,
+- distributed lock/withoutOverlapping blokuje równoległy pełny refresh,
+- zmiana version podczas generacji pozostawia wymagany kolejny pass,
+- publish request nie wywołuje pełnego `SeoSitemapGenerator::generate`,
+- test działa przy `QUEUE_CONNECTION=sync`; nie wymaga worker process,
+- failed refresh nie cofa publikacji, pozostawia recovery signal/log,
 - daily scheduled `seo:refresh-sitemaps` nadal działa jako recovery path.
 
 Static HTTP delivery:
@@ -640,7 +694,14 @@ Minimum:
 - relation persistence,
 - publish blocked with missing requirements,
 - schedule works,
-- archive works.
+- archive works with deterministic public-detail policy,
+- only admin can access newsroom resources/actions,
+- User audit actor differs from ContentAuthor author/reviewer identity,
+- stale article update rejected,
+- stale/overlapping home placement update rejected,
+- category slug/deactivation guards,
+- topic corpus/slug guards,
+- admin-only preview with private,no-store.
 
 ---
 
@@ -779,7 +840,7 @@ Production after rollout:
 ## 36. Security QA
 
 - authz policies,
-- preview signed/auth,
+- preview admin-only auth + private/no-store,
 - XSS,
 - upload validation,
 - no SSRF source fetch,
@@ -791,17 +852,16 @@ Production after rollout:
 
 ## 37. CI integration
 
-Nie tworzymy osobnego CI tylko dla newsroomu, jeśli obecne pipeline’y mogą go objąć.
+Zachowujemy istniejący szybki SQLite CI i dodajemy tylko brakujący gate.
 
 Wymagane:
 
-- php tests,
-- lint/format zgodnie z repo,
-- frontend build,
-- Playwright targeted/full according to CI strategy,
-- PostgreSQL test path.
+- istniejący php tests / smoke / Pint / frontend build bez regresji,
+- addytywny `newsroom-postgres` job od PR C dla migracji, constraints, transactional/concurrency paths,
+- Filament/feature tests w automatycznym CI,
+- `newsroom-editorial.spec.ts` i `newsroom-public.spec.ts` jako jawny browser release gate po ustabilizowaniu CMS/public renderer.
 
-Nowe testy muszą wejść do istniejących jobs, nie być lokalną instrukcją bez CI.
+Istniejący `browser-smoke.yml` dotyczy produktu i nie jest dowodem przejścia newsroom E2E. Newsroom E2E może początkowo działać jako osobny manual/workflow gate przed produkcją, ale nie może pozostać lokalną, nieweryfikowalną instrukcją.
 
 ---
 
@@ -810,7 +870,8 @@ Nowe testy muszą wejść do istniejących jobs, nie być lokalną instrukcją b
 - [ ] diff ograniczony do task scope
 - [ ] tests added/updated
 - [ ] targeted tests green
-- [ ] full CI green
+- [ ] full existing CI green
+- [ ] jeśli PR dotyka newsroom DB/concurrency: newsroom-postgres green
 - [ ] docs match code
 - [ ] no plan described as implemented
 - [ ] migrations reviewed
@@ -820,8 +881,10 @@ Nowe testy muszą wejść do istniejących jobs, nie być lokalną instrukcją b
 
 ## 39. First production release prerequisites
 
-- N0 done,
+- wymagane hard gates G0–G5 zamknięte,
 - N1–N5 required scope done,
+- `NEWSROOM_PUBLIC_ENABLED=false` przed cutover,
+- newsroom editorial + public browser E2E green,
 - at least sample production-safe content,
 - backups healthy,
 - scheduler healthy,
@@ -847,24 +910,38 @@ Nie kopiować sekretów ani DB dump do repo.
 
 ## 41. Deployment sequence — first release
 
+### Phase A — deploy dark
+
 1. backup verification
-2. deploy code
-3. migrations
-4. cache/config clear/build per normal deploy
-5. scheduler registration verification
-6. smoke /health
-7. admin resource smoke
-8. public /aktualnosci smoke
-9. sample article smoke
-10. uruchom/zweryfikuj statyczny sitemap refresh + audit
-11. sprawdź main index -> wszystkie child files 200
-12. sprawdź brak regresji istniejących question/sign/legal/author sitemap
-13. sitemap static HTTP headers / conditional 304 smoke, jeśli skonfigurowane
-14. feed smoke/validators
-15. homepage site-name/Organization graph smoke
-16. robots HTTP response + Sitemap directive
-17. logs/queue refresh failures check
-18. Search Console actions after stable production
+2. potwierdź `NEWSROOM_PUBLIC_ENABLED=false`
+3. deploy code
+4. migrations
+5. cache/config clear/build per normal deploy
+6. scheduler registration + dirty-marker coordinator verification
+7. smoke /health i pełny istniejący produkt smoke
+8. admin resource + authenticated private preview smoke
+9. PostgreSQL/newsroom backend checks
+10. wygeneruj/audytuj statyczne sitemap i potwierdź brak regresji istniejących question/sign/legal/author XML
+11. robots/static delivery baseline HTTP check
+
+Jeśli Phase A failuje, publiczny newsroom nadal jest wyłączony.
+
+### Phase B — controlled cutover
+
+12. przygotuj sample production-safe content
+13. włącz `NEWSROOM_PUBLIC_ENABLED=true` i odśwież config cache w kontrolowanym oknie
+14. public /aktualnosci + category/topic + sample article/guide smoke
+15. sprawdź canonical/schema/author/breadcrumb
+16. sprawdź dirty-marker refresh -> świeży news/article sitemap bez czekania na daily cron
+17. sprawdź main index -> wszystkie child files 200
+18. sitemap static HTTP headers / conditional 304 smoke, jeśli skonfigurowane
+19. feed smoke/validators
+20. homepage site-name/Organization graph smoke
+21. robots HTTP response + Sitemap directive
+22. sprawdź scheduler/coordinator logs/locks/failures
+23. Search Console actions po stabilnym production
+
+Rollback publiczny w pierwszej kolejności: `NEWSROOM_PUBLIC_ENABLED=false`, bez cofania danych/migracji.
 
 ---
 
@@ -912,16 +989,14 @@ Nie uruchamiać migrate:rollback automatycznie po tym, jak redakcja stworzyła d
 
 ## 44. Emergency disable strategy
 
-Rekomendowane rozwiązanie minimalne:
+Prosty config gate `NEWSROOM_PUBLIC_ENABLED` jest wymaganym elementem v1 release.
 
-config/feature flag dla publicznego newsroomu może być rozważona przed release.
+- wyłącza publiczny newsroom/article/category/topic rollout bez usuwania admin/data,
+- nie wymaga rozbudowanego feature flag service,
+- jest sprawdzany w config cache/deploy smoke,
+- rollback publiczny zaczyna się od ustawienia false.
 
-Jeśli nie ma globalnego feature flag system:
-
-- route/hub może zostać tymczasowo wyłączony deployem,
-- admin/data pozostają.
-
-Nie dodawać rozbudowanego feature flag service tylko dla newsroomu, jeśli prosty config wystarczy.
+Nie cofamy migracji ani treści tylko po to, by wyłączyć publiczną ekspozycję.
 
 ---
 
@@ -1059,7 +1134,7 @@ Jeśli draft stał się publiczny:
 - [ ] OG image + alt + stable public URL
 - [ ] og:site_name
 - [ ] articles sitemap/shard z istniejącego static generatora
-- [ ] news sitemap required metadata + fresh async refresh
+- [ ] news sitemap required metadata + fresh dirty-marker/scheduled refresh
 - [ ] child-before-index atomic publication
 - [ ] feed + head discovery
 - [ ] sitemap static delivery headers/304 na faktycznej warstwie
@@ -1067,11 +1142,15 @@ Jeśli draft stał się publiczny:
 
 ### Admin
 
+- [ ] admin allowed / non-admin denied
 - [ ] list
 - [ ] edit
-- [ ] article preview
+- [ ] stale edit rejected
+- [ ] article preview private,no-store
 - [ ] home composer
-- [ ] future home preview
+- [ ] overlapping/stale placement rejected
+- [ ] future home preview private,no-store
+- [ ] AuditLog actor/state metadata sane
 - [ ] save draft
 
 ---
@@ -1148,13 +1227,14 @@ Może być w PR/release notes; nie potrzebujemy nowej tabeli tylko do tego.
 Runbook jest spełniony, gdy:
 
 - wszystkie krytyczne flows mają test,
-- CI obejmuje newsroom,
-- first release ma backup/smoke/rollback plan,
+- istniejący CI + dedykowany PostgreSQL gate obejmuje newsroom,
+- newsroom browser E2E jest jawnie wykonanym release gate,
+- first release ma backup/smoke/rollback + public config-disable plan,
 - scheduler ma monitoring,
 - entity graph/site identity ma regression coverage,
 - route-family/canonical exclusivity ma regression coverage,
 - semantic silo/orphan/reverse-link rules mają regression coverage bez modyfikacji question graphu,
-- static sitemap atomic publication/async refresh/news metadata ma regression coverage,
+- static sitemap atomic publication/dirty-marker refresh/news metadata ma regression coverage bez wymogu queue workera,
 - rzeczywista warstwa static delivery/robots ma production smoke,
 - content może być cofnięty bez deploy,
 - draft/XSS/canonical incidents mają procedurę,
@@ -1172,7 +1252,9 @@ Na 2026-09-16:
 - newsroom-specific tests i E2E jeszcze nie istnieją,
 - homepage placement/topic/block editor tests jeszcze nie istnieją,
 - newsroom entity graph/news sitemap/sharding/feed-discovery/static-delivery tests jeszcze nie istnieją,
-- atomic static publication i async newsroom refresh jeszcze nie istnieją,
+- atomic static publication i dirty/version newsroom refresh coordinator jeszcze nie istnieją,
+- canonical CI jest SQLite-only; newsroom-postgres job jeszcze nie istnieje,
+- newsroom-specific browser E2E nie jest pokryty istniejącym product browser smoke,
 - istniejący SeoSitemapAuditor nie obsługuje jeszcze newsroom/news namespace.
 
 ---
@@ -1186,7 +1268,9 @@ Na 2026-09-16:
 - [ ] dodać site-identity/entity-graph/date-consistency tests,
 - [ ] dodać semantic silo/orphan/reverse-link/click-depth tests,
 - [ ] dodać route-family/canonical exclusivity tests,
-- [ ] dodać news namespace + sitemap sharding + atomic publish + async refresh/feed-discovery tests,
+- [ ] dodać newsroom-postgres CI job,
+- [ ] dodać audit/stale-write/placement-concurrency/category-topic guard tests,
+- [ ] dodać news namespace + sitemap sharding + atomic publish + dirty-marker refresh/feed-discovery tests,
 - [ ] dodać production-like static robots/sitemap delivery smoke,
 - [ ] rozszerzyć istniejący SeoSitemapAuditor,
 - [ ] stworzyć production smoke checklist w praktyce,
@@ -1195,6 +1279,16 @@ Na 2026-09-16:
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-16 — v0.5
+
+- wyrównano runbook z faktycznym SQLite CI przez wymagany additive newsroom-postgres gate,
+- preview v1 zmieniono na admin-only/private-no-store i dodano rozdzielenie User actor vs ContentAuthor identity,
+- dodano stale-write, placement concurrency, category/topic identity oraz block-format compatibility tests,
+- archive otrzymało deterministyczny historical-200 contract,
+- async queue assumptions zastąpiono dirty/version coordinator tests działającymi przy QUEUE_CONNECTION=sync,
+- NEWSROOM_PUBLIC_ENABLED stał się wymaganym dark-deploy/cutover/rollback gate,
+- newsroom browser E2E oddzielono od istniejącego product browser smoke.
 
 ### 2026-09-16 — v0.4
 
