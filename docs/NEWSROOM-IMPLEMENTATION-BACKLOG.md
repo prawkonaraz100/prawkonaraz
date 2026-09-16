@@ -954,6 +954,23 @@ Computed blocking/warning items.
 
 ## NEWSROOM-N2-010 — Provenance, regulatory context and media art direction
 
+### Status implementacji
+
+**DONE — zmergowano PR #60 na `main@4936d14d56fa15e59e6dd771e443e93895d3d281` po exact-head CI #217. `quality` zakończył się wynikiem 1015 passed / 19 245 assertions / 2 skipped, Pint 1027 files PASS i frontend build PASS; `newsroom-postgres` zakończył się wynikiem 7 passed / 89 assertions.**
+
+### Aktualny stan implementacji
+
+- `ContentArticleResource` ma kontrolowane pola `origin_type` i `regulatory_status` oraz `effective_from`, `change_summary`, `applies_to` i `exam_impact`; origin/regulatory są widoczne także w tabeli, filtrach i infoliście,
+- `ContentArticlePublicationChecklist` i `ContentArticlePublishingService` współdzielą backendowe reguły spójności: `official_source` oraz aktywny kontekst regulacyjny wymagają publicznie cytowanego źródła `official` lub `legislation` z bezpiecznym HTTP(S) URL, a `adopted_future` / `in_force` wymagają `effective_from`,
+- brak `change_summary`, `applies_to` lub `exam_impact` przy aktywnym kontekście regulacyjnym jest warningiem, nie obejściem twardych blockerów,
+- `NewsroomArticleMediaService` zapisuje hero/OG przez istniejący `NewsroomMediaStorage`; question-specific `AdminMediaUploadService` nie jest używany,
+- hero/OG używają immutable managed source paths; backend ponownie sprawdza faktyczne bytes, raster MIME, dimensions i stabilny publiczny URL przed persistence oraz ponownie przy publication readiness,
+- zapisane width/height są wyprowadzane z inspekcji rzeczywistego assetu; publication gate odrzuca metadata niezgodne z obiektem storage,
+- hero ma focal X/Y jako parę znormalizowanych współrzędnych 0..1; formularz pokazuje CSS crop previews 16:9, 4:3 i 1:1 z focal pointem, bez tworzenia lub deklarowania fizycznych wariantów,
+- hero/OG obsługują alt, hero caption i publiczny image credit; `image_license_note` pozostaje wyłącznie backoffice,
+- pola N2-010 są częścią istniejącego atomowego stale-safe `Apply public update`; zwykły public Save nadal nie omija tego kontraktu,
+- nie dodano migracji, nowego asset modelu, crop/OG variant generatora ani publicznego renderera N3/N4.
+
 ### Zakres
 
 - origin_type,
@@ -2063,6 +2080,15 @@ N2-009 oraz brakująca HomeComposer część N2-012 są zamknięte po PR #58. Na
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.28
+
+- PR #60 zmergowano na `main@4936d14d56fa15e59e6dd771e443e93895d3d281`; exact-head CI #217: `quality` PASS (1015 passed / 19 245 assertions / 2 skipped, Pint 1027 files PASS, frontend build PASS) oraz `newsroom-postgres` 7 passed / 89 assertions,
+- NEWSROOM-N2-010 jest **DONE**: `ContentArticleResource` ma kontrolowane provenance/regulatory fields, hero/OG upload oparty o `NewsroomArticleMediaService` + istniejący `NewsroomMediaStorage`, focal X/Y 0..1 oraz CSS crop previews 16:9 / 4:3 / 1:1,
+- backend wymaga spójności `official_source` / aktywnego regulatory statusu z publicznie cytowanym official/legislation HTTP(S) source; `adopted_future` i `in_force` wymagają `effective_from`,
+- hero/OG są ponownie inspectowane przed persistence i publication readiness, a zapisane dimensions muszą odpowiadać faktycznemu managed assetowi; `image_license_note` pozostaje backoffice-only,
+- nie dodano migracji, asset modelu, fizycznego crop/OG variant generatora ani publicznego N3/N4 renderera,
+- następnym taskiem wykonawczym N2 jest NEWSROOM-N2-011 `ContentTopicResource`.
 
 ### 2026-09-16 — v0.27
 

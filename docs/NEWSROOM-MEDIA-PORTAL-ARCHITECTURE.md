@@ -103,7 +103,7 @@ Na pierwszym etapie nie budujemy:
 
 ## 5. Aktualny stan implementacji
 
-Stan sprawdzony ponownie 2026-09-16 względem `main@570f884a89869ec44d24f57f0506f4444d20a7d2` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-006 oraz ContentArticle stale-write/public-update slice N2-012.
+Stan sprawdzony ponownie 2026-09-16 względem `main@4936d14d56fa15e59e6dd771e443e93895d3d281` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-010 oraz N2-012. N2-011 (`ContentTopicResource`) pozostaje otwarte.
 
 ### 5.1. Elementy już istniejące
 
@@ -162,13 +162,13 @@ To oznacza, że:
 - model domenowy artykułów/kategorii/tagów/topiców i relacji oraz backendowy publishing/scheduling foundation już istnieją,
 - nie istnieje jeszcze publiczna lista artykułów ani widok pojedynczego artykułu,
 - service-level `ContentArticlePathResolver` istnieje, ale nie jest jeszcze podłączony do publicznych controllerów,
-- redakcyjny CMS jest częściowy: istnieją `ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor dla `body_blocks`, relationship editor źródeł, article-owned questions/legal/signs/topics editor, pełne workflow/exposure actions, stale-safe `Apply public update`, N2-007 publication checklist, N2-008 private Article preview oraz N2-009 custom `NewsroomHomeComposer` + private future preview; stale-write N2-012 jest DONE, nadal nie ma pełnego media/origin/regulatory UI ani `ContentTopicResource`.
+- redakcyjny CMS jest częściowy: istnieją `ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor dla `body_blocks`, relationship editor źródeł, article-owned questions/legal/signs/topics editor, pełne workflow/exposure actions, stale-safe `Apply public update`, N2-007 publication checklist, N2-008 private Article preview, N2-009 custom `NewsroomHomeComposer` + private future preview oraz N2-010 provenance/regulatory/media art direction; stale-write N2-012 jest DONE, nadal nie ma `ContentTopicResource`.
 
 ### 5.3. Brakujące elementy
 
 Nie ma obecnie kompletnego end-to-end odpowiednika:
 
-- UI dla media/origin/regulatory oraz `ContentTopicResource`; pozostałe zmaterializowane elementy N2 obejmują publication checklist po PR #52, article stale-write + `Apply public update` po PR #50, private Article preview po PR #56 oraz `NewsroomHomeComposer` + future preview + HomeComposer stale-write po PR #58,
+- `ContentTopicResource`; media/origin/regulatory UI jest zmaterializowane przez N2-010, a pozostałe wdrożone elementy N2 obejmują publication checklist po PR #52, article stale-write + `Apply public update` po PR #50, private Article preview po PR #56 oraz `NewsroomHomeComposer` + future preview + HomeComposer stale-write po PR #58,
 - publicznego list/detail/category/topic renderera pod utrwalonym route contract,
 - pełnej publicznej integracji byline/tag/topic/question/legal relations mimo istniejącej warstwy modelowej,
 - news sitemap,
@@ -1460,7 +1460,7 @@ Na moment utworzenia dokumentu za ukończone uznajemy wyłącznie elementy rzecz
 - publiczna nawigacja prowadząca do aktualności,
 - istniejące klastry pytań, znaków i przepisów, które mogą zostać powiązane z artykułami.
 
-**Newsroom ma zmaterializowane N1-001..N1-006 oraz N2-001..N2-009, a N2-012 jest DONE (`ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor, sources, article-owned relations/topics, Edit/View workflow actions, stale-safe `Apply public update`, publication checklist, admin-only private Article preview oraz custom `NewsroomHomeComposer` + future preview). N1 domain foundation jest zamknięte, ale CMS jako całość nadal nie jest wdrożony: `ContentTopicResource`, media/origin-regulatory UI oraz N3 renderer/controllers/HTTP 301/410 pozostają otwarte.**
+**Newsroom ma zmaterializowane N1-001..N1-006, N2-001..N2-010 oraz N2-012 (`ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor, sources, article-owned relations/topics, Edit/View workflow actions, stale-safe `Apply public update`, publication checklist, admin-only private Article preview, custom `NewsroomHomeComposer` + future preview oraz provenance/regulatory/media art direction). N1 domain foundation jest zamknięte, ale CMS jako całość nadal nie jest wdrożony: `ContentTopicResource` (N2-011) oraz N3 renderer/controllers/HTTP 301/410 pozostają otwarte.**
 
 ---
 
@@ -1490,7 +1490,8 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N2-008` — admin-only private/no-store Article preview,
 - [x] `NEWSROOM-N2-009` — custom NewsroomHomeComposer + admin-only future preview,
 - [x] `NEWSROOM-N2-012` — ContentArticle + HomeComposer stale-write/audit identity hardening,
-- [ ] `NEWSROOM-N2-010` — provenance, regulatory context and media art direction jako następny wykonywalny task.
+- [x] `NEWSROOM-N2-010` — provenance, regulatory context and media art direction,
+- [ ] `NEWSROOM-N2-011` — ContentTopicResource jako następny wykonywalny task.
 
 Pozostałe elementy N2–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu checklistę.
 
@@ -1517,6 +1518,14 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-16 — v0.28
+
+- PR #60 zmergowano na `main@4936d14d56fa15e59e6dd771e443e93895d3d281` po exact-head CI #217 (`quality` 1015 passed / 19 245 assertions / 2 skipped, Pint 1027 files PASS, frontend build PASS; `newsroom-postgres` 7 passed / 89 assertions),
+- N2-010 materializuje kontrolowane provenance i regulatory context w istniejącym `ContentArticleResource`; aktywny status regulacyjny i `official_source` są backendowo powiązane z publicznie cytowanym źródłem official/legislation, a statusy przyszłe/obowiązujące wymagają `effective_from`,
+- hero/OG upload korzysta z nowego `NewsroomArticleMediaService` nad istniejącym `NewsroomMediaStorage`; rzeczywisty asset jest ponownie inspektowany pod kątem MIME/bytes/dimensions/stabilnego publicznego URL i nie korzysta z question-specific `AdminMediaUploadService`,
+- focal point jest przechowywany jako X/Y 0..1, a CMS pokazuje CSS previews 16:9 / 4:3 / 1:1 bez deklarowania fizycznych wariantów,
+- N2-010 nie dodaje migracji, asset modelu, crop generatora ani publicznego N3/N4 renderera; następnym wykonawczym taskiem N2 jest N2-011 `ContentTopicResource`.
 
 ### 2026-09-16 — v0.27
 
