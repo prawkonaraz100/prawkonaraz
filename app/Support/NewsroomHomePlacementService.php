@@ -20,7 +20,6 @@ final class NewsroomHomePlacementService
     public function __construct(
         private readonly PostgresTransactionAdvisoryLock $advisoryLock,
         private readonly ContentHomePlacementEditToken $editToken,
-        private readonly NewsroomHomeCompositionService $compositionService,
         private readonly AuditLogService $auditLog,
     ) {}
 
@@ -36,7 +35,6 @@ final class NewsroomHomePlacementService
             }
 
             $normalized = $this->normalizeAttributes($attributes);
-            $this->assertTargetEligibleAtPlacementStart($normalized);
             $this->acquireTupleLocks([$this->tupleFor($normalized)]);
             $this->assertNoOverlap($normalized);
 
@@ -91,7 +89,6 @@ final class NewsroomHomePlacementService
                 'updated_by_user_id' => $actor?->getKey() ?? ($attributes['updated_by_user_id'] ?? $locked->updated_by_user_id),
             ]);
 
-            $this->assertTargetEligibleAtPlacementStart($normalized);
             $this->assertNoOverlap($normalized, (int) $locked->getKey());
 
             $locked->fill($normalized);
@@ -261,22 +258,6 @@ final class NewsroomHomePlacementService
         }
 
         return Carbon::parse($value);
-    }
-
-    /**
-     * @param  array<string, mixed>  $attributes
-     */
-    private function assertTargetEligibleAtPlacementStart(array $attributes): void
-    {
-        $article = ContentArticle::query()->findOrFail((int) $attributes['article_id']);
-        $startsAt = $attributes['starts_at'];
-        $at = $startsAt instanceof Carbon && $startsAt->isFuture()
-            ? $startsAt
-            : now();
-
-        if (! $this->compositionService->isArticleEligibleAt($article, $at)) {
-            throw new DomainException('Placement article is not eligible for newsroom distribution at the placement start time.');
-        }
     }
 
     /**
