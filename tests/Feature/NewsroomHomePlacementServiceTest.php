@@ -133,9 +133,13 @@ test('placement writer update ignores itself but rejects overlap after tuple mov
         'ends_at' => '2026-09-16 12:00:00',
     ]);
 
-    $updated = $service->update($existing, [
-        'ends_at' => '2026-09-16 11:30:00',
-    ]);
+    $updated = $service->update(
+        $existing,
+        [
+            'ends_at' => '2026-09-16 11:30:00',
+        ],
+        $service->editToken($existing),
+    );
 
     expect($updated->ends_at?->toDateTimeString())->toBe('2026-09-16 11:30:00');
 
@@ -147,9 +151,13 @@ test('placement writer update ignores itself but rejects overlap after tuple mov
         'ends_at' => '2026-09-16 12:00:00',
     ]);
 
-    expect(fn () => $service->update($other, [
-        'position' => 0,
-    ]))->toThrow(DomainException::class);
+    expect(fn () => $service->update(
+        $other,
+        [
+            'position' => 0,
+        ],
+        $service->editToken($other),
+    ))->toThrow(DomainException::class);
 });
 
 test('placement writer rejects invalid intervals unknown contexts and unsupported surface keys', function () {
