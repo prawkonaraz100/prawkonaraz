@@ -103,7 +103,7 @@ Na pierwszym etapie nie budujemy:
 
 ## 5. Aktualny stan implementacji
 
-Stan sprawdzony ponownie 2026-09-16 względem `main@4936d14d56fa15e59e6dd771e443e93895d3d281` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-010 oraz N2-012. N2-011 (`ContentTopicResource`) pozostaje otwarte.
+Stan sprawdzony ponownie 2026-09-16 względem `main@ff81f92fe75442b60e67297f3945d2a63b7c5128` po wdrożeniu N0, N1-001..N1-006 oraz N2-001..N2-012. Zakres admin/domain N2 jest zamknięty; publiczne N3/N4 i discovery N5 pozostają otwarte.
 
 ### 5.1. Elementy już istniejące
 
@@ -162,13 +162,13 @@ To oznacza, że:
 - model domenowy artykułów/kategorii/tagów/topiców i relacji oraz backendowy publishing/scheduling foundation już istnieją,
 - nie istnieje jeszcze publiczna lista artykułów ani widok pojedynczego artykułu,
 - service-level `ContentArticlePathResolver` istnieje, ale nie jest jeszcze podłączony do publicznych controllerów,
-- redakcyjny CMS jest częściowy: istnieją `ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor dla `body_blocks`, relationship editor źródeł, article-owned questions/legal/signs/topics editor, pełne workflow/exposure actions, stale-safe `Apply public update`, N2-007 publication checklist, N2-008 private Article preview, N2-009 custom `NewsroomHomeComposer` + private future preview oraz N2-010 provenance/regulatory/media art direction; stale-write N2-012 jest DONE, nadal nie ma `ContentTopicResource`.
+- zakres admin/domain CMS N2 jest zmaterializowany: obok `ContentCategoryResource`, `ContentArticleResource`, Builder/sources/relations/workflow/public-update/checklist/preview/HomeComposer/provenance-media istnieje `ContentTopicResource` + kontrolowany topic publish/archive/republish workflow; publiczne route’y pozostają nieuruchomione.
 
 ### 5.3. Brakujące elementy
 
 Nie ma obecnie kompletnego end-to-end odpowiednika:
 
-- `ContentTopicResource`; media/origin/regulatory UI jest zmaterializowane przez N2-010, a pozostałe wdrożone elementy N2 obejmują publication checklist po PR #52, article stale-write + `Apply public update` po PR #50, private Article preview po PR #56 oraz `NewsroomHomeComposer` + future preview + HomeComposer stale-write po PR #58,
+- publicznego topic lifecycle pod `/aktualnosci/temat/{topicSlug}`: route nadal pozostaje 404; publiczne 200/410, nav i sitemap consequences nie zostały uruchomione przez N2-011 i pozostają N4/N5,
 - publicznego list/detail/category/topic renderera pod utrwalonym route contract,
 - pełnej publicznej integracji byline/tag/topic/question/legal relations mimo istniejącej warstwy modelowej,
 - news sitemap,
@@ -1460,7 +1460,7 @@ Na moment utworzenia dokumentu za ukończone uznajemy wyłącznie elementy rzecz
 - publiczna nawigacja prowadząca do aktualności,
 - istniejące klastry pytań, znaków i przepisów, które mogą zostać powiązane z artykułami.
 
-**Newsroom ma zmaterializowane N1-001..N1-006, N2-001..N2-010 oraz N2-012 (`ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor, sources, article-owned relations/topics, Edit/View workflow actions, stale-safe `Apply public update`, publication checklist, admin-only private Article preview, custom `NewsroomHomeComposer` + future preview oraz provenance/regulatory/media art direction). N1 domain foundation jest zamknięte, ale CMS jako całość nadal nie jest wdrożony: `ContentTopicResource` (N2-011) oraz N3 renderer/controllers/HTTP 301/410 pozostają otwarte.**
+**Newsroom ma zmaterializowane N1-001..N1-006 oraz N2-001..N2-012, w tym `ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor, sources, article-owned relations/topics, workflow actions, stale-safe `Apply public update`, publication checklist, admin-only private Article preview, custom `NewsroomHomeComposer`, provenance/regulatory/media art direction oraz `ContentTopicResource` + topic publication workflow. N1 i zakres admin/domain N2 są zamknięte; N3 renderer/controllers/HTTP 301/410 oraz publiczne huby N4 pozostają otwarte.**
 
 ---
 
@@ -1491,9 +1491,10 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N2-009` — custom NewsroomHomeComposer + admin-only future preview,
 - [x] `NEWSROOM-N2-012` — ContentArticle + HomeComposer stale-write/audit identity hardening,
 - [x] `NEWSROOM-N2-010` — provenance, regulatory context and media art direction,
-- [ ] `NEWSROOM-N2-011` — ContentTopicResource jako następny wykonywalny task.
+- [x] `NEWSROOM-N2-011` — ContentTopicResource + topic publication/identity guards,
+- [ ] `NEWSROOM-N3-001` — Public catalog service jako następny wykonywalny task.
 
-Pozostałe elementy N2–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu checklistę.
+Pozostałe elementy N3–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu checklistę.
 
 ---
 ## 28. Zasady utrzymania dokumentu
@@ -1518,6 +1519,15 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-16 — v0.29
+
+- PR #62 zmergowano na `main@ff81f92fe75442b60e67297f3945d2a63b7c5128` po exact-head CI #224 (`quality` 1025 passed / 19 297 assertions / 2 skipped, Pint 1038 files PASS, frontend build PASS; `newsroom-postgres` 7 passed / 89 assertions),
+- N2-011 materializuje adminowy `ContentTopicResource` nad istniejącym modelem/pivotem, bez nowych migracji i bez ręcznego rankingu topic corpus,
+- `ContentTopicPublishingService` utrwala kontrolowane publish/archive/republish, corpus/featured eligibility i AuditLog; model utrwala post-publication slug/`published_at` identity oraz delete guard,
+- corpus below baseline po publikacji nie zmienia automatycznie statusu ani HTTP i wyłącza topic z redakcyjnej promocji przez istniejące predicate,
+- publiczny topic controller oraz 200/410/nav/sitemap behavior pozostają N4/N5; route nadal 404 w pre-launch stanie,
+- N2 jest zamknięte implementacyjnie; następnym taskiem jest N3-001 Public catalog service.
 
 ### 2026-09-16 — v0.28
 
