@@ -65,6 +65,7 @@ class ContentCategoriesTable
                     ->label('Usuń')
                     ->disabled(fn (ContentCategory $record): bool => ! $record->canBeDeleted()),
             ])
+            ->reorderable('position')
             ->defaultSort('position');
     }
 }
