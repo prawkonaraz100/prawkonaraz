@@ -510,7 +510,6 @@ final class ContentArticlePublishingService
         });
     }
 
-
     /**
      * Reject a form that was loaded from an older article/source/relation state.
      */
