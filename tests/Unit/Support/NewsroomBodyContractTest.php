@@ -379,3 +379,73 @@ test('block payloads reject hidden unsupported fields instead of persisting them
         ],
     ]);
 })->throws(InvalidArgumentException::class);
+
+test('rich text allows the documented h2 list and safe link structure while dropping onclick presentation attrs', function () {
+    $normalized = NewsroomBodyContract::normalizeRichTextDocument([
+        'type' => 'doc',
+        'content' => [
+            [
+                'type' => 'heading',
+                'attrs' => [
+                    'level' => 2,
+                    'onclick' => 'alert(1)',
+                ],
+                'content' => [
+                    ['type' => 'text', 'text' => 'Nagłówek'],
+                ],
+            ],
+            [
+                'type' => 'bulletList',
+                'attrs' => ['onclick' => 'alert(1)'],
+                'content' => [[
+                    'type' => 'listItem',
+                    'content' => [[
+                        'type' => 'paragraph',
+                        'content' => [[
+                            'type' => 'text',
+                            'text' => 'Bezpieczny link',
+                            'marks' => [[
+                                'type' => 'link',
+                                'attrs' => [
+                                    'href' => 'https://example.com/source',
+                                    'target' => '_blank',
+                                ],
+                            ]],
+                        ]],
+                    ]],
+                ]],
+            ],
+        ],
+    ]);
+
+    expect($normalized['content'][0]['attrs'])->toBe(['level' => 2])
+        ->and($normalized['content'][1])->not->toHaveKey('attrs')
+        ->and($normalized['content'][1]['content'][0]['content'][0]['content'][0]['marks'][0]['attrs'])
+        ->toBe([
+            'href' => 'https://example.com/source',
+            'target' => '_blank',
+            'rel' => 'noopener noreferrer',
+        ]);
+});
+
+test('raw iframe structures and embed provider payloads fail closed', function () {
+    expect(fn () => NewsroomBodyContract::normalizeRichTextDocument([
+        'type' => 'doc',
+        'content' => [[
+            'type' => 'html',
+            'attrs' => [
+                'html' => '<iframe src="https://attacker.example/embed"></iframe>',
+            ],
+        ]],
+    ]))->toThrow(InvalidArgumentException::class);
+
+    expect(fn () => NewsroomBodyContract::normalize([
+        [
+            'type' => 'embed',
+            'data' => [
+                'provider' => 'unsafe-provider',
+                'url' => 'https://attacker.example/embed',
+            ],
+        ],
+    ]))->toThrow(InvalidArgumentException::class, 'disabled in newsroom v1');
+});
