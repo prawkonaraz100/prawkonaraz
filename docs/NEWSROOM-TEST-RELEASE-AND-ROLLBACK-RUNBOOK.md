@@ -282,6 +282,28 @@ Jeśli jeden rekord nie może się opublikować, strategia ma być jawna:
 
 ## 11. Slug and redirect tests
 
+### 11.0. Aktualny stan po N1-003
+
+Istnieją `tests/Feature/NewsroomSlugServiceTest.php` oraz `tests/Postgres/NewsroomPostgresSlugServiceTest.php`.
+
+Pokrywają już service/domain layer:
+
+- deterministic initial slug + suffix allocation,
+- reserved newsroom slugs,
+- duplicate current slug rejection,
+- draft slug change bez redirectu,
+- published slug history i one-hop rewrite,
+- same-article historical path reclaim,
+- historical full-path reservation przeciw innemu artykułowi,
+- draft cross-family type change, published cross-family block i same-family published change,
+- service-level route-family exclusivity przez `ContentArticlePathResolver`,
+- compact AuditLog metadata,
+- PostgreSQL advisory-lock contention na drugim połączeniu.
+
+Finalny N1-003 PostgreSQL gate: 6 testów / 86 asercji PASS. Finalny ogólny gate: 906 passed / 18 565 assertions / 2 skipped; Pint 980 files i frontend build PASS.
+
+Nie istnieją jeszcze publiczne N3 article controllers, dlatego poniższe HTTP-level old path -> 301, new path -> 200 oraz sitemap-only-current-canonical pozostają testami przyszłej integracji, a nie stanem wykonanym.
+
 - initial slug unique,
 - duplicate current slug rejected/resolved zgodnie z service,
 - canonical path colliding with another article historical `from_path` rejected,
@@ -1400,7 +1422,7 @@ Na 2026-09-16:
 - istnieją globalne backend tests,
 - istnieje Playwright smoke dla produktu,
 - istnieją ops backup/restore/health commands,
-- istnieją newsroom-specific unit/security tests dla `NewsroomBodyContract`, storage/security regression dla `NewsroomMediaStorage`, enum/schema regression oraz PostgreSQL migration contract; browser E2E nadal nie istnieje,
+- istnieją newsroom-specific unit/security tests dla `NewsroomBodyContract`, storage/security regression dla `NewsroomMediaStorage`, enum/schema/model regression oraz N1-003 slug/history tests; PostgreSQL gate obejmuje migration/model/slug concurrency contracts; browser E2E nadal nie istnieje,
 - faktyczne N2 block-editor integration/E2E oraz homepage placement/topic tests jeszcze nie istnieją,
 - newsroom entity graph/news sitemap/sharding/feed-discovery/static-delivery tests jeszcze nie istnieją,
 - atomic static publication i dirty/version newsroom refresh coordinator jeszcze nie istnieją,
@@ -1417,7 +1439,7 @@ Na 2026-09-16:
 - [ ] dodać faktyczne N2 editor/media uploader + N3 renderer integration/E2E oraz composition/topic/focal-point/crop tests,
 - [ ] dodać site-identity/entity-graph/date-consistency tests,
 - [ ] dodać semantic silo/orphan/reverse-link/click-depth tests,
-- [ ] dodać route-family/canonical exclusivity tests,
+- [ ] dodać public HTTP route-family/canonical/old-slug redirect integration/E2E; service-level exclusivity i slug history są już pokryte w N1-003,
 - [ ] dodać audit/stale-write/placement-concurrency/category-topic guard tests,
 - [ ] dodać news namespace + sitemap sharding + atomic publish + dirty-marker refresh/feed-discovery tests,
 - [ ] dodać production-like static robots/sitemap delivery smoke,
@@ -1428,6 +1450,14 @@ Na 2026-09-16:
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-16 — v0.10
+
+- NEWSROOM-N1-003 dodał service-level slug/history/canonical resolver regression na SQLite i PostgreSQL,
+- feature tests pokrywają slug allocation, history reservation/reclaim, one-hop redirects, route-family transition/exclusivity i compact audit metadata,
+- PostgreSQL test używa drugiego connection + lock_timeout do realnego sprawdzenia transaction advisory lock contention,
+- finalny `newsroom-postgres`: 6 testów / 86 asercji PASS; finalny `quality`: 906 passed / 18 565 assertions / 2 skipped, Pint 980 files, frontend build PASS,
+- public HTTP old-slug 301/new-canonical 200 oraz sitemap-only-current-canonical pozostają niewykonane do czasu N3/N5 integration.
 
 ### 2026-09-16 — v0.9
 
