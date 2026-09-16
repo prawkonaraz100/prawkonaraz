@@ -47,7 +47,10 @@ class ContentCategory extends Model
             if (
                 $category->isDirty('is_active')
                 && ! $category->is_active
-                && ! $category->canBeDeactivated()
+                && (
+                    $category->articles()->publiclyVisible()->exists()
+                    || $category->articles()->activelyDistributed()->exists()
+                )
             ) {
                 throw ValidationException::withMessages([
                     'is_active' => 'Nie można wyłączyć kategorii, dopóki ma publiczne lub aktywnie dystrybuowane artykuły.',
@@ -56,7 +59,7 @@ class ContentCategory extends Model
         });
 
         static::deleting(function (ContentCategory $category): void {
-            if (! $category->canBeDeleted()) {
+            if ($category->articles()->exists()) {
                 throw ValidationException::withMessages([
                     'category' => 'Nie można usunąć kategorii, która jest używana przez artykuły.',
                 ]);
