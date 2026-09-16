@@ -174,7 +174,7 @@ Nie ma obecnie kompletnego odpowiednika:
 
 Przed wdrożeniem schema `NewsArticle` należy uporządkować branding publishera.
 
-W `HomePageController.php` występują jeszcze pozostałości marki „Orły na Drodze” w structured data i assetach, podczas gdy produkt działa jako PrawkoNaRaz.
+Historycznie `HomePageController.php` zawierał pozostałości marki „Orły na Drodze”. NEWSROOM-N0-001 usunął ten hardcode: homepage korzysta teraz ze wspólnego kanonicznego site identity PrawkoNaRaz.
 
 Jednocześnie repo już ma właściwy fundament: `config/content.php['organization']`, `SchemaIds` i `SchemaRenderer`. Niespójność polega więc na tym, że homepage omija istniejący source of truth.
 
@@ -1394,7 +1394,6 @@ Newsroom v1 jest ukończony, gdy:
 ### 25.2. Otwarte decyzje N0 wymagające domknięcia przed implementacją zależnych elementów
 
 - konkretny komponent block editora, serializacja payloadów i techniczna strategia sanitization (`NEWSROOM-N0-004`),
-- techniczne wyekstrahowanie/reużycie wspólnego site identity buildera przy zachowaniu istniejącego `config/content.php['organization']` (`NEWSROOM-N0-001`),
 - finalne wspólne design tokens używane przez newsroom po audycie obecnego publicznego UI.
 
 Pozostałe szczegóły nie powinny blokować N1, jeśli nie wpływają na schema, bezpieczeństwo body albo publiczny routing.
@@ -1412,12 +1411,16 @@ Na moment utworzenia dokumentu za ukończone uznajemy wyłącznie elementy rzecz
 - statyczny sitemap generator + builder/auditor + daily refresh,
 - statyczny public/robots.txt oraz istniejący RobotsController,
 - SchemaIds/SchemaRenderer i organization config,
+- NEWSROOM-N0-001: współdzielony `SiteIdentitySchema` dla Organization/WebSite,
+- homepage oparty o `config/content.php['organization']`, stabilne `/#organization` i `/#website`, bez legacy „Orły na Drodze”,
+- wspólny `og:site_name` oraz Organization logo ImageObject z potwierdzonym baseline 256×256,
+- traffic-sign/public-question/legal-content graph services reużywające wspólnego site identity buildera,
 - routes `/aktualnosci` i `/poradniki`,
 - placeholdery tych tras,
 - publiczna nawigacja prowadząca do aktualności,
 - istniejące klastry pytań, znaków i przepisów, które mogą zostać powiązane z artykułami.
 
-**Nie uznajemy newsroomu za zaimplementowany.**
+**Nie uznajemy jeszcze właściwego newsroomu (domain/CMS/public content) za zaimplementowany; ukończony jest foundation task NEWSROOM-N0-001.**
 
 ---
 
@@ -1425,7 +1428,7 @@ Na moment utworzenia dokumentu za ukończone uznajemy wyłącznie elementy rzecz
 
 Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./NEWSROOM-IMPLEMENTATION-BACKLOG.md). Najbliższa kolejność:
 
-- [ ] `NEWSROOM-N0-001` — publisher branding source of truth,
+- [x] `NEWSROOM-N0-001` — publisher branding source of truth,
 - [ ] `NEWSROOM-N0-002` — test/utrwalenie przyjętego route contract,
 - [ ] `NEWSROOM-N0-003` — deterministyczny taxonomy seed contract,
 - [ ] `NEWSROOM-N0-004` — block editor + serialization + sanitization + format-evolution decision,
@@ -1457,6 +1460,14 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-16 — v0.7
+
+- wdrożono NEWSROOM-N0-001 i zamknięto branding/site-identity foundation gate,
+- dodano wspólny `SiteIdentitySchema` oparty o istniejący organization config i stabilne SchemaIds,
+- homepage przestał emitować legacy „Orły na Drodze” i korzysta z tego samego Organization/WebSite graph co istniejące publiczne moduły,
+- dodano kanoniczne `og:site_name`, WebSite alternateName oraz zweryfikowane wymiary publicznego logo,
+- usunięto site-identity builder z listy otwartych decyzji N0; następnym taskiem jest N0-002.
 
 ### 2026-09-16 — v0.6
 
