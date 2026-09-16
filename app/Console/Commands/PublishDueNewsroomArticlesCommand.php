@@ -6,6 +6,7 @@ use App\Enums\ContentArticleWorkflowStatus;
 use App\Models\ContentArticle;
 use App\Support\AuditLogService;
 use App\Support\ContentArticlePublishingService;
+use DomainException;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -77,7 +78,9 @@ class PublishDueNewsroomArticlesCommand extends Command
                         'workflow_status' => $fresh->workflow_status->value,
                         'scheduled_for' => $fresh->scheduled_for,
                         'exception' => class_basename($exception),
-                        'reason' => $exception->getMessage(),
+                        'reason' => $exception instanceof DomainException
+                            ? $exception->getMessage()
+                            : 'Unexpected scheduled publish failure.',
                     ],
                 );
 
