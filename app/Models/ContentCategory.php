@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\NewsroomRouteContract;
 use Database\Factories\ContentCategoryFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -27,6 +28,12 @@ class ContentCategory extends Model
     protected static function booted(): void
     {
         static::saving(function (ContentCategory $category): void {
+            if (preg_match('/\\A'.NewsroomRouteContract::SLUG_PATTERN.'\\z/', (string) $category->slug) !== 1) {
+                throw ValidationException::withMessages([
+                    'slug' => 'Slug kategorii może zawierać tylko małe litery, cyfry i myślniki.',
+                ]);
+            }
+
             if (! $category->exists) {
                 return;
             }
