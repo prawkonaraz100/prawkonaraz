@@ -509,9 +509,9 @@ Focal point powinien być ustawiany wizualnie na obrazie, jeśli komponent na to
 
 Nie przechowujemy raw binary w bazie.
 
-### 19.1. Aktualny foundation po N0-006
+### 19.1. Aktualny stan po N2-010
 
-Kod posiada `NewsroomMediaStorage`, który:
+Kod nadal opiera newsroom media na `NewsroomMediaStorage`, który:
 
 - jest osobny od question-specific `AdminMediaUploadService`,
 - przygotowuje immutable/unique source paths pod dedykowanym newsroom prefixem,
@@ -520,7 +520,17 @@ Kod posiada `NewsroomMediaStorage`, który:
 - odrzuca SVG/non-raster, metadata mismatch, path traversal i obiekty spoza managed namespace,
 - rozwiązuje stabilny publiczny HTTP(S) URL przez `MediaUrlResolver`.
 
-Nie istnieją jeszcze: Filament hero uploader, presign/confirm endpointy newsroomu, zapis asset metadata do `ContentArticle`, focal-point picker ani crop generator. N2 ma użyć istniejącego storage contract zamiast budować drugi upload policy.
+NEWSROOM-N2-010 dodało warstwę CMS bez zmiany schema:
+
+- `NewsroomArticleMediaService` zapisuje upload przez powyższy storage contract i usuwa częściowo zapisany asset, jeśli końcowa inspekcja lub URL resolution nie przejdą,
+- Filament ma pojedyncze uploady hero i opcjonalnego dedykowanego OG; oba zapisują storage-relative immutable managed path, nie temporary/signed URL,
+- `NewsroomArticleProvenanceMediaAdapter` ponownie inspectuje zapisany asset i ustawia width/height z rzeczywistego obiektu przed persistence,
+- publication checklist ponownie inspectuje hero/OG przed publication readiness i blokuje mismatch zapisanych dimensions z faktycznym obiektem,
+- hero focal point jest edytowany jako X/Y 0..1; brak obu wartości oznacza środek, a podanie tylko jednej współrzędnej jest odrzucane,
+- CMS pokazuje trzy CSS previews 16:9, 4:3 i 1:1 z `object-position` wynikającym z focal pointu; nie powstają fizyczne crop files ani warianty OG,
+- hero/OG alt, hero caption i image credit są publicznymi metadanymi; `image_license_note` pozostaje wyłącznie backoffice.
+
+Nie istnieją nadal: presign/confirm endpointy newsroomu, graficzny point-and-click focal picker ani crop/variant generator. Nie są one wymagane do zamkniętego N2-010, ponieważ bieżący Filament flow zapisuje asset przez server-side service, a preview jawnie nie udaje fizycznych wariantów.
 
 ---
 
@@ -1317,7 +1327,7 @@ Na 2026-09-16:
 - TrafficSigns CMS daje wzorzec workflow/checklist,
 - ContentAuthors resource istnieje,
 - `NewsroomBodyContract` v1 i jego unit/security tests istnieją,
-- `NewsroomMediaStorage` i jego unit regression istnieją jako N0-006 storage/validation foundation,
+- `NewsroomMediaStorage` pozostaje N0-006 storage/validation foundation, a N2-010 dodało `NewsroomArticleMediaService` oraz `NewsroomArticleProvenanceMediaAdapter` dla hero/OG persistence, reinspekcji i provenance/regulatory normalization,
 - N0-004 wybrało Builder + RichEditor TipTap JSON jako adapter, a N2-003 zmaterializowało go w `ContentArticleResource` przez `NewsroomBodyEditorAdapter`,
 - backendowy `ContentArticlePublishingService` istnieje i implementuje audytowane workflow transitions oraz after-commit event boundary z N1-004,
 - backendowe `NewsroomHomeCompositionService` i `NewsroomHomePlacementService` istnieją po N1-006; zapewniają composition/fallback/future-preview eligibility i concurrency-safe placement writes,
@@ -1333,7 +1343,7 @@ Na 2026-09-16:
 - PR #52 dodał `ContentArticlePublicationChecklist`; formularz artykułu pokazuje read-only listę `OK` / `OSTRZEŻENIE` / `BLOKUJE`, a `ContentArticlePublishingService` deleguje do tej samej klasy review/publication/fresh-review assertions,
 - warningi checklisty nie blokują publikacji, natomiast domain blockers pozostają autorytatywne po stronie backendu; dedykowany różny OG asset bez własnego alt pozostaje blockerem,
 - `ContentTopicResource` nadal nie istnieje; custom `NewsroomHomeComposer` jest wdrożony po PR #58,
-- N2-006, N2-007, N2-008, N2-009 i N2-012 są DONE; media/origin-regulatory UI nadal pozostaje otwarte,
+- N2-006, N2-007, N2-008, N2-009, N2-010 i N2-012 są DONE; N2-010 obejmuje provenance/regulatory fields, hero/OG upload, verified metadata, focal X/Y i CSS crop previews, natomiast `ContentTopicResource` pozostaje otwarte jako N2-011,
 - publiczny renderer bloków nie istnieje.
 
 ---
@@ -1343,9 +1353,9 @@ Na 2026-09-16:
 - [ ] wdrożyć ContentTopicResource,
 - [ ] wdrożyć public/reverse relation rendering w odpowiednim etapie N3/N4,
 - [x] wdrożyć NewsroomHomeComposer + future preview,
-- [ ] wdrożyć hero/OG uploader korzystający z `NewsroomMediaStorage` i zapis verified metadata do `ContentArticle`,
-- [ ] wdrożyć focal-point/crop UX; nie deklarować variantów bez fizycznie wygenerowanych plików,
-- [ ] wdrożyć origin/regulatory fields,
+- [x] wdrożyć hero/OG uploader przez `NewsroomArticleMediaService` + `NewsroomMediaStorage` i zapis verified metadata do `ContentArticle`,
+- [x] wdrożyć focal-point X/Y oraz CSS crop previews bez deklarowania fizycznych variantów; sam crop/variant generator pozostaje poza N2-010,
+- [x] wdrożyć origin/regulatory fields oraz backendową regulatory/source/effective-date coherence,
 - [x] N2-006: workflow/exposure actions + atomowy stale-safe `Apply public update` dla `ContentArticle`,
 - [x] NEWSROOM-N2-007: wdrożyć computed publication checklist współdzielącą backend invariants,
 - [x] NEWSROOM-N2-008: admin-only private preview route/rendering z `private, no-store`, `noindex,nofollow`, bez public analytics i signed share tokenów,
@@ -1356,6 +1366,15 @@ Na 2026-09-16:
 ---
 
 ## 55. Historia zmian
+
+### 2026-09-16 — v0.20
+
+- PR #60 zmergowano na `main@4936d14d56fa15e59e6dd771e443e93895d3d281`; exact-head CI #217: 1015 passed / 19 245 assertions / 2 skipped, Pint 1027 files PASS, frontend build PASS oraz `newsroom-postgres` 7 passed / 89 assertions,
+- formularz artykułu ma kontrolowane origin/regulatory fields oraz hero/OG upload oparty o `NewsroomArticleMediaService` i istniejący `NewsroomMediaStorage`,
+- backend wiąże `official_source` i aktywny regulatory status z publicznie cytowanym official/legislation HTTP(S) source; adopted-future/in-force wymagają `effective_from`, a brak opisowych pól kontekstu pozostaje warningiem,
+- hero/OG są ponownie inspectowane przy zapisie i publication readiness; focal X/Y 0..1 steruje CSS previews 16:9 / 4:3 / 1:1 bez fizycznych variantów,
+- provenance/regulatory/media fields przechodzą przez istniejący stale-safe `Apply public update`; `image_license_note` pozostaje prywatne,
+- N2-010 jest DONE bez migracji, nowego asset modelu i publicznego N3/N4; następny N2 task to N2-011 `ContentTopicResource`.
 
 ### 2026-09-16 — v0.19
 
