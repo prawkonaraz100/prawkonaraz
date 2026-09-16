@@ -675,6 +675,22 @@ Implementacja obejmuje warstwę domenową/read-model kompozycji oraz transakcyjn
 
 ## NEWSROOM-N2-001 — ContentCategoryResource
 
+### Status implementacji
+
+**DONE — zmergowano PR #37 na `main@c103dda20c96b75f21413f72c684f774d081a6d0` po zielonych jobach `quality` i `newsroom-postgres`.**
+
+### Aktualny stan implementacji
+
+- istnieje Filament `ContentCategoryResource` z pages index/create/view/edit,
+- formularz zarządza nazwą, opisem, SEO, `position` i `is_active`; slug jest podawany przy tworzeniu i disabled na edit,
+- slug jest dodatkowo walidowany i immutable na poziomie modelu, więc UI nie jest jedyną ochroną,
+- tabela pokazuje liczniki wszystkich, `publiclyVisible()` i `activelyDistributed()` artykułów,
+- kolejność można zmieniać przez `position`, w tym table reorder,
+- delete jest blokowany modelowo, jeśli istnieje jakikolwiek artykuł; brak bulk delete,
+- deactivation jest blokowana modelowo oraz przez edit-page validation, jeśli istnieją publiczne lub aktywnie dystrybuowane artykuły,
+- guardy save/delete wykonują świeże zapytania relacji; testy potwierdzają, że stale preloaded counts nie omijają invariantów,
+- resource pozostaje dostępny wyłącznie przez istniejący admin-only Filament panel contract.
+
 ### Zakres
 
 - CRUD,
@@ -1915,7 +1931,7 @@ Nie oznaczać tasku DONE przed merge + green verification.
 Na 2026-09-16:
 
 - pakiet projektowy newsroomu obejmuje architekturę, model danych, CMS, UI, governance, SEO, backlog i runbook,
-- foundation N0 oraz pełny etap N1-001..N1-006 są wdrożone: schema/enumy, modele/scopes, slug/history/path resolution, publishing workflow, due scheduler oraz home composition/placement writer; CMS i publiczny newsroom nadal nie są wdrożone,
+- foundation N0 oraz pełny etap N1-001..N1-006 są wdrożone; N2 rozpoczęło się od `ContentCategoryResource`, ale pozostałe resources/editor/workflow UI i publiczny newsroom nadal nie są wdrożone,
 - `/aktualnosci` i `/poradniki` nadal renderują pre-launch placeholder, teraz z dedykowanym `X-Robots-Tag: noindex, follow`; finalne detail/category/topic/feed route namespaces są zarejestrowane, ale pozostają 404 bez publicznych controllerów,
 - fundamenty ContentAuthor/legal/traffic signs/public SEO istnieją,
 - istnieją config/content.php organization, SchemaIds/SchemaRenderer oraz współdzielony SiteIdentitySchema; homepage i istniejące główne publiczne graph services korzystają z kanonicznego Organization/WebSite identity,
@@ -1930,13 +1946,24 @@ Na 2026-09-16:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N2-001 — ContentCategoryResource.
+NEWSROOM-N2-002 — ContentArticleResource shell.
 
-NEWSROOM-N1-001..N1-006 są zamknięte w zakresie swoich foundation/domain gates. Następny krok wykonawczy przechodzi do CMS: category CRUD/order/active/article-counts przy zachowaniu immutable sluga oraz guards dla delete/deactivation używanej kategorii.
+NEWSROOM-N2-001 jest zamknięte: category CRUD/order/active/article-counts oraz immutable-slug/delete/deactivation guards są wdrożone. Następny krok materializuje article resource shell bez wyprzedzania Builder/workflow/media zakresów kolejnych tasków N2.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.18
+
+- zamknięto NEWSROOM-N2-001 po merge PR #37 na `main@c103dda20c96b75f21413f72c684f774d081a6d0`,
+- dodano Filament `ContentCategoryResource` z index/create/view/edit, form/infolist/table i admin-only access przez istniejący panel gate,
+- wdrożono trzy article counts, filtrowanie active oraz reorder po `position`,
+- category slug jest route-compatible i immutable na poziomie modelu; edit UI nie zapisuje sluga,
+- delete używanej kategorii oraz deactivation kategorii z publicznym/aktywnie dystrybuowanym corpusem są blokowane modelowo; edit page powierzchniowo zwraca validation error dla deactivation,
+- regression tests potwierdzają także, że stale preloaded counts nie omijają save/delete guards,
+- finalny gate PR #37: `quality` 945 passed / 18 806 assertions / 2 skipped, Pint 999 files, frontend build PASS; `newsroom-postgres` 7 passed / 89 assertions,
+- duplikujący zakres PR #38 został zamknięty; następnym taskiem jest NEWSROOM-N2-002 ContentArticleResource shell.
 
 ### 2026-09-16 — v0.17
 
