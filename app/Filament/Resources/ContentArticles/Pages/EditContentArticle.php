@@ -218,6 +218,7 @@ class EditContentArticle extends EditRecord
 
                 $locked->forceFill([
                     'editorial_note' => $data['editorial_note'] ?? $locked->editorial_note,
+                    'image_license_note' => $data['image_license_note'] ?? $locked->image_license_note,
                 ])->save();
 
                 return $locked->refresh();
