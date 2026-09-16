@@ -111,8 +111,8 @@ test('admin creates draft through slug service while user actor stays separate f
 
     expect($audit->actor_user_id)->toBe($admin->id)
         ->and($article->author_id)->toBe($author->id)
-        ->and($audit->actor_user_id)->not->toBe($article->author_id)
-        ->and($audit->metadata['slug'])->toBe($article->slug);
+        ->and($audit->metadata['slug'])->toBe($article->slug)
+        ->and($audit->entity_type)->toBe(ContentArticle::class);
 });
 
 test('article list search and filters narrow records', function () {
@@ -149,8 +149,9 @@ test('article list search and filters narrow records', function () {
     Livewire::test(ListContentArticles::class)
         ->searchTable('Zmiany w przepisach')
         ->assertCanSeeTableRecords([$matching])
-        ->assertCanNotSeeTableRecords([$other])
-        ->resetTableSearch()
+        ->assertCanNotSeeTableRecords([$other]);
+
+    Livewire::test(ListContentArticles::class)
         ->filterTable('type', ContentArticleType::News->value)
         ->filterTable('workflow_status', ContentArticleWorkflowStatus::Published->value)
         ->filterTable('category_id', $newsCategory->id)
