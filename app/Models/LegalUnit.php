@@ -57,6 +57,19 @@ class LegalUnit extends Model
         return $this->hasMany(self::class, 'parent_legal_unit_id');
     }
 
+    public function contentArticles(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            ContentArticle::class,
+            'content_article_legal_unit',
+            'legal_unit_id',
+            'article_id',
+        )
+            ->withPivot(['relation_type', 'sort_order', 'note'])
+            ->withTimestamps()
+            ->orderByPivot('sort_order');
+    }
+
     public function contentPages(): BelongsToMany
     {
         return $this->belongsToMany(LegalContentPage::class, 'legal_content_page_legal_unit')

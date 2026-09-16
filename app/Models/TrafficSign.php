@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TrafficSign extends Model
@@ -102,6 +103,19 @@ class TrafficSign extends Model
     public function queryMapEntries(): HasMany
     {
         return $this->hasMany(TrafficSignQueryMapEntry::class);
+    }
+
+    public function contentArticles(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            ContentArticle::class,
+            'content_article_traffic_sign',
+            'traffic_sign_id',
+            'article_id',
+        )
+            ->withPivot(['relation_type', 'sort_order'])
+            ->withTimestamps()
+            ->orderByPivot('sort_order');
     }
 
     public function legalReferences(): HasMany
