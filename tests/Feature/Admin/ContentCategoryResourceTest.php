@@ -165,3 +165,47 @@ test('category used by any article cannot be deleted while empty category can be
 
     expect(ContentCategory::query()->whereKey($empty->getKey())->exists())->toBeFalse();
 });
+
+
+test('category invariants ignore stale preloaded article counts', function () {
+    $category = ContentCategory::factory()->create([
+        'slug' => 'bezpieczenstwo',
+        'is_active' => true,
+    ]);
+
+    $staleRecord = ContentCategoryResource::getEloquentQuery()
+        ->whereKey($category->getKey())
+        ->firstOrFail();
+
+    expect((int) $staleRecord->articles_count)->toBe(0)
+        ->and((int) $staleRecord->publicly_visible_articles_count)->toBe(0)
+        ->and((int) $staleRecord->actively_distributed_articles_count)->toBe(0);
+
+    ContentArticle::factory()->published()->for($category, 'category')->create();
+
+    $staleRecord->is_active = false;
+
+    expect(fn () => $staleRecord->save())
+        ->toThrow(ValidationException::class);
+
+    expect($category->fresh()->is_active)->toBeTrue();
+});
+
+test('category delete guard ignores stale preloaded article count', function () {
+    $category = ContentCategory::factory()->create([
+        'slug' => 'metodyka',
+    ]);
+
+    $staleRecord = ContentCategoryResource::getEloquentQuery()
+        ->whereKey($category->getKey())
+        ->firstOrFail();
+
+    expect((int) $staleRecord->articles_count)->toBe(0);
+
+    ContentArticle::factory()->for($category, 'category')->create();
+
+    expect(fn () => $staleRecord->delete())
+        ->toThrow(ValidationException::class);
+
+    expect(ContentCategory::query()->whereKey($category->getKey())->exists())->toBeTrue();
+});
