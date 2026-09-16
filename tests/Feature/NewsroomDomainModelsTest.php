@@ -43,6 +43,25 @@ test('content article casts canonical newsroom fields and uses slug route key', 
         ->and($article->getRouteKeyName())->toBe('slug');
 });
 
+test('content article factory exposes all documented workflow fixture states', function () {
+    $draft = ContentArticle::factory()->draft()->create();
+    $inReview = ContentArticle::factory()->inReview()->create();
+    $scheduled = ContentArticle::factory()->scheduled()->create();
+    $published = ContentArticle::factory()->published()->create();
+    $breaking = ContentArticle::factory()->breaking()->create();
+    $needsReview = ContentArticle::factory()->needsReview()->create();
+    $archived = ContentArticle::factory()->archived()->create();
+
+    expect($draft->workflow_status)->toBe(ContentArticleWorkflowStatus::Draft)
+        ->and($inReview->workflow_status)->toBe(ContentArticleWorkflowStatus::InReview)
+        ->and($scheduled->workflow_status)->toBe(ContentArticleWorkflowStatus::Scheduled)
+        ->and($published->workflow_status)->toBe(ContentArticleWorkflowStatus::Published)
+        ->and($breaking->workflow_status)->toBe(ContentArticleWorkflowStatus::Published)
+        ->and($breaking->is_breaking)->toBeTrue()
+        ->and($needsReview->workflow_status)->toBe(ContentArticleWorkflowStatus::NeedsReview)
+        ->and($archived->workflow_status)->toBe(ContentArticleWorkflowStatus::Archived);
+});
+
 test('public visibility active distribution and indexability remain distinct', function () {
     $published = ContentArticle::factory()->published()->create();
     $noindex = ContentArticle::factory()->published()->noindex()->create();
