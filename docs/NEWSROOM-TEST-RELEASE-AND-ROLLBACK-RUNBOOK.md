@@ -29,7 +29,7 @@ Każdy etap musi przejść odpowiednie do ryzyka:
 - odpowiednie browser E2E,
 - pełny istniejący CI przed merge.
 
-Stan wejściowy: kanoniczny `ci.yml` używa SQLite. Dlatego od PR C/N1 dokładamy osobny PostgreSQL gate zamiast udawać, że obecny „full CI green” już go obejmuje.
+Stan po NEWSROOM-N1-001: kanoniczny `ci.yml` zachowuje szybki job `quality` na SQLite i ma addytywny job `newsroom-postgres` na PostgreSQL 16. Dla zmian newsroom DB/concurrency wymagane jest przejście obu właściwych gate'ów; samo SQLite `quality` nie zastępuje PostgreSQL evidence.
 
 ---
 
@@ -1400,11 +1400,11 @@ Na 2026-09-16:
 - istnieją globalne backend tests,
 - istnieje Playwright smoke dla produktu,
 - istnieją ops backup/restore/health commands,
-- istnieją newsroom-specific unit/security tests dla `NewsroomBodyContract` oraz storage/security regression dla `NewsroomMediaStorage`, ale szersze newsroom tests i browser E2E jeszcze nie istnieją,
+- istnieją newsroom-specific unit/security tests dla `NewsroomBodyContract`, storage/security regression dla `NewsroomMediaStorage`, enum/schema regression oraz PostgreSQL migration contract; browser E2E nadal nie istnieje,
 - faktyczne N2 block-editor integration/E2E oraz homepage placement/topic tests jeszcze nie istnieją,
 - newsroom entity graph/news sitemap/sharding/feed-discovery/static-delivery tests jeszcze nie istnieją,
 - atomic static publication i dirty/version newsroom refresh coordinator jeszcze nie istnieją,
-- canonical CI jest SQLite-only; newsroom-postgres job jeszcze nie istnieje,
+- canonical CI ma dwa uzupełniające joby: `quality` na SQLite oraz addytywny `newsroom-postgres` na PostgreSQL 16,
 - newsroom-specific browser E2E nie jest pokryty istniejącym product browser smoke,
 - istniejący SeoSitemapAuditor nie obsługuje jeszcze newsroom/news namespace.
 
@@ -1413,13 +1413,11 @@ Na 2026-09-16:
 ## 59. Pozostałe zadania
 
 - [ ] dodać test files w trakcie N1–N5,
-- [ ] podłączyć do CI,
 - [ ] stworzyć newsroom E2E,
 - [ ] dodać faktyczne N2 editor/media uploader + N3 renderer integration/E2E oraz composition/topic/focal-point/crop tests,
 - [ ] dodać site-identity/entity-graph/date-consistency tests,
 - [ ] dodać semantic silo/orphan/reverse-link/click-depth tests,
 - [ ] dodać route-family/canonical exclusivity tests,
-- [ ] dodać newsroom-postgres CI job,
 - [ ] dodać audit/stale-write/placement-concurrency/category-topic guard tests,
 - [ ] dodać news namespace + sitemap sharding + atomic publish + dirty-marker refresh/feed-discovery tests,
 - [ ] dodać production-like static robots/sitemap delivery smoke,
@@ -1430,6 +1428,15 @@ Na 2026-09-16:
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-16 — v0.9
+
+- NEWSROOM-N1-001 dodał realny addytywny job `newsroom-postgres` do canonical CI,
+- PostgreSQL 16 gate uruchamia izolowany `NewsroomPostgresMigrationTest` poza globalnym Pest Feature scope,
+- gate wykonuje migrate fresh, sprawdza krytyczne indeksy i FK delete rules oraz realny rollback 12 newsroom migrations,
+- finalny targeted wynik: 3 testy / 64 asercje PASS; ogólny `quality`, Pint i frontend build również PASS,
+- dotychczasowy szybki SQLite `quality` pozostał bez zastępowania PostgreSQL gate,
+- browser E2E, editor/renderer integration i N5 static-delivery regressions pozostają otwarte.
 
 ### 2026-09-16 — v0.8
 

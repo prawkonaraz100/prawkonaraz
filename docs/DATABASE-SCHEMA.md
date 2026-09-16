@@ -687,6 +687,226 @@ Uwagi implementacyjne:
 - `source_plan` i `correction_notes` spinaja standard zrodel oraz triggerow do przyszlych korekt bez mieszania tego z publiczna trescia strony,
 - `batch_label` pozwala zebrac w panelu jeden operacyjny rollout, np. `rollout-01`.
 
+## 12.2. Rozszerzenie: newsroom / portal redakcyjny (`2026-09-16`)
+
+Stan faktyczny po NEWSROOM-N1-001 / PR #24:
+
+- 12 migracji newsroomu jest zmergowanych,
+- schema przechodzi zwykly CI na SQLite oraz dedykowany `newsroom-postgres` gate na PostgreSQL 16,
+- PostgreSQL test obejmuje migrate fresh, krytyczne indeksy, FK delete rules i rollback 12 migracji,
+- Eloquent modele/factories/scopes newsroomu nie sa jeszcze wdrozone.
+
+Application-level enumy:
+
+- `ContentArticleType`
+- `ContentArticleWorkflowStatus`
+- `ContentArticleSourceType`
+- `ContentArticleOriginType`
+- `ContentArticleRegulatoryStatus`
+
+Kolumny status/type pozostaja `varchar`; enumy PHP sa kontraktem aplikacyjnym, nie natywnymi PostgreSQL ENUM.
+
+### 12.2.1. `content_categories`
+
+- `id`
+- `name varchar(120)`
+- `slug varchar(160) unique`
+- `description text nullable`
+- `position smallint default 0`
+- `is_active boolean default true`
+- `seo_title varchar(255) nullable`
+- `seo_description varchar(320) nullable`
+- timestamps
+
+### 12.2.2. `content_tags`
+
+- `id`
+- `name varchar(120)`
+- `slug varchar(160) unique`
+- timestamps
+
+### 12.2.3. `content_articles`
+
+Glowny rekord tresci newsroomu.
+
+Identity / ownership:
+
+- `id`
+- `type varchar(32)`
+- `category_id -> content_categories.id` — RESTRICT on delete
+- `author_id -> content_authors.id nullable` — RESTRICT on delete
+- `reviewer_id -> content_authors.id nullable` — RESTRICT on delete
+- `origin_type varchar(32) default original`
+
+Content:
+
+- `title varchar(255)`
+- `slug varchar(255) unique`
+- `lead text nullable`
+- `body_blocks jsonb nullable`
+- `body_schema_version smallint default 1`
+- `key_points jsonb nullable`
+- `correction_note text nullable`
+- `editorial_note text nullable`
+
+Regulatory context:
+
+- `regulatory_status varchar(32) default not_applicable`
+- `effective_from date nullable`
+- `change_summary text nullable`
+- `applies_to text nullable`
+- `exam_impact text nullable`
+
+Workflow / chronology:
+
+- `workflow_status varchar(32) default draft`
+- `published_at timestamptz nullable`
+- `first_published_at timestamptz nullable`
+- `scheduled_for timestamptz nullable`
+- `reviewed_at timestamptz nullable`
+- `needs_review_at timestamptz nullable`
+- `archived_at timestamptz nullable`
+- `withdrawn_at timestamptz nullable`
+- `withdrawal_reason text nullable`
+
+Promotion:
+
+- `is_featured boolean default false`
+- `is_breaking boolean default false`
+- `breaking_expires_at timestamptz nullable`
+- `editorial_priority smallint default 0`
+
+Media / SEO:
+
+- hero/OG paths, alts i faktyczne width/height
+- `hero_image_caption text nullable`
+- `hero_focal_x decimal(5,4) nullable`
+- `hero_focal_y decimal(5,4) nullable`
+- `image_credit`, `image_license_note`
+- `seo_title`, `seo_description`, `robots`
+
+Freshness / public state:
+
+- `source_checked_at timestamptz nullable`
+- `freshness_review_due_at timestamptz nullable`
+- `last_substantive_update_at timestamptz nullable`
+- `public_state_changed_at timestamptz nullable`
+- timestamps
+
+Nie istnieja w v1:
+
+- `canonical_url`
+- `featured_position`
+
+Pozycjonowanie homepage jest realizowane przez `content_home_placements`.
+
+Krytyczne indeksy:
+
+- `(workflow_status, first_published_at)`
+- `(category_id, workflow_status, first_published_at)`
+- `(type, workflow_status, first_published_at)`
+- `(is_featured, workflow_status, editorial_priority)`
+- `(is_breaking, breaking_expires_at)`
+- `freshness_review_due_at`
+- `(scheduled_for, workflow_status)`
+
+### 12.2.4. `content_topics`
+
+- `id`
+- `title varchar(180)`
+- `slug varchar(200) unique`
+- `description text`
+- `status varchar(32) default draft`
+- `featured_article_id -> content_articles.id nullable` — SET NULL on delete
+- SEO fields
+- `published_at timestamptz nullable`
+- timestamps
+- index `(status, published_at)`
+
+### 12.2.5. Membership i relacje
+
+`content_article_tag`:
+
+- `article_id -> content_articles.id` — CASCADE
+- `tag_id -> content_tags.id` — CASCADE
+- `created_at`
+- unique `(article_id, tag_id)`
+- bez osobnego `id` i bez `updated_at`
+
+`content_article_topic`:
+
+- `article_id -> content_articles.id` — CASCADE
+- `topic_id -> content_topics.id` — CASCADE
+- `created_at`
+- unique `(article_id, topic_id)`
+- bez osobnego `id` i bez `updated_at`
+
+`content_article_question`:
+
+- `id`
+- article/question FK
+- `relation_type varchar(32)`
+- `sort_order smallint default 0`
+- `note text nullable`
+- timestamps
+- unique article/question
+- reverse index od `question_id`
+
+`content_article_legal_unit`:
+
+- analogiczny rekord relacji do `legal_units`
+- unique article/legal unit
+- reverse index od `legal_unit_id`
+
+`content_article_traffic_sign`:
+
+- `id`
+- article/traffic-sign FK
+- `relation_type varchar(32)`
+- `sort_order smallint default 0`
+- timestamps
+- reverse index od `traffic_sign_id`
+
+Usuniecie zewnetrznego question/legal-unit/traffic-sign usuwa tylko zalezne rekordy pivotu; nie istnieje kaskada z artykulu do bytow produktu.
+
+### 12.2.6. `content_article_sources`
+
+- `id`
+- `article_id -> content_articles.id` — CASCADE
+- `source_type varchar(32)`
+- `publisher varchar(255) nullable`
+- `title varchar(500)`
+- `url varchar(2048) nullable`
+- `published_at/accessed_at timestamptz nullable`
+- `is_primary`, `is_official`, `is_publicly_cited`
+- `note text nullable`
+- `sort_order smallint default 0`
+- timestamps
+- index `(article_id, sort_order)`
+
+### 12.2.7. `content_article_redirects`
+
+- `id`
+- `article_id -> content_articles.id` — CASCADE
+- `from_path varchar(1024) unique`
+- `to_path varchar(1024)`
+- `http_status smallint default 301`
+- timestamps
+
+### 12.2.8. `content_home_placements`
+
+- `id`
+- `surface_key varchar(64) default newsroom_home`
+- `slot_key varchar(64)`
+- `context_key varchar(120) nullable`
+- `position smallint default 0`
+- `article_id -> content_articles.id` — CASCADE
+- `starts_at/ends_at timestamptz nullable`
+- `created_by_user_id -> users.id nullable` — SET NULL
+- `updated_by_user_id -> users.id nullable` — SET NULL
+- timestamps
+- lookup index `(surface_key, slot_key, context_key, position, starts_at, ends_at)`
+
 ## 13. Reguly migracji
 
 Kazda migracja powinna:
