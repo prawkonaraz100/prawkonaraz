@@ -35,6 +35,16 @@ class ContentAuthor extends Model
         ];
     }
 
+    public function authoredContentArticles(): HasMany
+    {
+        return $this->hasMany(ContentArticle::class, 'author_id');
+    }
+
+    public function reviewedContentArticles(): HasMany
+    {
+        return $this->hasMany(ContentArticle::class, 'reviewer_id');
+    }
+
     public function trafficSigns(): HasMany
     {
         return $this->hasMany(TrafficSign::class);
