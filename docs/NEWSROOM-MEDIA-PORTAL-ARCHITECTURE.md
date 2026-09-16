@@ -103,7 +103,7 @@ Na pierwszym etapie nie budujemy:
 
 ## 5. Aktualny stan implementacji
 
-Stan sprawdzony ponownie 2026-09-16 względem `main@262d9fab0b171c13a159f7c97670dee3db583b56` po wdrożeniu N0, N1-001..N1-006 oraz N2-001..N2-005.
+Stan sprawdzony ponownie 2026-09-16 względem `main@88533b04d74a839c3bbccf86b707909ccdd235f8` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-005 oraz workflow/exposure action slice N2-006.
 
 ### 5.1. Elementy już istniejące
 
@@ -162,7 +162,7 @@ To oznacza, że:
 - model domenowy artykułów/kategorii/tagów/topiców i relacji oraz backendowy publishing/scheduling foundation już istnieją,
 - nie istnieje jeszcze publiczna lista artykułów ani widok pojedynczego artykułu,
 - service-level `ContentArticlePathResolver` istnieje, ale nie jest jeszcze podłączony do publicznych controllerów,
-- redakcyjny CMS jest częściowy: istnieją `ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor dla `body_blocks`, relationship editor źródeł oraz article-owned questions/legal/signs/topics editor, ale nie pełne media/origin/regulatory UI, workflow/preview/HomeComposer.
+- redakcyjny CMS jest częściowy: istnieją `ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor dla `body_blocks`, relationship editor źródeł, article-owned questions/legal/signs/topics editor oraz workflow/exposure actions; nadal nie ma pełnego media/origin/regulatory UI, `Apply public update` + stale-write, preview ani HomeComposer.
 
 ### 5.3. Brakujące elementy
 
@@ -170,7 +170,7 @@ Nie ma obecnie kompletnego end-to-end odpowiednika:
 
 - UI dla media/origin/regulatory oraz pozostałych etapów N2,
 - `ContentTopicResource`,
-- Filament workflow actions, checklisty, stale-write guard, `Apply public update`, private preview i `NewsroomHomeComposer`,
+- publication checklist, stale-write guard, `Apply public update`, private preview i `NewsroomHomeComposer`; workflow/exposure actions są już zmaterializowane po PR #48,
 - publicznego list/detail/category/topic renderera pod utrwalonym route contract,
 - pełnej publicznej integracji byline/tag/topic/question/legal relations mimo istniejącej warstwy modelowej,
 - news sitemap,
@@ -1456,12 +1456,13 @@ Na moment utworzenia dokumentu za ukończone uznajemy wyłącznie elementy rzecz
 - NEWSROOM-N2-003: kontrolowany Filament Builder/RichEditor dla aktywnych bloków v1, `NewsroomBodyEditorAdapter`, canonical key round-trip oraz server-side normalizacja przez `NewsroomBodyContract`,
 - NEWSROOM-N2-004: relationship Repeater `ContentArticleSource` z `sort_order`, kontrolowanymi typami/statusami, bezpiecznym HTTP(S) URL handlingiem oraz finalną source-policy validation w `ContentArticlePublishingService`,
 - NEWSROOM-N2-005: article-owned questions/legal/signs/topics editor + `NewsroomArticleRelationsEditorAdapter`; questions/legal/signs zapisują istniejące pivoty z `sort_order`, topics pozostają bez ręcznego rankingu, a target corpora są wyszukiwane bez preloadu,
+- NEWSROOM-N2-006 slice: wspólne Edit/View workflow actions dla review/schedule/publish/archive/withdraw/republish oraz audytowane featured/breaking exposure actions delegujące do `ContentArticlePublishingService`; `Apply public update` + stale-write pozostają zależnością N2-012,
 - routes `/aktualnosci` i `/poradniki` jako dedykowane pre-launch 200/noindex placeholders,
 - placeholdery tych tras,
 - publiczna nawigacja prowadząca do aktualności,
 - istniejące klastry pytań, znaków i przepisów, które mogą zostać powiązane z artykułami.
 
-**Newsroom ma zmaterializowane N1-001..N1-006 oraz N2-001..N2-005 (`ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor dla `body_blocks`, relationship editor źródeł oraz article-owned relations/topics editor). N1 domain foundation jest zamknięte, ale CMS jako całość nadal nie jest wdrożony: `ContentTopicResource`, media/origin-regulatory UI, workflow/stale-write/preview UI, HomeComposer oraz N3 renderer/controllers/HTTP 301/410 pozostają otwarte.**
+**Newsroom ma zmaterializowane N1-001..N1-006 oraz N2-001..N2-005, a także workflow/exposure action slice N2-006 (`ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor, sources, article-owned relations/topics oraz Edit/View workflow actions). N1 domain foundation jest zamknięte, ale CMS jako całość nadal nie jest wdrożony: `ContentTopicResource`, media/origin-regulatory UI, N2-012 `Apply public update` + stale-write, checklist/preview UI, HomeComposer oraz N3 renderer/controllers/HTTP 301/410 pozostają otwarte.**
 
 ---
 
@@ -1486,7 +1487,7 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N2-003` — controlled Builder/RichEditor + body adapter + server-side sanitization/XSS regression,
 - [x] `NEWSROOM-N2-004` — sources relationship editor + source ordering/status UX + authoritative source-policy validation,
 - [x] `NEWSROOM-N2-005` — article-owned questions/legal/signs/topics editor + relation validation/sync + bounded search,
-- [ ] kontynuować N2 zgodnie z backlogiem; następny task: `NEWSROOM-N2-006` Workflow actions.
+- [ ] `NEWSROOM-N2-006` pozostaje PARTIAL po wdrożeniu workflow/exposure actions; następny task wykonawczy: `NEWSROOM-N2-012` `Apply public update` + stale-write, wymagane do pełnego DoD N2-006.
 
 Pozostałe elementy N2–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu checklistę.
 
@@ -1513,6 +1514,15 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-16 — v0.23
+
+- PR #48 zmergowano na `main@88533b04d74a839c3bbccf86b707909ccdd235f8`; exact-head CI #176 przeszedł dla `quality` i `newsroom-postgres`,
+- zmaterializowano wspólną warstwę Edit/View workflow actions delegującą do `ContentArticlePublishingService`,
+- review/schedule/publish/archive/withdraw/restore/republish oraz featured/breaking są dostępne jako kontrolowane actions; exposure mutations zachowują audit/public-state semantics,
+- ordinary `publiclyVisible()` Edit nadal nie ma low-level public Save,
+- N2-006 pozostaje **PARTIAL**: `Apply public update` i loaded-token stale-write rejection nadal należą do N2-012,
+- kolejny wykonawczy krok to N2-012, aby domknąć zależność zamiast fałszywie oznaczać N2-006 jako ukończone.
 
 ### 2026-09-16 — v0.22
 
