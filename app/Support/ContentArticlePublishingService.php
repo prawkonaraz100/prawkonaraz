@@ -7,7 +7,6 @@ use App\Enums\ContentArticleType;
 use App\Enums\ContentArticleWorkflowStatus;
 use App\Events\ContentArticleWorkflowTransitioned;
 use App\Models\ContentArticle;
-use App\Models\ContentArticleSource;
 use App\Models\User;
 use DateTimeInterface;
 use DomainException;
@@ -550,8 +549,11 @@ final class ContentArticlePublishingService
             $this->assertFreshEditToken($locked, $loadedToken);
             $beforePublicFingerprint = $this->editToken->publicFingerprint($locked);
 
-            $sources = $payload['sources'] ?? [];
-            unset($payload['sources'], $payload['_edit_token'], $payload['editorial_note']);
+            unset($payload['_edit_token'], $payload['editorial_note']);
+
+            $sourcePayload = NewsroomArticleSourcesEditorAdapter::extractArticleData($payload);
+            $payload = $sourcePayload['article_data'];
+            $sources = $sourcePayload['sources'];
 
             $payload = NewsroomBodyEditorAdapter::normalizeArticleData(
                 $payload,
@@ -599,7 +601,7 @@ final class ContentArticlePublishingService
                 $locked = $this->slugService->changeSlug($locked, $requestedSlug, $actor);
             }
 
-            $this->replaceSources($locked, $sources);
+            $locked = NewsroomArticleSourcesEditorAdapter::sync($locked, $sources);
             $locked = NewsroomArticleRelationsEditorAdapter::sync($locked, $relations)->refresh();
 
             $this->assertPublicationReady($locked);
@@ -623,7 +625,7 @@ final class ContentArticlePublishingService
                     'workflow_status' => $this->statusValue($locked),
                     'substantive_change' => $substantiveChange,
                     'last_substantive_update_at' => $locked->last_substantive_update_at,
-                    'source_count' => count($this->sourceRows($sources)),
+                    'source_count' => count($sources),
                     'question_relation_count' => count($relations['questions']),
                     'legal_unit_relation_count' => count($relations['legal_units']),
                     'traffic_sign_relation_count' => count($relations['traffic_signs']),
@@ -634,85 +636,6 @@ final class ContentArticlePublishingService
 
             return $locked->refresh();
         });
-    }
-
-    /**
-     * @return list<array<string, mixed>>
-     */
-    private function sourceRows(mixed $sources): array
-    {
-        if (! is_array($sources)) {
-            throw new InvalidArgumentException('Content article sources payload must be an array.');
-        }
-
-        $rows = [];
-
-        foreach ($sources as $source) {
-            if (! is_array($source)) {
-                throw new InvalidArgumentException('Each content article source must be an object-like array.');
-            }
-
-            $rows[] = $source;
-        }
-
-        return array_values($rows);
-    }
-
-    private function replaceSources(ContentArticle $article, mixed $sources): void
-    {
-        $rows = $this->sourceRows($sources);
-
-        $article->sources()->delete();
-
-        foreach ($rows as $index => $source) {
-            $sourceType = $source['source_type'] ?? null;
-            $sourceType = $sourceType instanceof ContentArticleSourceType
-                ? $sourceType->value
-                : trim((string) $sourceType);
-
-            if (ContentArticleSourceType::tryFrom($sourceType) === null) {
-                throw new InvalidArgumentException('Content article source has an unsupported source_type.');
-            }
-
-            $title = trim((string) ($source['title'] ?? ''));
-
-            if ($title === '') {
-                throw new InvalidArgumentException('Content article source title is required.');
-            }
-
-            $url = $this->nullableTrimmedString($source['url'] ?? null);
-
-            if ($url !== null && ! $this->isSafeHttpUrl($url)) {
-                throw new InvalidArgumentException('Content article source URL must use a valid http or https URL.');
-            }
-
-            $article->sources()->create([
-                'source_type' => $sourceType,
-                'publisher' => $this->nullableTrimmedString($source['publisher'] ?? null),
-                'title' => $title,
-                'url' => $url,
-                'published_at' => $source['published_at'] ?? null,
-                'accessed_at' => $source['accessed_at'] ?? null,
-                'is_primary' => (bool) ($source['is_primary'] ?? false),
-                'is_official' => (bool) ($source['is_official'] ?? false),
-                'is_publicly_cited' => array_key_exists('is_publicly_cited', $source)
-                    ? (bool) $source['is_publicly_cited']
-                    : true,
-                'note' => $this->nullableTrimmedString($source['note'] ?? null),
-                'sort_order' => $index,
-            ]);
-        }
-    }
-
-    private function nullableTrimmedString(mixed $value): ?string
-    {
-        if ($value === null) {
-            return null;
-        }
-
-        $value = trim((string) $value);
-
-        return $value === '' ? null : $value;
     }
 
     private function publishLocked(
