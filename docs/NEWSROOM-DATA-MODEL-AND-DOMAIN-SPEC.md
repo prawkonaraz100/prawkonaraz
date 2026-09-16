@@ -6,7 +6,7 @@
 - Obszar: newsroom / media portal
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Bazowy stan repo przy projektowaniu: main@6a38c95ce76ee05997977d614d795ed8513462f1
-- Ostatnia weryfikacja zgodności z kodem: main@5a4f92e08c8618ff70270abb683f97bd88d02700 (2026-09-16)
+- Ostatnia weryfikacja zgodności z kodem: main@fd2042f22532b7b7c14dc993e532c0887876e159 (2026-09-16)
 - Data: 2026-09-16
 - Zakres: model domenowy, baza danych, invariants, serwisy aplikacyjne, routing domeny i kolejność migracji
 
@@ -572,6 +572,20 @@ Pola:
 - `is_publicly_cited=false` zachowuje source jako wewnętrzny dowód i nigdy nie renderuje jego title/publisher/url,
 - `note` jest zawsze wewnętrzne i nigdy nie jest częścią publicznej citation,
 - accessed_at zapisujemy dla źródeł webowych, gdy ma znaczenie weryfikacyjne.
+
+### 11.3. Aktualny stan implementacji N2-004
+
+Po NEWSROOM-N2-004 istniejący model `ContentArticleSource` jest edytowany z `ContentArticleResource` przez relationship Repeater, bez tworzenia drugiego source modelu ani JSON-owego formatu równoległego.
+
+Aktualnie:
+
+- pusty draft nie dostaje sztucznego source row: Repeater używa `defaultItems(0)`; wymóg źródła jest finalnie egzekwowany przy review/publish dla typu news,
+- kolejność jest zapisywana przez `sort_order`, a formularz obsługuje wszystkie wartości `ContentArticleSourceType` v1,
+- `title` jest wymagany, `url` pozostaje nullable; jeśli URL jest podany, UI i `ContentArticlePublishingService` akceptują wyłącznie poprawny HTTP(S),
+- interview/direct/internal evidence może pozostać bez URL, a `is_publicly_cited=false` zachowuje rekord jako wewnętrzny evidence; publiczny renderer nadal nie istnieje i N3 musi respektować ten kontrakt,
+- dla newsów `ContentArticlePublishingService` wymaga co najmniej jednego source; dla kategorii `przepisy`, jeśli w zapisanych źródłach istnieje primary `official` lub `legislation`, co najmniej jeden taki primary musi być publicznie cytowalny z poprawnym HTTP(S) URL,
+- powyższy mechaniczny gate implementuje wykonawczy DoD N2-004; szersza zasada redakcyjna „jeśli jawne źródło pierwotne istnieje, należy je znaleźć i cytować” pozostaje zasadą governance i nie jest automatycznym mechanizmem odkrywania zewnętrznych źródeł,
+- `ContentArticleSource::$touches = ['article']` bumpuje techniczny `ContentArticle.updated_at` przy modelowych mutacjach źródła; nie oznacza to `last_substantive_update_at` i nie zastępuje przyszłego stale-write guardu N2-012.
 
 ---
 
@@ -1671,17 +1685,18 @@ Na 2026-09-16:
 - `ContentCategory` Eloquent model istnieje; N2-001 dodało jego Filament `ContentCategoryResource` oraz modelowe slug/delete/deactivation guards; dedykowany DB seeder kategorii nadal nie istnieje,
 - N2-002 dodało Filament `ContentArticleResource` shell; create i draftowe type/slug mutations reużywają `ContentArticleSlugService`, a ordinary Save `publiclyVisible()` rekordu nie mutuje publicznych pól,
 - N2-003 dodało `NewsroomBodyEditorAdapter` oraz kontrolowany Builder/RichEditor dla `body_blocks`; canonical keys/order są zachowywane, rich text pozostaje TipTap JSON, a zapis jest ponownie normalizowany przez `NewsroomBodyContract`,
+- N2-004 dodało relationship source editor na istniejącym `ContentArticleSource`, reorder przez `sort_order`, source status indicators, HTTP(S) URL validation, parent `updated_at` touch oraz finalny source-policy gate w `ContentArticlePublishingService`,
 - `ContentArticle`, `ContentTag`, `ContentTopic`, `ContentArticleSource` i `ContentHomePlacement` Eloquent models/factories istnieją; factory workflow states pokrywają dokumentowany baseline,
 - service-level route-family lookup guard istnieje w `ContentArticlePathResolver`; nadal nie jest podłączony do publicznych controllerów N3,
 - NEWSROOM-N1-005 scheduler istnieje jako `newsroom:publish-due`, jest zarejestrowany co minutę w production i deleguje due-time revalidation/publish do `ContentArticlePublishingService`,
 - NEWSROOM-N1-006 jest wdrożone: istnieją `NewsroomHomeCompositionService`, `NewsroomHomePlacementService` i niemutujący `ContentArticlePublishingService::assertScheduledPreviewReady()`; overlap/concurrency jest testowane również na PostgreSQL,
-- newsroom CMS jest częściowo zmaterializowany przez `ContentCategoryResource`, `ContentArticleResource` oraz kontrolowany body Builder/editor; `ContentTopicResource`, sources/media/origin-regulatory/relations UI, workflow/stale-write/preview UI i HomeComposer nadal nie istnieją.
+- newsroom CMS jest częściowo zmaterializowany przez `ContentCategoryResource`, `ContentArticleResource`, kontrolowany body Builder/editor oraz source relationship editor; `ContentTopicResource`, media/origin-regulatory/relations UI, workflow/stale-write/preview UI i HomeComposer nadal nie istnieją.
 
 ---
 
 ## 44. Pozostałe zadania
 
-- [ ] wdrożyć N2 sources editor i dalsze article-owned child UI bez omijania publish/source invariants,
+- [ ] wdrożyć N2 relations/topics editor i dalsze article-owned child UI bez omijania istniejących invariants,
 - [ ] wdrożyć N3 publiczny renderer bloków zgodny z `NewsroomBodyContract`,
 - [ ] podłączyć `NewsroomMediaStorage` do N2 hero/OG uploader + `ContentArticle` persistence oraz wdrożyć focal point/OG-alt UX,
 - [ ] wdrożyć crop/variant generation dopiero wraz z fizycznymi artefaktami i ich testami,
@@ -1695,6 +1710,16 @@ Na 2026-09-16:
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.19
+
+- wdrożono NEWSROOM-N2-004 przez PR #44 na `main@fd2042f22532b7b7c14dc993e532c0887876e159`, bez zmiany tabeli ani enumów source v1,
+- istniejący `ContentArticleSource` jest zarządzany przez relationship Repeater w article form; `defaultItems(0)` nie wymusza źródła przy zwykłym draft save, a reorder zapisuje `sort_order`,
+- source URL może pozostać null dla interview/internal evidence; podany URL przechodzi HTTP(S) validation również po stronie `ContentArticlePublishingService`,
+- review/publish source policy wymaga source dla news i implementuje primary official/legislation public-URL gate dla kategorii `przepisy`; szersza editorial source hierarchy pozostaje niezmieniona,
+- model source dotyka parent `updated_at`, ale stale-write rejection oraz public `last_substantive_update_at` semantics nadal pozostają osobnymi taskami,
+- ordinary public Edit nie może mutować source relationship; N3 public renderer i public citation filtering nie są oznaczone jako wdrożone,
+- finalny exact-head gate PR #44: `quality` 968 passed / 18 917 assertions / 2 skipped, Pint 1010 files PASS, frontend build PASS; `newsroom-postgres` 7 passed / 89 assertions.
 
 ### 2026-09-16 — v0.18
 

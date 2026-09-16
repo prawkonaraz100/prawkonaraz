@@ -1060,6 +1060,8 @@ W formularzu powinny być ostrzeżenia:
 - published bez hero alt, jeśli hero istnieje,
 - brak powiązań produktu nie blokuje publish, ale powinien być widoczny.
 
+Aktualny stan po N2-004: source editor i finalny backend source-policy gate są wdrożone, ale osobny computed warning „brak primary source dla prawnego newsa” nadal nie istnieje. Pozostaje on późniejszym publication checklist/provenance zakresem (N2-007/N2-010). Nie zmienia to powyższej zasady redakcyjnej.
+
 ---
 
 ## 44. Preview
@@ -1124,12 +1126,13 @@ Proces jest gotowy, gdy:
 
 Na 2026-09-16:
 
-- istnieje ContentAuthor,
-- istnieją mechanizmy review/freshness w innych modułach,
-- istnieje AuditLog,
-- nie istnieje newsroomowy workflow,
-- nie istnieje newsroom Filament resource,
-- nie istnieje source model dla artykułów.
+- istnieją `ContentAuthor` i istniejący `AuditLog`; `User` pozostaje aktorem operacji, a `ContentAuthor` publiczną tożsamością autora/reviewera,
+- backendowy `ContentArticlePublishingService` i `newsroom:publish-due` istnieją, ale Filament workflow actions, publication checklist i correction/apply-public-update orchestration nadal nie są wdrożone,
+- istnieją `ContentCategoryResource` i `ContentArticleResource`; article CMS ma kontrolowany body Builder/RichEditor oraz relationship source editor,
+- istnieją model `ContentArticleSource`, source types v1, private-evidence flag i source ordering; N2-004 dodaje ich edycję oraz finalną source-policy validation,
+- draft może istnieć bez source, natomiast news nie przechodzi review/publish bez source; prywatny interview/direct evidence może mieć URL null,
+- ordinary Edit publicznie widocznego artykułu nie może zmieniać publicznych sources,
+- publiczny renderer citation, origin/regulatory UI, computed publication warnings, preview, HomeComposer i pełny stale-write reject nadal nie istnieją.
 
 ---
 
@@ -1137,13 +1140,12 @@ Na 2026-09-16:
 
 - [ ] wdrożyć admin-only policies bez rozszerzania panel access i spiąć AuditLog User actor,
 - [ ] odwzorować mandatory checklist w walidacji,
-- [ ] wdrożyć source model,
 - [ ] wdrożyć origin/regulatory governance w CMS,
 - [ ] wdrożyć homepage placements i future home preview,
 - [ ] wdrożyć topic governance,
 - [ ] wdrożyć focal-point review,
 - [ ] wdrożyć admin-only private/no-store preview,
-- [ ] wdrożyć scheduling,
+- [ ] wdrożyć Filament workflow/schedule actions nad istniejącym backendowym publishing/scheduler foundation,
 - [ ] wdrożyć corrections,
 - [ ] wdrożyć freshness filters,
 - [ ] przygotować publiczną stronę zasad redakcyjnych przed większym rolloutem.
@@ -1151,6 +1153,14 @@ Na 2026-09-16:
 ---
 
 ## 49. Historia zmian
+
+### 2026-09-16 — v0.7
+
+- zsynchronizowano bieżący stan governance z kodem po N2-004 bez zmiany source hierarchy ani standardów redakcyjnych,
+- istniejący `ContentArticleSource` jest teraz pierwszoklasowo edytowany w article CMS; private evidence, nullable URL i source ordering są zachowane,
+- backend finalnie waliduje source policy przed review/publish, ale redakcyjny wymóg szukania jawnego Tier 1 oraz computed warning o braku primary source pozostają niezmienioną policy i nie są deklarowane jako automatycznie wdrożone,
+- potwierdzono, że backend workflow/scheduler istnieje, natomiast Filament workflow/checklist/correction UI nadal pozostaje otwarte,
+- finalny exact-head gate N2-004: `quality` 968 passed / 18 917 assertions / 2 skipped, Pint 1010 files PASS, frontend build PASS; `newsroom-postgres` 7 passed / 89 assertions.
 
 ### 2026-09-16 — v0.6
 

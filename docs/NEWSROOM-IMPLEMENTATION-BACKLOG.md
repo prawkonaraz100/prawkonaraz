@@ -784,6 +784,23 @@ Implementacja obejmuje warstwę domenową/read-model kompozycji oraz transakcyjn
 
 ## NEWSROOM-N2-004 — Sources editor
 
+### Status implementacji
+
+**DONE — zmergowano PR #44 na `main@fd2042f22532b7b7c14dc993e532c0887876e159` po zielonych jobach `quality` i `newsroom-postgres`.**
+
+### Aktualny stan implementacji
+
+- istniejący `ContentArticleSource` jest edytowany jako relationship Repeater `sources` w `ContentArticleResource`; nie dodano osobnego source resource ani migracji,
+- Repeater używa `defaultItems(0)`, więc zwykły draft nie jest blokowany pustym source row; wymóg source dla news pozostaje finalnym review/publish invariant,
+- wszystkie source types v1 i pola modelu są dostępne, reorder zapisuje `sort_order`, a UI pokazuje PRIMARY/OFFICIAL/PUBLIC/TYLKO WEWNĘTRZNE,
+- `url` może być null dla interview/direct/internal evidence; podany URL musi być poprawnym HTTP(S) zarówno w form validation, jak i w `ContentArticlePublishingService`,
+- ordinary Edit `publiclyVisible()` nie może mutować source relationship; regression potwierdza zachowanie istniejącego source,
+- `ContentArticleSource::$touches = ['article']` bumpuje parent `updated_at` jako fundament przyszłego edit tokenu, ale N2-012 stale-write rejection nadal pozostaje otwarte,
+- source policy przed review/publish wymaga co najmniej jednego source dla news; dla kategorii `przepisy`, jeśli istnieje primary `official`/`legislation`, co najmniej jeden taki primary musi być publicznie cytowalny z poprawnym HTTP(S) URL,
+- `is_publicly_cited=false` pozostaje jednoznacznym internal-evidence stanem; publiczny renderer nie istnieje jeszcze, więc N3 nadal musi egzekwować brak publicznego wycieku title/publisher/url,
+- osobny computed warning „brak primary source dla prawnego newsa” nie należy do ukończonego editor gate i pozostaje N2-007/N2-010,
+- finalny exact-head gate PR #44: `quality` 968 passed / 18 917 assertions / 2 skipped, Pint 1010 files PASS, frontend build PASS; `newsroom-postgres` 7 passed / 89 assertions.
+
 ### Zakres
 
 - source repeater/relation,
@@ -1712,7 +1729,7 @@ Docs-only:
 - [x] category resource
 - [ ] topic resource
 - [x] controlled block editor
-- [ ] sources
+- [x] sources
 - [ ] relations
 - [ ] origin/regulatory fields
 - [ ] focal point/crop preview
@@ -1963,7 +1980,7 @@ Nie oznaczać tasku DONE przed merge + green verification.
 Na 2026-09-16:
 
 - pakiet projektowy newsroomu obejmuje architekturę, model danych, CMS, UI, governance, SEO, backlog i runbook,
-- foundation N0 oraz pełny etap N1-001..N1-006 są wdrożone; N2 ma już `ContentCategoryResource`, `ContentArticleResource` i kontrolowany Builder/RichEditor dla `body_blocks`, ale `ContentTopicResource`, sources/media/origin-regulatory/relations UI, workflow/stale-write/preview/HomeComposer oraz publiczny newsroom nadal nie są wdrożone,
+- foundation N0 oraz pełny etap N1-001..N1-006 są wdrożone; N2 ma już `ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor dla `body_blocks` i source relationship editor, ale `ContentTopicResource`, media/origin-regulatory/relations UI, workflow/stale-write/preview/HomeComposer oraz publiczny newsroom nadal nie są wdrożone,
 - `/aktualnosci` i `/poradniki` nadal renderują pre-launch placeholder, teraz z dedykowanym `X-Robots-Tag: noindex, follow`; finalne detail/category/topic/feed route namespaces są zarejestrowane, ale pozostają 404 bez publicznych controllerów,
 - fundamenty ContentAuthor/legal/traffic signs/public SEO istnieją,
 - istnieją config/content.php organization, SchemaIds/SchemaRenderer oraz współdzielony SiteIdentitySchema; homepage i istniejące główne publiczne graph services korzystają z kanonicznego Organization/WebSite identity,
@@ -1978,13 +1995,24 @@ Na 2026-09-16:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N2-004 — Sources editor.
+NEWSROOM-N2-005 — Relations and topics editor.
 
-NEWSROOM-N2-003 jest zamknięte po PR #42: istnieje kontrolowany Builder/RichEditor, adapter do kanonicznego `body_blocks`, server-side normalizacja/sanitization i regresje bezpieczeństwa. Następny krok materializuje edycję `ContentArticleSource` zgodnie z istniejącą source policy, bez wyprzedzania relations/workflow/media/preview zakresów kolejnych tasków N2.
+NEWSROOM-N2-004 jest zamknięte po PR #44: istnieje relationship source editor, source ordering/status UX, nullable internal evidence URL handling, parent edit-token touch oraz finalna source-policy validation. Następny krok materializuje article-level questions/legal/topics/optional-sign relations bez dublowania body-block pickers i bez preloadu dużych corpusów.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.21
+
+- zamknięto NEWSROOM-N2-004 po merge PR #44 na `main@fd2042f22532b7b7c14dc993e532c0887876e159`,
+- dodano relationship Repeater źródeł do istniejącego article form z `defaultItems(0)`, reorder przez `sort_order` i jawnymi statusami source,
+- źródło może być prywatnym interview/direct evidence bez URL; niepusty URL jest ograniczony do poprawnego HTTP(S) również przez backend service gate,
+- review/publish news wymaga source, a primary official/legislation dla `przepisy` musi mieć co najmniej jeden publicznie cytowalny HTTP(S) URL,
+- ordinary public Edit nie zmienia source relationship; source child bumpuje parent `updated_at`, lecz pełny stale-write reject nadal pozostaje N2-012,
+- public citation renderer i computed warning o braku primary source dla prawnego newsa nie są fałszywie oznaczone jako ukończone,
+- finalny exact-head gate PR #44: `quality` 968 passed / 18 917 assertions / 2 skipped, Pint 1010 files PASS, frontend build PASS; `newsroom-postgres` 7 passed / 89 assertions,
+- następnym taskiem jest NEWSROOM-N2-005 Relations and topics editor.
 
 ### 2026-09-16 — v0.20
 
