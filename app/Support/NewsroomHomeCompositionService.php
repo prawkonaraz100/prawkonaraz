@@ -315,8 +315,7 @@ final class NewsroomHomeCompositionService
             ->where(function (Builder $query) use ($at, $includeScheduledPreview): void {
                 $query->where(function (Builder $published) use ($at): void {
                     $published
-                        ->where('workflow_status', ContentArticleWorkflowStatus::Published->value)
-                        ->whereNotNull('published_at')
+                        ->activelyDistributed()
                         ->where('published_at', '<=', $at);
                 });
 
@@ -369,7 +368,8 @@ final class NewsroomHomeCompositionService
     private function isEligibleAt(ContentArticle $article, Carbon $at): bool
     {
         if ($article->workflow_status === ContentArticleWorkflowStatus::Published) {
-            return $article->published_at !== null
+            return $article->isActivelyDistributed()
+                && $article->published_at !== null
                 && $article->published_at->lte($at);
         }
 
