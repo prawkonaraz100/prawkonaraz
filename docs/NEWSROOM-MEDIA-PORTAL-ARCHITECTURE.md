@@ -285,11 +285,11 @@ Newsroom v1 przewiduje uporządkowany dokument z kontrolowanymi typami bloków, 
 - question group,
 - traffic sign group,
 - product CTA,
-- allowlisted embed.
+- embed — typ zarezerwowany, lecz wyłączony w v1 do czasu osobnego provider/CSP security gate.
 
 To nadal nie jest uniwersalny page builder: redaktor nie definiuje dowolnego HTML, CSS, layoutu ani nowych typów komponentów.
 
-Dokładna serializacja i komponent edytora są domykane w `NEWSROOM-N0-004`, ale jeden uporządkowany dokument blokowy ma być kanonicznym źródłem treści body.
+NEWSROOM-N0-004 domknęło tę decyzję: `NewsroomBodyContract` v1 zapisuje kanonicznie uporządkowaną listę `{key?, type, data}`, niezależną od wewnętrznego associative state Filament Buildera. Przyszły N2 editor używa Buildera jako adaptera UI, a `rich_text` przechowuje structured TipTap JSON z RichEditor, bez równoległego `body_html`. Nieznany typ/wersja failuje zamknięcie. Nowy writer/block type nie może wyprzedzić kompatybilnego readera/renderera lub jawnej migracji danych.
 
 ### DEC-NR-008 — topic jest innym bytem niż tag
 
@@ -1436,12 +1436,13 @@ Na moment utworzenia dokumentu za ukończone uznajemy wyłącznie elementy rzecz
 - traffic-sign/public-question/legal-content graph services reużywające wspólnego site identity buildera,
 - NEWSROOM-N0-002: `NewsroomRouteContract`, finalne route namespaces, reserved slug policy i route-family transition guard,
 - NEWSROOM-N0-003: `NewsroomTaxonomyContract` v1 z sześcioma kategoriami, nazwami publicznymi i deterministyczną kolejnością,
+- NEWSROOM-N0-004: `NewsroomBodyContract` v1 z canonical block list, structured TipTap rich text, ścisłymi payload schemas i disabled embed,
 - routes `/aktualnosci` i `/poradniki` jako dedykowane pre-launch 200/noindex placeholders,
 - placeholdery tych tras,
 - publiczna nawigacja prowadząca do aktualności,
 - istniejące klastry pytań, znaków i przepisów, które mogą zostać powiązane z artykułami.
 
-**Nie uznajemy jeszcze właściwego newsroomu (domain/CMS/public content) za zaimplementowany; ukończone są foundation tasks NEWSROOM-N0-001, NEWSROOM-N0-002 i NEWSROOM-N0-003. Tabela/model/seeder kategorii nadal nie istnieją.**
+**Nie uznajemy jeszcze właściwego newsroomu (domain/CMS/public content) za zaimplementowany; ukończone są foundation tasks NEWSROOM-N0-001, NEWSROOM-N0-002, NEWSROOM-N0-003 i NEWSROOM-N0-004. Modele/tabele, N2 article editor i N3 renderer nadal nie istnieją.**
 
 ---
 
@@ -1452,8 +1453,9 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N0-001` — publisher branding source of truth,
 - [x] `NEWSROOM-N0-002` — test/utrwalenie przyjętego route contract,
 - [x] `NEWSROOM-N0-003` — deterministyczny taxonomy seed contract,
-- [ ] `NEWSROOM-N0-004` — block editor + serialization + sanitization + format-evolution decision,
-- [ ] `NEWSROOM-N0-005` — utrwalić compatibility contract istniejącego SEO delivery,
+- [x] `NEWSROOM-N0-004` — block editor + serialization + sanitization + format-evolution decision,
+- [x] `NEWSROOM-N0-005` — compatibility decision istniejącego SEO delivery jest udokumentowana; kodowy regression gate pozostaje w N5,
+- [ ] `NEWSROOM-N0-006` — media upload/storage contract,
 - [ ] następnie wykonywać N1 zgodnie z macierzą hard gates z backlogu.
 
 Pozostałe elementy N2–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu checklistę.
@@ -1481,6 +1483,16 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-16 — v0.10
+
+- wdrożono i zmergowano NEWSROOM-N0-004 po green CI,
+- utrwalono `NewsroomBodyContract` v1 jako canonical block-format/validation contract,
+- Filament Builder pozostaje adapterem przyszłego N2 UI, a rich text ma structured TipTap JSON zamiast raw HTML,
+- `embed` jest wyłączony do czasu osobnego provider/CSP security gate,
+- reader-before-writer i explicit migration pozostają warunkiem przyszłej ewolucji body schema,
+- właściwy CMS i public renderer nie są jeszcze wdrożone,
+- uporządkowano tę samą checklistę: N0-005 ma zamkniętą decyzję dokumentacyjną, N0-006 pozostaje otwartym foundation contractem.
 
 ### 2026-09-16 — v0.9
 
