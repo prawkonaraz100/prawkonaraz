@@ -103,7 +103,7 @@ final class NewsroomArticleSourceEditorAdapter
                 'accessed_at' => self::nullableDateTime($row['accessed_at'] ?? null),
                 'is_primary' => (bool) ($row['is_primary'] ?? false),
                 'is_official' => (bool) ($row['is_official'] ?? false),
-                'is_publicly_cited' => (bool) ($row['is_publicly_cited'] ?? false),
+                'is_publicly_cited' => (bool) ($row['is_publicly_cited'] ?? true),
                 'note' => self::nullableString($row['note'] ?? null),
                 'sort_order' => $index,
             ];
