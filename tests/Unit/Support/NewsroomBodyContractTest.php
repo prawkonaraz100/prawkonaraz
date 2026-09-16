@@ -66,8 +66,7 @@ test('body contract fixes the v1 editor and serialization choices', function () 
 
 test('normalization preserves the canonical type data shape and strips rich text presentation attributes', function () {
     $normalized = NewsroomBodyContract::normalize([
-        [
-            'key' => 'intro_1',
+        '018f7d4a-0d15-7f4a-9f19-2b6adcc7b8cb' => [
             'type' => 'rich_text',
             'data' => ['content' => validNewsroomRichText()],
         ],
@@ -81,7 +80,7 @@ test('normalization preserves the canonical type data shape and strips rich text
         ],
     ]);
 
-    expect($normalized[0]['key'])->toBe('intro_1')
+    expect($normalized[0]['key'])->toBe('018f7d4a-0d15-7f4a-9f19-2b6adcc7b8cb')
         ->and($normalized[0]['type'])->toBe('rich_text')
         ->and($normalized[0]['data']['content']['content'][0]['attrs'])->toBe(['level' => 2])
         ->and($normalized[0]['data']['content']['content'][1])->not->toHaveKey('attrs')
@@ -92,6 +91,22 @@ test('normalization preserves the canonical type data shape and strips rich text
             'title' => 'Uwaga',
             'text' => 'To jest kontrolowany callout.',
         ]);
+});
+
+test('canonical stored keys survive a second normalization pass', function () {
+    $first = NewsroomBodyContract::normalize([
+        '018f7d4a-0d15-7f4a-9f19-2b6adcc7b8cb' => [
+            'type' => 'context',
+            'data' => [
+                'variant' => 'metodologia',
+                'text' => 'Opis metodologii.',
+            ],
+        ],
+    ]);
+
+    $second = NewsroomBodyContract::normalize($first);
+
+    expect($second)->toBe($first);
 });
 
 test('rich text script-looking text stays text and renders escaped instead of executable html', function () {
