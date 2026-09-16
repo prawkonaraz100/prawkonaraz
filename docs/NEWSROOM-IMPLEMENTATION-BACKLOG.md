@@ -198,6 +198,12 @@ Aktualny N0-002 realizuje pre-launch noindex bez feature flaga; `NEWSROOM_PUBLIC
 
 ## NEWSROOM-N0-003 — Taxonomy seed contract
 
+### Status implementacji
+
+**DONE — executable taxonomy seed contract zamknięty na `main` przez PR #18.**
+
+N0-003 zamraża wartości wejściowe dla przyszłego seeda DB. Nie oznacza jeszcze istnienia tabeli `content_categories`, modelu `ContentCategory` ani seedera zapisującego rekordy do bazy; te elementy należą do N1.
+
 ### Zakres
 
 Zatwierdzić kategorie v1:
@@ -208,6 +214,23 @@ Zatwierdzić kategorie v1:
 - word
 - kierowcy
 - osk
+
+### Aktualny stan implementacji
+
+`NewsroomTaxonomyContract::categories()` jest jedynym wykonywalnym kontraktem kategorii v1 i zwraca deterministycznie:
+
+| position | slug | nazwa publiczna |
+| ---: | --- | --- |
+| 10 | `prawo-jazdy` | Prawo jazdy |
+| 20 | `egzaminy` | Egzaminy |
+| 30 | `przepisy` | Przepisy |
+| 40 | `word` | WORD |
+| 50 | `kierowcy` | Kierowcy |
+| 60 | `osk` | OSK |
+
+Dla wszystkich pozycji kontrakt ustawia `is_active=true`, a `description`, `seo_title` i `seo_description` pozostają jawnie `null` do czasu zatwierdzenia copy. Test blokuje przypadkową zmianę listy, nazw, kolejności, duplikaty slugów/pozycji oraz slugi niezgodne z `NewsroomRouteContract::SLUG_PATTERN`.
+
+Przyszły dedykowany seeder N1 ma konsumować ten kontrakt zamiast utrzymywać drugą listę kategorii.
 
 ### DoD
 
@@ -1730,7 +1753,7 @@ Nie oznaczać tasku DONE przed merge + green verification.
 Na 2026-09-16:
 
 - pakiet projektowy newsroomu obejmuje architekturę, model danych, CMS, UI, governance, SEO, backlog i runbook,
-- foundation N0-001 i N0-002 są wdrożone; właściwy domain/CMS/public newsroom nadal nie jest wdrożony,
+- foundation N0-001, N0-002 i N0-003 są wdrożone; właściwy domain/CMS/public newsroom nadal nie jest wdrożony,
 - `/aktualnosci` i `/poradniki` nadal renderują pre-launch placeholder, teraz z dedykowanym `X-Robots-Tag: noindex, follow`; finalne detail/category/topic/feed route namespaces są zarejestrowane, ale pozostają 404 bez publicznych controllerów,
 - fundamenty ContentAuthor/legal/traffic signs/public SEO istnieją,
 - istnieją config/content.php organization, SchemaIds/SchemaRenderer oraz współdzielony SiteIdentitySchema; homepage i istniejące główne publiczne graph services korzystają z kanonicznego Organization/WebSite identity,
@@ -1745,13 +1768,22 @@ Na 2026-09-16:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N0-003 — Taxonomy seed contract.
+NEWSROOM-N0-004 — Block editor + serialization + sanitization decision.
 
-NEWSROOM-N0-001 i NEWSROOM-N0-002 są zamknięte. N0-003/N0-004/N0-006 można dalej zamykać według macierzy hard dependencies. N0-005 jest już decyzją dokumentacyjną; jego kodowy regression gate wykonuje się w N5.
+NEWSROOM-N0-001, NEWSROOM-N0-002 i NEWSROOM-N0-003 są zamknięte. Tym samym G0-A (routing/taxonomy) jest zamknięty jako dependency gate. N0-004 i N0-006 pozostają otwartymi foundation gates według macierzy hard dependencies. N0-005 jest już decyzją dokumentacyjną; jego kodowy regression gate wykonuje się w N5.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.9
+
+- zamknięto NEWSROOM-N0-003 po merge PR #18 i green CI,
+- dodano wykonywalny `NewsroomTaxonomyContract` v1 z sześcioma zatwierdzonymi slugami, nazwami publicznymi i kolejnością 10..60,
+- testy blokują duplikaty i zmianę kontraktu oraz potwierdzają zgodność slugów z newsroom route regex,
+- SEO description/title i opis kategorii pozostają jawnie niezatwierdzone (`null`), zgodnie z wcześniejszym DoD,
+- nie utworzono jeszcze `content_categories`, `ContentCategory` ani DB seedera; przyszły N1 seeder ma konsumować kontrakt zamiast go duplikować,
+- G0-A routing/taxonomy jest zamknięty; pierwszym następnym taskiem wykonawczym jest N0-004.
 
 ### 2026-09-16 — v0.8
 
