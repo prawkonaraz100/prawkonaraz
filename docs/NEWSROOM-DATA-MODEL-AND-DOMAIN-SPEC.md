@@ -212,21 +212,27 @@ Nie kodujemy layoutu strony głównej ani konkretnej pozycji w rekordzie artyku�
 - image_credit: varchar(500) nullable, publiczny credit jeśli potrzebny
 - image_license_note: text nullable, tylko backoffice
 
-Stan kodu podczas audytu:
+Aktualny stan implementacji po NEWSROOM-N0-006:
 
 - istnieje `MediaUrlResolver` i wspólna konfiguracja public/upload disk,
-- istniejący `AdminMediaUploadService` jest **question-specific** i zapisuje `QuestionMedia`; nie jest gotowym uploaderem newsroomu,
-- Traffic Signs/ContentAuthor przechowują obecnie ścieżki assetów bez wspólnego newsroom asset modelu,
-- nie ma potwierdzonego automatycznego pipeline'u cropów 1:1/4:3/16:9 dla newsroomu.
+- istniejący `AdminMediaUploadService` pozostaje **question-specific** i zapisuje `QuestionMedia`; newsroom go nie reużywa,
+- istnieje dedykowany `NewsroomMediaStorage` jako storage/validation foundation,
+- newsroom używa osobnego konfigurowalnego `media.newsroom_disk`, `media.newsroom_prefix` i `media.newsroom_max_dimension`,
+- source paths mają immutable/unique format `newsroom/articles/source/{ULID}.{ext}`,
+- przygotowanie nowego obrazu zawsze generuje nową ścieżkę; replacement nie nadpisuje starego publicznego URL,
+- rzeczywisty zapisany obiekt jest sprawdzany po storage: bytes, dekodowalny raster, MIME oraz width/height; deklarowane MIME/bytes mogą być porównane i mismatch jest odrzucany,
+- v1 baseline to JPEG/PNG/WebP/AVIF intersectowane ze wspólną image allowlistą; SVG i non-raster payload są odrzucane,
+- managed path guard odrzuca traversal, absolute URL/path i ręczne ścieżki spoza dedykowanego namespace,
+- publiczny URL jest rozwiązywany przez istniejący `MediaUrlResolver` i musi być stabilnym HTTP(S) URL,
+- Traffic Signs/ContentAuthor nadal przechowują własne ścieżki assetów; nie utworzono wspólnego newsroom asset modelu,
+- nie ma automatycznego pipeline'u cropów 1:1/4:3/16:9 ani fizycznych lead/standard/compact/OG variants dla newsroomu.
 
-Target:
+Pozostały target N2/N3:
 
-- URL-e publiczne rozwiązujemy przez istniejący `MediaUrlResolver` / public media config,
-- newsroom dostaje własny bezpieczny upload adapter/service lub jawnie skonfigurowany Filament upload do newsroom prefix; **nie reużywa question-specific AdminMediaUploadService**,
-- storage path, MIME, bytes i rzeczywiste dimensions są walidowane po stronie backendu przed uznaniem assetu za gotowy,
-- newsroom media path jest unikalny/immutable (np. ULID/hash w nazwie); replacement zapisuje nowy object/path zamiast overwrite pod istniejącym publicznym URL,
-- dozwolone obrazy v1: raster MIME zgodny z security/media config (JPEG/PNG/WebP/AVIF); SVG nie jest domyślnie dopuszczone dla newsroom upload,
-- crop/variant jest deklarowany w schema/SEO tylko jeśli rzeczywisty plik został wygenerowany i jest publicznie osiągalny.
+- hero/OG upload adapter lub endpoint korzysta z `NewsroomMediaStorage` zamiast question-specific `AdminMediaUploadService`,
+- zapis do `ContentArticle` przechowuje storage-relative path + zweryfikowane metadata, nie temporary/signed URL,
+- crop/variant jest deklarowany w schema/SEO tylko jeśli rzeczywisty plik został wygenerowany i jest publicznie osiągalny,
+- focal-point i OG-alt UX pozostają do wdrożenia w CMS/public renderer.
 
 Nie sklejamy ręcznie publicznych URL-i i nie zapisujemy signed/temporary URLs jako hero/OG.
 
@@ -1083,7 +1089,7 @@ Kontrakt domenowy:
 - link przyjmuje root-relative/fragment/http/https; `javascript:` oraz nieobsługiwane targety są odrzucane, a `target=_blank` normalizuje się do `rel="noopener noreferrer"`,
 - aktywne bloki v1: `rich_text`, `image`, `quote`, `table`, `context`, `related_article`, `legal_reference`, `question_group`, `traffic_sign_group`, `product_cta`,
 - `embed` jest znany kontraktowi, ale feature-disabled/fail-closed, dopóki nie istnieje provider allowlista, sandbox/referrer policy oraz zgodny z produkcją CSP/`frame-src` contract,
-- image block przyjmuje wyłącznie storage-relative path i pola strukturalne; finalny storage/upload/crop contract pozostaje w N0-006,
+- image block przyjmuje wyłącznie storage-relative path i pola strukturalne; N0-006 zapewnia `NewsroomMediaStorage` dla managed paths/validation, a faktyczny upload UI/persistence i crop generation pozostają w N2/N3,
 - domain blocks utrzymują IDs, nie zduplikowane fragmenty HTML lub kart,
 - block key jest opcjonalny, ale jeśli występuje, ma stabilny format, musi być unikalny i nie może kolidować z Builder item key,
 - unknown block type oraz unknown payload field failują zamknięcie zamiast wykonywać nieznaną treść.
@@ -1576,6 +1582,7 @@ Na 2026-09-16:
 - NEWSROOM-N0-002 route contract jest wdrożony i przetestowany,
 - NEWSROOM-N0-003 taxonomy seed contract jest wdrożony i przetestowany jako `NewsroomTaxonomyContract` v1,
 - NEWSROOM-N0-004 body-format contract jest wdrożony i przetestowany jako `NewsroomBodyContract` v1,
+- NEWSROOM-N0-006 media storage/validation contract jest wdrożony i przetestowany jako `NewsroomMediaStorage`,
 - `/aktualnosci` i `/poradniki` pozostają placeholderami 200 z dedykowanym noindex header,
 - przyszłe detail/category/topic/feed routes są zarejestrowane, lecz zwracają 404 do czasu publicznej implementacji,
 - newsroom tables nie istnieją, więc taxonomy contract nie jest jeszcze zmaterializowany jako rekordy `content_categories`,
@@ -1593,7 +1600,8 @@ Na 2026-09-16:
 - [ ] wdrożyć N3 publiczny renderer bloków zgodny z `NewsroomBodyContract`,
 - [ ] wdrożyć model topics,
 - [ ] wdrożyć home placements/composition service,
-- [ ] wdrożyć focal point + OG alt/stable public URL w media contract,
+- [ ] podłączyć `NewsroomMediaStorage` do N2 hero/OG uploader + `ContentArticle` persistence oraz wdrożyć focal point/OG-alt UX,
+- [ ] wdrożyć crop/variant generation dopiero wraz z fizycznymi artefaktami i ich testami,
 - [ ] wdrożyć origin/regulatory context fields,
 - [ ] wdrożyć migracje,
 - [ ] wdrożyć `ContentCategory` i dedykowany idempotentny DB seeder konsumujący `NewsroomTaxonomyContract`,
@@ -1609,6 +1617,15 @@ Na 2026-09-16:
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.9
+
+- wdrożono N0-006 jako dedykowany `NewsroomMediaStorage` bez reużycia question-specific upload workflow,
+- utrwalono immutable ULID source paths, dedykowany newsroom disk/prefix i shared image byte policy,
+- backend inspectuje rzeczywisty obiekt po storage: bytes, raster MIME oraz width/height; deklarowane metadata mismatch są odrzucane,
+- baseline obrazów to JPEG/PNG/WebP/AVIF; SVG/non-raster/path traversal/unmanaged path failują,
+- publiczny URL jest rozwiązywany przez `MediaUrlResolver` i musi być stabilnym HTTP(S) URL,
+- nie zadeklarowano crop variants ani newsroom asset modelu, których kod jeszcze nie posiada; N2/N3 integration pozostaje otwarta.
 
 ### 2026-09-16 — v0.8
 

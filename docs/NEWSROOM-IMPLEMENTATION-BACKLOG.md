@@ -290,7 +290,7 @@ Domknąć techniczny sposób edycji kanonicznego `body_blocks`.
 - unknown block type, unknown payload field i unsupported `body_schema_version` failują zamknięcie,
 - rich text allowlistuje tylko paragraph, H2/H3, lists, text, hard break oraz marks bold/italic/link; raw HTML/style nodes nie są formatem wejściowym,
 - `javascript:` i nieobsługiwane targety linków są odrzucane; `target=_blank` otrzymuje wymuszone `rel="noopener noreferrer"`,
-- image block przyjmuje tylko storage-relative path; finalny upload/storage/crop contract nadal należy do N0-006,
+- image block przyjmuje tylko storage-relative path; N0-006 dostarcza już `NewsroomMediaStorage`, a faktyczny N2 upload UI/persistence i crop pipeline pozostają downstream,
 - domain blocks zapisują kontrolowane IDs, a nie skopiowane HTML/card payloady,
 - block `key` ma stabilny format, jest unikalny i nie może być sprzeczny z Builder item key.
 
@@ -341,7 +341,13 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 
 ## NEWSROOM-N0-006 — Media upload/storage contract
 
-### Potwierdzony stan
+### Status implementacji
+
+**DONE — storage/validation foundation zamknięty na `main` przez PR #22.**
+
+Zakres N0-006 zamraża bezpieczny storage contract przed N2 media editor. Nie oznacza jeszcze wdrożenia presign/confirm endpointów, `ContentArticle` media persistence, Filament hero/focal-point UI ani crop generatora.
+
+### Stan przed implementacją
 
 - `MediaUrlResolver` i media disk config są wspólne,
 - `AdminMediaUploadService` jest question-specific i zapisuje QuestionMedia,
@@ -356,6 +362,20 @@ Zamrozić sposób integracji newsroomu z już działającym backendem SEO przed 
 - brak signed URL w modelu,
 - JPEG/PNG/WebP/AVIF baseline; SVG disabled unless separate security decision,
 - nie deklarować/generated crop variants, jeśli fizycznie nie istnieją.
+
+### Aktualny stan implementacji
+
+- istnieje dedykowany `NewsroomMediaStorage`; nie reużywa `AdminMediaUploadService`,
+- newsroom ma osobny konfigurowalny `media.newsroom_disk`, `media.newsroom_prefix` i `media.newsroom_max_dimension`,
+- source image path ma immutable/unique namespace `newsroom/articles/source/{ULID}.{ext}`; każdy replacement generuje nową ścieżkę,
+- baseline MIME jest przecięciem wspólnej image allowlisty z JPEG/PNG/WebP/AVIF; SVG jest odrzucane nawet jeśli pojawi się we wspólnej allowliście,
+- `inspectStoredImage()` sprawdza faktycznie zapisany obiekt: istniejący path, rzeczywisty bytes, dekodowalny raster, rzeczywisty MIME oraz width/height,
+- deklarowany przez klienta MIME/bytes może zostać porównany z rzeczywistym obiektem i mismatch jest odrzucany,
+- path traversal, URL/absolute path i obiekty spoza managed immutable namespace są odrzucane,
+- publiczny URL jest rozwiązywany przez istniejący `MediaUrlResolver` i musi być stabilnym HTTP(S) URL,
+- kontrakt nie zapisuje signed/temporary URL,
+- crop/variant files nie są deklarowane ani generowane, bo newsroom crop pipeline nadal nie istnieje,
+- unit regression pokrywa unique paths, MIME spoofing/non-raster, actual bytes/dimensions, SVG rejection, namespace oraz public URL.
 
 ### DoD
 
@@ -1795,13 +1815,24 @@ Na 2026-09-16:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N0-006 — Media upload/storage contract.
+NEWSROOM-N1-001 — Enums + migrations.
 
-NEWSROOM-N0-001, NEWSROOM-N0-002, NEWSROOM-N0-003 i NEWSROOM-N0-004 są zamknięte. G0-A (routing/taxonomy) i G0-B (body format) są zamknięte jako dependency gates. N0-005 pozostaje decyzją dokumentacyjną z kodowym regression gate w N5. N0-006 jest ostatnim otwartym foundation contractem przed wejściem w odpowiadające mu zadania N2 media oraz dalsze N1/N2 zgodnie z macierzą hard dependencies.
+NEWSROOM-N0-001, N0-002, N0-003, N0-004 i N0-006 są zamknięte jako foundation contracts; N0-005 pozostaje zamkniętą decyzją kompatybilności z kodowym regression gate w N5. G0-A i G0-B są zamknięte. Następny krok wykonawczy to N1-001 z obowiązkowym addytywnym PostgreSQL gate.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.11
+
+- zamknięto NEWSROOM-N0-006 po merge PR #22 i green CI,
+- dodano dedykowany `NewsroomMediaStorage` zamiast reużycia question-specific `AdminMediaUploadService`,
+- storage contract generuje immutable ULID source paths, korzysta ze wspólnych media limits/resolvera i sprawdza rzeczywisty stored MIME/bytes/dimensions,
+- JPEG/PNG/WebP/AVIF są baseline, SVG/non-raster/path escape/mismatch metadata są odrzucane,
+- publiczny URL przechodzi przez `MediaUrlResolver`; kontrakt nie przechowuje signed/temporary URL,
+- nie zadeklarowano nieistniejących crop variants; N2 hero uploader/focal-point UI i crop generation pozostają otwarte,
+- code gate PR #22: 883 passed / 18 419 assertions / 2 skipped, Pint 939 files PASS, frontend build PASS,
+- foundation N0 jest domknięte; kolejnym taskiem wykonawczym jest NEWSROOM-N1-001.
 
 ### 2026-09-16 — v0.10
 
@@ -1810,8 +1841,9 @@ NEWSROOM-N0-001, NEWSROOM-N0-002, NEWSROOM-N0-003 i NEWSROOM-N0-004 są zamknię
 - wybrano Filament Builder jako przyszły adapter N2 oraz RichEditor TipTap JSON dla rich text; nie powstało równoległe `body_html`,
 - aktywne typy bloków mają ścisłe payload schemas, a `embed` pozostaje wyłączony do czasu provider/CSP security gate,
 - dodano unit/security regression dla unsafe nodes/marks/URLs, XSS escaping, block keys, image pathów, relacji i table shape,
-- właściwy N2 CMS, N3 renderer, media upload adapter i CSP/embed nadal nie są wdrożone,
-- pierwszym następnym foundation taskiem jest N0-006.
+- właściwy N2 CMS, N3 renderer, hero upload endpoint/UI, focal-point UX, crop pipeline i CSP/embed nadal nie są wdrożone,
+- `NewsroomMediaStorage` istnieje jako storage/validation foundation, ale nie jest jeszcze podłączony do `ContentArticle`,
+- foundation N0 jest domknięte w zakresie wymaganym przed N1; pierwszym następnym taskiem jest N1-001.
 
 ### 2026-09-16 — v0.9
 

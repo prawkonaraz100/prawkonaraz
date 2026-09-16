@@ -470,6 +470,19 @@ Focal point powinien być ustawiany wizualnie na obrazie, jeśli komponent na to
 
 Nie przechowujemy raw binary w bazie.
 
+### 19.1. Aktualny foundation po N0-006
+
+Kod posiada `NewsroomMediaStorage`, który:
+
+- jest osobny od question-specific `AdminMediaUploadService`,
+- przygotowuje immutable/unique source paths pod dedykowanym newsroom prefixem,
+- używa wspólnej image MIME/size policy, zawężonej do JPEG/PNG/WebP/AVIF,
+- po zapisie inspectuje rzeczywisty object: bytes, dekodowalny raster MIME, width i height,
+- odrzuca SVG/non-raster, metadata mismatch, path traversal i obiekty spoza managed namespace,
+- rozwiązuje stabilny publiczny HTTP(S) URL przez `MediaUrlResolver`.
+
+Nie istnieją jeszcze: Filament hero uploader, presign/confirm endpointy newsroomu, zapis asset metadata do `ContentArticle`, focal-point picker ani crop generator. N2 ma użyć istniejącego storage contract zamiast budować drugi upload policy.
+
 ---
 
 ## 20. Image validation
@@ -1221,6 +1234,7 @@ Na 2026-09-16:
 - TrafficSigns CMS daje wzorzec workflow/checklist,
 - ContentAuthors resource istnieje,
 - `NewsroomBodyContract` v1 i jego unit/security tests istnieją,
+- `NewsroomMediaStorage` i jego unit regression istnieją jako N0-006 storage/validation foundation,
 - decyzja N0-004 wybiera Builder + RichEditor TipTap JSON jako przyszły N2 adapter,
 - newsroom resources nie istnieją,
 - article editor/Builder UI nie istnieje,
@@ -1237,7 +1251,8 @@ Na 2026-09-16:
 - [ ] wdrożyć ContentCategoryResource,
 - [ ] wdrożyć ContentTopicResource,
 - [ ] wdrożyć NewsroomHomeComposer + future preview,
-- [ ] wdrożyć focal-point/crop UX,
+- [ ] wdrożyć hero/OG uploader korzystający z `NewsroomMediaStorage` i zapis verified metadata do `ContentArticle`,
+- [ ] wdrożyć focal-point/crop UX; nie deklarować variantów bez fizycznie wygenerowanych plików,
 - [ ] wdrożyć origin/regulatory fields,
 - [ ] wdrożyć relations pickers,
 - [ ] wdrożyć workflow actions + AuditLog actor contract,
@@ -1250,6 +1265,14 @@ Na 2026-09-16:
 ---
 
 ## 55. Historia zmian
+
+### 2026-09-16 — v0.7
+
+- zamknięto N0-006 storage contract przed wdrożeniem article media UI,
+- dodano `NewsroomMediaStorage` jako dedykowany newsroom foundation zamiast question-specific `AdminMediaUploadService`,
+- actual stored bytes/MIME/dimensions oraz managed immutable path są walidowane backendowo,
+- SVG/non-raster i niestabilne/unmanaged pathy są odrzucane, a public URL przechodzi przez `MediaUrlResolver`,
+- nie oznaczono hero uploader endpointów, focal-point picker ani crop generation jako wdrożonych.
 
 ### 2026-09-16 — v0.6
 

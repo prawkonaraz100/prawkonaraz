@@ -367,6 +367,22 @@ Format-evolution tests:
 - unknown future block failuje bezpiecznie, bez wykonywania HTML,
 - breaking schema migration ma jawny migrator/test; revision-history snapshot nie jest do tego wymagany.
 
+### 13.1. Newsroom media storage foundation tests
+
+Po N0-006 istnieje `NewsroomMediaStorageTest` i pokrywa:
+
+- dedykowany newsroom managed namespace zamiast question-specific uploadera,
+- unique/immutable ULID source paths oraz nowy path przy kolejnym prepare,
+- JPEG/PNG/WebP/AVIF allowlist z odrzuceniem SVG,
+- actual stored bytes policy,
+- actual decoded MIME i odrzucenie declared MIME mismatch,
+- actual width/height oraz max-dimension policy,
+- non-raster payload podszywający się pod obraz,
+- path traversal/absolute URL/manual unmanaged path rejection,
+- public URL przez współdzielony `MediaUrlResolver` bez signed-expiry semantics.
+
+To jest unit/storage foundation. Nie zastępuje przyszłych N2 uploader integration, focal-point/crop tests ani publicznego N3 media rendering/E2E.
+
 ---
 
 ## 14. Public article HTTP tests
@@ -1384,7 +1400,7 @@ Na 2026-09-16:
 - istnieją globalne backend tests,
 - istnieje Playwright smoke dla produktu,
 - istnieją ops backup/restore/health commands,
-- istnieją newsroom-specific unit/security tests dla `NewsroomBodyContract`, ale szersze newsroom tests i browser E2E jeszcze nie istnieją,
+- istnieją newsroom-specific unit/security tests dla `NewsroomBodyContract` oraz storage/security regression dla `NewsroomMediaStorage`, ale szersze newsroom tests i browser E2E jeszcze nie istnieją,
 - faktyczne N2 block-editor integration/E2E oraz homepage placement/topic tests jeszcze nie istnieją,
 - newsroom entity graph/news sitemap/sharding/feed-discovery/static-delivery tests jeszcze nie istnieją,
 - atomic static publication i dirty/version newsroom refresh coordinator jeszcze nie istnieją,
@@ -1399,7 +1415,7 @@ Na 2026-09-16:
 - [ ] dodać test files w trakcie N1–N5,
 - [ ] podłączyć do CI,
 - [ ] stworzyć newsroom E2E,
-- [ ] dodać faktyczne N2 editor + N3 renderer integration/E2E oraz composition/topic/focal-point tests,
+- [ ] dodać faktyczne N2 editor/media uploader + N3 renderer integration/E2E oraz composition/topic/focal-point/crop tests,
 - [ ] dodać site-identity/entity-graph/date-consistency tests,
 - [ ] dodać semantic silo/orphan/reverse-link/click-depth tests,
 - [ ] dodać route-family/canonical exclusivity tests,
@@ -1414,6 +1430,13 @@ Na 2026-09-16:
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-16 — v0.8
+
+- zapisano rzeczywisty test state po N0-006: `NewsroomMediaStorageTest` pokrywa storage namespace, immutable paths, actual bytes/MIME/dimensions, SVG/non-raster i stable public URL,
+- rozdzielono istniejący storage/security foundation od nadal brakujących N2 uploader/focal-point/crop integration i N3 media rendering/E2E,
+- code gate N0-006 przeszedł 883 tests / 18 419 assertions / 2 skipped, Pint 939 files oraz frontend build,
+- nie oznaczono crop variants ani upload endpoints jako istniejących.
 
 ### 2026-09-16 — v0.7
 
