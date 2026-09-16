@@ -510,6 +510,12 @@ Zmiana opublikowanego sluga:
    - wymagania,
    - rynek i cyfryzacja.
 
+### 8.1.1. Aktualny stan kontraktu kategorii
+
+NEWSROOM-N0-003 jest wdrożone jako `NewsroomTaxonomyContract` v1. Kontrakt utrwala tę samą kolejność przez pozycje 10, 20, 30, 40, 50, 60 oraz dokładne pary slug/nazwa publiczna. Description i pola SEO pozostają jawnie niezatwierdzone (`null`).
+
+To jest foundation contract dla przyszłej migracji/seedera, nie zmaterializowana taksonomia DB: `content_categories`, `ContentCategory` i dedykowany seeder nadal należą do N1.
+
 ### 8.2. Tagi
 
 Tag nie może zastępować kategorii.
@@ -1429,12 +1435,13 @@ Na moment utworzenia dokumentu za ukończone uznajemy wyłącznie elementy rzecz
 - wspólny `og:site_name` oraz Organization logo ImageObject z potwierdzonym baseline 256×256,
 - traffic-sign/public-question/legal-content graph services reużywające wspólnego site identity buildera,
 - NEWSROOM-N0-002: `NewsroomRouteContract`, finalne route namespaces, reserved slug policy i route-family transition guard,
+- NEWSROOM-N0-003: `NewsroomTaxonomyContract` v1 z sześcioma kategoriami, nazwami publicznymi i deterministyczną kolejnością,
 - routes `/aktualnosci` i `/poradniki` jako dedykowane pre-launch 200/noindex placeholders,
 - placeholdery tych tras,
 - publiczna nawigacja prowadząca do aktualności,
 - istniejące klastry pytań, znaków i przepisów, które mogą zostać powiązane z artykułami.
 
-**Nie uznajemy jeszcze właściwego newsroomu (domain/CMS/public content) za zaimplementowany; ukończone są foundation tasks NEWSROOM-N0-001 i NEWSROOM-N0-002.**
+**Nie uznajemy jeszcze właściwego newsroomu (domain/CMS/public content) za zaimplementowany; ukończone są foundation tasks NEWSROOM-N0-001, NEWSROOM-N0-002 i NEWSROOM-N0-003. Tabela/model/seeder kategorii nadal nie istnieją.**
 
 ---
 
@@ -1444,7 +1451,7 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 
 - [x] `NEWSROOM-N0-001` — publisher branding source of truth,
 - [x] `NEWSROOM-N0-002` — test/utrwalenie przyjętego route contract,
-- [ ] `NEWSROOM-N0-003` — deterministyczny taxonomy seed contract,
+- [x] `NEWSROOM-N0-003` — deterministyczny taxonomy seed contract,
 - [ ] `NEWSROOM-N0-004` — block editor + serialization + sanitization + format-evolution decision,
 - [ ] `NEWSROOM-N0-005` — utrwalić compatibility contract istniejącego SEO delivery,
 - [ ] następnie wykonywać N1 zgodnie z macierzą hard gates z backlogu.
@@ -1474,6 +1481,14 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-16 — v0.9
+
+- wdrożono i zmergowano NEWSROOM-N0-003 po green CI,
+- dodano `NewsroomTaxonomyContract` v1 jako wykonywalny source of truth sześciu kategorii newsroomu,
+- utrwalono publiczne nazwy, slugi i kolejność 10..60 bez zatwierdzania jeszcze description/SEO copy,
+- zamknięto G0-A routing/taxonomy jako foundation dependency gate,
+- pozostawiono `content_categories`, model `ContentCategory` i rzeczywisty DB seeder do N1; przyszły seeder ma konsumować kontrakt.
 
 ### 2026-09-16 — v0.8
 
