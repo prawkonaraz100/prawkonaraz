@@ -1169,6 +1169,8 @@ Kontrakt domenowy:
 - block key jest opcjonalny, ale jeśli występuje, ma stabilny format, musi być unikalny i nie może kolidować z Builder item key,
 - unknown block type oraz unknown payload field failują zamknięcie zamiast wykonywać nieznaną treść.
 
+Aktualny stan po NEWSROOM-N2-003: `NewsroomBodyEditorAdapter` mapuje Filament Builder na kanoniczne `body_blocks`, zachowując jawne `key` wewnątrz bloku i traktując Builder UUID jako efemeryczny stan UI. `ContentArticleResource` używa Builder/RichEditor wyłącznie jako warstwy edycji, a przed zapisem nadal uruchamia autorytatywne `NewsroomBodyContract::normalize()` i zapisuje `body_schema_version=1`. `embed` pozostaje wyłączony/fail-closed. Image block może zapisać storage-relative path, ale faktyczny upload, weryfikacja obiektu przez `NewsroomMediaStorage` i crop pipeline nie są częścią N2-003.
+
 Aktualny repo nadal nie ma newsroom-ready CSP middleware ani osobnego arbitrary-HTML sanitizer package. N0-004 nie dodaje ich, ponieważ wybrany structured JSON contract nie przyjmuje arbitralnego HTML jako formatu body. Publiczny N3 renderer nadal musi renderować wyłącznie kontrolowane komponenty.
 
 Strategia format evolution:
@@ -1668,17 +1670,18 @@ Na 2026-09-16:
 - schema i warstwa modelowa są zweryfikowane na SQLite i PostgreSQL 16; `newsroom-postgres` uruchamia migration contract oraz model/scope contract,
 - `ContentCategory` Eloquent model istnieje; N2-001 dodało jego Filament `ContentCategoryResource` oraz modelowe slug/delete/deactivation guards; dedykowany DB seeder kategorii nadal nie istnieje,
 - N2-002 dodało Filament `ContentArticleResource` shell; create i draftowe type/slug mutations reużywają `ContentArticleSlugService`, a ordinary Save `publiclyVisible()` rekordu nie mutuje publicznych pól,
+- N2-003 dodało `NewsroomBodyEditorAdapter` oraz kontrolowany Builder/RichEditor dla `body_blocks`; canonical keys/order są zachowywane, rich text pozostaje TipTap JSON, a zapis jest ponownie normalizowany przez `NewsroomBodyContract`,
 - `ContentArticle`, `ContentTag`, `ContentTopic`, `ContentArticleSource` i `ContentHomePlacement` Eloquent models/factories istnieją; factory workflow states pokrywają dokumentowany baseline,
 - service-level route-family lookup guard istnieje w `ContentArticlePathResolver`; nadal nie jest podłączony do publicznych controllerów N3,
 - NEWSROOM-N1-005 scheduler istnieje jako `newsroom:publish-due`, jest zarejestrowany co minutę w production i deleguje due-time revalidation/publish do `ContentArticlePublishingService`,
 - NEWSROOM-N1-006 jest wdrożone: istnieją `NewsroomHomeCompositionService`, `NewsroomHomePlacementService` i niemutujący `ContentArticlePublishingService::assertScheduledPreviewReady()`; overlap/concurrency jest testowane również na PostgreSQL,
-- newsroom CMS jest częściowo zmaterializowany przez `ContentCategoryResource` oraz podstawowy `ContentArticleResource` shell; `ContentTopicResource`, article Builder/editor, workflow/stale-write/preview UI i HomeComposer nadal nie istnieją.
+- newsroom CMS jest częściowo zmaterializowany przez `ContentCategoryResource`, `ContentArticleResource` oraz kontrolowany body Builder/editor; `ContentTopicResource`, sources/media/origin-regulatory/relations UI, workflow/stale-write/preview UI i HomeComposer nadal nie istnieją.
 
 ---
 
 ## 44. Pozostałe zadania
 
-- [ ] wdrożyć N2 Filament Builder/RichEditor adapter oparty o `NewsroomBodyContract`,
+- [ ] wdrożyć N2 sources editor i dalsze article-owned child UI bez omijania publish/source invariants,
 - [ ] wdrożyć N3 publiczny renderer bloków zgodny z `NewsroomBodyContract`,
 - [ ] podłączyć `NewsroomMediaStorage` do N2 hero/OG uploader + `ContentArticle` persistence oraz wdrożyć focal point/OG-alt UX,
 - [ ] wdrożyć crop/variant generation dopiero wraz z fizycznymi artefaktami i ich testami,
@@ -1692,6 +1695,15 @@ Na 2026-09-16:
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.18
+
+- wdrożono NEWSROOM-N2-003 przez PR #42 na `main@13a22058c7c945196e8d490a0620b93dcf449641`, bez zmiany domenowego `body_blocks` schema v1,
+- `NewsroomBodyEditorAdapter` tłumaczy stan formularza Buildera na kanoniczną listę `{key?, type, data}` i nie używa efemerycznych UUID Buildera jako tożsamości domenowej,
+- RichEditor zapisuje structured TipTap JSON z zamrożonym toolbar/allowlist contract; unsafe nodes/marks/URLs, iframe i disabled embed nadal failują zamknięcie,
+- create/edit zapisują `body_schema_version=1` i przechodzą przez `NewsroomBodyContract::normalize()`; publishing service zachowuje niezależną rewalidację canonical body przed review/publish,
+- image editor nie oznacza storage-relative path jako zweryfikowanego assetu; upload/object inspection/crop pozostają kolejnym zakresem media,
+- finalny gate PR #42: `quality` 963 passed / 18 895 assertions / 2 skipped, Pint 1010 files PASS, frontend build PASS; `newsroom-postgres` PASS.
 
 ### 2026-09-16 — v0.17
 

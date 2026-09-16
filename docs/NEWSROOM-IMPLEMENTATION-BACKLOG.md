@@ -743,6 +743,23 @@ Implementacja obejmuje warstwę domenową/read-model kompozycji oraz transakcyjn
 
 ## NEWSROOM-N2-003 — Block editor and sanitization
 
+### Status implementacji
+
+**DONE — zmergowano PR #42 na `main@13a22058c7c945196e8d490a0620b93dcf449641` po zielonych jobach `quality` i `newsroom-postgres`.**
+
+### Aktualny stan implementacji
+
+- istnieje kontrolowany Filament Builder w `ContentArticleResource` dla wszystkich aktywnych bloków v1 z `NewsroomBodyContract`,
+- `NewsroomBodyEditorAdapter` tłumaczy Builder state na kanoniczne `body_blocks` i zachowuje jawne `key` niezależnie od efemerycznych UUID UI,
+- RichEditor zapisuje structured TipTap JSON z toolbar/allowlist wynikającymi z `NewsroomBodyContract`, bez równoległego `body_html`,
+- create/edit zapisują `body_schema_version=1` i wykonują server-side `NewsroomBodyContract::normalize()` przed persistence,
+- bounded searchable pickers istnieją dla related article, legal unit, question group i traffic sign group; duże corpusy nie są preloadowane,
+- `embed` pozostaje znany kontraktowi, ale feature-disabled/fail-closed zgodnie z N0-004; N2-003 nie włącza providerów bez osobnego provider/CSP security gate,
+- image block przyjmuje storage-relative path i metadata formularza; upload, actual object verification i crop pipeline pozostają dalszym media scope,
+- ordinary Edit `publiclyVisible()` nadal ma server-side blokadę body/public fields,
+- regression pokrywa canonical key round-trip, kolejność/persistence, script-looking content, onclick/style, `javascript:` link, raw iframe, allowed H2/list/safe link, unknown/invalid payload i disabled embed,
+- finalny gate: `quality` 963 passed / 18 895 assertions / 2 skipped, Pint 1010 files PASS, frontend build PASS; `newsroom-postgres` PASS.
+
 ### Zakres
 
 - final Builder/editor component,
@@ -1694,7 +1711,7 @@ Docs-only:
 - [x] article resource
 - [x] category resource
 - [ ] topic resource
-- [ ] controlled block editor
+- [x] controlled block editor
 - [ ] sources
 - [ ] relations
 - [ ] origin/regulatory fields
@@ -1946,7 +1963,7 @@ Nie oznaczać tasku DONE przed merge + green verification.
 Na 2026-09-16:
 
 - pakiet projektowy newsroomu obejmuje architekturę, model danych, CMS, UI, governance, SEO, backlog i runbook,
-- foundation N0 oraz pełny etap N1-001..N1-006 są wdrożone; N2 ma już `ContentCategoryResource` i podstawowy `ContentArticleResource` shell, ale `ContentTopicResource`, Builder/editor, workflow/stale-write/preview/HomeComposer oraz publiczny newsroom nadal nie są wdrożone,
+- foundation N0 oraz pełny etap N1-001..N1-006 są wdrożone; N2 ma już `ContentCategoryResource`, `ContentArticleResource` i kontrolowany Builder/RichEditor dla `body_blocks`, ale `ContentTopicResource`, sources/media/origin-regulatory/relations UI, workflow/stale-write/preview/HomeComposer oraz publiczny newsroom nadal nie są wdrożone,
 - `/aktualnosci` i `/poradniki` nadal renderują pre-launch placeholder, teraz z dedykowanym `X-Robots-Tag: noindex, follow`; finalne detail/category/topic/feed route namespaces są zarejestrowane, ale pozostają 404 bez publicznych controllerów,
 - fundamenty ContentAuthor/legal/traffic signs/public SEO istnieją,
 - istnieją config/content.php organization, SchemaIds/SchemaRenderer oraz współdzielony SiteIdentitySchema; homepage i istniejące główne publiczne graph services korzystają z kanonicznego Organization/WebSite identity,
@@ -1961,13 +1978,24 @@ Na 2026-09-16:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N2-003 — Block editor and sanitization.
+NEWSROOM-N2-004 — Sources editor.
 
-NEWSROOM-N2-002 jest zamknięte: podstawowy article resource shell, draft create/edit przez istniejący slug service, list/search/filters/eager loading, admin-only access oraz User actor / ContentAuthor identity separation są wdrożone. Następny krok materializuje kontrolowany Builder/RichEditor dla `body_blocks` bez wyprzedzania workflow/media/preview zakresów kolejnych tasków N2.
+NEWSROOM-N2-003 jest zamknięte po PR #42: istnieje kontrolowany Builder/RichEditor, adapter do kanonicznego `body_blocks`, server-side normalizacja/sanitization i regresje bezpieczeństwa. Następny krok materializuje edycję `ContentArticleSource` zgodnie z istniejącą source policy, bez wyprzedzania relations/workflow/media/preview zakresów kolejnych tasków N2.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.20
+
+- zamknięto NEWSROOM-N2-003 po merge PR #42 na `main@13a22058c7c945196e8d490a0620b93dcf449641`,
+- dodano kontrolowany Filament Builder/RichEditor do istniejącego `ContentArticleResource` oraz `NewsroomBodyEditorAdapter` do round-trip canonical `body_blocks`,
+- canonical `key` jest przechowywany jako jawne pole bloku i nie jest utożsamiany z efemerycznym UUID Buildera,
+- zapis body nadal jest autorytatywnie walidowany przez `NewsroomBodyContract`; RichEditor używa TipTap JSON, unsafe HTML/URLs/iframe i disabled embed failują zamknięcie,
+- image block nie udaje ukończonego media pipeline: upload/object verification/crop nadal są otwarte,
+- ordinary public Edit zachowuje server-side body/public-field lock,
+- finalny gate PR #42: `quality` 963 passed / 18 895 assertions / 2 skipped, Pint 1010 files PASS, frontend build PASS; `newsroom-postgres` PASS,
+- następnym taskiem jest NEWSROOM-N2-004 Sources editor.
 
 ### 2026-09-16 — v0.19
 
