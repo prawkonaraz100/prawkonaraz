@@ -96,7 +96,11 @@ test('normalization preserves the canonical type data shape and strips rich text
         ->and($normalized[0]['data']['content']['content'][0]['attrs'])->toBe(['level' => 2])
         ->and($normalized[0]['data']['content']['content'][1])->not->toHaveKey('attrs')
         ->and($normalized[0]['data']['content']['content'][1]['content'][0]['marks'][0]['attrs'])
-        ->toBe(['href' => 'https://example.com/source'])
+        ->toBe([
+            'href' => 'https://example.com/source',
+            'target' => '_blank',
+            'rel' => 'noopener noreferrer',
+        ])
         ->and($normalized[1]['data'])->toBe([
             'variant' => 'uwaga',
             'title' => 'Uwaga',
@@ -283,6 +287,56 @@ test('domain blocks accept ids only and reject duplicates', function () {
         ['type' => 'question_group', 'data' => ['question_ids' => [1, 1]]],
     ]);
 })->throws(InvalidArgumentException::class);
+
+test('quote payload keeps plain editorial text and only safe source urls', function () {
+    $normalized = NewsroomBodyContract::normalize([
+        [
+            'type' => 'quote',
+            'data' => [
+                'text' => 'Egzamin rozpoczyna się o godzinie wskazanej w harmonogramie.',
+                'attribution' => 'Źródło oficjalne',
+                'source_url' => 'https://example.com/source',
+            ],
+        ],
+    ]);
+
+    expect($normalized[0]['data'])->toBe([
+        'text' => 'Egzamin rozpoczyna się o godzinie wskazanej w harmonogramie.',
+        'attribution' => 'Źródło oficjalne',
+        'source_url' => 'https://example.com/source',
+    ]);
+
+    NewsroomBodyContract::normalize([
+        [
+            'type' => 'quote',
+            'data' => [
+                'text' => 'Treść',
+                'attribution' => 'Źródło',
+                'source_url' => 'javascript:alert(1)',
+            ],
+        ],
+    ]);
+})->throws(InvalidArgumentException::class);
+
+test('rich text rejects unsupported link targets even when href is safe', function () {
+    NewsroomBodyContract::normalizeRichTextDocument([
+        'type' => 'doc',
+        'content' => [[
+            'type' => 'paragraph',
+            'content' => [[
+                'type' => 'text',
+                'text' => 'Link',
+                'marks' => [[
+                    'type' => 'link',
+                    'attrs' => [
+                        'href' => 'https://example.com',
+                        'target' => '_parent',
+                    ],
+                ]],
+            ]],
+        ]],
+    ]);
+})->throws(InvalidArgumentException::class, 'target is not allowed');
 
 test('table payload requires semantic headers and matching row widths', function () {
     $normalized = NewsroomBodyContract::normalize([
