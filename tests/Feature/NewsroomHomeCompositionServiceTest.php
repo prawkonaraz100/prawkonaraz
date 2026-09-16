@@ -383,7 +383,6 @@ test('breaking strip may intentionally repeat the lead article', function () {
         ->and($composition['breaking']?->id)->toBe($breaking->id);
 });
 
-
 test('composer can expose deterministic fallback without manual placements for admin UI', function () {
     Carbon::setTestNow('2026-09-16 09:00:00');
 
