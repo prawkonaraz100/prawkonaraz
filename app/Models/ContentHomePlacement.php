@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use DateTimeInterface;
 use Database\Factories\ContentHomePlacementFactory;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
