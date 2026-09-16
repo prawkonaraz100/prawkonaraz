@@ -166,7 +166,6 @@ test('category used by any article cannot be deleted while empty category can be
     expect(ContentCategory::query()->whereKey($empty->getKey())->exists())->toBeFalse();
 });
 
-
 test('category invariants ignore stale preloaded article counts', function () {
     $category = ContentCategory::factory()->create([
         'slug' => 'bezpieczenstwo',
