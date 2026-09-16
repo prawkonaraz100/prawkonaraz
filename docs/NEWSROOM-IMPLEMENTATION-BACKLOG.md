@@ -626,6 +626,12 @@ Aktualne zachowanie:
 
 ## NEWSROOM-N1-006 — Home composition service
 
+### Status implementacji
+
+**DONE — zmergowano PR #35 na `main@eb13b2160e4b8d49c128869ad4761eb0875b2dac` po zielonych jobach `quality` i `newsroom-postgres`.**
+
+Implementacja obejmuje warstwę domenową/read-model kompozycji oraz transakcyjny writer placements. Nie oznacza jeszcze wdrożenia publicznego kontrolera `/aktualnosci`, Filament UI placements ani stale-write UX; te elementy pozostają odpowiednio N3/N2.
+
 ### Zakres
 
 - resolve active placements,
@@ -643,6 +649,19 @@ Aktualne zachowanie:
 - future preview resolves scheduled article only after its publish time,
 - duplicate article excluded from later card modules,
 - missing unique candidate shortens module.
+
+### Aktualny stan implementacji
+
+- `NewsroomHomeCompositionService` rozwiązuje ręczne placements przed fallbackiem,
+- bieżący render przyjmuje wyłącznie `activelyDistributed()` artykuły; future preview może uwzględnić initial `scheduled` dopiero od `scheduled_for` po pełnej, niemutującej rewalidacji publishing invariants,
+- fallback jest deterministyczny: featured, `editorial_priority`, data publikacji/schedule i stabilny tie-breaker po `id`,
+- globalny zbiór użytych article IDs deduplikuje kolejno lead -> secondary -> latest -> category blocks -> guides -> important now,
+- breaking strip jest niezależnym wyjątkiem i może powtórzyć lead,
+- category lead respektuje `context_key`; guides lead wymaga typu `guide`,
+- brak unikalnych kandydatów skraca moduł zamiast duplikować kartę,
+- `NewsroomHomePlacementService` waliduje kontrolowane sloty/context/date ranges i serializuje overlap check przez transaction advisory lock + row lock,
+- PostgreSQL concurrency regression potwierdza serializację także dla pustego placement tuple,
+- `ContentArticlePublishingService::assertScheduledPreviewReady()` udostępnia wspólny, niemutujący contract publikowalności future preview.
 
 ### DoD
 
@@ -1896,7 +1915,7 @@ Nie oznaczać tasku DONE przed merge + green verification.
 Na 2026-09-16:
 
 - pakiet projektowy newsroomu obejmuje architekturę, model danych, CMS, UI, governance, SEO, backlog i runbook,
-- foundation N0 jest zamknięte, a N1-001 schema/enum foundation, N1-002 Eloquent models/factories/scopes oraz N1-003 slug/history/path resolver są wdrożone; CMS i publiczny newsroom nadal nie są wdrożone,
+- foundation N0 oraz pełny etap N1-001..N1-006 są wdrożone: schema/enumy, modele/scopes, slug/history/path resolution, publishing workflow, due scheduler oraz home composition/placement writer; CMS i publiczny newsroom nadal nie są wdrożone,
 - `/aktualnosci` i `/poradniki` nadal renderują pre-launch placeholder, teraz z dedykowanym `X-Robots-Tag: noindex, follow`; finalne detail/category/topic/feed route namespaces są zarejestrowane, ale pozostają 404 bez publicznych controllerów,
 - fundamenty ContentAuthor/legal/traffic signs/public SEO istnieją,
 - istnieją config/content.php organization, SchemaIds/SchemaRenderer oraz współdzielony SiteIdentitySchema; homepage i istniejące główne publiczne graph services korzystają z kanonicznego Organization/WebSite identity,
@@ -1911,13 +1930,24 @@ Na 2026-09-16:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N1-006 — Home composition service.
+NEWSROOM-N2-001 — ContentCategoryResource.
 
-NEWSROOM-N1-001..N1-005 są zamknięte w zakresie swoich foundation/domain gates. Następny krok wykonawczy to deterministyczna kompozycja home: active placements, publication-at-preview-time validation, fallback, global deduplication i context-aware category leads.
+NEWSROOM-N1-001..N1-006 są zamknięte w zakresie swoich foundation/domain gates. Następny krok wykonawczy przechodzi do CMS: category CRUD/order/active/article-counts przy zachowaniu immutable sluga oraz guards dla delete/deactivation używanej kategorii.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.17
+
+- zamknięto NEWSROOM-N1-006 po merge PR #35 na `main@eb13b2160e4b8d49c128869ad4761eb0875b2dac`,
+- dodano `NewsroomHomeCompositionService` z manual-placement-first resolution, future-preview eligibility, deterministycznym fallbackiem, global dedupe i context-aware category/guides modules,
+- dodano `NewsroomHomePlacementService` z kontrolowanymi slotami/context oraz overlap validation pod transaction advisory/row lockiem,
+- `ContentArticlePublishingService::assertScheduledPreviewReady()` reużywa publication/fresh-review/breaking invariants bez mutowania stanu,
+- breaking strip pozostaje jedynym jawnym wyjątkiem od globalnego card dedupe,
+- PostgreSQL test potwierdza serializację konkurencyjnego zapisu pustego placement tuple,
+- finalny gate PR #35: `quality` 935 passed / 18 769 assertions / 2 skipped, Pint 990 files, frontend build PASS; `newsroom-postgres` 7 passed / 89 assertions,
+- N1 jest zamknięte; następnym taskiem wykonawczym jest NEWSROOM-N2-001 ContentCategoryResource.
 
 ### 2026-09-16 — v0.16
 

@@ -1295,7 +1295,8 @@ Na 2026-09-16:
 - public-content Blade layout istnieje,
 - public header/footer istnieją,
 - globalna nawigacja zawiera Aktualności,
-- właściwe newsroom-specific list/article/category/topic components nie istnieją.
+- backendowy `NewsroomHomeCompositionService` istnieje i materializuje lead/secondary/latest/category/guides/important-now/breaking composition contract,
+- ten composer nie jest jeszcze podłączony do publicznego `/aktualnosci`; hub nadal pozostaje placeholderem i właściwe newsroom-specific list/article/category/topic components nie istnieją.
 
 ---
 
@@ -1319,6 +1320,12 @@ Na 2026-09-16:
 ---
 
 ## 69. Historia zmian
+
+### 2026-09-16 — v0.8
+
+- odnotowano wdrożony backendowy home composition service po N1-006,
+- rozdzielono istniejący read-model kompozycji od nadal brakującego publicznego huba/rendererów,
+- nie oznaczono żadnego publicznego newsroom componentu ani route controller jako wdrożonego.
 
 ### 2026-09-16 — v0.7
 

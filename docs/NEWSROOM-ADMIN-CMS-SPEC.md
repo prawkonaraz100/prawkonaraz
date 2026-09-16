@@ -1237,6 +1237,8 @@ Na 2026-09-16:
 - `NewsroomMediaStorage` i jego unit regression istnieją jako N0-006 storage/validation foundation,
 - decyzja N0-004 wybiera Builder + RichEditor TipTap JSON jako przyszły N2 adapter,
 - backendowy `ContentArticlePublishingService` istnieje i implementuje audytowane workflow transitions oraz after-commit event boundary z N1-004,
+- backendowe `NewsroomHomeCompositionService` i `NewsroomHomePlacementService` istnieją po N1-006; zapewniają composition/fallback/future-preview eligibility i concurrency-safe placement writes,
+- custom Filament `NewsroomHomeComposer` nadal nie istnieje; N1-006 nie dostarcza UI, stale-write UX ani admin preview route,
 - newsroom resources nie istnieją,
 - article editor/Builder UI nie istnieje,
 - publiczny renderer bloków nie istnieje,
@@ -1266,6 +1268,12 @@ Na 2026-09-16:
 ---
 
 ## 55. Historia zmian
+
+### 2026-09-16 — v0.9
+
+- zsynchronizowano CMS current state z N1-006 bez oznaczania UI jako wdrożonego,
+- odnotowano istniejące backendowe `NewsroomHomeCompositionService` i `NewsroomHomePlacementService`,
+- `NewsroomHomeComposer`, stale-write UX i admin-only future-preview page pozostają N2 i nadal są otwarte.
 
 ### 2026-09-16 — v0.8
 
