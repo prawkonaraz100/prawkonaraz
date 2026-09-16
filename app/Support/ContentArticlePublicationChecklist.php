@@ -12,7 +12,9 @@ use Closure;
 use DateTimeInterface;
 use DomainException;
 use Illuminate\Support\Carbon;
+use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
+use RuntimeException;
 
 final class ContentArticlePublicationChecklist
 {
@@ -427,8 +429,7 @@ final class ContentArticlePublicationChecklist
             throw new DomainException('Hero image requires positive width and height.');
         }
 
-        $verified = app(NewsroomMediaStorage::class)->inspectStoredImage((string) $article->hero_image_path);
-        app(NewsroomMediaStorage::class)->publicUrl((string) $article->hero_image_path);
+        $verified = $this->verifiedPublicMedia((string) $article->hero_image_path, 'Hero');
 
         if (
             $verified['width'] !== (int) $article->hero_image_width
@@ -465,14 +466,32 @@ final class ContentArticlePublicationChecklist
             throw new DomainException('OG image requires positive width and height.');
         }
 
-        $verified = app(NewsroomMediaStorage::class)->inspectStoredImage((string) $article->og_image_path);
-        app(NewsroomMediaStorage::class)->publicUrl((string) $article->og_image_path);
+        $verified = $this->verifiedPublicMedia((string) $article->og_image_path, 'OG');
 
         if (
             $verified['width'] !== (int) $article->og_image_width
             || $verified['height'] !== (int) $article->og_image_height
         ) {
             throw new DomainException('OG image dimensions do not match the stored newsroom asset.');
+        }
+    }
+
+    /**
+     * @return array{disk:string,path:string,mime_type:string,bytes:int,width:int,height:int}
+     */
+    private function verifiedPublicMedia(string $path, string $label): array
+    {
+        try {
+            $storage = app(NewsroomMediaStorage::class);
+            $verified = $storage->inspectStoredImage($path);
+            $storage->publicUrl($path);
+
+            return $verified;
+        } catch (ValidationException|RuntimeException $exception) {
+            throw new DomainException(
+                "{$label} image must be a verified managed newsroom asset with a stable public URL: {$exception->getMessage()}",
+                previous: $exception,
+            );
         }
     }
 
