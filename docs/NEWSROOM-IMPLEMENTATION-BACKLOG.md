@@ -849,6 +849,21 @@ Implementacja obejmuje warstwę domenową/read-model kompozycji oraz transakcyjn
 
 ## NEWSROOM-N2-006 — Workflow actions
 
+### Status implementacji
+
+**PARTIAL — workflow/exposure action slice zmergowano przez PR #48 na `main@88533b04d74a839c3bbccf86b707909ccdd235f8` po zielonym exact-head CI #176. Pełny DoD pozostaje otwarty do NEWSROOM-N2-012, ponieważ `Apply public update` + loaded-token stale-write rejection nie są jeszcze wdrożone.**
+
+### Aktualny stan implementacji
+
+- Edit i View współdzielą `InteractsWithContentArticleWorkflowActions`; Filament nie duplikuje transition logic z `ContentArticlePublishingService`,
+- dostępne są: submit for review, return to draft, mark reviewed, initial schedule, publish now, mark needs review, archive, republish archived po fresh review, withdraw z wymaganym reason oraz restore to review,
+- exposure actions obejmują featured + `editorial_priority`, unfeature, breaking z wymaganym przyszłym expiry oraz clear breaking,
+- `setFeatured()`, `enableBreaking()` i `clearBreaking()` działają w istniejącym transaction/row-lock boundary i zapisują allowlisted AuditLog z `User` actorem bez body/private notes,
+- featured można włączyć tylko dla scheduled/published; breaking tylko dla published news z przyszłym expiry,
+- ordinary Edit `publiclyVisible()` nadal nie zapisuje publicznych pól; ten PR nie otwiera low-level public Save,
+- `Apply public update` pozostaje N2-012: musi atomowo walidować/zapisywać pełny public payload i odrzucać stale loaded token,
+- exact-head PR #48: CI #176 PASS; joby `quality` i `newsroom-postgres` PASS.
+
 ### Zakres
 
 - review,
@@ -1752,7 +1767,7 @@ Docs-only:
 - [ ] article preview
 - [ ] home composer + future preview
 - [ ] checklist
-- [ ] workflow
+- [ ] workflow — transition/exposure actions są wdrożone, ale pełny N2-006 DoD czeka na N2-012 `Apply public update` + stale-write
 - [x] admin-only authorization bez rozszerzenia panel access
 - [ ] stale-write rejection
 - [x] AuditLog User actor / ContentAuthor identity separation
@@ -1996,7 +2011,7 @@ Nie oznaczać tasku DONE przed merge + green verification.
 Na 2026-09-16:
 
 - pakiet projektowy newsroomu obejmuje architekturę, model danych, CMS, UI, governance, SEO, backlog i runbook,
-- foundation N0 oraz pełny etap N1-001..N1-006 są wdrożone; N2 ma już `ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor dla `body_blocks`, source relationship editor i article-owned relations/topics editor, ale `ContentTopicResource`, media/origin-regulatory UI, workflow/stale-write/preview/HomeComposer oraz publiczny newsroom nadal nie są wdrożone,
+- foundation N0 oraz pełny etap N1-001..N1-006 są wdrożone; N2 ma już `ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor dla `body_blocks`, source relationship editor, article-owned relations/topics editor oraz workflow/exposure action slice z N2-006; `ContentTopicResource`, media/origin-regulatory UI, `Apply public update` + stale-write, checklist/preview/HomeComposer oraz publiczny newsroom nadal nie są wdrożone,
 - `/aktualnosci` i `/poradniki` nadal renderują pre-launch placeholder, teraz z dedykowanym `X-Robots-Tag: noindex, follow`; finalne detail/category/topic/feed route namespaces są zarejestrowane, ale pozostają 404 bez publicznych controllerów,
 - fundamenty ContentAuthor/legal/traffic signs/public SEO istnieją,
 - istnieją config/content.php organization, SchemaIds/SchemaRenderer oraz współdzielony SiteIdentitySchema; homepage i istniejące główne publiczne graph services korzystają z kanonicznego Organization/WebSite identity,
@@ -2011,13 +2026,22 @@ Na 2026-09-16:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N2-006 — Workflow actions.
+NEWSROOM-N2-012 — Admin stale-write + audit identity hardening, jako bezpośrednia zależność potrzebna do domknięcia NEWSROOM-N2-006.
 
-NEWSROOM-N2-005 jest zamknięte po PR #46: article form ma questions/legal/signs/topics editor, istniejące pivots zachowują relation metadata/order, topics pozostają bez ręcznego rankingu, a `NewsroomArticleRelationsEditorAdapter` zapewnia bounded search targetów i server-side validation/sync. Następny krok materializuje Filament workflow actions nad istniejącym `ContentArticlePublishingService`, bez dublowania transition logic.
+Workflow/exposure action slice N2-006 jest już na `main@88533b04d74a839c3bbccf86b707909ccdd235f8` po PR #48: Edit/View delegują transition/exposure actions do `ContentArticlePublishingService`, a featured/breaking mają audytowany service boundary. N2-006 pozostaje jednak celowo **PARTIAL**, dopóki N2-012 nie dostarczy atomowego `Apply public update` z loaded-token stale-write rejection.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.23
+
+- zmergowano PR #48 na `main@88533b04d74a839c3bbccf86b707909ccdd235f8`; exact-head CI #176 zakończył się PASS dla `quality` i `newsroom-postgres`,
+- zmaterializowano współdzielone Edit/View workflow actions: review/draft, mark reviewed, initial schedule, publish, needs-review, archive, republish, withdraw/restore,
+- dodano audytowane exposure actions dla featured/editorial priority oraz breaking/expiry; Filament deleguje do `ContentArticlePublishingService` zamiast kopiować transition logic,
+- ordinary public Edit pozostaje server-side locked i nie uzyskał low-level public Save,
+- NEWSROOM-N2-006 pozostaje **PARTIAL**, ponieważ jego DoD wymaga `Apply public update`; atomowy public payload write + stale loaded-token rejection nadal należą do NEWSROOM-N2-012,
+- następnym wykonawczym taskiem jest NEWSROOM-N2-012, aby domknąć zależność N2-006 bez fałszywego oznaczania go jako DONE.
 
 ### 2026-09-16 — v0.22
 

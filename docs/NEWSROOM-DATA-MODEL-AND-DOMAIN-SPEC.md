@@ -6,7 +6,7 @@
 - Obszar: newsroom / media portal
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Bazowy stan repo przy projektowaniu: main@6a38c95ce76ee05997977d614d795ed8513462f1
-- Ostatnia weryfikacja zgodności z kodem: main@262d9fab0b171c13a159f7c97670dee3db583b56 (2026-09-16)
+- Ostatnia weryfikacja zgodności z kodem: main@88533b04d74a839c3bbccf86b707909ccdd235f8 (2026-09-16)
 - Data: 2026-09-16
 - Zakres: model domenowy, baza danych, invariants, serwisy aplikacyjne, routing domeny i kolejność migracji
 
@@ -989,9 +989,11 @@ Na `main` istnieje `ContentArticlePublishingService` z transakcyjnymi przejścia
 
 Serwis blokuje brak wymaganych pól/body/category/author/source, nieaktywną kategorię, niepublicznego autora, niepoprawne hero/OG metadata, invalid key_points i breaking state. Zapis state/timestamps oraz AuditLog odbywa się w jednej transakcji. `ContentArticleWorkflowTransitioned` implementuje `ShouldDispatchAfterCommit`; test rollbacku potwierdza, że event nie jest dostarczany przed outer commit i znika przy rollbacku.
 
+Downstream N2-006 po PR #48 eksponuje istniejące transition methods przez wspólną warstwę Filament Edit/View oraz dodaje kontrolowane service methods `setFeatured()`, `enableBreaking()` i `clearBreaking()`. Te mutacje zachowują transaction/row-lock pattern, AuditLog `User` actor i public-state timestamp semantics.
+
 Granice obecnej implementacji:
 
-- `applyPublicUpdate` opisany niżej nie jest jeszcze wdrożony; pozostaje N2 orchestration/stale-write scope,
+- `applyPublicUpdate` opisany niżej nie jest jeszcze wdrożony; pozostaje NEWSROOM-N2-012 orchestration/stale-write scope,
 - scheduler command i batch due processing zostały wdrożone downstream w N1-005 i reużywają tego service boundary,
 - publiczny HTTP 410/301/200 pozostaje N3; service ustanawia withdrawal tombstone, ale nie renderuje odpowiedzi HTTP,
 - cache/sitemap/IndexNow listeners nie są jeszcze podłączone; istnieje jedynie bezpieczny after-commit event hook.
@@ -1701,11 +1703,12 @@ Na 2026-09-16:
 - N2-003 dodało `NewsroomBodyEditorAdapter` oraz kontrolowany Builder/RichEditor dla `body_blocks`; canonical keys/order są zachowywane, rich text pozostaje TipTap JSON, a zapis jest ponownie normalizowany przez `NewsroomBodyContract`,
 - N2-004 dodało relationship source editor na istniejącym `ContentArticleSource`, reorder przez `sort_order`, source status indicators, HTTP(S) URL validation, parent `updated_at` touch oraz finalny source-policy gate w `ContentArticlePublishingService`,
 - N2-005 dodało `NewsroomArticleRelationsEditorAdapter` oraz article-owned editor pytań/jednostek prawnych/znaków/topiców; ordered pivots zachowują `sort_order`, topics pozostają bez ręcznego rankingu, a targety są walidowane przed sync,
+- N2-006 jest częściowo zmaterializowane po PR #48: Edit/View mają workflow/exposure actions delegujące do `ContentArticlePublishingService`; featured/breaking mutations są audytowane i chronione service-level invariantami, natomiast `Apply public update` + stale-write pozostają N2-012,
 - `ContentArticle`, `ContentTag`, `ContentTopic`, `ContentArticleSource` i `ContentHomePlacement` Eloquent models/factories istnieją; factory workflow states pokrywają dokumentowany baseline,
 - service-level route-family lookup guard istnieje w `ContentArticlePathResolver`; nadal nie jest podłączony do publicznych controllerów N3,
 - NEWSROOM-N1-005 scheduler istnieje jako `newsroom:publish-due`, jest zarejestrowany co minutę w production i deleguje due-time revalidation/publish do `ContentArticlePublishingService`,
 - NEWSROOM-N1-006 jest wdrożone: istnieją `NewsroomHomeCompositionService`, `NewsroomHomePlacementService` i niemutujący `ContentArticlePublishingService::assertScheduledPreviewReady()`; overlap/concurrency jest testowane również na PostgreSQL,
-- newsroom CMS jest częściowo zmaterializowany przez `ContentCategoryResource`, `ContentArticleResource`, kontrolowany body Builder/editor, source relationship editor oraz article-owned relations/topics editor; `ContentTopicResource`, media/origin-regulatory UI, workflow/stale-write/preview UI i HomeComposer nadal nie istnieją.
+- newsroom CMS jest częściowo zmaterializowany przez `ContentCategoryResource`, `ContentArticleResource`, kontrolowany body Builder/editor, source relationship editor, article-owned relations/topics editor oraz N2-006 workflow/exposure actions; `ContentTopicResource`, media/origin-regulatory UI, `Apply public update` + stale-write, preview UI i HomeComposer nadal nie istnieją.
 
 ---
 
@@ -1725,6 +1728,15 @@ Na 2026-09-16:
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.21
+
+- PR #48 zmergowano na `main@88533b04d74a839c3bbccf86b707909ccdd235f8`; exact-head CI #176 przeszedł dla `quality` i `newsroom-postgres`,
+- Filament Edit/View udostępnia transition actions bez kopiowania domenowej logiki z `ContentArticlePublishingService`,
+- service boundary rozszerzono o `setFeatured()`, `enableBreaking()` i `clearBreaking()`; mutacje używają istniejącego row-lock/transaction pattern i allowlisted AuditLog,
+- featured jest ograniczone do scheduled/published, a breaking do published news z przyszłym expiry,
+- ordinary public Edit nadal nie zapisuje public payload,
+- atomowy `applyPublicUpdate` i stale-write rejection pozostają otwarte w NEWSROOM-N2-012; dlatego N2-006 nie jest oznaczone jako kompletne.
 
 ### 2026-09-16 — v0.20
 

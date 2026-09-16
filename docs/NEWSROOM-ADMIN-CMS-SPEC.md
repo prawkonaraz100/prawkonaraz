@@ -639,6 +639,35 @@ Record actions:
 - Restore to review — tylko dla withdrawn
 - Preview
 
+### 24.1. Aktualny stan implementacji N2-006
+
+Po PR #48 na `main@88533b04d74a839c3bbccf86b707909ccdd235f8` Edit i View używają wspólnej warstwy `InteractsWithContentArticleWorkflowActions`.
+
+Wdrożone actions:
+
+- Submit for review,
+- Return to draft,
+- Mark reviewed,
+- Schedule pierwszej publikacji,
+- Publish now,
+- Mark needs review,
+- Archive,
+- Republish archived po fresh review,
+- Withdraw from public z wymaganym `withdrawal_reason`,
+- Restore to review,
+- Featured + `editorial_priority` / unfeature,
+- Breaking z wymaganym przyszłym `breaking_expires_at` / clear breaking.
+
+UI deleguje do `ContentArticlePublishingService`; dodatkowe `setFeatured()`, `enableBreaking()` i `clearBreaking()` zachowują transaction/row-lock pattern, allowlisted AuditLog i `public_state_changed_at` dla public exposure changes.
+
+Nie wdrożono jeszcze:
+
+- `Apply public update` dla `publiclyVisible()`,
+- loaded-token stale-write rejection wymaganej dla tej operacji,
+- Preview, które pozostaje NEWSROOM-N2-008.
+
+Dlatego N2-006 nie jest jeszcze oznaczone jako DONE; jego pozostały DoD jest zależny od NEWSROOM-N2-012.
+
 Każda action:
 
 - ma confirmation, jeśli jest destrukcyjna/publiczna,
@@ -1280,10 +1309,11 @@ Na 2026-09-16:
 - N2-002 dodało podstawowy `ContentArticleResource` shell z index/create/view/edit, Form/Infolist/Table, search/filter setem oraz eager loadingiem category/author/reviewer,
 - N2-004 dodało relationship source editor na istniejącym `ContentArticleSource`, reorder/status indicators, nullable-evidence URL handling oraz finalną source-policy validation w `ContentArticlePublishingService`,
 - N2-005 dodało article-owned questions/legal/signs/topics editor i `NewsroomArticleRelationsEditorAdapter`; ordered pivots zachowują `sort_order`, topics celowo nie mają ręcznego rankingu,
+- PR #48 zmaterializował N2-006 workflow/exposure action slice na Edit/View: review/schedule/publish/archive/withdraw/republish oraz featured/breaking delegują do `ContentArticlePublishingService`,
 - create draft oraz draftowe zmiany type/sluga delegują do `ContentArticleSlugService`; `User` actor i `ContentAuthor` author/reviewer pozostają rozdzielone,
 - ordinary Edit dla `publiclyVisible()` nie zapisuje publicznych pól również server-side i pozwala w tej ścieżce tylko na osobny zapis `editorial_note`,
 - `ContentTopicResource` i custom `NewsroomHomeComposer` nadal nie istnieją,
-- workflow actions, stale-write guard, media/origin-regulatory UI i private preview nadal nie istnieją; kontrolowany article Builder/RichEditor, source relationship editor oraz article-owned relations/topics editor są już wdrożone,
+- workflow transition/exposure actions są już wdrożone, ale `Apply public update` + stale-write guard z N2-012 nadal nie istnieją; media/origin-regulatory UI i private preview także pozostają otwarte,
 - publiczny renderer bloków nie istnieje.
 
 ---
@@ -1296,7 +1326,7 @@ Na 2026-09-16:
 - [ ] wdrożyć hero/OG uploader korzystający z `NewsroomMediaStorage` i zapis verified metadata do `ContentArticle`,
 - [ ] wdrożyć focal-point/crop UX; nie deklarować variantów bez fizycznie wygenerowanych plików,
 - [ ] wdrożyć origin/regulatory fields,
-- [ ] wdrożyć Filament workflow actions wywołujące istniejący `ContentArticlePublishingService`; backend AuditLog actor/transition contract już istnieje,
+- [ ] domknąć N2-006 przez N2-012: wdrożyć atomowy `Apply public update` + loaded-token stale-write rejection; workflow/exposure actions nad `ContentArticlePublishingService` są już wdrożone,
 - [ ] wdrożyć checklist computed state,
 - [ ] wdrożyć stale-write guard dla articles/home placements,
 - [ ] wdrożyć admin-only private preview,
@@ -1306,6 +1336,16 @@ Na 2026-09-16:
 ---
 
 ## 55. Historia zmian
+
+### 2026-09-16 — v0.15
+
+- PR #48 zmergowano na `main@88533b04d74a839c3bbccf86b707909ccdd235f8`; exact-head CI #176: `quality` PASS i `newsroom-postgres` PASS,
+- Edit i View mają wspólny workflow action layer bez duplikowania transition logic z `ContentArticlePublishingService`,
+- wdrożono review/draft, mark-reviewed, initial schedule, publish, needs-review, archive, fresh-review republish, withdraw/restore oraz featured/breaking exposure actions,
+- withdraw wymaga reason; breaking wymaga published news + przyszłego expiry; featured jest ograniczone do scheduled/published,
+- exposure mutations zapisują allowlisted AuditLog i aktualizują `public_state_changed_at` zgodnie z public-state semantics,
+- ordinary `publiclyVisible()` Edit pozostaje zablokowany dla publicznych pól,
+- `Apply public update` i stale-write guard pozostają NEWSROOM-N2-012, więc pełny N2-006 DoD nadal jest otwarty.
 
 ### 2026-09-16 — v0.14
 
