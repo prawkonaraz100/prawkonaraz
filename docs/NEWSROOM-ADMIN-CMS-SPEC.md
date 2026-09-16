@@ -85,6 +85,8 @@ Preview v1:
 - nie tworzymy shareable signed preview tokenów w v1,
 - renderer może być public-like, ale transport pozostaje prywatny/no-store.
 
+**Stan implementacji po N2-008:** Edit i View udostępniają akcję „Podgląd” otwierającą `/admin/newsroom/articles/{contentArticle}/preview`. Controller dodatkowo wymaga `User::isAdministrator()`, odpowiedź ma `private, no-store` + `noindex,nofollow`, analytics jest wyłączone, a publiczne detail routes pozostają niezmienione/404 do N3. Preview renderuje zapisany stan rekordu, publicznie cytowalne źródła i bezpieczny subset rich text; finalne moduły domenowe N3 są oznaczone jako placeholdery, a nie udawane jako gotowy public renderer.
+
 ---
 
 ## 5. Lista artykułów
@@ -668,7 +670,7 @@ Po PR #50 na `main@570f884a89869ec44d24f57f0506f4444d20a7d2` wdrożono także:
 - atomowy public payload write przez `ContentArticlePublishingService`, z rollbackiem przy failed validation,
 - `last_substantive_update_at` tylko dla semantycznej publicznej zmiany oraz allowlisted AuditLog z `User` actorem.
 
-N2-006 jest przez to DONE. N2-012 pozostaje PARTIAL tylko dla analogicznego stale-write guard w przyszłym `NewsroomHomeComposer`; Preview nadal pozostaje NEWSROOM-N2-008.
+N2-006 jest przez to DONE. N2-012 pozostaje PARTIAL tylko dla analogicznego stale-write guard w przyszłym `NewsroomHomeComposer`; Article preview jest zmaterializowany po PR #56 jako prywatny admin-only surface i nie oznacza wdrożenia publicznego N3.
 
 Każda action:
 
@@ -1323,7 +1325,7 @@ Na 2026-09-16:
 - PR #52 dodał `ContentArticlePublicationChecklist`; formularz artykułu pokazuje read-only listę `OK` / `OSTRZEŻENIE` / `BLOKUJE`, a `ContentArticlePublishingService` deleguje do tej samej klasy review/publication/fresh-review assertions,
 - warningi checklisty nie blokują publikacji, natomiast domain blockers pozostają autorytatywne po stronie backendu; dedykowany różny OG asset bez własnego alt pozostaje blockerem,
 - `ContentTopicResource` i custom `NewsroomHomeComposer` nadal nie istnieją,
-- N2-006 i N2-007 są DONE; N2-012 pozostaje PARTIAL wyłącznie dla stale-write UX/guard `NewsroomHomeComposer`; media/origin-regulatory UI i private preview także pozostają otwarte,
+- N2-006, N2-007 i N2-008 są DONE; N2-012 pozostaje PARTIAL wyłącznie dla stale-write UX/guard `NewsroomHomeComposer`; media/origin-regulatory UI nadal pozostaje otwarte,
 - publiczny renderer bloków nie istnieje.
 
 ---
@@ -1338,7 +1340,7 @@ Na 2026-09-16:
 - [ ] wdrożyć origin/regulatory fields,
 - [x] N2-006: workflow/exposure actions + atomowy stale-safe `Apply public update` dla `ContentArticle`,
 - [x] NEWSROOM-N2-007: wdrożyć computed publication checklist współdzielącą backend invariants,
-- [ ] NEWSROOM-N2-008: wdrożyć admin-only private preview route/rendering z `private, no-store` i `noindex,nofollow`,
+- [x] NEWSROOM-N2-008: admin-only private preview route/rendering z `private, no-store`, `noindex,nofollow`, bez public analytics i signed share tokenów,
 - [ ] wdrożyć stale-write guard dla `NewsroomHomeComposer` po materializacji N2-009; article stale-write jest już wdrożony,
 - [ ] wdrożyć topic identity guards; category slug/delete/deactivation guards są już zmaterializowane przez N2-001,
 - [ ] rozszerzać testy CMS wraz z kolejnymi taskami (Builder, workflow, stale-write, preview i HomeComposer).
@@ -1346,6 +1348,14 @@ Na 2026-09-16:
 ---
 
 ## 55. Historia zmian
+
+### 2026-09-16 — v0.18
+
+- PR #56 zmergowano na `main@9aa621c083e02e157e72294f5e994ea566e45a9f`; exact-head CI #202: 997 passed / 19 146 assertions / 2 skipped, Pint 1020 files PASS, frontend build PASS oraz `newsroom-postgres` PASS,
+- Edit/View `ContentArticleResource` mają akcję „Podgląd” prowadzącą do authenticated admin-only route; controller wymaga administratora również poza Filament,
+- preview korzysta z istniejącego public-content shell, lecz jawnie wyłącza analytics/consent, wymusza private/no-store + noindex/nofollow i nie ma signed/share token contract,
+- renderowane są wyłącznie publicznie cytowalne sources; private evidence i source note nie są przekazywane do widoku, a rich text jest renderowany z allowlistowanego TipTap contract z escapingiem,
+- publiczne route’y artykułów nadal pozostają N3/404; N2-008 jest DONE, a następnym taskiem jest N2-009 NewsroomHomeComposer + future preview.
 
 ### 2026-09-16 — v0.17
 

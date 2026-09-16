@@ -1319,7 +1319,7 @@ Jeśli draft stał się publiczny:
 - [ ] list
 - [ ] edit
 - [ ] stale edit rejected
-- [ ] article preview private,no-store
+- [x] article preview private,no-store
 - [ ] home composer
 - [ ] overlapping/stale placement rejected
 - [ ] future home preview private,no-store
@@ -1422,7 +1422,7 @@ Na 2026-09-16:
 - istnieją globalne backend tests,
 - istnieje Playwright smoke dla produktu,
 - istnieją ops backup/restore/health commands,
-- istnieją newsroom-specific unit/security tests dla `NewsroomBodyContract`, storage/security regression dla `NewsroomMediaStorage`, enum/schema/model regression, N1-003 slug/history tests, `NewsroomPublishingServiceTest` dla N1-004 workflow/invariants/audit/after-commit rollback boundary oraz N1-006 `NewsroomHomeCompositionServiceTest`/`NewsroomHomePlacementServiceTest`; PostgreSQL gate obejmuje migration/model/slug concurrency oraz home-placement advisory-lock regression; browser E2E nadal nie istnieje,
+- istnieją newsroom-specific unit/security tests dla `NewsroomBodyContract`, storage/security regression dla `NewsroomMediaStorage`, enum/schema/model regression, N1-003 slug/history tests, `NewsroomPublishingServiceTest` dla N1-004 workflow/invariants/audit/after-commit rollback boundary, N1-006 `NewsroomHomeCompositionServiceTest`/`NewsroomHomePlacementServiceTest` oraz N2-008 `NewsroomArticlePreviewTest` pokrywający auth/admin gate, no-store/noindex, analytics suppression, XSS escaping, private-source leakage i brak signed-token contract; PostgreSQL gate obejmuje migration/model/slug concurrency oraz home-placement advisory-lock regression; browser E2E nadal nie istnieje,
 - faktyczne N2 block-editor/placement-editor integration/E2E oraz topic CMS tests jeszcze nie istnieją; N1 domain composition/placement tests są już obecne,
 - newsroom entity graph/news sitemap/sharding/feed-discovery/static-delivery tests jeszcze nie istnieją,
 - atomic static publication i dirty/version newsroom refresh coordinator jeszcze nie istnieją,
@@ -1450,6 +1450,13 @@ Na 2026-09-16:
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-16 — v0.13
+
+- NEWSROOM-N2-008 dodał feature/security regression dla private Article preview: anonymous denied, non-admin 403, admin allowed, `private, no-store`, meta/header noindex,nofollow, brak shareable signed tokenów i brak public analytics,
+- test potwierdza escaping rich text/XSS, `noopener noreferrer` dla target=_blank oraz brak wycieku `is_publicly_cited=false` source evidence/notatek,
+- publiczny `/aktualnosci/{slug}` nadal 404 w tym etapie, więc test jawnie chroni granicę N2 preview vs N3 public renderer,
+- finalny PR #56: quality 997 passed / 19 146 assertions / 2 skipped, Pint 1020 files PASS, frontend build PASS; newsroom-postgres PASS.
 
 ### 2026-09-16 — v0.12
 
