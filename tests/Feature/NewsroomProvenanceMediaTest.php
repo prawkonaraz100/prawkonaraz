@@ -12,7 +12,6 @@ use App\Support\NewsroomArticleMediaService;
 use App\Support\NewsroomArticleProvenanceMediaAdapter;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
 use Livewire\Livewire;
 
@@ -80,7 +79,7 @@ test('provenance media adapter verifies stored image metadata and focal point', 
 
     expect(fn () => NewsroomArticleProvenanceMediaAdapter::normalizeArticleData([
         'hero_image_path' => 'newsroom/articles/source/manual.png',
-    ]))->toThrow(ValidationException::class);
+    ]))->toThrow(InvalidArgumentException::class);
 
     expect(fn () => NewsroomArticleProvenanceMediaAdapter::normalizeArticleData([
         'hero_focal_x' => 0.4,
