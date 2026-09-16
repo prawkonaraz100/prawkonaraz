@@ -103,7 +103,7 @@ Na pierwszym etapie nie budujemy:
 
 ## 5. Aktualny stan implementacji
 
-Stan sprawdzony ponownie 2026-09-16 względem aktualnego `main` po wdrożeniu NEWSROOM-N0-001 i NEWSROOM-N0-002.
+Stan sprawdzony ponownie 2026-09-16 względem `main@54ddf66b6fb3f41d103415697019500cdab86d41` po wdrożeniu foundation NEWSROOM-N0-001–N0-004.
 
 ### 5.1. Elementy już istniejące
 
