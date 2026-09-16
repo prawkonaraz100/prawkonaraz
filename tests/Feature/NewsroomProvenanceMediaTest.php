@@ -209,7 +209,7 @@ test('apply public update persists provenance regulatory and verified media fiel
         ->set('data.change_summary', 'Nowe zasady egzaminu.')
         ->set('data.applies_to', 'Kandydaci na kategorię B.')
         ->set('data.exam_impact', 'Zmiana zakresu egzaminu.')
-        ->set('data.hero_image_path', $stored['path'])
+        ->set('data.hero_image_path', [$stored['path']])
         ->set('data.hero_image_alt', 'Hero artykułu')
         ->set('data.hero_focal_x', 0.25)
         ->set('data.hero_focal_y', 0.75)
