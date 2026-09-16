@@ -550,6 +550,8 @@ final class ContentArticlePublishingService
 
             unset($payload['_edit_token'], $payload['editorial_note']);
 
+            $payload = NewsroomArticleProvenanceMediaAdapter::normalizeArticleData($payload);
+
             $sourcePayload = NewsroomArticleSourcesEditorAdapter::extractArticleData($payload);
             $payload = $sourcePayload['article_data'];
             $sources = $sourcePayload['sources'];
@@ -567,11 +569,35 @@ final class ContentArticlePublishingService
                     'category_id',
                     'author_id',
                     'reviewer_id',
+                    'origin_type',
                     'title',
                     'slug',
                     'lead',
                     'body_blocks',
                     'body_schema_version',
+                    'key_points',
+                    'correction_note',
+                    'regulatory_status',
+                    'effective_from',
+                    'change_summary',
+                    'applies_to',
+                    'exam_impact',
+                    'hero_image_path',
+                    'hero_image_alt',
+                    'hero_image_width',
+                    'hero_image_height',
+                    'hero_image_caption',
+                    'hero_focal_x',
+                    'hero_focal_y',
+                    'og_image_path',
+                    'og_image_alt',
+                    'og_image_width',
+                    'og_image_height',
+                    'image_credit',
+                    'image_license_note',
+                    'seo_title',
+                    'seo_description',
+                    'robots',
                 ]),
             );
             $relations = $relationPayload['relations'];
