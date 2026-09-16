@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\ContentArticles\Schemas;
 
 use App\Enums\ContentArticleType;
-use App\Models\ContentArticle;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
