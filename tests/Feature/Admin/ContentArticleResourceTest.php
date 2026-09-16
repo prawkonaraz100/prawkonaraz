@@ -430,6 +430,51 @@ test('ordinary edit of publicly visible article cannot mutate public fields or b
         ->and($article->editorial_note)->toBe('Nowa notatka wewnętrzna');
 });
 
+test('explicit public update mode applies validated public fields and records the user actor', function () {
+    Carbon::setTestNow('2026-09-16 19:00:00');
+
+    $admin = User::factory()->admin()->create();
+    $article = ContentArticle::factory()->published()->create([
+        'title' => 'Tytuł przed public update',
+        'lead' => 'Lead przed public update',
+    ]);
+    ContentArticleSource::factory()
+        ->for($article, 'article')
+        ->create([
+            'source_type' => ContentArticleSourceType::Official->value,
+            'title' => 'Źródło publiczne',
+            'url' => 'https://example.test/public-source',
+            'is_publicly_cited' => true,
+        ]);
+
+    $this->actingAs($admin);
+
+    Livewire::test(EditContentArticle::class, ['record' => $article->getRouteKey()])
+        ->call('beginPublicUpdate')
+        ->assertSet('publicUpdateMode', true)
+        ->set('data.title', 'Tytuł po Apply public update')
+        ->set('data.lead', 'Lead po Apply public update')
+        ->call('applyPublicUpdate')
+        ->assertSet('publicUpdateMode', false)
+        ->assertHasNoErrors();
+
+    $article = $article->fresh();
+    $audit = AuditLog::query()
+        ->where('action', 'content_article.public_updated')
+        ->where('entity_id', (string) $article->id)
+        ->sole();
+
+    expect($article->title)->toBe('Tytuł po Apply public update')
+        ->and($article->lead)->toBe('Lead po Apply public update')
+        ->and($article->last_substantive_update_at?->toDateTimeString())->toBe('2026-09-16 19:00:00')
+        ->and($audit->actor_user_id)->toBe($admin->id)
+        ->and($audit->metadata)->not->toHaveKey('body_blocks')
+        ->and($audit->metadata)->not->toHaveKey('lead')
+        ->and($audit->metadata)->not->toHaveKey('editorial_note');
+
+    Carbon::setTestNow();
+});
+
 test('admin can persist ordered article sources including private evidence without a url', function () {
     $undoRepeaterFake = Repeater::fake();
 
