@@ -35,6 +35,18 @@ test('slug service generates deterministic initial slug and allocates a unique s
         ->and($second->slug)->toBe('nowe-zasady-egzaminu-2');
 });
 
+test('generated slug skips reserved newsroom segment with deterministic suffix', function () {
+    $category = ContentCategory::factory()->create();
+
+    $article = newsroomSlugService()->create([
+        'type' => ContentArticleType::News->value,
+        'category_id' => $category->id,
+        'title' => 'Kategoria',
+    ]);
+
+    expect($article->slug)->toBe('kategoria-2');
+});
+
 test('explicit duplicate current slug is rejected', function () {
     $category = ContentCategory::factory()->create();
     $service = newsroomSlugService();
@@ -74,9 +86,13 @@ test('published slug change creates direct redirect and later changes rewrite hi
 
     $service->changeSlug($article, 'drugi-adres');
 
+    $resolver = app(ContentArticlePathResolver::class);
+
     expect(ContentArticleRedirect::query()->where('from_path', '/aktualnosci/pierwszy-adres')->first())
         ->not->toBeNull()
         ->and(ContentArticleRedirect::query()->where('from_path', '/aktualnosci/pierwszy-adres')->value('to_path'))
+        ->toBe('/aktualnosci/drugi-adres')
+        ->and($resolver->findRedirect('/aktualnosci/pierwszy-adres')?->to_path)
         ->toBe('/aktualnosci/drugi-adres');
 
     $service->changeSlug($article->fresh(), 'trzeci-adres');
