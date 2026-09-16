@@ -129,6 +129,12 @@ Problemem był `HomePageController`, który hardcodował „Orły na Drodze” i
 
 ## NEWSROOM-N0-002 — Final route contract
 
+### Status implementacji
+
+**DONE — route-contract foundation zamknięty na `main` przez PR #16.**
+
+Zakres N0-002 utrwala routing i executable route-family contract. Nie oznacza jeszcze wdrożenia `ContentArticle`, publicznych controllerów artykułów ani record-level lookupu; te elementy pozostają zadaniami downstream i muszą konsumować ten kontrakt.
+
 ### Decyzja
 
 Preferowany:
@@ -140,11 +146,11 @@ Preferowany:
 - /poradniki
 - /poradniki/{articleSlug}
 
-### Potwierdzony stan
+### Stan przed implementacją
 
-- `/aktualnosci` już istnieje jako named route `public.news` i renderuje `Public/MarketingPlaceholder`,
-- `/poradniki` już istnieje jako named route `public.guides` i renderuje placeholder,
-- oba linki już istnieją w primary `PublicNavigation`.
+- `/aktualnosci` już istniało jako named route `public.news` i renderuje `Public/MarketingPlaceholder`,
+- `/poradniki` już istniało jako named route `public.guides` i renderowało placeholder,
+- oba linki już istniały w primary `PublicNavigation`.
 
 ### Zadania
 
@@ -153,6 +159,23 @@ Preferowany:
 - reserved slug list + regex,
 - jawnie zmapować type -> route family,
 - test route matching/order.
+
+### Aktualny stan implementacji
+
+- zachowano top-level route names `public.news` i `public.guides`,
+- dodano named routes:
+  - `public.news.feed` -> `/aktualnosci/feed.xml`,
+  - `public.news.categories.show` -> `/aktualnosci/kategoria/{categorySlug}`,
+  - `public.news.topics.show` -> `/aktualnosci/temat/{topicSlug}`,
+  - `public.news.show` -> `/aktualnosci/{articleSlug}`,
+  - `public.guides.show` -> `/poradniki/{articleSlug}`,
+- parametry używają kontraktu `[a-z0-9-]+`; newsroom article route rezerwuje segmenty `kategoria` i `temat`,
+- feed/category/topic routes są deklarowane przed article catch-all,
+- przyszłe feed/category/topic/detail routes są obecnie zarejestrowane, ale celowo zwracają 404 do czasu wdrożenia właściwych controllerów,
+- `/aktualnosci` i `/poradniki` nadal zachowują pre-launch placeholder UX, ale przez dedykowany `NewsroomPlaceholderController` dodają `X-Robots-Tag: noindex, follow`,
+- shared `Public/MarketingPlaceholder` innych sekcji nie został globalnie zmieniony,
+- `NewsroomRouteContract` implementuje type -> route family, canonical path, reserved slug policy i guard cross-family type transition po pierwszej publikacji,
+- record-level lookup przeciw faktycznemu `ContentArticle` nie istnieje jeszcze; N3 public controllers muszą użyć route-family contract tak, aby rekord nie mógł odpowiadać 200 pod obiema rodzinami.
 
 ### Route family
 
@@ -1705,8 +1728,8 @@ Nie oznaczać tasku DONE przed merge + green verification.
 Na 2026-09-16:
 
 - pakiet projektowy newsroomu obejmuje architekturę, model danych, CMS, UI, governance, SEO, backlog i runbook,
-- implementacja newsroomu rozpoczęła się od foundation N0-001; właściwy domain/CMS/public newsroom nadal nie jest wdrożony,
-- /aktualnosci i /poradniki nadal placeholder,
+- foundation N0-001 i N0-002 są wdrożone; właściwy domain/CMS/public newsroom nadal nie jest wdrożony,
+- `/aktualnosci` i `/poradniki` nadal renderują pre-launch placeholder, teraz z dedykowanym `X-Robots-Tag: noindex, follow`; finalne detail/category/topic/feed route namespaces są zarejestrowane, ale pozostają 404 bez publicznych controllerów,
 - fundamenty ContentAuthor/legal/traffic signs/public SEO istnieją,
 - istnieją config/content.php organization, SchemaIds/SchemaRenderer oraz współdzielony SiteIdentitySchema; homepage i istniejące główne publiczne graph services korzystają z kanonicznego Organization/WebSite identity,
 - istnieją public/robots.txt i RobotsController; newsroom nie zmienia tej warstwy bez osobnego production-delivery audit,
@@ -1720,13 +1743,22 @@ Na 2026-09-16:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N0-002 — Final route contract.
+NEWSROOM-N0-003 — Taxonomy seed contract.
 
-NEWSROOM-N0-001 / G0-C jest zamknięte. N0-002/N0-003/N0-004/N0-006 można dalej zamykać według macierzy hard dependencies. N0-005 jest już decyzją dokumentacyjną; jego kodowy regression gate wykonuje się w N5.
+NEWSROOM-N0-001 i NEWSROOM-N0-002 są zamknięte. N0-003/N0-004/N0-006 można dalej zamykać według macierzy hard dependencies. N0-005 jest już decyzją dokumentacyjną; jego kodowy regression gate wykonuje się w N5.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.8
+
+- zamknięto NEWSROOM-N0-002 po merge PR #16 i green CI,
+- utrwalono finalne route namespaces i ich kolejność przed article catch-all,
+- dodano executable `NewsroomRouteContract` z regexem slugów, reserved segments, type -> route family i post-publication cross-family guard,
+- pre-launch huby `/aktualnosci` i `/poradniki` zachowują placeholder UX z `X-Robots-Tag: noindex, follow`, bez zmiany innych MarketingPlaceholder routes,
+- future feed/category/topic/detail routes są świadomie 404 do czasu wdrożenia publicznych controllerów,
+- record-level ContentArticle lookup pozostaje wymaganiem downstream, nie jest deklarowany jako ukończony.
 
 ### 2026-09-16 — v0.7
 
