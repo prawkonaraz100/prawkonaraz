@@ -29,6 +29,7 @@ class PublishDueNewsroomArticlesCommand extends Command
 
         $ids = ContentArticle::query()
             ->where('workflow_status', ContentArticleWorkflowStatus::Scheduled->value)
+            ->whereNull('first_published_at')
             ->whereNotNull('scheduled_for')
             ->where('scheduled_for', '<=', now())
             ->orderBy('scheduled_for')
