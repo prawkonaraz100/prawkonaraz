@@ -4,7 +4,9 @@ namespace App\Support;
 
 use App\Enums\ContentArticleOriginType;
 use App\Enums\ContentArticleRegulatoryStatus;
+use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
+use RuntimeException;
 
 final class NewsroomArticleProvenanceMediaAdapter
 {
@@ -98,9 +100,16 @@ final class NewsroomArticleProvenanceMediaAdapter
             return $data;
         }
 
-        $storage = app(NewsroomMediaStorage::class);
-        $verified = $storage->inspectStoredImage($path);
-        $storage->publicUrl($path);
+        try {
+            $storage = app(NewsroomMediaStorage::class);
+            $verified = $storage->inspectStoredImage($path);
+            $storage->publicUrl($path);
+        } catch (ValidationException|RuntimeException $exception) {
+            throw new InvalidArgumentException(
+                "{$pathField} must reference a verified managed newsroom asset with a stable public URL: {$exception->getMessage()}",
+                previous: $exception,
+            );
+        }
 
         $data[$pathField] = $verified['path'];
         $data[$widthField] = $verified['width'];
