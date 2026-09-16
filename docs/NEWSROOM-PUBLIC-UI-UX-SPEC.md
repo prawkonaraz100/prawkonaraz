@@ -1296,7 +1296,9 @@ Na 2026-09-16:
 - public header/footer istnieją,
 - globalna nawigacja zawiera Aktualności,
 - backendowy `NewsroomHomeCompositionService` istnieje i materializuje lead/secondary/latest/category/guides/important-now/breaking composition contract,
-- ten composer nie jest jeszcze podłączony do publicznego `/aktualnosci`; hub nadal pozostaje placeholderem i właściwe newsroom-specific list/article/category/topic components nie istnieją.
+- backendowy `ContentArticlePublicCatalogService` istnieje po NEWSROOM-N3-001 i materializuje route-family current-canonical detail lookup, explicit visible/gone/not-found resolution oraz osobny `activelyDistributed()` list query z public-safe eager loading,
+- ten catalog service nie jest jeszcze podłączony do publicznych detail controllerów/Blade; `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}` nadal pozostają 404 w pre-launch stanie,
+- `NewsroomHomeCompositionService` nadal nie jest podłączony do publicznego `/aktualnosci`; hub pozostaje placeholderem i właściwe newsroom-specific list/article/category/topic components nie istnieją.
 
 ---
 
@@ -1320,6 +1322,12 @@ Na 2026-09-16:
 ---
 
 ## 69. Historia zmian
+
+### 2026-09-17 — v0.9
+
+- odnotowano wdrożony NEWSROOM-N3-001 backendowy `ContentArticlePublicCatalogService`,
+- rozdzielono gotowy read boundary od nadal niewdrożonych publicznych controllerów/Blade i zachowano pre-launch 404 dla detail routes,
+- nie oznaczono article page, archived UI ani withdrawn 410 surface jako wdrożonych tylko dlatego, że backendowy resolver zwraca odpowiedni status semantyczny.
 
 ### 2026-09-16 — v0.8
 

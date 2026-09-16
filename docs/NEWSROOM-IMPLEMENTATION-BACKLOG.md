@@ -1068,6 +1068,21 @@ Computed blocking/warning items.
 
 ## NEWSROOM-N3-001 — Public catalog service
 
+### Status implementacji
+
+**DONE — PR #64 zmergowano na `main@8215e142af2cd88c7335f17bc085bbd0c04d5790`. Exact-head PR CI #231 był pełnym PASS; finalny push-CI #232 na tym samym SHA zakończył się `quality` PASS (1029 passed / 19 335 assertions / 2 skipped, Pint PASS, frontend build PASS) oraz `newsroom-postgres` PASS.**
+
+### Aktualny stan implementacji
+
+- `ContentArticlePublicCatalogService::findPubliclyVisibleBySlug()` realizuje current-canonical lookup z route-family guard,
+- `resolveDetailBySlug()` zwraca jawne `visible/gone/not_found` dla 200/410/404 na poziomie backendowego resolution,
+- `activelyDistributedQuery()` jest osobną granicą dla hubów/list/feed candidates, z deterministycznym `first_published_at DESC, id DESC`,
+- archived po wcześniejszej publikacji pozostaje detail-visible, ale nie trafia do active query; needs_review pozostaje detail-visible zgodnie z policy,
+- draft/scheduled/never-published archived i never-published withdrawn są ukryte,
+- detail eager loading/column policy nie eksponuje private editorial/license/withdrawal/source-note fields,
+- publiczne controllery/Blade nadal nie są wdrożone; zarejestrowane detail routes pozostają 404 w pre-launch stanie,
+- old historical path -> 301 pozostaje osobnym NEWSROOM-N3-006 i nie jest deklarowane jako część N3-001.
+
 ### Zakres
 
 - findPubliclyVisibleBySlug z route-family guard,
@@ -2089,13 +2104,21 @@ Na 2026-09-16:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N3-001 — Public catalog service.
+NEWSROOM-N3-002 — Article SEO service.
 
-N2-001..N2-012 są zamknięte w zakresie implementacyjnym po PR #62. Następny krok rozpoczyna N3 i materializuje publiczny katalog/lookup artykułów z route-family guard, rozdzieleniem `publiclyVisible` od `activelyDistributed` oraz jawnie testowaną semantyką archived/withdrawn. Publiczne huby kategorii/topiców i ich HTTP lifecycle pozostają kolejnymi zadaniami N4.
+N2-001..N2-012 oraz NEWSROOM-N3-001 są zamknięte implementacyjnie. Następny krok buduje SEO metadata/canonical/robots/OG/Twitter/date policy nad istniejącym `ContentArticlePublicCatalogService`; nie uruchamia jeszcze Blade article page ani historycznych redirectów. Publiczne huby kategorii/topiców i ich HTTP lifecycle pozostają kolejnymi zadaniami N4.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-17 — v0.30
+
+- PR #64 zmergowano na `main@8215e142af2cd88c7335f17bc085bbd0c04d5790`; exact-head PR CI #231 PASS, a finalny push-CI #232 na `main` zakończył się `quality` PASS (1029 passed / 19 335 assertions / 2 skipped, Pint PASS, frontend build PASS) oraz `newsroom-postgres` PASS,
+- NEWSROOM-N3-001 jest **DONE**: wdrożono route-family-scoped current-canonical lookup, osobny active-distribution list query, explicit 200/410/404 resolution semantics oraz public-safe eager-load/column policy,
+- testy pokrywają published/needs_review/archived detail visibility, hidden draft/scheduled/never-published states, withdrawn tombstone, route-family isolation, deterministic chronology i private-field exclusion; PostgreSQL gate obejmuje N3-001,
+- N3-001 nie uruchamia publicznych controllerów ani historycznych 301; detail routes pozostają 404 do dalszych N3 tasków, a redirect resolver pozostaje N3-006,
+- następnym taskiem wykonawczym jest NEWSROOM-N3-002 `Article SEO service`.
 
 ### 2026-09-16 — v0.29
 
