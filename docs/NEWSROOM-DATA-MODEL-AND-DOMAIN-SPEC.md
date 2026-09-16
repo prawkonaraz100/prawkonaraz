@@ -6,7 +6,7 @@
 - Obszar: newsroom / media portal
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Bazowy stan repo przy projektowaniu: main@6a38c95ce76ee05997977d614d795ed8513462f1
-- Ostatnia weryfikacja zgodności z kodem: main@d2b48a322034c1ace020640427be833cd285e1e4 (2026-09-16)
+- Ostatnia weryfikacja zgodności z kodem: main@54ddf66b6fb3f41d103415697019500cdab86d41 (2026-09-16)
 - Data: 2026-09-16
 - Zakres: model domenowy, baza danych, invariants, serwisy aplikacyjne, routing domeny i kolejność migracji
 
@@ -1069,22 +1069,33 @@ Dla treści prawnie wrażliwych policy może wymagać `reviewer_id + reviewed_at
 
 ## 25. Walidacja i sanitization body_blocks
 
-Dokładny komponent edytora i serializacja wewnętrzna są decyzją N0-004, ale kontrakt domenowy jest stały:
+NEWSROOM-N0-004 jest zamknięte przez wykonywalny `App\Support\NewsroomBodyContract`.
 
-- `body_blocks` jest jednym kanonicznym źródłem body,
-- dokument body ma jawny `body_schema_version`,
-- każdy `type` bloku ma allowlistowany schema payloadu,
-- rich_text sanitizuje HTML/doc nodes po stronie serwera; nie polegamy wyłącznie na Filament/browser sanitization,
-- aktualny composer nie zawiera jawnej backendowej biblioteki HTML sanitizer, więc N0-004 musi wybrać i przetestować konkretny sanitizer albo format strukturalny niewymagający arbitralnego HTML,
-- aktualny bootstrap nie pokazuje newsroom-ready CSP middleware; nie wprowadzamy szerokiej CSP zmiany przy okazji edytora bez zgodności z istniejącymi analytics/fonts/scripts,
-- script/style/event handlers są zabronione,
-- `embed` jest domyślnie wyłączony w CMS, dopóki nie istnieje jawna provider allowlista, sandbox/referrer policy oraz zgodny z produkcją CSP/`frame-src` contract,
-- po włączeniu embed przyjmuje tylko allowlisted providers/URL i renderer nie emituje arbitralnego iframe HTML,
-- linki z `target=_blank` otrzymują bezpieczne `rel`,
-- block renderer ignoruje/odrzuca nieznany typ zamiast wykonywać go jako HTML,
-- publiczny renderer nie interpretuje arbitralnych klas CSS przekazanych z CMS.
+Kontrakt domenowy:
 
-Nie utrzymujemy pełnego `body_html` i `body_blocks` jako dwóch edytowalnych źródeł prawdy.
+- `body_blocks` pozostaje jedynym kanonicznym źródłem body; nie istnieje równoległe edytowalne `body_html`,
+- `body_schema_version=1` jest jedyną aktualnie obsługiwaną wersją; nieznana wersja failuje zamknięcie,
+- zapis domenowy jest uporządkowaną listą `{key?, type, data}`; associative UUID-keyed state Filament Buildera jest wyłącznie formatem adaptera UI,
+- każdy aktywny `type` ma allowlistowany schema payloadu,
+- `rich_text` jest structured TipTap JSON, nie HTML-em; backend waliduje allowlistę nodes/marks niezależnie od browsera,
+- dozwolone rich-text nodes: `doc`, `paragraph`, `heading` level 2/3, `bulletList`, `orderedList`, `listItem`, `text`, `hardBreak`,
+- dozwolone marks: `bold`, `italic`, `link`; raw HTML/style/custom nodes i marks są odrzucane,
+- link przyjmuje root-relative/fragment/http/https; `javascript:` oraz nieobsługiwane targety są odrzucane, a `target=_blank` normalizuje się do `rel="noopener noreferrer"`,
+- aktywne bloki v1: `rich_text`, `image`, `quote`, `table`, `context`, `related_article`, `legal_reference`, `question_group`, `traffic_sign_group`, `product_cta`,
+- `embed` jest znany kontraktowi, ale feature-disabled/fail-closed, dopóki nie istnieje provider allowlista, sandbox/referrer policy oraz zgodny z produkcją CSP/`frame-src` contract,
+- image block przyjmuje wyłącznie storage-relative path i pola strukturalne; finalny storage/upload/crop contract pozostaje w N0-006,
+- domain blocks utrzymują IDs, nie zduplikowane fragmenty HTML lub kart,
+- block key jest opcjonalny, ale jeśli występuje, ma stabilny format, musi być unikalny i nie może kolidować z Builder item key,
+- unknown block type oraz unknown payload field failują zamknięcie zamiast wykonywać nieznaną treść.
+
+Aktualny repo nadal nie ma newsroom-ready CSP middleware ani osobnego arbitrary-HTML sanitizer package. N0-004 nie dodaje ich, ponieważ wybrany structured JSON contract nie przyjmuje arbitralnego HTML jako formatu body. Publiczny N3 renderer nadal musi renderować wyłącznie kontrolowane komponenty.
+
+Strategia format evolution:
+
+- writer/editor może zapisywać tylko wersje obsługiwane przez reader/renderer,
+- nowy block type może zostać udostępniony w CMS dopiero po wdrożeniu jego readera/renderera,
+- v2 wymaga najpierw backward-compatible readera albo jawnej migracji danych z testem,
+- rollback nie może zostać wykonany do kodu, który nie potrafi bezpiecznie odczytać zapisanych wersji bez osobnego data planu.
 
 ---
 
@@ -1564,6 +1575,7 @@ Na 2026-09-16:
 - traffic signs workflow istnieje,
 - NEWSROOM-N0-002 route contract jest wdrożony i przetestowany,
 - NEWSROOM-N0-003 taxonomy seed contract jest wdrożony i przetestowany jako `NewsroomTaxonomyContract` v1,
+- NEWSROOM-N0-004 body-format contract jest wdrożony i przetestowany jako `NewsroomBodyContract` v1,
 - `/aktualnosci` i `/poradniki` pozostają placeholderami 200 z dedykowanym noindex header,
 - przyszłe detail/category/topic/feed routes są zarejestrowane, lecz zwracają 404 do czasu publicznej implementacji,
 - newsroom tables nie istnieją, więc taxonomy contract nie jest jeszcze zmaterializowany jako rekordy `content_categories`,
@@ -1577,7 +1589,8 @@ Na 2026-09-16:
 ## 44. Pozostałe zadania
 
 - [ ] finalizować naming tabel i klas,
-- [ ] domknąć N0-004: serializacja bloków + editor + sanitizer,
+- [ ] wdrożyć N2 Filament Builder/RichEditor adapter oparty o `NewsroomBodyContract`,
+- [ ] wdrożyć N3 publiczny renderer bloków zgodny z `NewsroomBodyContract`,
 - [ ] wdrożyć model topics,
 - [ ] wdrożyć home placements/composition service,
 - [ ] wdrożyć focal point + OG alt/stable public URL w media contract,
@@ -1596,6 +1609,16 @@ Na 2026-09-16:
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.8
+
+- wdrożono N0-004 jako wykonywalny `NewsroomBodyContract` v1,
+- kanoniczny body zapisano jako listę `{key?, type, data}`, oddzielając format domenowy od associative state Filament Buildera,
+- rich text zamrożono jako TipTap JSON z allowlistą nodes/marks i bez arbitrary HTML,
+- zdefiniowano ścisłe payload contracts dla aktywnych bloków i wyłączono `embed` do czasu provider/CSP gate,
+- zapisano fail-closed `body_schema_version` i strategię reader-before-writer / migration-before-breaking-change,
+- testy obejmują XSS escaping, unsafe URLs/nodes/marks, unknown blocks/version, keys, media paths, relacje i table shape,
+- N2 editor i N3 public renderer pozostają niewdrożone.
 
 ### 2026-09-16 — v0.7
 

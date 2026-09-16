@@ -243,6 +243,12 @@ Przyszły dedykowany seeder N1 ma konsumować ten kontrakt zamiast utrzymywać d
 
 ## NEWSROOM-N0-004 — Block editor + serialization + sanitization decision
 
+### Status implementacji
+
+**DONE — G0-B body-format contract zamknięty na `main` przez PR #20.**
+
+N0-004 zamyka format, walidację i compatibility policy. Nie oznacza jeszcze wdrożenia N2 article editor ani N3 public body renderer.
+
 ### Cel
 
 Domknąć techniczny sposób edycji kanonicznego `body_blocks`.
@@ -270,6 +276,27 @@ Domknąć techniczny sposób edycji kanonicznego `body_blocks`.
 - renderer dla nowego block type musi zostać wdrożony przed umożliwieniem jego tworzenia w CMS,
 - rollback code nie może zostać wykonany do wersji, która nie potrafi bezpiecznie odczytać już zapisanych blocków bez osobnego data planu,
 - XSS tests.
+
+### Aktualny stan implementacji
+
+`App\Support\NewsroomBodyContract` jest wykonywalnym source of truth dla body schema v1:
+
+- kanoniczny zapis to uporządkowana lista `{key?, type, data}`; stan Filament Buildera jest tylko adapterem UI i nie staje się formatem domenowym,
+- przyszły N2 editor używa `Filament\Forms\Components\Builder`,
+- `rich_text` używa structured TipTap JSON z `Filament\Forms\Components\RichEditor`, bez zapisu arbitrary HTML,
+- toolbar rich text jest zamrożony do bold/italic/link, H2/H3, ordered/unordered lists oraz undo/redo,
+- aktywne v1 block types: `rich_text`, `image`, `quote`, `table`, `context`, `related_article`, `legal_reference`, `question_group`, `traffic_sign_group`, `product_cta`,
+- `embed` jest znanym typem, ale w v1 jest feature-disabled/fail-closed,
+- unknown block type, unknown payload field i unsupported `body_schema_version` failują zamknięcie,
+- rich text allowlistuje tylko paragraph, H2/H3, lists, text, hard break oraz marks bold/italic/link; raw HTML/style nodes nie są formatem wejściowym,
+- `javascript:` i nieobsługiwane targety linków są odrzucane; `target=_blank` otrzymuje wymuszone `rel="noopener noreferrer"`,
+- image block przyjmuje tylko storage-relative path; finalny upload/storage/crop contract nadal należy do N0-006,
+- domain blocks zapisują kontrolowane IDs, a nie skopiowane HTML/card payloady,
+- block `key` ma stabilny format, jest unikalny i nie może być sprzeczny z Builder item key.
+
+Test `tests/Unit/Support/NewsroomBodyContractTest.php` pokrywa kontrakt payloadów, fail-closed schema evolution, unsafe URLs/nodes/marks, disabled embed, image path traversal, relation duplicates, table shape oraz XSS regression przez `RichContentRenderer`.
+
+Strategia ewolucji formatu pozostaje zgodna z decyzją architektoniczną: obecny reader obsługuje wyłącznie v1 i failuje bezpiecznie dla przyszłej wersji. V2 może zostać włączone dopiero po wdrożeniu readera zgodnego wstecz albo jawnej migracji danych; writer/editor nie może wyprzedzić readera/renderera. Rollback nie może kierować do kodu, który nie umie odczytać już zapisanej wersji bez osobnego data planu.
 
 ### DoD
 
@@ -1768,13 +1795,23 @@ Na 2026-09-16:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N0-004 — Block editor + serialization + sanitization decision.
+NEWSROOM-N0-006 — Media upload/storage contract.
 
-NEWSROOM-N0-001, NEWSROOM-N0-002 i NEWSROOM-N0-003 są zamknięte. Tym samym G0-A (routing/taxonomy) jest zamknięty jako dependency gate. N0-004 i N0-006 pozostają otwartymi foundation gates według macierzy hard dependencies. N0-005 jest już decyzją dokumentacyjną; jego kodowy regression gate wykonuje się w N5.
+NEWSROOM-N0-001, NEWSROOM-N0-002, NEWSROOM-N0-003 i NEWSROOM-N0-004 są zamknięte. G0-A (routing/taxonomy) i G0-B (body format) są zamknięte jako dependency gates. N0-005 pozostaje decyzją dokumentacyjną z kodowym regression gate w N5. N0-006 jest ostatnim otwartym foundation contractem przed wejściem w odpowiadające mu zadania N2 media oraz dalsze N1/N2 zgodnie z macierzą hard dependencies.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.10
+
+- zamknięto NEWSROOM-N0-004 / G0-B po merge PR #20 i green CI,
+- dodano wykonywalny `NewsroomBodyContract` z body schema v1, canonical list `{key?, type, data}` i fail-closed version policy,
+- wybrano Filament Builder jako przyszły adapter N2 oraz RichEditor TipTap JSON dla rich text; nie powstało równoległe `body_html`,
+- aktywne typy bloków mają ścisłe payload schemas, a `embed` pozostaje wyłączony do czasu provider/CSP security gate,
+- dodano unit/security regression dla unsafe nodes/marks/URLs, XSS escaping, block keys, image pathów, relacji i table shape,
+- właściwy N2 CMS, N3 renderer, media upload adapter i CSP/embed nadal nie są wdrożone,
+- pierwszym następnym foundation taskiem jest N0-006.
 
 ### 2026-09-16 — v0.9
 
