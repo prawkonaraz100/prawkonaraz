@@ -532,6 +532,26 @@ N1-003 zamyka domenowy kontrakt slugów, historycznych full paths, one-hop redir
 
 ## NEWSROOM-N1-004 — Publishing service
 
+### Status implementacji
+
+**DONE — publishing/workflow foundation zmergowany przez PR #30 na `main@701c9eb41003bd0d6a18c417f1051ccc6372668b`.**
+
+Aktualny zakres implementuje domenowe przejścia workflow, walidację publish/schedule eligibility, audyt i after-commit event boundary. Nie oznacza jeszcze publicznych controllerów/HTTP disposition ani CMS actions.
+
+Potwierdzony kod:
+
+- `ContentArticlePublishingService`,
+- `ContentArticleWorkflowTransitioned implements ShouldDispatchAfterCommit`,
+- `NewsroomPublishingServiceTest`.
+
+Zamknięte przejścia obejmują draft ↔ review, review mark, initial schedule, publish, needs_review, archive, dedicated archived republish, withdraw oraz restore-to-review z zachowaniem tombstone aż do skutecznego publish.
+
+Istotne granice pozostają otwarte:
+- publiczne HTTP `410 Gone` dla withdrawn nadal należy do N3; N1-004 ustanawia stan/tombstone, ale nie renderuje HTTP,
+- `applyPublicUpdate` dla już publicznego artykułu pozostaje N2 orchestration/stale-write scope,
+- scheduler command/registration pozostaje N1-005,
+- cache/sitemap/IndexNow listeners nie są jeszcze podłączone; PR #30 ustanawia wyłącznie bezpieczny after-commit hook.
+
 ### Zakres
 
 - submit for review,
@@ -1591,9 +1611,9 @@ Docs-only:
 
 - [x] schema wdrożona
 - [x] models/factories
-- [ ] publishing service
+- [x] publishing service
 - [ ] scheduling
-- [ ] redirects / withdrawn 410 disposition
+- [ ] public HTTP redirects / withdrawn 410 disposition
 
 ### CMS
 
@@ -1867,13 +1887,27 @@ Na 2026-09-16:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N1-004 — Publishing service.
+NEWSROOM-N1-005 — Scheduler.
 
-NEWSROOM-N1-001, NEWSROOM-N1-002 i NEWSROOM-N1-003 są zamknięte. Następny krok wykonawczy to audytowany publishing/workflow service z transakcyjnymi state/timestamp changes, wymaganymi invariants oraz public side effects emitowanymi wyłącznie after commit.
+NEWSROOM-N1-001, NEWSROOM-N1-002, NEWSROOM-N1-003 i NEWSROOM-N1-004 są zamknięte w zakresie swoich foundation/domain gates. Następny krok wykonawczy to `newsroom:publish-due` dla initial scheduled publish, z idempotency, ponowną walidacją eligibility w due time i izolacją failure jednego rekordu.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.15
+
+- zamknięto NEWSROOM-N1-004 po merge PR #30 na `main@701c9eb41003bd0d6a18c417f1051ccc6372668b`,
+- dodano `ContentArticlePublishingService` oraz after-commit `ContentArticleWorkflowTransitioned`,
+- wdrożono audytowane, transakcyjne przejścia review/schedule/publish/needs_review/archive/withdraw/restore/republish wraz z required invariants i timestamp semantics,
+- transition poza aktywny published distribution czyści breaking state; `first_published_at` pozostaje stabilny,
+- withdrawal wymaga reason i utrzymuje tombstone przez restore-to-review aż do skutecznego reviewed publish,
+- AuditLog używa `User` actora niezależnie od `ContentAuthor`, a metadata nie przechowuje pełnego body/lead,
+- rollback test potwierdza brak workflow eventu przed outer commit i brak eventu po rollbacku,
+- publiczne HTTP 410/301/200 nadal nie istnieje; withdrawn HTTP disposition pozostaje N3,
+- `applyPublicUpdate` pozostaje N2 orchestration; scheduler command pozostaje N1-005,
+- finalny gate PR #30: `quality` 917 passed / 18 656 assertions / 2 skipped, Pint 983 files, frontend build PASS; `newsroom-postgres` 6 passed / 86 assertions,
+- następnym taskiem wykonawczym jest NEWSROOM-N1-005.
 
 ### 2026-09-16 — v0.14
 

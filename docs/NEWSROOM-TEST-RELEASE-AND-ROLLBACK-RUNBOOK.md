@@ -1422,7 +1422,7 @@ Na 2026-09-16:
 - istnieją globalne backend tests,
 - istnieje Playwright smoke dla produktu,
 - istnieją ops backup/restore/health commands,
-- istnieją newsroom-specific unit/security tests dla `NewsroomBodyContract`, storage/security regression dla `NewsroomMediaStorage`, enum/schema/model regression oraz N1-003 slug/history tests; PostgreSQL gate obejmuje migration/model/slug concurrency contracts; browser E2E nadal nie istnieje,
+- istnieją newsroom-specific unit/security tests dla `NewsroomBodyContract`, storage/security regression dla `NewsroomMediaStorage`, enum/schema/model regression, N1-003 slug/history tests oraz `NewsroomPublishingServiceTest` dla N1-004 workflow/invariants/audit/after-commit rollback boundary; PostgreSQL gate obejmuje migration/model/slug concurrency contracts; browser E2E nadal nie istnieje,
 - faktyczne N2 block-editor integration/E2E oraz homepage placement/topic tests jeszcze nie istnieją,
 - newsroom entity graph/news sitemap/sharding/feed-discovery/static-delivery tests jeszcze nie istnieją,
 - atomic static publication i dirty/version newsroom refresh coordinator jeszcze nie istnieją,
@@ -1440,7 +1440,7 @@ Na 2026-09-16:
 - [ ] dodać site-identity/entity-graph/date-consistency tests,
 - [ ] dodać semantic silo/orphan/reverse-link/click-depth tests,
 - [ ] dodać public HTTP route-family/canonical/old-slug redirect integration/E2E; service-level exclusivity i slug history są już pokryte w N1-003,
-- [ ] dodać audit/stale-write/placement-concurrency/category-topic guard tests,
+- [ ] dodać N2 stale-write/Apply-public-update, placement-concurrency i category-topic guard tests; podstawowy N1-004 AuditLog/after-commit workflow contract ma już feature regression,
 - [ ] dodać news namespace + sitemap sharding + atomic publish + dirty-marker refresh/feed-discovery tests,
 - [ ] dodać production-like static robots/sitemap delivery smoke,
 - [ ] rozszerzyć istniejący SeoSitemapAuditor,
@@ -1450,6 +1450,14 @@ Na 2026-09-16:
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-16 — v0.11
+
+- NEWSROOM-N1-004 dodał `NewsroomPublishingServiceTest` dla transition matrix, publish/schedule invariants, date semantics, AuditLog actor/metadata i breaking cleanup,
+- test rollbacku potwierdza, że `ContentArticleWorkflowTransitioned` nie jest dostarczany przed outer commit i nie pozostaje po rollbacku,
+- feature regression obejmuje archive/needs_review/withdraw/restore/republish i stabilność `first_published_at`,
+- publiczny HTTP 410 dla withdrawn nadal nie jest pokryty, ponieważ N3 controllers nie istnieją; obecne testy weryfikują domenowy tombstone/public visibility state,
+- finalny PR #30: quality 917 passed / 18 656 assertions / 2 skipped, Pint 983 files, frontend build PASS; newsroom-postgres 6 passed / 86 assertions.
 
 ### 2026-09-16 — v0.10
 

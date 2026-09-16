@@ -1236,6 +1236,7 @@ Na 2026-09-16:
 - `NewsroomBodyContract` v1 i jego unit/security tests istnieją,
 - `NewsroomMediaStorage` i jego unit regression istnieją jako N0-006 storage/validation foundation,
 - decyzja N0-004 wybiera Builder + RichEditor TipTap JSON jako przyszły N2 adapter,
+- backendowy `ContentArticlePublishingService` istnieje i implementuje audytowane workflow transitions oraz after-commit event boundary z N1-004,
 - newsroom resources nie istnieją,
 - article editor/Builder UI nie istnieje,
 - publiczny renderer bloków nie istnieje,
@@ -1255,7 +1256,7 @@ Na 2026-09-16:
 - [ ] wdrożyć focal-point/crop UX; nie deklarować variantów bez fizycznie wygenerowanych plików,
 - [ ] wdrożyć origin/regulatory fields,
 - [ ] wdrożyć relations pickers,
-- [ ] wdrożyć workflow actions + AuditLog actor contract,
+- [ ] wdrożyć Filament workflow actions wywołujące istniejący `ContentArticlePublishingService`; backend AuditLog actor/transition contract już istnieje,
 - [ ] wdrożyć checklist computed state,
 - [ ] wdrożyć stale-write guard dla articles/home placements,
 - [ ] wdrożyć admin-only private preview,
@@ -1265,6 +1266,13 @@ Na 2026-09-16:
 ---
 
 ## 55. Historia zmian
+
+### 2026-09-16 — v0.8
+
+- N1-004 dostarczył backendowy `ContentArticlePublishingService`, AuditLog actor contract i after-commit workflow event,
+- przyszłe N2 workflow actions mają wywoływać ten serwis zamiast implementować transition logic w Filament,
+- UI checklist/confirmation, `Apply public update`, stale-write guard i newsroom resources nadal nie istnieją,
+- withdrawn UI nadal musi komunikować przyszłe HTTP 410, ale sam publiczny controller/410 response pozostaje N3.
 
 ### 2026-09-16 — v0.7
 
