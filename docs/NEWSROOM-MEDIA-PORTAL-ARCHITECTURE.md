@@ -103,7 +103,7 @@ Na pierwszym etapie nie budujemy:
 
 ## 5. Aktualny stan implementacji
 
-Stan sprawdzony ponownie 2026-09-16 względem `main@fd2042f22532b7b7c14dc993e532c0887876e159` po wdrożeniu N0, N1-001..N1-006 oraz N2-001..N2-004.
+Stan sprawdzony ponownie 2026-09-16 względem `main@262d9fab0b171c13a159f7c97670dee3db583b56` po wdrożeniu N0, N1-001..N1-006 oraz N2-001..N2-005.
 
 ### 5.1. Elementy już istniejące
 
@@ -162,13 +162,13 @@ To oznacza, że:
 - model domenowy artykułów/kategorii/tagów/topiców i relacji oraz backendowy publishing/scheduling foundation już istnieją,
 - nie istnieje jeszcze publiczna lista artykułów ani widok pojedynczego artykułu,
 - service-level `ContentArticlePathResolver` istnieje, ale nie jest jeszcze podłączony do publicznych controllerów,
-- redakcyjny CMS jest częściowy: istnieją `ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor dla `body_blocks` oraz relationship editor źródeł, ale nie pełne media/origin/regulatory/relations UI, workflow/preview/HomeComposer.
+- redakcyjny CMS jest częściowy: istnieją `ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor dla `body_blocks`, relationship editor źródeł oraz article-owned questions/legal/signs/topics editor, ale nie pełne media/origin/regulatory UI, workflow/preview/HomeComposer.
 
 ### 5.3. Brakujące elementy
 
 Nie ma obecnie kompletnego end-to-end odpowiednika:
 
-- UI dla media/origin/regulatory/relations oraz pozostałych etapów N2,
+- UI dla media/origin/regulatory oraz pozostałych etapów N2,
 - `ContentTopicResource`,
 - Filament workflow actions, checklisty, stale-write guard, `Apply public update`, private preview i `NewsroomHomeComposer`,
 - publicznego list/detail/category/topic renderera pod utrwalonym route contract,
@@ -1455,12 +1455,13 @@ Na moment utworzenia dokumentu za ukończone uznajemy wyłącznie elementy rzecz
 - NEWSROOM-N2-002: podstawowy Filament `ContentArticleResource` shell z index/create/view/edit, Form/Infolist/Table, search/filters/eager loading oraz write paths reużywającymi istniejący slug service,
 - NEWSROOM-N2-003: kontrolowany Filament Builder/RichEditor dla aktywnych bloków v1, `NewsroomBodyEditorAdapter`, canonical key round-trip oraz server-side normalizacja przez `NewsroomBodyContract`,
 - NEWSROOM-N2-004: relationship Repeater `ContentArticleSource` z `sort_order`, kontrolowanymi typami/statusami, bezpiecznym HTTP(S) URL handlingiem oraz finalną source-policy validation w `ContentArticlePublishingService`,
+- NEWSROOM-N2-005: article-owned questions/legal/signs/topics editor + `NewsroomArticleRelationsEditorAdapter`; questions/legal/signs zapisują istniejące pivoty z `sort_order`, topics pozostają bez ręcznego rankingu, a target corpora są wyszukiwane bez preloadu,
 - routes `/aktualnosci` i `/poradniki` jako dedykowane pre-launch 200/noindex placeholders,
 - placeholdery tych tras,
 - publiczna nawigacja prowadząca do aktualności,
 - istniejące klastry pytań, znaków i przepisów, które mogą zostać powiązane z artykułami.
 
-**Newsroom ma zmaterializowane N1-001..N1-006 oraz N2-001..N2-004 (`ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor dla `body_blocks` i relationship editor źródeł). N1 domain foundation jest zamknięte, ale CMS jako całość nadal nie jest wdrożony: `ContentTopicResource`, media/relations/origin-regulatory UI, workflow/stale-write/preview UI, HomeComposer oraz N3 renderer/controllers/HTTP 301/410 pozostają otwarte.**
+**Newsroom ma zmaterializowane N1-001..N1-006 oraz N2-001..N2-005 (`ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor dla `body_blocks`, relationship editor źródeł oraz article-owned relations/topics editor). N1 domain foundation jest zamknięte, ale CMS jako całość nadal nie jest wdrożony: `ContentTopicResource`, media/origin-regulatory UI, workflow/stale-write/preview UI, HomeComposer oraz N3 renderer/controllers/HTTP 301/410 pozostają otwarte.**
 
 ---
 
@@ -1484,7 +1485,8 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N2-002` — ContentArticleResource shell + basic Form/Infolist/Table/search/filters/eager loading + protected write paths,
 - [x] `NEWSROOM-N2-003` — controlled Builder/RichEditor + body adapter + server-side sanitization/XSS regression,
 - [x] `NEWSROOM-N2-004` — sources relationship editor + source ordering/status UX + authoritative source-policy validation,
-- [ ] kontynuować N2 zgodnie z backlogiem; następny task: `NEWSROOM-N2-005` Relations and topics editor.
+- [x] `NEWSROOM-N2-005` — article-owned questions/legal/signs/topics editor + relation validation/sync + bounded search,
+- [ ] kontynuować N2 zgodnie z backlogiem; następny task: `NEWSROOM-N2-006` Workflow actions.
 
 Pozostałe elementy N2–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu checklistę.
 
@@ -1511,6 +1513,18 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-16 — v0.22
+
+- wdrożono i zmergowano NEWSROOM-N2-005 przez PR #46 na `main@262d9fab0b171c13a159f7c97670dee3db583b56`,
+- istniejące article-owned relacje `questions()`, `legalUnits()`, `trafficSigns()` i `topics()` są edytowane w `ContentArticleResource` bez nowych tabel ani duplikowania istniejącego graphu pytań/przepisów/znaków,
+- questions/legal/signs używają ordered Repeaterów i zapisują kolejność do istniejącego pivot `sort_order`; topics używają searchable multi-select bez ręcznego rankingu zgodnie z istniejącą decyzją dla `content_article_topic`,
+- `NewsroomArticleRelationsEditorAdapter` waliduje allowlisty `relation_type`, duplikaty oraz istnienie targetów przed synchronizacją; sync nie mutuje target entities i jawnie bumpuje parent `ContentArticle.updated_at`,
+- pickery używają bounded search zamiast preloadu dużych corpusów; question label pokazuje external ID, kategorię i active/public state, legal/sign/topic pickery pokazują kontekstowe etykiety,
+- ordinary Edit `publiclyVisible()` nadal ignoruje mutacje relations/topics i pozostawia jedynie wewnętrzną ścieżkę `editorial_note`; pełny stale-write reject nadal pozostaje N2-012,
+- publiczny reverse-link/article relation renderer nadal nie istnieje i pozostaje zakresem N3/N4,
+- finalny exact-head gate PR #46: `quality` 972 passed / 18 940 assertions / 2 skipped, Pint 1011 files PASS, frontend build PASS (9.49 s); `newsroom-postgres` 7 passed / 89 assertions,
+- następnym taskiem jest `NEWSROOM-N2-006` Workflow actions.
 
 ### 2026-09-16 — v0.21
 

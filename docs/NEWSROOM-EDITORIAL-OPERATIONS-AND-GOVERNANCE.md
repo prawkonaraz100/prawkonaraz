@@ -1060,7 +1060,7 @@ W formularzu powinny być ostrzeżenia:
 - published bez hero alt, jeśli hero istnieje,
 - brak powiązań produktu nie blokuje publish, ale powinien być widoczny.
 
-Aktualny stan po N2-004: source editor i finalny backend source-policy gate są wdrożone, ale osobny computed warning „brak primary source dla prawnego newsa” nadal nie istnieje. Pozostaje on późniejszym publication checklist/provenance zakresem (N2-007/N2-010). Nie zmienia to powyższej zasady redakcyjnej.
+Aktualny stan po N2-005: source editor, finalny backend source-policy gate oraz article-owned relations/topics editor są wdrożone. Osobny computed warning „brak primary source dla prawnego newsa” i warning „brak powiązań produktu” nadal nie istnieją jako publication-checklist UI; pozostają późniejszym zakresem N2-007/N2-010. Nie zmienia to powyższych zasad redakcyjnych.
 
 ---
 
@@ -1128,11 +1128,11 @@ Na 2026-09-16:
 
 - istnieją `ContentAuthor` i istniejący `AuditLog`; `User` pozostaje aktorem operacji, a `ContentAuthor` publiczną tożsamością autora/reviewera,
 - backendowy `ContentArticlePublishingService` i `newsroom:publish-due` istnieją, ale Filament workflow actions, publication checklist i correction/apply-public-update orchestration nadal nie są wdrożone,
-- istnieją `ContentCategoryResource` i `ContentArticleResource`; article CMS ma kontrolowany body Builder/RichEditor oraz relationship source editor,
+- istnieją `ContentCategoryResource` i `ContentArticleResource`; article CMS ma kontrolowany body Builder/RichEditor, relationship source editor oraz article-owned questions/legal/signs/topics editor,
 - istnieją model `ContentArticleSource`, source types v1, private-evidence flag i source ordering; N2-004 dodaje ich edycję oraz finalną source-policy validation,
 - draft może istnieć bez source, natomiast news nie przechodzi review/publish bez source; prywatny interview/direct evidence może mieć URL null,
-- ordinary Edit publicznie widocznego artykułu nie może zmieniać publicznych sources,
-- publiczny renderer citation, origin/regulatory UI, computed publication warnings, preview, HomeComposer i pełny stale-write reject nadal nie istnieją.
+- ordinary Edit publicznie widocznego artykułu nie może zmieniać publicznych sources ani article relations/topics,
+- publiczny renderer citation/relations, origin/regulatory UI, computed publication warnings, preview, HomeComposer i pełny stale-write reject nadal nie istnieją.
 
 ---
 
@@ -1153,6 +1153,14 @@ Na 2026-09-16:
 ---
 
 ## 49. Historia zmian
+
+### 2026-09-16 — v0.8
+
+- zsynchronizowano bieżący stan governance z kodem po N2-005 bez zmiany source hierarchy, topic governance ani zasad publicznej kolejności,
+- article CMS umożliwia teraz zarządzanie article-owned questions/legal/signs/topics relations; topics pozostają bez ręcznego rankingu, a target entities nie są mutowane przez sync,
+- ordinary public Edit nie zmienia relations/topics; publiczne renderowanie relacji nadal pozostaje otwarte,
+- warning „brak powiązań produktu” nadal jest przyszłym computed checklist item i nie jest fałszywie deklarowany jako wdrożony,
+- finalny exact-head gate N2-005: `quality` 972 passed / 18 940 assertions / 2 skipped, Pint 1011 files PASS, frontend build PASS (9.49 s); `newsroom-postgres` 7 passed / 89 assertions.
 
 ### 2026-09-16 — v0.7
 
