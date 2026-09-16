@@ -929,6 +929,29 @@ Odpowiada za:
 
 Transakcja stanu publicznego obejmuje co najmniej rekord artykułu, krytyczne timestampy/invariants i audit opisujący tę zmianę. Eventy uruchamiające zewnętrzne side effecty (cache invalidation, sitemap dirty signal, IndexNow, notification) są dispatchowane dopiero po udanym commit. Rollback transakcji nie może zostawić „ghost publish” w cache/sitemap/IndexNow.
 
+#### 20.1.0. Aktualny stan implementacji N1-004
+
+Na `main` istnieje `ContentArticlePublishingService` z transakcyjnymi przejściami:
+
+- draft -> in_review i in_review -> draft,
+- mark reviewed dla in_review / needs_review / archived,
+- initial-only schedule,
+- publish dla in_review / needs_review / due scheduled,
+- published -> needs_review,
+- published -> archived,
+- archived -> published przez dedykowany republish po fresh review,
+- published / needs_review / archived -> withdrawn z reason,
+- withdrawn -> in_review z aktywnym tombstone do skutecznego reviewed publish.
+
+Serwis blokuje brak wymaganych pól/body/category/author/source, nieaktywną kategorię, niepublicznego autora, niepoprawne hero/OG metadata, invalid key_points i breaking state. Zapis state/timestamps oraz AuditLog odbywa się w jednej transakcji. `ContentArticleWorkflowTransitioned` implementuje `ShouldDispatchAfterCommit`; test rollbacku potwierdza, że event nie jest dostarczany przed outer commit i znika przy rollbacku.
+
+Granice obecnej implementacji:
+
+- `applyPublicUpdate` opisany niżej nie jest jeszcze wdrożony; pozostaje N2 orchestration/stale-write scope,
+- scheduler command i batch due processing pozostają N1-005,
+- publiczny HTTP 410/301/200 pozostaje N3; service ustanawia withdrawal tombstone, ale nie renderuje odpowiedzi HTTP,
+- cache/sitemap/IndexNow listeners nie są jeszcze podłączone; istnieje jedynie bezpieczny after-commit event hook.
+
 #### 20.1.1. Edycja już opublikowanego artykułu bez revisions
 
 V1 nie ma staged revision/snapshot systemu. Dlatego:
@@ -1607,6 +1630,7 @@ Na 2026-09-16:
 - NEWSROOM-N1-001 jest wdrożone: istnieje 5 enumów domenowych oraz 12 migracji newsroomu,
 - NEWSROOM-N1-002 jest wdrożone: istnieją modele `ContentArticle`, `ContentCategory`, `ContentTag`, `ContentTopic`, `ContentArticleSource`, `ContentHomePlacement`, ich factories, relations, reverse relations i scopes/predicates,
 - NEWSROOM-N1-003 jest wdrożone: istnieją `ContentArticleSlugService`, `ContentArticleRedirect`, `ContentArticlePathResolver` i PostgreSQL advisory-lock serialization,
+- NEWSROOM-N1-004 jest wdrożone w zakresie publishing/workflow foundation: istnieją `ContentArticlePublishingService`, `ContentArticleWorkflowTransitioned` i feature regression dla workflow/invariants/audit/after-commit rollback boundary,
 - `/aktualnosci` i `/poradniki` pozostają placeholderami 200 z dedykowanym noindex header,
 - przyszłe detail/category/topic/feed routes są zarejestrowane, lecz zwracają 404 do czasu publicznej implementacji,
 - newsroom schema istnieje: `content_categories`, `content_tags`, `content_articles`, `content_topics`, pivots/relations, redirects i `content_home_placements` są tworzone przez 12 migracji,
@@ -1628,14 +1652,25 @@ Na 2026-09-16:
 - [ ] podłączyć istniejące origin/regulatory columns do modeli, CMS i publish validation,
 - [ ] wdrożyć dedykowany idempotentny DB seeder kategorii konsumujący `NewsroomTaxonomyContract`,
 - [ ] wdrożyć policies,
-- [ ] wdrożyć publishing service,
-- [ ] wdrożyć scheduling,
+- [ ] wdrożyć `applyPublicUpdate` orchestration/stale-write path dla już publicznego artykułu w N2,
+- [ ] wdrożyć scheduling command/batch processing N1-005,
 - [ ] podłączyć `ContentArticlePathResolver` do publicznych N3 article controllers i zweryfikować HTTP canonical/301/404/410 behavior,
 - [ ] dodać sitemap/public-discovery regression korzystające wyłącznie z current canonical URL,
 
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.13
+
+- wdrożono NEWSROOM-N1-004 publishing/workflow foundation przez `ContentArticlePublishingService`,
+- state/timestamp mutation i AuditLog są objęte jedną transakcją z row lockiem artykułu,
+- `ContentArticleWorkflowTransitioned` używa `ShouldDispatchAfterCommit`; rollback regression blokuje ghost side effects,
+- publish/schedule walidują canonical body, category/author/source/media/key-points/breaking invariants i fresh review,
+- archive/needs_review/withdraw czyszczą breaking state, republish zachowuje `first_published_at`, a withdrawal tombstone jest czyszczony dopiero przy skutecznym publish,
+- AuditLog actor pozostaje `User`, niezależny od ContentAuthor author/reviewer identity,
+- publiczne HTTP 410 oraz `applyPublicUpdate` nie są oznaczone jako wdrożone: odpowiednio pozostają N3 i N2,
+- finalny CI PR #30: quality 917 passed / 18 656 assertions / 2 skipped, Pint 983 files, frontend build PASS; newsroom-postgres 6 passed / 86 assertions.
 
 ### 2026-09-16 — v0.12
 
