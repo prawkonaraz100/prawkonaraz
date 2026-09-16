@@ -392,7 +392,7 @@ Zakres N0-006 zamraża bezpieczny storage contract przed N2 media editor. Nie oz
 
 **DONE — schema foundation zmergowany przez PR #24 na `main@47e748047ec655ff2fdb5669d8cbff7e51041dc8`.**
 
-Zakres obejmuje 5 enumów, 12 migracji, SQLite schema regression oraz addytywny `newsroom-postgres` gate. PostgreSQL 16 zweryfikował `migrate:fresh`, krytyczne indeksy/FK delete rules i rollback 12 newsroom migrations. Modele/factories/scopes nadal należą do N1-002.
+Zakres obejmuje 5 enumów, 12 migracji, SQLite schema regression oraz addytywny `newsroom-postgres` gate. PostgreSQL 16 zweryfikował `migrate:fresh`, krytyczne indeksy/FK delete rules i rollback 12 newsroom migrations. W momencie zamknięcia N1-001 modele/factories/scopes były następnym zakresem N1-002; obecnie N1-002 również jest zmergowane.
 
 ### Aktualny stan implementacji
 
@@ -1570,7 +1570,7 @@ Docs-only:
 
 ### Domain
 
-- [ ] schema wdrożona
+- [x] schema wdrożona
 - [x] models/factories
 - [ ] publishing service
 - [ ] scheduling
