@@ -56,6 +56,7 @@ final class NewsroomHomeCompositionService
         int $categoryItemsLimit = self::DEFAULT_CATEGORY_ITEMS_LIMIT,
         int $guidesItemsLimit = self::DEFAULT_GUIDES_ITEMS_LIMIT,
         int $importantNowLimit = self::DEFAULT_IMPORTANT_NOW_LIMIT,
+        bool $includeManualPlacements = true,
     ): array {
         $at = $this->normalizeAt($at);
 
@@ -74,6 +75,7 @@ final class NewsroomHomeCompositionService
             1,
             $at,
             $used,
+            includeManualPlacements: $includeManualPlacements,
         )[0] ?? null;
 
         $secondary = $this->resolveEditorialSlot(
@@ -82,6 +84,7 @@ final class NewsroomHomeCompositionService
             $secondaryLimit,
             $at,
             $used,
+            includeManualPlacements: $includeManualPlacements,
         );
 
         $latest = $this->resolveChronological(
@@ -106,6 +109,7 @@ final class NewsroomHomeCompositionService
                 $at,
                 $used,
                 $category,
+                includeManualPlacements: $includeManualPlacements,
             )[0] ?? null;
 
             $items = $this->resolveChronological(
@@ -134,6 +138,7 @@ final class NewsroomHomeCompositionService
             $used,
             null,
             ContentArticleType::Guide,
+            includeManualPlacements: $includeManualPlacements,
         )[0] ?? null;
 
         $guideItems = $this->resolveChronological(
@@ -150,6 +155,7 @@ final class NewsroomHomeCompositionService
             $importantNowLimit,
             $at,
             $used,
+            includeManualPlacements: $includeManualPlacements,
         );
 
         return [
@@ -178,6 +184,7 @@ final class NewsroomHomeCompositionService
         array &$used,
         ?ContentCategory $category = null,
         ?ContentArticleType $type = null,
+        bool $includeManualPlacements = true,
     ): array {
         if ($limit === 0) {
             return [];
@@ -185,33 +192,35 @@ final class NewsroomHomeCompositionService
 
         $resolved = [];
 
-        $placements = ContentHomePlacement::query()
-            ->activeAt($at)
-            ->where('surface_key', ContentHomePlacement::SURFACE_NEWSROOM_HOME)
-            ->where('slot_key', $slotKey)
-            ->where('context_key', $contextKey)
-            ->with(['article.category', 'article.author'])
-            ->orderBy('position')
-            ->orderBy('id')
-            ->limit(self::CANDIDATE_WINDOW)
-            ->get();
+        if ($includeManualPlacements) {
+            $placements = ContentHomePlacement::query()
+                ->activeAt($at)
+                ->where('surface_key', ContentHomePlacement::SURFACE_NEWSROOM_HOME)
+                ->where('slot_key', $slotKey)
+                ->where('context_key', $contextKey)
+                ->with(['article.category', 'article.author'])
+                ->orderBy('position')
+                ->orderBy('id')
+                ->limit(self::CANDIDATE_WINDOW)
+                ->get();
 
-        foreach ($placements as $placement) {
-            $article = $placement->article;
+            foreach ($placements as $placement) {
+                $article = $placement->article;
 
-            if (
-                $article === null
-                || isset($used[(int) $article->getKey()])
-                || ! $this->matchesSlotContext($article, $slotKey, $category, $type)
-                || ! $this->isEligibleAt($article, $at)
-            ) {
-                continue;
-            }
+                if (
+                    $article === null
+                    || isset($used[(int) $article->getKey()])
+                    || ! $this->matchesSlotContext($article, $slotKey, $category, $type)
+                    || ! $this->isArticleEligibleAt($article, $at)
+                ) {
+                    continue;
+                }
 
-            $this->appendCandidate($resolved, $used, $article);
+                $this->appendCandidate($resolved, $used, $article);
 
-            if (count($resolved) >= $limit) {
-                return $resolved;
+                if (count($resolved) >= $limit) {
+                    return $resolved;
+                }
             }
         }
 
@@ -228,7 +237,7 @@ final class NewsroomHomeCompositionService
         foreach ($query->limit(self::CANDIDATE_WINDOW)->get() as $article) {
             if (
                 isset($used[(int) $article->getKey()])
-                || ! $this->isEligibleAt($article, $at)
+                || ! $this->isArticleEligibleAt($article, $at)
             ) {
                 continue;
             }
@@ -270,7 +279,7 @@ final class NewsroomHomeCompositionService
         foreach ($query->limit(self::CANDIDATE_WINDOW)->get() as $article) {
             if (
                 isset($used[(int) $article->getKey()])
-                || ! $this->isEligibleAt($article, $at)
+                || ! $this->isArticleEligibleAt($article, $at)
             ) {
                 continue;
             }
@@ -297,7 +306,7 @@ final class NewsroomHomeCompositionService
             ->orderByDesc('id');
 
         foreach ($query->limit(self::CANDIDATE_WINDOW)->get() as $article) {
-            if ($this->isEligibleAt($article, $at)) {
+            if ($this->isArticleEligibleAt($article, $at)) {
                 return $article;
             }
         }
@@ -365,8 +374,9 @@ final class NewsroomHomeCompositionService
         return true;
     }
 
-    private function isEligibleAt(ContentArticle $article, Carbon $at): bool
+    public function isArticleEligibleAt(ContentArticle $article, DateTimeInterface $at): bool
     {
+        $at = $this->normalizeAt($at);
         if ($article->workflow_status === ContentArticleWorkflowStatus::Published) {
             return $article->isActivelyDistributed()
                 && $article->published_at !== null
