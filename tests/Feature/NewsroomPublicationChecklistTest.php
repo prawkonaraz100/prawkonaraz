@@ -71,7 +71,12 @@ test('publication checklist and publishing service share the same active categor
     expect($categoryItem['state'])->toBe(ContentArticlePublicationChecklist::STATE_BLOCKING)
         ->and($categoryItem['message'])->toContain('active category');
 
-    expect(fn () => app(ContentArticlePublishingService::class)->markReviewed($article))
+    $service = app(ContentArticlePublishingService::class);
+
+    expect(fn () => $service->markReviewed($article))
+        ->toThrow(DomainException::class, 'active category');
+
+    expect(fn () => $service->publish($article))
         ->toThrow(DomainException::class, 'active category');
 });
 
@@ -113,5 +118,7 @@ test('article edit form renders the computed publication checklist', function ()
         ->assertSee('Checklista publikacyjna')
         ->assertSee('Gotowość do publikacji')
         ->assertSee('BLOKUJE')
-        ->assertSee('OSTRZEŻENIE');
+        ->assertSee('OSTRZEŻENIE')
+        ->assertSee('Content article author is required.')
+        ->assertSee('News article requires at least one source.');
 });
