@@ -6,6 +6,7 @@ use App\Enums\ContentArticleOriginType;
 use App\Enums\ContentArticleRegulatoryStatus;
 use App\Enums\ContentArticleType;
 use App\Enums\ContentArticleWorkflowStatus;
+use App\Models\Concerns\HasOptimisticLockVersion;
 use Database\Factories\ContentArticleFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -18,6 +19,7 @@ class ContentArticle extends Model
 {
     /** @use HasFactory<ContentArticleFactory> */
     use HasFactory;
+    use HasOptimisticLockVersion;
 
     protected $fillable = [
         'type',
@@ -105,6 +107,7 @@ class ContentArticle extends Model
             'freshness_review_due_at' => 'immutable_datetime',
             'last_substantive_update_at' => 'immutable_datetime',
             'public_state_changed_at' => 'immutable_datetime',
+            'lock_version' => 'integer',
         ];
     }
 
