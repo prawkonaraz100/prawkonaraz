@@ -1132,7 +1132,7 @@ Na 2026-09-16:
 - istnieją model `ContentArticleSource`, source types v1, private-evidence flag i source ordering; N2-004 dodaje ich edycję oraz finalną source-policy validation,
 - draft może istnieć bez source, natomiast news nie przechodzi review/publish bez source; prywatny interview/direct evidence może mieć URL null,
 - ordinary Edit publicznie widocznego artykułu nadal nie zmienia publicznych sources ani article relations/topics przez zwykły Save; jawny `Apply public update` zapisuje aktualnie zmaterializowany public editor payload atomowo z loaded-state guardem,
-- publiczny renderer citation/relations, origin/regulatory UI i HomeComposer nadal nie istnieją; N2-008 private Article preview jest zmaterializowany i pokazuje wyłącznie publicznie cytowalne źródła, computed publication blocking/warning items są już w adminie, a N2-012 pozostaje otwarte tylko dla HomeComposer stale-write.
+- publiczny renderer citation/relations oraz origin/regulatory UI nadal nie istnieją; N2-008 private Article preview i N2-009 private HomeComposer/future preview są zmaterializowane, computed publication blocking/warning items są już w adminie, a N2-012 jest DONE.
 
 ---
 
@@ -1142,11 +1142,11 @@ Na 2026-09-16:
 - [x] N2-007: mandatory publish readiness jest współdzielone między checklistą i backend validation; warningi są addytywne i nie osłabiają gate'ów,
 - [x] N2-008: admin-only private/no-store article preview z noindex,nofollow, bez public analytics i private-source leakage,
 - [ ] wdrożyć origin/regulatory governance w CMS,
-- [ ] wdrożyć homepage placements i future home preview,
+- [x] wdrożyć homepage placements i future home preview,
 - [ ] wdrożyć topic governance,
 - [ ] wdrożyć focal-point review,
 - [x] N2-006: workflow/schedule/exposure actions + atomowy stale-safe `Apply public update` dla `ContentArticle`,
-- [ ] N2-012: analogiczny stale-write guard dla `NewsroomHomeComposer` po N2-009,
+- [x] N2-012: analogiczny stale-write guard dla `NewsroomHomeComposer`,
 - [ ] wdrożyć corrections,
 - [ ] wdrożyć freshness filters,
 - [ ] przygotować publiczną stronę zasad redakcyjnych przed większym rolloutem.
@@ -1154,6 +1154,15 @@ Na 2026-09-16:
 ---
 
 ## 49. Historia zmian
+
+### 2026-09-16 — v0.13
+
+- PR #58 zmergowano na `main@bcb8d783171fc565810a2149b735d86ca6039b00` po exact-head CI #211; `quality` i `newsroom-postgres` PASS,
+- `NewsroomHomeComposer` udostępnia wyłącznie stałe sloty redakcyjne; nie tworzy page-buildera ani dowolnych modułów layoutu,
+- redaktor może wyszukać artykuł, ustawić placement window, usunąć ręczne przypisanie i wrócić do fallbacku; eligibility dla wybranego czasu jest blokująca, a duplicate selection jest jawnie ostrzegane,
+- future preview jest admin-only/private/no-store/noindex i używa tego samego composition service; scheduled content może pojawić się wyłącznie dla wybranego czasu po swoim scheduled publish point i bez mutowania workflow,
+- placement writes audytują `User` actor, a stale token odrzuca update/delete przed nadpisaniem cudzej zmiany; N2-012 jest DONE,
+- następny task to N2-010 provenance/regulatory/media art direction; publiczny N3/N4 pozostaje osobnym rolloutem.
 
 ### 2026-09-16 — v0.12
 

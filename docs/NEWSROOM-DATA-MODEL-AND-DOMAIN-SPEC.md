@@ -994,7 +994,7 @@ Downstream N2-006 po PR #48 eksponuje istniejące transition methods przez wspó
 Granice obecnej implementacji:
 
 - `applyPublicUpdate` jest wdrożony dla aktualnie zmaterializowanego `ContentArticle` editor payloadu: row lock + deterministic loaded-state token + atomowy article/source/relation sync + pełna service validation; future public fields muszą dołączać do tego samego use case zamiast tworzyć low-level Save,
-- analogiczny stale-write guard dla `NewsroomHomeComposer` pozostaje otwartą częścią N2-012 zależną od N2-009,
+- analogiczny stale-write guard dla `NewsroomHomeComposer` jest wdrożony po PR #58 przez deterministyczny `ContentHomePlacementEditToken`; update/delete porównują loaded token pod row lockiem, a tuple advisory-lock/overlap contract pozostaje dodatkową warstwą concurrency protection,
 - scheduler command i batch due processing zostały wdrożone downstream w N1-005 i reużywają tego service boundary,
 - publiczny HTTP 410/301/200 pozostaje N3; service ustanawia withdrawal tombstone, ale nie renderuje odpowiedzi HTTP,
 - cache/sitemap/IndexNow listeners nie są jeszcze podłączone; istnieje jedynie bezpieczny after-commit event hook.
@@ -1711,7 +1711,7 @@ Na 2026-09-16:
 - service-level route-family lookup guard istnieje w `ContentArticlePathResolver`; nadal nie jest podłączony do publicznych controllerów N3,
 - NEWSROOM-N1-005 scheduler istnieje jako `newsroom:publish-due`, jest zarejestrowany co minutę w production i deleguje due-time revalidation/publish do `ContentArticlePublishingService`,
 - NEWSROOM-N1-006 jest wdrożone: istnieją `NewsroomHomeCompositionService`, `NewsroomHomePlacementService` i niemutujący `ContentArticlePublishingService::assertScheduledPreviewReady()`; overlap/concurrency jest testowane również na PostgreSQL,
-- newsroom CMS jest częściowo zmaterializowany przez `ContentCategoryResource`, `ContentArticleResource`, kontrolowany body Builder/editor, source relationship editor, article-owned relations/topics editor, N2-006 workflow/exposure actions, stale-safe `Apply public update`, N2-007 publication checklist oraz N2-008 private article preview; `ContentTopicResource`, media/origin-regulatory UI i HomeComposer nadal nie istnieją, a N2-012 pozostaje PARTIAL dla HomeComposer stale-write.
+- newsroom CMS jest częściowo zmaterializowany przez `ContentCategoryResource`, `ContentArticleResource`, kontrolowany body Builder/editor, source relationship editor, article-owned relations/topics editor, N2-006 workflow/exposure actions, stale-safe `Apply public update`, N2-007 publication checklist, N2-008 private article preview oraz N2-009 `NewsroomHomeComposer` + future preview; N2-012 jest DONE, natomiast `ContentTopicResource` i media/origin-regulatory UI nadal nie istnieją.
 
 ---
 
@@ -1725,15 +1725,26 @@ Na 2026-09-16:
 - [ ] wdrożyć dedykowany idempotentny DB seeder kategorii konsumujący `NewsroomTaxonomyContract`,
 - [ ] wdrożyć policies,
 - [x] wdrożyć `applyPublicUpdate` orchestration/stale-write path dla już publicznego `ContentArticle`,
-- [ ] wdrożyć analogiczny stale-write guard dla `NewsroomHomeComposer` po N2-009,
+- [x] wdrożyć analogiczny stale-write guard dla `NewsroomHomeComposer`,
 - [x] NEWSROOM-N2-007: computed publication checklist współdzieląca backend invariants,
 - [x] NEWSROOM-N2-008: authenticated admin-only private preview bez public exposure,
+- [x] NEWSROOM-N2-009: fixed-slot NewsroomHomeComposer + private future preview,
+- [x] NEWSROOM-N2-012: ContentArticle + HomeComposer stale-write/audit identity hardening,
 - [ ] podłączyć `ContentArticlePathResolver` do publicznych N3 article controllers i zweryfikować HTTP canonical/301/404/410 behavior,
 - [ ] dodać sitemap/public-discovery regression korzystające wyłącznie z current canonical URL,
 
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.25
+
+- PR #58 zmergowano na `main@bcb8d783171fc565810a2149b735d86ca6039b00`; exact-head CI #211: `quality` PASS (1006 passed / 19 194 assertions / 2 skipped, Pint 1024 files PASS, frontend build PASS) i `newsroom-postgres` PASS,
+- `NewsroomHomeComposer` nie dodaje nowego persisted layout modelu: zapisuje istniejące `ContentHomePlacement` w stałych slot tuple i korzysta z istniejącego `NewsroomHomeCompositionService`,
+- `ContentHomePlacementEditToken` jest deterministycznym optimistic-lock fingerprintem całego placement row; same-second zmiana `article_id` jest wykrywana mimo niezmienionego timestampu,
+- placement create/update/delete zapisują allowlisted AuditLog z `User` actorem; nie dodano `published_by` ani `reviewed_by`,
+- admin future preview reużywa domain composition i scheduled readiness bez mutowania article workflow; public visibility/path contracts pozostają bez zmian,
+- N2-009 i N2-012 są DONE; następny task to N2-010.
 
 ### 2026-09-16 — v0.24
 

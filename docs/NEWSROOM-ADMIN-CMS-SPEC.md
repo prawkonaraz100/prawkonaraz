@@ -670,7 +670,7 @@ Po PR #50 na `main@570f884a89869ec44d24f57f0506f4444d20a7d2` wdrożono także:
 - atomowy public payload write przez `ContentArticlePublishingService`, z rollbackiem przy failed validation,
 - `last_substantive_update_at` tylko dla semantycznej publicznej zmiany oraz allowlisted AuditLog z `User` actorem.
 
-N2-006 jest przez to DONE. N2-012 pozostaje PARTIAL tylko dla analogicznego stale-write guard w przyszłym `NewsroomHomeComposer`; Article preview jest zmaterializowany po PR #56 jako prywatny admin-only surface i nie oznacza wdrożenia publicznego N3.
+N2-006 jest przez to DONE. Po PR #58 analogiczny stale-write guard dla `NewsroomHomeComposer` również istnieje, więc N2-012 jest DONE. Article preview i future home preview pozostają prywatnymi admin-only surfaces i nie oznaczają wdrożenia publicznego N3/N4.
 
 Każda action:
 
@@ -936,6 +936,14 @@ Resolver preview uwzględnia:
 - deduplikację modułów.
 
 Preview jest authenticated admin-only, `private, no-store`, noindex/nofollow i zabezpieczone identycznie jak preview artykułu.
+
+### 33.4. Stan implementacji po N2-009
+
+`App\Filament\Pages\NewsroomHomeComposer` jest zmaterializowany jako custom Filament page w grupie „Zawartość”. UI wystawia wyłącznie sloty wynikające z istniejących stałych domenowych: lead, 4 secondary, aktywne category leads, guides lead i 6 important-now. Każdy slot pokazuje bieżący manual placement, okres, fallback liczony przez `NewsroomHomeCompositionService::compose(..., includeManualPlacements: false)`, eligibility dla wybranego czasu oraz duplicate warning.
+
+Create/update/delete placementu delegują do `NewsroomHomePlacementService`; update/delete wymagają loaded `ContentHomePlacementEditToken`, a overlap nadal chronią row/advisory locks. Operacje zapisują `User` actor w `AuditLog` i utrzymują placement `created_by_user_id` / `updated_by_user_id`.
+
+Akcja „Podgląd /aktualnosci” prowadzi do authenticated administrator-only `/admin/newsroom/home-preview?at=...`; odpowiedź korzysta z tego samego composition service, wspiera scheduled future state bez mutowania workflow, wymusza `private, no-store` + `noindex,nofollow` i wyłącza public analytics. Nie jest to publiczny hub N3/N4.
 
 ---
 
@@ -1313,7 +1321,7 @@ Na 2026-09-16:
 - N0-004 wybrało Builder + RichEditor TipTap JSON jako adapter, a N2-003 zmaterializowało go w `ContentArticleResource` przez `NewsroomBodyEditorAdapter`,
 - backendowy `ContentArticlePublishingService` istnieje i implementuje audytowane workflow transitions oraz after-commit event boundary z N1-004,
 - backendowe `NewsroomHomeCompositionService` i `NewsroomHomePlacementService` istnieją po N1-006; zapewniają composition/fallback/future-preview eligibility i concurrency-safe placement writes,
-- custom Filament `NewsroomHomeComposer` nadal nie istnieje; N1-006 nie dostarcza UI, stale-write UX ani admin preview route,
+- PR #58 zmaterializował custom Filament `NewsroomHomeComposer`, fixed-slot editing, fallback visibility, bounded article search, placement windows, duplicate warnings, stale-safe write/delete oraz admin-only future preview route,
 - `ContentCategoryResource` istnieje: index/create/view/edit, article counts, active filter, `position` reorder oraz category invariants,
 - N2-002 dodało podstawowy `ContentArticleResource` shell z index/create/view/edit, Form/Infolist/Table, search/filter setem oraz eager loadingiem category/author/reviewer,
 - N2-004 dodało relationship source editor na istniejącym `ContentArticleSource`, reorder/status indicators, nullable-evidence URL handling oraz finalną source-policy validation w `ContentArticlePublishingService`,
@@ -1324,8 +1332,8 @@ Na 2026-09-16:
 - PR #50 dodał deterministyczny `_edit_token`, stale-write reject dla article/source/relation state oraz atomowy `Apply public update` z pełną service validation i allowlisted audytem,
 - PR #52 dodał `ContentArticlePublicationChecklist`; formularz artykułu pokazuje read-only listę `OK` / `OSTRZEŻENIE` / `BLOKUJE`, a `ContentArticlePublishingService` deleguje do tej samej klasy review/publication/fresh-review assertions,
 - warningi checklisty nie blokują publikacji, natomiast domain blockers pozostają autorytatywne po stronie backendu; dedykowany różny OG asset bez własnego alt pozostaje blockerem,
-- `ContentTopicResource` i custom `NewsroomHomeComposer` nadal nie istnieją,
-- N2-006, N2-007 i N2-008 są DONE; N2-012 pozostaje PARTIAL wyłącznie dla stale-write UX/guard `NewsroomHomeComposer`; media/origin-regulatory UI nadal pozostaje otwarte,
+- `ContentTopicResource` nadal nie istnieje; custom `NewsroomHomeComposer` jest wdrożony po PR #58,
+- N2-006, N2-007, N2-008, N2-009 i N2-012 są DONE; media/origin-regulatory UI nadal pozostaje otwarte,
 - publiczny renderer bloków nie istnieje.
 
 ---
@@ -1334,20 +1342,30 @@ Na 2026-09-16:
 
 - [ ] wdrożyć ContentTopicResource,
 - [ ] wdrożyć public/reverse relation rendering w odpowiednim etapie N3/N4,
-- [ ] wdrożyć NewsroomHomeComposer + future preview,
+- [x] wdrożyć NewsroomHomeComposer + future preview,
 - [ ] wdrożyć hero/OG uploader korzystający z `NewsroomMediaStorage` i zapis verified metadata do `ContentArticle`,
 - [ ] wdrożyć focal-point/crop UX; nie deklarować variantów bez fizycznie wygenerowanych plików,
 - [ ] wdrożyć origin/regulatory fields,
 - [x] N2-006: workflow/exposure actions + atomowy stale-safe `Apply public update` dla `ContentArticle`,
 - [x] NEWSROOM-N2-007: wdrożyć computed publication checklist współdzielącą backend invariants,
 - [x] NEWSROOM-N2-008: admin-only private preview route/rendering z `private, no-store`, `noindex,nofollow`, bez public analytics i signed share tokenów,
-- [ ] wdrożyć stale-write guard dla `NewsroomHomeComposer` po materializacji N2-009; article stale-write jest już wdrożony,
+- [x] wdrożyć stale-write guard dla `NewsroomHomeComposer`; article i placement stale-write są wdrożone,
 - [ ] wdrożyć topic identity guards; category slug/delete/deactivation guards są już zmaterializowane przez N2-001,
 - [ ] rozszerzać testy CMS wraz z kolejnymi taskami (Builder, workflow, stale-write, preview i HomeComposer).
 
 ---
 
 ## 55. Historia zmian
+
+### 2026-09-16 — v0.19
+
+- PR #58 zmergowano na `main@bcb8d783171fc565810a2149b735d86ca6039b00`; exact-head CI #211: 1006 passed / 19 194 assertions / 2 skipped, Pint 1024 files PASS, frontend build PASS oraz `newsroom-postgres` PASS,
+- `NewsroomHomeComposer` jest custom Filament page, nie page builderem; wystawia fixed slots i nie pozwala definiować nowych layout modules,
+- UI pokazuje manual placement, window, eligibility i deterministyczny fallback; search jest bounded, a duplicate selection generuje warning,
+- `ContentHomePlacementEditToken` + row lock blokuje stale update/delete także dla same-second mutation; overlap nadal ma tuple advisory-lock protection,
+- placement create/update/delete zapisują `User` actor w `AuditLog` z allowlisted metadata,
+- admin-only future preview używa tego samego composition service, obsługuje scheduled state bez publikowania rekordu i pozostaje private/no-store/noindex bez analytics,
+- N2-009 i N2-012 są DONE; następny task to N2-010 provenance/regulatory/media art direction.
 
 ### 2026-09-16 — v0.18
 
