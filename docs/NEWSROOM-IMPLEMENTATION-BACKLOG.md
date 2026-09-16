@@ -994,7 +994,7 @@ Computed blocking/warning items.
 
 ### Status implementacji
 
-**DONE — zmergowano PR #62 na `main@ff81f92fe75442b60e67297f3945d2a63b7c5128` po exact-head CI #224 dla `c62ea2974572299b725387ee90ba7d38bfe0493e`. `quality` zakończył się wynikiem 1025 passed / 19 297 assertions / 2 skipped, Pint 1038 files PASS i frontend build PASS; `newsroom-postgres` zakończył się wynikiem 7 passed / 89 assertions.**
+**DONE — zmergowano PR #62 na `main@ff81f92fe75442b60e67297f3945d2a63b7c5128` po exact-head CI #224 dla `c62ea2974572299b725387ee90ba7d38bfe0493e`. `quality` zakończył się wynikiem 1025 passed / 19 297 assertions / 2 skipped, Pint 1038 files PASS i frontend build PASS; `newsroom-postgres` zakończył się wynikiem 7 passed / 89 assertions. Status DONE dotyczy warstwy N2/G2 admin-domain; publiczne skutki archive z ostatniego punktu DoD są jawnie zależnością N4/N5 i nie są jeszcze oznaczone jako wdrożone.**
 
 ### Aktualny stan implementacji
 
@@ -1024,6 +1024,8 @@ Computed blocking/warning items.
 - slug po pierwszej publikacji jest immutable,
 - spadek corpus poniżej baseline po publikacji daje warning/wyłączenie z promocji, ale nie automatyczny HTTP flip,
 - explicit topic archive usuwa go z sitemap/nav i zwraca 410 dla wcześniej publicznego URL.
+
+**Stan tego cross-stage punktu DoD:** domenowe `archived` i blokada dalszej promocji są wdrożone w N2-011, ale publiczny route/410 należy do N4-007, a sitemap coverage/exclusion do N5-001. Te publiczne elementy pozostają otwarte i nie są dowodem zamknięcia N2/G2.
 
 ---
 
