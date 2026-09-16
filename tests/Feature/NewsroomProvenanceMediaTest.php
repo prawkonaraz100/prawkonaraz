@@ -246,7 +246,6 @@ test('article edit form exposes provenance media and crop preview controls', fun
         ->assertSee('Podgląd cropów z focal point');
 });
 
-
 test('draft edit persists controlled provenance and regulatory metadata through ordinary save', function () {
     $admin = User::factory()->admin()->create();
     $article = ContentArticle::factory()->draft()->create();
