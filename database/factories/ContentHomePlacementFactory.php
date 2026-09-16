@@ -14,14 +14,8 @@ class ContentHomePlacementFactory extends Factory
     public function definition(): array
     {
         return [
-            'surface_key' => 'newsroom_home',
-            'slot_key' => fake()->randomElement([
-                'lead',
-                'secondary',
-                'category_lead',
-                'guides_lead',
-                'important_now',
-            ]),
+            'surface_key' => ContentHomePlacement::SURFACE_NEWSROOM_HOME,
+            'slot_key' => fake()->randomElement(ContentHomePlacement::allowedSlotKeys()),
             'context_key' => null,
             'position' => 0,
             'article_id' => ContentArticle::factory(),
