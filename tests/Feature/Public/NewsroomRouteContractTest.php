@@ -1,10 +1,7 @@
 <?php
 
 use App\Support\NewsroomRouteContract;
-use DateTimeImmutable;
-use DomainException;
 use Illuminate\Http\Request;
-use InvalidArgumentException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 function newsroomRouteNameForPath(string $path): ?string
@@ -89,26 +86,26 @@ test('route family resolver maps article types to one canonical family', functio
 
 test('route family resolver rejects reserved or unsupported canonical paths', function () {
     expect(fn () => NewsroomRouteContract::canonicalPath('news', 'kategoria'))
-        ->toThrow(InvalidArgumentException::class)
+        ->toThrow(\InvalidArgumentException::class)
         ->and(fn () => NewsroomRouteContract::canonicalPath('analysis', 'temat'))
-        ->toThrow(InvalidArgumentException::class)
+        ->toThrow(\InvalidArgumentException::class)
         ->and(fn () => NewsroomRouteContract::canonicalPath('news', 'Niepoprawny-Slug'))
-        ->toThrow(InvalidArgumentException::class)
+        ->toThrow(\InvalidArgumentException::class)
         ->and(fn () => NewsroomRouteContract::canonicalPath('video', 'material'))
-        ->toThrow(InvalidArgumentException::class);
+        ->toThrow(\InvalidArgumentException::class);
 
     expect(NewsroomRouteContract::canonicalPath('guide', 'kategoria'))
         ->toBe('/poradniki/kategoria');
 });
 
 test('published article type cannot cross public route families', function () {
-    $publishedAt = new DateTimeImmutable('2026-09-16T00:00:00+02:00');
+    $publishedAt = new \DateTimeImmutable('2026-09-16T00:00:00+02:00');
 
     NewsroomRouteContract::assertTypeTransitionAllowed('news', 'analysis', $publishedAt);
     NewsroomRouteContract::assertTypeTransitionAllowed('news', 'guide', null);
 
     expect(fn () => NewsroomRouteContract::assertTypeTransitionAllowed('news', 'guide', $publishedAt))
-        ->toThrow(DomainException::class)
+        ->toThrow(\DomainException::class)
         ->and(fn () => NewsroomRouteContract::assertTypeTransitionAllowed('guide', 'report', $publishedAt))
-        ->toThrow(DomainException::class);
+        ->toThrow(\DomainException::class);
 });
