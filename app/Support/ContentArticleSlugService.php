@@ -226,7 +226,11 @@ final class ContentArticleSlugService
                 ? $base
                 : $this->appendSuffix($base, $attempt);
 
-            $path = NewsroomRouteContract::canonicalPath($type, $candidate);
+            try {
+                $path = NewsroomRouteContract::canonicalPath($type, $candidate);
+            } catch (InvalidArgumentException) {
+                continue;
+            }
 
             $this->acquireMutationLocks([$candidate], [$path]);
 
@@ -292,7 +296,7 @@ final class ContentArticleSlugService
         $query = ContentArticle::query()->where('slug', $slug);
 
         if ($ignoreArticleId !== null) {
-            $query->whereKeyNot($ignoreArticleId);
+            $query->where('id', '!=', $ignoreArticleId);
         }
 
         if ($query->exists()) {
