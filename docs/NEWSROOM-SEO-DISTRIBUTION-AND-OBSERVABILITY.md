@@ -1588,7 +1588,9 @@ Obecnie:
 - newsroom-specific Article schema/news sitemap/feed nie istnieją,
 - newsroom dirty/version refresh coordinator i atomowy child-before-index switch nie istnieją,
 - repo nie gwarantuje async Laravel queue workera (`QUEUE_CONNECTION=sync` w env example), więc newsroom nie może opierać freshness na ShouldQueue,
-- /aktualnosci jest placeholderem.
+- `/aktualnosci` i `/poradniki` są pre-launch placeholderami 200 z `X-Robots-Tag: noindex, follow`,
+- `/aktualnosci/feed.xml` ma zarejestrowany route contract, ale obecnie zwraca 404; feed ani feed discovery nie są jeszcze wdrożone,
+- category/topic/article route namespaces są zarejestrowane, ale pozostają 404 bez publicznych controllerów.
 
 ---
 
@@ -1616,6 +1618,13 @@ Obecnie:
 ---
 
 ## 70. Historia zmian
+
+### 2026-09-16 — v0.8
+
+- zsynchronizowano SEO current state z wdrożonym NEWSROOM-N0-002,
+- pre-launch `/aktualnosci` i `/poradniki` mają jawny crawler-level `X-Robots-Tag: noindex, follow`,
+- odnotowano istniejący route contract `/aktualnosci/feed.xml`, ale feed i discovery pozostają niewdrożone,
+- future article/category/topic routes pozostają 404, więc nie są opisywane jako publiczny corpus.
 
 ### 2026-09-16 — v0.6
 
