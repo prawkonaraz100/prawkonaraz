@@ -28,6 +28,8 @@ beforeEach(function (): void {
     config()->set('content.organization.legal_name', null);
     config()->set('content.organization.email', 'kontakt@prawkonaraz.pl');
     config()->set('content.organization.logo_url', 'https://prawkonaraz.pl/favicon.png');
+    config()->set('content.organization.logo_width', 256);
+    config()->set('content.organization.logo_height', 256);
     config()->set('filesystems.disks.public.url', 'https://prawkonaraz.pl/storage');
     config()->set('filesystems.disks.media_local.url', 'https://prawkonaraz.pl/storage-bulk');
     config()->set('media.public_base_url', 'https://prawkonaraz.pl/storage');
@@ -1723,8 +1725,12 @@ test('public question detail exposes video poster as social image and labels the
     expect(array_key_exists('legalName', $organization))->toBeFalse();
     expect($organization['email'])->toBe('kontakt@prawkonaraz.pl');
     expect(data_get($organization, 'logo.url'))->toBe('https://prawkonaraz.pl/favicon.png');
+    expect(data_get($organization, 'logo.contentUrl'))->toBe('https://prawkonaraz.pl/favicon.png');
+    expect(data_get($organization, 'logo.width'))->toBe(256);
+    expect(data_get($organization, 'logo.height'))->toBe(256);
     expect($website['@id'])->toBe('https://prawkonaraz.pl/#website');
     expect($website['name'])->toBe('PrawkoNaRaz');
+    expect($website['alternateName'])->toBe('prawkonaraz.pl');
     expect(data_get($website, 'potentialAction.target'))->toBe('https://prawkonaraz.pl/oficjalna-baza-pytan-na-prawo-jazdy?q={search_term_string}');
     expect($webPage['@id'])->toBe($webPageId);
     expect($webPage['mainEntity'])->toBe(['@id' => $questionId]);
