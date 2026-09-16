@@ -171,7 +171,7 @@ final class ContentArticlePublicCatalogService
     }
 
     /**
-     * @return array<int, string|\Closure>
+     * @return array<int|string, string|\Closure>
      */
     private function detailRelations(): array
     {
@@ -179,7 +179,7 @@ final class ContentArticlePublicCatalogService
             'category:id,name,slug,description,is_active,seo_title,seo_description',
             'author:id,name,slug,job_title,bio,photo_path,is_published,published_at',
             'reviewer:id,name,slug,job_title,bio,photo_path,is_published,published_at',
-            'sources' => fn (Builder $query): Builder => $query
+            'sources' => fn ($query) => $query
                 ->publiclyCited()
                 ->select([
                     'id',
@@ -196,7 +196,7 @@ final class ContentArticlePublicCatalogService
                     'sort_order',
                 ]),
             'tags:id,name,slug',
-            'topics' => fn (Builder $query): Builder => $query
+            'topics' => fn ($query) => $query
                 ->published()
                 ->select([
                     'content_topics.id',
