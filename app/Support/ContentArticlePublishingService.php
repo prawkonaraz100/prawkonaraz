@@ -161,11 +161,14 @@ final class ContentArticlePublishingService
                 ContentArticleWorkflowStatus::Scheduled,
             ], 'publish');
 
-            if (
-                $locked->workflow_status === ContentArticleWorkflowStatus::Scheduled
-                && ($locked->scheduled_for === null || $locked->scheduled_for->isFuture())
-            ) {
-                throw new DomainException('Scheduled article is not due for publication.');
+            if ($locked->workflow_status === ContentArticleWorkflowStatus::Scheduled) {
+                if ($locked->first_published_at !== null) {
+                    throw new DomainException('Newsroom v1 does not support scheduled republish.');
+                }
+
+                if ($locked->scheduled_for === null || $locked->scheduled_for->isFuture()) {
+                    throw new DomainException('Scheduled article is not due for publication.');
+                }
             }
 
             $this->assertPublicationReady($locked);
