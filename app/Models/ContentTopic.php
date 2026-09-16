@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Support\NewsroomRouteContract;
 use Database\Factories\ContentTopicFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Validation\ValidationException;
 
 class ContentTopic extends Model
 {
@@ -32,6 +34,53 @@ class ContentTopic extends Model
         'seo_description',
         'published_at',
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(function (ContentTopic $topic): void {
+            if (preg_match('/\\A'.NewsroomRouteContract::SLUG_PATTERN.'\\z/', (string) $topic->slug) !== 1) {
+                throw ValidationException::withMessages([
+                    'slug' => 'Slug tematu może zawierać tylko małe litery, cyfry i myślniki.',
+                ]);
+            }
+
+            if (! in_array((string) $topic->status, [
+                self::STATUS_DRAFT,
+                self::STATUS_PUBLISHED,
+                self::STATUS_ARCHIVED,
+            ], true)) {
+                throw ValidationException::withMessages([
+                    'status' => 'Nieobsługiwany status tematu.',
+                ]);
+            }
+
+            if (! $topic->exists) {
+                return;
+            }
+
+            $wasPublished = $topic->getRawOriginal('published_at') !== null;
+
+            if ($wasPublished && $topic->isDirty('slug')) {
+                throw ValidationException::withMessages([
+                    'slug' => 'Slug tematu jest niezmienny po pierwszej publikacji.',
+                ]);
+            }
+
+            if ($wasPublished && $topic->isDirty('published_at') && $topic->published_at === null) {
+                throw ValidationException::withMessages([
+                    'published_at' => 'Data pierwszej publikacji tematu nie może zostać wyczyszczona.',
+                ]);
+            }
+        });
+
+        static::deleting(function (ContentTopic $topic): void {
+            if (! $topic->canBeDeleted()) {
+                throw ValidationException::withMessages([
+                    'topic' => 'Nie można usunąć topicu po pierwszej publikacji. Użyj archiwizacji, aby zachować historyczny URL.',
+                ]);
+            }
+        });
+    }
 
     protected function casts(): array
     {
@@ -70,12 +119,23 @@ class ContentTopic extends Model
             && $this->published_at->lte(now());
     }
 
-    public function meetsPublicationCorpusBaseline(): bool
+    public function eligibleCorpusCount(): int
     {
         return $this->articles()
             ->activelyDistributed()
             ->indexable()
-            ->count() >= self::PUBLICATION_CORPUS_MINIMUM;
+            ->count();
+    }
+
+    public function meetsPublicationCorpusBaseline(): bool
+    {
+        return $this->eligibleCorpusCount() >= self::PUBLICATION_CORPUS_MINIMUM;
+    }
+
+    public function isCorpusBelowBaseline(): bool
+    {
+        return $this->isPubliclyVisible()
+            && ! $this->meetsPublicationCorpusBaseline();
     }
 
     public function hasEligibleFeaturedArticle(): bool
@@ -96,6 +156,17 @@ class ContentTopic extends Model
         return trim((string) $this->description) !== ''
             && $this->meetsPublicationCorpusBaseline()
             && $this->hasEligibleFeaturedArticle();
+    }
+
+    public function isEditoriallyPromotable(): bool
+    {
+        return $this->isPubliclyVisible()
+            && $this->meetsPublicationRequirements();
+    }
+
+    public function canBeDeleted(): bool
+    {
+        return $this->published_at === null;
     }
 
     public function getRouteKeyName(): string
