@@ -1740,7 +1740,7 @@ Na 2026-09-16:
 
 ### 2026-09-16 — v0.20
 
-- wdrożono NEWSROOM-N2-005 przez PR #46 na `main@88533b04d74a839c3bbccf86b707909ccdd235f8`, bez nowych migracji ani zmian istniejących pivot schemas,
+- wdrożono NEWSROOM-N2-005 przez PR #46 na `main@262d9fab0b171c13a159f7c97670dee3db583b56`, bez nowych migracji ani zmian istniejących pivot schemas,
 - questions/legal/signs editor zapisuje istniejące `relation_type`, `note` tam gdzie wspierane oraz kolejność jako `sort_order`; topics są synchronizowane bez dodatkowego order column,
 - `NewsroomArticleRelationsEditorAdapter` waliduje duplicate/missing targets i allowlisty relation types, a następnie synchronizuje wyłącznie article-owned pivots,
 - target `Question`/`LegalUnit`/`TrafficSign` nie jest mutowany przez newsroom relation editor,
