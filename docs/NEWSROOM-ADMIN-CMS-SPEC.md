@@ -283,11 +283,13 @@ Edytor pracuje na uporządkowanym `body_blocks`.
 - Question group
 - Traffic sign group
 - Product CTA
-- Allowlisted embed
+- Embed — typ znany kontraktowi, ale wyłączony w v1 do czasu osobnego security/CSP gate
 
 ### 13.2. Builder UX
 
-Preferowany jest Filament Builder lub równoważny komponent, jeżeli po weryfikacji N0-004 spełni wymagania.
+NEWSROOM-N0-004 wybrało `Filament\Forms\Components\Builder` jako komponent/adaptor przyszłego N2 editora. Jego wewnętrzny associative item state nie jest jednak formatem domenowym: przy zapisie musi zostać znormalizowany przez `NewsroomBodyContract` do uporządkowanej listy `{key?, type, data}`.
+
+**Stan implementacji:** decyzja i normalizer istnieją; rzeczywisty `ContentArticleResource` z Builderem jeszcze nie istnieje.
 
 Redaktor powinien móc:
 
@@ -308,17 +310,16 @@ Nie pozwalamy na:
 
 ### 13.3. Rich text block
 
-Wymagane funkcje:
+N0-004 wybiera `Filament\Forms\Components\RichEditor` w trybie structured TipTap JSON, nie HTML. Docelowy N2 adapter ma używać toolbaru zgodnego z `NewsroomBodyContract::richTextToolbarButtons()`:
 
-- H2
-- H3
-- paragraphs
-- bold
-- italic
-- ordered/unordered lists
-- links
+- bold / italic / link,
+- H2 / H3,
+- ordered / unordered lists,
+- undo / redo.
 
-Blockquote ma osobny typ, jeśli zapewnia to lepszą kontrolę prezentacji.
+Paragraph i hard break wynikają z dozwolonego TipTap document contract. Blockquote pozostaje osobnym blokiem `quote`, nie rich-text node.
+
+Backendowy `NewsroomBodyContract` allowlistuje nodes/marks, odrzuca raw HTML/style/custom nodes, unsafe URLs/targets oraz normalizuje `target=_blank` do bezpiecznego `rel`.
 
 ### 13.4. Context block
 
@@ -1219,15 +1220,18 @@ Na 2026-09-16:
 
 - TrafficSigns CMS daje wzorzec workflow/checklist,
 - ContentAuthors resource istnieje,
+- `NewsroomBodyContract` v1 i jego unit/security tests istnieją,
+- decyzja N0-004 wybiera Builder + RichEditor TipTap JSON jako przyszły N2 adapter,
 - newsroom resources nie istnieją,
-- article editor nie istnieje,
+- article editor/Builder UI nie istnieje,
+- publiczny renderer bloków nie istnieje,
 - preview nie istnieje.
 
 ---
 
 ## 54. Pozostałe zadania
 
-- [ ] zatwierdzić block editor component, serializację i sanitization,
+- [ ] wdrożyć faktyczny Builder/RichEditor form adapter oparty o `NewsroomBodyContract`,
 - [ ] wdrożyć ContentArticleResource,
 - [ ] wdrożyć Form/Table/Infolist,
 - [ ] wdrożyć ContentCategoryResource,
@@ -1246,6 +1250,14 @@ Na 2026-09-16:
 ---
 
 ## 55. Historia zmian
+
+### 2026-09-16 — v0.6
+
+- zamknięto decyzję N0-004: przyszły article editor używa Filament Builder jako adaptera do kanonicznego `NewsroomBodyContract`,
+- rich text wybrano jako RichEditor TipTap JSON z zamrożonym toolbar contract, bez arbitrary HTML body,
+- `embed` pozostaje wyłączony w v1 do czasu provider/sandbox/referrerpolicy/CSP gate,
+- block/payload validation i XSS regression istnieją w warstwie kontraktu,
+- nie oznaczono `ContentArticleResource`, Builder UI ani preview jako wdrożonych.
 
 ### 2026-09-16 — v0.5
 
