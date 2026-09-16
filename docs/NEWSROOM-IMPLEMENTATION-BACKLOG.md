@@ -2081,6 +2081,15 @@ N2-009 oraz brakująca HomeComposer część N2-012 są zamknięte po PR #58. Na
 
 # 12. Historia zmian
 
+### 2026-09-16 — v0.28
+
+- PR #60 zmergowano na `main@4936d14d56fa15e59e6dd771e443e93895d3d281`; exact-head CI #217: `quality` PASS (1015 passed / 19 245 assertions / 2 skipped, Pint 1027 files PASS, frontend build PASS) oraz `newsroom-postgres` 7 passed / 89 assertions,
+- NEWSROOM-N2-010 jest **DONE**: `ContentArticleResource` ma kontrolowane provenance/regulatory fields, hero/OG upload oparty o `NewsroomArticleMediaService` + istniejący `NewsroomMediaStorage`, focal X/Y 0..1 oraz CSS crop previews 16:9 / 4:3 / 1:1,
+- backend wymaga spójności `official_source` / aktywnego regulatory statusu z publicznie cytowanym official/legislation HTTP(S) source; `adopted_future` i `in_force` wymagają `effective_from`,
+- hero/OG są ponownie inspectowane przed persistence i publication readiness, a zapisane dimensions muszą odpowiadać faktycznemu managed assetowi; `image_license_note` pozostaje backoffice-only,
+- nie dodano migracji, asset modelu, fizycznego crop/OG variant generatora ani publicznego N3/N4 renderera,
+- następnym taskiem wykonawczym N2 jest NEWSROOM-N2-011 `ContentTopicResource`.
+
 ### 2026-09-16 — v0.27
 
 - PR #58 zmergowano na `main@bcb8d783171fc565810a2149b735d86ca6039b00`; exact-head CI #211: `quality` PASS (1006 passed / 19 194 assertions / 2 skipped, Pint 1024 files PASS, frontend build PASS w 11.05 s) oraz `newsroom-postgres` PASS,
