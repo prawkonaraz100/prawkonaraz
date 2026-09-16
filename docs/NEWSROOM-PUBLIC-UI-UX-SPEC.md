@@ -1286,13 +1286,16 @@ Frontend newsroom v1 jest UI-complete, gdy:
 
 ## 67. Stan implementacji
 
-Na moment utworzenia:
+Na 2026-09-16:
 
-- /aktualnosci renderuje MarketingPlaceholder.vue,
+- `/aktualnosci` i `/poradniki` renderują `MarketingPlaceholder.vue` przez dedykowany `NewsroomPlaceholderController`,
+- oba pre-launch huby zwracają 200 i `X-Robots-Tag: noindex, follow`,
+- shared MarketingPlaceholder innych sekcji nie dziedziczy newsroom noindex,
+- finalne detail/category/topic/feed route namespaces są zarejestrowane, ale obecnie zwracają 404,
 - public-content Blade layout istnieje,
 - public header/footer istnieją,
 - globalna nawigacja zawiera Aktualności,
-- newsroom-specific components nie istnieją.
+- właściwe newsroom-specific list/article/category/topic components nie istnieją.
 
 ---
 
@@ -1316,6 +1319,13 @@ Na moment utworzenia:
 ---
 
 ## 69. Historia zmian
+
+### 2026-09-16 — v0.7
+
+- zsynchronizowano stan UI z wdrożonym NEWSROOM-N0-002,
+- udokumentowano dedykowane 200/noindex placeholdery `/aktualnosci` i `/poradniki`,
+- zapisano, że future detail/category/topic/feed routes są już zarejestrowane, ale pozostają 404 bez publicznych rendererów,
+- nie oznaczono żadnych newsroom-specific komponentów jako wdrożone.
 
 ### 2026-09-16 — v0.6
 
