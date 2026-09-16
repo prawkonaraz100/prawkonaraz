@@ -245,3 +245,49 @@ test('article edit form exposes provenance media and crop preview controls', fun
         ->assertSee('Focal X')
         ->assertSee('Podgląd cropów z focal point');
 });
+
+
+test('draft edit persists controlled provenance and regulatory metadata through ordinary save', function () {
+    $admin = User::factory()->admin()->create();
+    $article = ContentArticle::factory()->draft()->create();
+
+    $this->actingAs($admin);
+
+    Livewire::test(EditContentArticle::class, ['record' => $article->getRouteKey()])
+        ->set('data.origin_type', ContentArticleOriginType::DataAnalysis->value)
+        ->set('data.regulatory_status', ContentArticleRegulatoryStatus::Proposal->value)
+        ->set('data.change_summary', 'Projekt zmienia zakres szkolenia.')
+        ->set('data.applies_to', 'Kandydaci i OSK.')
+        ->set('data.exam_impact', 'Możliwa zmiana pytań.')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $article = $article->fresh();
+
+    expect($article->origin_type)->toBe(ContentArticleOriginType::DataAnalysis)
+        ->and($article->regulatory_status)->toBe(ContentArticleRegulatoryStatus::Proposal)
+        ->and($article->change_summary)->toBe('Projekt zmienia zakres szkolenia.')
+        ->and($article->applies_to)->toBe('Kandydaci i OSK.')
+        ->and($article->exam_impact)->toBe('Możliwa zmiana pytań.');
+});
+
+test('public ordinary save can update private image license note without mutating public provenance', function () {
+    $admin = User::factory()->admin()->create();
+    $article = ContentArticle::factory()->published()->create([
+        'origin_type' => ContentArticleOriginType::Original->value,
+        'image_license_note' => 'Stara notatka licencyjna.',
+    ]);
+
+    $this->actingAs($admin);
+
+    Livewire::test(EditContentArticle::class, ['record' => $article->getRouteKey()])
+        ->set('data.origin_type', ContentArticleOriginType::Compiled->value)
+        ->set('data.image_license_note', 'Nowa prywatna notatka licencyjna.')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $article = $article->fresh();
+
+    expect($article->origin_type)->toBe(ContentArticleOriginType::Original)
+        ->and($article->image_license_note)->toBe('Nowa prywatna notatka licencyjna.');
+});
