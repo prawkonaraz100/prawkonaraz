@@ -2,6 +2,8 @@
 
 namespace App\Support;
 
+use App\Enums\ContentArticleOriginType;
+use App\Enums\ContentArticleRegulatoryStatus;
 use App\Enums\ContentArticleSourceType;
 use App\Enums\ContentArticleType;
 use App\Enums\ContentArticleWorkflowStatus;
@@ -68,6 +70,16 @@ final class ContentArticlePublicationChecklist
                 fn (): mixed => $this->assertRenderableBody($article),
             ),
             $this->blockingItem(
+                'origin',
+                'Pochodzenie',
+                fn (): mixed => $this->assertOriginType($article),
+            ),
+            $this->blockingItem(
+                'regulatory',
+                'Kontekst regulacyjny',
+                fn (): mixed => $this->assertRegulatoryContext($article),
+            ),
+            $this->blockingItem(
                 'sources',
                 'Źródła',
                 fn (): mixed => $this->assertSourcePolicy($article, $this->articleType($article)),
@@ -132,6 +144,31 @@ final class ContentArticlePublicationChecklist
                 $this->missingLegalPrimarySource($article),
                 'Dla materiału o przepisach nie wskazano primary official/legislation source.',
             ),
+            $this->warningItem(
+                'regulatory_change_summary_missing',
+                'Co się zmienia',
+                $this->hasRegulatoryContext($article) && blank($article->change_summary),
+                'Aktywny kontekst regulacyjny nie ma jeszcze krótkiego opisu zmiany.',
+            ),
+            $this->warningItem(
+                'regulatory_applies_to_missing',
+                'Kogo dotyczy',
+                $this->hasRegulatoryContext($article) && blank($article->applies_to),
+                'Aktywny kontekst regulacyjny nie opisuje jeszcze, kogo dotyczy zmiana.',
+            ),
+            $this->warningItem(
+                'regulatory_exam_impact_missing',
+                'Wpływ na egzamin',
+                $this->hasRegulatoryContext($article) && blank($article->exam_impact),
+                'Aktywny kontekst regulacyjny nie opisuje jeszcze wpływu na egzamin.',
+            ),
+            $this->warningItem(
+                'hero_focal_point_missing',
+                'Focal point hero',
+                filled($article->hero_image_path)
+                    && ($article->hero_focal_x === null || $article->hero_focal_y === null),
+                'Hero nie ma ustawionego focal pointu. Publiczny renderer użyje środka obrazu.',
+            ),
         ];
     }
 
@@ -153,6 +190,8 @@ final class ContentArticlePublicationChecklist
         }
 
         $this->assertRenderableBody($article);
+        $this->assertOriginType($article);
+        $this->assertRegulatoryContext($article);
         $this->assertSourcePolicy($article, $type);
         $this->assertKeyPoints($article);
     }
@@ -187,6 +226,75 @@ final class ContentArticlePublicationChecklist
         if ($reference !== null && ! $article->reviewed_at->gt($reference)) {
             throw new DomainException('Content article requires a fresh review after its latest public-state change.');
         }
+    }
+
+    private function assertOriginType(ContentArticle $article): void
+    {
+        $origin = $article->origin_type instanceof ContentArticleOriginType
+            ? $article->origin_type
+            : ContentArticleOriginType::tryFrom((string) $article->origin_type);
+
+        if ($origin === null) {
+            throw new DomainException('Content article has an unsupported origin_type.');
+        }
+
+        if ($origin === ContentArticleOriginType::OfficialSource && ! $this->hasPublicOfficialSource($article)) {
+            throw new DomainException('official_source origin requires a publicly cited official or legislation source with a safe URL.');
+        }
+    }
+
+    private function assertRegulatoryContext(ContentArticle $article): void
+    {
+        $status = $article->regulatory_status instanceof ContentArticleRegulatoryStatus
+            ? $article->regulatory_status
+            : ContentArticleRegulatoryStatus::tryFrom((string) $article->regulatory_status);
+
+        if ($status === null) {
+            throw new DomainException('Content article has an unsupported regulatory_status.');
+        }
+
+        if ($status === ContentArticleRegulatoryStatus::NotApplicable) {
+            return;
+        }
+
+        if (! $this->hasPublicOfficialSource($article)) {
+            throw new DomainException('Regulatory content requires a publicly cited official or legislation source with a safe URL.');
+        }
+
+        if (
+            in_array($status, [
+                ContentArticleRegulatoryStatus::AdoptedFuture,
+                ContentArticleRegulatoryStatus::InForce,
+            ], true)
+            && $article->effective_from === null
+        ) {
+            throw new DomainException('Adopted or in-force regulatory content requires effective_from.');
+        }
+    }
+
+    private function hasRegulatoryContext(ContentArticle $article): bool
+    {
+        $status = $article->regulatory_status instanceof ContentArticleRegulatoryStatus
+            ? $article->regulatory_status
+            : ContentArticleRegulatoryStatus::tryFrom((string) $article->regulatory_status);
+
+        return $status !== null && $status !== ContentArticleRegulatoryStatus::NotApplicable;
+    }
+
+    private function hasPublicOfficialSource(ContentArticle $article): bool
+    {
+        return $article->sources()
+            ->get()
+            ->contains(function ($source): bool {
+                $sourceType = ContentArticleSourceType::tryFrom((string) $source->getRawOriginal('source_type'));
+
+                return in_array($sourceType, [
+                    ContentArticleSourceType::Official,
+                    ContentArticleSourceType::Legislation,
+                ], true)
+                    && $source->is_publicly_cited
+                    && $this->isSafeHttpUrl($source->url);
+            });
     }
 
     private function assertPublicationCategory(ContentArticle $article): void
@@ -318,6 +426,26 @@ final class ContentArticlePublicationChecklist
         if ((int) $article->hero_image_width < 1 || (int) $article->hero_image_height < 1) {
             throw new DomainException('Hero image requires positive width and height.');
         }
+
+        $verified = app(NewsroomMediaStorage::class)->inspectStoredImage((string) $article->hero_image_path);
+        app(NewsroomMediaStorage::class)->publicUrl((string) $article->hero_image_path);
+
+        if (
+            $verified['width'] !== (int) $article->hero_image_width
+            || $verified['height'] !== (int) $article->hero_image_height
+        ) {
+            throw new DomainException('Hero image dimensions do not match the stored newsroom asset.');
+        }
+
+        foreach ([$article->hero_focal_x, $article->hero_focal_y] as $coordinate) {
+            if ($coordinate !== null && ((float) $coordinate < 0.0 || (float) $coordinate > 1.0)) {
+                throw new DomainException('Hero focal point coordinates must be between 0 and 1.');
+            }
+        }
+
+        if (($article->hero_focal_x === null) xor ($article->hero_focal_y === null)) {
+            throw new DomainException('Hero focal point requires both X and Y coordinates.');
+        }
     }
 
     private function assertOgMetadata(ContentArticle $article): void
@@ -335,6 +463,16 @@ final class ContentArticlePublicationChecklist
 
         if ((int) $article->og_image_width < 1 || (int) $article->og_image_height < 1) {
             throw new DomainException('OG image requires positive width and height.');
+        }
+
+        $verified = app(NewsroomMediaStorage::class)->inspectStoredImage((string) $article->og_image_path);
+        app(NewsroomMediaStorage::class)->publicUrl((string) $article->og_image_path);
+
+        if (
+            $verified['width'] !== (int) $article->og_image_width
+            || $verified['height'] !== (int) $article->og_image_height
+        ) {
+            throw new DomainException('OG image dimensions do not match the stored newsroom asset.');
         }
     }
 
