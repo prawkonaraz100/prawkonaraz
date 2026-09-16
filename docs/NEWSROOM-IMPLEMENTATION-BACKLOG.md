@@ -392,7 +392,7 @@ Zakres N0-006 zamraża bezpieczny storage contract przed N2 media editor. Nie oz
 
 **DONE — schema foundation zmergowany przez PR #24 na `main@47e748047ec655ff2fdb5669d8cbff7e51041dc8`.**
 
-Zakres obejmuje 5 enumów, 12 migracji, SQLite schema regression oraz addytywny `newsroom-postgres` gate. PostgreSQL 16 zweryfikował `migrate:fresh`, krytyczne indeksy/FK delete rules i rollback 12 newsroom migrations. Modele/factories/scopes nadal należą do N1-002.
+Zakres obejmuje 5 enumów, 12 migracji, SQLite schema regression oraz addytywny `newsroom-postgres` gate. PostgreSQL 16 zweryfikował `migrate:fresh`, krytyczne indeksy/FK delete rules i rollback 12 newsroom migrations. W momencie zamknięcia N1-001 modele/factories/scopes były następnym zakresem N1-002; obecnie N1-002 również jest zmergowane.
 
 ### Aktualny stan implementacji
 
@@ -438,6 +438,23 @@ Zakres obejmuje 5 enumów, 12 migracji, SQLite schema regression oraz addytywny 
 ---
 
 ## NEWSROOM-N1-002 — Models + factories
+
+### Status implementacji
+
+**DONE — modele, relacje, scopes i factories zostały zmergowane w PR #26 i zweryfikowane na SQLite oraz PostgreSQL 16.**
+
+Zakres N1-002 materializuje warstwę Eloquent nad schema N1-001. Nie obejmuje slug/redirect service, workflow publishing, schedulera, home composition, CMS ani publicznego renderera.
+
+### Aktualny stan implementacji
+
+- istnieją `ContentArticle`, `ContentCategory`, `ContentTag`, `ContentTopic`, `ContentArticleSource` i `ContentHomePlacement`,
+- `ContentArticle` ma enum/date/body casts oraz relacje do category/author/reviewer/tags/topics/sources/home placements/questions/legal units/traffic signs,
+- istnieją reverse relations na `ContentAuthor`, `Question`, `LegalUnit` i `TrafficSign`,
+- rozdzielono `publiclyVisible()`, `activelyDistributed()` i `indexable()`; istnieją też scopes/predicates dla scheduled/category/featured/active breaking/freshness,
+- category/topic/source/home-placement mają własne scopes/predicates zgodne z Domain Spec,
+- factories istnieją dla wszystkich 6 modeli N1-002; `ContentArticleFactory` ma jawne stany `draft`, `inReview`, `scheduled`, `published`, `breaking`, `needsReview`, `archived` oraz dodatkowy `withdrawn`,
+- `ContentArticleFactory` reużywa `NewsroomBodyContract` zamiast duplikować format body,
+- addytywny job `newsroom-postgres` uruchamia całe `tests/Postgres`, więc zachowuje migration contract i dodaje model/scope contract.
 
 ### Zakres
 
@@ -1553,8 +1570,8 @@ Docs-only:
 
 ### Domain
 
-- [ ] schema wdrożona
-- [ ] models/factories
+- [x] schema wdrożona
+- [x] models/factories
 - [ ] publishing service
 - [ ] scheduling
 - [ ] redirects / withdrawn 410 disposition
@@ -1816,14 +1833,14 @@ Nie oznaczać tasku DONE przed merge + green verification.
 Na 2026-09-16:
 
 - pakiet projektowy newsroomu obejmuje architekturę, model danych, CMS, UI, governance, SEO, backlog i runbook,
-- foundation N0 jest zamknięte, a N1-001 schema/enum foundation jest wdrożone; modele/factories, CMS i publiczny newsroom nadal nie są wdrożone,
+- foundation N0 jest zamknięte, a N1-001 schema/enum foundation oraz N1-002 Eloquent models/factories/scopes są wdrożone; CMS i publiczny newsroom nadal nie są wdrożone,
 - `/aktualnosci` i `/poradniki` nadal renderują pre-launch placeholder, teraz z dedykowanym `X-Robots-Tag: noindex, follow`; finalne detail/category/topic/feed route namespaces są zarejestrowane, ale pozostają 404 bez publicznych controllerów,
 - fundamenty ContentAuthor/legal/traffic signs/public SEO istnieją,
 - istnieją config/content.php organization, SchemaIds/SchemaRenderer oraz współdzielony SiteIdentitySchema; homepage i istniejące główne publiczne graph services korzystają z kanonicznego Organization/WebSite identity,
 - istnieją public/robots.txt i RobotsController; newsroom nie zmienia tej warstwy bez osobnego production-delivery audit,
 - HomePageController nie hardcoduje już legacy „Orły na Drodze”; homepage korzysta z kanonicznego site identity, og:site_name i stabilnych graph IDs,
 - newsroom dirty/version refresh coordinator, atomic child-before-index publication i newsroom/news sitemap output jeszcze nie istnieją,
-- canonical CI zachowuje szybki SQLite job `quality` i ma addytywny `newsroom-postgres` job dla migration/FK/index/rollback contracts,
+- canonical CI zachowuje szybki SQLite job `quality` i ma addytywny `newsroom-postgres` job uruchamiający komplet `tests/Postgres` dla migration/FK/index/rollback oraz model/scope contracts,
 - QUEUE_CONNECTION w env example jest sync; stały queue worker nie jest gwarantowany,
 - panel Filament jest obecnie admin-only i ten kontrakt pozostaje wymaganiem v1.
 
@@ -1831,13 +1848,24 @@ Na 2026-09-16:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N1-002 — Models + factories.
+NEWSROOM-N1-003 — Slug service + redirects.
 
-NEWSROOM-N1-001 jest zamknięte po merge PR #24 i dwóch zielonych jobach CI: `quality` oraz `newsroom-postgres`. Kolejny krok wykonawczy to materializacja modeli, relacji, scopes i factories zgodnie z istniejącą schema.
+NEWSROOM-N1-001 i NEWSROOM-N1-002 są zamknięte. Następny krok wykonawczy to canonical slug/history service z trwałą rezerwacją historycznych full paths, one-hop redirects i PostgreSQL serialization zgodnie z istniejącym route-family contract.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.13
+
+- zamknięto NEWSROOM-N1-002 po merge PR #26,
+- dodano 6 modeli Eloquent newsroomu wraz z relacjami, reverse relations, casts i domenowymi scopes/predicates,
+- `publiclyVisible`, `activelyDistributed` i `indexable` są odrębnymi kontraktami query/model zgodnie z Domain Spec; archive/needs_review nie są aktywnie dystrybuowane,
+- dodano factories dla wszystkich modeli N1-002; `ContentArticleFactory` ma wymagane jawne stany `draft/inReview/scheduled/published/breaking/needsReview/archived` i reużywa `NewsroomBodyContract`,
+- `newsroom-postgres` uruchamia teraz cały katalog `tests/Postgres`; finalny PostgreSQL gate: 4 testy / 81 asercji PASS,
+- finalny `quality`: 895 passed / 18 532 assertions / 2 skipped, Pint 974 files PASS, frontend build PASS,
+- dedykowany produkcyjny seeder kategorii nadal nie istnieje; slug/redirect service, publishing, scheduler, home composition, CMS i public renderer pozostają kolejnymi zakresami,
+- następnym taskiem wykonawczym jest NEWSROOM-N1-003.
 
 ### 2026-09-16 — v0.12
 
