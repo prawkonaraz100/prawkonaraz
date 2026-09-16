@@ -948,7 +948,7 @@ Serwis blokuje brak wymaganych pól/body/category/author/source, nieaktywną kat
 Granice obecnej implementacji:
 
 - `applyPublicUpdate` opisany niżej nie jest jeszcze wdrożony; pozostaje N2 orchestration/stale-write scope,
-- scheduler command i batch due processing pozostają N1-005,
+- scheduler command i batch due processing zostały wdrożone downstream w N1-005 i reużywają tego service boundary,
 - publiczny HTTP 410/301/200 pozostaje N3; service ustanawia withdrawal tombstone, ale nie renderuje odpowiedzi HTTP,
 - cache/sitemap/IndexNow listeners nie są jeszcze podłączone; istnieje jedynie bezpieczny after-commit event hook.
 
