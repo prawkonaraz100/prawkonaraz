@@ -1127,24 +1127,24 @@ Proces jest gotowy, gdy:
 Na 2026-09-16:
 
 - istnieją `ContentAuthor` i istniejący `AuditLog`; `User` pozostaje aktorem operacji, a `ContentAuthor` publiczną tożsamością autora/reviewera,
-- backendowy `ContentArticlePublishingService` i `newsroom:publish-due` istnieją; po PR #50 Filament ma pełne N2-006 workflow/exposure actions oraz stale-safe `Apply public update` dla już publicznego `ContentArticle`; publication checklist i pełny correction flow nadal nie są wdrożone,
+- backendowy `ContentArticlePublishingService` i `newsroom:publish-due` istnieją; po PR #50 Filament ma pełne N2-006 workflow/exposure actions oraz stale-safe `Apply public update`, a PR #52 dodał N2-007 publication checklist współdzielącą te same backend readiness assertions; pełny correction flow nadal nie jest wdrożony,
 - istnieją `ContentCategoryResource` i `ContentArticleResource`; article CMS ma kontrolowany body Builder/RichEditor, relationship source editor oraz article-owned questions/legal/signs/topics editor,
 - istnieją model `ContentArticleSource`, source types v1, private-evidence flag i source ordering; N2-004 dodaje ich edycję oraz finalną source-policy validation,
 - draft może istnieć bez source, natomiast news nie przechodzi review/publish bez source; prywatny interview/direct evidence może mieć URL null,
 - ordinary Edit publicznie widocznego artykułu nadal nie zmienia publicznych sources ani article relations/topics przez zwykły Save; jawny `Apply public update` zapisuje aktualnie zmaterializowany public editor payload atomowo z loaded-state guardem,
-- publiczny renderer citation/relations, origin/regulatory UI, computed publication warnings, preview i HomeComposer nadal nie istnieją; N2-012 pozostaje otwarte tylko dla HomeComposer stale-write.
+- publiczny renderer citation/relations, origin/regulatory UI, preview i HomeComposer nadal nie istnieją; computed publication blocking/warning items są już zmaterializowane w adminie, a N2-012 pozostaje otwarte tylko dla HomeComposer stale-write.
 
 ---
 
 ## 48. Pozostałe zadania
 
 - [ ] wdrożyć admin-only policies bez rozszerzania panel access i spiąć AuditLog User actor,
-- [ ] odwzorować mandatory checklist w walidacji,
+- [x] N2-007: mandatory publish readiness jest współdzielone między checklistą i backend validation; warningi są addytywne i nie osłabiają gate'ów,
+- [ ] N2-008: wdrożyć admin-only private/no-store article preview,
 - [ ] wdrożyć origin/regulatory governance w CMS,
 - [ ] wdrożyć homepage placements i future home preview,
 - [ ] wdrożyć topic governance,
 - [ ] wdrożyć focal-point review,
-- [ ] wdrożyć admin-only private/no-store preview,
 - [x] N2-006: workflow/schedule/exposure actions + atomowy stale-safe `Apply public update` dla `ContentArticle`,
 - [ ] N2-012: analogiczny stale-write guard dla `NewsroomHomeComposer` po N2-009,
 - [ ] wdrożyć corrections,
@@ -1154,6 +1154,14 @@ Na 2026-09-16:
 ---
 
 ## 49. Historia zmian
+
+### 2026-09-16 — v0.11
+
+- PR #52 zmergowano na `main@eb37034090e7233e72cd9452d12fe9876631440a` po exact-head CI #194; `quality` i `newsroom-postgres` PASS,
+- `ContentArticlePublicationChecklist` jest wspólnym źródłem blocking readiness dla UI i `ContentArticlePublishingService`, więc redakcyjna checklista nie może deklarować gotowości przez drugi, słabszy zestaw reguł,
+- admin widzi precyzyjne OK/warning/blocking items; warningi takie jak brak hero/SEO/powiązań nie zatrzymują publikacji,
+- dedykowany OG asset różny od hero bez własnego alt pozostaje blockerem zgodnie z media/domain policy, zamiast być traktowany jako miękki warning,
+- N2-007 jest DONE; następnym taskiem jest N2-008 admin-only Article preview.
 
 ### 2026-09-16 — v0.10
 

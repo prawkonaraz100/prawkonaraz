@@ -888,6 +888,10 @@ Implementacja obejmuje warstwę domenową/read-model kompozycji oraz transakcyjn
 
 ## NEWSROOM-N2-007 — Publication checklist
 
+### Status implementacji
+
+**DONE — zmergowano przez PR #52 na `main@eb37034090e7233e72cd9452d12fe9876631440a` po exact-head CI #194. `ContentArticlePublicationChecklist` jest wspólnym source of truth dla blocking readiness assertions i read-only checklisty w `ContentArticleResource`; `ContentArticlePublishingService` deleguje do tej samej klasy, więc publish/review/schedule nie mogą ominąć twardych blockerów.**
+
 ### Zakres
 
 Computed blocking/warning items.
@@ -2027,7 +2031,7 @@ Nie oznaczać tasku DONE przed merge + green verification.
 Na 2026-09-16:
 
 - pakiet projektowy newsroomu obejmuje architekturę, model danych, CMS, UI, governance, SEO, backlog i runbook,
-- foundation N0 oraz pełny etap N1-001..N1-006 są wdrożone; N2 ma już `ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor dla `body_blocks`, source relationship editor, article-owned relations/topics editor, pełne N2-006 workflow actions oraz stale-safe `Apply public update` dla `ContentArticle`; `ContentTopicResource`, media/origin-regulatory UI, publication checklist, preview/HomeComposer, HomeComposer stale-write oraz publiczny newsroom nadal nie są wdrożone,
+- foundation N0 oraz pełny etap N1-001..N1-006 są wdrożone; N2 ma już `ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor dla `body_blocks`, source relationship editor, article-owned relations/topics editor, pełne N2-006 workflow actions, stale-safe `Apply public update` oraz N2-007 publication checklist współdzielącą backend invariants; `ContentTopicResource`, media/origin-regulatory UI, preview/HomeComposer, HomeComposer stale-write oraz publiczny newsroom nadal nie są wdrożone,
 - `/aktualnosci` i `/poradniki` nadal renderują pre-launch placeholder, teraz z dedykowanym `X-Robots-Tag: noindex, follow`; finalne detail/category/topic/feed route namespaces są zarejestrowane, ale pozostają 404 bez publicznych controllerów,
 - fundamenty ContentAuthor/legal/traffic signs/public SEO istnieją,
 - istnieją config/content.php organization, SchemaIds/SchemaRenderer oraz współdzielony SiteIdentitySchema; homepage i istniejące główne publiczne graph services korzystają z kanonicznego Organization/WebSite identity,
@@ -2042,13 +2046,22 @@ Na 2026-09-16:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N2-007 — Publication checklist.
+NEWSROOM-N2-008 — Article preview.
 
-N2-006 jest zamknięte po PR #50. N2-012 pozostaje **PARTIAL** tylko dla `NewsroomHomeComposer` stale-write, a ta część zależy od późniejszej materializacji N2-009. Najbliższym niezależnym i wykonywalnym krokiem jest więc N2-007: computed blocking/warning items w adminie, przy zachowaniu `ContentArticlePublishingService` jako autorytatywnego backend gate bez duplikowania reguł publikacyjnych w Filament.
+N2-007 jest zamknięte po PR #52. Następnym niezależnym krokiem jest admin-only preview: authenticated administrator-only route, `Cache-Control: private, no-store`, `noindex,nofollow`, public-like renderer i jawny preview banner. N2-012 nadal pozostaje **PARTIAL** wyłącznie dla `NewsroomHomeComposer` stale-write i wróci dopiero po materializacji N2-009.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.25
+
+- zmergowano PR #52 na `main@eb37034090e7233e72cd9452d12fe9876631440a`; exact-head CI #194: `quality` PASS (992 passed / 19 114 assertions / 2 skipped, Pint 1017 files PASS, frontend build PASS) oraz `newsroom-postgres` PASS,
+- dodano `ContentArticlePublicationChecklist` jako wspólny read-model + source of truth dla review/publication/fresh-review assertions; `ContentArticlePublishingService` deleguje do tej samej klasy zamiast utrzymywać drugi zestaw reguł,
+- `ContentArticleResource` pokazuje read-only listę `OK` / `OSTRZEŻENIE` / `BLOKUJE` z precyzyjnymi domenowymi powodami,
+- warningi takie jak brak hero, manual SEO description, powiązanych pytań i dedykowanego OG assetu nie blokują publish; twarde domain invariants nadal blokują review/schedule/publish,
+- dedykowany OG asset różny od hero bez własnego alt pozostaje blockerem zgodnie z domain/media contract,
+- NEWSROOM-N2-007 jest **DONE**; następnym taskiem jest NEWSROOM-N2-008 Article preview.
 
 ### 2026-09-16 — v0.24
 

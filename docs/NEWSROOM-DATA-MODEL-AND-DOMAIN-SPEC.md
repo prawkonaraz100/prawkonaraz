@@ -1705,11 +1705,12 @@ Na 2026-09-16:
 - N2-004 dodało relationship source editor na istniejącym `ContentArticleSource`, reorder przez `sort_order`, source status indicators, HTTP(S) URL validation, parent `updated_at` touch oraz finalny source-policy gate w `ContentArticlePublishingService`,
 - N2-005 dodało `NewsroomArticleRelationsEditorAdapter` oraz article-owned editor pytań/jednostek prawnych/znaków/topiców; ordered pivots zachowują `sort_order`, topics pozostają bez ręcznego rankingu, a targety są walidowane przed sync,
 - N2-006 jest DONE po PR #50: obok workflow/exposure actions istnieje jawny stale-safe `Apply public update`; mutacje publiczne pozostają w `ContentArticlePublishingService`, a AuditLog zachowuje `User` actor / `ContentAuthor` identity separation,
+- N2-007 jest DONE po PR #52: `ContentArticlePublicationChecklist` przejęło istniejące review/publication/fresh-review assertions i jest wspólnym source of truth dla backendowych blockerów oraz adminowej listy readiness; warningi pozostają addytywne i nie osłabiają publish invariants,
 - `ContentArticle`, `ContentTag`, `ContentTopic`, `ContentArticleSource` i `ContentHomePlacement` Eloquent models/factories istnieją; factory workflow states pokrywają dokumentowany baseline,
 - service-level route-family lookup guard istnieje w `ContentArticlePathResolver`; nadal nie jest podłączony do publicznych controllerów N3,
 - NEWSROOM-N1-005 scheduler istnieje jako `newsroom:publish-due`, jest zarejestrowany co minutę w production i deleguje due-time revalidation/publish do `ContentArticlePublishingService`,
 - NEWSROOM-N1-006 jest wdrożone: istnieją `NewsroomHomeCompositionService`, `NewsroomHomePlacementService` i niemutujący `ContentArticlePublishingService::assertScheduledPreviewReady()`; overlap/concurrency jest testowane również na PostgreSQL,
-- newsroom CMS jest częściowo zmaterializowany przez `ContentCategoryResource`, `ContentArticleResource`, kontrolowany body Builder/editor, source relationship editor, article-owned relations/topics editor, N2-006 workflow/exposure actions oraz stale-safe `Apply public update`; `ContentTopicResource`, media/origin-regulatory UI, publication checklist, preview UI i HomeComposer nadal nie istnieją, a N2-012 pozostaje PARTIAL dla HomeComposer stale-write.
+- newsroom CMS jest częściowo zmaterializowany przez `ContentCategoryResource`, `ContentArticleResource`, kontrolowany body Builder/editor, source relationship editor, article-owned relations/topics editor, N2-006 workflow/exposure actions, stale-safe `Apply public update` oraz N2-007 publication checklist; `ContentTopicResource`, media/origin-regulatory UI, preview UI i HomeComposer nadal nie istnieją, a N2-012 pozostaje PARTIAL dla HomeComposer stale-write.
 
 ---
 
@@ -1724,13 +1725,22 @@ Na 2026-09-16:
 - [ ] wdrożyć policies,
 - [x] wdrożyć `applyPublicUpdate` orchestration/stale-write path dla już publicznego `ContentArticle`,
 - [ ] wdrożyć analogiczny stale-write guard dla `NewsroomHomeComposer` po N2-009,
-- [ ] wdrożyć NEWSROOM-N2-007 computed publication checklist bez duplikowania backend invariants,
+- [x] NEWSROOM-N2-007: computed publication checklist współdzieląca backend invariants,
+- [ ] NEWSROOM-N2-008: authenticated admin-only private preview bez public exposure,
 - [ ] podłączyć `ContentArticlePathResolver` do publicznych N3 article controllers i zweryfikować HTTP canonical/301/404/410 behavior,
 - [ ] dodać sitemap/public-discovery regression korzystające wyłącznie z current canonical URL,
 
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.23
+
+- PR #52 zmergowano na `main@eb37034090e7233e72cd9452d12fe9876631440a`; exact-head CI #194: `quality` PASS (992 passed / 19 114 assertions / 2 skipped, Pint 1017 files PASS, frontend build PASS) i `newsroom-postgres` PASS,
+- istniejące `assertReviewReady`, `assertPublicationReady` i `assertFreshReview` przeniesiono bez osłabiania semantyki do `ContentArticlePublicationChecklist`; `ContentArticlePublishingService` deleguje do tej klasy,
+- checklista daje blocker dla twardych domain invariants oraz addytywne warningi dla nieobowiązkowych sygnałów redakcyjnych,
+- brak dedykowanego OG assetu może być warningiem, lecz istniejący dedykowany różny OG asset bez własnego alt/wymiarów pozostaje blockerem zgodnie z media contract,
+- NEWSROOM-N2-007 jest DONE; następny wykonywalny task to N2-008 Article preview.
 
 ### 2026-09-16 — v0.22
 

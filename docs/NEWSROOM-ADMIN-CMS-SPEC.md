@@ -831,8 +831,11 @@ Blocking:
 - brak author,
 - brak category,
 - brak source dla news,
-- wymagany reviewer niezatwierdzony,
-- scheduled time invalid.
+- wymagany review/fresh review,
+- scheduled state invalid,
+- hero ma asset bez wymaganego alt/wymiarów,
+- dedykowany OG asset semantycznie różny od hero nie ma własnego alt albo poprawnych wymiarów,
+- inne twarde invariants `ContentArticlePublicationChecklist` / `ContentArticlePublishingService`.
 
 Warning:
 
@@ -840,7 +843,9 @@ Warning:
 - brak manual SEO description,
 - brak related questions,
 - brak OG-specific image, jeśli hero daje poprawny fallback,
-- brak dedykowanego OG alt, gdy dedykowany OG asset semantycznie różni się od hero.
+- brak primary official/legislation source dla prawnego newsa jest sygnałem redakcyjnym, o ile nie narusza twardej source policy.
+
+`OG alt` nie jest warningiem, gdy istnieje dedykowany inny OG asset: zgodnie z domain/media contract taki asset wymaga własnego alt i jest blockerem. Fallback bez dedykowanego OG assetu pozostaje nieblokujący.
 
 ---
 
@@ -1315,8 +1320,10 @@ Na 2026-09-16:
 - create draft oraz draftowe zmiany type/sluga delegują do `ContentArticleSlugService`; `User` actor i `ContentAuthor` author/reviewer pozostają rozdzielone,
 - ordinary Edit dla `publiclyVisible()` nadal nie zapisuje publicznych pól przez zwykły Save i pozwala w tej ścieżce tylko na osobny zapis `editorial_note`; publiczny payload zmienia wyłącznie jawny `Apply public update`,
 - PR #50 dodał deterministyczny `_edit_token`, stale-write reject dla article/source/relation state oraz atomowy `Apply public update` z pełną service validation i allowlisted audytem,
+- PR #52 dodał `ContentArticlePublicationChecklist`; formularz artykułu pokazuje read-only listę `OK` / `OSTRZEŻENIE` / `BLOKUJE`, a `ContentArticlePublishingService` deleguje do tej samej klasy review/publication/fresh-review assertions,
+- warningi checklisty nie blokują publikacji, natomiast domain blockers pozostają autorytatywne po stronie backendu; dedykowany różny OG asset bez własnego alt pozostaje blockerem,
 - `ContentTopicResource` i custom `NewsroomHomeComposer` nadal nie istnieją,
-- N2-006 jest DONE; N2-012 pozostaje PARTIAL wyłącznie dla stale-write UX/guard `NewsroomHomeComposer`; media/origin-regulatory UI i private preview także pozostają otwarte,
+- N2-006 i N2-007 są DONE; N2-012 pozostaje PARTIAL wyłącznie dla stale-write UX/guard `NewsroomHomeComposer`; media/origin-regulatory UI i private preview także pozostają otwarte,
 - publiczny renderer bloków nie istnieje.
 
 ---
@@ -1330,15 +1337,24 @@ Na 2026-09-16:
 - [ ] wdrożyć focal-point/crop UX; nie deklarować variantów bez fizycznie wygenerowanych plików,
 - [ ] wdrożyć origin/regulatory fields,
 - [x] N2-006: workflow/exposure actions + atomowy stale-safe `Apply public update` dla `ContentArticle`,
-- [ ] wdrożyć checklist computed state (NEWSROOM-N2-007),
+- [x] NEWSROOM-N2-007: wdrożyć computed publication checklist współdzielącą backend invariants,
+- [ ] NEWSROOM-N2-008: wdrożyć admin-only private preview route/rendering z `private, no-store` i `noindex,nofollow`,
 - [ ] wdrożyć stale-write guard dla `NewsroomHomeComposer` po materializacji N2-009; article stale-write jest już wdrożony,
-- [ ] wdrożyć admin-only private preview,
 - [ ] wdrożyć topic identity guards; category slug/delete/deactivation guards są już zmaterializowane przez N2-001,
 - [ ] rozszerzać testy CMS wraz z kolejnymi taskami (Builder, workflow, stale-write, preview i HomeComposer).
 
 ---
 
 ## 55. Historia zmian
+
+### 2026-09-16 — v0.17
+
+- PR #52 zmergowano na `main@eb37034090e7233e72cd9452d12fe9876631440a`; exact-head CI #194: 992 passed / 19 114 assertions / 2 skipped, Pint 1017 files PASS, frontend build PASS oraz `newsroom-postgres` PASS,
+- `ContentArticlePublicationChecklist` współdzieli twarde readiness assertions z `ContentArticlePublishingService`; Filament nie duplikuje reguł publish,
+- `ContentArticleResource` pokazuje read-only computed checklistę z trzema severity: OK, warning i blocking,
+- warningi nie zatrzymują publish, ale aktywna kategoria, publiczny autor, body/source/review/media/breaking invariants nadal są egzekwowane backendowo,
+- doprecyzowano OG severity: brak dedykowanego OG assetu może być warningiem, ale dedykowany różny OG asset bez własnego alt jest blockerem zgodnie z domain contract,
+- N2-007 jest DONE; następnym taskiem wykonawczym jest N2-008 Article preview.
 
 ### 2026-09-16 — v0.16
 
