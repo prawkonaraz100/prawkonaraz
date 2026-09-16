@@ -7,6 +7,7 @@ use App\Http\Controllers\AdminContentArticlePreviewController;
 use App\Http\Controllers\AdminLegalContentQuestionReferenceController;
 use App\Http\Controllers\AdminLegalUnitSearchController;
 use App\Http\Controllers\AdminMediaController;
+use App\Http\Controllers\AdminNewsroomHomePreviewController;
 use App\Http\Controllers\AdminPjmReportController;
 use App\Http\Controllers\AdminQuestionCollectionPreviewController;
 use App\Http\Controllers\AdminQuestionController;
@@ -477,6 +478,8 @@ Route::middleware(['auth'])->prefix('admin/backupy')->name('admin.backups.')->gr
 Route::middleware(['auth'])->prefix('admin/newsroom')->name('admin.newsroom.')->group(function () {
     Route::get('/articles/{contentArticle}/preview', AdminContentArticlePreviewController::class)
         ->name('articles.preview');
+    Route::get('/home-preview', AdminNewsroomHomePreviewController::class)
+        ->name('home-preview');
 });
 
 Route::middleware(['auth', 'verified'])->prefix('admin/kolekcje-pytan')->name('admin.question-collections.')->group(function () {
