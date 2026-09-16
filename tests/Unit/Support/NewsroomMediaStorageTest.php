@@ -28,10 +28,10 @@ beforeEach(function (): void {
     ]);
 });
 
-function newsroomOnePixelPng(): string
+function newsroomTestPng(): string
 {
     return (string) base64_decode(
-        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9ZB9sAAAAASUVORK5CYII=',
+        'iVBORw0KGgoAAAANSUhEUgAAAAIAAAADCAIAAAA2iEnWAAAAE0lEQVR4nGP8z8DAwMDAxIBMAQAUQAEF3SN5DgAAAABJRU5ErkJggg==',
         true,
     );
 }
@@ -64,7 +64,7 @@ test('prepared newsroom image uploads use a dedicated immutable namespace', func
 
 test('stored newsroom images are inspected from actual bytes mime and dimensions', function () {
     $storage = app(NewsroomMediaStorage::class);
-    $binary = newsroomOnePixelPng();
+    $binary = newsroomTestPng();
     $upload = $storage->prepareImageUpload('image/png', strlen($binary));
 
     Storage::disk('newsroom_test')->put($upload['path'], $binary);
@@ -80,14 +80,14 @@ test('stored newsroom images are inspected from actual bytes mime and dimensions
         'path' => $upload['path'],
         'mime_type' => 'image/png',
         'bytes' => strlen($binary),
-        'width' => 1,
-        'height' => 1,
+        'width' => 2,
+        'height' => 3,
     ]);
 });
 
 test('stored newsroom image inspection rejects client metadata mismatches', function (string $declaredMime, ?int $declaredBytes) {
     $storage = app(NewsroomMediaStorage::class);
-    $binary = newsroomOnePixelPng();
+    $binary = newsroomTestPng();
     $upload = $storage->prepareImageUpload('image/png', strlen($binary));
 
     Storage::disk('newsroom_test')->put($upload['path'], $binary);
@@ -104,7 +104,7 @@ test('stored newsroom image inspection rejects client metadata mismatches', func
 
 test('stored newsroom image inspection enforces shared byte policy against the actual object', function () {
     $storage = app(NewsroomMediaStorage::class);
-    $binary = newsroomOnePixelPng();
+    $binary = newsroomTestPng();
 
     config()->set('media.max_bytes.image', strlen($binary) - 1);
 
@@ -137,15 +137,11 @@ test('public newsroom media url is resolved through the shared media url resolve
 
 test('newsroom media dimension ceiling is enforced from actual image dimensions', function () {
     $storage = app(NewsroomMediaStorage::class);
-    $binary = newsroomOnePixelPng();
+    $binary = newsroomTestPng();
     $upload = $storage->prepareImageUpload('image/png', strlen($binary));
 
     Storage::disk('newsroom_test')->put($upload['path'], $binary);
-    config()->set('media.newsroom_max_dimension', 0);
+    config()->set('media.newsroom_max_dimension', 2);
 
-    expect($storage->maxDimension())->toBe(10000);
-
-    config()->set('media.newsroom_max_dimension', 1);
-
-    expect($storage->inspectStoredImage($upload['path'])['width'])->toBe(1);
-});
+    $storage->inspectStoredImage($upload['path']);
+})->throws(ValidationException::class);
