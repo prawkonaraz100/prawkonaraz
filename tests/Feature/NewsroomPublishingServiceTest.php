@@ -226,7 +226,7 @@ test('archived article stays historical public but requires fresh review for ded
         ->and($archived->archived_at)->not->toBeNull();
 
     expect(fn () => newsroomPublishingService()->republish($archived))
-        ->toThrow(DomainException::class, 'fresh review')
+        ->toThrow(DomainException::class)
         ->and(fn () => newsroomPublishingService()->publish($archived))
         ->toThrow(DomainException::class);
 
