@@ -15,15 +15,25 @@ final class NewsroomBodyContract
     public const RICH_TEXT_FORMAT = 'tiptap-json';
 
     public const BLOCK_RICH_TEXT = 'rich_text';
+
     public const BLOCK_IMAGE = 'image';
+
     public const BLOCK_QUOTE = 'quote';
+
     public const BLOCK_TABLE = 'table';
+
     public const BLOCK_CONTEXT = 'context';
+
     public const BLOCK_RELATED_ARTICLE = 'related_article';
+
     public const BLOCK_LEGAL_REFERENCE = 'legal_reference';
+
     public const BLOCK_QUESTION_GROUP = 'question_group';
+
     public const BLOCK_TRAFFIC_SIGN_GROUP = 'traffic_sign_group';
+
     public const BLOCK_PRODUCT_CTA = 'product_cta';
+
     public const BLOCK_EMBED = 'embed';
 
     /**
