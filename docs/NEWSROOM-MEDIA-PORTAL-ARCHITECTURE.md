@@ -514,7 +514,7 @@ Zmiana opublikowanego sluga:
 
 NEWSROOM-N0-003 jest wdrożone jako `NewsroomTaxonomyContract` v1. Kontrakt utrwala tę samą kolejność przez pozycje 10, 20, 30, 40, 50, 60 oraz dokładne pary slug/nazwa publiczna. Description i pola SEO pozostają jawnie niezatwierdzone (`null`).
 
-To jest foundation contract dla przyszłej migracji/seedera, nie zmaterializowana taksonomia DB: `content_categories`, `ContentCategory` i dedykowany seeder nadal należą do N1.
+To jest foundation contract dla danych systemowych kategorii. Po N1-001 tabela `content_categories` jest już zmaterializowana w DB; nadal nie istnieją `ContentCategory` ani dedykowany seeder konsumujący `NewsroomTaxonomyContract`, więc sama taksonomia nie jest jeszcze automatycznie seedowana.
 
 ### 8.2. Tagi
 
