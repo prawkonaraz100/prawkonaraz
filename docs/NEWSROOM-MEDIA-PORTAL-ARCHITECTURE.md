@@ -103,7 +103,7 @@ Na pierwszym etapie nie budujemy:
 
 ## 5. Aktualny stan implementacji
 
-Stan sprawdzony ponownie 2026-09-16 względem `main@54ddf66b6fb3f41d103415697019500cdab86d41` po wdrożeniu foundation NEWSROOM-N0-001–N0-004.
+Stan sprawdzony ponownie 2026-09-16 względem `main@5a4f92e08c8618ff70270abb683f97bd88d02700` po wdrożeniu N0, N1-001..N1-006 oraz N2-001..N2-002.
 
 ### 5.1. Elementy już istniejące
 
@@ -159,27 +159,22 @@ zwracają obecnie 404 do czasu wdrożenia właściwych publicznych controllerów
 To oznacza, że:
 
 - adresy, IA i matching/order contract już istnieją,
-- nie istnieje właściwy model publikacji newsroomowej,
-- nie istnieje lista artykułów,
-- nie istnieje widok artykułu informacyjnego,
-- nie istnieje record-level ContentArticle route-family lookup,
-- nie istnieje redakcyjny CMS dla newsów.
+- model domenowy artykułów/kategorii/tagów/topiców i relacji oraz backendowy publishing/scheduling foundation już istnieją,
+- nie istnieje jeszcze publiczna lista artykułów ani widok pojedynczego artykułu,
+- service-level `ContentArticlePathResolver` istnieje, ale nie jest jeszcze podłączony do publicznych controllerów,
+- redakcyjny CMS jest częściowy: istnieją `ContentCategoryResource` i podstawowy `ContentArticleResource` shell, ale nie pełny editor/workflow/preview/HomeComposer.
 
 ### 5.3. Brakujące elementy
 
-Nie ma obecnie kompletnego odpowiednika:
+Nie ma obecnie kompletnego end-to-end odpowiednika:
 
-- `ContentArticle`,
-- `ContentCategory`,
-- tagów redakcyjnych,
-- relacji artykuł ↔ pytanie,
-- relacji artykuł ↔ podstawa prawna,
-- workflow newsroomowego,
-- modułu „pilne / ważne / featured”,
+- kontrolowanego article Builder/RichEditor oraz UI dla sources/media/origin/regulatory/relations,
+- `ContentTopicResource`,
+- Filament workflow actions, checklisty, stale-write guard, `Apply public update`, private preview i `NewsroomHomeComposer`,
+- publicznego list/detail/category/topic renderera pod utrwalonym route contract,
+- pełnej publicznej integracji byline/tag/topic/question/legal relations mimo istniejącej warstwy modelowej,
 - news sitemap,
 - feedu RSS/Atom,
-- strony kategorii newsroomowej,
-- strony pojedynczego newsa,
 - rankingów najnowsze / najczęściej czytane,
 - pomiaru ekspozycji i CTR modułów redakcyjnych.
 
@@ -1457,12 +1452,13 @@ Na moment utworzenia dokumentu za ukończone uznajemy wyłącznie elementy rzecz
 - NEWSROOM-N1-005: `newsroom:publish-due` + produkcyjny every-minute scheduler, due-time revalidation, idempotent skip/failure isolation i scheduled-republish guard,
 - NEWSROOM-N1-006: `NewsroomHomeCompositionService` + `NewsroomHomePlacementService`, future-preview eligibility, deterministic fallback/global dedupe oraz PostgreSQL-serialized placement overlaps,
 - NEWSROOM-N2-001: Filament `ContentCategoryResource` z CRUD/order/active/article counts oraz modelowymi category identity guards,
+- NEWSROOM-N2-002: podstawowy Filament `ContentArticleResource` shell z index/create/view/edit, Form/Infolist/Table, search/filters/eager loading oraz write paths reużywającymi istniejący slug service,
 - routes `/aktualnosci` i `/poradniki` jako dedykowane pre-launch 200/noindex placeholders,
 - placeholdery tych tras,
 - publiczna nawigacja prowadząca do aktualności,
 - istniejące klastry pytań, znaków i przepisów, które mogą zostać powiązane z artykułami.
 
-**Newsroom ma zmaterializowane N1-001..N1-006 oraz pierwszy resource N2-001 (`ContentCategoryResource`). N1 domain foundation jest zamknięte, ale CMS jako całość nadal nie jest wdrożony: article/topic resources, editor/media/workflow UI, HomeComposer oraz N3 renderer/controllers/HTTP 301/410 pozostają otwarte.**
+**Newsroom ma zmaterializowane N1-001..N1-006 oraz N2-001..N2-002 (`ContentCategoryResource` + podstawowy `ContentArticleResource` shell). N1 domain foundation jest zamknięte, ale CMS jako całość nadal nie jest wdrożony: `ContentTopicResource`, Builder/editor, media/sources/relations, workflow/stale-write/preview UI, HomeComposer oraz N3 renderer/controllers/HTTP 301/410 pozostają otwarte.**
 
 ---
 
@@ -1483,7 +1479,8 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N1-005` — due scheduler + revalidation/failure isolation/idempotency,
 - [x] `NEWSROOM-N1-006` — home composition + placement writer + future preview + PostgreSQL overlap serialization,
 - [x] `NEWSROOM-N2-001` — ContentCategoryResource + category CRUD/order/active/article-count invariants,
-- [ ] kontynuować N2 zgodnie z backlogiem; następny task: `NEWSROOM-N2-002` ContentArticleResource shell.
+- [x] `NEWSROOM-N2-002` — ContentArticleResource shell + basic Form/Infolist/Table/search/filters/eager loading + protected write paths,
+- [ ] kontynuować N2 zgodnie z backlogiem; następny task: `NEWSROOM-N2-003` Block editor and sanitization.
 
 Pozostałe elementy N2–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu checklistę.
 
@@ -1510,6 +1507,16 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-16 — v0.19
+
+- wdrożono i zmergowano NEWSROOM-N2-002 po zielonych jobach `quality` i `newsroom-postgres`,
+- `ContentArticleResource` shell materializuje podstawowy admin CRUD surface bez dublowania domenowego slug/path/workflow foundation,
+- create oraz draftowe type/slug changes reużywają `ContentArticleSlugService`; list/search/filters/eager loading obejmują wymagany baseline N2-002,
+- ordinary Save `publiclyVisible()` rekordu nie mutuje publicznych pól; wewnętrzny `editorial_note` pozostaje osobnym zapisem,
+- admin-only panel contract i rozdzielenie AuditLog `User` actor od publicznego `ContentAuthor` pozostają zachowane,
+- Builder/workflow/stale-write/media/sources/preview/HomeComposer nadal nie są uznane za wdrożone; następnym krokiem jest N2-003,
+- finalny gate PR #40: `quality` 951 passed / 18 857 assertions / 2 skipped, Pint 1008 files, frontend build PASS; `newsroom-postgres` 7 passed / 89 assertions.
 
 ### 2026-09-16 — v0.18
 

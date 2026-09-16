@@ -6,11 +6,11 @@
 - Obszar: newsroom / media portal
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Bazowy stan repo przy projektowaniu: main@6a38c95ce76ee05997977d614d795ed8513462f1
-- Ostatnia weryfikacja zgodności z kodem: main@eb13b2160e4b8d49c128869ad4761eb0875b2dac (2026-09-16)
+- Ostatnia weryfikacja zgodności z kodem: main@5a4f92e08c8618ff70270abb683f97bd88d02700 (2026-09-16)
 - Data: 2026-09-16
 - Zakres: model domenowy, baza danych, invariants, serwisy aplikacyjne, routing domeny i kolejność migracji
 
-Ten dokument opisuje docelowy model danych newsroomu. Schema N1-001 oraz modele/factories/scopes N1-002 są już zmaterializowane, ale serwisy aplikacyjne kolejnych etapów nadal nie istnieją. Stan wdrożenia należy czytać z sekcji 43 i aktualizować po każdej zmianie kodu.
+Ten dokument opisuje docelowy model danych newsroomu. Schema, modele/factories/scopes oraz serwisy aplikacyjne N1 są już zmaterializowane; N2 UI jest wdrażane etapami. Stan wdrożenia należy czytać z sekcji 43 i aktualizować po każdej zmianie kodu.
 
 ---
 
@@ -1667,11 +1667,12 @@ Na 2026-09-16:
 - newsroom schema istnieje: `content_categories`, `content_tags`, `content_articles`, `content_topics`, pivots/relations, redirects i `content_home_placements` są tworzone przez 12 migracji,
 - schema i warstwa modelowa są zweryfikowane na SQLite i PostgreSQL 16; `newsroom-postgres` uruchamia migration contract oraz model/scope contract,
 - `ContentCategory` Eloquent model istnieje; N2-001 dodało jego Filament `ContentCategoryResource` oraz modelowe slug/delete/deactivation guards; dedykowany DB seeder kategorii nadal nie istnieje,
+- N2-002 dodało Filament `ContentArticleResource` shell; create i draftowe type/slug mutations reużywają `ContentArticleSlugService`, a ordinary Save `publiclyVisible()` rekordu nie mutuje publicznych pól,
 - `ContentArticle`, `ContentTag`, `ContentTopic`, `ContentArticleSource` i `ContentHomePlacement` Eloquent models/factories istnieją; factory workflow states pokrywają dokumentowany baseline,
 - service-level route-family lookup guard istnieje w `ContentArticlePathResolver`; nadal nie jest podłączony do publicznych controllerów N3,
 - NEWSROOM-N1-005 scheduler istnieje jako `newsroom:publish-due`, jest zarejestrowany co minutę w production i deleguje due-time revalidation/publish do `ContentArticlePublishingService`,
 - NEWSROOM-N1-006 jest wdrożone: istnieją `NewsroomHomeCompositionService`, `NewsroomHomePlacementService` i niemutujący `ContentArticlePublishingService::assertScheduledPreviewReady()`; overlap/concurrency jest testowane również na PostgreSQL,
-- newsroom CMS jest częściowo rozpoczęty przez `ContentCategoryResource`; article/topic resources, article editor/workflow UI i HomeComposer nadal nie istnieją.
+- newsroom CMS jest częściowo zmaterializowany przez `ContentCategoryResource` oraz podstawowy `ContentArticleResource` shell; `ContentTopicResource`, article Builder/editor, workflow/stale-write/preview UI i HomeComposer nadal nie istnieją.
 
 ---
 
@@ -1691,6 +1692,16 @@ Na 2026-09-16:
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.17
+
+- wdrożono NEWSROOM-N2-002 jako podstawowy Filament `ContentArticleResource` shell bez zmiany domenowych invariants,
+- create draft i draftowe zmiany type/sluga delegują do `ContentArticleSlugService`, więc canonical/history path reservation i route-family guards pozostają autorytatywne,
+- resource eager-loaduje category/author/reviewer oraz materializuje wymagane list/search/filter powierzchnie,
+- admin `User` pozostaje aktorem AuditLog niezależnie od publicznych `ContentAuthor` author/reviewer identities,
+- ordinary Save `publiclyVisible()` rekordu nie może zmienić publicznych pól; osobny `editorial_note` pozostaje wewnętrzną mutacją shellu,
+- Builder/workflow/applyPublicUpdate/stale-write/media/preview pozostają dalszym zakresem N2,
+- finalny gate PR #40: `quality` 951 passed / 18 857 assertions / 2 skipped, Pint 1008 files, frontend build PASS; `newsroom-postgres` 7 passed / 89 assertions.
 
 ### 2026-09-16 — v0.16
 

@@ -289,7 +289,7 @@ Edytor pracuje na uporządkowanym `body_blocks`.
 
 NEWSROOM-N0-004 wybrało `Filament\Forms\Components\Builder` jako komponent/adaptor przyszłego N2 editora. Jego wewnętrzny associative item state nie jest jednak formatem domenowym: przy zapisie musi zostać znormalizowany przez `NewsroomBodyContract` do uporządkowanej listy `{key?, type, data}`.
 
-**Stan implementacji:** decyzja i normalizer istnieją; rzeczywisty `ContentArticleResource` z Builderem jeszcze nie istnieje.
+**Stan implementacji:** podstawowy `ContentArticleResource` shell już istnieje po N2-002, ale Builder/RichEditor adapter do `body_blocks` nadal nie istnieje i pozostaje zakresem N2-003.
 
 Redaktor powinien móc:
 
@@ -1239,19 +1239,19 @@ Na 2026-09-16:
 - backendowy `ContentArticlePublishingService` istnieje i implementuje audytowane workflow transitions oraz after-commit event boundary z N1-004,
 - backendowe `NewsroomHomeCompositionService` i `NewsroomHomePlacementService` istnieją po N1-006; zapewniają composition/fallback/future-preview eligibility i concurrency-safe placement writes,
 - custom Filament `NewsroomHomeComposer` nadal nie istnieje; N1-006 nie dostarcza UI, stale-write UX ani admin preview route,
-- `ContentCategoryResource` istnieje jako pierwszy newsroom resource: index/create/view/edit, article counts, active filter, `position` reorder oraz category invariants,
-- `ContentArticleResource`, `ContentTopicResource` i custom `NewsroomHomeComposer` nadal nie istnieją,
-- article editor/Builder UI nie istnieje,
-- publiczny renderer bloków nie istnieje,
-- preview nie istnieje.
+- `ContentCategoryResource` istnieje: index/create/view/edit, article counts, active filter, `position` reorder oraz category invariants,
+- N2-002 dodało podstawowy `ContentArticleResource` shell z index/create/view/edit, Form/Infolist/Table, search/filter setem oraz eager loadingiem category/author/reviewer,
+- create draft oraz draftowe zmiany type/sluga delegują do `ContentArticleSlugService`; `User` actor i `ContentAuthor` author/reviewer pozostają rozdzielone,
+- ordinary Edit dla `publiclyVisible()` nie zapisuje publicznych pól również server-side i pozwala w tej ścieżce tylko na osobny zapis `editorial_note`,
+- `ContentTopicResource` i custom `NewsroomHomeComposer` nadal nie istnieją,
+- article editor/Builder UI, workflow actions, stale-write guard, media/sources/relations UI i private preview nadal nie istnieją,
+- publiczny renderer bloków nie istnieje.
 
 ---
 
 ## 54. Pozostałe zadania
 
 - [ ] wdrożyć faktyczny Builder/RichEditor form adapter oparty o `NewsroomBodyContract`,
-- [ ] wdrożyć ContentArticleResource,
-- [ ] wdrożyć Form/Table/Infolist,
 - [ ] wdrożyć ContentTopicResource,
 - [ ] wdrożyć NewsroomHomeComposer + future preview,
 - [ ] wdrożyć hero/OG uploader korzystający z `NewsroomMediaStorage` i zapis verified metadata do `ContentArticle`,
@@ -1263,11 +1263,22 @@ Na 2026-09-16:
 - [ ] wdrożyć stale-write guard dla articles/home placements,
 - [ ] wdrożyć admin-only private preview,
 - [ ] wdrożyć topic identity guards; category slug/delete/deactivation guards są już zmaterializowane przez N2-001,
-- [ ] wdrożyć tests.
+- [ ] rozszerzać testy CMS wraz z kolejnymi taskami (Builder, workflow, stale-write, preview i HomeComposer).
 
 ---
 
 ## 55. Historia zmian
+
+### 2026-09-16 — v0.11
+
+- N2-002 zmaterializowało `ContentArticleResource` shell z index/create/view/edit oraz rozdzielonymi Form/Infolist/Table,
+- lista implementuje wymagane kolumny, search title/slug/lead, filtry redakcyjne i eager loading category/author/reviewer,
+- create draft używa `ContentArticleSlugService`, a draftowe type/slug changes przechodzą przez jego `changeType()` / `changeSlug()`,
+- dostęp nadal wynika wyłącznie z istniejącego admin panel gate; nie dodano newsroom RBAC,
+- `User` actor AuditLog pozostaje niezależny od `ContentAuthor` author/reviewer,
+- ordinary Save `publiclyVisible()` rekordu nie może zmienić publicznych pól; shell zachowuje osobny wewnętrzny zapis `editorial_note`,
+- Builder/RichEditor, workflow actions, `Apply public update`, stale-write, media/sources/relations, preview i HomeComposer nadal pozostają otwarte,
+- finalny gate PR #40: `quality` 951 passed / 18 857 assertions / 2 skipped, Pint 1008 files, frontend build PASS; `newsroom-postgres` 7 passed / 89 assertions.
 
 ### 2026-09-16 — v0.10
 
