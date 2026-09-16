@@ -1235,7 +1235,7 @@ Na 2026-09-16:
 - ContentAuthors resource istnieje,
 - `NewsroomBodyContract` v1 i jego unit/security tests istnieją,
 - `NewsroomMediaStorage` i jego unit regression istnieją jako N0-006 storage/validation foundation,
-- decyzja N0-004 wybiera Builder + RichEditor TipTap JSON jako przyszły N2 adapter,
+- N0-004 wybrało Builder + RichEditor TipTap JSON jako adapter, a N2-003 zmaterializowało go w `ContentArticleResource` przez `NewsroomBodyEditorAdapter`,
 - backendowy `ContentArticlePublishingService` istnieje i implementuje audytowane workflow transitions oraz after-commit event boundary z N1-004,
 - backendowe `NewsroomHomeCompositionService` i `NewsroomHomePlacementService` istnieją po N1-006; zapewniają composition/fallback/future-preview eligibility i concurrency-safe placement writes,
 - custom Filament `NewsroomHomeComposer` nadal nie istnieje; N1-006 nie dostarcza UI, stale-write UX ani admin preview route,
@@ -1244,14 +1244,14 @@ Na 2026-09-16:
 - create draft oraz draftowe zmiany type/sluga delegują do `ContentArticleSlugService`; `User` actor i `ContentAuthor` author/reviewer pozostają rozdzielone,
 - ordinary Edit dla `publiclyVisible()` nie zapisuje publicznych pól również server-side i pozwala w tej ścieżce tylko na osobny zapis `editorial_note`,
 - `ContentTopicResource` i custom `NewsroomHomeComposer` nadal nie istnieją,
-- article editor/Builder UI, workflow actions, stale-write guard, media/sources/relations UI i private preview nadal nie istnieją,
+- workflow actions, stale-write guard, media/sources/relations/origin-regulatory UI i private preview nadal nie istnieją; kontrolowany article Builder/RichEditor jest już wdrożony,
 - publiczny renderer bloków nie istnieje.
 
 ---
 
 ## 54. Pozostałe zadania
 
-- [ ] wdrożyć faktyczny Builder/RichEditor form adapter oparty o `NewsroomBodyContract`,
+- [ ] wdrożyć Sources editor zgodnie z N2-004 i istniejącym `ContentArticleSource`/publish-source contract,
 - [ ] wdrożyć ContentTopicResource,
 - [ ] wdrożyć NewsroomHomeComposer + future preview,
 - [ ] wdrożyć hero/OG uploader korzystający z `NewsroomMediaStorage` i zapis verified metadata do `ContentArticle`,
@@ -1268,6 +1268,16 @@ Na 2026-09-16:
 ---
 
 ## 55. Historia zmian
+
+### 2026-09-16 — v0.12
+
+- N2-003 zmaterializowało kontrolowany article Builder/RichEditor w istniejącym `ContentArticleResource`, bez tworzenia drugiego CMS ani arbitrary-HTML body,
+- `NewsroomBodyEditorAdapter` mapuje UI do `NewsroomBodyContract` v1, zachowuje canonical `key` niezależnie od efemerycznych UUID Filament Buildera i utrzymuje kolejność bloków,
+- aktywne bloki v1 mają dedykowane pola formularza; domain pickery używają bounded searchable queries zamiast preloadu całych corpusów pytań/przepisów/znaków,
+- RichEditor zapisuje TipTap JSON i przed persistence cały body przechodzi server-side `NewsroomBodyContract::normalize()`; embed pozostaje fail-closed,
+- ordinary Edit `publiclyVisible()` nadal nie zapisuje body/public fields; upload/crop, sources, relations, workflow, stale-write i preview pozostają otwarte,
+- finalny gate PR #42: `quality` 963 passed / 18 895 assertions / 2 skipped, Pint 1010 files PASS, frontend build PASS; `newsroom-postgres` PASS,
+- następnym taskiem jest `NEWSROOM-N2-004` Sources editor.
 
 ### 2026-09-16 — v0.11
 

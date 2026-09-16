@@ -103,7 +103,7 @@ Na pierwszym etapie nie budujemy:
 
 ## 5. Aktualny stan implementacji
 
-Stan sprawdzony ponownie 2026-09-16 względem `main@5a4f92e08c8618ff70270abb683f97bd88d02700` po wdrożeniu N0, N1-001..N1-006 oraz N2-001..N2-002.
+Stan sprawdzony ponownie 2026-09-16 względem `main@13a22058c7c945196e8d490a0620b93dcf449641` po wdrożeniu N0, N1-001..N1-006 oraz N2-001..N2-003.
 
 ### 5.1. Elementy już istniejące
 
@@ -162,13 +162,13 @@ To oznacza, że:
 - model domenowy artykułów/kategorii/tagów/topiców i relacji oraz backendowy publishing/scheduling foundation już istnieją,
 - nie istnieje jeszcze publiczna lista artykułów ani widok pojedynczego artykułu,
 - service-level `ContentArticlePathResolver` istnieje, ale nie jest jeszcze podłączony do publicznych controllerów,
-- redakcyjny CMS jest częściowy: istnieją `ContentCategoryResource` i podstawowy `ContentArticleResource` shell, ale nie pełny editor/workflow/preview/HomeComposer.
+- redakcyjny CMS jest częściowy: istnieją `ContentCategoryResource`, `ContentArticleResource` oraz kontrolowany Builder/RichEditor dla `body_blocks`, ale nie pełne sources/media/origin/regulatory/relations UI, workflow/preview/HomeComposer.
 
 ### 5.3. Brakujące elementy
 
 Nie ma obecnie kompletnego end-to-end odpowiednika:
 
-- kontrolowanego article Builder/RichEditor oraz UI dla sources/media/origin/regulatory/relations,
+- UI dla sources/media/origin/regulatory/relations oraz pozostałych etapów N2,
 - `ContentTopicResource`,
 - Filament workflow actions, checklisty, stale-write guard, `Apply public update`, private preview i `NewsroomHomeComposer`,
 - publicznego list/detail/category/topic renderera pod utrwalonym route contract,
@@ -1453,12 +1453,13 @@ Na moment utworzenia dokumentu za ukończone uznajemy wyłącznie elementy rzecz
 - NEWSROOM-N1-006: `NewsroomHomeCompositionService` + `NewsroomHomePlacementService`, future-preview eligibility, deterministic fallback/global dedupe oraz PostgreSQL-serialized placement overlaps,
 - NEWSROOM-N2-001: Filament `ContentCategoryResource` z CRUD/order/active/article counts oraz modelowymi category identity guards,
 - NEWSROOM-N2-002: podstawowy Filament `ContentArticleResource` shell z index/create/view/edit, Form/Infolist/Table, search/filters/eager loading oraz write paths reużywającymi istniejący slug service,
+- NEWSROOM-N2-003: kontrolowany Filament Builder/RichEditor dla aktywnych bloków v1, `NewsroomBodyEditorAdapter`, canonical key round-trip oraz server-side normalizacja przez `NewsroomBodyContract`,
 - routes `/aktualnosci` i `/poradniki` jako dedykowane pre-launch 200/noindex placeholders,
 - placeholdery tych tras,
 - publiczna nawigacja prowadząca do aktualności,
 - istniejące klastry pytań, znaków i przepisów, które mogą zostać powiązane z artykułami.
 
-**Newsroom ma zmaterializowane N1-001..N1-006 oraz N2-001..N2-002 (`ContentCategoryResource` + podstawowy `ContentArticleResource` shell). N1 domain foundation jest zamknięte, ale CMS jako całość nadal nie jest wdrożony: `ContentTopicResource`, Builder/editor, media/sources/relations, workflow/stale-write/preview UI, HomeComposer oraz N3 renderer/controllers/HTTP 301/410 pozostają otwarte.**
+**Newsroom ma zmaterializowane N1-001..N1-006 oraz N2-001..N2-003 (`ContentCategoryResource`, `ContentArticleResource` i kontrolowany Builder/RichEditor dla `body_blocks`). N1 domain foundation jest zamknięte, ale CMS jako całość nadal nie jest wdrożony: `ContentTopicResource`, media/sources/relations/origin-regulatory UI, workflow/stale-write/preview UI, HomeComposer oraz N3 renderer/controllers/HTTP 301/410 pozostają otwarte.**
 
 ---
 
@@ -1480,7 +1481,8 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N1-006` — home composition + placement writer + future preview + PostgreSQL overlap serialization,
 - [x] `NEWSROOM-N2-001` — ContentCategoryResource + category CRUD/order/active/article-count invariants,
 - [x] `NEWSROOM-N2-002` — ContentArticleResource shell + basic Form/Infolist/Table/search/filters/eager loading + protected write paths,
-- [ ] kontynuować N2 zgodnie z backlogiem; następny task: `NEWSROOM-N2-003` Block editor and sanitization.
+- [x] `NEWSROOM-N2-003` — controlled Builder/RichEditor + body adapter + server-side sanitization/XSS regression,
+- [ ] kontynuować N2 zgodnie z backlogiem; następny task: `NEWSROOM-N2-004` Sources editor.
 
 Pozostałe elementy N2–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu checklistę.
 
@@ -1507,6 +1509,17 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-16 — v0.20
+
+- wdrożono i zmergowano NEWSROOM-N2-003 przez PR #42 na `main@13a22058c7c945196e8d490a0620b93dcf449641`,
+- `ContentArticleResource` ma kontrolowany Filament Builder dla aktywnych bloków v1 oraz RichEditor zapisujący structured TipTap JSON zgodnie z `NewsroomBodyContract`,
+- `NewsroomBodyEditorAdapter` oddziela efemeryczne UUID Buildera od kanonicznego `body_blocks.key`, zachowuje kolejność i normalizuje formularz do jedynego domenowego kontraktu przed zapisem,
+- `embed` pozostaje feature-disabled/fail-closed zgodnie z N0-004; N2-003 nie włącza providerów bez osobnego CSP/provider security gate,
+- image block przyjmuje storage-relative path, ale upload/object verification/crop pozostają dalszym media scope N2; dokumentacja nie przypisuje editorowi nieistniejącej weryfikacji assetu,
+- zwykły Edit `publiclyVisible()` nadal nie może zmieniać body/public fields; regression potwierdza też trwałość canonical key oraz odrzucanie unsafe rich text/iframe/embed payloads,
+- finalny gate PR #42: `quality` 963 passed / 18 895 assertions / 2 skipped, Pint 1010 files PASS, frontend build PASS; `newsroom-postgres` PASS,
+- następnym taskiem jest `NEWSROOM-N2-004` Sources editor.
 
 ### 2026-09-16 — v0.19
 
