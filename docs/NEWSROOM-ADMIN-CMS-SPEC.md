@@ -398,7 +398,7 @@ Sekcja źródeł jest zmaterializowana w istniejącym `ContentArticleResource` j
 - formularz pokazuje stany PRIMARY / OFFICIAL / PUBLIC / TYLKO WEWNĘTRZNE i wszystkie source types v1,
 - URL jest opcjonalny; dla niepustej wartości UI wymaga HTTP(S), a akcja „Otwórz źródło” pojawia się tylko dla bezpiecznego HTTP(S) URL,
 - ordinary Edit `publiclyVisible()` ma source Repeater disabled, a server-side public edit path nie zapisuje source relationship,
-- `ContentArticleSource` bumpuje parent `ContentArticle.updated_at`; pełny loaded-token stale-write reject pozostaje osobnym N2-012,
+- `ContentArticleSource` nadal bumpuje parent `ContentArticle.updated_at`, ale po PR #50 loaded-state guard używa deterministycznego tokenu obejmującego również source state; same-second child mutation jest odrzucana przed persistence,
 - publiczny renderer źródeł nadal nie istnieje, więc N2-004 nie jest deklarowane jako wdrożenie public citation UI.
 
 ---
@@ -481,7 +481,7 @@ Sekcja „Powiązania” jest zmaterializowana w istniejącym `ContentArticleRes
 - `NewsroomArticleRelationsEditorAdapter` waliduje target existence, duplicate targets i relation-type allowlists przed sync,
 - create/edit synchronizują article-owned pivots transakcyjnie; ordinary Edit `publiclyVisible()` nie przechodzi przez ten sync path,
 - relacja nie modyfikuje target entity ani istniejącego question/legal/sign graphu,
-- relation sync bumpuje parent `ContentArticle.updated_at`; pełny stale-write reject pozostaje N2-012,
+- relation sync bumpuje parent `ContentArticle.updated_at`, a po PR #50 deterministyczny loaded-state token obejmuje także article-owned relations/topics i jest sprawdzany przed sync,
 - publiczny renderer/reverse-link UI nadal nie istnieje.
 
 ---
