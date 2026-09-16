@@ -1451,12 +1451,13 @@ Na moment utworzenia dokumentu za ukończone uznajemy wyłącznie elementy rzecz
 - NEWSROOM-N0-004: `NewsroomBodyContract` v1 z canonical block list, structured TipTap rich text, ścisłymi payload schemas i disabled embed,
 - NEWSROOM-N0-006: `NewsroomMediaStorage` z immutable source paths, actual object MIME/bytes/dimensions validation i shared public URL resolver,
 - NEWSROOM-N1-001: 5 enumów domenowych, 12 migracji newsroomu oraz addytywny PostgreSQL 16 migration gate,
+- NEWSROOM-N1-002: 6 modeli Eloquent newsroomu, factories, relacje/reverse relations oraz domenowe scopes/predicates zweryfikowane na SQLite i PostgreSQL,
 - routes `/aktualnosci` i `/poradniki` jako dedykowane pre-launch 200/noindex placeholders,
 - placeholdery tych tras,
 - publiczna nawigacja prowadząca do aktualności,
 - istniejące klastry pytań, znaków i przepisów, które mogą zostać powiązane z artykułami.
 
-**Newsroom ma już zmaterializowaną warstwę schema N1-001: tabele i enumy istnieją. Nadal nie uznajemy pełnej domeny/CMS/public content za wdrożone: Eloquent models/factories/scopes, N2 article editor/media UI i N3 renderer jeszcze nie istnieją.**
+**Newsroom ma już zmaterializowane N1-001 i N1-002: tabele/enumy oraz warstwa Eloquent models/factories/scopes istnieją. Nadal nie uznajemy pełnej domeny/CMS/public content za wdrożone: slug/publishing/scheduler/composition services, N2 article editor/media UI i N3 renderer jeszcze nie istnieją.**
 
 ---
 
@@ -1471,7 +1472,8 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N0-005` — compatibility decision istniejącego SEO delivery jest udokumentowana; kodowy regression gate pozostaje w N5,
 - [x] `NEWSROOM-N0-006` — media upload/storage contract,
 - [x] `NEWSROOM-N1-001` — enumy + 12 migracji + SQLite/PostgreSQL schema gates,
-- [ ] kontynuować N1 zgodnie z backlogiem; następny task: `NEWSROOM-N1-002` models + factories.
+- [x] `NEWSROOM-N1-002` — models + factories + relations/scopes + SQLite/PostgreSQL model contract,
+- [ ] kontynuować N1 zgodnie z backlogiem; następny task: `NEWSROOM-N1-003` slug service + redirects.
 
 Pozostałe elementy N2–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu checklistę.
 
@@ -1498,6 +1500,16 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-16 — v0.13
+
+- wdrożono i zmergowano NEWSROOM-N1-002 po zielonych jobach `quality` i `newsroom-postgres`,
+- dodano 6 modeli Eloquent newsroomu, factories i reverse relations do `ContentAuthor`, `Question`, `LegalUnit` i `TrafficSign`,
+- `ContentArticle` implementuje odrębne `publiclyVisible`, `activelyDistributed`, `indexable` oraz pozostałe N1-002 scopes/predicates bez wprowadzania jeszcze workflow services,
+- factories mają dokumentowane workflow states i reużywają `NewsroomBodyContract` dla body fixture,
+- PostgreSQL gate obejmuje teraz cały `tests/Postgres`; finalnie 4 testy / 81 asercji PASS, a ogólny gate: 895 passed / 18 532 assertions / 2 skipped, Pint 974 files, frontend build PASS,
+- dedykowany category DB seeder oraz N1-003 slug/redirect service i dalsze N1 services pozostają otwarte,
+- następnym taskiem wykonawczym jest NEWSROOM-N1-003.
 
 ### 2026-09-16 — v0.12
 
