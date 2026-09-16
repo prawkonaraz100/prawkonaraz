@@ -35,7 +35,6 @@ class ContentTopic extends Model
         'published_at',
     ];
 
-
     protected static function booted(): void
     {
         static::saving(function (ContentTopic $topic): void {
@@ -45,7 +44,7 @@ class ContentTopic extends Model
                 ]);
             }
 
-            if (! in_array((string) $topic->status, [
+            if (!in_array((string) $topic->status, [
                 self::STATUS_DRAFT,
                 self::STATUS_PUBLISHED,
                 self::STATUS_ARCHIVED,
@@ -55,7 +54,7 @@ class ContentTopic extends Model
                 ]);
             }
 
-            if (! $topic->exists) {
+            if (!$topic->exists) {
                 return;
             }
 
@@ -75,7 +74,7 @@ class ContentTopic extends Model
         });
 
         static::deleting(function (ContentTopic $topic): void {
-            if (! $topic->canBeDeleted()) {
+            if (!$topic->canBeDeleted()) {
                 throw ValidationException::withMessages([
                     'topic' => 'Nie można usunąć topicu po pierwszej publikacji. Użyj archiwizacji, aby zachować historyczny URL.',
                 ]);
@@ -136,7 +135,7 @@ class ContentTopic extends Model
     public function isCorpusBelowBaseline(): bool
     {
         return $this->isPubliclyVisible()
-            && ! $this->meetsPublicationCorpusBaseline();
+            && !$this->meetsPublicationCorpusBaseline();
     }
 
     public function hasEligibleFeaturedArticle(): bool
