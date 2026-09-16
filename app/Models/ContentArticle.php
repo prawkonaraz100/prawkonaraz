@@ -153,6 +153,11 @@ class ContentArticle extends Model
         return $this->hasMany(ContentHomePlacement::class, 'article_id');
     }
 
+    public function redirects(): HasMany
+    {
+        return $this->hasMany(ContentArticleRedirect::class, 'article_id');
+    }
+
     public function questions(): BelongsToMany
     {
         return $this->belongsToMany(
