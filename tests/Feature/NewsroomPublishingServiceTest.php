@@ -43,7 +43,6 @@ function newsroomReviewedArticle(array $attributes = [], ?User $actor = null): C
     return newsroomPublishingService()->markReviewed($article, $actor);
 }
 
-
 /**
  * @param  array<string, mixed>  $overrides
  * @return array<string, mixed>
