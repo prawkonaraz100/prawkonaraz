@@ -135,7 +135,7 @@ class ContentTopic extends Model
     public function isCorpusBelowBaseline(): bool
     {
         return $this->isPubliclyVisible()
-            && !$this->meetsPublicationCorpusBaseline();
+            && ! $this->meetsPublicationCorpusBaseline();
     }
 
     public function hasEligibleFeaturedArticle(): bool
