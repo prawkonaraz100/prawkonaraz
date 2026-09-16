@@ -6,7 +6,7 @@
 - Obszar: newsroom / media portal
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Bazowy stan repo przy projektowaniu: main@6a38c95ce76ee05997977d614d795ed8513462f1
-- Ostatnia weryfikacja zgodności z kodem: main@1fc2dcff2b7a6f44ad21865d41dbca98ade2efad (2026-09-16)
+- Ostatnia weryfikacja zgodności z kodem: main@f2ccc997b4aea4634b148ff4696aa66eaaf75d91 (2026-09-16)
 - Data: 2026-09-16
 - Zakres: model domenowy, baza danych, invariants, serwisy aplikacyjne, routing domeny i kolejność migracji
 
@@ -698,6 +698,27 @@ Pola:
 - to_path zawsze lokalny canonical path dla własnego contentu,
 - usunięcie artykułu nie oznacza automatycznego redirectu do huba,
 - 410/404 jest lepsze niż niepowiązany redirect.
+
+### 15.2. Aktualny stan implementacji
+
+NEWSROOM-N1-003 jest wdrożone.
+
+Kod zawiera:
+
+- `ContentArticleSlugService` dla create/initial slug allocation, explicit slug, slug changes i type changes,
+- `ContentArticleRedirect` oraz relację `ContentArticle::redirects()`,
+- `ContentArticlePathResolver` dla service-level canonical lookup per route family oraz historycznych redirect records,
+- `PostgresTransactionAdvisoryLock` z transaction-only PostgreSQL advisory locks i deterministycznym sortowaniem kluczy,
+- generated slug suffix allocation, reserved newsroom slug handling i global current-slug uniqueness zgodną z istniejącym unique indexem,
+- published slug history przepisywaną one-hop do bieżącego canonical,
+- service-only same-article historical path reclaim,
+- blockadę przejęcia historycznego `from_path` innego artykułu,
+- cross-family type-change guard po `first_published_at`,
+- kompaktowe AuditLog events dla create/slug/type mutations.
+
+PostgreSQL 16 gate wykonuje realny contention test na drugim połączeniu i potwierdza serialization tego samego full path. Finalny wynik po N1-003: 6 testów / 86 asercji.
+
+Publiczne article controllers nadal nie istnieją, więc HTTP 301 dla old path i 200 dla new canonical nie są jeszcze zmaterializowane w routingu; N3 ma konsumować `ContentArticlePathResolver` zamiast duplikować lookup logic.
 
 ---
 
@@ -1585,13 +1606,14 @@ Na 2026-09-16:
 - NEWSROOM-N0-006 media storage/validation contract jest wdrożony i przetestowany jako `NewsroomMediaStorage`,
 - NEWSROOM-N1-001 jest wdrożone: istnieje 5 enumów domenowych oraz 12 migracji newsroomu,
 - NEWSROOM-N1-002 jest wdrożone: istnieją modele `ContentArticle`, `ContentCategory`, `ContentTag`, `ContentTopic`, `ContentArticleSource`, `ContentHomePlacement`, ich factories, relations, reverse relations i scopes/predicates,
+- NEWSROOM-N1-003 jest wdrożone: istnieją `ContentArticleSlugService`, `ContentArticleRedirect`, `ContentArticlePathResolver` i PostgreSQL advisory-lock serialization,
 - `/aktualnosci` i `/poradniki` pozostają placeholderami 200 z dedykowanym noindex header,
 - przyszłe detail/category/topic/feed routes są zarejestrowane, lecz zwracają 404 do czasu publicznej implementacji,
 - newsroom schema istnieje: `content_categories`, `content_tags`, `content_articles`, `content_topics`, pivots/relations, redirects i `content_home_placements` są tworzone przez 12 migracji,
 - schema i warstwa modelowa są zweryfikowane na SQLite i PostgreSQL 16; `newsroom-postgres` uruchamia migration contract oraz model/scope contract,
 - `ContentCategory` Eloquent model istnieje; dedykowany DB seeder kategorii nadal nie istnieje,
 - `ContentArticle`, `ContentTag`, `ContentTopic`, `ContentArticleSource` i `ContentHomePlacement` Eloquent models/factories istnieją; factory workflow states pokrywają dokumentowany baseline,
-- record-level route-family lookup guard nie jest jeszcze podłączony do modelu/controllerów,
+- service-level route-family lookup guard istnieje w `ContentArticlePathResolver`; nadal nie jest podłączony do publicznych controllerów N3,
 - newsroom CMS nie istnieje.
 
 ---
@@ -1608,12 +1630,22 @@ Na 2026-09-16:
 - [ ] wdrożyć policies,
 - [ ] wdrożyć publishing service,
 - [ ] wdrożyć scheduling,
-- [ ] wdrożyć slug redirects,
-- [ ] podłączyć `NewsroomRouteContract` do publicznego ContentArticle lookupu i zweryfikować route-family exclusivity na realnych rekordach,
+- [ ] podłączyć `ContentArticlePathResolver` do publicznych N3 article controllers i zweryfikować HTTP canonical/301/404/410 behavior,
+- [ ] dodać sitemap/public-discovery regression korzystające wyłącznie z current canonical URL,
 
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.12
+
+- wdrożono NEWSROOM-N1-003 jako canonical slug/history/path-resolution layer,
+- dodano `ContentArticleSlugService`, `ContentArticleRedirect`, `ContentArticlePathResolver` oraz `PostgresTransactionAdvisoryLock`,
+- historyczne full paths są zarezerwowane przed innym artykułem, same-article reclaim jest service-only, a redirect history pozostaje one-hop,
+- route-family transition po pierwszej publikacji jest blokowany, a resolver uniemożliwia service-level 200 lookup tego samego rekordu pod obiema rodzinami,
+- PostgreSQL gate rozszerzono o slug service concurrency; finalnie 6 testów / 86 asercji PASS,
+- ogólny gate przeszedł 906 testów / 18 565 asercji / 2 skipped, Pint 980 files i frontend build,
+- publiczne HTTP redirect/canonical controllers nadal nie istnieją i pozostają N3 integration.
 
 ### 2026-09-16 — v0.11
 
