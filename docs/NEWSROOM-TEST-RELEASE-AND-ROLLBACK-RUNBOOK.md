@@ -1422,8 +1422,8 @@ Na 2026-09-16:
 - istnieją globalne backend tests,
 - istnieje Playwright smoke dla produktu,
 - istnieją ops backup/restore/health commands,
-- istnieją newsroom-specific unit/security tests dla `NewsroomBodyContract`, storage/security regression dla `NewsroomMediaStorage`, enum/schema/model regression, N1-003 slug/history tests oraz `NewsroomPublishingServiceTest` dla N1-004 workflow/invariants/audit/after-commit rollback boundary; PostgreSQL gate obejmuje migration/model/slug concurrency contracts; browser E2E nadal nie istnieje,
-- faktyczne N2 block-editor integration/E2E oraz homepage placement/topic tests jeszcze nie istnieją,
+- istnieją newsroom-specific unit/security tests dla `NewsroomBodyContract`, storage/security regression dla `NewsroomMediaStorage`, enum/schema/model regression, N1-003 slug/history tests, `NewsroomPublishingServiceTest` dla N1-004 workflow/invariants/audit/after-commit rollback boundary oraz N1-006 `NewsroomHomeCompositionServiceTest`/`NewsroomHomePlacementServiceTest`; PostgreSQL gate obejmuje migration/model/slug concurrency oraz home-placement advisory-lock regression; browser E2E nadal nie istnieje,
+- faktyczne N2 block-editor/placement-editor integration/E2E oraz topic CMS tests jeszcze nie istnieją; N1 domain composition/placement tests są już obecne,
 - newsroom entity graph/news sitemap/sharding/feed-discovery/static-delivery tests jeszcze nie istnieją,
 - atomic static publication i dirty/version newsroom refresh coordinator jeszcze nie istnieją,
 - canonical CI ma dwa uzupełniające joby: `quality` na SQLite oraz addytywny `newsroom-postgres` na PostgreSQL 16,
@@ -1440,7 +1440,7 @@ Na 2026-09-16:
 - [ ] dodać site-identity/entity-graph/date-consistency tests,
 - [ ] dodać semantic silo/orphan/reverse-link/click-depth tests,
 - [ ] dodać public HTTP route-family/canonical/old-slug redirect integration/E2E; service-level exclusivity i slug history są już pokryte w N1-003,
-- [ ] dodać N2 stale-write/Apply-public-update, placement-concurrency i category-topic guard tests; podstawowy N1-004 AuditLog/after-commit workflow contract ma już feature regression,
+- [ ] dodać N2 stale-write/Apply-public-update i category-topic guard tests; podstawowy N1-004 AuditLog/after-commit workflow oraz N1-006 placement-concurrency/domain-composition contracts mają już regression coverage,
 - [ ] dodać news namespace + sitemap sharding + atomic publish + dirty-marker refresh/feed-discovery tests,
 - [ ] dodać production-like static robots/sitemap delivery smoke,
 - [ ] rozszerzyć istniejący SeoSitemapAuditor,
@@ -1450,6 +1450,13 @@ Na 2026-09-16:
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-16 — v0.12
+
+- NEWSROOM-N1-006 dodał `NewsroomHomeCompositionServiceTest` i `NewsroomHomePlacementServiceTest` dla manual/fallback resolution, current/future windows, scheduled preview, global dedupe, category context, short modules oraz breaking exception,
+- PostgreSQL gate dodał realny advisory-lock regression dla konkurencyjnego zapisu pustego placement tuple,
+- N2 stale-write editor behavior pozostaje niewdrożone i nie jest utożsamiane z N1 tuple-concurrency contract,
+- finalny PR #35: quality 935 passed / 18 769 assertions / 2 skipped, Pint 990 files, frontend build PASS; newsroom-postgres 7 passed / 89 assertions.
 
 ### 2026-09-16 — v0.11
 
