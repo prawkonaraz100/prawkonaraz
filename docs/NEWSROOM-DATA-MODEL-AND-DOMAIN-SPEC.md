@@ -1212,7 +1212,7 @@ Kod zawiera:
 - `/aktualnosci` i `/poradniki` jako nadal działające placeholdery 200 z `X-Robots-Tag: noindex, follow`,
 - przyszłe feed/category/topic/detail routes jako jawne 404 do czasu wdrożenia odpowiadających controllerów.
 
-Nie istnieją jeszcze `ContentArticle` ani publiczne article/category/topic/feed controllery. Z tego powodu record-level family lookup guard pozostaje obowiązkiem downstream N3 i nie jest opisany jako wdrożony.
+`ContentArticle` istnieje już jako model N1-002, ale publiczne article/category/topic/feed controllery nadal nie istnieją. Z tego powodu record-level family lookup guard pozostaje obowiązkiem downstream N3 i nie jest opisany jako wdrożony.
 
 ---
 
