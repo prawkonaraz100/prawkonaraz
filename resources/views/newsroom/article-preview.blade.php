@@ -105,13 +105,13 @@
                 <div class="space-y-8">
                     @forelse ($bodyBlocks as $block)
                         @switch($block['type'])
-                            @case(AppSupportNewsroomBodyContract::BLOCK_RICH_TEXT)
+                            @case('rich_text')
                                 <section class="newsroom-preview-prose text-[16px] leading-8 text-slate-800">
                                     {!! $block['preview_html'] !!}
                                 </section>
                                 @break
 
-                            @case(AppSupportNewsroomBodyContract::BLOCK_IMAGE)
+                            @case('image')
                                 <figure class="overflow-hidden rounded-md bg-slate-100">
                                     @if ($block['preview_url'] ?? null)
                                         <img
@@ -137,7 +137,7 @@
                                 </figure>
                                 @break
 
-                            @case(AppSupportNewsroomBodyContract::BLOCK_QUOTE)
+                            @case('quote')
                                 <blockquote class="border-l-4 border-slate-900 bg-slate-50 px-6 py-5">
                                     <p class="text-lg leading-8 text-slate-900">„{{ $block['data']['text'] }}”</p>
                                     <footer class="mt-3 text-sm font-semibold text-slate-600">
@@ -149,7 +149,7 @@
                                 </blockquote>
                                 @break
 
-                            @case(AppSupportNewsroomBodyContract::BLOCK_TABLE)
+                            @case('table')
                                 <div class="overflow-x-auto border border-slate-200">
                                     <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
                                         @if ($block['data']['caption'])
@@ -175,7 +175,7 @@
                                 </div>
                                 @break
 
-                            @case(AppSupportNewsroomBodyContract::BLOCK_CONTEXT)
+                            @case('context')
                                 <aside class="border-l-4 border-[#efc54f] bg-[#fffdf3] px-6 py-5">
                                     @if ($block['data']['title'])
                                         <h2 class="text-lg font-semibold text-slate-950">{{ $block['data']['title'] }}</h2>
@@ -185,31 +185,31 @@
                                 </aside>
                                 @break
 
-                            @case(AppSupportNewsroomBodyContract::BLOCK_RELATED_ARTICLE)
+                            @case('related_article')
                                 <div class="border border-dashed border-slate-300 bg-slate-50 px-5 py-4 text-sm text-slate-700">
                                     Moduł publiczny N3: powiązany artykuł #{{ $block['data']['article_id'] }}
                                 </div>
                                 @break
 
-                            @case(AppSupportNewsroomBodyContract::BLOCK_LEGAL_REFERENCE)
+                            @case('legal_reference')
                                 <div class="border border-dashed border-slate-300 bg-slate-50 px-5 py-4 text-sm text-slate-700">
                                     Moduł publiczny N3: podstawa prawna #{{ $block['data']['legal_unit_id'] }}
                                 </div>
                                 @break
 
-                            @case(AppSupportNewsroomBodyContract::BLOCK_QUESTION_GROUP)
+                            @case('question_group')
                                 <div class="border border-dashed border-slate-300 bg-slate-50 px-5 py-4 text-sm text-slate-700">
                                     Moduł publiczny N3: grupa pytań ({{ count($block['data']['question_ids']) }})
                                 </div>
                                 @break
 
-                            @case(AppSupportNewsroomBodyContract::BLOCK_TRAFFIC_SIGN_GROUP)
+                            @case('traffic_sign_group')
                                 <div class="border border-dashed border-slate-300 bg-slate-50 px-5 py-4 text-sm text-slate-700">
                                     Moduł publiczny N3: grupa znaków ({{ count($block['data']['traffic_sign_ids']) }})
                                 </div>
                                 @break
 
-                            @case(AppSupportNewsroomBodyContract::BLOCK_PRODUCT_CTA)
+                            @case('product_cta')
                                 <div class="border border-dashed border-slate-300 bg-slate-50 px-5 py-4 text-sm text-slate-700">
                                     Moduł publiczny N3: CTA produktu „{{ $block['data']['kind'] }}”
                                 </div>
