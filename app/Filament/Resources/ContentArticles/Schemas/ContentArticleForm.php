@@ -290,7 +290,7 @@ class ContentArticleForm
     /**
      * @return list<Block>
      */
-    protected static function bodyBlocks(): array
+    public static function bodyBlocks(): array
     {
         return [
             Block::make(NewsroomBodyContract::BLOCK_RICH_TEXT)
@@ -538,7 +538,7 @@ class ContentArticleForm
             ->required();
     }
 
-    protected static function questionRelationSelect(): Select
+    public static function questionRelationSelect(): Select
     {
         return Select::make('question_id')
             ->label('Pytanie')
@@ -569,7 +569,7 @@ class ContentArticleForm
             ->required();
     }
 
-    protected static function topicSelect(): Select
+    public static function topicSelect(): Select
     {
         return Select::make('topic_ids')
             ->label('Tematy')
@@ -638,7 +638,7 @@ class ContentArticleForm
             ->required();
     }
 
-    protected static function trafficSignRelationSelect(): Select
+    public static function trafficSignRelationSelect(): Select
     {
         return Select::make('traffic_sign_id')
             ->label('Znak drogowy')
@@ -729,7 +729,7 @@ class ContentArticleForm
     /**
      * @return array<string, string>
      */
-    protected static function questionRelationTypeOptions(): array
+    public static function questionRelationTypeOptions(): array
     {
         return [
             'direct' => 'Bezpośrednio dotyczy',
@@ -742,7 +742,7 @@ class ContentArticleForm
     /**
      * @return array<string, string>
      */
-    protected static function legalRelationTypeOptions(): array
+    public static function legalRelationTypeOptions(): array
     {
         return [
             'direct_basis' => 'Bezpośrednia podstawa',
@@ -755,7 +755,7 @@ class ContentArticleForm
     /**
      * @return array<string, string>
      */
-    protected static function trafficSignRelationTypeOptions(): array
+    public static function trafficSignRelationTypeOptions(): array
     {
         return [
             'direct' => 'Bezpośrednio dotyczy',
@@ -767,7 +767,7 @@ class ContentArticleForm
     /**
      * @return array<string, string>
      */
-    protected static function sourceTypeOptions(): array
+    public static function sourceTypeOptions(): array
     {
         return [
             ContentArticleSourceType::Official->value => 'Oficjalne',
