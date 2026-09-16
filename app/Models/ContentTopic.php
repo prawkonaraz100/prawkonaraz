@@ -73,6 +73,14 @@ class ContentTopic extends Model
                 ]);
             }
         });
+
+        static::deleting(function (ContentTopic $topic): void {
+            if (! $topic->canBeDeleted()) {
+                throw ValidationException::withMessages([
+                    'topic' => 'Nie można usunąć topicu po pierwszej publikacji. Użyj archiwizacji, aby zachować historyczny URL.',
+                ]);
+            }
+        });
     }
 
     protected function casts(): array
@@ -155,6 +163,11 @@ class ContentTopic extends Model
     {
         return $this->isPubliclyVisible()
             && $this->meetsPublicationRequirements();
+    }
+
+    public function canBeDeleted(): bool
+    {
+        return $this->published_at === null;
     }
 
     public function getRouteKeyName(): string
