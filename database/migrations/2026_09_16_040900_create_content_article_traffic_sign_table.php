@@ -20,7 +20,6 @@ return new class extends Migration
             $table->smallInteger('sort_order')->default(0);
             $table->timestamps();
 
-            $table->unique(['article_id', 'traffic_sign_id']);
             $table->index(
                 ['traffic_sign_id', 'sort_order', 'article_id'],
                 'content_article_traffic_sign_reverse_idx',
