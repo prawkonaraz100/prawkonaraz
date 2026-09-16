@@ -80,9 +80,6 @@ jobs:
       - name: Run smoke verification
         run: php artisan ops:smoke-test --require-media
 
-      - name: Diagnose newsroom slug service tests
-        run: timeout 90s php artisan test tests/Feature/NewsroomSlugServiceTest.php --testdox
-
       - name: Run backend test suite
         run: php artisan test
 
