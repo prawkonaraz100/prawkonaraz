@@ -2,7 +2,6 @@
 
 namespace App\Support;
 
-use App\Enums\ContentArticleSourceType;
 use App\Enums\ContentArticleType;
 use App\Enums\ContentArticleWorkflowStatus;
 use App\Events\ContentArticleWorkflowTransitioned;
@@ -24,6 +23,7 @@ final class ContentArticlePublishingService
     public function __construct(
         private readonly AuditLogService $auditLogService,
         private readonly ContentArticleEditToken $editToken,
+        private readonly ContentArticlePublicationChecklist $publicationChecklist,
         private readonly ContentArticleSlugService $slugService,
     ) {}
 
@@ -32,7 +32,7 @@ final class ContentArticlePublishingService
         return DB::transaction(function () use ($article, $actor): ContentArticle {
             $locked = $this->lockArticle($article);
             $this->assertStatus($locked, [ContentArticleWorkflowStatus::Draft], 'submit for review');
-            $this->assertReviewReady($locked);
+            $this->publicationChecklist->assertReviewReady($locked);
 
             $from = $locked->workflow_status;
             $locked->workflow_status = ContentArticleWorkflowStatus::InReview;
@@ -85,7 +85,7 @@ final class ContentArticlePublishingService
                 ContentArticleWorkflowStatus::NeedsReview,
                 ContentArticleWorkflowStatus::Archived,
             ], 'mark reviewed');
-            $this->assertPublicationReady($locked);
+            $this->publicationChecklist->assertPublicationReady($locked);
 
             $locked->reviewed_at = now();
             $locked->save();
@@ -125,8 +125,8 @@ final class ContentArticlePublishingService
                 throw new DomainException('Scheduled publication time must be in the future.');
             }
 
-            $this->assertPublicationReady($locked);
-            $this->assertFreshReview($locked);
+            $this->publicationChecklist->assertPublicationReady($locked);
+            $this->publicationChecklist->assertFreshReview($locked);
 
             $from = $locked->workflow_status;
             $locked->workflow_status = ContentArticleWorkflowStatus::Scheduled;
@@ -168,8 +168,8 @@ final class ContentArticlePublishingService
             throw new DomainException('Scheduled article is not due at the requested preview time.');
         }
 
-        $this->assertPublicationReady($article, $previewAt);
-        $this->assertFreshReview($article);
+        $this->publicationChecklist->assertPublicationReady($article, $previewAt);
+        $this->publicationChecklist->assertFreshReview($article);
     }
 
     public function publish(
@@ -198,8 +198,8 @@ final class ContentArticlePublishingService
                 }
             }
 
-            $this->assertPublicationReady($locked);
-            $this->assertFreshReview($locked);
+            $this->publicationChecklist->assertPublicationReady($locked);
+            $this->publicationChecklist->assertFreshReview($locked);
 
             return $this->publishLocked($locked, $actor, $trigger, 'content_article.published');
         });
@@ -275,8 +275,8 @@ final class ContentArticlePublishingService
             $locked = $this->lockArticle($article);
             $this->assertStatus($locked, [ContentArticleWorkflowStatus::Archived], 'republish');
             $this->assertPreviouslyPublished($locked);
-            $this->assertPublicationReady($locked);
-            $this->assertFreshReview($locked);
+            $this->publicationChecklist->assertPublicationReady($locked);
+            $this->publicationChecklist->assertFreshReview($locked);
 
             return $this->publishLocked(
                 $locked,
@@ -603,7 +603,7 @@ final class ContentArticlePublishingService
             $locked = NewsroomArticleSourcesEditorAdapter::sync($locked, $sources);
             $locked = NewsroomArticleRelationsEditorAdapter::sync($locked, $relations)->refresh();
 
-            $this->assertPublicationReady($locked);
+            $this->publicationChecklist->assertPublicationReady($locked);
 
             $substantiveChange = ! hash_equals(
                 $beforePublicFingerprint,
@@ -674,225 +674,10 @@ final class ContentArticlePublishingService
         return $article->refresh();
     }
 
-    private function assertReviewReady(ContentArticle $article): void
-    {
-        $this->assertRequiredText($article->title, 'title');
-        $this->assertRequiredText($article->slug, 'slug');
-        $this->assertRequiredText($article->lead, 'lead');
-
-        $type = $this->articleType($article);
-        NewsroomRouteContract::canonicalPath($type->value, (string) $article->slug);
-
-        if ($article->category_id === null) {
-            throw new DomainException('Content article category is required.');
-        }
-
-        if ($article->author_id === null) {
-            throw new DomainException('Content article author is required.');
-        }
-
-        $body = is_array($article->body_blocks) ? $article->body_blocks : [];
-        $version = (int) ($article->body_schema_version ?? 0);
-        $normalized = NewsroomBodyContract::normalize($body, $version);
-
-        if ($normalized === []) {
-            throw new DomainException('Content article requires at least one renderable body block.');
-        }
-
-        $this->assertSourcePolicy($article, $type);
-        $this->assertKeyPoints($article);
-    }
-
-    private function assertPublicationReady(
-        ContentArticle $article,
-        ?DateTimeInterface $at = null,
-    ): void {
-        $this->assertReviewReady($article);
-
-        $category = $article->category()->first();
-
-        if ($category === null || ! $category->isPublicationEligible()) {
-            throw new DomainException('Content article requires an active category.');
-        }
-
-        $author = $article->author()->first();
-
-        if ($author === null || ! $author->isPubliclyVisible()) {
-            throw new DomainException('Content article requires a published author.');
-        }
-
-        if (filled($article->hero_image_path)) {
-            $this->assertRequiredText($article->hero_image_alt, 'hero_image_alt');
-
-            if ((int) $article->hero_image_width < 1 || (int) $article->hero_image_height < 1) {
-                throw new DomainException('Hero image requires positive width and height.');
-            }
-        }
-
-        if (filled($article->og_image_path)) {
-            $canInheritHeroAlt = filled($article->hero_image_alt)
-                && $article->og_image_path === $article->hero_image_path;
-
-            if (! filled($article->og_image_alt) && ! $canInheritHeroAlt) {
-                throw new DomainException('OG image requires its own alt unless it reuses the hero asset.');
-            }
-
-            if ((int) $article->og_image_width < 1 || (int) $article->og_image_height < 1) {
-                throw new DomainException('OG image requires positive width and height.');
-            }
-        }
-
-        $this->assertBreakingInvariant($article, $at);
-    }
-
     private function assertPreviouslyPublished(ContentArticle $article): void
     {
         if ($article->first_published_at === null) {
             throw new DomainException('Content article transition requires a previously published article.');
-        }
-    }
-
-    private function assertFreshReview(ContentArticle $article): void
-    {
-        if ($article->reviewed_at === null) {
-            throw new DomainException('Content article requires a completed review.');
-        }
-
-        $reference = collect([
-            $article->needs_review_at,
-            $article->archived_at,
-            $article->withdrawn_at,
-        ])
-            ->filter()
-            ->sortByDesc(fn ($date) => $date->getTimestamp())
-            ->first();
-
-        if ($reference !== null && ! $article->reviewed_at->gt($reference)) {
-            throw new DomainException('Content article requires a fresh review after its latest public-state change.');
-        }
-    }
-
-    private function assertSourcePolicy(ContentArticle $article, ContentArticleType $articleType): void
-    {
-        $sources = $article->sources()->get();
-
-        if ($articleType === ContentArticleType::News && $sources->isEmpty()) {
-            throw new DomainException('News article requires at least one source.');
-        }
-
-        foreach ($sources as $source) {
-            $this->assertRequiredText($source->title, 'source title');
-
-            $sourceType = ContentArticleSourceType::tryFrom((string) $source->getRawOriginal('source_type'));
-
-            if ($sourceType === null) {
-                throw new DomainException('Content article source has an unsupported source_type.');
-            }
-
-            if (filled($source->url) && ! $this->isSafeHttpUrl($source->url)) {
-                throw new DomainException('Content article source URL must use a valid http or https URL.');
-            }
-        }
-
-        if ($articleType !== ContentArticleType::News) {
-            return;
-        }
-
-        $category = $article->category()->first();
-
-        if ($category?->slug !== 'przepisy') {
-            return;
-        }
-
-        $legalPrimarySources = $sources->filter(function ($source): bool {
-            if (! $source->is_primary) {
-                return false;
-            }
-
-            $sourceType = ContentArticleSourceType::tryFrom((string) $source->getRawOriginal('source_type'));
-
-            return in_array($sourceType, [
-                ContentArticleSourceType::Official,
-                ContentArticleSourceType::Legislation,
-            ], true);
-        });
-
-        if ($legalPrimarySources->isEmpty()) {
-            return;
-        }
-
-        $hasPublicPrimaryUrl = $legalPrimarySources->contains(
-            fn ($source): bool => $source->is_publicly_cited && $this->isSafeHttpUrl($source->url),
-        );
-
-        if (! $hasPublicPrimaryUrl) {
-            throw new DomainException(
-                'Legal news with a primary official or legislation source requires a publicly cited http or https URL.',
-            );
-        }
-    }
-
-    private function isSafeHttpUrl(mixed $value): bool
-    {
-        if (! is_string($value)) {
-            return false;
-        }
-
-        $url = trim($value);
-
-        if ($url === '' || filter_var($url, FILTER_VALIDATE_URL) === false) {
-            return false;
-        }
-
-        return in_array(
-            strtolower((string) parse_url($url, PHP_URL_SCHEME)),
-            ['http', 'https'],
-            true,
-        );
-    }
-
-    private function assertKeyPoints(ContentArticle $article): void
-    {
-        if ($article->key_points === null) {
-            return;
-        }
-
-        if (! is_array($article->key_points) || count($article->key_points) < 2 || count($article->key_points) > 5) {
-            throw new DomainException('Content article key points must contain between 2 and 5 items.');
-        }
-
-        foreach ($article->key_points as $point) {
-            if (
-                ! is_string($point)
-                || trim($point) === ''
-                || strip_tags($point) !== $point
-            ) {
-                throw new DomainException('Content article key points must be non-empty plain text.');
-            }
-        }
-    }
-
-    private function assertBreakingInvariant(
-        ContentArticle $article,
-        ?DateTimeInterface $at = null,
-    ): void {
-        if (! $article->is_breaking) {
-            return;
-        }
-
-        if ($this->articleType($article) !== ContentArticleType::News) {
-            throw new DomainException('Breaking article must be a news article.');
-        }
-
-        $referenceAt = $at === null
-            ? now()
-            : Carbon::parse($at->format(DATE_ATOM));
-
-        if (
-            $article->breaking_expires_at === null
-            || $article->breaking_expires_at->lte($referenceAt)
-        ) {
-            throw new DomainException('Breaking article requires a future expiration timestamp after the evaluated publication time.');
         }
     }
 
@@ -942,13 +727,6 @@ final class ContentArticlePublishingService
         return $article->workflow_status instanceof ContentArticleWorkflowStatus
             ? $article->workflow_status->value
             : (string) $article->workflow_status;
-    }
-
-    private function assertRequiredText(mixed $value, string $field): void
-    {
-        if (! is_string($value) || trim($value) === '') {
-            throw new DomainException("Content article {$field} is required.");
-        }
     }
 
     private function assertTrigger(string $trigger): void

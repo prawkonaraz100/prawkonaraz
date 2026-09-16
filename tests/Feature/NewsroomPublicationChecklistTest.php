@@ -1,0 +1,117 @@
+<?php
+
+use App\Filament\Resources\ContentArticles\Pages\EditContentArticle;
+use App\Models\ContentArticle;
+use App\Models\ContentArticleSource;
+use App\Models\ContentCategory;
+use App\Models\User;
+use App\Support\ContentArticlePublicationChecklist;
+use App\Support\ContentArticlePublishingService;
+use Livewire\Livewire;
+
+test('publication checklist exposes precise blocking items for an incomplete article', function () {
+    $article = ContentArticle::factory()->draft()->create([
+        'title' => '',
+        'slug' => '',
+        'lead' => '',
+        'author_id' => null,
+        'body_blocks' => [],
+    ]);
+
+    $items = collect(app(ContentArticlePublicationChecklist::class)->items($article))
+        ->keyBy('key');
+
+    expect($items['title']['state'])->toBe(ContentArticlePublicationChecklist::STATE_BLOCKING)
+        ->and($items['slug']['state'])->toBe(ContentArticlePublicationChecklist::STATE_BLOCKING)
+        ->and($items['author']['state'])->toBe(ContentArticlePublicationChecklist::STATE_BLOCKING)
+        ->and($items['lead']['state'])->toBe(ContentArticlePublicationChecklist::STATE_BLOCKING)
+        ->and($items['body']['state'])->toBe(ContentArticlePublicationChecklist::STATE_BLOCKING)
+        ->and($items['sources']['state'])->toBe(ContentArticlePublicationChecklist::STATE_BLOCKING)
+        ->and($items['review']['state'])->toBe(ContentArticlePublicationChecklist::STATE_BLOCKING)
+        ->and($items['title']['message'])->toContain('title is required')
+        ->and($items['sources']['message'])->toContain('requires at least one source');
+});
+
+test('publication warnings do not block a valid reviewed article from publishing', function () {
+    $article = ContentArticle::factory()->inReview()->create([
+        'hero_image_path' => null,
+        'seo_description' => null,
+    ]);
+
+    ContentArticleSource::factory()
+        ->for($article, 'article')
+        ->create();
+
+    $service = app(ContentArticlePublishingService::class);
+    $reviewed = $service->markReviewed($article);
+
+    $items = collect(app(ContentArticlePublicationChecklist::class)->items($reviewed));
+    $blocking = $items->where('state', ContentArticlePublicationChecklist::STATE_BLOCKING);
+    $warnings = $items->where('state', ContentArticlePublicationChecklist::STATE_WARNING);
+
+    expect($blocking)->toBeEmpty()
+        ->and($warnings->pluck('key')->all())->toContain('hero_missing', 'seo_description_missing', 'related_questions_missing');
+
+    expect($service->publish($reviewed)->workflow_status->value)->toBe('published');
+});
+
+test('publication checklist and publishing service share the same active category blocker', function () {
+    $inactiveCategory = ContentCategory::factory()->inactive()->create();
+    $article = ContentArticle::factory()->inReview()->create([
+        'category_id' => $inactiveCategory->id,
+    ]);
+
+    ContentArticleSource::factory()
+        ->for($article, 'article')
+        ->create();
+
+    $categoryItem = collect(app(ContentArticlePublicationChecklist::class)->items($article))
+        ->firstWhere('key', 'category');
+
+    expect($categoryItem['state'])->toBe(ContentArticlePublicationChecklist::STATE_BLOCKING)
+        ->and($categoryItem['message'])->toContain('active category');
+
+    expect(fn () => app(ContentArticlePublishingService::class)->markReviewed($article))
+        ->toThrow(DomainException::class, 'active category');
+});
+
+test('dedicated og asset without alt remains a blocking domain requirement', function () {
+    $article = ContentArticle::factory()->inReview()->create([
+        'hero_image_path' => 'newsroom/articles/source/hero.webp',
+        'hero_image_alt' => 'Opis hero',
+        'hero_image_width' => 1200,
+        'hero_image_height' => 630,
+        'og_image_path' => 'newsroom/articles/source/og.webp',
+        'og_image_alt' => null,
+        'og_image_width' => 1200,
+        'og_image_height' => 630,
+    ]);
+
+    ContentArticleSource::factory()
+        ->for($article, 'article')
+        ->create();
+
+    $ogItem = collect(app(ContentArticlePublicationChecklist::class)->items($article))
+        ->firstWhere('key', 'og');
+
+    expect($ogItem['state'])->toBe(ContentArticlePublicationChecklist::STATE_BLOCKING)
+        ->and($ogItem['message'])->toContain('requires its own alt');
+
+    expect(fn () => app(ContentArticlePublishingService::class)->markReviewed($article))
+        ->toThrow(DomainException::class, 'requires its own alt');
+});
+
+test('article edit form renders the computed publication checklist', function () {
+    $admin = User::factory()->admin()->create();
+    $article = ContentArticle::factory()->draft()->create([
+        'author_id' => null,
+    ]);
+
+    $this->actingAs($admin);
+
+    Livewire::test(EditContentArticle::class, ['record' => $article->getRouteKey()])
+        ->assertSee('Checklista publikacyjna')
+        ->assertSee('Gotowość do publikacji')
+        ->assertSee('BLOKUJE')
+        ->assertSee('OSTRZEŻENIE');
+});
