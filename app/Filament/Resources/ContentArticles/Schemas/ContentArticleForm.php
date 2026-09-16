@@ -14,6 +14,7 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\Builder as FormBuilder;
 use Filament\Forms\Components\Builder\Block;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
@@ -36,6 +37,8 @@ class ContentArticleForm
     {
         return $schema
             ->components([
+                Hidden::make('_edit_token')
+                    ->dehydrated(fn (?ContentArticle $record): bool => $record !== null),
                 Grid::make([
                     'lg' => 12,
                 ])->schema([
@@ -51,26 +54,26 @@ class ContentArticleForm
                                 ->default(ContentArticleType::News->value)
                                 ->native(false)
                                 ->required()
-                                ->disabled(fn (?ContentArticle $record): bool => static::publicFieldsLocked($record)),
+                                ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire)),
                             Select::make('category_id')
                                 ->label('Kategoria')
                                 ->relationship('category', 'name')
                                 ->searchable()
                                 ->preload()
                                 ->required()
-                                ->disabled(fn (?ContentArticle $record): bool => static::publicFieldsLocked($record)),
+                                ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire)),
                             TextInput::make('title')
                                 ->label('Tytuł')
                                 ->required()
                                 ->maxLength(255)
-                                ->disabled(fn (?ContentArticle $record): bool => static::publicFieldsLocked($record))
+                                ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire))
                                 ->columnSpanFull(),
                             TextInput::make('slug')
                                 ->label('Slug')
                                 ->regex('/\\A[a-z0-9-]+\\z/')
                                 ->maxLength(255)
                                 ->required(fn (?ContentArticle $record): bool => $record !== null)
-                                ->disabled(fn (?ContentArticle $record): bool => static::publicFieldsLocked($record))
+                                ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire))
                                 ->helperText('Przy tworzeniu może pozostać pusty — ContentArticleSlugService wygeneruje i zarezerwuje bezpieczny slug.')
                                 ->columnSpanFull(),
                             Select::make('author_id')
@@ -79,14 +82,14 @@ class ContentArticleForm
                                 ->searchable()
                                 ->preload()
                                 ->placeholder('Bez autora na etapie draftu')
-                                ->disabled(fn (?ContentArticle $record): bool => static::publicFieldsLocked($record)),
+                                ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire)),
                             Select::make('reviewer_id')
                                 ->label('Reviewer publiczny')
                                 ->relationship('reviewer', 'name')
                                 ->searchable()
                                 ->preload()
                                 ->placeholder('Bez reviewera')
-                                ->disabled(fn (?ContentArticle $record): bool => static::publicFieldsLocked($record)),
+                                ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire)),
                         ])
                         ->columns(2),
                     Section::make('Stan')
@@ -114,7 +117,7 @@ class ContentArticleForm
                         Textarea::make('lead')
                             ->label('Lead')
                             ->rows(5)
-                            ->disabled(fn (?ContentArticle $record): bool => static::publicFieldsLocked($record))
+                            ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire))
                             ->columnSpanFull(),
                     ]),
                 Section::make('Treść artykułu')
@@ -127,7 +130,7 @@ class ContentArticleForm
                             ->blockPickerColumns(2)
                             ->reorderableWithButtons()
                             ->collapsible()
-                            ->disabled(fn (?ContentArticle $record): bool => static::publicFieldsLocked($record))
+                            ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire))
                             ->columnSpanFull(),
                     ]),
                 Section::make('Źródła')
@@ -201,14 +204,14 @@ class ContentArticleForm
                                     ->columnSpanFull(),
                             ])
                             ->columns(2)
-                            ->disabled(fn (?ContentArticle $record): bool => static::publicFieldsLocked($record))
+                            ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire))
                             ->columnSpanFull(),
                     ]),
                 Section::make('Powiązania')
                     ->description('Relacje wskazują istniejące encje produktu. Pytania, przepisy i znaki zachowują kolejność redakcyjną; tematy nie mają ręcznego rankingu.')
                     ->schema([
                         static::topicSelect()
-                            ->disabled(fn (?ContentArticle $record): bool => static::publicFieldsLocked($record))
+                            ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire))
                             ->columnSpanFull(),
                         Repeater::make('question_relations')
                             ->label('Pytania')
@@ -231,7 +234,7 @@ class ContentArticleForm
                                     ->columnSpanFull(),
                             ])
                             ->columns(2)
-                            ->disabled(fn (?ContentArticle $record): bool => static::publicFieldsLocked($record))
+                            ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire))
                             ->columnSpanFull(),
                         Repeater::make('legal_unit_relations')
                             ->label('Podstawy prawne')
@@ -254,7 +257,7 @@ class ContentArticleForm
                                     ->columnSpanFull(),
                             ])
                             ->columns(2)
-                            ->disabled(fn (?ContentArticle $record): bool => static::publicFieldsLocked($record))
+                            ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire))
                             ->columnSpanFull(),
                         Repeater::make('traffic_sign_relations')
                             ->label('Znaki drogowe')
@@ -273,7 +276,7 @@ class ContentArticleForm
                                     ->required(),
                             ])
                             ->columns(2)
-                            ->disabled(fn (?ContentArticle $record): bool => static::publicFieldsLocked($record))
+                            ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire))
                             ->columnSpanFull(),
                     ]),
                 Section::make('Notatka wewnętrzna')
@@ -863,9 +866,17 @@ class ContentArticleForm
         ];
     }
 
-    protected static function publicFieldsLocked(?ContentArticle $record): bool
+    protected static function publicFieldsLocked(?ContentArticle $record, mixed $livewire = null): bool
     {
-        return $record?->isPubliclyVisible() ?? false;
+        if (! ($record?->isPubliclyVisible() ?? false)) {
+            return false;
+        }
+
+        return ! (
+            is_object($livewire)
+            && method_exists($livewire, 'isPublicUpdateMode')
+            && $livewire->isPublicUpdateMode()
+        );
     }
 
     protected static function workflowLabel(?ContentArticle $record): string
