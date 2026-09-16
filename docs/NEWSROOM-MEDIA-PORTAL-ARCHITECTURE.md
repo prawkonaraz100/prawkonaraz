@@ -1384,7 +1384,7 @@ Newsroom v1 jest ukończony, gdy:
 10. Feed v1 używa `/aktualnosci/feed.xml`.
 11. Publiczne strony newsroomu są SSR/Blade-first.
 12. Strona główna korzysta z kontrolowanych placements i fallbacków, nie z pełnego page buildera.
-13. Body artykułu jest kontrolowanym dokumentem blokowym; szczegół serializacji domyka N0-004.
+13. Body artykułu jest kontrolowanym dokumentem blokowym; N0-004 zamknęło serializację jako `NewsroomBodyContract` v1 z canonical list `{key?, type, data}` i structured TipTap JSON dla rich text.
 14. Topic jest odrębnym bytem od taga.
 15. Media używają focal point i deterministycznych cropów, jeśli pipeline je wspiera.
 16. Audio/AI są rozszerzeniami po v1, bez prealokowania schema.
@@ -1412,7 +1412,6 @@ Newsroom v1 jest ukończony, gdy:
 
 ### 25.2. Otwarte decyzje N0 wymagające domknięcia przed implementacją zależnych elementów
 
-- konkretny komponent block editora, serializacja payloadów i techniczna strategia sanitization (`NEWSROOM-N0-004`),
 - finalne wspólne design tokens używane przez newsroom po audycie obecnego publicznego UI.
 
 Pozostałe szczegóły nie powinny blokować N1, jeśli nie wpływają na schema, bezpieczeństwo body albo publiczny routing.
