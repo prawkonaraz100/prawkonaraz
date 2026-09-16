@@ -42,6 +42,7 @@ use App\Http\Controllers\LegalContentController;
 use App\Http\Controllers\LlmsTextController;
 use App\Http\Controllers\MeProfileController;
 use App\Http\Controllers\MethodologyPageController;
+use App\Http\Controllers\NewsroomPlaceholderController;
 use App\Http\Controllers\ModeratorAccountsController;
 use App\Http\Controllers\PartnersPageController;
 use App\Http\Controllers\PjmSessionPageController;
@@ -75,6 +76,7 @@ use App\Http\Middleware\MarkReturningUser;
 use App\Http\Middleware\TrackUserIpActivity;
 use App\Models\Question;
 use App\Models\StudySession;
+use App\Support\NewsroomRouteContract;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Http\Request;
 use Illuminate\Session\Middleware\StartSession;
@@ -171,11 +173,19 @@ Route::get('/szkolenia-z-instruktorem', fn () => Inertia::render('Public/Marketi
     'eyebrow' => 'Wsparcie',
     'description' => 'To miejsce jest przygotowane pod ofertę szkoleń z instruktorem i dalszą prezentację szczegółów współpracy.',
 ]))->name('public.instructor-training');
-Route::get('/aktualnosci', fn () => Inertia::render('Public/MarketingPlaceholder', [
-    'title' => 'Aktualności',
-    'eyebrow' => 'Serwis',
-    'description' => 'Tu pojawią się aktualności dla kandydatów, kursantów i instruktorów prawa jazdy.',
-]))->name('public.news');
+Route::get('/aktualnosci', [NewsroomPlaceholderController::class, 'news'])
+    ->name('public.news');
+Route::get('/aktualnosci/feed.xml', fn () => abort(404))
+    ->name('public.news.feed');
+Route::get('/aktualnosci/kategoria/{categorySlug}', fn () => abort(404))
+    ->where('categorySlug', NewsroomRouteContract::SLUG_PATTERN)
+    ->name('public.news.categories.show');
+Route::get('/aktualnosci/temat/{topicSlug}', fn () => abort(404))
+    ->where('topicSlug', NewsroomRouteContract::SLUG_PATTERN)
+    ->name('public.news.topics.show');
+Route::get('/aktualnosci/{articleSlug}', fn () => abort(404))
+    ->where('articleSlug', NewsroomRouteContract::NEWSROOM_ARTICLE_SLUG_PATTERN)
+    ->name('public.news.show');
 Route::get('/reklama', fn () => Inertia::render('Public/MarketingPlaceholder', [
     'title' => 'Reklama',
     'eyebrow' => 'Współpraca',
@@ -190,11 +200,11 @@ Route::get('/przepisy/{slug}', [LegalContentController::class, 'show'])
     ->name('public.regulations.show');
 Route::get('/metodologia/przepisy-i-podstawy-prawne', [LegalContentController::class, 'methodology'])
     ->name('public.regulations.methodology');
-Route::get('/poradniki', fn () => Inertia::render('Public/MarketingPlaceholder', [
-    'title' => 'Poradniki',
-    'eyebrow' => 'Nauka',
-    'description' => 'W poradnikach zbierzemy praktyczne materiały pomagające przejść od teorii do pewnego wyniku na egzaminie.',
-]))->name('public.guides');
+Route::get('/poradniki', [NewsroomPlaceholderController::class, 'guides'])
+    ->name('public.guides');
+Route::get('/poradniki/{articleSlug}', fn () => abort(404))
+    ->where('articleSlug', NewsroomRouteContract::SLUG_PATTERN)
+    ->name('public.guides.show');
 Route::get('/spolecznosc', fn () => Inertia::render('Public/MarketingPlaceholder', [
     'title' => 'Społeczność',
     'eyebrow' => 'Użytkownicy',
