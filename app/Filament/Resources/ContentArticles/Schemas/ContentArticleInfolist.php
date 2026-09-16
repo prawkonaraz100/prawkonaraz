@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\ContentArticles\Schemas;
 
+use App\Enums\ContentArticleOriginType;
+use App\Enums\ContentArticleRegulatoryStatus;
 use App\Enums\ContentArticleType;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
@@ -77,6 +79,73 @@ class ContentArticleInfolist
                                 ->dateTime('d.m.Y H:i'),
                         ]),
                 ]),
+                Section::make('Pochodzenie i kontekst')
+                    ->schema([
+                        TextEntry::make('origin_type')
+                            ->label('Pochodzenie')
+                            ->formatStateUsing(fn (mixed $state): string => static::originLabel($state)),
+                        TextEntry::make('regulatory_status')
+                            ->label('Status regulacyjny')
+                            ->formatStateUsing(fn (mixed $state): string => static::regulatoryLabel($state)),
+                        TextEntry::make('effective_from')
+                            ->label('Obowiązuje od')
+                            ->date('d.m.Y')
+                            ->placeholder('-'),
+                        TextEntry::make('change_summary')
+                            ->label('Co się zmienia')
+                            ->placeholder('-')
+                            ->columnSpanFull(),
+                        TextEntry::make('applies_to')
+                            ->label('Kogo dotyczy')
+                            ->placeholder('-'),
+                        TextEntry::make('exam_impact')
+                            ->label('Wpływ na egzamin')
+                            ->placeholder('-'),
+                    ])
+                    ->columns(2),
+                Section::make('Media / art direction')
+                    ->schema([
+                        TextEntry::make('hero_image_path')
+                            ->label('Hero path')
+                            ->placeholder('-')
+                            ->columnSpanFull(),
+                        TextEntry::make('hero_image_alt')
+                            ->label('Hero alt')
+                            ->placeholder('-'),
+                        TextEntry::make('hero_dimensions_display')
+                            ->label('Hero wymiary')
+                            ->state(fn ($record): string => static::dimensionsLabel(
+                                $record?->hero_image_width,
+                                $record?->hero_image_height,
+                            )),
+                        TextEntry::make('hero_focal_display')
+                            ->label('Focal point')
+                            ->state(fn ($record): string => static::focalLabel(
+                                $record?->hero_focal_x,
+                                $record?->hero_focal_y,
+                            )),
+                        TextEntry::make('og_image_path')
+                            ->label('OG path')
+                            ->placeholder('-')
+                            ->columnSpanFull(),
+                        TextEntry::make('og_image_alt')
+                            ->label('OG alt')
+                            ->placeholder('-'),
+                        TextEntry::make('og_dimensions_display')
+                            ->label('OG wymiary')
+                            ->state(fn ($record): string => static::dimensionsLabel(
+                                $record?->og_image_width,
+                                $record?->og_image_height,
+                            )),
+                        TextEntry::make('image_credit')
+                            ->label('Credit')
+                            ->placeholder('-'),
+                        TextEntry::make('image_license_note')
+                            ->label('Notatka licencyjna (backoffice)')
+                            ->placeholder('-')
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2),
                 Section::make('Notatka wewnętrzna')
                     ->schema([
                         TextEntry::make('editorial_note')
@@ -84,6 +153,53 @@ class ContentArticleInfolist
                             ->placeholder('-'),
                     ]),
             ]);
+    }
+
+    protected static function originLabel(mixed $state): string
+    {
+        $value = $state instanceof ContentArticleOriginType ? $state->value : (string) $state;
+
+        return match ($value) {
+            'original' => 'Oryginalny materiał',
+            'compiled' => 'Opracowanie wielu źródeł',
+            'official_source' => 'Źródło oficjalne',
+            'data_analysis' => 'Analiza danych',
+            'licensed_agency' => 'Agencyjny/licencjonowany',
+            default => $value,
+        };
+    }
+
+    protected static function regulatoryLabel(mixed $state): string
+    {
+        $value = $state instanceof ContentArticleRegulatoryStatus ? $state->value : (string) $state;
+
+        return match ($value) {
+            'not_applicable' => 'Nie dotyczy',
+            'proposal' => 'Projekt',
+            'consultation' => 'Konsultacje',
+            'official_announcement' => 'Oficjalna zapowiedź',
+            'adopted_future' => 'Przyjęte — przyszłe',
+            'in_force' => 'Obowiązuje',
+            default => $value,
+        };
+    }
+
+    protected static function dimensionsLabel(mixed $width, mixed $height): string
+    {
+        return (int) $width > 0 && (int) $height > 0
+            ? ((int) $width).' × '.((int) $height).' px'
+            : '-';
+    }
+
+    protected static function focalLabel(mixed $x, mixed $y): string
+    {
+        if ($x === null || $y === null) {
+            return 'Środek (fallback)';
+        }
+
+        return number_format((float) $x, 2, '.', '')
+            .' / '
+            .number_format((float) $y, 2, '.', '');
     }
 
     protected static function typeLabel(mixed $state): string

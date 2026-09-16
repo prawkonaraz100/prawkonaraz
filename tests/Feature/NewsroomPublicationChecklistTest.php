@@ -7,6 +7,9 @@ use App\Models\ContentCategory;
 use App\Models\User;
 use App\Support\ContentArticlePublicationChecklist;
 use App\Support\ContentArticlePublishingService;
+use App\Support\NewsroomArticleMediaService;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
 test('publication checklist exposes precise blocking items for an incomplete article', function () {
@@ -81,15 +84,35 @@ test('publication checklist and publishing service share the same active categor
 });
 
 test('dedicated og asset without alt remains a blocking domain requirement', function () {
+    Storage::fake('public');
+    config()->set('media.public_disk', 'public');
+    config()->set('media.newsroom_disk', 'public');
+    config()->set('media.newsroom_prefix', 'newsroom/articles');
+    config()->set('media.public_base_url', 'https://cdn.example.test/media');
+
+    $png = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9ZQMcAAAAASUVORK5CYII=', true);
+
+    $heroFile = tempnam(sys_get_temp_dir(), 'newsroom-hero-');
+    file_put_contents($heroFile, $png);
+    $hero = app(NewsroomArticleMediaService::class)->store(
+        new UploadedFile($heroFile, 'hero.png', 'image/png', null, true),
+    );
+
+    $ogFile = tempnam(sys_get_temp_dir(), 'newsroom-og-');
+    file_put_contents($ogFile, $png);
+    $og = app(NewsroomArticleMediaService::class)->store(
+        new UploadedFile($ogFile, 'og.png', 'image/png', null, true),
+    );
+
     $article = ContentArticle::factory()->inReview()->create([
-        'hero_image_path' => 'newsroom/articles/source/hero.webp',
+        'hero_image_path' => $hero['path'],
         'hero_image_alt' => 'Opis hero',
-        'hero_image_width' => 1200,
-        'hero_image_height' => 630,
-        'og_image_path' => 'newsroom/articles/source/og.webp',
+        'hero_image_width' => $hero['width'],
+        'hero_image_height' => $hero['height'],
+        'og_image_path' => $og['path'],
         'og_image_alt' => null,
-        'og_image_width' => 1200,
-        'og_image_height' => 630,
+        'og_image_width' => $og['width'],
+        'og_image_height' => $og['height'],
     ]);
 
     ContentArticleSource::factory()

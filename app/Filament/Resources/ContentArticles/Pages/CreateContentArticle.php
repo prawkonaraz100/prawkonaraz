@@ -5,6 +5,7 @@ namespace App\Filament\Resources\ContentArticles\Pages;
 use App\Filament\Resources\ContentArticles\ContentArticleResource;
 use App\Models\User;
 use App\Support\ContentArticleSlugService;
+use App\Support\NewsroomArticleProvenanceMediaAdapter;
 use App\Support\NewsroomArticleRelationsEditorAdapter;
 use App\Support\NewsroomBodyEditorAdapter;
 use Filament\Resources\Pages\CreateRecord;
@@ -24,6 +25,14 @@ class CreateContentArticle extends CreateRecord
         } catch (InvalidArgumentException $exception) {
             throw ValidationException::withMessages([
                 'data.body_blocks' => $exception->getMessage(),
+            ]);
+        }
+
+        try {
+            $data = NewsroomArticleProvenanceMediaAdapter::normalizeArticleData($data);
+        } catch (InvalidArgumentException $exception) {
+            throw ValidationException::withMessages([
+                'data.origin_type' => $exception->getMessage(),
             ]);
         }
 

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\ContentArticles\Tables;
 
+use App\Enums\ContentArticleOriginType;
+use App\Enums\ContentArticleRegulatoryStatus;
 use App\Enums\ContentArticleType;
 use App\Enums\ContentArticleWorkflowStatus;
 use App\Models\ContentArticle;
@@ -43,6 +45,16 @@ class ContentArticlesTable
                 TextColumn::make('category.name')
                     ->label('Kategoria')
                     ->sortable(),
+                TextColumn::make('origin_type')
+                    ->label('Pochodzenie')
+                    ->formatStateUsing(fn (mixed $state): string => static::originLabel($state))
+                    ->badge()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('regulatory_status')
+                    ->label('Status regulacyjny')
+                    ->formatStateUsing(fn (mixed $state): string => static::regulatoryLabel($state))
+                    ->badge()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('workflow_status')
                     ->label('Workflow')
                     ->formatStateUsing(fn (mixed $state): string => static::workflowLabel($state))
@@ -95,6 +107,12 @@ class ContentArticlesTable
                 SelectFilter::make('type')
                     ->label('Typ')
                     ->options(static::typeOptions()),
+                SelectFilter::make('origin_type')
+                    ->label('Pochodzenie')
+                    ->options(static::originOptions()),
+                SelectFilter::make('regulatory_status')
+                    ->label('Status regulacyjny')
+                    ->options(static::regulatoryOptions()),
                 SelectFilter::make('category_id')
                     ->label('Kategoria')
                     ->relationship('category', 'name')
@@ -181,6 +199,35 @@ class ContentArticlesTable
     /**
      * @return array<string, string>
      */
+    protected static function originOptions(): array
+    {
+        return [
+            ContentArticleOriginType::Original->value => 'Oryginalny',
+            ContentArticleOriginType::Compiled->value => 'Opracowanie',
+            ContentArticleOriginType::OfficialSource->value => 'Źródło oficjalne',
+            ContentArticleOriginType::DataAnalysis->value => 'Analiza danych',
+            ContentArticleOriginType::LicensedAgency->value => 'Agencyjny/licencjonowany',
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected static function regulatoryOptions(): array
+    {
+        return [
+            ContentArticleRegulatoryStatus::NotApplicable->value => 'Nie dotyczy',
+            ContentArticleRegulatoryStatus::Proposal->value => 'Projekt',
+            ContentArticleRegulatoryStatus::Consultation->value => 'Konsultacje',
+            ContentArticleRegulatoryStatus::OfficialAnnouncement->value => 'Oficjalna zapowiedź',
+            ContentArticleRegulatoryStatus::AdoptedFuture->value => 'Przyjęte — przyszłe',
+            ContentArticleRegulatoryStatus::InForce->value => 'Obowiązuje',
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
     protected static function workflowOptions(): array
     {
         return [
@@ -199,6 +246,20 @@ class ContentArticlesTable
         $value = $state instanceof ContentArticleType ? $state->value : (string) $state;
 
         return static::typeOptions()[$value] ?? $value;
+    }
+
+    protected static function originLabel(mixed $state): string
+    {
+        $value = $state instanceof ContentArticleOriginType ? $state->value : (string) $state;
+
+        return static::originOptions()[$value] ?? $value;
+    }
+
+    protected static function regulatoryLabel(mixed $state): string
+    {
+        $value = $state instanceof ContentArticleRegulatoryStatus ? $state->value : (string) $state;
+
+        return static::regulatoryOptions()[$value] ?? $value;
     }
 
     protected static function workflowLabel(mixed $state): string

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\ContentArticles\Schemas;
 
+use App\Enums\ContentArticleOriginType;
+use App\Enums\ContentArticleRegulatoryStatus;
 use App\Enums\ContentArticleSourceType;
 use App\Enums\ContentArticleType;
 use App\Models\ContentArticle;
@@ -10,11 +12,16 @@ use App\Models\LegalUnit;
 use App\Models\Question;
 use App\Models\TrafficSign;
 use App\Support\ContentArticlePublicationChecklist;
+use App\Support\NewsroomArticleMediaService;
 use App\Support\NewsroomBodyContract;
+use App\Support\NewsroomMediaStorage;
 use Filament\Actions\Action;
+use Filament\Forms\Components\BaseFileUpload;
 use Filament\Forms\Components\Builder as FormBuilder;
 use Filament\Forms\Components\Builder\Block;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
@@ -32,6 +39,7 @@ use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class ContentArticleForm
 {
@@ -45,7 +53,7 @@ class ContentArticleForm
                     'lg' => 12,
                 ])->schema([
                     Section::make('Tożsamość i klasyfikacja')
-                        ->description('Podstawowe pola artykułu. Workflow i ekspozycja są sterowane dedykowanymi actions; media pozostają osobnym etapem N2.')
+                        ->description('Podstawowe pola artykułu. Workflow i ekspozycja są sterowane dedykowanymi actions; provenance i media mają osobne kontrolowane sekcje.')
                         ->columnSpan([
                             'lg' => 8,
                         ])
@@ -113,6 +121,46 @@ class ContentArticleForm
                                 ->content('Builder zapisuje wyłącznie kontrolowany body_blocks schema v1. Embed pozostaje wyłączony do osobnego security/CSP gate.'),
                         ]),
                 ]),
+                Section::make('Pochodzenie i kontekst regulacyjny')
+                    ->description('Pochodzenie i status regulacyjny używają enumów domenowych. Aktywny kontekst regulacyjny jest finalnie sprawdzany razem ze źródłami przez publication checklist.')
+                    ->schema([
+                        Select::make('origin_type')
+                            ->label('Pochodzenie materiału')
+                            ->options(static::originTypeOptions())
+                            ->default(ContentArticleOriginType::Original->value)
+                            ->native(false)
+                            ->required()
+                            ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire)),
+                        Select::make('regulatory_status')
+                            ->label('Status regulacyjny')
+                            ->options(static::regulatoryStatusOptions())
+                            ->default(ContentArticleRegulatoryStatus::NotApplicable->value)
+                            ->native(false)
+                            ->required()
+                            ->live()
+                            ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire)),
+                        DatePicker::make('effective_from')
+                            ->label('Obowiązuje od')
+                            ->helperText('Wymagane dla statusu „przyjęte — przyszłe” i „obowiązuje”.')
+                            ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire)),
+                        Placeholder::make('regulatory_source_hint')
+                            ->label('Źródło regulacyjne')
+                            ->content('Dla aktywnego statusu backend wymaga publicznie cytowanego źródła official/legislation z bezpiecznym HTTP(S) URL.'),
+                        Textarea::make('change_summary')
+                            ->label('Co dokładnie się zmienia?')
+                            ->rows(3)
+                            ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire))
+                            ->columnSpanFull(),
+                        Textarea::make('applies_to')
+                            ->label('Kogo dotyczy?')
+                            ->rows(3)
+                            ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire)),
+                        Textarea::make('exam_impact')
+                            ->label('Czy wpływa na egzamin?')
+                            ->rows(3)
+                            ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire)),
+                    ])
+                    ->columns(2),
                 Section::make('Checklista publikacyjna')
                     ->description('Read-only stan zapisanej wersji rekordu. Te same domenowe reguły blokujące są ponownie egzekwowane przez ContentArticlePublishingService przy review, schedule i publish.')
                     ->schema([
@@ -289,6 +337,103 @@ class ContentArticleForm
                             ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire))
                             ->columnSpanFull(),
                     ]),
+                Section::make('Media / art direction')
+                    ->description('Hero i dedykowany OG zapisują immutable newsroom source path. Backend ponownie odczytuje bytes, MIME i dimensions przez NewsroomMediaStorage. Cropy poniżej są tylko podglądem art direction — nie deklarują fizycznych wariantów.')
+                    ->schema([
+                        FileUpload::make('hero_image_path')
+                            ->label('Hero image')
+                            ->image()
+                            ->disk(fn (): string => app(NewsroomMediaStorage::class)->disk())
+                            ->visibility('public')
+                            ->acceptedFileTypes(fn (): array => app(NewsroomMediaStorage::class)->allowedMimeTypes())
+                            ->maxSize(fn (): int => (int) ceil(app(NewsroomMediaStorage::class)->maxBytes() / 1024))
+                            ->saveUploadedFileUsing(
+                                fn (BaseFileUpload $_component, TemporaryUploadedFile $file): string => app(NewsroomArticleMediaService::class)->store($file)['path'],
+                            )
+                            ->helperText('JPEG/PNG/WebP/AVIF. Zapis zawsze tworzy nowy immutable source path; istniejący publiczny URL nie jest nadpisywany.')
+                            ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire))
+                            ->columnSpanFull(),
+                        TextInput::make('hero_image_alt')
+                            ->label('Hero alt')
+                            ->maxLength(500)
+                            ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire)),
+                        Textarea::make('hero_image_caption')
+                            ->label('Hero caption')
+                            ->rows(2)
+                            ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire)),
+                        TextInput::make('hero_focal_x')
+                            ->label('Focal X')
+                            ->numeric()
+                            ->minValue(0)
+                            ->maxValue(1)
+                            ->step(0.01)
+                            ->placeholder('0.50')
+                            ->helperText('0 = lewa krawędź, 1 = prawa. Brak wartości oznacza środek.')
+                            ->live(onBlur: true)
+                            ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire)),
+                        TextInput::make('hero_focal_y')
+                            ->label('Focal Y')
+                            ->numeric()
+                            ->minValue(0)
+                            ->maxValue(1)
+                            ->step(0.01)
+                            ->placeholder('0.50')
+                            ->helperText('0 = góra, 1 = dół. Brak wartości oznacza środek.')
+                            ->live(onBlur: true)
+                            ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire)),
+                        Hidden::make('hero_image_width'),
+                        Hidden::make('hero_image_height'),
+                        Hidden::make('og_image_width'),
+                        Hidden::make('og_image_height'),
+                        Placeholder::make('hero_dimensions')
+                            ->label('Zweryfikowane wymiary')
+                            ->content(fn (Get $get): string => static::dimensionsLabel(
+                                $get('hero_image_width'),
+                                $get('hero_image_height'),
+                            )),
+                        Placeholder::make('hero_crop_preview')
+                            ->label('Podgląd cropów z focal point')
+                            ->content(fn (Get $get): HtmlString|string => static::cropPreviewHtml(
+                                $get('hero_image_path'),
+                                $get('hero_focal_x'),
+                                $get('hero_focal_y'),
+                            ))
+                            ->columnSpanFull(),
+                        FileUpload::make('og_image_path')
+                            ->label('Dedykowany OG image')
+                            ->image()
+                            ->disk(fn (): string => app(NewsroomMediaStorage::class)->disk())
+                            ->visibility('public')
+                            ->acceptedFileTypes(fn (): array => app(NewsroomMediaStorage::class)->allowedMimeTypes())
+                            ->maxSize(fn (): int => (int) ceil(app(NewsroomMediaStorage::class)->maxBytes() / 1024))
+                            ->saveUploadedFileUsing(
+                                fn (BaseFileUpload $_component, TemporaryUploadedFile $file): string => app(NewsroomArticleMediaService::class)->store($file)['path'],
+                            )
+                            ->helperText('Opcjonalny. Gdy brak, publiczny renderer może użyć hero jako fallback. Dedykowany OG wymaga własnego alt.')
+                            ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire))
+                            ->columnSpanFull(),
+                        TextInput::make('og_image_alt')
+                            ->label('OG alt')
+                            ->maxLength(500)
+                            ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire)),
+                        Placeholder::make('og_dimensions')
+                            ->label('Zweryfikowane wymiary OG')
+                            ->content(fn (Get $get): string => static::dimensionsLabel(
+                                $get('og_image_width'),
+                                $get('og_image_height'),
+                            )),
+                        TextInput::make('image_credit')
+                            ->label('Credit obrazu')
+                            ->maxLength(500)
+                            ->helperText('Publiczny credit, jeśli jest wymagany.')
+                            ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire)),
+                        Textarea::make('image_license_note')
+                            ->label('Notatka licencyjna')
+                            ->rows(3)
+                            ->helperText('Tylko backoffice. Nie może trafić do publicznego renderera i może być zapisana bez public update.')
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2),
                 Section::make('Notatka wewnętrzna')
                     ->description('Pole tylko dla backoffice. Nie jest publiczną treścią artykułu i pozostaje edytowalne także dla publicznego rekordu.')
                     ->schema([
@@ -926,6 +1071,83 @@ class ContentArticleForm
             && method_exists($livewire, 'isPublicUpdateMode')
             && $livewire->isPublicUpdateMode()
         );
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected static function originTypeOptions(): array
+    {
+        return [
+            ContentArticleOriginType::Original->value => 'Oryginalny materiał',
+            ContentArticleOriginType::Compiled->value => 'Opracowanie wielu źródeł',
+            ContentArticleOriginType::OfficialSource->value => 'Na podstawie źródła oficjalnego',
+            ContentArticleOriginType::DataAnalysis->value => 'Analiza danych',
+            ContentArticleOriginType::LicensedAgency->value => 'Materiał agencyjny/licencjonowany',
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected static function regulatoryStatusOptions(): array
+    {
+        return [
+            ContentArticleRegulatoryStatus::NotApplicable->value => 'Nie dotyczy',
+            ContentArticleRegulatoryStatus::Proposal->value => 'Projekt',
+            ContentArticleRegulatoryStatus::Consultation->value => 'Konsultacje',
+            ContentArticleRegulatoryStatus::OfficialAnnouncement->value => 'Oficjalna zapowiedź',
+            ContentArticleRegulatoryStatus::AdoptedFuture->value => 'Przyjęte — przyszłe',
+            ContentArticleRegulatoryStatus::InForce->value => 'Obowiązuje',
+        ];
+    }
+
+    protected static function dimensionsLabel(mixed $width, mixed $height): string
+    {
+        $width = (int) $width;
+        $height = (int) $height;
+
+        return $width > 0 && $height > 0
+            ? "{$width} × {$height} px"
+            : 'Wymiary zostaną zapisane po server-side inspekcji assetu.';
+    }
+
+    protected static function cropPreviewHtml(mixed $path, mixed $focalX, mixed $focalY): HtmlString|string
+    {
+        if (! is_string($path) || trim($path) === '') {
+            return 'Dodaj i zapisz hero, aby zobaczyć podgląd cropów.';
+        }
+
+        try {
+            $url = app(NewsroomMediaStorage::class)->publicUrl(trim($path));
+        } catch (\Throwable) {
+            return 'Asset nie ma prawidłowego stabilnego newsroom URL.';
+        }
+
+        $x = is_numeric($focalX) ? max(0.0, min(1.0, (float) $focalX)) : 0.5;
+        $y = is_numeric($focalY) ? max(0.0, min(1.0, (float) $focalY)) : 0.5;
+        $position = number_format($x * 100, 1, '.', '').'% '.number_format($y * 100, 1, '.', '').'%';
+        $safeUrl = e($url);
+        $safePosition = e($position);
+
+        $cards = [
+            ['Lead 16:9', '16 / 9'],
+            ['Standard 4:3', '4 / 3'],
+            ['Compact 1:1', '1 / 1'],
+        ];
+
+        $html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">';
+
+        foreach ($cards as [$label, $ratio]) {
+            $html .= '<figure style="margin:0">'
+                .'<div style="aspect-ratio:'.$ratio.';overflow:hidden;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc">'
+                .'<img src="'.$safeUrl.'" alt="" style="width:100%;height:100%;object-fit:cover;object-position:'.$safePosition.'">'
+                .'</div>'
+                .'<figcaption style="margin-top:6px;font-size:12px;color:#64748b">'.e($label).' · preview CSS, bez pliku wariantu</figcaption>'
+                .'</figure>';
+        }
+
+        return new HtmlString($html.'</div>');
     }
 
     protected static function workflowLabel(?ContentArticle $record): string

@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Support\ContentArticleEditToken;
 use App\Support\ContentArticlePublishingService;
 use App\Support\ContentArticleSlugService;
+use App\Support\NewsroomArticleProvenanceMediaAdapter;
 use App\Support\NewsroomArticleRelationsEditorAdapter;
 use App\Support\NewsroomArticleSourcesEditorAdapter;
 use App\Support\NewsroomBodyEditorAdapter;
@@ -217,6 +218,7 @@ class EditContentArticle extends EditRecord
 
                 $locked->forceFill([
                     'editorial_note' => $data['editorial_note'] ?? $locked->editorial_note,
+                    'image_license_note' => $data['image_license_note'] ?? $locked->image_license_note,
                 ])->save();
 
                 return $locked->refresh();
@@ -241,6 +243,14 @@ class EditContentArticle extends EditRecord
         } catch (InvalidArgumentException $exception) {
             throw ValidationException::withMessages([
                 'data.body_blocks' => $exception->getMessage(),
+            ]);
+        }
+
+        try {
+            $data = NewsroomArticleProvenanceMediaAdapter::normalizeArticleData($data);
+        } catch (InvalidArgumentException $exception) {
+            throw ValidationException::withMessages([
+                'data.origin_type' => $exception->getMessage(),
             ]);
         }
 
