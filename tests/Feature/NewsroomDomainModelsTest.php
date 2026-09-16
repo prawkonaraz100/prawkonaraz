@@ -99,7 +99,9 @@ test('category and article category scopes preserve active publication invariant
         ->and($activeCategory->hasPubliclyVisibleArticles())->toBeTrue()
         ->and($activeCategory->hasActivelyDistributedArticles())->toBeTrue()
         ->and($activeCategory->canBeDeactivated())->toBeFalse()
-        ->and($emptyCategory->canBeDeactivated())->toBeTrue();
+        ->and($activeCategory->canBeDeleted())->toBeFalse()
+        ->and($emptyCategory->canBeDeactivated())->toBeTrue()
+        ->and($emptyCategory->canBeDeleted())->toBeTrue();
 });
 
 test('topic publication corpus baseline does not redefine published url visibility', function () {
