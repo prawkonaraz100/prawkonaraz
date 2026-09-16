@@ -3,6 +3,7 @@
 use App\Http\Controllers\AboutOrganizationController;
 use App\Http\Controllers\AccessActivationController;
 use App\Http\Controllers\AdminBackupFileController;
+use App\Http\Controllers\AdminContentArticlePreviewController;
 use App\Http\Controllers\AdminLegalContentQuestionReferenceController;
 use App\Http\Controllers\AdminLegalUnitSearchController;
 use App\Http\Controllers\AdminMediaController;
@@ -471,6 +472,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['auth'])->prefix('admin/backupy')->name('admin.backups.')->group(function () {
     Route::get('/pobierz', [AdminBackupFileController::class, 'download'])
         ->name('download');
+});
+
+Route::middleware(['auth'])->prefix('admin/newsroom')->name('admin.newsroom.')->group(function () {
+    Route::get('/articles/{contentArticle}/preview', AdminContentArticlePreviewController::class)
+        ->name('articles.preview');
 });
 
 Route::middleware(['auth', 'verified'])->prefix('admin/kolekcje-pytan')->name('admin.question-collections.')->group(function () {
