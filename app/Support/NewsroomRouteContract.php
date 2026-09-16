@@ -65,11 +65,10 @@ final class NewsroomRouteContract
         string $nextType,
         ?DateTimeInterface $firstPublishedAt,
     ): void {
-        if ($firstPublishedAt === null) {
-            return;
-        }
+        $currentFamily = self::familyForType($currentType);
+        $nextFamily = self::familyForType($nextType);
 
-        if (self::familyForType($currentType) === self::familyForType($nextType)) {
+        if ($firstPublishedAt === null || $currentFamily === $nextFamily) {
             return;
         }
 
