@@ -146,5 +146,5 @@ jobs:
           php artisan key:generate --force
 
       - name: Run newsroom PostgreSQL migration contract
-        run: php artisan test tests/Feature/Newsroom/NewsroomPostgresMigrationTest.php
+        run: php artisan test tests/Postgres/NewsroomPostgresMigrationTest.php
 
