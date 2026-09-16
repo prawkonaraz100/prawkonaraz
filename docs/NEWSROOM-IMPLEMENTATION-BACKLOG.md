@@ -708,6 +708,21 @@ Implementacja obejmuje warstwę domenową/read-model kompozycji oraz transakcyjn
 
 ## NEWSROOM-N2-002 — ContentArticleResource shell
 
+### Status implementacji
+
+**DONE — zmergowano PR #40 na `main@5a4f92e08c8618ff70270abb683f97bd88d02700` po zielonych jobach `quality` i `newsroom-postgres`.**
+
+### Aktualny stan implementacji
+
+- istnieje Filament `ContentArticleResource` z pages index/create/view/edit oraz rozdzielonymi Form/Infolist/Table,
+- create draft deleguje do istniejącego `ContentArticleSlugService`, więc generowanie lub jawny slug nadal przechodzi canonical/history reservation contract,
+- draftowe zmiany `type` i `slug` również delegują do `ContentArticleSlugService`; resource nie implementuje równoległej logiki route-family/history,
+- lista eager-loaduje `category`, `author` i `reviewer`, wyszukuje po title/slug/lead oraz ma filtry workflow/type/category/author/reviewer/featured/breaking/scheduled/freshness/published date,
+- dostęp pozostaje admin-only przez istniejący `User::canAccessPanel()` contract; moderator i student są odrzucani,
+- zalogowany `User` pozostaje aktorem AuditLog, a `ContentAuthor` publiczną tożsamością autora/reviewera,
+- dla `publiclyVisible()` zwykły Edit ma także server-side guard: publiczne pola nie są zapisywane, a shell pozwala w tej ścieżce tylko na wewnętrzny `editorial_note`,
+- Builder/RichEditor, sources, media, origin/regulatory fields, workflow actions, stale-write, preview i HomeComposer nie należą do N2-002 i pozostają otwarte.
+
 ### Zakres
 
 - Resource,
@@ -1671,12 +1686,12 @@ Docs-only:
 - [x] schema wdrożona
 - [x] models/factories
 - [x] publishing service
-- [ ] scheduling
+- [x] scheduling
 - [ ] public HTTP redirects / withdrawn 410 disposition
 
 ### CMS
 
-- [ ] article resource
+- [x] article resource
 - [x] category resource
 - [ ] topic resource
 - [ ] controlled block editor
@@ -1688,9 +1703,9 @@ Docs-only:
 - [ ] home composer + future preview
 - [ ] checklist
 - [ ] workflow
-- [ ] admin-only authorization bez rozszerzenia panel access
+- [x] admin-only authorization bez rozszerzenia panel access
 - [ ] stale-write rejection
-- [ ] AuditLog User actor / ContentAuthor identity separation
+- [x] AuditLog User actor / ContentAuthor identity separation
 
 ### Public
 
@@ -1931,7 +1946,7 @@ Nie oznaczać tasku DONE przed merge + green verification.
 Na 2026-09-16:
 
 - pakiet projektowy newsroomu obejmuje architekturę, model danych, CMS, UI, governance, SEO, backlog i runbook,
-- foundation N0 oraz pełny etap N1-001..N1-006 są wdrożone; N2 rozpoczęło się od `ContentCategoryResource`, ale pozostałe resources/editor/workflow UI i publiczny newsroom nadal nie są wdrożone,
+- foundation N0 oraz pełny etap N1-001..N1-006 są wdrożone; N2 ma już `ContentCategoryResource` i podstawowy `ContentArticleResource` shell, ale `ContentTopicResource`, Builder/editor, workflow/stale-write/preview/HomeComposer oraz publiczny newsroom nadal nie są wdrożone,
 - `/aktualnosci` i `/poradniki` nadal renderują pre-launch placeholder, teraz z dedykowanym `X-Robots-Tag: noindex, follow`; finalne detail/category/topic/feed route namespaces są zarejestrowane, ale pozostają 404 bez publicznych controllerów,
 - fundamenty ContentAuthor/legal/traffic signs/public SEO istnieją,
 - istnieją config/content.php organization, SchemaIds/SchemaRenderer oraz współdzielony SiteIdentitySchema; homepage i istniejące główne publiczne graph services korzystają z kanonicznego Organization/WebSite identity,
@@ -1946,13 +1961,24 @@ Na 2026-09-16:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N2-002 — ContentArticleResource shell.
+NEWSROOM-N2-003 — Block editor and sanitization.
 
-NEWSROOM-N2-001 jest zamknięte: category CRUD/order/active/article-counts oraz immutable-slug/delete/deactivation guards są wdrożone. Następny krok materializuje article resource shell bez wyprzedzania Builder/workflow/media zakresów kolejnych tasków N2.
+NEWSROOM-N2-002 jest zamknięte: podstawowy article resource shell, draft create/edit przez istniejący slug service, list/search/filters/eager loading, admin-only access oraz User actor / ContentAuthor identity separation są wdrożone. Następny krok materializuje kontrolowany Builder/RichEditor dla `body_blocks` bez wyprzedzania workflow/media/preview zakresów kolejnych tasków N2.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.19
+
+- zamknięto NEWSROOM-N2-002 po merge PR #40 na `main@5a4f92e08c8618ff70270abb683f97bd88d02700`,
+- dodano Filament `ContentArticleResource` z index/create/view/edit, podstawowym form/infolist/table, wymaganym search/filter setem i eager loadingiem relacji redakcyjnych,
+- create oraz draftowe zmiany type/sluga reużywają `ContentArticleSlugService`; historyczne path reservations i reserved slug contract nie są omijane przez Filament,
+- admin-only panel contract pozostaje bez zmian; feature regression potwierdza odmowę dla moderatora/studenta oraz rozdzielenie AuditLog `User` actor od `ContentAuthor`,
+- zwykły Edit publicznego rekordu ma UI i server-side blokadę publicznych pól; w shellu osobno zapisuje się wyłącznie `editorial_note`,
+- Builder/RichEditor, sources/media, workflow actions, stale-write, preview i HomeComposer pozostają otwarte,
+- finalny gate PR #40: `quality` 951 passed / 18 857 assertions / 2 skipped, Pint 1008 files, frontend build PASS; `newsroom-postgres` 7 passed / 89 assertions,
+- następnym taskiem jest NEWSROOM-N2-003 Block editor and sanitization.
 
 ### 2026-09-16 — v0.18
 
