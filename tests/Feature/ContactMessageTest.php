@@ -21,6 +21,13 @@ test('homepage rotates the contact advisor with the Warsaw weekday', function ()
     Carbon::setTestNow();
 });
 
+test('contact form uses its dedicated rate limiter', function () {
+    $route = app('router')->getRoutes()->getByName('about.contact.store');
+
+    expect($route)->not->toBeNull()
+        ->and($route->gatherMiddleware())->toContain('throttle:contact');
+});
+
 test('visitor can send a contact message from the homepage', function () {
     Mail::fake();
     Config::set('content.organization.email', 'kontakt@example.test');

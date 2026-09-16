@@ -44,8 +44,10 @@ test('traffic signs hub shows only publicly visible categories and signs', funct
     $response
         ->assertOk()
         ->assertSeeText('Znaki drogowe')
-        ->assertSeeText('Nauka')
-        ->assertSeeText('Testy')
+        ->assertSeeText('Baza pytań')
+        ->assertSeeText('Cennik')
+        ->assertSeeText('Kontakt')
+        ->assertSeeText('Testy na prawo jazdy')
         ->assertSeeText('O nas')
         ->assertSeeText('Kategorie znaków')
         ->assertSeeText('Ostatnio aktualizowane')
