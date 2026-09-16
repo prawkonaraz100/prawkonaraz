@@ -16,6 +16,7 @@
     $modifiedTime = $meta['modified_time'] ?? null;
     $breadcrumbs = $breadcrumbs ?? [];
     $structuredData = $structuredData ?? [];
+    $analyticsEnabled = (bool) ($analyticsEnabled ?? true);
     $structuredDataScripts = [];
     if (is_array($structuredData) && $structuredData !== []) {
         $isSingleStructuredDataPayload = array_key_exists('@context', $structuredData)
@@ -86,7 +87,9 @@
         @if ($preloadImage)
             <link rel="preload" href="{{ $preloadImage }}" as="image">
         @endif
-        <x-analytics.google-tag />
+        @if ($analyticsEnabled)
+            <x-analytics.google-tag />
+        @endif
         @if ($hasViteAssets)
             @vite(['resources/js/public-content.ts'])
         @endif
@@ -208,7 +211,9 @@
                 :lazy="(bool) config('performance.public_auth_drawers.lazy', false)"
             />
         @endguest
-        <x-analytics.google-consent-banner />
+        @if ($analyticsEnabled)
+            <x-analytics.google-consent-banner />
+        @endif
         @stack('scripts')
     </body>
 </html>
