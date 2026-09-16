@@ -182,6 +182,7 @@ test('article sources tags topics authors and placements expose documented relat
 
     expect($article->fresh()->sources->pluck('id')->all())
         ->toBe([$publicSource->id, $privateSource->id])
+        ->and($publicSource->fresh()->source_type)->toBe(ContentArticleSourceType::Official)
         ->and(ContentArticleSource::query()->publiclyCited()->pluck('id')->all())
         ->toContain($publicSource->id)
         ->not->toContain($privateSource->id)
