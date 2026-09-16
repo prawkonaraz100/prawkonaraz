@@ -334,6 +334,10 @@ class EditContentArticle extends EditRecord
     {
         return [
             ViewAction::make(),
+            Action::make('preview')
+                ->label('Podgląd')
+                ->url(fn (): string => route('admin.newsroom.articles.preview', $this->record))
+                ->openUrlInNewTab(),
             Action::make('beginPublicUpdate')
                 ->label('Apply public update')
                 ->color('warning')
