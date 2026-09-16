@@ -64,32 +64,47 @@ test('publish due command publishes a due article through the publishing service
             ->exists())->toBeTrue();
 });
 
-test('publish due command revalidates eligibility audits failure and continues later records', function () {
+test('publish due command revalidates eligibility audits failures and continues later records', function () {
     Carbon::setTestNow('2026-09-16 08:00:00');
 
-    $invalid = newsroomScheduledArticleAt('2026-09-16 10:00:00');
+    $inactiveCategory = newsroomScheduledArticleAt('2026-09-16 10:00:00');
+    $unpublishedAuthor = newsroomScheduledArticleAt('2026-09-16 10:00:00');
+    $missingSource = newsroomScheduledArticleAt('2026-09-16 10:00:00');
+    $invalidBody = newsroomScheduledArticleAt('2026-09-16 10:00:00');
     $valid = newsroomScheduledArticleAt('2026-09-16 10:00:00');
 
-    $invalid->category()->update(['is_active' => false]);
+    $inactiveCategory->category()->update(['is_active' => false]);
+    $unpublishedAuthor->author()->update([
+        'is_published' => false,
+        'published_at' => null,
+    ]);
+    $missingSource->sources()->delete();
+    $invalidBody->update(['body_blocks' => []]);
 
     Carbon::setTestNow('2026-09-16 10:00:00');
 
     $this->artisan('newsroom:publish-due')
-        ->expectsOutputToContain('selected=2 published=1 failed=1 skipped=0')
+        ->expectsOutputToContain('selected=5 published=1 failed=4 skipped=0')
         ->assertFailed();
 
-    expect($invalid->fresh()->workflow_status)->toBe(ContentArticleWorkflowStatus::Scheduled)
-        ->and($invalid->fresh()->first_published_at)->toBeNull()
-        ->and($valid->fresh()->workflow_status)->toBe(ContentArticleWorkflowStatus::Published)
+    foreach ([$inactiveCategory, $unpublishedAuthor, $missingSource, $invalidBody] as $invalid) {
+        expect($invalid->fresh()->workflow_status)->toBe(ContentArticleWorkflowStatus::Scheduled)
+            ->and($invalid->fresh()->first_published_at)->toBeNull()
+            ->and(AuditLog::query()
+                ->where('action', 'content_article.scheduled_publish_failed')
+                ->where('entity_id', (string) $invalid->id)
+                ->whereNull('actor_user_id')
+                ->exists())->toBeTrue();
+    }
+
+    expect($valid->fresh()->workflow_status)->toBe(ContentArticleWorkflowStatus::Published)
         ->and(AuditLog::query()
             ->where('action', 'content_article.scheduled_publish_failed')
-            ->where('entity_id', (string) $invalid->id)
-            ->whereNull('actor_user_id')
-            ->exists())->toBeTrue();
+            ->count())->toBe(4);
 
     $failure = AuditLog::query()
         ->where('action', 'content_article.scheduled_publish_failed')
-        ->where('entity_id', (string) $invalid->id)
+        ->where('entity_id', (string) $invalidBody->id)
         ->latest('id')
         ->firstOrFail();
 
