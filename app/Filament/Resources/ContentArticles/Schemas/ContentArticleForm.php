@@ -429,8 +429,7 @@ class ContentArticleForm
                         Textarea::make('image_license_note')
                             ->label('Notatka licencyjna')
                             ->rows(3)
-                            ->helperText('Tylko backoffice. Nie może trafić do publicznego renderera.')
-                            ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire))
+                            ->helperText('Tylko backoffice. Nie może trafić do publicznego renderera i może być zapisana bez public update.')
                             ->columnSpanFull(),
                     ])
                     ->columns(2),
