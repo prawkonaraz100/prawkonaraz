@@ -11,6 +11,8 @@ use App\Models\ContentArticle;
 use App\Models\ContentAuthor;
 use App\Models\ContentCategory;
 use App\Models\User;
+use App\Support\NewsroomBodyContract;
+use Filament\Forms\Components\Builder;
 use Livewire\Livewire;
 
 test('admin can access content article resource with eager loaded editorial relations', function () {
@@ -101,7 +103,9 @@ test('admin creates draft through slug service while user actor stays separate f
         ->and($article->slug)->toBe('nowe-zasady-egzaminu-praktycznego')
         ->and($article->category_id)->toBe($category->id)
         ->and($article->author_id)->toBe($author->id)
-        ->and($article->editorial_note)->toBe('Wewnętrzna notatka.');
+        ->and($article->editorial_note)->toBe('Wewnętrzna notatka.')
+        ->and($article->body_blocks)->toBe([])
+        ->and($article->body_schema_version)->toBe(NewsroomBodyContract::CURRENT_SCHEMA_VERSION);
 
     $audit = AuditLog::query()
         ->where('action', 'content_article.created')
@@ -195,11 +199,156 @@ test('draft edit routes slug and type changes through domain service', function 
             ->exists())->toBeTrue();
 });
 
-test('ordinary edit of publicly visible article cannot mutate public fields', function () {
+test('admin can persist ordered canonical body blocks through the builder adapter', function () {
+    $undoBuilderFake = Builder::fake();
+
+    try {
+        $admin = User::factory()->admin()->create();
+        $category = ContentCategory::factory()->create([
+            'name' => 'Prawo',
+            'slug' => 'prawo',
+        ]);
+
+        $this->actingAs($admin);
+
+        Livewire::test(CreateContentArticle::class)
+            ->set('data.type', ContentArticleType::News->value)
+            ->set('data.category_id', $category->id)
+            ->set('data.title', 'Artykuł blokowy')
+            ->set('data.body_blocks', [
+                [
+                    'type' => 'context',
+                    'data' => [
+                        'variant' => 'uwaga',
+                        'title' => 'Najpierw',
+                        'text' => 'Pierwszy blok.',
+                    ],
+                ],
+                [
+                    'type' => 'table',
+                    'data' => [
+                        'caption' => 'Opłaty',
+                        'headers' => ['Pozycja', 'Kwota'],
+                        'rows' => [
+                            ['cells' => ['Egzamin', '100 zł']],
+                            ['cells' => ['Powtórka', '100 zł']],
+                        ],
+                    ],
+                ],
+            ])
+            ->call('create')
+            ->assertHasNoErrors();
+
+        $article = ContentArticle::query()
+            ->where('title', 'Artykuł blokowy')
+            ->firstOrFail();
+
+        expect($article->body_schema_version)->toBe(1)
+            ->and(array_column($article->body_blocks, 'type'))->toBe(['context', 'table'])
+            ->and($article->body_blocks[1]['data']['rows'])->toBe([
+                ['Egzamin', '100 zł'],
+                ['Powtórka', '100 zł'],
+            ]);
+    } finally {
+        $undoBuilderFake();
+    }
+});
+
+test('draft edit preserves existing canonical body block keys across builder hydration', function () {
+    $undoBuilderFake = Builder::fake();
+
+    try {
+        $admin = User::factory()->admin()->create();
+        $article = ContentArticle::factory()->draft()->create([
+            'body_schema_version' => 1,
+            'body_blocks' => [
+                [
+                    'key' => 'stable-context-key',
+                    'type' => 'context',
+                    'data' => [
+                        'variant' => 'uwaga',
+                        'title' => null,
+                        'text' => 'Treść z trwałym kluczem.',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->actingAs($admin);
+
+        Livewire::test(EditContentArticle::class, ['record' => $article->getRouteKey()])
+            ->set('data.editorial_note', 'Zmiana bez modyfikacji body.')
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $article = $article->fresh();
+
+        expect($article->body_blocks[0]['key'])->toBe('stable-context-key')
+            ->and($article->body_blocks[0]['data']['text'])->toBe('Treść z trwałym kluczem.');
+    } finally {
+        $undoBuilderFake();
+    }
+});
+
+test('unsafe rich text is rejected by the server side body contract during create', function () {
+    $undoBuilderFake = Builder::fake();
+
+    try {
+        $admin = User::factory()->admin()->create();
+        $category = ContentCategory::factory()->create();
+
+        $this->actingAs($admin);
+
+        Livewire::test(CreateContentArticle::class)
+            ->set('data.type', ContentArticleType::News->value)
+            ->set('data.category_id', $category->id)
+            ->set('data.title', 'Niebezpieczny body')
+            ->set('data.body_blocks', [
+                [
+                    'type' => 'rich_text',
+                    'data' => [
+                        'content' => [
+                            'type' => 'doc',
+                            'content' => [[
+                                'type' => 'paragraph',
+                                'content' => [[
+                                    'type' => 'text',
+                                    'text' => 'Kliknij',
+                                    'marks' => [[
+                                        'type' => 'link',
+                                        'attrs' => ['href' => 'javascript:alert(1)'],
+                                    ]],
+                                ]],
+                            ]],
+                        ],
+                    ],
+                ],
+            ])
+            ->call('create')
+            ->assertHasErrors(['data.body_blocks']);
+
+        expect(ContentArticle::query()->where('title', 'Niebezpieczny body')->exists())->toBeFalse();
+    } finally {
+        $undoBuilderFake();
+    }
+});
+
+test('ordinary edit of publicly visible article cannot mutate public fields or body blocks', function () {
     $admin = User::factory()->admin()->create();
     $article = ContentArticle::factory()->published()->create([
         'title' => 'Tytuł publiczny',
         'lead' => 'Lead publiczny',
+        'body_schema_version' => 1,
+        'body_blocks' => [
+            [
+                'type' => 'context',
+                'data' => [
+                    'variant' => 'uwaga',
+                    'title' => null,
+                    'text' => 'Treść publiczna',
+                ],
+            ],
+        ],
         'editorial_note' => 'Stara notatka',
     ]);
 
@@ -208,6 +357,16 @@ test('ordinary edit of publicly visible article cannot mutate public fields', fu
     Livewire::test(EditContentArticle::class, ['record' => $article->getRouteKey()])
         ->set('data.title', 'Próba zmiany tytułu')
         ->set('data.lead', 'Próba zmiany leadu')
+        ->set('data.body_blocks', [
+            [
+                'type' => 'context',
+                'data' => [
+                    'variant' => 'uwaga',
+                    'title' => null,
+                    'text' => 'Próba zmiany body',
+                ],
+            ],
+        ])
         ->set('data.editorial_note', 'Nowa notatka wewnętrzna')
         ->call('save')
         ->assertHasNoErrors();
@@ -216,5 +375,6 @@ test('ordinary edit of publicly visible article cannot mutate public fields', fu
 
     expect($article->title)->toBe('Tytuł publiczny')
         ->and($article->lead)->toBe('Lead publiczny')
+        ->and($article->body_blocks[0]['data']['text'])->toBe('Treść publiczna')
         ->and($article->editorial_note)->toBe('Nowa notatka wewnętrzna');
 });
