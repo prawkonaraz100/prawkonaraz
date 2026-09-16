@@ -1255,7 +1255,7 @@ Migration tests muszą sprawdzać co najmniej krytyczne restrict/cascade directi
 
 ## 31. Seed danych systemowych
 
-NEWSROOM-N0-003 dostarcza `NewsroomTaxonomyContract` jako jedyne wykonywalne źródło wartości kategorii v1 przed powstaniem warstwy DB.
+NEWSROOM-N0-003 dostarcza `NewsroomTaxonomyContract` jako jedyne wykonywalne źródło wartości kategorii v1. Po N1-001 tabela `content_categories` już istnieje, ale kontrakt nadal ma być źródłem danych dla przyszłego seedera.
 
 Przyszły dedykowany seeder N1:
 
@@ -1266,7 +1266,7 @@ Przyszły dedykowany seeder N1:
 - nie nadpisuje ręcznie zmienionej treści SEO bez jawnej decyzji,
 - nie seeduje sztucznych produkcyjnych artykułów.
 
-Na obecnym etapie tabela `content_categories`, model `ContentCategory` i DB seeder **nie istnieją jeszcze**.
+Na obecnym etapie tabela `content_categories` **już istnieje** po N1-001. Model `ContentCategory` i dedykowany DB seeder **nie istnieją jeszcze** i pozostają pracą N1-002 / kolejnego małego kroku domenowego.
 
 Test fixtures pozostają w factories/seed smoke data.
 
