@@ -1677,7 +1677,7 @@ Docs-only:
 ### CMS
 
 - [ ] article resource
-- [ ] category resource
+- [x] category resource
 - [ ] topic resource
 - [ ] controlled block editor
 - [ ] sources
