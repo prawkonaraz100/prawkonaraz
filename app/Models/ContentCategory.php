@@ -89,11 +89,19 @@ class ContentCategory extends Model
 
     public function hasPubliclyVisibleArticles(): bool
     {
+        if (array_key_exists('publicly_visible_articles_count', $this->getAttributes())) {
+            return (int) $this->getAttribute('publicly_visible_articles_count') > 0;
+        }
+
         return $this->articles()->publiclyVisible()->exists();
     }
 
     public function hasActivelyDistributedArticles(): bool
     {
+        if (array_key_exists('actively_distributed_articles_count', $this->getAttributes())) {
+            return (int) $this->getAttribute('actively_distributed_articles_count') > 0;
+        }
+
         return $this->articles()->activelyDistributed()->exists();
     }
 
@@ -105,6 +113,10 @@ class ContentCategory extends Model
 
     public function canBeDeleted(): bool
     {
+        if (array_key_exists('articles_count', $this->getAttributes())) {
+            return (int) $this->getAttribute('articles_count') === 0;
+        }
+
         return ! $this->articles()->exists();
     }
 
