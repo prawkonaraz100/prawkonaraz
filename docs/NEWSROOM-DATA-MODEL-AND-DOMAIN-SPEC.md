@@ -6,7 +6,7 @@
 - Obszar: newsroom / media portal
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Bazowy stan repo przy projektowaniu: main@6a38c95ce76ee05997977d614d795ed8513462f1
-- Ostatnia weryfikacja zgodności z kodem: main@7157b60b643fa57e38c111a26a42cf70b5715024 (2026-09-16)
+- Ostatnia weryfikacja zgodności z kodem: main@eb13b2160e4b8d49c128869ad4761eb0875b2dac (2026-09-16)
 - Data: 2026-09-16
 - Zakres: model domenowy, baza danych, invariants, serwisy aplikacyjne, routing domeny i kolejność migracji
 
@@ -794,6 +794,22 @@ NewsroomHomeCompositionService:
 6. jeśli brakuje unikalnego kandydata, zwraca krótszą sekcję zamiast duplikatu.
 
 Breaking strip jest niezależnym alertem i może wskazywać ten sam artykuł co lead, ponieważ nie jest kolejną kartą contentową.
+
+### 16.5. Aktualny stan implementacji N1-006
+
+NEWSROOM-N1-006 jest wdrożone na `main`:
+
+- `NewsroomHomeCompositionService` materializuje kolejność lead -> secondary -> latest -> category blocks -> guides -> important now i prowadzi globalny zbiór użytych article IDs,
+- manual placements są rozwiązywane przed fallbackiem, ale placement poza oknem czasowym nie dyskwalifikuje samego artykułu z legalnego fallbacku,
+- bieżący render używa `activelyDistributed()`; future preview może uwzględnić initial `scheduled` dopiero od `scheduled_for`, po `ContentArticlePublishingService::assertScheduledPreviewReady()` i bez mutowania workflow,
+- fallback jest deterministyczny i nie pobiera całego corpusu do filtrowania w PHP,
+- category lead respektuje category context, guides lead wymaga typu `guide`, a krótkie moduły są dozwolone przy braku unikalnych kandydatów,
+- breaking strip jest rozwiązywany niezależnie i może powtórzyć lead,
+- `NewsroomHomePlacementService` wykonuje create/update w transakcji, waliduje kontrolowane surface/slot/context/date ranges i sprawdza overlap po acquisition PostgreSQL advisory locka oraz row locka,
+- half-open interval contract pozwala na sąsiadujące okna,
+- PostgreSQL concurrency test potwierdza, że dwa równoległe zapisy tego samego pustego tuple nie mogą równocześnie przejść walidacji.
+
+Nie wdrożono jeszcze Filament UI placements ani publicznego kontrolera konsumującego composer; odpowiednio pozostają N2/N3.
 
 ---
 
@@ -1654,6 +1670,7 @@ Na 2026-09-16:
 - `ContentArticle`, `ContentTag`, `ContentTopic`, `ContentArticleSource` i `ContentHomePlacement` Eloquent models/factories istnieją; factory workflow states pokrywają dokumentowany baseline,
 - service-level route-family lookup guard istnieje w `ContentArticlePathResolver`; nadal nie jest podłączony do publicznych controllerów N3,
 - NEWSROOM-N1-005 scheduler istnieje jako `newsroom:publish-due`, jest zarejestrowany co minutę w production i deleguje due-time revalidation/publish do `ContentArticlePublishingService`,
+- NEWSROOM-N1-006 jest wdrożone: istnieją `NewsroomHomeCompositionService`, `NewsroomHomePlacementService` i niemutujący `ContentArticlePublishingService::assertScheduledPreviewReady()`; overlap/concurrency jest testowane również na PostgreSQL,
 - newsroom CMS nie istnieje.
 
 ---
@@ -1662,7 +1679,6 @@ Na 2026-09-16:
 
 - [ ] wdrożyć N2 Filament Builder/RichEditor adapter oparty o `NewsroomBodyContract`,
 - [ ] wdrożyć N3 publiczny renderer bloków zgodny z `NewsroomBodyContract`,
-- [ ] wdrożyć home composition service,
 - [ ] podłączyć `NewsroomMediaStorage` do N2 hero/OG uploader + `ContentArticle` persistence oraz wdrożyć focal point/OG-alt UX,
 - [ ] wdrożyć crop/variant generation dopiero wraz z fizycznymi artefaktami i ich testami,
 - [ ] podłączyć istniejące origin/regulatory columns do modeli, CMS i publish validation,
@@ -1675,6 +1691,16 @@ Na 2026-09-16:
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.15
+
+- wdrożono NEWSROOM-N1-006 jako `NewsroomHomeCompositionService` + `NewsroomHomePlacementService`,
+- kompozycja rozwiązuje manual placements, future-preview eligibility, deterministyczne fallbacki oraz globalne card dedupe zgodnie z §16,
+- `ContentArticlePublishingService::assertScheduledPreviewReady()` udostępnia wspólną publication/fresh-review/breaking rewalidację dla future preview bez mutacji,
+- placement writer serializuje overlap check przez PostgreSQL transaction advisory lock + row lock; half-open intervals dopuszczają sąsiadujące okna,
+- category/guides context jest walidowany po stronie domenowej, a breaking strip pozostaje niezależnym wyjątkiem dedupe,
+- finalny CI PR #35: quality 935 passed / 18 769 assertions / 2 skipped, Pint 990 files, frontend build PASS; newsroom-postgres 7 passed / 89 assertions,
+- N1 domain foundation jest zamknięte; Filament placement UI i publiczny controller pozostają odpowiednio N2/N3.
 
 ### 2026-09-16 — v0.14
 
