@@ -10,6 +10,8 @@ return [
         ),
         'email' => env('CONTENT_CONTACT_EMAIL', 'kontakt@prawkonaraz.pl'),
         'logo_url' => env('CONTENT_ORGANIZATION_LOGO_URL', rtrim((string) env('APP_URL', 'http://localhost'), '/').'/favicon.png'),
+        'logo_width' => (int) env('CONTENT_ORGANIZATION_LOGO_WIDTH', 256),
+        'logo_height' => (int) env('CONTENT_ORGANIZATION_LOGO_HEIGHT', 256),
         'same_as' => array_values(array_filter([
             env('CONTENT_ORGANIZATION_LINKEDIN_URL'),
             env('CONTENT_ORGANIZATION_FACEBOOK_URL'),

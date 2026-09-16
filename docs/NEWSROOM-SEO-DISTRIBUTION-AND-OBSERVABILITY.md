@@ -542,7 +542,7 @@ Stan obecny: `ContentAuthorController` i `TrafficSignSchemaService::author()` ju
 
 ## 20. Publisher schema
 
-Przed uruchomieniem newsroomu trzeba zamknąć N0 branding.
+NEWSROOM-N0-001 zamknął domenowy branding/site identity foundation. Newsroom ma reużywać ten sam kanoniczny publisher graph.
 
 Publisher:
 
@@ -559,25 +559,29 @@ Nie może równolegle występować „Orły na Drodze” jako publisher tego sam
 
 ### 21.1. Stan istniejący w repo
 
-Repo już posiada:
+Repo posiada:
 
-- `config/content.php -> organization` jako dane organizacji,
+- `config/content.php -> organization` jako kanoniczne dane organizacji,
 - `SchemaIds::organization()` -> root `/#organization`,
 - `SchemaIds::website()` -> root `/#website`,
 - `SchemaRenderer` i graph pattern,
-- Organization/WebSite/Person graph używany przez istniejące publiczne moduły.
+- współdzielony `SiteIdentitySchema` dla Organization/WebSite,
+- homepage oraz główne public-question/traffic-sign/legal-content graph services korzystające z tego samego buildera,
+- wspólny `og:site_name` z organization config.
 
-Jednocześnie `HomePageController` nadal ma stare hardcoded „Orły na Drodze”. To jest realna niespójność kodu, nie powód do tworzenia drugiego configu.
+Legacy hardcode „Orły na Drodze” został usunięty z homepage w NEWSROOM-N0-001.
 
-### 21.2. Target
+### 21.2. Implementacja N0-001
 
-N0-001 ma:
+N0-001:
 
-- zachować `config/content.php['organization']` jako istniejące kanoniczne dane brand/organization,
-- wyekstrahować/reużyć wspólny site identity/schema builder, jeśli potrzeba, zamiast kopiować metody pomiędzy modułami,
-- zachować stabilne IDs `/#organization` i `/#website`,
-- przenieść homepage na te same dane i IDs,
-- usunąć stare hardcoded logo/name/alt.
+- zachował `config/content.php['organization']` jako kanoniczne dane brand/organization,
+- wyekstrahował wspólny site identity/schema builder zamiast dalszego kopiowania Organization/WebSite,
+- zachował stabilne IDs `/#organization` i `/#website`,
+- przeniósł homepage na te same dane i IDs,
+- usunął stare hardcoded logo/name/alt,
+- dodał WebSite `alternateName` z rzeczywistego `app.name`,
+- zapisał publiczne logo jako ImageObject z url/contentUrl i potwierdzonymi wymiarami 256×256.
 
 Nie tworzymy równoległego brand configu. Ewentualna migracja istniejącego `config/content.php['organization']` wymaga osobnej, jawnej decyzji architektonicznej.
 
@@ -1577,8 +1581,9 @@ Obecnie:
 - istnieje zarówno `public/robots.txt`, jak i route `RobotsController`; production delivery trzeba traktować zgodnie z `SEO-SITEMAP-REPAIR-PLAN.md`,
 - istnieje IndexNowUrlSubmission,
 - author pages istnieją i mają istniejący ProfilePage pattern,
-- `config/content.php['organization']`, `SchemaIds` i `SchemaRenderer` są istniejącym fundamentem entity graph,
-- HomePageController nadal hardcoduje „Orły na Drodze”, więc site identity jest obecnie niespójne,
+- `config/content.php['organization']`, `SchemaIds`, `SchemaRenderer` i współdzielony `SiteIdentitySchema` stanowią fundament entity graph,
+- HomePageController korzysta z kanonicznego Organization/WebSite graph; legacy „Orły na Drodze” nie jest już emitowane przez homepage,
+- wspólny public-content layout emituje `og:site_name` z kanonicznego identity,
 - istnieje również runtime `SitemapController`, ale statyczne pliki są nadrzędnym produkcyjnym modelem; samo dodanie headerów do kontrolera nie rozwiązuje static delivery,
 - newsroom-specific Article schema/news sitemap/feed nie istnieją,
 - newsroom dirty/version refresh coordinator i atomowy child-before-index switch nie istnieją,
@@ -1589,8 +1594,9 @@ Obecnie:
 
 ## 69. Pozostałe zadania
 
-- [ ] ujednolicić Organization/WebSite/site name na istniejącym config/schema infrastructure,
-- [ ] dodać `og:site_name` i feed discovery do wspólnego public layout contract,
+- [x] ujednolicić Organization/WebSite/site name na istniejącym config/schema infrastructure,
+- [x] dodać `og:site_name` do wspólnego public layout contract,
+- [ ] dodać feed discovery do wspólnego public layout contract,
 - [ ] wdrożyć ContentArticleSeoService,
 - [ ] wdrożyć ContentArticleSchemaService,
 - [ ] rozszerzyć istniejący statyczny generator o article sitemap z deterministic sharding readiness,
@@ -1627,6 +1633,14 @@ Obecnie:
 - dodano sitemap coverage dla newsroom/guides/category/topic hubs,
 - ograniczono NEWSROOM_PUBLIC_ENABLED=false do dark-deploy; po launch techniczny rollback nie może masowo zamieniać indeksowanych URL-i w 404,
 - poprawiono kolejność sekcji 4.3/4.4 i wyrównano current-state/remaining-work do faktycznego backendu.
+
+### 2026-09-16 — v0.7
+
+- wdrożono NEWSROOM-N0-001: wspólny SiteIdentitySchema, stabilny Organization/WebSite graph i jeden site name,
+- usunięto legacy publisher „Orły na Drodze” z homepage,
+- dodano `og:site_name`, WebSite alternateName i Organization logo ImageObject z wymiarami 256×256,
+- istniejące public-question/traffic-sign/legal-content schema services reużywają wspólny builder,
+- pozostawiono feed discovery oraz NewsArticle/news sitemap jako późniejsze zadania.
 
 ### 2026-09-16 — v0.4
 

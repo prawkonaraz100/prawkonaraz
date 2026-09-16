@@ -6,6 +6,28 @@ afterEach(function (): void {
     app(PaymentRequirementService::class)->forgetCachedRequirement();
 });
 
+test('homepage uses the canonical site identity graph and social site name', function () {
+    config()->set('app.name', 'prawkonaraz.pl');
+    config()->set('content.organization.name', 'PrawkoNaRaz');
+    config()->set('content.organization.logo_url', '/favicon.png');
+    config()->set('content.organization.logo_width', 256);
+    config()->set('content.organization.logo_height', 256);
+
+    $root = rtrim(url('/'), '/');
+
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertSee('meta property="og:site_name" content="PrawkoNaRaz"', false)
+        ->assertSee('"@id":"'.$root.'/#organization"', false)
+        ->assertSee('"@id":"'.$root.'/#website"', false)
+        ->assertSee('"name":"PrawkoNaRaz"', false)
+        ->assertSee('"alternateName":"prawkonaraz.pl"', false)
+        ->assertSee('"url":"'.$root.'/favicon.png","contentUrl":"'.$root.'/favicon.png","width":256,"height":256', false)
+        ->assertSee('"isPartOf":{"@id":"'.$root.'/#website"}', false)
+        ->assertSee('"publisher":{"@id":"'.$root.'/#organization"}', false)
+        ->assertDontSee('Orły na Drodze', false);
+});
+
 test('home page renders the public landing page', function () {
     $seoYear = now('Europe/Warsaw')->format('Y');
 

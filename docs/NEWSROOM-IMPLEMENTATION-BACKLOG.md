@@ -57,20 +57,37 @@ Prace niezależne mogą iść po zamknięciu własnych prerequisites, ale **publ
 
 ## NEWSROOM-N0-001 — Publisher branding source of truth
 
+### Status implementacji
+
+**DONE — G0-C zamknięty.** Implementacja została wykonana i zweryfikowana pełnym CI w PR #15.
+
 ### Cel
 
 Usunąć niespójność PrawkoNaRaz / Orły na Drodze w structured data.
 
-### Potwierdzony stan repo
+### Stan przed implementacją
 
-Istnieją już:
+Istniały już:
 
 - `config/content.php['organization']`,
 - `SchemaIds::organization()` i `SchemaIds::website()`,
 - `SchemaRenderer`,
 - Organization/WebSite/Person graph pattern w istniejących schema services.
 
-Problemem jest `HomePageController`, który nadal hardcoduje „Orły na Drodze” i stare logo.
+Problemem był `HomePageController`, który hardcodował „Orły na Drodze” i stare logo.
+
+### Aktualny stan implementacji
+
+- dodano współdzielony `App\SEO\Schema\SiteIdentitySchema`,
+- `config/content.php['organization']` pozostaje jedynym source of truth dla danych Organization,
+- homepage emituje wspólny graph Organization/WebSite z istniejącymi stabilnymi `/#organization` i `/#website`,
+- homepage nie emituje już legacy publishera ani assetu „Orły na Drodze”,
+- wspólny public layout emituje `og:site_name` z kanonicznego organization config,
+- WebSite ma jeden `name` oraz `alternateName` z `app.name`, jeśli jest rzeczywiście różne,
+- Organization logo używa publicznego `favicon.png`; zweryfikowane fizyczne wymiary 256×256 są zapisane w organization config/env contract,
+- `TrafficSignSchemaService`, `PublicQuestionSchemaService` i `LegalContentSchemaService` delegują Organization/WebSite do tego samego buildera,
+- test homepage blokuje powrót „Orły na Drodze” i sprawdza site name, stabilne IDs, publisher relation oraz logo dimensions,
+- istniejące testy public question graph sprawdzają wspólny logo/site-name contract.
 
 ### Zakres
 
@@ -1688,12 +1705,12 @@ Nie oznaczać tasku DONE przed merge + green verification.
 Na 2026-09-16:
 
 - pakiet projektowy newsroomu obejmuje architekturę, model danych, CMS, UI, governance, SEO, backlog i runbook,
-- niniejsze rozszerzenie doprecyzowuje editorial composition; implementacja newsroomu nadal nie rozpoczęta,
+- implementacja newsroomu rozpoczęła się od foundation N0-001; właściwy domain/CMS/public newsroom nadal nie jest wdrożony,
 - /aktualnosci i /poradniki nadal placeholder,
 - fundamenty ContentAuthor/legal/traffic signs/public SEO istnieją,
-- istnieją config/content.php organization, SchemaIds/SchemaRenderer, statyczny SeoSitemapGenerator + builder/auditor, daily seo:refresh-sitemaps oraz IndexNow pipeline,
+- istnieją config/content.php organization, SchemaIds/SchemaRenderer oraz współdzielony SiteIdentitySchema; homepage i istniejące główne publiczne graph services korzystają z kanonicznego Organization/WebSite identity,
 - istnieją public/robots.txt i RobotsController; newsroom nie zmienia tej warstwy bez osobnego production-delivery audit,
-- HomePageController nadal ma legacy „Orły na Drodze”,
+- HomePageController nie hardcoduje już legacy „Orły na Drodze”; homepage korzysta z kanonicznego site identity, og:site_name i stabilnych graph IDs,
 - newsroom dirty/version refresh coordinator, atomic child-before-index publication i newsroom/news sitemap output jeszcze nie istnieją,
 - canonical CI nadal używa SQLite; dedykowany PostgreSQL job dla newsroomu jeszcze nie istnieje,
 - QUEUE_CONNECTION w env example jest sync; stały queue worker nie jest gwarantowany,
@@ -1701,15 +1718,23 @@ Na 2026-09-16:
 
 ---
 
-# 11. Pierwszy następny task po zamknięciu dokumentacji
+# 11. Pierwszy następny task
 
-NEWSROOM-N0-001 — Publisher branding source of truth.
+NEWSROOM-N0-002 — Final route contract.
 
-N0-002/N0-003/N0-004/N0-006 można następnie zamykać według macierzy hard dependencies. N0-005 jest już decyzją dokumentacyjną; jego kodowy regression gate wykonuje się w N5.
+NEWSROOM-N0-001 / G0-C jest zamknięte. N0-002/N0-003/N0-004/N0-006 można dalej zamykać według macierzy hard dependencies. N0-005 jest już decyzją dokumentacyjną; jego kodowy regression gate wykonuje się w N5.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.7
+
+- zamknięto NEWSROOM-N0-001 / G0-C po wdrożeniu wspólnego `SiteIdentitySchema`,
+- homepage przeniesiono z legacy „Orły na Drodze” na `config/content.php['organization']` i stabilne `/#organization` + `/#website`,
+- dodano spójne `og:site_name`, WebSite alternateName oraz publiczne logo ImageObject z potwierdzonymi wymiarami 256×256,
+- istniejące traffic-sign, public-question i legal-content graph services reużywają wspólny Organization/WebSite builder,
+- regression tests blokują ponowne rozjechanie publisher/site identity.
 
 ### 2026-09-16 — v0.6
 
