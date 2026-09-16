@@ -85,7 +85,7 @@ test('stored newsroom images are inspected from actual bytes mime and dimensions
     ]);
 });
 
-test('stored newsroom image inspection rejects client metadata mismatches', function (string $declaredMime, ?int $declaredBytes) {
+test('stored newsroom image inspection rejects client metadata mismatches', function (string $declaredMime, int $byteDelta) {
     $storage = app(NewsroomMediaStorage::class);
     $binary = newsroomTestPng();
     $upload = $storage->prepareImageUpload('image/png', strlen($binary));
@@ -95,12 +95,22 @@ test('stored newsroom image inspection rejects client metadata mismatches', func
     $storage->inspectStoredImage(
         $upload['path'],
         declaredMimeType: $declaredMime,
-        declaredBytes: $declaredBytes ?? strlen($binary) + 1,
+        declaredBytes: strlen($binary) + $byteDelta,
     );
 })->with([
-    'mime mismatch' => ['image/jpeg', null],
-    'byte mismatch' => ['image/png', 1],
+    'mime mismatch' => ['image/jpeg', 0],
+    'byte mismatch' => ['image/png', -1],
 ])->throws(ValidationException::class);
+
+test('stored newsroom asset must actually be a supported raster image', function () {
+    $storage = app(NewsroomMediaStorage::class);
+    $upload = $storage->prepareImageUpload('image/png', 41);
+    $fakeSvg = '<svg xmlns="http://www.w3.org/2000/svg"></svg>';
+
+    Storage::disk('newsroom_test')->put($upload['path'], $fakeSvg);
+
+    $storage->inspectStoredImage($upload['path']);
+})->throws(ValidationException::class);
 
 test('stored newsroom image inspection enforces shared byte policy against the actual object', function () {
     $storage = app(NewsroomMediaStorage::class);
