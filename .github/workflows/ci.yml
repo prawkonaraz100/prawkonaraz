@@ -88,3 +88,63 @@ jobs:
 
       - name: Build frontend assets
         run: npm run build
+
+  newsroom-postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: prawkonaraz_newsroom
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d prawkonaraz_newsroom"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      APP_ENV: testing
+      NEWSROOM_POSTGRES_TESTS: '1'
+      NEWSROOM_PG_HOST: 127.0.0.1
+      NEWSROOM_PG_PORT: 5432
+      NEWSROOM_PG_DATABASE: prawkonaraz_newsroom
+      NEWSROOM_PG_USERNAME: postgres
+      NEWSROOM_PG_PASSWORD: postgres
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          extensions: mbstring, pdo_pgsql, fileinfo
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-8.3-${{ hashFiles('composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-8.3-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Prepare application environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate --force
+
+      - name: Run newsroom PostgreSQL migration contract
+        run: php artisan test tests/Postgres/NewsroomPostgresMigrationTest.php
+
