@@ -388,6 +388,22 @@ Zakres N0-006 zamraża bezpieczny storage contract przed N2 media editor. Nie oz
 
 ## NEWSROOM-N1-001 — Enums + migrations
 
+### Status implementacji
+
+**DONE — schema foundation zmergowany przez PR #24 na `main@47e748047ec655ff2fdb5669d8cbff7e51041dc8`.**
+
+Zakres obejmuje 5 enumów, 12 migracji, SQLite schema regression oraz addytywny `newsroom-postgres` gate. PostgreSQL 16 zweryfikował `migrate:fresh`, krytyczne indeksy/FK delete rules i rollback 12 newsroom migrations. Modele/factories/scopes nadal należą do N1-002.
+
+### Aktualny stan implementacji
+
+- istnieją enumy: `ContentArticleType`, `ContentArticleWorkflowStatus`, `ContentArticleSourceType`, `ContentArticleOriginType`, `ContentArticleRegulatoryStatus`,
+- istnieje 12 migracji newsroomu: categories, tags, articles, topics, membership pivots, sources, question/legal/sign relations, redirects i home placements,
+- `content_articles` zawiera `body_blocks`, `body_schema_version`, regulatory/media/focal/public-state fields zgodne z data spec,
+- `canonical_url` i `featured_position` nie zostały dodane,
+- istnieją testy schema/enum na zwykłym CI oraz osobny PostgreSQL migration contract,
+- workflow CI ma zachowany job `quality` na SQLite oraz addytywny job `newsroom-postgres` na PostgreSQL 16,
+- finalny PostgreSQL gate: 3 testy / 64 asercje PASS; finalny `quality`: backend, Pint i frontend build PASS.
+
 ### Zakres
 
 - ContentArticleType
@@ -1800,14 +1816,14 @@ Nie oznaczać tasku DONE przed merge + green verification.
 Na 2026-09-16:
 
 - pakiet projektowy newsroomu obejmuje architekturę, model danych, CMS, UI, governance, SEO, backlog i runbook,
-- foundation N0-001, N0-002 i N0-003 są wdrożone; właściwy domain/CMS/public newsroom nadal nie jest wdrożony,
+- foundation N0 jest zamknięte, a N1-001 schema/enum foundation jest wdrożone; modele/factories, CMS i publiczny newsroom nadal nie są wdrożone,
 - `/aktualnosci` i `/poradniki` nadal renderują pre-launch placeholder, teraz z dedykowanym `X-Robots-Tag: noindex, follow`; finalne detail/category/topic/feed route namespaces są zarejestrowane, ale pozostają 404 bez publicznych controllerów,
 - fundamenty ContentAuthor/legal/traffic signs/public SEO istnieją,
 - istnieją config/content.php organization, SchemaIds/SchemaRenderer oraz współdzielony SiteIdentitySchema; homepage i istniejące główne publiczne graph services korzystają z kanonicznego Organization/WebSite identity,
 - istnieją public/robots.txt i RobotsController; newsroom nie zmienia tej warstwy bez osobnego production-delivery audit,
 - HomePageController nie hardcoduje już legacy „Orły na Drodze”; homepage korzysta z kanonicznego site identity, og:site_name i stabilnych graph IDs,
 - newsroom dirty/version refresh coordinator, atomic child-before-index publication i newsroom/news sitemap output jeszcze nie istnieją,
-- canonical CI nadal używa SQLite; dedykowany PostgreSQL job dla newsroomu jeszcze nie istnieje,
+- canonical CI zachowuje szybki SQLite job `quality` i ma addytywny `newsroom-postgres` job dla migration/FK/index/rollback contracts,
 - QUEUE_CONNECTION w env example jest sync; stały queue worker nie jest gwarantowany,
 - panel Filament jest obecnie admin-only i ten kontrakt pozostaje wymaganiem v1.
 
@@ -1815,13 +1831,24 @@ Na 2026-09-16:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N1-001 — Enums + migrations.
+NEWSROOM-N1-002 — Models + factories.
 
-NEWSROOM-N0-001, N0-002, N0-003, N0-004 i N0-006 są zamknięte jako foundation contracts; N0-005 pozostaje zamkniętą decyzją kompatybilności z kodowym regression gate w N5. G0-A i G0-B są zamknięte. Następny krok wykonawczy to N1-001 z obowiązkowym addytywnym PostgreSQL gate.
+NEWSROOM-N1-001 jest zamknięte po merge PR #24 i dwóch zielonych jobach CI: `quality` oraz `newsroom-postgres`. Kolejny krok wykonawczy to materializacja modeli, relacji, scopes i factories zgodnie z istniejącą schema.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.12
+
+- zamknięto NEWSROOM-N1-001 po merge PR #24,
+- dodano 5 enumów domenowych i 12 migracji zgodnych z Data Model/Domain,
+- `content_articles` materializuje canonical body/regulatory/media/freshness/public-state contract bez `canonical_url` i bez `featured_position`,
+- dodano SQLite schema regression oraz izolowany PostgreSQL migration contract,
+- CI zachowuje istniejący szybki `quality` i dodaje `newsroom-postgres` na PostgreSQL 16,
+- PostgreSQL gate potwierdził 3 testy / 64 asercje: migrate fresh, indeksy/FK delete rules i rollback 12 newsroom migrations,
+- finalny ogólny CI, Pint i frontend build przeszły,
+- modele/factories/scopes pozostają N1-002; nie opisano ich jako istniejących.
 
 ### 2026-09-16 — v0.11
 
