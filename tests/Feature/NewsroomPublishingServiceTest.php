@@ -264,6 +264,35 @@ test('public update is atomic stale guarded audited and marks substantive freshn
         ->and($audit->metadata)->not->toHaveKey('note');
 });
 
+test('public update without a public semantic change does not bump substantive freshness', function () {
+    Carbon::setTestNow('2026-09-16 18:35:00');
+
+    $article = ContentArticle::factory()->published()->create([
+        'last_substantive_update_at' => Carbon::parse('2026-09-15 12:00:00'),
+    ]);
+    ContentArticleSource::factory()
+        ->for($article, 'article')
+        ->create([
+            'sort_order' => 1,
+        ]);
+
+    $loadedToken = app(ContentArticleEditToken::class)->make($article->fresh());
+
+    $updated = newsroomPublishingService()->applyPublicUpdate(
+        $article,
+        newsroomPublicUpdatePayload($article),
+        $loadedToken,
+    );
+
+    $audit = AuditLog::query()
+        ->where('action', 'content_article.public_updated')
+        ->where('entity_id', (string) $article->id)
+        ->sole();
+
+    expect($updated->last_substantive_update_at?->toDateTimeString())->toBe('2026-09-15 12:00:00')
+        ->and($audit->metadata['substantive_change'])->toBeFalse();
+});
+
 test('public update rejects same-second stale source state without overwriting the concurrent change', function () {
     Carbon::setTestNow('2026-09-16 18:40:00');
 
