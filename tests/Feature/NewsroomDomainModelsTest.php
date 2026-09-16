@@ -80,6 +80,7 @@ test('public visibility active distribution and indexability remain distinct', f
 test('category and article category scopes preserve active publication invariant', function () {
     $activeCategory = ContentCategory::factory()->create(['position' => 10]);
     $inactiveCategory = ContentCategory::factory()->inactive()->create(['position' => 20]);
+    $emptyCategory = ContentCategory::factory()->create(['position' => 30]);
 
     $activeArticle = ContentArticle::factory()->published()->for($activeCategory, 'category')->create();
     $inactiveArticle = ContentArticle::factory()->published()->for($inactiveCategory, 'category')->create();
@@ -95,7 +96,10 @@ test('category and article category scopes preserve active publication invariant
         ->and($inactiveArticle->hasActiveCategory())->toBeFalse()
         ->and($activeCategory->isPublicationEligible())->toBeTrue()
         ->and($inactiveCategory->isPublicationEligible())->toBeFalse()
-        ->and($activeCategory->hasPubliclyVisibleArticles())->toBeTrue();
+        ->and($activeCategory->hasPubliclyVisibleArticles())->toBeTrue()
+        ->and($activeCategory->hasActivelyDistributedArticles())->toBeTrue()
+        ->and($activeCategory->canBeDeactivated())->toBeFalse()
+        ->and($emptyCategory->canBeDeactivated())->toBeTrue();
 });
 
 test('topic publication corpus baseline does not redefine published url visibility', function () {
