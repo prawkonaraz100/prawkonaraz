@@ -551,11 +551,23 @@ final class NewsroomBodyContract
             throw new InvalidArgumentException("Rich text link {$path} must contain href.");
         }
 
+        $normalizedAttrs = [
+            'href' => self::safeHref($attrs['href']),
+        ];
+        $target = $attrs['target'] ?? null;
+
+        if ($target !== null) {
+            if ($target !== '_blank') {
+                throw new InvalidArgumentException("Rich text link {$path} target is not allowed.");
+            }
+
+            $normalizedAttrs['target'] = '_blank';
+            $normalizedAttrs['rel'] = 'noopener noreferrer';
+        }
+
         return [
             'type' => 'link',
-            'attrs' => [
-                'href' => self::safeHref($attrs['href']),
-            ],
+            'attrs' => $normalizedAttrs,
         ];
     }
 
@@ -573,7 +585,7 @@ final class NewsroomBodyContract
 
         $scheme = parse_url($href, PHP_URL_SCHEME);
 
-        if (! is_string($scheme) || ! in_array(strtolower($scheme), ['http', 'https', 'mailto'], true)) {
+        if (! is_string($scheme) || ! in_array(strtolower($scheme), ['http', 'https'], true)) {
             throw new InvalidArgumentException('Link href scheme is not allowed.');
         }
 
