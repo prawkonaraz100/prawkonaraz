@@ -188,7 +188,7 @@ test('rich text rejects executable and unsupported structures', function (array 
             ]],
         ]],
     ]],
-])->throws(\InvalidArgumentException::class);
+])->throws(InvalidArgumentException::class);
 
 test('canonical body block keys must stay unique and cannot conflict with Builder item ids', function () {
     NewsroomBodyContract::normalize([
@@ -203,7 +203,7 @@ test('canonical body block keys must stay unique and cannot conflict with Builde
             'data' => ['variant' => 'uwaga', 'text' => 'Drugi'],
         ],
     ]);
-})->throws(\InvalidArgumentException::class, 'Duplicate newsroom body block key');
+})->throws(InvalidArgumentException::class, 'Duplicate newsroom body block key');
 
 test('builder item key cannot disagree with an explicit canonical key', function () {
     NewsroomBodyContract::normalize([
@@ -213,17 +213,17 @@ test('builder item key cannot disagree with an explicit canonical key', function
             'data' => ['variant' => 'uwaga', 'text' => 'Treść'],
         ],
     ]);
-})->throws(\InvalidArgumentException::class, 'key conflicts with its Builder item key');
+})->throws(InvalidArgumentException::class, 'key conflicts with its Builder item key');
 
 test('unknown and embed blocks fail closed', function (string $type) {
     NewsroomBodyContract::normalize([
         ['type' => $type, 'data' => []],
     ]);
-})->with(['future_block', 'embed'])->throws(\InvalidArgumentException::class);
+})->with(['future_block', 'embed'])->throws(InvalidArgumentException::class);
 
 test('schema version changes fail closed until compatibility is implemented', function () {
     NewsroomBodyContract::normalize([], 2);
-})->throws(\InvalidArgumentException::class, 'Unsupported newsroom body schema version: 2.');
+})->throws(InvalidArgumentException::class, 'Unsupported newsroom body schema version: 2.');
 
 test('image payload uses a storage relative path and normalized focal point pair', function () {
     $normalized = NewsroomBodyContract::normalize([
@@ -265,7 +265,7 @@ test('image payload rejects urls traversal and incomplete focal points', functio
         'alt' => 'Alt',
         'focal_x' => 0.5,
     ]],
-])->throws(\InvalidArgumentException::class);
+])->throws(InvalidArgumentException::class);
 
 test('domain blocks accept ids only and reject duplicates', function () {
     $normalized = NewsroomBodyContract::normalize([
@@ -282,7 +282,7 @@ test('domain blocks accept ids only and reject duplicates', function () {
     NewsroomBodyContract::normalize([
         ['type' => 'question_group', 'data' => ['question_ids' => [1, 1]]],
     ]);
-})->throws(\InvalidArgumentException::class);
+})->throws(InvalidArgumentException::class);
 
 test('table payload requires semantic headers and matching row widths', function () {
     $normalized = NewsroomBodyContract::normalize([
@@ -311,7 +311,7 @@ test('table payload requires semantic headers and matching row widths', function
             ],
         ],
     ]);
-})->throws(\InvalidArgumentException::class);
+})->throws(InvalidArgumentException::class);
 
 test('block payloads reject hidden unsupported fields instead of persisting them', function () {
     NewsroomBodyContract::normalize([
@@ -324,4 +324,4 @@ test('block payloads reject hidden unsupported fields instead of persisting them
             ],
         ],
     ]);
-})->throws(\InvalidArgumentException::class);
+})->throws(InvalidArgumentException::class);
