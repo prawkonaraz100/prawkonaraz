@@ -331,6 +331,12 @@ V1 nie ma shareable signed preview.
 
 ## 13. Block validation and sanitization security tests
 
+### 13.0. Aktualny stan po N0-004
+
+Istnieje unit/security regression `tests/Unit/Support/NewsroomBodyContractTest.php` dla wykonywalnego `NewsroomBodyContract`. Pokrywa m.in. unknown/disabled block, schema version fail-closed, structured rich-text node/mark allowlist, unsafe URLs/targets, XSS escaping przez `RichContentRenderer`, block keys, image paths, relation IDs oraz table shape.
+
+Nie istnieją jeszcze testy faktycznego N2 Filament article editora ani N3 publicznego renderera. Poniższy kontrakt pozostaje wymaganiem dla tych warstw; checkboxy/testy integracyjne nie mogą być uznane za wykonane tylko na podstawie N0-004 unit contract.
+
 Payloads:
 
 - unknown block type,
@@ -1378,8 +1384,8 @@ Na 2026-09-16:
 - istnieją globalne backend tests,
 - istnieje Playwright smoke dla produktu,
 - istnieją ops backup/restore/health commands,
-- newsroom-specific tests i E2E jeszcze nie istnieją,
-- homepage placement/topic/block editor tests jeszcze nie istnieją,
+- istnieją newsroom-specific unit/security tests dla `NewsroomBodyContract`, ale szersze newsroom tests i browser E2E jeszcze nie istnieją,
+- faktyczne N2 block-editor integration/E2E oraz homepage placement/topic tests jeszcze nie istnieją,
 - newsroom entity graph/news sitemap/sharding/feed-discovery/static-delivery tests jeszcze nie istnieją,
 - atomic static publication i dirty/version newsroom refresh coordinator jeszcze nie istnieją,
 - canonical CI jest SQLite-only; newsroom-postgres job jeszcze nie istnieje,
@@ -1393,7 +1399,7 @@ Na 2026-09-16:
 - [ ] dodać test files w trakcie N1–N5,
 - [ ] podłączyć do CI,
 - [ ] stworzyć newsroom E2E,
-- [ ] dodać block/composition/topic/focal-point tests,
+- [ ] dodać faktyczne N2 editor + N3 renderer integration/E2E oraz composition/topic/focal-point tests,
 - [ ] dodać site-identity/entity-graph/date-consistency tests,
 - [ ] dodać semantic silo/orphan/reverse-link/click-depth tests,
 - [ ] dodać route-family/canonical exclusivity tests,
@@ -1408,6 +1414,13 @@ Na 2026-09-16:
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-16 — v0.7
+
+- zapisano rzeczywisty test state po N0-004: `NewsroomBodyContractTest` pokrywa body schema/validation/security foundation,
+- rozdzielono istniejące unit/security regression od nadal brakujących N2 editor i N3 renderer integration/E2E,
+- potwierdzono fail-closed unknown version/block, structured rich-text XSS/URL guards oraz disabled embed jako wykonany kontrakt,
+- pełny public renderer/editor release gate pozostaje niewykonany.
 
 ### 2026-09-16 — v0.6
 
