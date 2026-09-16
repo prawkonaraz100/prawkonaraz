@@ -44,32 +44,29 @@ final class NewsroomHomePlacementService
         array $attributes,
     ): ContentHomePlacement {
         return DB::transaction(function () use ($placement, $attributes): ContentHomePlacement {
+            $snapshot = ContentHomePlacement::query()
+                ->whereKey($placement->getKey())
+                ->firstOrFail();
+
+            $snapshotAttributes = $this->attributesFrom($snapshot);
+            $normalized = $this->normalizeAttributes([
+                ...$snapshotAttributes,
+                ...$attributes,
+            ]);
+
+            $this->acquireTupleLocks([
+                $this->tupleFor($snapshotAttributes),
+                $this->tupleFor($normalized),
+            ]);
+
             $locked = ContentHomePlacement::query()
                 ->whereKey($placement->getKey())
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            $current = [
-                'surface_key' => $locked->surface_key,
-                'slot_key' => $locked->slot_key,
-                'context_key' => $locked->context_key,
-                'position' => $locked->position,
-                'article_id' => $locked->article_id,
-                'starts_at' => $locked->starts_at,
-                'ends_at' => $locked->ends_at,
-                'created_by_user_id' => $locked->created_by_user_id,
-                'updated_by_user_id' => $locked->updated_by_user_id,
-            ];
-
-            $normalized = $this->normalizeAttributes([
-                ...$current,
-                ...$attributes,
-            ]);
-
-            $this->acquireTupleLocks([
-                $this->tupleFor($current),
-                $this->tupleFor($normalized),
-            ]);
+            if ($this->tupleFor($this->attributesFrom($locked)) !== $this->tupleFor($snapshotAttributes)) {
+                throw new DomainException('Newsroom home placement changed concurrently; retry the update.');
+            }
 
             $this->assertNoOverlap($normalized, (int) $locked->getKey());
 
@@ -215,7 +212,7 @@ final class NewsroomHomePlacementService
             ->lockForUpdate();
 
         if ($ignorePlacementId !== null) {
-            $query->whereKeyNot($ignorePlacementId);
+            $query->where('id', '!=', $ignorePlacementId);
         }
 
         foreach ($query->get() as $existing) {
@@ -236,15 +233,41 @@ final class NewsroomHomePlacementService
         ?DateTimeInterface $rightStart,
         ?DateTimeInterface $rightEnd,
     ): bool {
-        if ($leftEnd !== null && $rightStart !== null && $leftEnd <= $rightStart) {
+        if (
+            $leftEnd !== null
+            && $rightStart !== null
+            && Carbon::parse($leftEnd->format(DATE_ATOM))->lte(Carbon::parse($rightStart->format(DATE_ATOM)))
+        ) {
             return false;
         }
 
-        if ($rightEnd !== null && $leftStart !== null && $rightEnd <= $leftStart) {
+        if (
+            $rightEnd !== null
+            && $leftStart !== null
+            && Carbon::parse($rightEnd->format(DATE_ATOM))->lte(Carbon::parse($leftStart->format(DATE_ATOM)))
+        ) {
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function attributesFrom(ContentHomePlacement $placement): array
+    {
+        return [
+            'surface_key' => $placement->surface_key,
+            'slot_key' => $placement->slot_key,
+            'context_key' => $placement->context_key,
+            'position' => $placement->position,
+            'article_id' => $placement->article_id,
+            'starts_at' => $placement->starts_at,
+            'ends_at' => $placement->ends_at,
+            'created_by_user_id' => $placement->created_by_user_id,
+            'updated_by_user_id' => $placement->updated_by_user_id,
+        ];
     }
 
     /**
