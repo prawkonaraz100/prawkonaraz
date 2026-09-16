@@ -7,6 +7,7 @@ use App\Filament\Resources\ContentArticles\ContentArticleResource;
 use App\Models\ContentArticle;
 use App\Models\User;
 use App\Support\ContentArticleSlugService;
+use App\Support\NewsroomArticleRelationsEditorAdapter;
 use App\Support\NewsroomBodyEditorAdapter;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
@@ -21,7 +22,13 @@ class EditContentArticle extends EditRecord
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
-        return NewsroomBodyEditorAdapter::hydrateArticleData($data);
+        $data = NewsroomBodyEditorAdapter::hydrateArticleData($data);
+
+        if ($this->record instanceof ContentArticle) {
+            $data = NewsroomArticleRelationsEditorAdapter::hydrateArticleData($data, $this->record);
+        }
+
+        return $data;
     }
 
     protected function handleRecordUpdate(Model $record, array $data): Model
@@ -49,10 +56,14 @@ class EditContentArticle extends EditRecord
             ]);
         }
 
+        $relationPayload = NewsroomArticleRelationsEditorAdapter::extractArticleData($data);
+        $data = $relationPayload['article_data'];
+        $relations = $relationPayload['relations'];
+
         $actor = auth()->user();
         $actor = $actor instanceof User ? $actor : null;
 
-        return DB::transaction(function () use ($record, $data, $actor): ContentArticle {
+        return DB::transaction(function () use ($record, $data, $relations, $actor): ContentArticle {
             $requestedType = $data['type'] ?? $record->type;
             $requestedType = $requestedType instanceof ContentArticleType
                 ? $requestedType->value
@@ -78,7 +89,7 @@ class EditContentArticle extends EditRecord
                 $record = $service->changeSlug($record, $requestedSlug, $actor);
             }
 
-            return $record->refresh();
+            return NewsroomArticleRelationsEditorAdapter::sync($record, $relations);
         });
     }
 

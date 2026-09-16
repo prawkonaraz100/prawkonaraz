@@ -12,10 +12,18 @@ use App\Models\ContentArticle;
 use App\Models\ContentArticleSource;
 use App\Models\ContentAuthor;
 use App\Models\ContentCategory;
+use App\Models\ContentTopic;
+use App\Models\LegalAct;
+use App\Models\LegalUnit;
+use App\Models\Question;
+use App\Models\TrafficSign;
 use App\Models\User;
+use App\Support\NewsroomArticleRelationsEditorAdapter;
 use App\Support\NewsroomBodyContract;
 use Filament\Forms\Components\Builder;
 use Filament\Forms\Components\Repeater;
+use Illuminate\Support\Carbon;
+use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
 
 test('admin can access content article resource with eager loaded editorial relations', function () {
@@ -485,5 +493,207 @@ test('ordinary public article edit cannot mutate source relationship records', f
             ->and($article->fresh()->editorial_note)->toBe('Tylko notatka może się zmienić.');
     } finally {
         $undoRepeaterFake();
+    }
+});
+
+test('admin can persist ordered article relations and topic membership', function () {
+    $undoRepeaterFake = Repeater::fake();
+
+    try {
+        $admin = User::factory()->admin()->create();
+        $category = ContentCategory::factory()->create();
+        $author = ContentAuthor::factory()->create();
+        $topicA = ContentTopic::factory()->create(['title' => 'Egzaminy praktyczne']);
+        $topicB = ContentTopic::factory()->published()->create(['title' => 'Zmiany 2026']);
+        $questionA = Question::factory()->create([
+            'external_id' => 'REL-Q-A',
+            'prompt' => 'Pierwsze pytanie relacyjne?',
+        ]);
+        $questionB = Question::factory()->create([
+            'external_id' => 'REL-Q-B',
+            'prompt' => 'Drugie pytanie relacyjne?',
+        ]);
+        $legalAct = LegalAct::query()->create([
+            'slug' => 'relacje-akt',
+            'title' => 'Ustawa testowa relacji',
+            'short_title' => 'UTR',
+            'source_url' => 'https://example.test/legal-act',
+            'status' => LegalAct::STATUS_VERIFIED,
+        ]);
+        $legalUnit = LegalUnit::query()->create([
+            'legal_act_id' => $legalAct->id,
+            'type' => 'article',
+            'label' => 'Art. 1',
+            'slug' => 'art-1',
+            'title' => 'Jednostka relacyjna',
+            'source_url' => 'https://example.test/legal-act#art-1',
+            'status' => LegalUnit::STATUS_VERIFIED,
+        ]);
+        $trafficSign = TrafficSign::factory()->published()->create([
+            'code' => 'A-99',
+            'slug' => 'a-99-test-relacji',
+            'name' => 'Test relacji',
+        ]);
+
+        $this->actingAs($admin);
+
+        Livewire::test(CreateContentArticle::class)
+            ->set('data.type', ContentArticleType::Guide->value)
+            ->set('data.category_id', $category->id)
+            ->set('data.author_id', $author->id)
+            ->set('data.title', 'Artykuł z relacjami')
+            ->set('data.topic_ids', [$topicB->id, $topicA->id])
+            ->set('data.question_relations', [
+                [
+                    'question_id' => $questionB->id,
+                    'relation_type' => 'practice',
+                    'note' => 'Najpierw ćwiczenie.',
+                ],
+                [
+                    'question_id' => $questionA->id,
+                    'relation_type' => 'background',
+                    'note' => null,
+                ],
+            ])
+            ->set('data.legal_unit_relations', [
+                [
+                    'legal_unit_id' => $legalUnit->id,
+                    'relation_type' => 'direct_basis',
+                    'note' => 'Podstawa materiału.',
+                ],
+            ])
+            ->set('data.traffic_sign_relations', [
+                [
+                    'traffic_sign_id' => $trafficSign->id,
+                    'relation_type' => 'example',
+                ],
+            ])
+            ->call('create')
+            ->assertHasNoErrors();
+
+        $article = ContentArticle::query()->where('title', 'Artykuł z relacjami')->firstOrFail();
+        $questions = $article->questions()->get();
+        $legalUnits = $article->legalUnits()->get();
+        $signs = $article->trafficSigns()->get();
+
+        expect($questions->pluck('id')->all())->toBe([$questionB->id, $questionA->id])
+            ->and($questions[0]->pivot?->sort_order)->toBe(0)
+            ->and($questions[0]->pivot?->relation_type)->toBe('practice')
+            ->and($questions[0]->pivot?->note)->toBe('Najpierw ćwiczenie.')
+            ->and($questions[1]->pivot?->sort_order)->toBe(1)
+            ->and($legalUnits)->toHaveCount(1)
+            ->and($legalUnits[0]->pivot?->relation_type)->toBe('direct_basis')
+            ->and($legalUnits[0]->pivot?->note)->toBe('Podstawa materiału.')
+            ->and($signs)->toHaveCount(1)
+            ->and($signs[0]->pivot?->relation_type)->toBe('example')
+            ->and($article->topics()->pluck('content_topics.id')->sort()->values()->all())
+            ->toBe(collect([$topicA->id, $topicB->id])->sort()->values()->all())
+            ->and($questionA->fresh()->prompt)->toBe('Pierwsze pytanie relacyjne?')
+            ->and($legalUnit->fresh()->official_excerpt)->toBeNull();
+    } finally {
+        $undoRepeaterFake();
+    }
+});
+
+test('ordinary public article edit cannot mutate article relations or topic membership', function () {
+    $undoRepeaterFake = Repeater::fake();
+
+    try {
+        $admin = User::factory()->admin()->create();
+        $article = ContentArticle::factory()->published()->create();
+        $questionOriginal = Question::factory()->create();
+        $questionReplacement = Question::factory()->create();
+        $topicOriginal = ContentTopic::factory()->create();
+        $topicReplacement = ContentTopic::factory()->create();
+
+        $article->questions()->attach($questionOriginal->id, [
+            'relation_type' => 'direct',
+            'sort_order' => 0,
+            'note' => null,
+        ]);
+        $article->topics()->attach($topicOriginal->id);
+
+        $this->actingAs($admin);
+
+        Livewire::test(EditContentArticle::class, ['record' => $article->getRouteKey()])
+            ->set('data.question_relations', [
+                [
+                    'question_id' => $questionReplacement->id,
+                    'relation_type' => 'related',
+                    'note' => 'Nie powinno się zapisać.',
+                ],
+            ])
+            ->set('data.topic_ids', [$topicReplacement->id])
+            ->set('data.editorial_note', 'Relacje pozostają bez zmian.')
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $article = $article->fresh();
+
+        expect($article->questions()->pluck('questions.id')->all())->toBe([$questionOriginal->id])
+            ->and($article->topics()->pluck('content_topics.id')->all())->toBe([$topicOriginal->id])
+            ->and($article->editorial_note)->toBe('Relacje pozostają bez zmian.');
+    } finally {
+        $undoRepeaterFake();
+    }
+});
+
+test('relations adapter rejects duplicate targets invalid relation types and missing records', function () {
+    $question = Question::factory()->create();
+
+    expect(fn () => NewsroomArticleRelationsEditorAdapter::extractArticleData([
+        'question_relations' => [
+            [
+                'question_id' => $question->id,
+                'relation_type' => 'direct',
+            ],
+            [
+                'question_id' => $question->id,
+                'relation_type' => 'related',
+            ],
+        ],
+    ]))->toThrow(ValidationException::class);
+
+    expect(fn () => NewsroomArticleRelationsEditorAdapter::extractArticleData([
+        'question_relations' => [
+            [
+                'question_id' => $question->id,
+                'relation_type' => 'unsupported',
+            ],
+        ],
+    ]))->toThrow(ValidationException::class);
+
+    expect(fn () => NewsroomArticleRelationsEditorAdapter::extractArticleData([
+        'topic_ids' => [999999999],
+    ]))->toThrow(ValidationException::class);
+});
+
+test('relations sync touches parent article edit token', function () {
+    Carbon::setTestNow('2026-09-16 11:00:00');
+
+    try {
+        $article = ContentArticle::factory()->create();
+        $question = Question::factory()->create();
+        $before = $article->fresh()->updated_at;
+
+        Carbon::setTestNow('2026-09-16 11:01:00');
+
+        NewsroomArticleRelationsEditorAdapter::sync($article, [
+            'questions' => [
+                [
+                    'question_id' => $question->id,
+                    'relation_type' => 'related',
+                    'note' => null,
+                ],
+            ],
+            'legal_units' => [],
+            'traffic_signs' => [],
+            'topic_ids' => [],
+        ]);
+
+        expect($article->fresh()->updated_at?->gt($before))->toBeTrue()
+            ->and($article->questions()->first()?->pivot?->sort_order)->toBe(0);
+    } finally {
+        Carbon::setTestNow();
     }
 });

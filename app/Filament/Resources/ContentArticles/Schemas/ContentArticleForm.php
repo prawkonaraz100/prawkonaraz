@@ -5,6 +5,7 @@ namespace App\Filament\Resources\ContentArticles\Schemas;
 use App\Enums\ContentArticleSourceType;
 use App\Enums\ContentArticleType;
 use App\Models\ContentArticle;
+use App\Models\ContentTopic;
 use App\Models\LegalUnit;
 use App\Models\Question;
 use App\Models\TrafficSign;
@@ -198,6 +199,78 @@ class ContentArticleForm
                                     ->rows(3)
                                     ->helperText('Nigdy nie jest częścią publicznej citation.')
                                     ->columnSpanFull(),
+                            ])
+                            ->columns(2)
+                            ->disabled(fn (?ContentArticle $record): bool => static::publicFieldsLocked($record))
+                            ->columnSpanFull(),
+                    ]),
+                Section::make('Powiązania')
+                    ->description('Relacje wskazują istniejące encje produktu. Pytania, przepisy i znaki zachowują kolejność redakcyjną; tematy nie mają ręcznego rankingu.')
+                    ->schema([
+                        static::topicSelect()
+                            ->disabled(fn (?ContentArticle $record): bool => static::publicFieldsLocked($record))
+                            ->columnSpanFull(),
+                        Repeater::make('question_relations')
+                            ->label('Pytania')
+                            ->defaultItems(0)
+                            ->addActionLabel('Dodaj pytanie')
+                            ->reorderableWithButtons()
+                            ->collapsible()
+                            ->itemLabel(fn (array $state): string => static::relationItemLabel('Pytanie', $state['relation_type'] ?? null))
+                            ->schema([
+                                static::questionRelationSelect(),
+                                Select::make('relation_type')
+                                    ->label('Typ relacji')
+                                    ->options(static::questionRelationTypeOptions())
+                                    ->default('related')
+                                    ->native(false)
+                                    ->required(),
+                                Textarea::make('note')
+                                    ->label('Notatka wewnętrzna')
+                                    ->rows(2)
+                                    ->columnSpanFull(),
+                            ])
+                            ->columns(2)
+                            ->disabled(fn (?ContentArticle $record): bool => static::publicFieldsLocked($record))
+                            ->columnSpanFull(),
+                        Repeater::make('legal_unit_relations')
+                            ->label('Podstawy prawne')
+                            ->defaultItems(0)
+                            ->addActionLabel('Dodaj jednostkę prawną')
+                            ->reorderableWithButtons()
+                            ->collapsible()
+                            ->itemLabel(fn (array $state): string => static::relationItemLabel('Przepis', $state['relation_type'] ?? null))
+                            ->schema([
+                                static::legalUnitSelect(),
+                                Select::make('relation_type')
+                                    ->label('Typ relacji')
+                                    ->options(static::legalRelationTypeOptions())
+                                    ->default('related')
+                                    ->native(false)
+                                    ->required(),
+                                Textarea::make('note')
+                                    ->label('Notatka wewnętrzna')
+                                    ->rows(2)
+                                    ->columnSpanFull(),
+                            ])
+                            ->columns(2)
+                            ->disabled(fn (?ContentArticle $record): bool => static::publicFieldsLocked($record))
+                            ->columnSpanFull(),
+                        Repeater::make('traffic_sign_relations')
+                            ->label('Znaki drogowe')
+                            ->defaultItems(0)
+                            ->addActionLabel('Dodaj znak')
+                            ->reorderableWithButtons()
+                            ->collapsible()
+                            ->itemLabel(fn (array $state): string => static::relationItemLabel('Znak', $state['relation_type'] ?? null))
+                            ->schema([
+                                static::trafficSignRelationSelect(),
+                                Select::make('relation_type')
+                                    ->label('Typ relacji')
+                                    ->options(static::trafficSignRelationTypeOptions())
+                                    ->default('related')
+                                    ->native(false)
+                                    ->required(),
                             ])
                             ->columns(2)
                             ->disabled(fn (?ContentArticle $record): bool => static::publicFieldsLocked($record))
@@ -439,6 +512,7 @@ class ContentArticleForm
                 $needle = '%'.mb_strtolower(trim($search)).'%';
 
                 return Question::query()
+                    ->with('licenseCategory')
                     ->where(function (EloquentBuilder $query) use ($needle): void {
                         $query
                             ->whereRaw('LOWER(CAST(external_id AS TEXT)) LIKE ?', [$needle])
@@ -453,6 +527,7 @@ class ContentArticleForm
                     ->all();
             })
             ->getOptionLabelsUsing(fn (array $values): array => Question::query()
+                ->with('licenseCategory')
                 ->whereIn('id', $values)
                 ->get(['id', 'external_id', 'prompt'])
                 ->mapWithKeys(fn (Question $question): array => [
@@ -461,6 +536,71 @@ class ContentArticleForm
                 ->all())
             ->minItems(1)
             ->required();
+    }
+
+    protected static function questionRelationSelect(): Select
+    {
+        return Select::make('question_id')
+            ->label('Pytanie')
+            ->searchable()
+            ->getSearchResultsUsing(function (string $search): array {
+                $needle = '%'.mb_strtolower(trim($search)).'%';
+
+                return Question::query()
+                    ->with('licenseCategory')
+                    ->where(function (EloquentBuilder $query) use ($needle): void {
+                        $query
+                            ->whereRaw('LOWER(CAST(external_id AS TEXT)) LIKE ?', [$needle])
+                            ->orWhereRaw('LOWER(prompt) LIKE ?', [$needle]);
+                    })
+                    ->orderByDesc('id')
+                    ->limit(50)
+                    ->get()
+                    ->mapWithKeys(fn (Question $question): array => [
+                        $question->id => static::questionLabel($question),
+                    ])
+                    ->all();
+            })
+            ->getOptionLabelUsing(function ($value): ?string {
+                $question = Question::query()->with('licenseCategory')->find($value);
+
+                return $question instanceof Question ? static::questionLabel($question) : null;
+            })
+            ->required();
+    }
+
+    protected static function topicSelect(): Select
+    {
+        return Select::make('topic_ids')
+            ->label('Tematy')
+            ->helperText('Tematy nie mają ręcznej kolejności. Publiczny topic ma własny corpus i featured article.')
+            ->multiple()
+            ->searchable()
+            ->getSearchResultsUsing(function (string $search): array {
+                $needle = '%'.mb_strtolower(trim($search)).'%';
+
+                return ContentTopic::query()
+                    ->where(function (EloquentBuilder $query) use ($needle): void {
+                        $query
+                            ->whereRaw('LOWER(title) LIKE ?', [$needle])
+                            ->orWhereRaw('LOWER(slug) LIKE ?', [$needle])
+                            ->orWhereRaw('LOWER(COALESCE(description, \'\')) LIKE ?', [$needle]);
+                    })
+                    ->orderByDesc('id')
+                    ->limit(50)
+                    ->get(['id', 'title', 'slug', 'status'])
+                    ->mapWithKeys(fn (ContentTopic $topic): array => [
+                        $topic->id => static::topicLabel($topic),
+                    ])
+                    ->all();
+            })
+            ->getOptionLabelsUsing(fn (array $values): array => ContentTopic::query()
+                ->whereIn('id', $values)
+                ->get(['id', 'title', 'slug', 'status'])
+                ->mapWithKeys(fn (ContentTopic $topic): array => [
+                    $topic->id => static::topicLabel($topic),
+                ])
+                ->all());
     }
 
     protected static function trafficSignSelect(): Select
@@ -498,6 +638,37 @@ class ContentArticleForm
             ->required();
     }
 
+    protected static function trafficSignRelationSelect(): Select
+    {
+        return Select::make('traffic_sign_id')
+            ->label('Znak drogowy')
+            ->searchable()
+            ->getSearchResultsUsing(function (string $search): array {
+                $needle = '%'.mb_strtolower(trim($search)).'%';
+
+                return TrafficSign::query()
+                    ->where(function (EloquentBuilder $query) use ($needle): void {
+                        $query
+                            ->whereRaw('LOWER(code) LIKE ?', [$needle])
+                            ->orWhereRaw('LOWER(name) LIKE ?', [$needle])
+                            ->orWhereRaw('LOWER(slug) LIKE ?', [$needle]);
+                    })
+                    ->orderBy('code')
+                    ->limit(50)
+                    ->get()
+                    ->mapWithKeys(fn (TrafficSign $sign): array => [
+                        $sign->id => static::trafficSignLabel($sign),
+                    ])
+                    ->all();
+            })
+            ->getOptionLabelUsing(function ($value): ?string {
+                $sign = TrafficSign::query()->find($value);
+
+                return $sign instanceof TrafficSign ? static::trafficSignLabel($sign) : null;
+            })
+            ->required();
+    }
+
     protected static function articleLabel(ContentArticle $article): string
     {
         return Str::limit((string) $article->title, 100).' · /'.$article->slug;
@@ -517,9 +688,80 @@ class ContentArticleForm
     protected static function questionLabel(Question $question): string
     {
         $externalId = trim((string) $question->external_id);
-        $prompt = Str::limit(trim((string) $question->prompt), 120);
+        $prompt = Str::limit(trim((string) $question->prompt), 110);
+        $category = trim((string) $question->licenseCategory?->code);
+        $active = $question->is_active ? 'aktywne' : 'nieaktywne';
+        $public = $question->is_active
+            && $question->published_at !== null
+            && $question->published_at->lte(now())
+            ? 'publiczne'
+            : 'niepubliczne';
 
-        return $externalId !== '' ? $externalId.' · '.$prompt : $prompt;
+        $prefix = implode(' · ', array_values(array_filter([
+            $externalId !== '' ? $externalId : null,
+            $category !== '' ? 'kat. '.$category : null,
+            $active,
+            $public,
+        ])));
+
+        return $prefix !== '' ? $prefix.' — '.$prompt : $prompt;
+    }
+
+    protected static function trafficSignLabel(TrafficSign $sign): string
+    {
+        $state = $sign->isPubliclyVisible() ? 'publiczny' : 'niepubliczny';
+
+        return $sign->publicTitle().' · '.$state;
+    }
+
+    protected static function topicLabel(ContentTopic $topic): string
+    {
+        return Str::limit((string) $topic->title, 100).' · '.$topic->status;
+    }
+
+    protected static function relationItemLabel(string $entity, mixed $relationType): string
+    {
+        $type = trim((string) $relationType);
+
+        return $type !== '' ? $entity.' · '.$type : $entity;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected static function questionRelationTypeOptions(): array
+    {
+        return [
+            'direct' => 'Bezpośrednio dotyczy',
+            'practice' => 'Do ćwiczenia',
+            'background' => 'Kontekst',
+            'related' => 'Powiązane',
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected static function legalRelationTypeOptions(): array
+    {
+        return [
+            'direct_basis' => 'Bezpośrednia podstawa',
+            'changed_rule' => 'Zmieniany przepis',
+            'supporting_context' => 'Kontekst prawny',
+            'related' => 'Powiązane',
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected static function trafficSignRelationTypeOptions(): array
+    {
+        return [
+            'direct' => 'Bezpośrednio dotyczy',
+            'example' => 'Przykład',
+            'related' => 'Powiązane',
+        ];
     }
 
     /**

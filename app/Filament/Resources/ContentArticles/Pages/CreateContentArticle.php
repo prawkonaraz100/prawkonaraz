@@ -5,9 +5,11 @@ namespace App\Filament\Resources\ContentArticles\Pages;
 use App\Filament\Resources\ContentArticles\ContentArticleResource;
 use App\Models\User;
 use App\Support\ContentArticleSlugService;
+use App\Support\NewsroomArticleRelationsEditorAdapter;
 use App\Support\NewsroomBodyEditorAdapter;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
 
@@ -25,11 +27,17 @@ class CreateContentArticle extends CreateRecord
             ]);
         }
 
-        $actor = auth()->user();
+        $relationPayload = NewsroomArticleRelationsEditorAdapter::extractArticleData($data);
+        $data = $relationPayload['article_data'];
+        $relations = $relationPayload['relations'];
 
-        return app(ContentArticleSlugService::class)->create(
-            $data,
-            $actor instanceof User ? $actor : null,
-        );
+        $actor = auth()->user();
+        $actor = $actor instanceof User ? $actor : null;
+
+        return DB::transaction(function () use ($data, $relations, $actor): Model {
+            $article = app(ContentArticleSlugService::class)->create($data, $actor);
+
+            return NewsroomArticleRelationsEditorAdapter::sync($article, $relations);
+        });
     }
 }
