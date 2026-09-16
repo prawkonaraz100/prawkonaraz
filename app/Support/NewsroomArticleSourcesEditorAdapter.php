@@ -90,7 +90,7 @@ final class NewsroomArticleSourcesEditorAdapter
                     ? self::booleanValue($source['is_publicly_cited'])
                     : true,
                 'note' => self::nullableTrimmedString($source['note'] ?? null),
-                'sort_order' => $index,
+                'sort_order' => $index + 1,
             ];
         }
 
