@@ -22,6 +22,7 @@ use Filament\Resources\Events\RecordUpdated;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Support\Exceptions\Halt;
 use Filament\Support\Facades\FilamentView;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -96,12 +97,7 @@ class EditContentArticle extends EditRecord
             $this->callHook('afterValidate');
             $this->callHook('beforeSave');
 
-            $rawState = $this->form->getRawState();
-            $snapshot = $this->form->getStateSnapshot();
-            $payload = [
-                ...(is_array($rawState) ? $rawState : $rawState->toArray()),
-                ...$snapshot,
-            ];
+            $payload = $this->validatedEditorPayload();
 
             $loadedToken = trim((string) ($payload['_edit_token'] ?? ''));
             $actor = auth()->user();
@@ -161,13 +157,7 @@ class EditContentArticle extends EditRecord
             $this->form->validate();
             $this->callHook('afterValidate');
 
-            $rawState = $this->form->getRawState();
-            $snapshot = $this->form->getStateSnapshot();
-            $data = [
-                ...(is_array($rawState) ? $rawState : $rawState->toArray()),
-                ...$snapshot,
-            ];
-            $data = $this->mutateFormDataBeforeSave($data);
+            $data = $this->mutateFormDataBeforeSave($this->validatedEditorPayload());
 
             $this->callHook('beforeSave');
             $this->record = $this->handleRecordUpdate($this->getRecord(), $data);
@@ -237,7 +227,13 @@ class EditContentArticle extends EditRecord
             $sourcePayload = NewsroomArticleSourcesEditorAdapter::extractArticleData($data);
             $data = $sourcePayload['article_data'];
             $sources = $sourcePayload['sources'];
+        } catch (InvalidArgumentException $exception) {
+            throw ValidationException::withMessages([
+                'data.sources' => $exception->getMessage(),
+            ]);
+        }
 
+        try {
             $data = NewsroomBodyEditorAdapter::normalizeArticleData(
                 $data,
                 (int) ($record->body_schema_version ?? 1),
@@ -347,6 +343,27 @@ class EditContentArticle extends EditRecord
                 ->action(fn (): void => $this->beginPublicUpdate()),
             ...$this->contentArticleWorkflowActions(),
         ];
+    }
+
+    /**
+     * Build an allowlisted editor payload without triggering Filament relationship persistence.
+     *
+     * @return array<string, mixed>
+     */
+    private function validatedEditorPayload(): array
+    {
+        $snapshot = $this->form->getStateSnapshot();
+        $rawState = $this->form->getRawState();
+
+        if ($rawState instanceof Arrayable) {
+            $rawState = $rawState->toArray();
+        }
+
+        if (is_array($rawState) && array_key_exists('sources', $rawState)) {
+            $snapshot['sources'] = $rawState['sources'];
+        }
+
+        return $snapshot;
     }
 
     private function assertFreshToken(ContentArticle $article, string $loadedToken): void
