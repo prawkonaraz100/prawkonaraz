@@ -265,6 +265,46 @@ test('admin can persist ordered canonical body blocks through the builder adapte
     }
 });
 
+test('stale draft edit is rejected before relationship state can overwrite a concurrent source change', function () {
+    Carbon::setTestNow('2026-09-16 18:45:00');
+
+    $undoRepeaterFake = Repeater::fake();
+
+    try {
+        $admin = User::factory()->admin()->create();
+        $article = ContentArticle::factory()->draft()->create([
+            'title' => 'Roboczy tytuł',
+        ]);
+        $source = ContentArticleSource::factory()
+            ->for($article, 'article')
+            ->create([
+                'title' => 'Źródło załadowane do formularza',
+                'url' => 'https://example.test/loaded',
+            ]);
+
+        $this->actingAs($admin);
+
+        $component = Livewire::test(EditContentArticle::class, ['record' => $article->getRouteKey()]);
+
+        $source->update([
+            'title' => 'Równoległa zmiana źródła',
+            'url' => 'https://example.test/concurrent',
+        ]);
+
+        $component
+            ->set('data.title', 'Nie wolno nadpisać')
+            ->call('save')
+            ->assertHasErrors(['data.title']);
+
+        expect($article->fresh()->title)->toBe('Roboczy tytuł')
+            ->and($source->fresh()->title)->toBe('Równoległa zmiana źródła')
+            ->and($source->fresh()->url)->toBe('https://example.test/concurrent');
+    } finally {
+        $undoRepeaterFake();
+        Carbon::setTestNow();
+    }
+});
+
 test('draft edit preserves existing canonical body block keys across builder hydration', function () {
     $undoBuilderFake = Builder::fake();
 
