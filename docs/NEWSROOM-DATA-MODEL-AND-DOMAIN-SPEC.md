@@ -1089,7 +1089,7 @@ Kontrakt domenowy:
 - link przyjmuje root-relative/fragment/http/https; `javascript:` oraz nieobsługiwane targety są odrzucane, a `target=_blank` normalizuje się do `rel="noopener noreferrer"`,
 - aktywne bloki v1: `rich_text`, `image`, `quote`, `table`, `context`, `related_article`, `legal_reference`, `question_group`, `traffic_sign_group`, `product_cta`,
 - `embed` jest znany kontraktowi, ale feature-disabled/fail-closed, dopóki nie istnieje provider allowlista, sandbox/referrer policy oraz zgodny z produkcją CSP/`frame-src` contract,
-- image block przyjmuje wyłącznie storage-relative path i pola strukturalne; finalny storage/upload/crop contract pozostaje w N0-006,
+- image block przyjmuje wyłącznie storage-relative path i pola strukturalne; N0-006 zapewnia `NewsroomMediaStorage` dla managed paths/validation, a faktyczny upload UI/persistence i crop generation pozostają w N2/N3,
 - domain blocks utrzymują IDs, nie zduplikowane fragmenty HTML lub kart,
 - block key jest opcjonalny, ale jeśli występuje, ma stabilny format, musi być unikalny i nie może kolidować z Builder item key,
 - unknown block type oraz unknown payload field failują zamknięcie zamiast wykonywać nieznaną treść.
