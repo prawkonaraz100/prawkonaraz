@@ -5,7 +5,7 @@
 - **Status:** Canonical architecture + live implementation status
 - **Obszar:** publiczny serwis informacyjny, newsroom, aktualności, poradniki i dystrybucja treści
 - **Repozytorium:** `prawkonaraz100/prawkonaraz`
-- **Bazowy stan kodu:** `main@4b10738705f3696bc2bcce730a707473eab8cd2b`
+- **Bazowy stan kodu:** `main@8215e142af2cd88c7335f17bc085bbd0c04d5790`
 - **Data utworzenia:** 2026-09-15
 - **Właściciel decyzji produktowej:** PrawkoNaRaz
 - **Cel:** zaprojektować profesjonalny pion medialny bez dublowania istniejącej platformy, bez osobnego CMS/WordPressa i bez rozbijania modularnego monolitu.
@@ -103,7 +103,7 @@ Na pierwszym etapie nie budujemy:
 
 ## 5. Aktualny stan implementacji
 
-Stan sprawdzony ponownie 2026-09-16 względem `main@ff81f92fe75442b60e67297f3945d2a63b7c5128` po wdrożeniu N0, N1-001..N1-006 oraz N2-001..N2-012. Zakres admin/domain N2 jest zamknięty; publiczne N3/N4 i discovery N5 pozostają otwarte.
+Stan sprawdzony ponownie 2026-09-17 względem `main@8215e142af2cd88c7335f17bc085bbd0c04d5790` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-012 oraz NEWSROOM-N3-001. Zakres admin/domain N2 jest zamknięty, a backendowy public read boundary N3-001 jest wdrożony; publiczne kontrolery/renderery, SEO/schema i dalsze N3/N4/N5 pozostają otwarte.
 
 ### 5.1. Elementy już istniejące
 
@@ -161,7 +161,8 @@ To oznacza, że:
 - adresy, IA i matching/order contract już istnieją,
 - model domenowy artykułów/kategorii/tagów/topiców i relacji oraz backendowy publishing/scheduling foundation już istnieją,
 - nie istnieje jeszcze publiczna lista artykułów ani widok pojedynczego artykułu,
-- service-level `ContentArticlePathResolver` istnieje, ale nie jest jeszcze podłączony do publicznych controllerów,
+- `ContentArticlePublicCatalogService` materializuje backendowy public read boundary: route-family-scoped lookup dla publicznie widocznego detailu, jawne `visible/gone/not_found` (200/410/404 na poziomie resolution), osobny `activelyDistributed()` query dla listingów oraz public-safe eager loading/column allowlists,
+- `ContentArticlePathResolver` nadal przechowuje canonical/history path foundation; publiczne kontrolery nie są jeszcze podłączone, a historyczny old-path -> 301 resolver pozostaje NEWSROOM-N3-006,
 - zakres admin/domain CMS N2 jest zmaterializowany: obok `ContentCategoryResource`, `ContentArticleResource`, Builder/sources/relations/workflow/public-update/checklist/preview/HomeComposer/provenance-media istnieje `ContentTopicResource` + kontrolowany topic publish/archive/republish workflow; publiczne route’y pozostają nieuruchomione.
 
 ### 5.3. Brakujące elementy
@@ -1492,7 +1493,8 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N2-012` — ContentArticle + HomeComposer stale-write/audit identity hardening,
 - [x] `NEWSROOM-N2-010` — provenance, regulatory context and media art direction,
 - [x] `NEWSROOM-N2-011` — ContentTopicResource + topic publication/identity guards,
-- [ ] `NEWSROOM-N3-001` — Public catalog service jako następny wykonywalny task.
+- [x] `NEWSROOM-N3-001` — Public catalog service: backendowy route-family read boundary, active-list query i jawna visible/gone/not-found semantyka.
+- [ ] `NEWSROOM-N3-002` — Article SEO service jako następny wykonywalny task.
 
 Pozostałe elementy N3–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu checklistę.
 
@@ -1519,6 +1521,15 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-17 — v0.30
+
+- PR #64 zmergowano na `main@8215e142af2cd88c7335f17bc085bbd0c04d5790`; exact-head PR CI #231 był pełnym PASS, a finalny push-CI #232 na tym samym `main` zakończył się `quality` PASS (1029 passed / 19 335 assertions / 2 skipped, Pint PASS, frontend build PASS) oraz `newsroom-postgres` PASS,
+- NEWSROOM-N3-001 jest **DONE**: `ContentArticlePublicCatalogService` rozdziela canonical detail lookup od `activelyDistributed()` list query, respektuje route family i ładuje wyłącznie public-safe pola/relacje,
+- `ContentArticlePublicResolution` rozróżnia current-canonical visible 200, historycznie publiczny withdrawn 410 oraz hidden/not-found 404; draft, scheduled i never-published archived nie uzyskują publicznego detailu,
+- archived po wcześniejszej publikacji pozostaje widocznym detail candidate, ale nie trafia do active listings; needs_review pozostaje publicznie widoczne zgodnie z policy, lecz nie jest aktywnie dystrybuowane,
+- publiczne article controllery/renderery nadal są wyłączone i detail routes pozostają 404 w pre-launch stanie; historyczny old-path 301 jest osobnym NEWSROOM-N3-006,
+- następnym taskiem wykonawczym jest NEWSROOM-N3-002 `Article SEO service`.
 
 ### 2026-09-16 — v0.29
 

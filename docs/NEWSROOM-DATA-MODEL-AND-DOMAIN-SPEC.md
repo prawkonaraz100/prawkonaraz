@@ -756,7 +756,7 @@ Kod zawiera:
 
 PostgreSQL 16 gate wykonuje realny contention test na drugim połączeniu i potwierdza serialization tego samego full path. Finalny wynik po N1-003: 6 testów / 86 asercji.
 
-Publiczne article controllers nadal nie istnieją, więc HTTP 301 dla old path i 200 dla new canonical nie są jeszcze zmaterializowane w routingu; N3 ma konsumować `ContentArticlePathResolver` zamiast duplikować lookup logic.
+Publiczne article controllers nadal nie istnieją. NEWSROOM-N3-001 dodało `ContentArticlePublicCatalogService` dla current-canonical public detail/list read boundary, reużywając `NewsroomRouteContract` i istniejące scope'y zamiast dublować visibility logic. Historyczne old-path -> 301 nadal ma konsumować `ContentArticlePathResolver` w NEWSROOM-N3-006; HTTP 200/410/301 nie są jeszcze podłączone do publicznych route controllerów.
 
 ---
 
@@ -959,6 +959,19 @@ Zwykłe read modele list/hubów nie mogą używać `publiclyVisible()` zamiast `
 Artykuł `archived`, który nigdy nie był publiczny (`first_published_at=null`), nie uzyskuje publicznego detail URL tylko dlatego, że ma status archived.
 
 `withdrawn` nigdy nie jest `publiclyVisible()`: rekord i historia pozostają w backoffice, ale jego kanoniczny dawny path jest rozpoznawany przez resolver jako celowe `410 Gone`, chyba że istnieje jawny redirect do rzeczywistego następcy.
+
+### 19.2.1. Aktualny stan implementacji N3-001
+
+Na `main@8215e142af2cd88c7335f17bc085bbd0c04d5790` istnieje `ContentArticlePublicCatalogService` jako publiczny read boundary warstwy backendowej:
+
+- `findPubliclyVisibleBySlug()` używa route-family guard oraz istniejącego `publiclyVisible()` i nie pozwala temu samemu rekordowi odpowiadać w niewłaściwej rodzinie URL,
+- `resolveDetailBySlug()` daje jawny wynik `visible` / `gone` / `not_found`, odpowiadający 200 / 410 / 404 dla bieżącego canonical slug; historyczne old-path redirecty nie są tu rozwiązywane,
+- `activelyDistributedQuery()` jest osobnym query boundary dla hubów/list/feed candidates i świadomie nie dodaje automatycznie `indexable()`, bo sitemap/SEO mają własny downstream filter,
+- detail eager loading używa public-safe allowlist: nie eksponuje `editorial_note`, `image_license_note`, `withdrawal_reason` ani prywatnych source notes; źródła są tylko `publiclyCited()`, a topic relations tylko opublikowane,
+- archived po wcześniejszej publikacji może zostać zwrócone dla canonical detailu, ale jest wykluczone z active query; needs_review pozostaje detail-visible, lecz nie jest aktywnie dystrybuowane,
+- draft, scheduled, never-published archived oraz never-published withdrawn pozostają ukryte.
+
+Ta warstwa nie uruchamia jeszcze publicznego HTTP renderera. Zarejestrowane detail routes nadal zwracają 404 do czasu N3-004/rollout, a historyczne old-path -> 301 pozostaje NEWSROOM-N3-006.
 
 ---
 
@@ -1743,12 +1756,21 @@ Na 2026-09-16:
 - [x] NEWSROOM-N2-009: fixed-slot NewsroomHomeComposer + private future preview,
 - [x] NEWSROOM-N2-010: provenance, regulatory context and media art direction,
 - [x] NEWSROOM-N2-012: ContentArticle + HomeComposer stale-write/audit identity hardening,
-- [ ] podłączyć `ContentArticlePathResolver` do publicznych N3 article controllers i zweryfikować HTTP canonical/301/404/410 behavior,
+- [x] NEWSROOM-N3-001: wdrożyć `ContentArticlePublicCatalogService` z route-family current-canonical lookup, `activelyDistributed()` list query i visible/gone/not-found resolution,
+- [ ] podłączyć publiczne article controllers/renderery oraz NEWSROOM-N3-006 historyczny `ContentArticlePathResolver` redirect flow i zweryfikować HTTP canonical/301/404/410 behavior,
 - [ ] dodać sitemap/public-discovery regression korzystające wyłącznie z current canonical URL,
 
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-17 — v0.28
+
+- NEWSROOM-N3-001 zmergowano przez PR #64 na `main@8215e142af2cd88c7335f17bc085bbd0c04d5790`; finalny push-CI #232: `quality` PASS (1029 passed / 19 335 assertions / 2 skipped, Pint PASS, frontend build PASS) oraz `newsroom-postgres` PASS,
+- dodano `ContentArticlePublicCatalogService` i `ContentArticlePublicResolution` bez zmian schema/migracji oraz bez zmiany istniejących model scopes,
+- current-canonical detail read boundary respektuje route family i statusy publiczne; withdrawn po wcześniejszej publikacji jest jawnie `gone`, a aktywne listy korzystają osobno z `activelyDistributed()`,
+- eager-load/column allowlist nie ujawnia private editorial/license/withdrawal/source-note pól,
+- publiczne route controllery nadal nie są uruchomione, a historyczne redirecty pozostają N3-006; następny etap to N3-002 SEO service.
 
 ### 2026-09-16 — v0.27
 
