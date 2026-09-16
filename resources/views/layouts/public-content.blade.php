@@ -9,6 +9,7 @@
     $imageHeight = $meta['image_height'] ?? null;
     $preloadImage = $meta['preload_image'] ?? null;
     $ogType = $meta['og_type'] ?? 'website';
+    $siteName = (string) config('content.organization.name', config('app.name', 'prawkonaraz.pl'));
     $robots = $meta['robots'] ?? 'index,follow,max-image-preview:large';
     $authorName = $meta['author_name'] ?? null;
     $publishedTime = $meta['published_time'] ?? null;
@@ -46,6 +47,7 @@
         @endif
         <link rel="canonical" href="{{ $canonical }}">
         <meta property="og:locale" content="pl_PL">
+        <meta property="og:site_name" content="{{ $siteName }}">
         <meta property="og:type" content="{{ $ogType }}">
         <meta property="og:title" content="{{ $title }}">
         @if ($description)
