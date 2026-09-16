@@ -483,6 +483,25 @@ Zakres N1-002 materializuje warstwę Eloquent nad schema N1-001. Nie obejmuje sl
 
 ## NEWSROOM-N1-003 — Slug service + redirects
 
+### Status implementacji
+
+**DONE — canonical slug/history service został zmergowany przez PR #28 na `main@f2ccc997b4aea4634b148ff4696aa66eaaf75d91`.**
+
+N1-003 zamyka domenowy kontrakt slugów, historycznych full paths, one-hop redirects, route-family exclusivity resolver oraz PostgreSQL serialization. Nie oznacza jeszcze publicznego HTTP 301/200, ponieważ N3 article controllers nadal nie istnieją.
+
+### Aktualny stan implementacji
+
+- istnieje `ContentArticleSlugService` dla create, initial slug allocation, explicit slug validation, slug change i type change,
+- generated slug allocation jest deterministyczne i suffixuje kolizje; reserved newsroom segments są pomijane,
+- opublikowana zmiana sluga zapisuje `ContentArticleRedirect` 301 i przepisuje całą historię bezpośrednio do aktualnego canonical path,
+- własny historyczny path można odzyskać tylko przez service; historyczny `from_path` innego artykułu pozostaje zarezerwowany,
+- cross-family type change jest dozwolony tylko przed `first_published_at`; opublikowana zmiana w obrębie tej samej route family pozostaje dozwolona,
+- `ContentArticlePathResolver` egzekwuje service-level route-family exclusivity i rozwiązuje historyczne redirect records,
+- `PostgresTransactionAdvisoryLock` serializuje mutacje slug/full-path; lock keys są deduplikowane i sortowane przed pobraniem,
+- slug/type mutations zapisują kompaktowy `AuditLog` bez body,
+- finalny `newsroom-postgres`: 6 testów / 86 asercji PASS, w tym realny contention test na drugim połączeniu PostgreSQL,
+- finalny `quality`: 906 passed / 18 565 assertions / 2 skipped; Pint 980 files PASS; frontend build PASS.
+
 ### Zakres
 
 - initial slug,
@@ -1833,7 +1852,7 @@ Nie oznaczać tasku DONE przed merge + green verification.
 Na 2026-09-16:
 
 - pakiet projektowy newsroomu obejmuje architekturę, model danych, CMS, UI, governance, SEO, backlog i runbook,
-- foundation N0 jest zamknięte, a N1-001 schema/enum foundation oraz N1-002 Eloquent models/factories/scopes są wdrożone; CMS i publiczny newsroom nadal nie są wdrożone,
+- foundation N0 jest zamknięte, a N1-001 schema/enum foundation, N1-002 Eloquent models/factories/scopes oraz N1-003 slug/history/path resolver są wdrożone; CMS i publiczny newsroom nadal nie są wdrożone,
 - `/aktualnosci` i `/poradniki` nadal renderują pre-launch placeholder, teraz z dedykowanym `X-Robots-Tag: noindex, follow`; finalne detail/category/topic/feed route namespaces są zarejestrowane, ale pozostają 404 bez publicznych controllerów,
 - fundamenty ContentAuthor/legal/traffic signs/public SEO istnieją,
 - istnieją config/content.php organization, SchemaIds/SchemaRenderer oraz współdzielony SiteIdentitySchema; homepage i istniejące główne publiczne graph services korzystają z kanonicznego Organization/WebSite identity,
@@ -1848,13 +1867,24 @@ Na 2026-09-16:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N1-003 — Slug service + redirects.
+NEWSROOM-N1-004 — Publishing service.
 
-NEWSROOM-N1-001 i NEWSROOM-N1-002 są zamknięte. Następny krok wykonawczy to canonical slug/history service z trwałą rezerwacją historycznych full paths, one-hop redirects i PostgreSQL serialization zgodnie z istniejącym route-family contract.
+NEWSROOM-N1-001, NEWSROOM-N1-002 i NEWSROOM-N1-003 są zamknięte. Następny krok wykonawczy to audytowany publishing/workflow service z transakcyjnymi state/timestamp changes, wymaganymi invariants oraz public side effects emitowanymi wyłącznie after commit.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.14
+
+- zamknięto NEWSROOM-N1-003 po merge PR #28 i zielonych jobach `quality` + `newsroom-postgres`,
+- dodano `ContentArticleSlugService`, `ContentArticleRedirect`, `ContentArticlePathResolver` i współdzielony `PostgresTransactionAdvisoryLock`,
+- opublikowane slug changes utrzymują one-hop history, same-article reclaim jest service-only, a historyczny full path innego artykułu pozostaje reserved,
+- route-family transition jest blokowany po pierwszej publikacji, natomiast same-family published type change pozostaje dozwolony,
+- PostgreSQL concurrency jest realnie testowane drugim połączeniem; finalny gate: 6 testów / 86 asercji,
+- ogólny gate: 906 passed / 18 565 assertions / 2 skipped, Pint 980 files, frontend build PASS,
+- publiczny HTTP 301/200 nie jest jeszcze wdrożony; N3 controllers mają konsumować `ContentArticlePathResolver`,
+- następnym taskiem wykonawczym jest NEWSROOM-N1-004.
 
 ### 2026-09-16 — v0.13
 
