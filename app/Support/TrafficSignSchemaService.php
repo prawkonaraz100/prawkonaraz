@@ -7,6 +7,7 @@ use App\Models\TrafficSign;
 use App\Models\TrafficSignCategory;
 use App\SEO\Schema\SchemaIds;
 use App\SEO\Schema\SchemaRenderer;
+use App\SEO\Schema\SiteIdentitySchema;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -18,6 +19,7 @@ class TrafficSignSchemaService
         protected PublicUrlResolver $publicUrlResolver,
         protected SchemaIds $schemaIds,
         protected SchemaRenderer $schemaRenderer,
+        protected SiteIdentitySchema $siteIdentitySchema,
     ) {}
 
     /**
@@ -732,25 +734,7 @@ class TrafficSignSchemaService
      */
     protected function organizationSchema(string $organizationId): array
     {
-        $sameAs = (array) config('content.organization.same_as', []);
-        $email = (string) config('content.organization.email', '');
-        $logoUrl = $this->publicUrlResolver->normalize((string) config('content.organization.logo_url', '/favicon.png'));
-        $legalName = trim((string) config('content.organization.legal_name', ''));
-
-        return array_filter([
-            '@id' => $organizationId,
-            '@type' => 'Organization',
-            'name' => (string) config('content.organization.name', 'PrawkoNaRaz'),
-            'legalName' => $legalName !== '' ? $legalName : null,
-            'url' => $this->publicUrlResolver->currentRoot(),
-            'description' => (string) config('content.organization.description'),
-            'logo' => $logoUrl !== null ? [
-                '@type' => 'ImageObject',
-                'url' => $logoUrl,
-            ] : null,
-            'email' => $email !== '' ? $email : null,
-            'sameAs' => $sameAs === [] ? null : $sameAs,
-        ], fn (mixed $value): bool => $value !== null && $value !== '' && $value !== []);
+        return $this->siteIdentitySchema->organization();
     }
 
     /**
@@ -758,15 +742,7 @@ class TrafficSignSchemaService
      */
     protected function websiteSchema(string $websiteId, string $organizationId): array
     {
-        return [
-            '@id' => $websiteId,
-            '@type' => 'WebSite',
-            'url' => $this->publicUrlResolver->currentRoot(),
-            'name' => (string) config('content.organization.name', 'PrawkoNaRaz'),
-            'publisher' => [
-                '@id' => $organizationId,
-            ],
-        ];
+        return $this->siteIdentitySchema->website();
     }
 
     /**
@@ -879,26 +855,10 @@ class TrafficSignSchemaService
      */
     protected function organization(): array
     {
-        $sameAs = (array) config('content.organization.same_as', []);
-        $email = (string) config('content.organization.email', '');
-
-        return array_filter([
+        return [
             '@context' => 'https://schema.org',
-            '@type' => 'Organization',
-            'name' => (string) config('content.organization.name', config('app.name', 'prawkonaraz.pl')),
-            'legalName' => (string) config('content.organization.legal_name', config('app.name', 'prawkonaraz.pl')),
-            'url' => $this->publicUrlResolver->currentRoot(),
-            'description' => (string) config('content.organization.description'),
-            'logo' => $this->publicUrlResolver->normalize((string) config('content.organization.logo_url', '/favicon.png')),
-            'email' => $email,
-            'contactPoint' => $email !== '' ? [[
-                '@type' => 'ContactPoint',
-                'contactType' => 'customer support',
-                'email' => $email,
-                'availableLanguage' => ['pl'],
-            ]] : null,
-            'sameAs' => $sameAs === [] ? null : $sameAs,
-        ], fn (mixed $value): bool => $value !== null && $value !== '');
+            ...$this->siteIdentitySchema->organization(),
+        ];
     }
 
     /**
