@@ -322,11 +322,11 @@ class EditContentArticle extends EditRecord
                 ->requiresConfirmation()
                 ->modalHeading('Zastosować zmianę publiczną?')
                 ->modalDescription('Backend ponownie sprawdzi cały aktualny payload i token edycji. Po zatwierdzeniu zmiana stanie się publiczna natychmiast.')
-                ->action(fn (): void => $this->applyPublicUpdate()),
+                ->action(fn () => $this->applyPublicUpdate()),
             Action::make('cancelPublicUpdate')
                 ->label('Anuluj edycję publiczną')
                 ->color('gray')
-                ->action(fn (): void => $this->cancelPublicUpdate()),
+                ->action(fn () => $this->cancelPublicUpdate()),
         ];
     }
 
@@ -340,7 +340,7 @@ class EditContentArticle extends EditRecord
                 ->visible(fn (): bool => $this->record instanceof ContentArticle
                     && $this->record->isPubliclyVisible()
                     && ! $this->isPublicUpdateMode())
-                ->action(fn (): void => $this->beginPublicUpdate()),
+                ->action(fn () => $this->beginPublicUpdate()),
             ...$this->contentArticleWorkflowActions(),
         ];
     }
