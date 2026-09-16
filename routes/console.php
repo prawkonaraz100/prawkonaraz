@@ -2370,6 +2370,11 @@ Artisan::command('content:apply-manual-explanation-resolutions {path=storage/app
     return self::SUCCESS;
 })->purpose('Apply curated manual explanations to questions by external_id.');
 
+Schedule::command('newsroom:publish-due')
+    ->everyMinute()
+    ->environments(['production'])
+    ->withoutOverlapping();
+
 Schedule::command('ops:prune-user-ip-history')
     ->dailyAt((string) env('USER_IP_HISTORY_PRUNE_AT', '03:05'))
     ->environments(['production'])
