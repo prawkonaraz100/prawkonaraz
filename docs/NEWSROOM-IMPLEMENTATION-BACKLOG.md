@@ -795,7 +795,7 @@ Implementacja obejmuje warstwę domenową/read-model kompozycji oraz transakcyjn
 - wszystkie source types v1 i pola modelu są dostępne, reorder zapisuje `sort_order`, a UI pokazuje PRIMARY/OFFICIAL/PUBLIC/TYLKO WEWNĘTRZNE,
 - `url` może być null dla interview/direct/internal evidence; podany URL musi być poprawnym HTTP(S) zarówno w form validation, jak i w `ContentArticlePublishingService`,
 - ordinary Edit `publiclyVisible()` nie może mutować source relationship; regression potwierdza zachowanie istniejącego source,
-- `ContentArticleSource::$touches = ['article']` bumpuje parent `updated_at` jako fundament przyszłego edit tokenu, ale N2-012 stale-write rejection nadal pozostaje otwarte,
+- `ContentArticleSource::$touches = ['article']` nadal bumpuje parent `updated_at`, ale po PR #50 stale-write nie polega wyłącznie na tym timestampie: deterministyczny edit token obejmuje także raw source state i odrzuca same-second child mutation przed sync,
 - source policy przed review/publish wymaga co najmniej jednego source dla news; dla kategorii `przepisy`, jeśli istnieje primary `official`/`legislation`, co najmniej jeden taki primary musi być publicznie cytowalny z poprawnym HTTP(S) URL,
 - `is_publicly_cited=false` pozostaje jednoznacznym internal-evidence stanem; publiczny renderer nie istnieje jeszcze, więc N3 nadal musi egzekwować brak publicznego wycieku title/publisher/url,
 - osobny computed warning „brak primary source dla prawnego newsa” nie należy do ukończonego editor gate i pozostaje N2-007/N2-010,
@@ -830,7 +830,7 @@ Implementacja obejmuje warstwę domenową/read-model kompozycji oraz transakcyjn
 - `NewsroomArticleRelationsEditorAdapter` odrzuca duplicate targets, brakujące rekordy i relation types spoza istniejących allowlist,
 - sync zapisuje tylko article-owned pivots i nie mutuje target Question/LegalUnit/TrafficSign ani ich innych grafów/źródeł,
 - ordinary Edit `publiclyVisible()` nie może zmieniać relations/topics,
-- relation sync jawnie bumpuje parent `ContentArticle.updated_at` jako edit-token foundation, ale pełny stale-write rejection nadal pozostaje N2-012,
+- relation sync nadal bumpuje parent `ContentArticle.updated_at`, a po PR #50 deterministic edit token obejmuje także article-owned relation/topic state; stale relation/topic mutation jest odrzucana przed sync,
 - publiczny relation renderer/reverse linking nadal pozostaje dalszym etapem N3/N4,
 - finalny exact-head gate PR #46: `quality` 972 passed / 18 940 assertions / 2 skipped, Pint 1011 files PASS, frontend build PASS (9.49 s); `newsroom-postgres` 7 passed / 89 assertions.
 
