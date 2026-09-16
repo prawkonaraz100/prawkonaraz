@@ -1069,6 +1069,21 @@ Rekomendacja:
 - row lock lub atomic conditional update,
 - test współbieżności na poziomie możliwym w obecnym stacku.
 
+### 22.2. Aktualny stan implementacji
+
+NEWSROOM-N1-005 jest wdrożone na `main`:
+
+- `newsroom:publish-due` wybiera wyłącznie rekordy `scheduled` z `scheduled_for <= now()`, w deterministycznej kolejności `scheduled_for, id`,
+- każdy rekord jest przed publikacją ponownie pobierany, a właściwa mutacja przechodzi przez `ContentArticlePublishingService::publish(..., trigger: 'scheduler')`,
+- publishing service wykonuje row lock oraz ponownie waliduje publication-ready i fresh-review invariants w aktualnym stanie zależności,
+- scheduled record z istniejącym `first_published_at` jest odrzucany; v1 nie wykonuje scheduled republish,
+- failure jednego rekordu pozostawia go w stanie `scheduled`, zapisuje mały `content_article.scheduled_publish_failed` AuditLog i warning log, po czym batch przechodzi dalej,
+- identyczny failure AuditLog jest deduplikowany dla tego samego `scheduled_for`, klasy i komunikatu błędu, aby minutowy scheduler nie generował nieograniczonego audytu,
+- jeśli po pobraniu ID inny proces zmieni stan rekordu, refetch traktuje go jako idempotentny skip; row lock w publishing service pozostaje finalnym race boundary,
+- komenda zwraca non-zero po przetworzeniu batcha, jeśli pozostały faktyczne due failures,
+- `routes/console.php` rejestruje komendę co minutę tylko dla production z `withoutOverlapping()`; nie deklarujemy `onOneServer()` ani distributed single-execution guarantee,
+- reviewer identity nadal zależy od policy; technicznie scheduler wymaga fresh `reviewed_at` przez istniejący publishing contract i nie dodaje osobnego mandatory reviewer-id invariant.
+
 ---
 
 ## 23. Time semantics
@@ -1638,6 +1653,7 @@ Na 2026-09-16:
 - `ContentCategory` Eloquent model istnieje; dedykowany DB seeder kategorii nadal nie istnieje,
 - `ContentArticle`, `ContentTag`, `ContentTopic`, `ContentArticleSource` i `ContentHomePlacement` Eloquent models/factories istnieją; factory workflow states pokrywają dokumentowany baseline,
 - service-level route-family lookup guard istnieje w `ContentArticlePathResolver`; nadal nie jest podłączony do publicznych controllerów N3,
+- NEWSROOM-N1-005 scheduler istnieje jako `newsroom:publish-due`, jest zarejestrowany co minutę w production i deleguje due-time revalidation/publish do `ContentArticlePublishingService`,
 - newsroom CMS nie istnieje.
 
 ---
@@ -1653,13 +1669,22 @@ Na 2026-09-16:
 - [ ] wdrożyć dedykowany idempotentny DB seeder kategorii konsumujący `NewsroomTaxonomyContract`,
 - [ ] wdrożyć policies,
 - [ ] wdrożyć `applyPublicUpdate` orchestration/stale-write path dla już publicznego artykułu w N2,
-- [ ] wdrożyć scheduling command/batch processing N1-005,
 - [ ] podłączyć `ContentArticlePathResolver` do publicznych N3 article controllers i zweryfikować HTTP canonical/301/404/410 behavior,
 - [ ] dodać sitemap/public-discovery regression korzystające wyłącznie z current canonical URL,
 
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.14
+
+- wdrożono NEWSROOM-N1-005 jako komendę `newsroom:publish-due` oraz produkcyjną rejestrację co minutę z `withoutOverlapping()`,
+- due publication reużywa `ContentArticlePublishingService`, więc publication/fresh-review invariants są rewalidowane pod istniejącym row lockiem,
+- invalid due record pozostaje nieopublikowany, failure jest logowany i audytowany bez blokowania dalszych rekordów,
+- failure AuditLog jest deduplikowany dla identycznego failure/scheduled_for, a concurrent/already-transitioned rekord po refetchu jest bezpiecznym skipem,
+- service-level guard blokuje scheduled republish rekordu z istniejącym `first_published_at`,
+- nie deklarujemy distributed `onOneServer` guarantee; obecny schedule contract to production + everyMinute + withoutOverlapping,
+- finalny CI PR #33: quality 922 passed / 18 734 assertions / 2 skipped, Pint 985 files, frontend build PASS; newsroom-postgres 6 passed / 86 assertions.
 
 ### 2026-09-16 — v0.13
 
