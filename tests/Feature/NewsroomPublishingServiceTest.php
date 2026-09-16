@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\ContentArticleSourceType;
+use App\Enums\ContentArticleType;
 use App\Enums\ContentArticleWorkflowStatus;
 use App\Events\ContentArticleWorkflowTransitioned;
 use App\Models\AuditLog;
@@ -403,4 +404,96 @@ test('legal news primary official source must have a publicly cited http or http
     ]);
 
     expect($service->markReviewed($article->fresh())->reviewed_at)->not->toBeNull();
+});
+
+test('featured state is service controlled audited and limited when enabling', function () {
+    Carbon::setTestNow('2026-09-16 16:00:00');
+
+    $actor = User::factory()->create();
+    $article = ContentArticle::factory()->published()->create([
+        'is_featured' => false,
+        'editorial_priority' => 0,
+    ]);
+
+    $featured = newsroomPublishingService()->setFeatured($article, true, 25, $actor);
+    $audit = AuditLog::query()
+        ->where('action', 'content_article.featured_changed')
+        ->where('entity_id', (string) $article->id)
+        ->latest('id')
+        ->firstOrFail();
+
+    expect($featured->is_featured)->toBeTrue()
+        ->and($featured->editorial_priority)->toBe(25)
+        ->and($featured->public_state_changed_at?->toDateTimeString())->toBe('2026-09-16 16:00:00')
+        ->and($audit->actor_user_id)->toBe($actor->id)
+        ->and($audit->metadata['previous_is_featured'])->toBeFalse()
+        ->and($audit->metadata['is_featured'])->toBeTrue()
+        ->and($audit->metadata['editorial_priority'])->toBe(25)
+        ->and($audit->metadata)->not->toHaveKey('body_blocks')
+        ->and($audit->metadata)->not->toHaveKey('editorial_note');
+
+    Carbon::setTestNow('2026-09-16 16:05:00');
+
+    $unfeatured = newsroomPublishingService()->setFeatured($featured, false, null, $actor);
+
+    expect($unfeatured->is_featured)->toBeFalse()
+        ->and($unfeatured->editorial_priority)->toBe(25)
+        ->and($unfeatured->public_state_changed_at?->toDateTimeString())->toBe('2026-09-16 16:05:00');
+
+    $draft = ContentArticle::factory()->draft()->create();
+
+    expect(fn () => newsroomPublishingService()->setFeatured($draft, true, 1, $actor))
+        ->toThrow(DomainException::class);
+});
+
+test('breaking state is service controlled audited and enforces published news with future expiry', function () {
+    Carbon::setTestNow('2026-09-16 17:00:00');
+
+    $actor = User::factory()->create();
+    $article = ContentArticle::factory()->published()->create([
+        'type' => ContentArticleType::News->value,
+        'is_breaking' => false,
+        'breaking_expires_at' => null,
+    ]);
+
+    $breaking = newsroomPublishingService()->enableBreaking(
+        $article,
+        Carbon::parse('2026-09-16 19:00:00'),
+        $actor,
+    );
+    $audit = AuditLog::query()
+        ->where('action', 'content_article.breaking_changed')
+        ->where('entity_id', (string) $article->id)
+        ->latest('id')
+        ->firstOrFail();
+
+    expect($breaking->is_breaking)->toBeTrue()
+        ->and($breaking->breaking_expires_at?->toDateTimeString())->toBe('2026-09-16 19:00:00')
+        ->and($breaking->public_state_changed_at?->toDateTimeString())->toBe('2026-09-16 17:00:00')
+        ->and($audit->actor_user_id)->toBe($actor->id)
+        ->and($audit->metadata['is_breaking'])->toBeTrue()
+        ->and($audit->metadata)->not->toHaveKey('body_blocks')
+        ->and($audit->metadata)->not->toHaveKey('lead');
+
+    Carbon::setTestNow('2026-09-16 17:05:00');
+
+    $cleared = newsroomPublishingService()->clearBreaking($breaking, $actor);
+
+    expect($cleared->is_breaking)->toBeFalse()
+        ->and($cleared->breaking_expires_at)->toBeNull()
+        ->and($cleared->public_state_changed_at?->toDateTimeString())->toBe('2026-09-16 17:05:00');
+
+    $guide = ContentArticle::factory()->published()->guide()->create();
+
+    expect(fn () => newsroomPublishingService()->enableBreaking(
+        $guide,
+        Carbon::parse('2026-09-16 20:00:00'),
+        $actor,
+    ))->toThrow(DomainException::class, 'must be a news');
+
+    expect(fn () => newsroomPublishingService()->enableBreaking(
+        $article->fresh(),
+        Carbon::parse('2026-09-16 16:59:00'),
+        $actor,
+    ))->toThrow(DomainException::class, 'future expiration');
 });

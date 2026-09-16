@@ -40,7 +40,7 @@ class ContentArticleForm
                     'lg' => 12,
                 ])->schema([
                     Section::make('Tożsamość i klasyfikacja')
-                        ->description('Podstawowe pola artykułu. Workflow, media i relacje redakcyjne mają osobne etapy N2.')
+                        ->description('Podstawowe pola artykułu. Workflow i ekspozycja są sterowane dedykowanymi actions; media pozostają osobnym etapem N2.')
                         ->columnSpan([
                             'lg' => 8,
                         ])
@@ -90,7 +90,7 @@ class ContentArticleForm
                         ])
                         ->columns(2),
                     Section::make('Stan')
-                        ->description('Workflow jest tylko informacyjny na tym etapie. Zmiany statusu będą wykonywane przez dedykowane actions/service.')
+                        ->description('Status jest read-only w formularzu. Zmiany workflow i ekspozycji wykonują dedykowane actions delegujące do service boundary.')
                         ->columnSpan([
                             'lg' => 4,
                         ])

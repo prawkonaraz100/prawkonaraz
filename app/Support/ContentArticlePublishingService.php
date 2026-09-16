@@ -216,7 +216,7 @@ final class ContentArticlePublishingService
             $locked->workflow_status = ContentArticleWorkflowStatus::NeedsReview;
             $locked->needs_review_at = $at;
             $locked->public_state_changed_at = $at;
-            $this->clearBreaking($locked);
+            $this->clearBreakingState($locked);
             $locked->save();
 
             $this->recordTransition(
@@ -248,7 +248,7 @@ final class ContentArticlePublishingService
             $locked->workflow_status = ContentArticleWorkflowStatus::Archived;
             $locked->archived_at = $at;
             $locked->public_state_changed_at = $at;
-            $this->clearBreaking($locked);
+            $this->clearBreakingState($locked);
             $locked->save();
 
             $this->recordTransition(
@@ -312,7 +312,7 @@ final class ContentArticlePublishingService
             $locked->withdrawn_at = $at;
             $locked->withdrawal_reason = $reason;
             $locked->public_state_changed_at = $at;
-            $this->clearBreaking($locked);
+            $this->clearBreakingState($locked);
             $locked->save();
 
             $this->recordTransition(
@@ -343,7 +343,7 @@ final class ContentArticlePublishingService
             $locked->workflow_status = ContentArticleWorkflowStatus::InReview;
             $locked->reviewed_at = null;
             $locked->scheduled_for = null;
-            $this->clearBreaking($locked);
+            $this->clearBreakingState($locked);
             $locked->save();
 
             $this->recordTransition(
@@ -355,6 +355,152 @@ final class ContentArticlePublishingService
                 [
                     'withdrawn_at' => $locked->withdrawn_at,
                     'withdrawal_reason_retained' => $locked->withdrawal_reason !== null,
+                ],
+            );
+
+            return $locked->refresh();
+        });
+    }
+
+    public function setFeatured(
+        ContentArticle $article,
+        bool $featured,
+        ?int $editorialPriority = null,
+        ?User $actor = null,
+    ): ContentArticle {
+        return DB::transaction(function () use ($article, $featured, $editorialPriority, $actor): ContentArticle {
+            $locked = $this->lockArticle($article);
+
+            if ($featured) {
+                $this->assertStatus($locked, [
+                    ContentArticleWorkflowStatus::Scheduled,
+                    ContentArticleWorkflowStatus::Published,
+                ], 'mark as featured');
+            }
+
+            $priority = $editorialPriority ?? (int) $locked->editorial_priority;
+
+            if ($priority < -32768 || $priority > 32767) {
+                throw new InvalidArgumentException('Editorial priority must fit the signed smallint range.');
+            }
+
+            $previousFeatured = (bool) $locked->is_featured;
+            $previousPriority = (int) $locked->editorial_priority;
+
+            if ($previousFeatured === $featured && $previousPriority === $priority) {
+                return $locked->refresh();
+            }
+
+            $locked->is_featured = $featured;
+            $locked->editorial_priority = $priority;
+
+            if ($locked->first_published_at !== null) {
+                $locked->public_state_changed_at = now();
+            }
+
+            $locked->save();
+
+            $this->auditLogService->record(
+                action: 'content_article.featured_changed',
+                entityType: ContentArticle::class,
+                entityId: $locked->getKey(),
+                actor: $actor,
+                metadata: [
+                    'previous_is_featured' => $previousFeatured,
+                    'is_featured' => $featured,
+                    'previous_editorial_priority' => $previousPriority,
+                    'editorial_priority' => $priority,
+                    'public_state_changed_at' => $locked->public_state_changed_at,
+                    'trigger' => $this->triggerForActor($actor),
+                ],
+            );
+
+            return $locked->refresh();
+        });
+    }
+
+    public function enableBreaking(
+        ContentArticle $article,
+        DateTimeInterface $expiresAt,
+        ?User $actor = null,
+    ): ContentArticle {
+        return DB::transaction(function () use ($article, $expiresAt, $actor): ContentArticle {
+            $locked = $this->lockArticle($article);
+            $this->assertStatus($locked, [ContentArticleWorkflowStatus::Published], 'mark as breaking');
+            $this->assertPreviouslyPublished($locked);
+
+            if ($this->articleType($locked) !== ContentArticleType::News) {
+                throw new DomainException('Breaking article must be a news article.');
+            }
+
+            $expiration = Carbon::parse($expiresAt->format(DATE_ATOM));
+
+            if (! $expiration->isFuture()) {
+                throw new DomainException('Breaking article requires a future expiration timestamp.');
+            }
+
+            $previousBreaking = (bool) $locked->is_breaking;
+            $previousExpiration = $locked->breaking_expires_at;
+
+            if ($previousBreaking && $previousExpiration?->equalTo($expiration)) {
+                return $locked->refresh();
+            }
+
+            $locked->is_breaking = true;
+            $locked->breaking_expires_at = $expiration;
+            $locked->public_state_changed_at = now();
+            $locked->save();
+
+            $this->auditLogService->record(
+                action: 'content_article.breaking_changed',
+                entityType: ContentArticle::class,
+                entityId: $locked->getKey(),
+                actor: $actor,
+                metadata: [
+                    'previous_is_breaking' => $previousBreaking,
+                    'is_breaking' => true,
+                    'previous_breaking_expires_at' => $previousExpiration,
+                    'breaking_expires_at' => $expiration,
+                    'public_state_changed_at' => $locked->public_state_changed_at,
+                    'trigger' => $this->triggerForActor($actor),
+                ],
+            );
+
+            return $locked->refresh();
+        });
+    }
+
+    public function clearBreaking(ContentArticle $article, ?User $actor = null): ContentArticle
+    {
+        return DB::transaction(function () use ($article, $actor): ContentArticle {
+            $locked = $this->lockArticle($article);
+            $previousBreaking = (bool) $locked->is_breaking;
+            $previousExpiration = $locked->breaking_expires_at;
+
+            if (! $previousBreaking && $previousExpiration === null) {
+                return $locked->refresh();
+            }
+
+            $this->clearBreakingState($locked);
+
+            if ($locked->first_published_at !== null) {
+                $locked->public_state_changed_at = now();
+            }
+
+            $locked->save();
+
+            $this->auditLogService->record(
+                action: 'content_article.breaking_changed',
+                entityType: ContentArticle::class,
+                entityId: $locked->getKey(),
+                actor: $actor,
+                metadata: [
+                    'previous_is_breaking' => $previousBreaking,
+                    'is_breaking' => false,
+                    'previous_breaking_expires_at' => $previousExpiration,
+                    'breaking_expires_at' => null,
+                    'public_state_changed_at' => $locked->public_state_changed_at,
+                    'trigger' => $this->triggerForActor($actor),
                 ],
             );
 
@@ -621,7 +767,7 @@ final class ContentArticlePublishingService
         }
     }
 
-    private function clearBreaking(ContentArticle $article): void
+    private function clearBreakingState(ContentArticle $article): void
     {
         $article->is_breaking = false;
         $article->breaking_expires_at = null;

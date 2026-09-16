@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ContentArticles\Pages;
 
 use App\Enums\ContentArticleType;
 use App\Filament\Resources\ContentArticles\ContentArticleResource;
+use App\Filament\Resources\ContentArticles\Pages\Concerns\InteractsWithContentArticleWorkflowActions;
 use App\Models\ContentArticle;
 use App\Models\User;
 use App\Support\ContentArticleSlugService;
@@ -18,6 +19,8 @@ use InvalidArgumentException;
 
 class EditContentArticle extends EditRecord
 {
+    use InteractsWithContentArticleWorkflowActions;
+
     protected static string $resource = ContentArticleResource::class;
 
     protected function mutateFormDataBeforeFill(array $data): array
@@ -97,6 +100,7 @@ class EditContentArticle extends EditRecord
     {
         return [
             ViewAction::make(),
+            ...$this->contentArticleWorkflowActions(),
         ];
     }
 }
