@@ -51,6 +51,17 @@ class ContentCategory extends Model
         return $this->articles()->publiclyVisible()->exists();
     }
 
+    public function hasActivelyDistributedArticles(): bool
+    {
+        return $this->articles()->activelyDistributed()->exists();
+    }
+
+    public function canBeDeactivated(): bool
+    {
+        return ! $this->hasPubliclyVisibleArticles()
+            && ! $this->hasActivelyDistributedArticles();
+    }
+
     public function getRouteKeyName(): string
     {
         return 'slug';
