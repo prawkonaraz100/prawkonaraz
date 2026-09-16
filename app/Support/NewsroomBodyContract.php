@@ -14,6 +14,21 @@ final class NewsroomBodyContract
 
     public const RICH_TEXT_FORMAT = 'tiptap-json';
 
+    /**
+     * Exact toolbar exposed by the future N2 RichEditor adapter.
+     *
+     * @return list<list<string>>
+     */
+    public static function richTextToolbarButtons(): array
+    {
+        return [
+            ['bold', 'italic', 'link'],
+            ['h2', 'h3'],
+            ['bulletList', 'orderedList'],
+            ['undo', 'redo'],
+        ];
+    }
+
     public const BLOCK_RICH_TEXT = 'rich_text';
 
     public const BLOCK_IMAGE = 'image';
@@ -158,6 +173,7 @@ final class NewsroomBodyContract
         }
 
         $normalized = [];
+        $seenKeys = [];
 
         foreach ($blocks as $sourceKey => $block) {
             $index = count($normalized);
@@ -193,13 +209,25 @@ final class NewsroomBodyContract
                 'data' => self::normalizeBlockData($type, $data, $index),
             ];
 
-            $key = $block['key'] ?? (is_string($sourceKey) ? $sourceKey : null);
+            $sourceStringKey = is_string($sourceKey) ? $sourceKey : null;
+            $explicitKey = $block['key'] ?? null;
+
+            if ($sourceStringKey !== null && $explicitKey !== null && $sourceStringKey !== $explicitKey) {
+                throw new InvalidArgumentException("Body block {$index} key conflicts with its Builder item key.");
+            }
+
+            $key = $explicitKey ?? $sourceStringKey;
 
             if ($key !== null) {
                 if (! is_string($key) || preg_match('/\A[A-Za-z0-9_-]{1,100}\z/', $key) !== 1) {
                     throw new InvalidArgumentException("Body block {$index} key has an invalid format.");
                 }
 
+                if (isset($seenKeys[$key])) {
+                    throw new InvalidArgumentException("Duplicate newsroom body block key [{$key}].");
+                }
+
+                $seenKeys[$key] = true;
                 $item['key'] = $key;
             }
 
