@@ -470,7 +470,7 @@ class ContentArticleForm
             ->required();
     }
 
-    protected static function legalUnitSelect(): Select
+    public static function legalUnitSelect(): Select
     {
         return Select::make('legal_unit_id')
             ->label('Jednostka prawna')
