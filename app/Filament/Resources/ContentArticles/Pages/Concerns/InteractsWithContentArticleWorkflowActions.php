@@ -250,6 +250,10 @@ trait InteractsWithContentArticleWorkflowActions
 
             $this->contentArticleRecord()->refresh();
 
+            if (method_exists($this, 'refreshContentArticleEditStateAfterWorkflowAction')) {
+                $this->refreshContentArticleEditStateAfterWorkflowAction();
+            }
+
             Notification::make()
                 ->success()
                 ->title($successMessage)
