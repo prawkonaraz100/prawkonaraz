@@ -104,6 +104,9 @@ test('published article type cannot cross public route families', function () {
     NewsroomRouteContract::assertTypeTransitionAllowed('news', 'analysis', $publishedAt);
     NewsroomRouteContract::assertTypeTransitionAllowed('news', 'guide', null);
 
+    expect(fn () => NewsroomRouteContract::assertTypeTransitionAllowed('news', 'video', null))
+        ->toThrow(\InvalidArgumentException::class);
+
     expect(fn () => NewsroomRouteContract::assertTypeTransitionAllowed('news', 'guide', $publishedAt))
         ->toThrow(\DomainException::class)
         ->and(fn () => NewsroomRouteContract::assertTypeTransitionAllowed('guide', 'report', $publishedAt))
