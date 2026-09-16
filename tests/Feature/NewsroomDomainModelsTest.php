@@ -180,6 +180,14 @@ test('article sources tags topics authors and placements expose documented relat
         'ends_at' => now()->addHour(),
     ]);
 
+    expect(ContentHomePlacement::allowedSlotKeys())->toBe([
+        ContentHomePlacement::SLOT_LEAD,
+        ContentHomePlacement::SLOT_SECONDARY,
+        ContentHomePlacement::SLOT_CATEGORY_LEAD,
+        ContentHomePlacement::SLOT_GUIDES_LEAD,
+        ContentHomePlacement::SLOT_IMPORTANT_NOW,
+    ]);
+
     expect($article->fresh()->sources->pluck('id')->all())
         ->toBe([$publicSource->id, $privateSource->id])
         ->and($publicSource->fresh()->source_type)->toBe(ContentArticleSourceType::Official)
