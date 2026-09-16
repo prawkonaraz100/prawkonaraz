@@ -62,6 +62,11 @@ class ContentCategory extends Model
             && ! $this->hasActivelyDistributedArticles();
     }
 
+    public function canBeDeleted(): bool
+    {
+        return ! $this->articles()->exists();
+    }
+
     public function getRouteKeyName(): string
     {
         return 'slug';
