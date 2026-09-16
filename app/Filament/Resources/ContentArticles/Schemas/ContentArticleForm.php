@@ -380,6 +380,10 @@ class ContentArticleForm
                             ->helperText('0 = góra, 1 = dół. Brak wartości oznacza środek.')
                             ->live(onBlur: true)
                             ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire)),
+                        Hidden::make('hero_image_width'),
+                        Hidden::make('hero_image_height'),
+                        Hidden::make('og_image_width'),
+                        Hidden::make('og_image_height'),
                         Placeholder::make('hero_dimensions')
                             ->label('Zweryfikowane wymiary')
                             ->content(fn (Get $get): string => static::dimensionsLabel(
