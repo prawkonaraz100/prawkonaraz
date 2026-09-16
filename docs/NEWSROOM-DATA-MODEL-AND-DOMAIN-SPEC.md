@@ -6,7 +6,7 @@
 - Obszar: newsroom / media portal
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Bazowy stan repo przy projektowaniu: main@6a38c95ce76ee05997977d614d795ed8513462f1
-- Ostatnia weryfikacja zgodności z kodem: main@88533b04d74a839c3bbccf86b707909ccdd235f8 (2026-09-16)
+- Ostatnia weryfikacja zgodności z kodem: main@4936d14d56fa15e59e6dd771e443e93895d3d281 (2026-09-16)
 - Data: 2026-09-16
 - Zakres: model domenowy, baza danych, invariants, serwisy aplikacyjne, routing domeny i kolejność migracji
 
@@ -212,27 +212,25 @@ Nie kodujemy layoutu strony głównej ani konkretnej pozycji w rekordzie artyku�
 - image_credit: varchar(500) nullable, publiczny credit jeśli potrzebny
 - image_license_note: text nullable, tylko backoffice
 
-Aktualny stan implementacji po NEWSROOM-N0-006:
+Aktualny stan implementacji po NEWSROOM-N2-010:
 
 - istnieje `MediaUrlResolver` i wspólna konfiguracja public/upload disk,
 - istniejący `AdminMediaUploadService` pozostaje **question-specific** i zapisuje `QuestionMedia`; newsroom go nie reużywa,
-- istnieje dedykowany `NewsroomMediaStorage` jako storage/validation foundation,
+- dedykowany `NewsroomMediaStorage` pozostaje storage/validation foundation, a N2-010 dodało `NewsroomArticleMediaService` jako warstwę uploadu hero/OG dla `ContentArticleResource`,
 - newsroom używa osobnego konfigurowalnego `media.newsroom_disk`, `media.newsroom_prefix` i `media.newsroom_max_dimension`,
-- source paths mają immutable/unique format `newsroom/articles/source/{ULID}.{ext}`,
-- przygotowanie nowego obrazu zawsze generuje nową ścieżkę; replacement nie nadpisuje starego publicznego URL,
-- rzeczywisty zapisany obiekt jest sprawdzany po storage: bytes, dekodowalny raster, MIME oraz width/height; deklarowane MIME/bytes mogą być porównane i mismatch jest odrzucany,
-- v1 baseline to JPEG/PNG/WebP/AVIF intersectowane ze wspólną image allowlistą; SVG i non-raster payload są odrzucane,
-- managed path guard odrzuca traversal, absolute URL/path i ręczne ścieżki spoza dedykowanego namespace,
-- publiczny URL jest rozwiązywany przez istniejący `MediaUrlResolver` i musi być stabilnym HTTP(S) URL,
-- Traffic Signs/ContentAuthor nadal przechowują własne ścieżki assetów; nie utworzono wspólnego newsroom asset modelu,
-- nie ma automatycznego pipeline'u cropów 1:1/4:3/16:9 ani fizycznych lead/standard/compact/OG variants dla newsroomu.
+- source paths mają immutable/unique format `newsroom/articles/source/{ULID}.{ext}`; replacement tworzy nową ścieżkę zamiast nadpisywać stary publiczny URL,
+- po zapisie `NewsroomMediaStorage` sprawdza faktyczny obiekt: bytes, dekodowalny raster MIME oraz width/height; JPEG/PNG/WebP/AVIF pozostają allowlistą v1, a SVG/non-raster/path traversal/unmanaged paths są odrzucane,
+- `NewsroomArticleProvenanceMediaAdapter` ponownie inspektuje managed hero/OG path przed persistence i wyprowadza zapisane width/height z rzeczywistego assetu zamiast ufać formularzowym metadata,
+- `ContentArticlePublicationChecklist` ponownie inspektuje hero/OG przy publication readiness, wymaga stabilnego publicznego HTTP(S) URL i odrzuca zapisane dimensions niezgodne z obiektem storage,
+- hero focal point jest parą X/Y w zakresie 0..1; CMS pokazuje wizualne CSS previews 16:9, 4:3 i 1:1, ale nie tworzy ani nie deklaruje fizycznych crop variants,
+- hero/OG obsługują alt, hero caption i publiczny `image_credit`; `image_license_note` pozostaje wyłącznie backoffice,
+- Traffic Signs/ContentAuthor nadal przechowują własne ścieżki assetów; nie utworzono wspólnego newsroom asset modelu ani nowych migracji,
+- nadal nie ma automatycznego pipeline'u cropów 1:1/4:3/16:9 ani fizycznych lead/standard/compact/OG variants dla newsroomu.
 
-Pozostały target N2/N3:
+Pozostały target N3+:
 
-- hero/OG upload adapter lub endpoint korzysta z `NewsroomMediaStorage` zamiast question-specific `AdminMediaUploadService`,
-- zapis do `ContentArticle` przechowuje storage-relative path + zweryfikowane metadata, nie temporary/signed URL,
-- crop/variant jest deklarowany w schema/SEO tylko jeśli rzeczywisty plik został wygenerowany i jest publicznie osiągalny,
-- focal-point i OG-alt UX pozostają do wdrożenia w CMS/public renderer.
+- publiczny renderer ma konsumować zapisane managed paths, focal point, alt/caption/credit i nie może udawać istnienia niegenerowanych wariantów,
+- crop/variant może zostać zadeklarowany w schema/SEO dopiero, gdy rzeczywisty plik został wygenerowany, jest publicznie osiągalny i objęty testami.
 
 Nie sklejamy ręcznie publicznych URL-i i nie zapisujemy signed/temporary URLs jako hero/OG.
 
@@ -1711,17 +1709,19 @@ Na 2026-09-16:
 - service-level route-family lookup guard istnieje w `ContentArticlePathResolver`; nadal nie jest podłączony do publicznych controllerów N3,
 - NEWSROOM-N1-005 scheduler istnieje jako `newsroom:publish-due`, jest zarejestrowany co minutę w production i deleguje due-time revalidation/publish do `ContentArticlePublishingService`,
 - NEWSROOM-N1-006 jest wdrożone: istnieją `NewsroomHomeCompositionService`, `NewsroomHomePlacementService` i niemutujący `ContentArticlePublishingService::assertScheduledPreviewReady()`; overlap/concurrency jest testowane również na PostgreSQL,
-- newsroom CMS jest częściowo zmaterializowany przez `ContentCategoryResource`, `ContentArticleResource`, kontrolowany body Builder/editor, source relationship editor, article-owned relations/topics editor, N2-006 workflow/exposure actions, stale-safe `Apply public update`, N2-007 publication checklist, N2-008 private article preview oraz N2-009 `NewsroomHomeComposer` + future preview; N2-012 jest DONE, natomiast `ContentTopicResource` i media/origin-regulatory UI nadal nie istnieją.
+- N2-010 jest DONE po PR #60: `ContentArticleResource` ma kontrolowane provenance/regulatory fields, hero/OG upload przez `NewsroomArticleMediaService`, verified managed media metadata, focal X/Y i CSS crop previews; `ContentArticlePublicationChecklist` egzekwuje regulatory/source/effective-date coherence oraz ponowną media reinspekcję,
+- newsroom CMS jest częściowo zmaterializowany przez `ContentCategoryResource`, `ContentArticleResource`, kontrolowany body Builder/editor, source relationship editor, article-owned relations/topics editor, N2-006 workflow/exposure actions, stale-safe `Apply public update`, N2-007 publication checklist, N2-008 private article preview, N2-009 `NewsroomHomeComposer` + future preview oraz N2-010 provenance/regulatory/media art direction; N2-012 jest DONE, natomiast `ContentTopicResource` (N2-011) nadal nie istnieje.
 
 ---
 
 ## 44. Pozostałe zadania
 
-- [ ] wdrożyć kolejne N2 CMS actions/UI bez omijania istniejących workflow, topic i public-edit invariants,
+- [ ] wdrożyć NEWSROOM-N2-011 `ContentTopicResource` bez omijania istniejących topic/public-edit invariants,
 - [ ] wdrożyć N3 publiczny renderer bloków zgodny z `NewsroomBodyContract`,
-- [ ] podłączyć `NewsroomMediaStorage` do N2 hero/OG uploader + `ContentArticle` persistence oraz wdrożyć focal point/OG-alt UX,
+- [x] podłączyć `NewsroomMediaStorage` do N2 hero/OG uploadu i `ContentArticle` persistence przez `NewsroomArticleMediaService` / `NewsroomArticleProvenanceMediaAdapter`,
+- [x] wdrożyć focal-point X/Y oraz CSS crop previews i OG-alt UX bez deklarowania fizycznych variants,
 - [ ] wdrożyć crop/variant generation dopiero wraz z fizycznymi artefaktami i ich testami,
-- [ ] podłączyć istniejące origin/regulatory columns do modeli, CMS i publish validation,
+- [x] podłączyć istniejące origin/regulatory columns do CMS, `Apply public update` i publish validation,
 - [ ] wdrożyć dedykowany idempotentny DB seeder kategorii konsumujący `NewsroomTaxonomyContract`,
 - [ ] wdrożyć policies,
 - [x] wdrożyć `applyPublicUpdate` orchestration/stale-write path dla już publicznego `ContentArticle`,
@@ -1729,6 +1729,7 @@ Na 2026-09-16:
 - [x] NEWSROOM-N2-007: computed publication checklist współdzieląca backend invariants,
 - [x] NEWSROOM-N2-008: authenticated admin-only private preview bez public exposure,
 - [x] NEWSROOM-N2-009: fixed-slot NewsroomHomeComposer + private future preview,
+- [x] NEWSROOM-N2-010: provenance, regulatory context and media art direction,
 - [x] NEWSROOM-N2-012: ContentArticle + HomeComposer stale-write/audit identity hardening,
 - [ ] podłączyć `ContentArticlePathResolver` do publicznych N3 article controllers i zweryfikować HTTP canonical/301/404/410 behavior,
 - [ ] dodać sitemap/public-discovery regression korzystające wyłącznie z current canonical URL,
@@ -1736,6 +1737,15 @@ Na 2026-09-16:
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.26
+
+- PR #60 zmergowano na `main@4936d14d56fa15e59e6dd771e443e93895d3d281`; exact-head CI #217: `quality` PASS (1015 passed / 19 245 assertions / 2 skipped, Pint 1027 files PASS, frontend build PASS) i `newsroom-postgres` 7 passed / 89 assertions,
+- N2-010 nie zmienia schema: wykorzystuje istniejące kolumny `origin_type`, regulatory context i media/focal fields z N1-001; nie dodano migracji ani asset modelu,
+- `NewsroomArticleProvenanceMediaAdapter` normalizuje provenance/regulatory/media payload, ponownie inspektuje managed hero/OG asset i zapisuje dimensions wyprowadzone z storage; te pola są także częścią istniejącego stale-safe `Apply public update`,
+- `ContentArticlePublicationChecklist` wymaga publicznie cytowanego official/legislation HTTP(S) source dla `official_source` i aktywnego regulatory statusu, wymaga `effective_from` dla `adopted_future` / `in_force`, a przy publish ponownie weryfikuje hero/OG oraz zgodność dimensions,
+- focal point pozostaje parą X/Y 0..1; CMS ma CSS previews 16:9 / 4:3 / 1:1, lecz nie istnieje fizyczny crop/variant generator ani publiczny N3 renderer,
+- N2-010 jest DONE; następnym N2 taskiem pozostaje N2-011 `ContentTopicResource`.
 
 ### 2026-09-16 — v0.25
 
