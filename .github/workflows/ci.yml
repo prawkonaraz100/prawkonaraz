@@ -145,6 +145,6 @@ jobs:
           cp .env.example .env
           php artisan key:generate --force
 
-      - name: Run newsroom PostgreSQL migration contract
-        run: php artisan test tests/Postgres/NewsroomPostgresMigrationTest.php
+      - name: Run newsroom PostgreSQL domain contract
+        run: php artisan test tests/Postgres
 
