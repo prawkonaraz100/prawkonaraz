@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ContentArticleSourceType;
 use App\Enums\ContentArticleType;
 use App\Enums\ContentArticleWorkflowStatus;
 use App\Filament\Resources\ContentArticles\ContentArticleResource;
@@ -8,11 +9,13 @@ use App\Filament\Resources\ContentArticles\Pages\EditContentArticle;
 use App\Filament\Resources\ContentArticles\Pages\ListContentArticles;
 use App\Models\AuditLog;
 use App\Models\ContentArticle;
+use App\Models\ContentArticleSource;
 use App\Models\ContentAuthor;
 use App\Models\ContentCategory;
 use App\Models\User;
 use App\Support\NewsroomBodyContract;
 use Filament\Forms\Components\Builder;
+use Filament\Forms\Components\Repeater;
 use Livewire\Livewire;
 
 test('admin can access content article resource with eager loaded editorial relations', function () {
@@ -377,4 +380,110 @@ test('ordinary edit of publicly visible article cannot mutate public fields or b
         ->and($article->lead)->toBe('Lead publiczny')
         ->and($article->body_blocks[0]['data']['text'])->toBe('Treść publiczna')
         ->and($article->editorial_note)->toBe('Nowa notatka wewnętrzna');
+});
+
+test('admin can persist ordered article sources including private evidence without a url', function () {
+    $undoRepeaterFake = Repeater::fake();
+
+    try {
+        $admin = User::factory()->admin()->create();
+        $category = ContentCategory::factory()->create();
+        $author = ContentAuthor::factory()->create();
+
+        $this->actingAs($admin);
+
+        Livewire::test(CreateContentArticle::class)
+            ->set('data.type', ContentArticleType::News->value)
+            ->set('data.category_id', $category->id)
+            ->set('data.author_id', $author->id)
+            ->set('data.title', 'News ze źródłami')
+            ->set('data.sources', [
+                [
+                    'source_type' => ContentArticleSourceType::Official->value,
+                    'publisher' => 'Ministerstwo Infrastruktury',
+                    'title' => 'Oficjalny komunikat',
+                    'url' => 'https://www.gov.pl/example',
+                    'published_at' => null,
+                    'accessed_at' => null,
+                    'is_primary' => true,
+                    'is_official' => true,
+                    'is_publicly_cited' => true,
+                    'note' => null,
+                ],
+                [
+                    'source_type' => ContentArticleSourceType::Interview->value,
+                    'publisher' => 'Instruktor',
+                    'title' => 'Rozmowa redakcyjna',
+                    'url' => null,
+                    'published_at' => null,
+                    'accessed_at' => null,
+                    'is_primary' => false,
+                    'is_official' => false,
+                    'is_publicly_cited' => false,
+                    'note' => 'Kontakt wewnętrzny.',
+                ],
+            ])
+            ->call('create')
+            ->assertHasNoErrors();
+
+        $article = ContentArticle::query()->where('title', 'News ze źródłami')->firstOrFail();
+        $sources = $article->sources()->get();
+
+        expect($sources)->toHaveCount(2)
+            ->and($sources->pluck('title')->all())->toBe([
+                'Oficjalny komunikat',
+                'Rozmowa redakcyjna',
+            ])
+            ->and($sources[0]->source_type)->toBe(ContentArticleSourceType::Official)
+            ->and($sources[0]->is_primary)->toBeTrue()
+            ->and($sources[0]->is_official)->toBeTrue()
+            ->and($sources[1]->source_type)->toBe(ContentArticleSourceType::Interview)
+            ->and($sources[1]->url)->toBeNull()
+            ->and($sources[1]->is_publicly_cited)->toBeFalse()
+            ->and($sources[1]->note)->toBe('Kontakt wewnętrzny.');
+    } finally {
+        $undoRepeaterFake();
+    }
+});
+
+test('ordinary public article edit cannot mutate source relationship records', function () {
+    $undoRepeaterFake = Repeater::fake();
+
+    try {
+        $admin = User::factory()->admin()->create();
+        $article = ContentArticle::factory()->published()->create();
+        $source = ContentArticleSource::factory()->for($article, 'article')->create([
+            'title' => 'Źródło publiczne',
+            'url' => 'https://example.test/original',
+            'sort_order' => 0,
+        ]);
+
+        $this->actingAs($admin);
+
+        Livewire::test(EditContentArticle::class, ['record' => $article->getRouteKey()])
+            ->set('data.sources', [
+                [
+                    'source_type' => ContentArticleSourceType::Media->value,
+                    'publisher' => 'Zmiana',
+                    'title' => 'Próba podmiany',
+                    'url' => 'https://example.test/changed',
+                    'is_primary' => true,
+                    'is_official' => false,
+                    'is_publicly_cited' => true,
+                    'note' => null,
+                ],
+            ])
+            ->set('data.editorial_note', 'Tylko notatka może się zmienić.')
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $source = $source->fresh();
+
+        expect($article->fresh()->sources()->count())->toBe(1)
+            ->and($source->title)->toBe('Źródło publiczne')
+            ->and($source->url)->toBe('https://example.test/original')
+            ->and($article->fresh()->editorial_note)->toBe('Tylko notatka może się zmienić.');
+    } finally {
+        $undoRepeaterFake();
+    }
 });

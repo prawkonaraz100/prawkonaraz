@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Enums\ContentArticleSourceType;
 use App\Enums\ContentArticleType;
 use App\Enums\ContentArticleWorkflowStatus;
 use App\Events\ContentArticleWorkflowTransitioned;
@@ -423,13 +424,7 @@ final class ContentArticlePublishingService
             throw new DomainException('Content article requires at least one renderable body block.');
         }
 
-        if (
-            $type === ContentArticleType::News
-            && ! $article->sources()->exists()
-        ) {
-            throw new DomainException('News article requires at least one source.');
-        }
-
+        $this->assertSourcePolicy($article, $type);
         $this->assertKeyPoints($article);
     }
 
@@ -500,6 +495,85 @@ final class ContentArticlePublishingService
         if ($reference !== null && ! $article->reviewed_at->gt($reference)) {
             throw new DomainException('Content article requires a fresh review after its latest public-state change.');
         }
+    }
+
+    private function assertSourcePolicy(ContentArticle $article, ContentArticleType $articleType): void
+    {
+        $sources = $article->sources()->get();
+
+        if ($articleType === ContentArticleType::News && $sources->isEmpty()) {
+            throw new DomainException('News article requires at least one source.');
+        }
+
+        foreach ($sources as $source) {
+            $this->assertRequiredText($source->title, 'source title');
+
+            $sourceType = ContentArticleSourceType::tryFrom((string) $source->getRawOriginal('source_type'));
+
+            if ($sourceType === null) {
+                throw new DomainException('Content article source has an unsupported source_type.');
+            }
+
+            if (filled($source->url) && ! $this->isSafeHttpUrl($source->url)) {
+                throw new DomainException('Content article source URL must use a valid http or https URL.');
+            }
+        }
+
+        if ($articleType !== ContentArticleType::News) {
+            return;
+        }
+
+        $category = $article->category()->first();
+
+        if ($category?->slug !== 'przepisy') {
+            return;
+        }
+
+        $legalPrimarySources = $sources->filter(function ($source): bool {
+            if (! $source->is_primary) {
+                return false;
+            }
+
+            $sourceType = ContentArticleSourceType::tryFrom((string) $source->getRawOriginal('source_type'));
+
+            return in_array($sourceType, [
+                ContentArticleSourceType::Official,
+                ContentArticleSourceType::Legislation,
+            ], true);
+        });
+
+        if ($legalPrimarySources->isEmpty()) {
+            return;
+        }
+
+        $hasPublicPrimaryUrl = $legalPrimarySources->contains(
+            fn ($source): bool => $source->is_publicly_cited && $this->isSafeHttpUrl($source->url),
+        );
+
+        if (! $hasPublicPrimaryUrl) {
+            throw new DomainException(
+                'Legal news with a primary official or legislation source requires a publicly cited http or https URL.',
+            );
+        }
+    }
+
+    private function isSafeHttpUrl(mixed $value): bool
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        $url = trim($value);
+
+        if ($url === '' || filter_var($url, FILTER_VALIDATE_URL) === false) {
+            return false;
+        }
+
+        return in_array(
+            strtolower((string) parse_url($url, PHP_URL_SCHEME)),
+            ['http', 'https'],
+            true,
+        );
     }
 
     private function assertKeyPoints(ContentArticle $article): void

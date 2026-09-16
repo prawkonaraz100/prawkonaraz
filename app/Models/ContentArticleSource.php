@@ -14,6 +14,8 @@ class ContentArticleSource extends Model
     /** @use HasFactory<ContentArticleSourceFactory> */
     use HasFactory;
 
+    protected $touches = ['article'];
+
     protected $fillable = [
         'article_id',
         'source_type',

@@ -18,6 +18,7 @@ use App\Models\Question;
 use App\Models\TrafficSign;
 use App\Models\User;
 use App\Support\NewsroomBodyContract;
+use Illuminate\Support\Carbon;
 
 test('content article casts canonical newsroom fields and uses slug route key', function () {
     $article = ContentArticle::factory()->create([
@@ -297,4 +298,24 @@ test('scheduled featured and freshness scopes remain independent', function () {
         ->and(ContentArticle::query()->needsFreshnessReview()->pluck('id')->all())
         ->toContain($due->id)
         ->not->toContain($futureReview->id);
+});
+
+test('article source mutations touch the parent article edit token', function () {
+    Carbon::setTestNow('2026-09-16 10:00:00');
+
+    try {
+        $article = ContentArticle::factory()->create();
+        $source = ContentArticleSource::factory()->for($article, 'article')->create();
+        $before = $article->fresh()->updated_at;
+
+        Carbon::setTestNow('2026-09-16 10:01:00');
+
+        $source->update([
+            'title' => 'Źródło po korekcie',
+        ]);
+
+        expect($article->fresh()->updated_at?->gt($before))->toBeTrue();
+    } finally {
+        Carbon::setTestNow();
+    }
 });

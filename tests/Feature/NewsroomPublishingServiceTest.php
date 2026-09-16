@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ContentArticleSourceType;
 use App\Enums\ContentArticleWorkflowStatus;
 use App\Events\ContentArticleWorkflowTransitioned;
 use App\Models\AuditLog;
@@ -345,4 +346,61 @@ test('breaking publication invariant rejects non news and expired breaking state
 
     expect(fn () => newsroomPublishingService()->markReviewed($expired))
         ->toThrow(DomainException::class, 'future expiration');
+});
+
+test('source policy allows private interview evidence without a url but rejects unsafe source urls', function () {
+    $service = newsroomPublishingService();
+
+    $article = ContentArticle::factory()->inReview()->create();
+    ContentArticleSource::factory()
+        ->for($article, 'article')
+        ->privateEvidence()
+        ->create([
+            'source_type' => ContentArticleSourceType::Interview->value,
+            'title' => 'Rozmowa z ekspertem',
+            'url' => null,
+            'is_official' => false,
+        ]);
+
+    expect($service->markReviewed($article)->reviewed_at)->not->toBeNull();
+
+    $unsafe = ContentArticle::factory()->inReview()->create();
+    ContentArticleSource::factory()
+        ->for($unsafe, 'article')
+        ->create([
+            'title' => 'Niebezpieczny link',
+            'url' => 'javascript:alert(1)',
+        ]);
+
+    expect(fn () => $service->markReviewed($unsafe))
+        ->toThrow(DomainException::class, 'source URL must use a valid http or https URL');
+});
+
+test('legal news primary official source must have a publicly cited http or https url', function () {
+    $service = newsroomPublishingService();
+    $category = ContentCategory::factory()->create([
+        'name' => 'Przepisy',
+        'slug' => 'przepisy',
+    ]);
+    $article = ContentArticle::factory()->inReview()->for($category, 'category')->create();
+    $source = ContentArticleSource::factory()
+        ->for($article, 'article')
+        ->privateEvidence()
+        ->create([
+            'source_type' => ContentArticleSourceType::Legislation->value,
+            'title' => 'Projekt ustawy',
+            'url' => null,
+            'is_primary' => true,
+            'is_official' => true,
+        ]);
+
+    expect(fn () => $service->markReviewed($article))
+        ->toThrow(DomainException::class, 'requires a publicly cited http or https URL');
+
+    $source->update([
+        'url' => 'https://legislacja.gov.pl/example',
+        'is_publicly_cited' => true,
+    ]);
+
+    expect($service->markReviewed($article->fresh())->reviewed_at)->not->toBeNull();
 });
