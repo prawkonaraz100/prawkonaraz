@@ -585,7 +585,7 @@ Aktualnie:
 - interview/direct/internal evidence może pozostać bez URL, a `is_publicly_cited=false` zachowuje rekord jako wewnętrzny evidence; publiczny renderer nadal nie istnieje i N3 musi respektować ten kontrakt,
 - dla newsów `ContentArticlePublishingService` wymaga co najmniej jednego source; dla kategorii `przepisy`, jeśli w zapisanych źródłach istnieje primary `official` lub `legislation`, co najmniej jeden taki primary musi być publicznie cytowalny z poprawnym HTTP(S) URL,
 - powyższy mechaniczny gate implementuje wykonawczy DoD N2-004; szersza zasada redakcyjna „jeśli jawne źródło pierwotne istnieje, należy je znaleźć i cytować” pozostaje zasadą governance i nie jest automatycznym mechanizmem odkrywania zewnętrznych źródeł,
-- `ContentArticleSource::$touches = ['article']` bumpuje techniczny `ContentArticle.updated_at` przy modelowych mutacjach źródła; nie oznacza to `last_substantive_update_at` i nie zastępuje przyszłego stale-write guardu N2-012.
+- `ContentArticleSource::$touches = ['article']` nadal bumpuje techniczny `ContentArticle.updated_at`, ale stale-write nie opiera się wyłącznie na tym timestampie: po PR #50 deterministyczny edit token obejmuje również raw source state; ten touch nie oznacza `last_substantive_update_at`.
 
 ---
 
@@ -689,7 +689,7 @@ N2-005 zmaterializowało article-owned editor istniejących relacji bez zmiany s
 - allowlisty relation types odpowiadają dokładnie istniejącemu kontraktowi pytań, legal units i traffic signs,
 - sync zapisuje wyłącznie article-owned pivoty i nie zmienia pól `Question`, `LegalUnit`, `TrafficSign` ani ich istniejących grafów/dowodów,
 - question/legal/sign/topic pickery używają bounded search z limitem 50 zamiast preloadu całych corpusów,
-- po sync parent `ContentArticle.updated_at` jest bumpowany jako techniczny edit token; pełny stale-write rejection nadal pozostaje N2-012,
+- po sync parent `ContentArticle.updated_at` jest bumpowany technicznie; po PR #50 stale-write używa szerszego deterministycznego tokenu obejmującego również article-owned relation/topic state, więc same-second child mutation nie jest zależna wyłącznie od precyzji timestampu,
 - ordinary Edit publicznie widocznego artykułu nie może mutować relations/topics,
 - publiczne filtrowanie/wyświetlanie tych relacji nadal pozostaje przyszłym N3/N4 i N2-005 nie deklaruje publicznego renderera.
 
@@ -993,7 +993,8 @@ Downstream N2-006 po PR #48 eksponuje istniejące transition methods przez wspó
 
 Granice obecnej implementacji:
 
-- `applyPublicUpdate` opisany niżej nie jest jeszcze wdrożony; pozostaje NEWSROOM-N2-012 orchestration/stale-write scope,
+- `applyPublicUpdate` jest wdrożony dla aktualnie zmaterializowanego `ContentArticle` editor payloadu: row lock + deterministic loaded-state token + atomowy article/source/relation sync + pełna service validation; future public fields muszą dołączać do tego samego use case zamiast tworzyć low-level Save,
+- analogiczny stale-write guard dla `NewsroomHomeComposer` pozostaje otwartą częścią N2-012 zależną od N2-009,
 - scheduler command i batch due processing zostały wdrożone downstream w N1-005 i reużywają tego service boundary,
 - publiczny HTTP 410/301/200 pozostaje N3; service ustanawia withdrawal tombstone, ale nie renderuje odpowiedzi HTTP,
 - cache/sitemap/IndexNow listeners nie są jeszcze podłączone; istnieje jedynie bezpieczny after-commit event hook.
@@ -1703,12 +1704,12 @@ Na 2026-09-16:
 - N2-003 dodało `NewsroomBodyEditorAdapter` oraz kontrolowany Builder/RichEditor dla `body_blocks`; canonical keys/order są zachowywane, rich text pozostaje TipTap JSON, a zapis jest ponownie normalizowany przez `NewsroomBodyContract`,
 - N2-004 dodało relationship source editor na istniejącym `ContentArticleSource`, reorder przez `sort_order`, source status indicators, HTTP(S) URL validation, parent `updated_at` touch oraz finalny source-policy gate w `ContentArticlePublishingService`,
 - N2-005 dodało `NewsroomArticleRelationsEditorAdapter` oraz article-owned editor pytań/jednostek prawnych/znaków/topiców; ordered pivots zachowują `sort_order`, topics pozostają bez ręcznego rankingu, a targety są walidowane przed sync,
-- N2-006 jest częściowo zmaterializowane po PR #48: Edit/View mają workflow/exposure actions delegujące do `ContentArticlePublishingService`; featured/breaking mutations są audytowane i chronione service-level invariantami, natomiast `Apply public update` + stale-write pozostają N2-012,
+- N2-006 jest DONE po PR #50: obok workflow/exposure actions istnieje jawny stale-safe `Apply public update`; mutacje publiczne pozostają w `ContentArticlePublishingService`, a AuditLog zachowuje `User` actor / `ContentAuthor` identity separation,
 - `ContentArticle`, `ContentTag`, `ContentTopic`, `ContentArticleSource` i `ContentHomePlacement` Eloquent models/factories istnieją; factory workflow states pokrywają dokumentowany baseline,
 - service-level route-family lookup guard istnieje w `ContentArticlePathResolver`; nadal nie jest podłączony do publicznych controllerów N3,
 - NEWSROOM-N1-005 scheduler istnieje jako `newsroom:publish-due`, jest zarejestrowany co minutę w production i deleguje due-time revalidation/publish do `ContentArticlePublishingService`,
 - NEWSROOM-N1-006 jest wdrożone: istnieją `NewsroomHomeCompositionService`, `NewsroomHomePlacementService` i niemutujący `ContentArticlePublishingService::assertScheduledPreviewReady()`; overlap/concurrency jest testowane również na PostgreSQL,
-- newsroom CMS jest częściowo zmaterializowany przez `ContentCategoryResource`, `ContentArticleResource`, kontrolowany body Builder/editor, source relationship editor, article-owned relations/topics editor oraz N2-006 workflow/exposure actions; `ContentTopicResource`, media/origin-regulatory UI, `Apply public update` + stale-write, preview UI i HomeComposer nadal nie istnieją.
+- newsroom CMS jest częściowo zmaterializowany przez `ContentCategoryResource`, `ContentArticleResource`, kontrolowany body Builder/editor, source relationship editor, article-owned relations/topics editor, N2-006 workflow/exposure actions oraz stale-safe `Apply public update`; `ContentTopicResource`, media/origin-regulatory UI, publication checklist, preview UI i HomeComposer nadal nie istnieją, a N2-012 pozostaje PARTIAL dla HomeComposer stale-write.
 
 ---
 
@@ -1721,13 +1722,23 @@ Na 2026-09-16:
 - [ ] podłączyć istniejące origin/regulatory columns do modeli, CMS i publish validation,
 - [ ] wdrożyć dedykowany idempotentny DB seeder kategorii konsumujący `NewsroomTaxonomyContract`,
 - [ ] wdrożyć policies,
-- [ ] wdrożyć `applyPublicUpdate` orchestration/stale-write path dla już publicznego artykułu w N2,
+- [x] wdrożyć `applyPublicUpdate` orchestration/stale-write path dla już publicznego `ContentArticle`,
+- [ ] wdrożyć analogiczny stale-write guard dla `NewsroomHomeComposer` po N2-009,
+- [ ] wdrożyć NEWSROOM-N2-007 computed publication checklist bez duplikowania backend invariants,
 - [ ] podłączyć `ContentArticlePathResolver` do publicznych N3 article controllers i zweryfikować HTTP canonical/301/404/410 behavior,
 - [ ] dodać sitemap/public-discovery regression korzystające wyłącznie z current canonical URL,
 
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.22
+
+- PR #50 zmergowano na `main@570f884a89869ec44d24f57f0506f4444d20a7d2`; exact-head CI #190: 987 passed / 19 088 assertions / 2 skipped, Pint 1015 files PASS, frontend build PASS, `newsroom-postgres` PASS,
+- `ContentArticleEditToken` jest deterministycznym loaded-state fingerprintem article + sources + article-owned relations/topics i wykrywa child changes także przy sekundowej precyzji SQL timestamps,
+- `ContentArticlePublishingService::applyPublicUpdate()` zapisuje atomowo aktualnie wspierany public editor payload, rewaliduje publication invariants, rollbackuje child mutations przy błędzie i audytuje allowlisted metadata przez `User`,
+- `last_substantive_update_at` zmienia się wyłącznie dla semantycznej publicznej zmiany; no-op zachowuje poprzednią wartość,
+- N2-006 jest DONE; N2-012 pozostaje PARTIAL tylko dla `NewsroomHomeComposer` stale-write, a kolejnym wykonywalnym krokiem jest N2-007 Publication checklist.
 
 ### 2026-09-16 — v0.21
 

@@ -1127,12 +1127,12 @@ Proces jest gotowy, gdy:
 Na 2026-09-16:
 
 - istnieją `ContentAuthor` i istniejący `AuditLog`; `User` pozostaje aktorem operacji, a `ContentAuthor` publiczną tożsamością autora/reviewera,
-- backendowy `ContentArticlePublishingService` i `newsroom:publish-due` istnieją; po PR #48 istnieją także Filament workflow/exposure actions na Edit/View, natomiast publication checklist oraz correction/`Apply public update` + stale-write orchestration nadal nie są wdrożone,
+- backendowy `ContentArticlePublishingService` i `newsroom:publish-due` istnieją; po PR #50 Filament ma pełne N2-006 workflow/exposure actions oraz stale-safe `Apply public update` dla już publicznego `ContentArticle`; publication checklist i pełny correction flow nadal nie są wdrożone,
 - istnieją `ContentCategoryResource` i `ContentArticleResource`; article CMS ma kontrolowany body Builder/RichEditor, relationship source editor oraz article-owned questions/legal/signs/topics editor,
 - istnieją model `ContentArticleSource`, source types v1, private-evidence flag i source ordering; N2-004 dodaje ich edycję oraz finalną source-policy validation,
 - draft może istnieć bez source, natomiast news nie przechodzi review/publish bez source; prywatny interview/direct evidence może mieć URL null,
-- ordinary Edit publicznie widocznego artykułu nie może zmieniać publicznych sources ani article relations/topics,
-- publiczny renderer citation/relations, origin/regulatory UI, computed publication warnings, preview, HomeComposer oraz `Apply public update` z pełnym stale-write reject nadal nie istnieją.
+- ordinary Edit publicznie widocznego artykułu nadal nie zmienia publicznych sources ani article relations/topics przez zwykły Save; jawny `Apply public update` zapisuje aktualnie zmaterializowany public editor payload atomowo z loaded-state guardem,
+- publiczny renderer citation/relations, origin/regulatory UI, computed publication warnings, preview i HomeComposer nadal nie istnieją; N2-012 pozostaje otwarte tylko dla HomeComposer stale-write.
 
 ---
 
@@ -1145,7 +1145,8 @@ Na 2026-09-16:
 - [ ] wdrożyć topic governance,
 - [ ] wdrożyć focal-point review,
 - [ ] wdrożyć admin-only private/no-store preview,
-- [ ] domknąć N2-006 przez N2-012: atomowy `Apply public update` + loaded-token stale-write rejection; workflow/schedule/exposure actions nad istniejącym publishing foundation są już wdrożone,
+- [x] N2-006: workflow/schedule/exposure actions + atomowy stale-safe `Apply public update` dla `ContentArticle`,
+- [ ] N2-012: analogiczny stale-write guard dla `NewsroomHomeComposer` po N2-009,
 - [ ] wdrożyć corrections,
 - [ ] wdrożyć freshness filters,
 - [ ] przygotować publiczną stronę zasad redakcyjnych przed większym rolloutem.
@@ -1153,6 +1154,15 @@ Na 2026-09-16:
 ---
 
 ## 49. Historia zmian
+
+### 2026-09-16 — v0.10
+
+- PR #50 zmergowano na `main@570f884a89869ec44d24f57f0506f4444d20a7d2` po exact-head CI #190; `quality` i `newsroom-postgres` PASS,
+- redaktor ma jawny `Apply public update` dla już publicznego artykułu; ordinary public Save pozostaje ograniczony do bezpiecznej wewnętrznej ścieżki,
+- stale-write guard używa deterministycznego loaded-state tokenu obejmującego article, sources i article-owned relations/topics, więc konflikt nie kończy się last-write-wins nawet przy same-second child mutation,
+- public update audytuje `User` actor bez pełnego body/lead/private notes i aktualizuje `last_substantive_update_at` tylko dla semantycznej zmiany,
+- N2-006 jest DONE; HomeComposer stale-write pozostaje późniejszą częścią N2-012, a następnym taskiem jest N2-007 Publication checklist,
+- correction governance pozostaje bez zmian: obecny `Apply public update` nie oznacza jeszcze kompletnego `Apply correction` UI ani zmaterializowanego `correction_note` flow.
 
 ### 2026-09-16 — v0.9
 
