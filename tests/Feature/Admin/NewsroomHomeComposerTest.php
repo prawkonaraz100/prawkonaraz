@@ -91,6 +91,9 @@ test('composer saves fixed placement with audit actor and can return slot to fal
     $article = ContentArticle::factory()->published()->create([
         'title' => 'Ręczny lead',
     ]);
+    $replacement = ContentArticle::factory()->published()->create([
+        'title' => 'Ręczny lead po zmianie',
+    ]);
 
     $this->actingAs($admin);
 
@@ -108,6 +111,20 @@ test('composer saves fixed placement with audit actor and can return slot to fal
         ->and($placement->updated_by_user_id)->toBe($admin->id)
         ->and(AuditLog::query()
             ->where('action', 'content_home_placement.created')
+            ->where('entity_id', (string) $placement->id)
+            ->where('actor_user_id', $admin->id)
+            ->exists())->toBeTrue();
+
+    $component
+        ->call('chooseArticle', 'lead--global--0', $replacement->id)
+        ->call('saveSlot', 'lead--global--0');
+
+    $placement = $placement->fresh();
+
+    expect($placement->article_id)->toBe($replacement->id)
+        ->and($placement->updated_by_user_id)->toBe($admin->id)
+        ->and(AuditLog::query()
+            ->where('action', 'content_home_placement.updated')
             ->where('entity_id', (string) $placement->id)
             ->where('actor_user_id', $admin->id)
             ->exists())->toBeTrue();
