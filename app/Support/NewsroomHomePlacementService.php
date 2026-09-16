@@ -6,6 +6,7 @@ use App\Enums\ContentArticleType;
 use App\Models\ContentArticle;
 use App\Models\ContentCategory;
 use App\Models\ContentHomePlacement;
+use App\Models\User;
 use DateTimeInterface;
 use DomainException;
 use Illuminate\Support\Carbon;
@@ -18,21 +19,34 @@ final class NewsroomHomePlacementService
 
     public function __construct(
         private readonly PostgresTransactionAdvisoryLock $advisoryLock,
+        private readonly ContentHomePlacementEditToken $editToken,
+        private readonly NewsroomHomeCompositionService $compositionService,
+        private readonly AuditLogService $auditLog,
     ) {}
 
     /**
      * @param  array<string, mixed>  $attributes
      */
-    public function create(array $attributes): ContentHomePlacement
+    public function create(array $attributes, ?User $actor = null): ContentHomePlacement
     {
-        return DB::transaction(function () use ($attributes): ContentHomePlacement {
+        return DB::transaction(function () use ($attributes, $actor): ContentHomePlacement {
+            if ($actor !== null) {
+                $attributes['created_by_user_id'] = $actor->getKey();
+                $attributes['updated_by_user_id'] = $actor->getKey();
+            }
+
             $normalized = $this->normalizeAttributes($attributes);
+            $this->assertTargetEligibleAtPlacementStart($normalized);
             $this->acquireTupleLocks([$this->tupleFor($normalized)]);
             $this->assertNoOverlap($normalized);
 
-            return ContentHomePlacement::query()
+            $placement = ContentHomePlacement::query()
                 ->create($normalized)
                 ->refresh();
+
+            $this->recordAudit('content_home_placement.created', $placement, $actor);
+
+            return $placement;
         });
     }
 
@@ -42,20 +56,24 @@ final class NewsroomHomePlacementService
     public function update(
         ContentHomePlacement $placement,
         array $attributes,
+        string $loadedToken,
+        ?User $actor = null,
     ): ContentHomePlacement {
-        return DB::transaction(function () use ($placement, $attributes): ContentHomePlacement {
-            $snapshot = ContentHomePlacement::query()
+        return DB::transaction(function () use ($placement, $attributes, $loadedToken, $actor): ContentHomePlacement {
+            $current = ContentHomePlacement::query()
                 ->whereKey($placement->getKey())
                 ->firstOrFail();
 
-            $snapshotAttributes = $this->attributesFrom($snapshot);
+            $currentAttributes = $this->attributesFrom($current);
             $requested = $this->normalizeAttributes([
-                ...$snapshotAttributes,
+                ...$currentAttributes,
                 ...$attributes,
+                'created_by_user_id' => $current->created_by_user_id,
+                'updated_by_user_id' => $actor?->getKey() ?? ($attributes['updated_by_user_id'] ?? $current->updated_by_user_id),
             ]);
 
             $this->acquireTupleLocks([
-                $this->tupleFor($snapshotAttributes),
+                $this->tupleFor($currentAttributes),
                 $this->tupleFor($requested),
             ]);
 
@@ -64,26 +82,63 @@ final class NewsroomHomePlacementService
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            if ($this->tupleFor($this->attributesFrom($locked)) !== $this->tupleFor($snapshotAttributes)) {
-                throw new DomainException('Newsroom home placement changed concurrently; retry the update.');
-            }
+            $this->assertFreshEditToken($locked, $loadedToken);
 
             $normalized = $this->normalizeAttributes([
                 ...$this->attributesFrom($locked),
                 ...$attributes,
+                'created_by_user_id' => $locked->created_by_user_id,
+                'updated_by_user_id' => $actor?->getKey() ?? ($attributes['updated_by_user_id'] ?? $locked->updated_by_user_id),
             ]);
 
-            if ($this->tupleFor($normalized) !== $this->tupleFor($requested)) {
-                throw new DomainException('Newsroom home placement target changed concurrently; retry the update.');
-            }
-
+            $this->assertTargetEligibleAtPlacementStart($normalized);
             $this->assertNoOverlap($normalized, (int) $locked->getKey());
 
             $locked->fill($normalized);
             $locked->save();
 
-            return $locked->refresh();
+            $updated = $locked->refresh();
+            $this->recordAudit('content_home_placement.updated', $updated, $actor);
+
+            return $updated;
         });
+    }
+
+    public function delete(
+        ContentHomePlacement $placement,
+        string $loadedToken,
+        ?User $actor = null,
+    ): void {
+        DB::transaction(function () use ($placement, $loadedToken, $actor): void {
+            $current = ContentHomePlacement::query()
+                ->whereKey($placement->getKey())
+                ->firstOrFail();
+
+            $this->acquireTupleLocks([
+                $this->tupleFor($this->attributesFrom($current)),
+            ]);
+
+            $locked = ContentHomePlacement::query()
+                ->whereKey($placement->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $this->assertFreshEditToken($locked, $loadedToken);
+            $this->recordAudit('content_home_placement.deleted', $locked, $actor);
+            $locked->delete();
+        });
+    }
+
+    public function editToken(ContentHomePlacement $placement): string
+    {
+        return $this->editToken->make($placement);
+    }
+
+    public function assertFreshEditToken(ContentHomePlacement $placement, string $loadedToken): void
+    {
+        if ($loadedToken === '' || ! hash_equals($this->editToken->make($placement), $loadedToken)) {
+            throw new DomainException('Newsroom home placement changed concurrently; refresh the composer before saving.');
+        }
     }
 
     /**
@@ -211,6 +266,22 @@ final class NewsroomHomePlacementService
     /**
      * @param  array<string, mixed>  $attributes
      */
+    private function assertTargetEligibleAtPlacementStart(array $attributes): void
+    {
+        $article = ContentArticle::query()->findOrFail((int) $attributes['article_id']);
+        $startsAt = $attributes['starts_at'];
+        $at = $startsAt instanceof Carbon && $startsAt->isFuture()
+            ? $startsAt
+            : now();
+
+        if (! $this->compositionService->isArticleEligibleAt($article, $at)) {
+            throw new DomainException('Placement article is not eligible for newsroom distribution at the placement start time.');
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
     private function assertNoOverlap(array $attributes, ?int $ignorePlacementId = null): void
     {
         $query = ContentHomePlacement::query()
@@ -312,6 +383,28 @@ final class NewsroomHomePlacementService
         }
 
         $this->advisoryLock->acquire($keys);
+    }
+
+    private function recordAudit(
+        string $action,
+        ContentHomePlacement $placement,
+        ?User $actor,
+    ): void {
+        $this->auditLog->record(
+            $action,
+            ContentHomePlacement::class,
+            (string) $placement->getKey(),
+            $actor,
+            [
+                'surface_key' => $placement->surface_key,
+                'slot_key' => $placement->slot_key,
+                'context_key' => $placement->context_key,
+                'position' => (int) $placement->position,
+                'article_id' => (int) $placement->article_id,
+                'starts_at' => $placement->starts_at,
+                'ends_at' => $placement->ends_at,
+            ],
+        );
     }
 
     public static function lockKey(
