@@ -1239,7 +1239,8 @@ Na 2026-09-16:
 - backendowy `ContentArticlePublishingService` istnieje i implementuje audytowane workflow transitions oraz after-commit event boundary z N1-004,
 - backendowe `NewsroomHomeCompositionService` i `NewsroomHomePlacementService` istnieją po N1-006; zapewniają composition/fallback/future-preview eligibility i concurrency-safe placement writes,
 - custom Filament `NewsroomHomeComposer` nadal nie istnieje; N1-006 nie dostarcza UI, stale-write UX ani admin preview route,
-- newsroom resources nie istnieją,
+- `ContentCategoryResource` istnieje jako pierwszy newsroom resource: index/create/view/edit, article counts, active filter, `position` reorder oraz category invariants,
+- `ContentArticleResource`, `ContentTopicResource` i custom `NewsroomHomeComposer` nadal nie istnieją,
 - article editor/Builder UI nie istnieje,
 - publiczny renderer bloków nie istnieje,
 - preview nie istnieje.
@@ -1251,7 +1252,6 @@ Na 2026-09-16:
 - [ ] wdrożyć faktyczny Builder/RichEditor form adapter oparty o `NewsroomBodyContract`,
 - [ ] wdrożyć ContentArticleResource,
 - [ ] wdrożyć Form/Table/Infolist,
-- [ ] wdrożyć ContentCategoryResource,
 - [ ] wdrożyć ContentTopicResource,
 - [ ] wdrożyć NewsroomHomeComposer + future preview,
 - [ ] wdrożyć hero/OG uploader korzystający z `NewsroomMediaStorage` i zapis verified metadata do `ContentArticle`,
@@ -1262,12 +1262,22 @@ Na 2026-09-16:
 - [ ] wdrożyć checklist computed state,
 - [ ] wdrożyć stale-write guard dla articles/home placements,
 - [ ] wdrożyć admin-only private preview,
-- [ ] wdrożyć category/topic identity guards,
+- [ ] wdrożyć topic identity guards; category slug/delete/deactivation guards są już zmaterializowane przez N2-001,
 - [ ] wdrożyć tests.
 
 ---
 
 ## 55. Historia zmian
+
+### 2026-09-16 — v0.10
+
+- wdrożono `ContentCategoryResource` jako pierwszy newsroom Filament resource,
+- dostęp pozostaje admin-only przez istniejący `User::canAccessPanel()` contract; nie dodano newsroom RBAC,
+- resource ma index/create/view/edit, trzy article counts, active filter i reorder po `position`,
+- slug jest create-only w UI oraz immutable/model-validated w domenie,
+- delete/deactivation guards są autorytatywne na modelu; edit page powierzchniowo zwraca błąd pola `is_active`, ale reactive toggle nie wykonuje relacyjnych zapytań,
+- stale eager counts nie mogą ominąć guards; jest to objęte feature regression,
+- `ContentArticleResource`, Builder/editor, `ContentTopicResource`, HomeComposer i preview nadal pozostają otwarte.
 
 ### 2026-09-16 — v0.9
 

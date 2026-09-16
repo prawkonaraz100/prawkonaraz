@@ -1456,12 +1456,13 @@ Na moment utworzenia dokumentu za ukończone uznajemy wyłącznie elementy rzecz
 - NEWSROOM-N1-004: `ContentArticlePublishingService` + after-commit `ContentArticleWorkflowTransitioned` dla audytowanych workflow/public-state transitions,
 - NEWSROOM-N1-005: `newsroom:publish-due` + produkcyjny every-minute scheduler, due-time revalidation, idempotent skip/failure isolation i scheduled-republish guard,
 - NEWSROOM-N1-006: `NewsroomHomeCompositionService` + `NewsroomHomePlacementService`, future-preview eligibility, deterministic fallback/global dedupe oraz PostgreSQL-serialized placement overlaps,
+- NEWSROOM-N2-001: Filament `ContentCategoryResource` z CRUD/order/active/article counts oraz modelowymi category identity guards,
 - routes `/aktualnosci` i `/poradniki` jako dedykowane pre-launch 200/noindex placeholders,
 - placeholdery tych tras,
 - publiczna nawigacja prowadząca do aktualności,
 - istniejące klastry pytań, znaków i przepisów, które mogą zostać powiązane z artykułami.
 
-**Newsroom ma już zmaterializowane N1-001..N1-006: schema/enumy, warstwa Eloquent, canonical slug/history/path-resolution, publishing/workflow service, scheduler initial publish oraz home composition/placement writer istnieją. N1 domain foundation jest zamknięte. Nadal nie uznajemy CMS/public content za wdrożone: N2 resources/editor/media UI/Apply public update oraz N3 renderer/controllers/HTTP 301/410 jeszcze nie istnieją.**
+**Newsroom ma zmaterializowane N1-001..N1-006 oraz pierwszy resource N2-001 (`ContentCategoryResource`). N1 domain foundation jest zamknięte, ale CMS jako całość nadal nie jest wdrożony: article/topic resources, editor/media/workflow UI, HomeComposer oraz N3 renderer/controllers/HTTP 301/410 pozostają otwarte.**
 
 ---
 
@@ -1481,7 +1482,8 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N1-004` — publishing/workflow service + AuditLog/after-commit boundary,
 - [x] `NEWSROOM-N1-005` — due scheduler + revalidation/failure isolation/idempotency,
 - [x] `NEWSROOM-N1-006` — home composition + placement writer + future preview + PostgreSQL overlap serialization,
-- [ ] przejść do N2 zgodnie z backlogiem; następny task: `NEWSROOM-N2-001` ContentCategoryResource.
+- [x] `NEWSROOM-N2-001` — ContentCategoryResource + category CRUD/order/active/article-count invariants,
+- [ ] kontynuować N2 zgodnie z backlogiem; następny task: `NEWSROOM-N2-002` ContentArticleResource shell.
 
 Pozostałe elementy N2–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu checklistę.
 
@@ -1508,6 +1510,14 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-16 — v0.18
+
+- wdrożono i zmergowano NEWSROOM-N2-001 po zielonych jobach `quality` i `newsroom-postgres`,
+- pierwszy newsroom Filament resource zarządza kategoriami bez zmiany istniejącego public route/taxonomy contract,
+- slug pozostaje stabilną publiczną tożsamością kategorii; delete/deactivation invariants są wymuszane również poza UI,
+- table order wykorzystuje `position`; list/infolist pokazują all/publicly-visible/actively-distributed article counts,
+- nie uznano całego CMS za wdrożony; następny krok to N2-002 ContentArticleResource shell.
 
 ### 2026-09-16 — v0.17
 

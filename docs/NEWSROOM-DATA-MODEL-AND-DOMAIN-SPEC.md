@@ -1666,12 +1666,12 @@ Na 2026-09-16:
 - przyszłe detail/category/topic/feed routes są zarejestrowane, lecz zwracają 404 do czasu publicznej implementacji,
 - newsroom schema istnieje: `content_categories`, `content_tags`, `content_articles`, `content_topics`, pivots/relations, redirects i `content_home_placements` są tworzone przez 12 migracji,
 - schema i warstwa modelowa są zweryfikowane na SQLite i PostgreSQL 16; `newsroom-postgres` uruchamia migration contract oraz model/scope contract,
-- `ContentCategory` Eloquent model istnieje; dedykowany DB seeder kategorii nadal nie istnieje,
+- `ContentCategory` Eloquent model istnieje; N2-001 dodało jego Filament `ContentCategoryResource` oraz modelowe slug/delete/deactivation guards; dedykowany DB seeder kategorii nadal nie istnieje,
 - `ContentArticle`, `ContentTag`, `ContentTopic`, `ContentArticleSource` i `ContentHomePlacement` Eloquent models/factories istnieją; factory workflow states pokrywają dokumentowany baseline,
 - service-level route-family lookup guard istnieje w `ContentArticlePathResolver`; nadal nie jest podłączony do publicznych controllerów N3,
 - NEWSROOM-N1-005 scheduler istnieje jako `newsroom:publish-due`, jest zarejestrowany co minutę w production i deleguje due-time revalidation/publish do `ContentArticlePublishingService`,
 - NEWSROOM-N1-006 jest wdrożone: istnieją `NewsroomHomeCompositionService`, `NewsroomHomePlacementService` i niemutujący `ContentArticlePublishingService::assertScheduledPreviewReady()`; overlap/concurrency jest testowane również na PostgreSQL,
-- newsroom CMS nie istnieje.
+- newsroom CMS jest częściowo rozpoczęty przez `ContentCategoryResource`; article/topic resources, article editor/workflow UI i HomeComposer nadal nie istnieją.
 
 ---
 
@@ -1691,6 +1691,15 @@ Na 2026-09-16:
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.16
+
+- wdrożono NEWSROOM-N2-001 bez zmiany istniejących category invariants z §8.1,
+- `ContentCategoryResource` udostępnia admin-only index/create/view/edit, article counts i zarządzanie `position`/active/SEO,
+- slug syntax oraz immutability są wymuszane modelowo, niezależnie od disabled edit field,
+- delete guard odpytuje faktyczną relację artykułów, a deactivation guard świeżo sprawdza `publiclyVisible()` i `activelyDistributed()`,
+- stale preloaded counts służą prezentacji, ale nie mogą obejść save/delete invariants,
+- szerszy newsroom CMS nadal nie jest uznany za wdrożony; następnym resource taskiem jest N2-002.
 
 ### 2026-09-16 — v0.15
 
