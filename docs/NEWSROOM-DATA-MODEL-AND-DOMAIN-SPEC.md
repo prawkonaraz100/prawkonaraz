@@ -1599,19 +1599,17 @@ Na 2026-09-16:
 
 - [ ] wdrożyć N2 Filament Builder/RichEditor adapter oparty o `NewsroomBodyContract`,
 - [ ] wdrożyć N3 publiczny renderer bloków zgodny z `NewsroomBodyContract`,
-- [ ] wdrożyć model topics,
-- [ ] wdrożyć home placements/composition service,
+- [ ] wdrożyć N1-002 modele, relations, scopes i factories dla istniejącej schema, w tym topics i home placements,
+- [ ] wdrożyć home composition service,
 - [ ] podłączyć `NewsroomMediaStorage` do N2 hero/OG uploader + `ContentArticle` persistence oraz wdrożyć focal point/OG-alt UX,
 - [ ] wdrożyć crop/variant generation dopiero wraz z fizycznymi artefaktami i ich testami,
-- [ ] wdrożyć origin/regulatory context fields,
-- [ ] wdrożyć `ContentCategory` i dedykowany idempotentny DB seeder konsumujący `NewsroomTaxonomyContract`,
-- [ ] wdrożyć modele i factories,
+- [ ] podłączyć istniejące origin/regulatory columns do modeli, CMS i publish validation,
+- [ ] wdrożyć dedykowany idempotentny DB seeder kategorii konsumujący `NewsroomTaxonomyContract`,
 - [ ] wdrożyć policies,
 - [ ] wdrożyć publishing service,
 - [ ] wdrożyć scheduling,
 - [ ] wdrożyć slug redirects,
 - [ ] podłączyć `NewsroomRouteContract` do publicznego ContentArticle lookupu i zweryfikować route-family exclusivity na realnych rekordach,
-- [ ] wdrożyć idempotentny DB seeder kategorii konsumujący `NewsroomTaxonomyContract`.
 
 ---
 
