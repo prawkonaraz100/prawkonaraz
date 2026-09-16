@@ -112,6 +112,25 @@ test('category with public articles cannot be deactivated', function () {
     expect($category->fresh()->is_active)->toBeTrue();
 });
 
+test('admin edit form surfaces deactivation guard on the active field', function () {
+    $admin = User::factory()->admin()->create();
+    $category = ContentCategory::factory()->create([
+        'slug' => 'osk',
+        'is_active' => true,
+    ]);
+
+    ContentArticle::factory()->published()->for($category, 'category')->create();
+
+    $this->actingAs($admin);
+
+    Livewire::test(EditContentCategory::class, ['record' => $category->getRouteKey()])
+        ->set('data.is_active', false)
+        ->call('save')
+        ->assertHasErrors(['data.is_active']);
+
+    expect($category->fresh()->is_active)->toBeTrue();
+});
+
 test('category without public articles can be deactivated', function () {
     $category = ContentCategory::factory()->create([
         'slug' => 'word',
