@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasOptimisticLockVersion;
 use Database\Factories\ContentHomePlacementFactory;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Builder;
@@ -13,6 +14,7 @@ class ContentHomePlacement extends Model
 {
     /** @use HasFactory<ContentHomePlacementFactory> */
     use HasFactory;
+    use HasOptimisticLockVersion;
 
     public const SURFACE_NEWSROOM_HOME = 'newsroom_home';
 
@@ -58,6 +60,7 @@ class ContentHomePlacement extends Model
             'position' => 'integer',
             'starts_at' => 'immutable_datetime',
             'ends_at' => 'immutable_datetime',
+            'lock_version' => 'integer',
         ];
     }
 
