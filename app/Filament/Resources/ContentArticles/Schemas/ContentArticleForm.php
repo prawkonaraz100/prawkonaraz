@@ -9,6 +9,7 @@ use App\Models\ContentTopic;
 use App\Models\LegalUnit;
 use App\Models\Question;
 use App\Models\TrafficSign;
+use App\Support\ContentArticlePublicationChecklist;
 use App\Support\NewsroomBodyContract;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Builder as FormBuilder;
@@ -29,6 +30,7 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
 class ContentArticleForm
@@ -111,6 +113,14 @@ class ContentArticleForm
                                 ->content('Builder zapisuje wyłącznie kontrolowany body_blocks schema v1. Embed pozostaje wyłączony do osobnego security/CSP gate.'),
                         ]),
                 ]),
+                Section::make('Checklista publikacyjna')
+                    ->description('Read-only stan zapisanej wersji rekordu. Te same domenowe reguły blokujące są ponownie egzekwowane przez ContentArticlePublishingService przy review, schedule i publish.')
+                    ->schema([
+                        Placeholder::make('publication_checklist')
+                            ->label('Gotowość do publikacji')
+                            ->content(fn (?ContentArticle $record): HtmlString|string => static::publicationChecklistHtml($record))
+                            ->columnSpanFull(),
+                    ]),
                 Section::make('Treść podstawowa')
                     ->description('Lead pozostaje osobnym polem. Body jest zapisywane jako kontrolowana lista bloków, nie jako dowolny HTML.')
                     ->schema([
@@ -825,6 +835,45 @@ class ContentArticleForm
         $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
 
         return in_array($scheme, ['http', 'https'], true) ? $url : null;
+    }
+
+    protected static function publicationChecklistHtml(?ContentArticle $record): HtmlString|string
+    {
+        if ($record === null) {
+            return 'Checklista pojawi się po pierwszym zapisie artykułu.';
+        }
+
+        $items = app(ContentArticlePublicationChecklist::class)->items($record);
+        $blockingCount = collect($items)
+            ->where('state', ContentArticlePublicationChecklist::STATE_BLOCKING)
+            ->count();
+        $warningCount = collect($items)
+            ->where('state', ContentArticlePublicationChecklist::STATE_WARNING)
+            ->count();
+
+        $summary = $blockingCount === 0
+            ? ($warningCount === 0
+                ? 'Gotowe do publikacji.'
+                : "Brak blokad · {$warningCount} ostrzeżeń.")
+            : "{$blockingCount} blokad · {$warningCount} ostrzeżeń.";
+
+        $rows = collect($items)
+            ->map(function (array $item): string {
+                $stateLabel = match ($item['state']) {
+                    ContentArticlePublicationChecklist::STATE_BLOCKING => 'BLOKUJE',
+                    ContentArticlePublicationChecklist::STATE_WARNING => 'OSTRZEŻENIE',
+                    default => 'OK',
+                };
+
+                return '<li><strong>'.e($stateLabel).' · '.e($item['label']).'</strong> — '.e($item['message']).'</li>';
+            })
+            ->implode('');
+
+        return new HtmlString(
+            '<div><p><strong>'.e($summary).'</strong></p><ul style="margin-top:0.5rem;padding-left:1.25rem;list-style:disc">'
+            .$rows
+            .'</ul></div>',
+        );
     }
 
     /**
