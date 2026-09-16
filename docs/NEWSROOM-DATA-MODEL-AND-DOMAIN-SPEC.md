@@ -6,11 +6,11 @@
 - Obszar: newsroom / media portal
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Bazowy stan repo przy projektowaniu: main@6a38c95ce76ee05997977d614d795ed8513462f1
-- Ostatnia weryfikacja zgodności z kodem: main@54ddf66b6fb3f41d103415697019500cdab86d41 (2026-09-16)
+- Ostatnia weryfikacja zgodności z kodem: main@47e748047ec655ff2fdb5669d8cbff7e51041dc8 (2026-09-16)
 - Data: 2026-09-16
 - Zakres: model domenowy, baza danych, invariants, serwisy aplikacyjne, routing domeny i kolejność migracji
 
-Ten dokument opisuje docelowy model danych newsroomu. Nie oznacza, że opisane tabele lub klasy już istnieją. Stan wdrożenia należy aktualizować po każdej zmianie kodu.
+Ten dokument opisuje docelowy model danych newsroomu. Część schema jest już zmaterializowana przez N1-001, ale nie wszystkie klasy/serwisy istnieją. Stan wdrożenia należy czytać z sekcji 43 i aktualizować po każdej zmianie kodu.
 
 ---
 
@@ -1583,11 +1583,13 @@ Na 2026-09-16:
 - NEWSROOM-N0-003 taxonomy seed contract jest wdrożony i przetestowany jako `NewsroomTaxonomyContract` v1,
 - NEWSROOM-N0-004 body-format contract jest wdrożony i przetestowany jako `NewsroomBodyContract` v1,
 - NEWSROOM-N0-006 media storage/validation contract jest wdrożony i przetestowany jako `NewsroomMediaStorage`,
+- NEWSROOM-N1-001 jest wdrożone: istnieje 5 enumów domenowych oraz 12 migracji newsroomu,
 - `/aktualnosci` i `/poradniki` pozostają placeholderami 200 z dedykowanym noindex header,
 - przyszłe detail/category/topic/feed routes są zarejestrowane, lecz zwracają 404 do czasu publicznej implementacji,
-- newsroom tables nie istnieją, więc taxonomy contract nie jest jeszcze zmaterializowany jako rekordy `content_categories`,
-- `ContentCategory` i dedykowany DB seeder kategorii nie istnieją,
-- ContentArticle nie istnieje,
+- newsroom schema istnieje: `content_categories`, `content_tags`, `content_articles`, `content_topics`, pivots/relations, redirects i `content_home_placements` są tworzone przez 12 migracji,
+- schema jest zweryfikowana na SQLite i PostgreSQL 16; PostgreSQL gate sprawdza indeksy, krytyczne FK delete rules i rollback,
+- `ContentCategory` Eloquent model i dedykowany DB seeder kategorii nie istnieją,
+- `ContentArticle`, `ContentTag`, `ContentTopic`, `ContentArticleSource` i `ContentHomePlacement` Eloquent models/factories nie istnieją,
 - record-level route-family lookup guard nie jest jeszcze podłączony do modelu/controllerów,
 - newsroom CMS nie istnieje.
 
@@ -1595,7 +1597,6 @@ Na 2026-09-16:
 
 ## 44. Pozostałe zadania
 
-- [ ] finalizować naming tabel i klas,
 - [ ] wdrożyć N2 Filament Builder/RichEditor adapter oparty o `NewsroomBodyContract`,
 - [ ] wdrożyć N3 publiczny renderer bloków zgodny z `NewsroomBodyContract`,
 - [ ] wdrożyć model topics,
@@ -1603,20 +1604,27 @@ Na 2026-09-16:
 - [ ] podłączyć `NewsroomMediaStorage` do N2 hero/OG uploader + `ContentArticle` persistence oraz wdrożyć focal point/OG-alt UX,
 - [ ] wdrożyć crop/variant generation dopiero wraz z fizycznymi artefaktami i ich testami,
 - [ ] wdrożyć origin/regulatory context fields,
-- [ ] wdrożyć migracje,
 - [ ] wdrożyć `ContentCategory` i dedykowany idempotentny DB seeder konsumujący `NewsroomTaxonomyContract`,
-- [ ] wdrożyć enumy,
 - [ ] wdrożyć modele i factories,
 - [ ] wdrożyć policies,
 - [ ] wdrożyć publishing service,
 - [ ] wdrożyć scheduling,
 - [ ] wdrożyć slug redirects,
 - [ ] podłączyć `NewsroomRouteContract` do publicznego ContentArticle lookupu i zweryfikować route-family exclusivity na realnych rekordach,
-- [ ] zaktualizować DATABASE-SCHEMA.md po faktycznej implementacji.
+- [ ] wdrożyć idempotentny DB seeder kategorii konsumujący `NewsroomTaxonomyContract`.
 
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.10
+
+- wdrożono NEWSROOM-N1-001 jako pierwszą zmaterializowaną warstwę DB newsroomu,
+- dodano 5 enumów domenowych i 12 migracji zgodnych z tym dokumentem,
+- materializacja obejmuje categories/tags/articles/topics, membership pivots, sources, question/legal/sign relations, redirect history i home placements,
+- `content_articles` zawiera body schema, regulatory context, media/focal fields, public-state/freshness fields i wymagane indeksy; nie zawiera `canonical_url` ani `featured_position`,
+- dodano SQLite schema regression oraz addytywny PostgreSQL 16 gate; PostgreSQL migration contract przeszedł 3 testy / 64 asercje wraz z rollbackiem,
+- Eloquent models/factories/scopes pozostają niewdrożone i przechodzą do N1-002.
 
 ### 2026-09-16 — v0.9
 
