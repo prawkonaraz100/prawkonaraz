@@ -168,9 +168,7 @@ To oznacza, że:
 
 Nie ma obecnie kompletnego end-to-end odpowiednika:
 
-- UI dla media/origin/regulatory oraz pozostałych etapów N2,
-- `ContentTopicResource`,
-- media/origin/regulatory UI i `ContentTopicResource`; publication checklist jest wdrożona po PR #52, article stale-write + `Apply public update` po PR #50, private Article preview po PR #56, a `NewsroomHomeComposer` + future preview + HomeComposer stale-write po PR #58,
+- UI dla media/origin/regulatory oraz `ContentTopicResource`; pozostałe zmaterializowane elementy N2 obejmują publication checklist po PR #52, article stale-write + `Apply public update` po PR #50, private Article preview po PR #56 oraz `NewsroomHomeComposer` + future preview + HomeComposer stale-write po PR #58,
 - publicznego list/detail/category/topic renderera pod utrwalonym route contract,
 - pełnej publicznej integracji byline/tag/topic/question/legal relations mimo istniejącej warstwy modelowej,
 - news sitemap,
