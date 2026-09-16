@@ -1452,12 +1452,13 @@ Na moment utworzenia dokumentu za ukończone uznajemy wyłącznie elementy rzecz
 - NEWSROOM-N0-006: `NewsroomMediaStorage` z immutable source paths, actual object MIME/bytes/dimensions validation i shared public URL resolver,
 - NEWSROOM-N1-001: 5 enumów domenowych, 12 migracji newsroomu oraz addytywny PostgreSQL 16 migration gate,
 - NEWSROOM-N1-002: 6 modeli Eloquent newsroomu, factories, relacje/reverse relations oraz domenowe scopes/predicates zweryfikowane na SQLite i PostgreSQL,
+- NEWSROOM-N1-003: `ContentArticleSlugService`, `ContentArticleRedirect`, `ContentArticlePathResolver` i PostgreSQL advisory-lock serialization dla canonical/history paths,
 - routes `/aktualnosci` i `/poradniki` jako dedykowane pre-launch 200/noindex placeholders,
 - placeholdery tych tras,
 - publiczna nawigacja prowadząca do aktualności,
 - istniejące klastry pytań, znaków i przepisów, które mogą zostać powiązane z artykułami.
 
-**Newsroom ma już zmaterializowane N1-001 i N1-002: tabele/enumy oraz warstwa Eloquent models/factories/scopes istnieją. Nadal nie uznajemy pełnej domeny/CMS/public content za wdrożone: slug/publishing/scheduler/composition services, N2 article editor/media UI i N3 renderer jeszcze nie istnieją.**
+**Newsroom ma już zmaterializowane N1-001, N1-002 i N1-003: schema/enumy, warstwa Eloquent oraz canonical slug/history/path-resolution service istnieją. Nadal nie uznajemy pełnej domeny/CMS/public content za wdrożone: publishing/scheduler/composition services, N2 article editor/media UI i N3 renderer jeszcze nie istnieją. Publiczne HTTP 301/200 nadal czeka na N3 controllers.**
 
 ---
 
@@ -1473,7 +1474,8 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N0-006` — media upload/storage contract,
 - [x] `NEWSROOM-N1-001` — enumy + 12 migracji + SQLite/PostgreSQL schema gates,
 - [x] `NEWSROOM-N1-002` — models + factories + relations/scopes + SQLite/PostgreSQL model contract,
-- [ ] kontynuować N1 zgodnie z backlogiem; następny task: `NEWSROOM-N1-003` slug service + redirects.
+- [x] `NEWSROOM-N1-003` — slug/history service + one-hop redirects + route-family resolver + PostgreSQL concurrency,
+- [ ] kontynuować N1 zgodnie z backlogiem; następny task: `NEWSROOM-N1-004` publishing service.
 
 Pozostałe elementy N2–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu checklistę.
 
@@ -1500,6 +1502,16 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-16 — v0.14
+
+- wdrożono i zmergowano NEWSROOM-N1-003 po zielonych jobach `quality` i `newsroom-postgres`,
+- dodano canonical slug allocation/change service, model redirect history, service-level canonical/path resolver i współdzielony PostgreSQL transaction advisory lock,
+- published slug changes zapisują one-hop redirect history, historyczny full path innego artykułu pozostaje reserved, a own-history reclaim jest service-only,
+- cross-family type change jest blokowany po pierwszej publikacji; same-family change zachowuje canonical family,
+- PostgreSQL gate obejmuje realny lock contention i finalnie przeszedł 6 testów / 86 asercji; ogólny gate 906 passed / 18 565 assertions / 2 skipped, Pint 980 files, frontend build PASS,
+- publiczne article controllers nadal nie istnieją, więc HTTP old-path 301 / canonical 200 pozostaje N3 integration,
+- następnym taskiem wykonawczym jest NEWSROOM-N1-004.
 
 ### 2026-09-16 — v0.13
 
