@@ -436,8 +436,7 @@ final class ContentArticlePublishingService
     private function assertPublicationReady(
         ContentArticle $article,
         ?DateTimeInterface $at = null,
-    ): void
-    {
+    ): void {
         $this->assertReviewReady($article);
 
         $category = $article->category()->first();
