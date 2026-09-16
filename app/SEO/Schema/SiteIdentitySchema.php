@@ -56,6 +56,8 @@ class SiteIdentitySchema
             'url' => $this->publicUrlResolver->currentRoot(),
             'name' => $this->siteName(),
             'alternateName' => $this->alternateName(),
+            'description' => trim((string) config('content.organization.description', '')),
+            'inLanguage' => 'pl-PL',
             'publisher' => [
                 '@id' => $this->schemaIds->organization(),
             ],
@@ -84,7 +86,7 @@ class SiteIdentitySchema
     {
         $alternateName = trim((string) config('app.name', ''));
 
-        if ($alternateName === '' || mb_strtolower($alternateName) === mb_strtolower($this->siteName())) {
+        if ($alternateName === '' || strcasecmp($alternateName, $this->siteName()) === 0) {
             return null;
         }
 
