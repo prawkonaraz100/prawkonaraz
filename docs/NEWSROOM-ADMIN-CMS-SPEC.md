@@ -660,13 +660,15 @@ Wdrożone actions:
 
 UI deleguje do `ContentArticlePublishingService`; dodatkowe `setFeatured()`, `enableBreaking()` i `clearBreaking()` zachowują transaction/row-lock pattern, allowlisted AuditLog i `public_state_changed_at` dla public exposure changes.
 
-Nie wdrożono jeszcze:
+Po PR #50 na `main@570f884a89869ec44d24f57f0506f4444d20a7d2` wdrożono także:
 
-- `Apply public update` dla `publiclyVisible()`,
-- loaded-token stale-write rejection wymaganej dla tej operacji,
-- Preview, które pozostaje NEWSROOM-N2-008.
+- jawny mode/action `Apply public update` dla `publiclyVisible()`,
+- deterministyczny loaded-state token obejmujący article + sources + article-owned relations/topics zamiast polegania wyłącznie na sekundowym `updated_at`,
+- stale-write reject przed article/source/relation mutation zarówno dla ordinary Save, jak i `Apply public update`,
+- atomowy public payload write przez `ContentArticlePublishingService`, z rollbackiem przy failed validation,
+- `last_substantive_update_at` tylko dla semantycznej publicznej zmiany oraz allowlisted AuditLog z `User` actorem.
 
-Dlatego N2-006 nie jest jeszcze oznaczone jako DONE; jego pozostały DoD jest zależny od NEWSROOM-N2-012.
+N2-006 jest przez to DONE. N2-012 pozostaje PARTIAL tylko dla analogicznego stale-write guard w przyszłym `NewsroomHomeComposer`; Preview nadal pozostaje NEWSROOM-N2-008.
 
 Każda action:
 
@@ -1311,9 +1313,10 @@ Na 2026-09-16:
 - N2-005 dodało article-owned questions/legal/signs/topics editor i `NewsroomArticleRelationsEditorAdapter`; ordered pivots zachowują `sort_order`, topics celowo nie mają ręcznego rankingu,
 - PR #48 zmaterializował N2-006 workflow/exposure action slice na Edit/View: review/schedule/publish/archive/withdraw/republish oraz featured/breaking delegują do `ContentArticlePublishingService`,
 - create draft oraz draftowe zmiany type/sluga delegują do `ContentArticleSlugService`; `User` actor i `ContentAuthor` author/reviewer pozostają rozdzielone,
-- ordinary Edit dla `publiclyVisible()` nie zapisuje publicznych pól również server-side i pozwala w tej ścieżce tylko na osobny zapis `editorial_note`,
+- ordinary Edit dla `publiclyVisible()` nadal nie zapisuje publicznych pól przez zwykły Save i pozwala w tej ścieżce tylko na osobny zapis `editorial_note`; publiczny payload zmienia wyłącznie jawny `Apply public update`,
+- PR #50 dodał deterministyczny `_edit_token`, stale-write reject dla article/source/relation state oraz atomowy `Apply public update` z pełną service validation i allowlisted audytem,
 - `ContentTopicResource` i custom `NewsroomHomeComposer` nadal nie istnieją,
-- workflow transition/exposure actions są już wdrożone, ale `Apply public update` + stale-write guard z N2-012 nadal nie istnieją; media/origin-regulatory UI i private preview także pozostają otwarte,
+- N2-006 jest DONE; N2-012 pozostaje PARTIAL wyłącznie dla stale-write UX/guard `NewsroomHomeComposer`; media/origin-regulatory UI i private preview także pozostają otwarte,
 - publiczny renderer bloków nie istnieje.
 
 ---
@@ -1326,9 +1329,9 @@ Na 2026-09-16:
 - [ ] wdrożyć hero/OG uploader korzystający z `NewsroomMediaStorage` i zapis verified metadata do `ContentArticle`,
 - [ ] wdrożyć focal-point/crop UX; nie deklarować variantów bez fizycznie wygenerowanych plików,
 - [ ] wdrożyć origin/regulatory fields,
-- [ ] domknąć N2-006 przez N2-012: wdrożyć atomowy `Apply public update` + loaded-token stale-write rejection; workflow/exposure actions nad `ContentArticlePublishingService` są już wdrożone,
-- [ ] wdrożyć checklist computed state,
-- [ ] wdrożyć stale-write guard dla articles/home placements,
+- [x] N2-006: workflow/exposure actions + atomowy stale-safe `Apply public update` dla `ContentArticle`,
+- [ ] wdrożyć checklist computed state (NEWSROOM-N2-007),
+- [ ] wdrożyć stale-write guard dla `NewsroomHomeComposer` po materializacji N2-009; article stale-write jest już wdrożony,
 - [ ] wdrożyć admin-only private preview,
 - [ ] wdrożyć topic identity guards; category slug/delete/deactivation guards są już zmaterializowane przez N2-001,
 - [ ] rozszerzać testy CMS wraz z kolejnymi taskami (Builder, workflow, stale-write, preview i HomeComposer).
@@ -1336,6 +1339,15 @@ Na 2026-09-16:
 ---
 
 ## 55. Historia zmian
+
+### 2026-09-16 — v0.16
+
+- PR #50 zmergowano na `main@570f884a89869ec44d24f57f0506f4444d20a7d2`; exact-head CI #190 przeszedł dla `quality` i `newsroom-postgres`,
+- `ContentArticleResource` ma jawny `Apply public update` mode dla już publicznego rekordu; ordinary public Save nadal nie mutuje publicznych pól,
+- `_edit_token` jest równoważnym loaded-state tokenem obejmującym article + sources + article-owned relations/topics i wykrywa same-second child changes,
+- public update zapisuje aktualnie zmaterializowany public editor payload atomowo przez `ContentArticlePublishingService`, rollbackuje na validation failure i odświeża token po własnych workflow actions,
+- N2-006 jest DONE; N2-012 pozostaje PARTIAL wyłącznie dla przyszłego `NewsroomHomeComposer` stale-write,
+- następnym wykonawczym taskiem jest N2-007 Publication checklist.
 
 ### 2026-09-16 — v0.15
 
