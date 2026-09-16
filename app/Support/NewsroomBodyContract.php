@@ -135,7 +135,10 @@ final class NewsroomBodyContract
      * The output contains no arbitrary HTML/CSS/JS. Rich text stays structured
      * TipTap JSON; presentation HTML is generated later by the public renderer.
      *
-     * @param  array<int, mixed>  $blocks
+     * Accepts both Filament Builder state (UUID associative keys) and the
+     * canonical stored list (explicit optional key field).
+     *
+     * @param  array<int|string, mixed>  $blocks
      * @return list<array{type: string, data: array<string, mixed>, key?: string}>
      */
     public static function normalize(array $blocks, int $schemaVersion = self::CURRENT_SCHEMA_VERSION): array
@@ -146,7 +149,9 @@ final class NewsroomBodyContract
 
         $normalized = [];
 
-        foreach (array_values($blocks) as $index => $block) {
+        foreach ($blocks as $sourceKey => $block) {
+            $index = count($normalized);
+
             if (! is_array($block)) {
                 throw new InvalidArgumentException("Body block {$index} must be an object.");
             }
@@ -178,9 +183,9 @@ final class NewsroomBodyContract
                 'data' => self::normalizeBlockData($type, $data, $index),
             ];
 
-            if (array_key_exists('key', $block)) {
-                $key = $block['key'];
+            $key = $block['key'] ?? (is_string($sourceKey) ? $sourceKey : null);
 
+            if ($key !== null) {
                 if (! is_string($key) || preg_match('/\A[A-Za-z0-9_-]{1,100}\z/', $key) !== 1) {
                     throw new InvalidArgumentException("Body block {$index} key has an invalid format.");
                 }
@@ -404,11 +409,13 @@ final class NewsroomBodyContract
                     throw new InvalidArgumentException("Rich text marks at {$path} must be an array.");
                 }
 
-                $normalized['marks'] = array_values(array_map(
-                    fn (mixed $mark, int $markIndex): array => self::normalizeRichTextMark($mark, "{$path}.marks.{$markIndex}"),
-                    $node['marks'],
-                    array_keys($node['marks']),
-                ));
+                $normalizedMarks = [];
+
+                foreach (array_values($node['marks']) as $markIndex => $mark) {
+                    $normalizedMarks[] = self::normalizeRichTextMark($mark, "{$path}.marks.{$markIndex}");
+                }
+
+                $normalized['marks'] = $normalizedMarks;
             }
 
             return $normalized;
