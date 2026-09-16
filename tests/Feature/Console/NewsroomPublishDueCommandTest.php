@@ -98,6 +98,24 @@ test('publish due command revalidates eligibility audits failure and continues l
         ->and($failure->metadata)->not->toHaveKey('lead');
 });
 
+test('publish due command ignores previously published records even if scheduled state is corrupted', function () {
+    Carbon::setTestNow('2026-09-16 10:00:00');
+
+    $article = ContentArticle::factory()->published()->create([
+        'workflow_status' => ContentArticleWorkflowStatus::Scheduled->value,
+        'scheduled_for' => Carbon::parse('2026-09-16 09:00:00'),
+    ]);
+
+    $firstPublishedAt = $article->first_published_at?->toDateTimeString();
+
+    $this->artisan('newsroom:publish-due')
+        ->expectsOutputToContain('selected=0 published=0 failed=0 skipped=0')
+        ->assertSuccessful();
+
+    expect($article->fresh()->workflow_status)->toBe(ContentArticleWorkflowStatus::Scheduled)
+        ->and($article->fresh()->first_published_at?->toDateTimeString())->toBe($firstPublishedAt);
+});
+
 test('publish due command is idempotent after successful publication', function () {
     Carbon::setTestNow('2026-09-16 08:00:00');
     $article = newsroomScheduledArticleAt('2026-09-16 10:00:00');
