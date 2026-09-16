@@ -575,8 +575,6 @@ final class ContentArticlePublishingService
                     'lead',
                     'body_blocks',
                     'body_schema_version',
-                    'key_points',
-                    'correction_note',
                     'regulatory_status',
                     'effective_from',
                     'change_summary',
@@ -595,9 +593,6 @@ final class ContentArticlePublishingService
                     'og_image_height',
                     'image_credit',
                     'image_license_note',
-                    'seo_title',
-                    'seo_description',
-                    'robots',
                 ]),
             );
             $relations = $relationPayload['relations'];
