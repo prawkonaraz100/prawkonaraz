@@ -345,6 +345,18 @@ class EditContentArticle extends EditRecord
         ];
     }
 
+    protected function refreshContentArticleEditStateAfterWorkflowAction(): void
+    {
+        if (! ($this->record instanceof ContentArticle)) {
+            return;
+        }
+
+        $this->record = $this->record->refresh();
+        $this->publicUpdateMode = false;
+        $this->fillForm();
+        $this->rememberData();
+    }
+
     /**
      * Build an allowlisted editor payload without triggering Filament relationship persistence.
      *
