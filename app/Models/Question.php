@@ -141,6 +141,19 @@ class Question extends Model
         return $this->hasMany(QuestionLegalReference::class);
     }
 
+    public function contentArticles(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            ContentArticle::class,
+            'content_article_question',
+            'question_id',
+            'article_id',
+        )
+            ->withPivot(['relation_type', 'sort_order', 'note'])
+            ->withTimestamps()
+            ->orderByPivot('sort_order');
+    }
+
     public function legalArticleTopicCandidates(): BelongsToMany
     {
         return $this->belongsToMany(
