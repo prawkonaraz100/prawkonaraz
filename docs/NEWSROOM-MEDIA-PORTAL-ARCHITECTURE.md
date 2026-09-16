@@ -1050,6 +1050,19 @@ Każdy hero:
 - upload newsroomu ma własny adapter/service lub jawny Filament upload contract; obecny `AdminMediaUploadService` jest question-specific i nie jest genericznym uploaderem newsroomu,
 - nie deklaruje fizycznych crop variants, których system realnie nie wygenerował.
 
+### 17.1.1. Aktualny foundation po N0-006
+
+`NewsroomMediaStorage` jest wdrożonym storage/validation contractem:
+
+- ma dedykowany newsroom disk/prefix i immutable ULID source namespace,
+- reużywa shared image byte/MIME policy, ale ogranicza newsroom do JPEG/PNG/WebP/AVIF,
+- po zapisie sprawdza rzeczywisty object bytes, raster MIME i width/height,
+- odrzuca SVG/non-raster, declared metadata mismatch, traversal i unmanaged paths,
+- stabilny publiczny URL rozwiązuje przez `MediaUrlResolver`,
+- nie generuje ani nie deklaruje crop/variant files.
+
+To nie jest jeszcze article media feature: upload endpoint/UI, `ContentArticle` persistence, focal point i fizyczny crop pipeline pozostają zadaniami N2/N3.
+
 ### 17.2. Prawa do materiałów
 
 Nie kopiujemy losowych zdjęć z internetu.
@@ -1436,12 +1449,13 @@ Na moment utworzenia dokumentu za ukończone uznajemy wyłącznie elementy rzecz
 - NEWSROOM-N0-002: `NewsroomRouteContract`, finalne route namespaces, reserved slug policy i route-family transition guard,
 - NEWSROOM-N0-003: `NewsroomTaxonomyContract` v1 z sześcioma kategoriami, nazwami publicznymi i deterministyczną kolejnością,
 - NEWSROOM-N0-004: `NewsroomBodyContract` v1 z canonical block list, structured TipTap rich text, ścisłymi payload schemas i disabled embed,
+- NEWSROOM-N0-006: `NewsroomMediaStorage` z immutable source paths, actual object MIME/bytes/dimensions validation i shared public URL resolver,
 - routes `/aktualnosci` i `/poradniki` jako dedykowane pre-launch 200/noindex placeholders,
 - placeholdery tych tras,
 - publiczna nawigacja prowadząca do aktualności,
 - istniejące klastry pytań, znaków i przepisów, które mogą zostać powiązane z artykułami.
 
-**Nie uznajemy jeszcze właściwego newsroomu (domain/CMS/public content) za zaimplementowany; ukończone są foundation tasks NEWSROOM-N0-001, NEWSROOM-N0-002, NEWSROOM-N0-003 i NEWSROOM-N0-004. Modele/tabele, N2 article editor i N3 renderer nadal nie istnieją.**
+**Nie uznajemy jeszcze właściwego newsroomu (domain/CMS/public content) za zaimplementowany; foundation N0-001/N0-002/N0-003/N0-004/N0-006 są wdrożone, a N0-005 ma zamkniętą decyzję kompatybilności. Modele/tabele, N2 article editor/media UI i N3 renderer nadal nie istnieją.**
 
 ---
 
@@ -1454,8 +1468,8 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N0-003` — deterministyczny taxonomy seed contract,
 - [x] `NEWSROOM-N0-004` — block editor + serialization + sanitization + format-evolution decision,
 - [x] `NEWSROOM-N0-005` — compatibility decision istniejącego SEO delivery jest udokumentowana; kodowy regression gate pozostaje w N5,
-- [ ] `NEWSROOM-N0-006` — media upload/storage contract,
-- [ ] następnie wykonywać N1 zgodnie z macierzą hard gates z backlogu.
+- [x] `NEWSROOM-N0-006` — media upload/storage contract,
+- [ ] wykonywać N1 zgodnie z macierzą hard gates z backlogu; pierwszy task: `NEWSROOM-N1-001`.
 
 Pozostałe elementy N2–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu checklistę.
 
@@ -1482,6 +1496,15 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-16 — v0.11
+
+- wdrożono i zmergowano NEWSROOM-N0-006 po green CI,
+- dodano `NewsroomMediaStorage` jako osobny newsroom storage/validation foundation bez reużycia `QuestionMedia` workflow,
+- utrwalono immutable ULID source paths oraz backendową inspekcję actual bytes/MIME/dimensions,
+- publiczny URL pozostaje współdzielony przez `MediaUrlResolver`, a SVG/non-raster/unmanaged paths failują,
+- nie zadeklarowano nieistniejących crop variants; uploader UI/focal point/crop pipeline nadal należą do N2/N3,
+- foundation N0 jest domknięte w zakresie wymaganym przed wejściem do N1; kolejnym taskiem jest N1-001.
 
 ### 2026-09-16 — v0.10
 
