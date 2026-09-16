@@ -121,12 +121,14 @@ class PublishDueNewsroomArticlesCommand extends Command
     {
         $value = $this->option('limit');
 
-        if (! is_numeric($value) || (int) $value < 1 || (int) $value > 1000) {
+        $validated = filter_var($value, FILTER_VALIDATE_INT);
+
+        if ($validated === false || $validated < 1 || $validated > 1000) {
             $this->error('--limit must be an integer between 1 and 1000.');
 
             return null;
         }
 
-        return (int) $value;
+        return $validated;
     }
 }
