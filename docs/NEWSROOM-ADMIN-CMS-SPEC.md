@@ -469,6 +469,21 @@ Relacje, dla których publiczna kolejność jest redakcyjna (questions/legal/sig
 
 `content_article_topic` jest wyjątkiem: topic ma pojedynczy `featured_article_id`, a reszta corpus jest chronologiczna po `first_published_at`; nie utrzymujemy drugiego ręcznego rankingu topicu.
 
+### 18.1. Aktualny stan implementacji N2-005
+
+Sekcja „Powiązania” jest zmaterializowana w istniejącym `ContentArticleResource`:
+
+- questions/legal/signs używają ordered Repeaterów i istniejących pivotów; kolejność UI zapisuje się jako `sort_order`,
+- topics używają searchable multi-select bez reorder i bez nowego `sort_order`, zgodnie z powyższą decyzją architektoniczną,
+- questions są wyszukiwane po external ID/prompt, a label zawiera external ID, kategorię prawa jazdy i active/public state,
+- legal units są wyszukiwane po label/title/canonical path z kontekstem aktu; traffic signs po code/name/slug; topics po title/slug/description,
+- wszystkie search callbacks są bounded do 50 rekordów i nie używają preloadu dużych corpusów,
+- `NewsroomArticleRelationsEditorAdapter` waliduje target existence, duplicate targets i relation-type allowlists przed sync,
+- create/edit synchronizują article-owned pivots transakcyjnie; ordinary Edit `publiclyVisible()` nie przechodzi przez ten sync path,
+- relacja nie modyfikuje target entity ani istniejącego question/legal/sign graphu,
+- relation sync bumpuje parent `ContentArticle.updated_at`; pełny stale-write reject pozostaje N2-012,
+- publiczny renderer/reverse-link UI nadal nie istnieje.
+
 ---
 
 ## 19. Sekcja „Media / art direction”
@@ -1264,23 +1279,23 @@ Na 2026-09-16:
 - `ContentCategoryResource` istnieje: index/create/view/edit, article counts, active filter, `position` reorder oraz category invariants,
 - N2-002 dodało podstawowy `ContentArticleResource` shell z index/create/view/edit, Form/Infolist/Table, search/filter setem oraz eager loadingiem category/author/reviewer,
 - N2-004 dodało relationship source editor na istniejącym `ContentArticleSource`, reorder/status indicators, nullable-evidence URL handling oraz finalną source-policy validation w `ContentArticlePublishingService`,
+- N2-005 dodało article-owned questions/legal/signs/topics editor i `NewsroomArticleRelationsEditorAdapter`; ordered pivots zachowują `sort_order`, topics celowo nie mają ręcznego rankingu,
 - create draft oraz draftowe zmiany type/sluga delegują do `ContentArticleSlugService`; `User` actor i `ContentAuthor` author/reviewer pozostają rozdzielone,
 - ordinary Edit dla `publiclyVisible()` nie zapisuje publicznych pól również server-side i pozwala w tej ścieżce tylko na osobny zapis `editorial_note`,
 - `ContentTopicResource` i custom `NewsroomHomeComposer` nadal nie istnieją,
-- workflow actions, stale-write guard, media/relations/origin-regulatory UI i private preview nadal nie istnieją; kontrolowany article Builder/RichEditor i source relationship editor są już wdrożone,
+- workflow actions, stale-write guard, media/origin-regulatory UI i private preview nadal nie istnieją; kontrolowany article Builder/RichEditor, source relationship editor oraz article-owned relations/topics editor są już wdrożone,
 - publiczny renderer bloków nie istnieje.
 
 ---
 
 ## 54. Pozostałe zadania
 
-- [ ] wdrożyć relations/topics editor zgodnie z N2-005 bez preloadu dużych corpusów,
 - [ ] wdrożyć ContentTopicResource,
+- [ ] wdrożyć public/reverse relation rendering w odpowiednim etapie N3/N4,
 - [ ] wdrożyć NewsroomHomeComposer + future preview,
 - [ ] wdrożyć hero/OG uploader korzystający z `NewsroomMediaStorage` i zapis verified metadata do `ContentArticle`,
 - [ ] wdrożyć focal-point/crop UX; nie deklarować variantów bez fizycznie wygenerowanych plików,
 - [ ] wdrożyć origin/regulatory fields,
-- [ ] wdrożyć relations pickers,
 - [ ] wdrożyć Filament workflow actions wywołujące istniejący `ContentArticlePublishingService`; backend AuditLog actor/transition contract już istnieje,
 - [ ] wdrożyć checklist computed state,
 - [ ] wdrożyć stale-write guard dla articles/home placements,
@@ -1291,6 +1306,17 @@ Na 2026-09-16:
 ---
 
 ## 55. Historia zmian
+
+### 2026-09-16 — v0.14
+
+- N2-005 zmaterializowało sekcję article-owned relations/topics w istniejącym `ContentArticleResource`, bez nowego resource dla targetów i bez migracji,
+- questions/legal/signs są ordered Repeaterami z bounded search i zapisują kolejność do istniejącego pivot `sort_order`; topics pozostają searchable multi-selectem bez ręcznego rankingu,
+- `NewsroomArticleRelationsEditorAdapter` waliduje duplicate/missing targets i relation-type allowlists przed sync,
+- create/edit syncują tylko article-owned pivots; target Question/LegalUnit/TrafficSign content nie jest modyfikowany,
+- ordinary public Edit nie może zmieniać relations/topics; relation sync bumpuje parent `updated_at`, ale loaded-token stale-write rejection pozostaje N2-012,
+- publiczny renderer relacji nie jest oznaczony jako wdrożony,
+- finalny exact-head gate PR #46: `quality` 972 passed / 18 940 assertions / 2 skipped, Pint 1011 files PASS, frontend build PASS (9.49 s); `newsroom-postgres` 7 passed / 89 assertions,
+- następnym taskiem jest `NEWSROOM-N2-006` Workflow actions.
 
 ### 2026-09-16 — v0.13
 

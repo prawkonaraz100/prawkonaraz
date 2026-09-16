@@ -6,7 +6,7 @@
 - Obszar: newsroom / media portal
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Bazowy stan repo przy projektowaniu: main@6a38c95ce76ee05997977d614d795ed8513462f1
-- Ostatnia weryfikacja zgodności z kodem: main@fd2042f22532b7b7c14dc993e532c0887876e159 (2026-09-16)
+- Ostatnia weryfikacja zgodności z kodem: main@262d9fab0b171c13a159f7c97670dee3db583b56 (2026-09-16)
 - Data: 2026-09-16
 - Zakres: model domenowy, baza danych, invariants, serwisy aplikacyjne, routing domeny i kolejność migracji
 
@@ -678,6 +678,20 @@ relation_type:
 - related
 
 Wdrożenie może zostać przesunięte do N3/N4, jeśli N1 wymaga ograniczenia scope.
+
+### 14.1. Aktualny stan implementacji N2-005
+
+N2-005 zmaterializowało article-owned editor istniejących relacji bez zmiany schema:
+
+- `questions`, `legalUnits` i `trafficSigns` są edytowane jako ordered Repeatery; kolejność formularza jest serializowana do istniejącego pivot `sort_order`,
+- `topics` są edytowane przez searchable multi-select, ale `content_article_topic` nadal nie ma `sort_order`; nie powstał drugi ręczny ranking topic corpus,
+- `NewsroomArticleRelationsEditorAdapter` jest warstwą UI -> pivot: odrzuca duplicate targets, nieobsługiwany `relation_type` i brakujący target przed persistence,
+- allowlisty relation types odpowiadają dokładnie istniejącemu kontraktowi pytań, legal units i traffic signs,
+- sync zapisuje wyłącznie article-owned pivoty i nie zmienia pól `Question`, `LegalUnit`, `TrafficSign` ani ich istniejących grafów/dowodów,
+- question/legal/sign/topic pickery używają bounded search z limitem 50 zamiast preloadu całych corpusów,
+- po sync parent `ContentArticle.updated_at` jest bumpowany jako techniczny edit token; pełny stale-write rejection nadal pozostaje N2-012,
+- ordinary Edit publicznie widocznego artykułu nie może mutować relations/topics,
+- publiczne filtrowanie/wyświetlanie tych relacji nadal pozostaje przyszłym N3/N4 i N2-005 nie deklaruje publicznego renderera.
 
 ---
 
@@ -1686,17 +1700,18 @@ Na 2026-09-16:
 - N2-002 dodało Filament `ContentArticleResource` shell; create i draftowe type/slug mutations reużywają `ContentArticleSlugService`, a ordinary Save `publiclyVisible()` rekordu nie mutuje publicznych pól,
 - N2-003 dodało `NewsroomBodyEditorAdapter` oraz kontrolowany Builder/RichEditor dla `body_blocks`; canonical keys/order są zachowywane, rich text pozostaje TipTap JSON, a zapis jest ponownie normalizowany przez `NewsroomBodyContract`,
 - N2-004 dodało relationship source editor na istniejącym `ContentArticleSource`, reorder przez `sort_order`, source status indicators, HTTP(S) URL validation, parent `updated_at` touch oraz finalny source-policy gate w `ContentArticlePublishingService`,
+- N2-005 dodało `NewsroomArticleRelationsEditorAdapter` oraz article-owned editor pytań/jednostek prawnych/znaków/topiców; ordered pivots zachowują `sort_order`, topics pozostają bez ręcznego rankingu, a targety są walidowane przed sync,
 - `ContentArticle`, `ContentTag`, `ContentTopic`, `ContentArticleSource` i `ContentHomePlacement` Eloquent models/factories istnieją; factory workflow states pokrywają dokumentowany baseline,
 - service-level route-family lookup guard istnieje w `ContentArticlePathResolver`; nadal nie jest podłączony do publicznych controllerów N3,
 - NEWSROOM-N1-005 scheduler istnieje jako `newsroom:publish-due`, jest zarejestrowany co minutę w production i deleguje due-time revalidation/publish do `ContentArticlePublishingService`,
 - NEWSROOM-N1-006 jest wdrożone: istnieją `NewsroomHomeCompositionService`, `NewsroomHomePlacementService` i niemutujący `ContentArticlePublishingService::assertScheduledPreviewReady()`; overlap/concurrency jest testowane również na PostgreSQL,
-- newsroom CMS jest częściowo zmaterializowany przez `ContentCategoryResource`, `ContentArticleResource`, kontrolowany body Builder/editor oraz source relationship editor; `ContentTopicResource`, media/origin-regulatory/relations UI, workflow/stale-write/preview UI i HomeComposer nadal nie istnieją.
+- newsroom CMS jest częściowo zmaterializowany przez `ContentCategoryResource`, `ContentArticleResource`, kontrolowany body Builder/editor, source relationship editor oraz article-owned relations/topics editor; `ContentTopicResource`, media/origin-regulatory UI, workflow/stale-write/preview UI i HomeComposer nadal nie istnieją.
 
 ---
 
 ## 44. Pozostałe zadania
 
-- [ ] wdrożyć N2 relations/topics editor i dalsze article-owned child UI bez omijania istniejących invariants,
+- [ ] wdrożyć kolejne N2 CMS actions/UI bez omijania istniejących workflow, topic i public-edit invariants,
 - [ ] wdrożyć N3 publiczny renderer bloków zgodny z `NewsroomBodyContract`,
 - [ ] podłączyć `NewsroomMediaStorage` do N2 hero/OG uploader + `ContentArticle` persistence oraz wdrożyć focal point/OG-alt UX,
 - [ ] wdrożyć crop/variant generation dopiero wraz z fizycznymi artefaktami i ich testami,
@@ -1710,6 +1725,16 @@ Na 2026-09-16:
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.20
+
+- wdrożono NEWSROOM-N2-005 przez PR #46 na `main@262d9fab0b171c13a159f7c97670dee3db583b56`, bez nowych migracji ani zmian istniejących pivot schemas,
+- questions/legal/signs editor zapisuje istniejące `relation_type`, `note` tam gdzie wspierane oraz kolejność jako `sort_order`; topics są synchronizowane bez dodatkowego order column,
+- `NewsroomArticleRelationsEditorAdapter` waliduje duplicate/missing targets i allowlisty relation types, a następnie synchronizuje wyłącznie article-owned pivots,
+- target `Question`/`LegalUnit`/`TrafficSign` nie jest mutowany przez newsroom relation editor,
+- bounded search nie preloaduje dużych corpusów; ordinary public Edit nie może zmieniać relations/topics,
+- sync bumpuje parent `updated_at`, ale pełny stale-write guard i public relation renderer pozostają otwarte,
+- finalny exact-head gate PR #46: `quality` 972 passed / 18 940 assertions / 2 skipped, Pint 1011 files PASS, frontend build PASS (9.49 s); `newsroom-postgres` 7 passed / 89 assertions.
 
 ### 2026-09-16 — v0.19
 

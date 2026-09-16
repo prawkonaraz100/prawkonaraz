@@ -818,6 +818,22 @@ Implementacja obejmuje warstwę domenową/read-model kompozycji oraz transakcyjn
 
 ## NEWSROOM-N2-005 — Relations and topics editor
 
+### Status implementacji
+
+**DONE — zmergowano PR #46 na `main@262d9fab0b171c13a159f7c97670dee3db583b56` po zielonych jobach `quality` i `newsroom-postgres`.**
+
+### Aktualny stan implementacji
+
+- istniejące `ContentArticle::questions()`, `legalUnits()`, `trafficSigns()` i `topics()` są edytowane z article form; nie dodano nowych tabel ani alternatywnego relation modelu,
+- questions/legal/signs są ordered Repeaterami, a kolejność jest zapisywana do istniejącego pivot `sort_order`; topics są searchable multi-selectem bez ręcznego rankingu zgodnie z Admin CMS Spec,
+- questions/legal/signs/topics korzystają z bounded search, bez preloadu dużych corpusów; UI pokazuje kontekstowe etykiety zamiast surowych internal IDs,
+- `NewsroomArticleRelationsEditorAdapter` odrzuca duplicate targets, brakujące rekordy i relation types spoza istniejących allowlist,
+- sync zapisuje tylko article-owned pivots i nie mutuje target Question/LegalUnit/TrafficSign ani ich innych grafów/źródeł,
+- ordinary Edit `publiclyVisible()` nie może zmieniać relations/topics,
+- relation sync jawnie bumpuje parent `ContentArticle.updated_at` jako edit-token foundation, ale pełny stale-write rejection nadal pozostaje N2-012,
+- publiczny relation renderer/reverse linking nadal pozostaje dalszym etapem N3/N4,
+- finalny exact-head gate PR #46: `quality` 972 passed / 18 940 assertions / 2 skipped, Pint 1011 files PASS, frontend build PASS (9.49 s); `newsroom-postgres` 7 passed / 89 assertions.
+
 ### Zakres
 
 - questions searchable picker,
@@ -1730,7 +1746,7 @@ Docs-only:
 - [ ] topic resource
 - [x] controlled block editor
 - [x] sources
-- [ ] relations
+- [x] relations
 - [ ] origin/regulatory fields
 - [ ] focal point/crop preview
 - [ ] article preview
@@ -1980,7 +1996,7 @@ Nie oznaczać tasku DONE przed merge + green verification.
 Na 2026-09-16:
 
 - pakiet projektowy newsroomu obejmuje architekturę, model danych, CMS, UI, governance, SEO, backlog i runbook,
-- foundation N0 oraz pełny etap N1-001..N1-006 są wdrożone; N2 ma już `ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor dla `body_blocks` i source relationship editor, ale `ContentTopicResource`, media/origin-regulatory/relations UI, workflow/stale-write/preview/HomeComposer oraz publiczny newsroom nadal nie są wdrożone,
+- foundation N0 oraz pełny etap N1-001..N1-006 są wdrożone; N2 ma już `ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor dla `body_blocks`, source relationship editor i article-owned relations/topics editor, ale `ContentTopicResource`, media/origin-regulatory UI, workflow/stale-write/preview/HomeComposer oraz publiczny newsroom nadal nie są wdrożone,
 - `/aktualnosci` i `/poradniki` nadal renderują pre-launch placeholder, teraz z dedykowanym `X-Robots-Tag: noindex, follow`; finalne detail/category/topic/feed route namespaces są zarejestrowane, ale pozostają 404 bez publicznych controllerów,
 - fundamenty ContentAuthor/legal/traffic signs/public SEO istnieją,
 - istnieją config/content.php organization, SchemaIds/SchemaRenderer oraz współdzielony SiteIdentitySchema; homepage i istniejące główne publiczne graph services korzystają z kanonicznego Organization/WebSite identity,
@@ -1995,13 +2011,25 @@ Na 2026-09-16:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N2-005 — Relations and topics editor.
+NEWSROOM-N2-006 — Workflow actions.
 
-NEWSROOM-N2-004 jest zamknięte po PR #44: istnieje relationship source editor, source ordering/status UX, nullable internal evidence URL handling, parent edit-token touch oraz finalna source-policy validation. Następny krok materializuje article-level questions/legal/topics/optional-sign relations bez dublowania body-block pickers i bez preloadu dużych corpusów.
+NEWSROOM-N2-005 jest zamknięte po PR #46: article form ma questions/legal/signs/topics editor, istniejące pivots zachowują relation metadata/order, topics pozostają bez ręcznego rankingu, a `NewsroomArticleRelationsEditorAdapter` zapewnia bounded search targetów i server-side validation/sync. Następny krok materializuje Filament workflow actions nad istniejącym `ContentArticlePublishingService`, bez dublowania transition logic.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.22
+
+- zamknięto NEWSROOM-N2-005 po merge PR #46 na `main@262d9fab0b171c13a159f7c97670dee3db583b56`,
+- zmaterializowano article-owned questions/legal/signs/topics editor bez nowych migracji; existing pivots pozostają source of truth,
+- questions/legal/signs zapisują redakcyjną kolejność jako `sort_order`, podczas gdy topics zgodnie z architekturą nie otrzymują drugiego ręcznego rankingu,
+- bounded searchable pickers nie preloadują dużych corpusów, a contextual labels nie wymagają wybierania po samym internal ID,
+- `NewsroomArticleRelationsEditorAdapter` waliduje duplicate/missing targets oraz relation-type allowlists i synchronizuje tylko article-owned pivots,
+- ordinary public Edit nie zmienia relations/topics; sync bumpuje parent `updated_at`, ale pełny stale-write reject pozostaje N2-012,
+- publiczny relation renderer/reverse-link surface nadal pozostaje N3/N4,
+- finalny exact-head gate PR #46: `quality` 972 passed / 18 940 assertions / 2 skipped, Pint 1011 files PASS, frontend build PASS (9.49 s); `newsroom-postgres` 7 passed / 89 assertions,
+- następnym taskiem jest NEWSROOM-N2-006 Workflow actions.
 
 ### 2026-09-16 — v0.21
 
