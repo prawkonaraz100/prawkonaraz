@@ -14,6 +14,32 @@ class ContentHomePlacement extends Model
     /** @use HasFactory<ContentHomePlacementFactory> */
     use HasFactory;
 
+    public const SURFACE_NEWSROOM_HOME = 'newsroom_home';
+
+    public const SLOT_LEAD = 'lead';
+
+    public const SLOT_SECONDARY = 'secondary';
+
+    public const SLOT_CATEGORY_LEAD = 'category_lead';
+
+    public const SLOT_GUIDES_LEAD = 'guides_lead';
+
+    public const SLOT_IMPORTANT_NOW = 'important_now';
+
+    /**
+     * @return list<string>
+     */
+    public static function allowedSlotKeys(): array
+    {
+        return [
+            self::SLOT_LEAD,
+            self::SLOT_SECONDARY,
+            self::SLOT_CATEGORY_LEAD,
+            self::SLOT_GUIDES_LEAD,
+            self::SLOT_IMPORTANT_NOW,
+        ];
+    }
+
     protected $fillable = [
         'surface_key',
         'slot_key',
