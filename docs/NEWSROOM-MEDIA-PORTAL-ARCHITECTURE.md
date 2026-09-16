@@ -139,7 +139,6 @@ Repo ma już istotny fundament:
 - wykonywalny `NewsroomRouteContract`,
 - zarejestrowane route namespaces feed/category/topic/article zgodne z finalnym kontraktem,
 - przyszłe detail/category/topic/feed routes pozostające 404 do czasu wdrożenia publicznych controllerów,
-- route `/poradniki`,
 - SEO/content roadmap,
 - Filamentowy workflow dla części istniejącego contentu.
 
