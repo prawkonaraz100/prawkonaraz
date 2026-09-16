@@ -16,6 +16,7 @@ use App\Support\NewsroomArticleMediaService;
 use App\Support\NewsroomBodyContract;
 use App\Support\NewsroomMediaStorage;
 use Filament\Actions\Action;
+use Filament\Forms\Components\BaseFileUpload;
 use Filament\Forms\Components\Builder as FormBuilder;
 use Filament\Forms\Components\Builder\Block;
 use Filament\Forms\Components\DatePicker;
@@ -347,7 +348,7 @@ class ContentArticleForm
                             ->acceptedFileTypes(fn (): array => app(NewsroomMediaStorage::class)->allowedMimeTypes())
                             ->maxSize(fn (): int => (int) ceil(app(NewsroomMediaStorage::class)->maxBytes() / 1024))
                             ->saveUploadedFileUsing(
-                                fn (TemporaryUploadedFile $file): string => app(NewsroomArticleMediaService::class)->store($file)['path'],
+                                fn (BaseFileUpload $_component, TemporaryUploadedFile $file): string => app(NewsroomArticleMediaService::class)->store($file)['path'],
                             )
                             ->helperText('JPEG/PNG/WebP/AVIF. Zapis zawsze tworzy nowy immutable source path; istniejący publiczny URL nie jest nadpisywany.')
                             ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire))
@@ -406,7 +407,7 @@ class ContentArticleForm
                             ->acceptedFileTypes(fn (): array => app(NewsroomMediaStorage::class)->allowedMimeTypes())
                             ->maxSize(fn (): int => (int) ceil(app(NewsroomMediaStorage::class)->maxBytes() / 1024))
                             ->saveUploadedFileUsing(
-                                fn (TemporaryUploadedFile $file): string => app(NewsroomArticleMediaService::class)->store($file)['path'],
+                                fn (BaseFileUpload $_component, TemporaryUploadedFile $file): string => app(NewsroomArticleMediaService::class)->store($file)['path'],
                             )
                             ->helperText('Opcjonalny. Gdy brak, publiczny renderer może użyć hero jako fallback. Dedykowany OG wymaga własnego alt.')
                             ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::publicFieldsLocked($record, $livewire))
