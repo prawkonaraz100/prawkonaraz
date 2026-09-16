@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\ContentCategories\Schemas;
 
-use App\Models\ContentCategory;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -53,15 +52,7 @@ class ContentCategoryForm
                                 ->label('Aktywna')
                                 ->default(true)
                                 ->required()
-                                ->inline(false)
-                                ->disabled(fn (?ContentCategory $record): bool => $record !== null
-                                    && $record->is_active
-                                    && ! $record->canBeDeactivated())
-                                ->helperText(fn (?ContentCategory $record): ?string => $record !== null
-                                    && $record->is_active
-                                    && ! $record->canBeDeactivated()
-                                        ? 'Kategoria ma publiczne lub aktywnie dystrybuowane artykuły i nie może zostać wyłączona.'
-                                        : null),
+                                ->inline(false),
                             TextInput::make('position')
                                 ->label('Kolejność')
                                 ->required()
