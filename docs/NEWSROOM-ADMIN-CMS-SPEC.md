@@ -2,7 +2,7 @@
 
 ## 1. Status
 
-- Status: Proposed / implementation-ready CMS contract
+- Status: Canonical CMS contract + live implementation status
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Powiązane:
   - [NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md](./NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md)
@@ -992,6 +992,19 @@ Próg 3 jest baseline jakości produktu v1, nie gwarancją rankingu Google.
 
 Tag creation pozostaje oddzielnym lekkim mechanizmem.
 
+### 34.1. Aktualny stan implementacji po NEWSROOM-N2-011
+
+Po PR #62 istnieje pełny adminowy resource topiców bez zmiany publicznego route contract:
+
+- `ContentTopicResource` ma index/create/view/edit, tabelę z wyszukiwaniem, filtrem statusu, countami corpus i sygnałem kwalifikacji do promocji oraz infolist,
+- formularz zarządza `title`, `slug`, `description`, SEO, article membership i pojedynczym featured article; membership jest zapisywany do istniejącego pivotu bez ręcznego `sort_order`,
+- create wymusza draft + brak `published_at`; status nie jest zwykłym edytowalnym polem,
+- `ContentTopicPublishingService` obsługuje publish/archive/republish pod row lockiem i zapisuje audyt przez istniejący `AuditLogService`,
+- publish/republish egzekwuje własny opis, minimum 3 actively-distributed + indexable artykuły oraz eligibility featured article,
+- model blokuje zmianę sluga i wyczyszczenie pierwszej daty publikacji po pierwszym publish oraz blokuje zwykły delete historycznego topicu,
+- opublikowany topic może później spaść poniżej corpus baseline bez automatycznego status flip; UI pokazuje health warning, a domena wyłącza go z `isEditoriallyPromotable()`,
+- publiczny `/aktualnosci/temat/{topicSlug}` nadal nie ma controllera N4 i pozostaje 404; 410 po archive oraz nav/sitemap exclusion nie są częścią wdrożonego N2-011.
+
 ---
 
 ## 35. View/Infolist
@@ -1342,15 +1355,15 @@ Na 2026-09-16:
 - PR #50 dodał deterministyczny `_edit_token`, stale-write reject dla article/source/relation state oraz atomowy `Apply public update` z pełną service validation i allowlisted audytem,
 - PR #52 dodał `ContentArticlePublicationChecklist`; formularz artykułu pokazuje read-only listę `OK` / `OSTRZEŻENIE` / `BLOKUJE`, a `ContentArticlePublishingService` deleguje do tej samej klasy review/publication/fresh-review assertions,
 - warningi checklisty nie blokują publikacji, natomiast domain blockers pozostają autorytatywne po stronie backendu; dedykowany różny OG asset bez własnego alt pozostaje blockerem,
-- `ContentTopicResource` nadal nie istnieje; custom `NewsroomHomeComposer` jest wdrożony po PR #58,
-- N2-006, N2-007, N2-008, N2-009, N2-010 i N2-012 są DONE; N2-010 obejmuje provenance/regulatory fields, hero/OG upload, verified metadata, focal X/Y i CSS crop previews, natomiast `ContentTopicResource` pozostaje otwarte jako N2-011,
+- `ContentTopicResource` istnieje po PR #62; custom `NewsroomHomeComposer` pozostaje wdrożony po PR #58,
+- N2-006, N2-007, N2-008, N2-009, N2-010, N2-011 i N2-012 są DONE; N2-011 domyka adminowy CMS topiców, a publiczny renderer/controllers pozostają poza N2,
 - publiczny renderer bloków nie istnieje.
 
 ---
 
 ## 54. Pozostałe zadania
 
-- [ ] wdrożyć ContentTopicResource,
+- [x] wdrożyć NEWSROOM-N2-011 `ContentTopicResource` + kontrolowany topic publish/archive/republish workflow,
 - [ ] wdrożyć public/reverse relation rendering w odpowiednim etapie N3/N4,
 - [x] wdrożyć NewsroomHomeComposer + future preview,
 - [x] wdrożyć hero/OG uploader przez `NewsroomArticleMediaService` + `NewsroomMediaStorage` i zapis verified metadata do `ContentArticle`,
@@ -1360,12 +1373,21 @@ Na 2026-09-16:
 - [x] NEWSROOM-N2-007: wdrożyć computed publication checklist współdzielącą backend invariants,
 - [x] NEWSROOM-N2-008: admin-only private preview route/rendering z `private, no-store`, `noindex,nofollow`, bez public analytics i signed share tokenów,
 - [x] wdrożyć stale-write guard dla `NewsroomHomeComposer`; article i placement stale-write są wdrożone,
-- [ ] wdrożyć topic identity guards; category slug/delete/deactivation guards są już zmaterializowane przez N2-001,
+- [x] wdrożyć topic identity guards: format sluga, immutable slug/published_at po pierwszej publikacji i delete tylko dla never-published draft; category guards pozostają z N2-001,
 - [ ] rozszerzać testy CMS wraz z kolejnymi taskami (Builder, workflow, stale-write, preview i HomeComposer).
 
 ---
 
 ## 55. Historia zmian
+
+### 2026-09-16 — v0.21
+
+- PR #62 zmergowano na `main@ff81f92fe75442b60e67297f3945d2a63b7c5128` po exact-head CI #224: 1025 passed / 19 297 assertions / 2 skipped, Pint 1038 files PASS, frontend build PASS oraz `newsroom-postgres` 7 passed / 89 assertions,
+- `ContentTopicResource` materializuje index/create/view/edit, bounded article search, SEO fields, corpus membership bez ręcznego rankingu, featured picker oraz health/promotability read models,
+- status topicu jest sterowany przez `ContentTopicPublishingService`; publish/archive/republish są audytowane i używają row locka, a publish/republish wymagają opisu, minimum 3 eligible artykułów i poprawnego featured article,
+- modelowe guardy chronią format sluga, post-publication slug/`published_at` identity i blokują delete po pierwszej publikacji,
+- spadek corpus poniżej baseline nie wykonuje automatycznego status/HTTP flip; publiczny topic route nadal pozostaje 404, a 410/nav/sitemap są downstream N4/N5,
+- wszystkie taski N2 są zamknięte w zakresie implementacyjnym; kolejnym etapem jest N3.
 
 ### 2026-09-16 — v0.20
 

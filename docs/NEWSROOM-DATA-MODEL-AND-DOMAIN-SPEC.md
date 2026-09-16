@@ -2,15 +2,15 @@
 
 ## 1. Status
 
-- Status: Proposed / implementation-ready design
+- Status: Canonical domain/data contract + live implementation status
 - Obszar: newsroom / media portal
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Bazowy stan repo przy projektowaniu: main@6a38c95ce76ee05997977d614d795ed8513462f1
-- Ostatnia weryfikacja zgodności z kodem: main@4936d14d56fa15e59e6dd771e443e93895d3d281 (2026-09-16)
+- Ostatnia weryfikacja zgodności z kodem: main@ff81f92fe75442b60e67297f3945d2a63b7c5128 (2026-09-16)
 - Data: 2026-09-16
 - Zakres: model domenowy, baza danych, invariants, serwisy aplikacyjne, routing domeny i kolejność migracji
 
-Ten dokument opisuje docelowy model danych newsroomu. Schema, modele/factories/scopes oraz serwisy aplikacyjne N1 są już zmaterializowane; N2 UI jest wdrażane etapami. Stan wdrożenia należy czytać z sekcji 43 i aktualizować po każdej zmianie kodu.
+Ten dokument opisuje docelowy model danych newsroomu. Schema, modele/factories/scopes oraz serwisy aplikacyjne N1 są już zmaterializowane; zakres admin/domain N2 jest zmaterializowany po PR #62, natomiast publiczne N3/N4 i discovery N5 pozostają dalszym etapem. Stan wdrożenia należy czytać z sekcji 43 i aktualizować po każdej zmianie kodu.
 
 ---
 
@@ -525,6 +525,18 @@ Reguły:
 - baseline >=3 jest gate'em przy pierwszym publish/ponownym publish topicu; chwilowy późniejszy spadek corpus nie zmienia automatycznie HTTP/indexability,
 - published topic poniżej baseline dostaje health warning w CMS/audycie i nie powinien być promowany jako featured topic do czasu naprawy,
 - jeśli corpus trwale utraci wartość, administrator ustawia status archived; archived topic jest usuwany z nawigacji/sitemap i jego wcześniej publiczny URL zwraca 410, chyba że istnieje realny następca.
+
+### 10.1. Aktualny stan implementacji N2-011
+
+PR #62 materializuje istniejący model topicu i adminowy workflow bez zmian schema:
+
+- `ContentTopic` ma jawne status constants, `PUBLICATION_CORPUS_MINIMUM=3`, `published()`, `isPubliclyVisible()`, corpus/featured predicates oraz `isEditoriallyPromotable()`,
+- modelowy saving guard waliduje route-compatible slug/status, po pierwszej publikacji blokuje zmianę sluga i wyczyszczenie `published_at`, a deleting guard blokuje zwykłe usunięcie historycznego topicu,
+- `ContentTopicPublishingService` używa transakcji + `lockForUpdate()` dla publish/archive/republish i rewaliduje opis, eligible corpus oraz featured article przed publish/republish,
+- eligible corpus liczy istniejącą relację `articles()` przez `activelyDistributed()->indexable()`; pivot nadal nie ma `sort_order`,
+- `ContentTopicResource` zapisuje article membership i featured membership bez tworzenia równoległego modelu lub nowej tabeli oraz pokazuje health/promotability w backoffice,
+- publish/archive/republish zapisują istniejący `AuditLog` z `User` actorem i allowlisted metadata status/corpus/featured,
+- późniejszy spadek corpus poniżej 3 nie mutuje automatycznie statusu; publiczne HTTP topicu nie jest jeszcze podłączone. Route `/aktualnosci/temat/{topicSlug}` pozostaje 404 do N4, a 410 archived topicu i sitemap/nav exclusion pozostają downstream.
 
 ---
 
@@ -1710,13 +1722,13 @@ Na 2026-09-16:
 - NEWSROOM-N1-005 scheduler istnieje jako `newsroom:publish-due`, jest zarejestrowany co minutę w production i deleguje due-time revalidation/publish do `ContentArticlePublishingService`,
 - NEWSROOM-N1-006 jest wdrożone: istnieją `NewsroomHomeCompositionService`, `NewsroomHomePlacementService` i niemutujący `ContentArticlePublishingService::assertScheduledPreviewReady()`; overlap/concurrency jest testowane również na PostgreSQL,
 - N2-010 jest DONE po PR #60: `ContentArticleResource` ma kontrolowane provenance/regulatory fields, hero/OG upload przez `NewsroomArticleMediaService`, verified managed media metadata, focal X/Y i CSS crop previews; `ContentArticlePublicationChecklist` egzekwuje regulatory/source/effective-date coherence oraz ponowną media reinspekcję,
-- newsroom CMS jest częściowo zmaterializowany przez `ContentCategoryResource`, `ContentArticleResource`, kontrolowany body Builder/editor, source relationship editor, article-owned relations/topics editor, N2-006 workflow/exposure actions, stale-safe `Apply public update`, N2-007 publication checklist, N2-008 private article preview, N2-009 `NewsroomHomeComposer` + future preview oraz N2-010 provenance/regulatory/media art direction; N2-012 jest DONE, natomiast `ContentTopicResource` (N2-011) nadal nie istnieje.
+- admin/domain CMS N2 jest zmaterializowany: obok `ContentCategoryResource`, `ContentArticleResource`, body/source/relation/workflow/public-update/checklist/preview/HomeComposer/provenance-media slices istnieje po PR #62 `ContentTopicResource` + `ContentTopicPublishingService`; N2-001..N2-012 są zamknięte implementacyjnie, natomiast publiczne N3/N4 i discovery N5 nadal nie są zmaterializowane.
 
 ---
 
 ## 44. Pozostałe zadania
 
-- [ ] wdrożyć NEWSROOM-N2-011 `ContentTopicResource` bez omijania istniejących topic/public-edit invariants,
+- [x] wdrożyć NEWSROOM-N2-011 `ContentTopicResource` + topic publication/identity guards bez zmiany istniejącej schema,
 - [ ] wdrożyć N3 publiczny renderer bloków zgodny z `NewsroomBodyContract`,
 - [x] podłączyć `NewsroomMediaStorage` do N2 hero/OG uploadu i `ContentArticle` persistence przez `NewsroomArticleMediaService` / `NewsroomArticleProvenanceMediaAdapter`,
 - [x] wdrożyć focal-point X/Y oraz CSS crop previews i OG-alt UX bez deklarowania fizycznych variants,
@@ -1737,6 +1749,15 @@ Na 2026-09-16:
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.27
+
+- PR #62 zmergowano na `main@ff81f92fe75442b60e67297f3945d2a63b7c5128` po exact-head CI #224: `quality` 1025 passed / 19 297 assertions / 2 skipped, Pint 1038 files PASS, frontend build PASS; `newsroom-postgres` 7 passed / 89 assertions,
+- N2-011 nie zmienia schema: używa istniejących `content_topics`, `content_article_topic`, `featured_article_id` oraz istniejącego AuditLog,
+- `ContentTopicPublishingService` materializuje kontrolowane i audytowane publish/archive/republish pod row lockiem; publish/republish rewaliduje własny opis, minimum 3 actively-distributed + indexable artykuły i featured eligibility,
+- model blokuje post-publication slug/`published_at` mutation i delete historycznego topicu; corpus below baseline pozostaje warningiem/promotability signal bez automatycznego status flip,
+- `ContentTopicResource` daje adminowi CRUD/corpus/SEO/featured/health surface, ale nie uruchamia publicznego topic route; publiczne 410/nav/sitemap pozostają N4/N5,
+- zakres admin/domain N2 jest zamknięty; następny etap implementacyjny to N3.
 
 ### 2026-09-16 — v0.26
 

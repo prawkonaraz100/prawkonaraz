@@ -2,7 +2,7 @@
 
 ## 1. Status
 
-- Status: Canonical implementation plan before coding
+- Status: Canonical implementation plan and live implementation status
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Specyfikacje wykonawcze:
   - [NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md](./NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md)
@@ -992,6 +992,20 @@ Computed blocking/warning items.
 
 ## NEWSROOM-N2-011 — ContentTopicResource
 
+### Status implementacji
+
+**DONE — zmergowano PR #62 na `main@ff81f92fe75442b60e67297f3945d2a63b7c5128` po exact-head CI #224 dla `c62ea2974572299b725387ee90ba7d38bfe0493e`. `quality` zakończył się wynikiem 1025 passed / 19 297 assertions / 2 skipped, Pint 1038 files PASS i frontend build PASS; `newsroom-postgres` zakończył się wynikiem 7 passed / 89 assertions. Status DONE dotyczy warstwy N2/G2 admin-domain; publiczne skutki archive z ostatniego punktu DoD są jawnie zależnością N4/N5 i nie są jeszcze oznaczone jako wdrożone.**
+
+### Aktualny stan implementacji
+
+- istnieje admin-only Filament `ContentTopicResource` z index/create/view/edit, wyszukiwaniem, filtrem statusu, countami całego i eligible corpus oraz read-only health/promotability signals,
+- create/edit zarządza istniejącą relacją `content_article_topic` bez dodawania ręcznego rankingu corpus; pojedynczy `featured_article_id` musi należeć do wybranego corpus już na poziomie formularza,
+- `ContentTopicPublishingService` realizuje pod row lockiem kontrolowane przejścia draft -> published, published -> archived i archived -> published oraz zapisuje `User` actor w istniejącym `AuditLog`,
+- publish/republish wymaga niepustego własnego opisu, minimum 3 powiązanych artykułów spełniających jednocześnie `activelyDistributed()` i `indexable()` oraz — jeśli featured jest ustawiony — jego membershipu i tej samej eligibility,
+- `ContentTopic` egzekwuje dozwolone statusy i format sluga; slug oraz `published_at` są chronione po pierwszej publikacji, a topic po pierwszej publikacji nie może zostać usunięty zwykłym delete,
+- późniejszy spadek eligible corpus poniżej baseline nie zmienia automatycznie statusu ani widoczności domenowej; `isCorpusBelowBaseline()` daje warning, a `isEditoriallyPromotable()` przestaje kwalifikować topic do promocji,
+- N2-011 nie uruchamia publicznego kontrolera topicu: `/aktualnosci/temat/{topicSlug}` nadal pozostaje 404 zgodnie z pre-launch contract. Publiczne 200/410, usunięcie archived topicu z nawigacji oraz integracja sitemap pozostają downstream w N4/N5 i nie są deklarowane jako wykonane przez ten PR.
+
 ### Zakres
 
 - topic CRUD,
@@ -1010,6 +1024,8 @@ Computed blocking/warning items.
 - slug po pierwszej publikacji jest immutable,
 - spadek corpus poniżej baseline po publikacji daje warning/wyłączenie z promocji, ale nie automatyczny HTTP flip,
 - explicit topic archive usuwa go z sitemap/nav i zwraca 410 dla wcześniej publicznego URL.
+
+**Stan tego cross-stage punktu DoD:** domenowe `archived` i blokada dalszej promocji są wdrożone w N2-011, ale publiczny route/410 należy do N4-007, a sitemap coverage/exclusion do N5-001. Te publiczne elementy pozostają otwarte i nie są dowodem zamknięcia N2/G2.
 
 ---
 
@@ -2073,13 +2089,22 @@ Na 2026-09-16:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N2-010 — Provenance, regulatory context and media art direction.
+NEWSROOM-N3-001 — Public catalog service.
 
-N2-009 oraz brakująca HomeComposer część N2-012 są zamknięte po PR #58. Następny krok podłącza istniejące pola provenance/regulatory do CMS i publish validation oraz materializuje newsroomowy hero/OG upload na `NewsroomMediaStorage` z focal-point/crop preview, bez deklarowania fizycznych wariantów, których pipeline jeszcze nie generuje. Publiczny N3 nadal pozostaje osobnym etapem.
+N2-001..N2-012 są zamknięte w zakresie implementacyjnym po PR #62. Następny krok rozpoczyna N3 i materializuje publiczny katalog/lookup artykułów z route-family guard, rozdzieleniem `publiclyVisible` od `activelyDistributed` oraz jawnie testowaną semantyką archived/withdrawn. Publiczne huby kategorii/topiców i ich HTTP lifecycle pozostają kolejnymi zadaniami N4.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.29
+
+- PR #62 zmergowano na `main@ff81f92fe75442b60e67297f3945d2a63b7c5128` po exact-head CI #224 dla `c62ea2974572299b725387ee90ba7d38bfe0493e`; `quality` PASS: 1025 passed / 19 297 assertions / 2 skipped, Pint 1038 files PASS, frontend build PASS (9.99 s), a `newsroom-postgres` PASS: 7 passed / 89 assertions,
+- NEWSROOM-N2-011 jest **DONE** w warstwie admin/domain: istnieje `ContentTopicResource`, kontrolowany `ContentTopicPublishingService`, modelowe identity/status guards, corpus/featured eligibility, health/promotability i AuditLog,
+- topic corpus nadal nie ma ręcznego rankingu; pojedynczy featured article jest kontrolowany, a publish/republish wymaga własnego opisu i minimum 3 actively-distributed + indexable linked articles,
+- po pierwszej publikacji slug pozostaje immutable i zwykły delete jest zablokowany; spadek corpus poniżej baseline daje warning/wyłączenie z promocji bez automatycznego status/HTTP flip,
+- publiczny topic controller, 410 archived topicu, nav i sitemap nie zostały wdrożone w N2-011 i pozostają downstream N4/N5,
+- etap N2 jest zamknięty; następnym taskiem wykonawczym jest NEWSROOM-N3-001 `Public catalog service`.
 
 ### 2026-09-16 — v0.28
 
