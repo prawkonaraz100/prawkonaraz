@@ -31,9 +31,17 @@ final class ContentArticlePathResolver
             ? $article->type->value
             : (string) $article->type;
 
-        return NewsroomRouteContract::familyForType($type) === $family
-            ? $article
-            : null;
+        if (NewsroomRouteContract::familyForType($type) !== $family) {
+            return null;
+        }
+
+        try {
+            NewsroomRouteContract::canonicalPath($type, $slug);
+        } catch (InvalidArgumentException) {
+            return null;
+        }
+
+        return $article;
     }
 
     public function findRedirect(string $fromPath): ?ContentArticleRedirect
