@@ -137,11 +137,11 @@ test('future and expired placements are ignored at the current render time', fun
 
     $future = ContentArticle::factory()->published()->create([
         'category_id' => $category->id,
-        'editorial_priority' => 50,
+        'editorial_priority' => -50,
     ]);
     $expired = ContentArticle::factory()->published()->create([
         'category_id' => $category->id,
-        'editorial_priority' => 40,
+        'editorial_priority' => -40,
     ]);
     $fallback = ContentArticle::factory()->published()->create([
         'category_id' => $category->id,
