@@ -148,7 +148,7 @@ Preferowany:
 
 ### Stan przed implementacją
 
-- `/aktualnosci` już istniało jako named route `public.news` i renderuje `Public/MarketingPlaceholder`,
+- `/aktualnosci` już istniało jako named route `public.news` i renderowało `Public/MarketingPlaceholder`,
 - `/poradniki` już istniało jako named route `public.guides` i renderowało placeholder,
 - oba linki już istniały w primary `PublicNavigation`.
 
@@ -191,6 +191,8 @@ Po pierwszej publikacji zwykła edycja nie może przenieść rekordu pomiędzy t
 - cross-family type change po first publish zablokowany,
 - pre-launch `/aktualnosci` i `/poradniki` placeholdery nie są pozostawione jako indeksowalne thin pages: przy public gate=false mają jawne `noindex` bez zmiany shared MarketingPlaceholder dla niepowiązanych routes,
 - dokumenty aktualizowane.
+
+Aktualny N0-002 realizuje pre-launch noindex bez feature flaga; `NEWSROOM_PUBLIC_ENABLED` pozostaje osobnym zadaniem N3-008 i ma później przejąć sterowanie rolloutem bez zmiany route contract.
 
 ---
 
