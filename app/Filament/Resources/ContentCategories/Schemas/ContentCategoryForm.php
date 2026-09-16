@@ -32,6 +32,7 @@ class ContentCategoryForm
                                 ->label('Slug')
                                 ->required()
                                 ->unique(ignoreRecord: true)
+                                ->regex('/\\A[a-z0-9-]+\\z/')
                                 ->maxLength(160)
                                 ->disabledOn('edit')
                                 ->helperText('Po utworzeniu sluga nie można zmienić, ponieważ v1 nie ma historii redirectów kategorii.'),
