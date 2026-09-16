@@ -6,7 +6,7 @@
 - Obszar: newsroom / media portal
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Bazowy stan repo przy projektowaniu: main@6a38c95ce76ee05997977d614d795ed8513462f1
-- Ostatnia weryfikacja zgodności z kodem: main@2c6a3a8aaab184179ba86652db981b8c3000a7c7 (2026-09-16)
+- Ostatnia weryfikacja zgodności z kodem: main@d2b48a322034c1ace020640427be833cd285e1e4 (2026-09-16)
 - Data: 2026-09-16
 - Zakres: model domenowy, baza danych, invariants, serwisy aplikacyjne, routing domeny i kolejność migracji
 
@@ -430,14 +430,18 @@ Pola:
 - created_at
 - updated_at
 
-Kategorie v1:
+Kategorie v1 są zamrożone przez `NewsroomTaxonomyContract::categories()`:
 
-- prawo-jazdy
-- egzaminy
-- przepisy
-- word
-- kierowcy
-- osk
+| position | slug | name |
+| ---: | --- | --- |
+| 10 | `prawo-jazdy` | Prawo jazdy |
+| 20 | `egzaminy` | Egzaminy |
+| 30 | `przepisy` | Przepisy |
+| 40 | `word` | WORD |
+| 50 | `kierowcy` | Kierowcy |
+| 60 | `osk` | OSK |
+
+Kontrakt N0-003 jest wykonywalny i przetestowany, ale nie zapisuje jeszcze rekordów do bazy. `description`, `seo_title` i `seo_description` pozostają w v1 seed contract jawnie `null` do czasu zatwierdzenia treści redakcyjnej.
 
 ### 8.1. Invariants
 
@@ -1234,15 +1238,18 @@ Migration tests muszą sprawdzać co najmniej krytyczne restrict/cascade directi
 
 ## 31. Seed danych systemowych
 
-Kategorie v1 mogą być seedowane deterministycznie.
+NEWSROOM-N0-003 dostarcza `NewsroomTaxonomyContract` jako jedyne wykonywalne źródło wartości kategorii v1 przed powstaniem warstwy DB.
 
-Seeder:
+Przyszły dedykowany seeder N1:
 
-- updateOrCreate po slug,
+- konsumuje `NewsroomTaxonomyContract::categories()` zamiast utrzymywać własną kopię listy,
+- używa `updateOrCreate` po slug,
+- jest idempotentny i nie tworzy duplikatów,
+- utrzymuje kontrakt pozycji/nazw dla danych systemowych,
 - nie nadpisuje ręcznie zmienionej treści SEO bez jawnej decyzji,
-- działa wielokrotnie bez duplikatów.
+- nie seeduje sztucznych produkcyjnych artykułów.
 
-Nie seedujemy sztucznych produkcyjnych artykułów.
+Na obecnym etapie tabela `content_categories`, model `ContentCategory` i DB seeder **nie istnieją jeszcze**.
 
 Test fixtures pozostają w factories/seed smoke data.
 
@@ -1556,9 +1563,11 @@ Na 2026-09-16:
 - legal trust layer istnieje,
 - traffic signs workflow istnieje,
 - NEWSROOM-N0-002 route contract jest wdrożony i przetestowany,
+- NEWSROOM-N0-003 taxonomy seed contract jest wdrożony i przetestowany jako `NewsroomTaxonomyContract` v1,
 - `/aktualnosci` i `/poradniki` pozostają placeholderami 200 z dedykowanym noindex header,
 - przyszłe detail/category/topic/feed routes są zarejestrowane, lecz zwracają 404 do czasu publicznej implementacji,
-- newsroom tables nie istnieją,
+- newsroom tables nie istnieją, więc taxonomy contract nie jest jeszcze zmaterializowany jako rekordy `content_categories`,
+- `ContentCategory` i dedykowany DB seeder kategorii nie istnieją,
 - ContentArticle nie istnieje,
 - record-level route-family lookup guard nie jest jeszcze podłączony do modelu/controllerów,
 - newsroom CMS nie istnieje.
@@ -1574,6 +1583,7 @@ Na 2026-09-16:
 - [ ] wdrożyć focal point + OG alt/stable public URL w media contract,
 - [ ] wdrożyć origin/regulatory context fields,
 - [ ] wdrożyć migracje,
+- [ ] wdrożyć `ContentCategory` i dedykowany idempotentny DB seeder konsumujący `NewsroomTaxonomyContract`,
 - [ ] wdrożyć enumy,
 - [ ] wdrożyć modele i factories,
 - [ ] wdrożyć policies,
@@ -1586,6 +1596,14 @@ Na 2026-09-16:
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.7
+
+- wdrożono N0-003 jako wykonywalny `NewsroomTaxonomyContract` v1,
+- zamrożono sześć slugów i nazw publicznych kategorii oraz deterministyczne pozycje 10..60,
+- powiązano walidację slugów kontraktu z istniejącym `NewsroomRouteContract::SLUG_PATTERN`,
+- pozostawiono description/SEO copy jawnie `null` do czasu zatwierdzenia redakcyjnego,
+- doprecyzowano, że tabela, model i rzeczywisty DB seeder powstaną dopiero w N1 i mają konsumować kontrakt zamiast duplikować listę.
 
 ### 2026-09-16 — v0.6
 
