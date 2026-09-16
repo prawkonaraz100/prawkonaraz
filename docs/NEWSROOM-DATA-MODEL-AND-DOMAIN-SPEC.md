@@ -6,11 +6,11 @@
 - Obszar: newsroom / media portal
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Bazowy stan repo przy projektowaniu: main@6a38c95ce76ee05997977d614d795ed8513462f1
-- Ostatnia weryfikacja zgodności z kodem: main@47e748047ec655ff2fdb5669d8cbff7e51041dc8 (2026-09-16)
+- Ostatnia weryfikacja zgodności z kodem: main@1fc2dcff2b7a6f44ad21865d41dbca98ade2efad (2026-09-16)
 - Data: 2026-09-16
 - Zakres: model domenowy, baza danych, invariants, serwisy aplikacyjne, routing domeny i kolejność migracji
 
-Ten dokument opisuje docelowy model danych newsroomu. Część schema jest już zmaterializowana przez N1-001, ale nie wszystkie klasy/serwisy istnieją. Stan wdrożenia należy czytać z sekcji 43 i aktualizować po każdej zmianie kodu.
+Ten dokument opisuje docelowy model danych newsroomu. Schema N1-001 oraz modele/factories/scopes N1-002 są już zmaterializowane, ale serwisy aplikacyjne kolejnych etapów nadal nie istnieją. Stan wdrożenia należy czytać z sekcji 43 i aktualizować po każdej zmianie kodu.
 
 ---
 
@@ -1266,7 +1266,7 @@ Przyszły dedykowany seeder N1:
 - nie nadpisuje ręcznie zmienionej treści SEO bez jawnej decyzji,
 - nie seeduje sztucznych produkcyjnych artykułów.
 
-Na obecnym etapie tabela `content_categories` **już istnieje** po N1-001. Model `ContentCategory` i dedykowany DB seeder **nie istnieją jeszcze** i pozostają pracą N1-002 / kolejnego małego kroku domenowego.
+Na obecnym etapie tabela `content_categories` **już istnieje** po N1-001, a model `ContentCategory` istnieje po N1-002. Dedykowany idempotentny DB seeder kategorii **nie istnieje jeszcze** i pozostaje osobnym małym krokiem domenowym; ma konsumować `NewsroomTaxonomyContract`.
 
 Test fixtures pozostają w factories/seed smoke data.
 
@@ -1274,7 +1274,7 @@ Test fixtures pozostają w factories/seed smoke data.
 
 ## 32. Factories
 
-Potrzebne:
+Wdrożone w N1-002:
 
 - ContentCategoryFactory
 - ContentArticleFactory
@@ -1293,7 +1293,7 @@ Stany factory:
 - needsReview
 - archived
 
-Factories mają umożliwiać czytelne testy workflow.
+Factories umożliwiają czytelne testy workflow. `ContentArticleFactory` ma jawne stany `draft`, `inReview`, `scheduled`, `published`, `breaking`, `needsReview`, `archived` oraz dodatkowy `withdrawn`; kanoniczny payload body buduje przez `NewsroomBodyContract`.
 
 ---
 
@@ -1584,12 +1584,13 @@ Na 2026-09-16:
 - NEWSROOM-N0-004 body-format contract jest wdrożony i przetestowany jako `NewsroomBodyContract` v1,
 - NEWSROOM-N0-006 media storage/validation contract jest wdrożony i przetestowany jako `NewsroomMediaStorage`,
 - NEWSROOM-N1-001 jest wdrożone: istnieje 5 enumów domenowych oraz 12 migracji newsroomu,
+- NEWSROOM-N1-002 jest wdrożone: istnieją modele `ContentArticle`, `ContentCategory`, `ContentTag`, `ContentTopic`, `ContentArticleSource`, `ContentHomePlacement`, ich factories, relations, reverse relations i scopes/predicates,
 - `/aktualnosci` i `/poradniki` pozostają placeholderami 200 z dedykowanym noindex header,
 - przyszłe detail/category/topic/feed routes są zarejestrowane, lecz zwracają 404 do czasu publicznej implementacji,
 - newsroom schema istnieje: `content_categories`, `content_tags`, `content_articles`, `content_topics`, pivots/relations, redirects i `content_home_placements` są tworzone przez 12 migracji,
-- schema jest zweryfikowana na SQLite i PostgreSQL 16; PostgreSQL gate sprawdza indeksy, krytyczne FK delete rules i rollback,
-- `ContentCategory` Eloquent model i dedykowany DB seeder kategorii nie istnieją,
-- `ContentArticle`, `ContentTag`, `ContentTopic`, `ContentArticleSource` i `ContentHomePlacement` Eloquent models/factories nie istnieją,
+- schema i warstwa modelowa są zweryfikowane na SQLite i PostgreSQL 16; `newsroom-postgres` uruchamia migration contract oraz model/scope contract,
+- `ContentCategory` Eloquent model istnieje; dedykowany DB seeder kategorii nadal nie istnieje,
+- `ContentArticle`, `ContentTag`, `ContentTopic`, `ContentArticleSource` i `ContentHomePlacement` Eloquent models/factories istnieją; factory workflow states pokrywają dokumentowany baseline,
 - record-level route-family lookup guard nie jest jeszcze podłączony do modelu/controllerów,
 - newsroom CMS nie istnieje.
 
@@ -1599,7 +1600,6 @@ Na 2026-09-16:
 
 - [ ] wdrożyć N2 Filament Builder/RichEditor adapter oparty o `NewsroomBodyContract`,
 - [ ] wdrożyć N3 publiczny renderer bloków zgodny z `NewsroomBodyContract`,
-- [ ] wdrożyć N1-002 modele, relations, scopes i factories dla istniejącej schema, w tym topics i home placements,
 - [ ] wdrożyć home composition service,
 - [ ] podłączyć `NewsroomMediaStorage` do N2 hero/OG uploader + `ContentArticle` persistence oraz wdrożyć focal point/OG-alt UX,
 - [ ] wdrożyć crop/variant generation dopiero wraz z fizycznymi artefaktami i ich testami,
@@ -1614,6 +1614,16 @@ Na 2026-09-16:
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.11
+
+- wdrożono NEWSROOM-N1-002 jako warstwę Eloquent nad schema N1-001,
+- dodano `ContentArticle`, `ContentCategory`, `ContentTag`, `ContentTopic`, `ContentArticleSource` i `ContentHomePlacement` wraz z casts, relations i reverse relations do istniejących bytów produktu,
+- rozdzielono wykonywalne scopes/predicates `publiclyVisible`, `activelyDistributed` i `indexable` oraz dodano category/topic/breaking/freshness/source/home-placement contracts,
+- factories pokrywają wymagane stany `draft/inReview/scheduled/published/breaking/needsReview/archived`; dodatkowo istnieje `withdrawn`, a body fixture reużywa `NewsroomBodyContract`,
+- PostgreSQL model/scope test został dodany do istniejącego gate; `newsroom-postgres` uruchamia cały `tests/Postgres` i finalnie przeszedł 4 testy / 81 asercji,
+- ogólny finalny gate przeszedł 895 testów / 18 532 asercji / 2 skipped, Pint 974 files i frontend build,
+- dedykowany DB seeder kategorii oraz N1-003+ services pozostają niewdrożone.
 
 ### 2026-09-16 — v0.10
 
