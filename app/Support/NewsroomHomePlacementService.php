@@ -49,14 +49,14 @@ final class NewsroomHomePlacementService
                 ->firstOrFail();
 
             $snapshotAttributes = $this->attributesFrom($snapshot);
-            $normalized = $this->normalizeAttributes([
+            $requested = $this->normalizeAttributes([
                 ...$snapshotAttributes,
                 ...$attributes,
             ]);
 
             $this->acquireTupleLocks([
                 $this->tupleFor($snapshotAttributes),
-                $this->tupleFor($normalized),
+                $this->tupleFor($requested),
             ]);
 
             $locked = ContentHomePlacement::query()
@@ -66,6 +66,15 @@ final class NewsroomHomePlacementService
 
             if ($this->tupleFor($this->attributesFrom($locked)) !== $this->tupleFor($snapshotAttributes)) {
                 throw new DomainException('Newsroom home placement changed concurrently; retry the update.');
+            }
+
+            $normalized = $this->normalizeAttributes([
+                ...$this->attributesFrom($locked),
+                ...$attributes,
+            ]);
+
+            if ($this->tupleFor($normalized) !== $this->tupleFor($requested)) {
+                throw new DomainException('Newsroom home placement target changed concurrently; retry the update.');
             }
 
             $this->assertNoOverlap($normalized, (int) $locked->getKey());
