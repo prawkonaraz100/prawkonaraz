@@ -21,6 +21,19 @@ final class ContentArticlePublishingService
      */
     private const PUBLISH_TRIGGERS = ['user', 'scheduler', 'system'];
 
+    /**
+     * @var list<string>
+     */
+    private const PUBLIC_UPDATE_FIELDS = [
+        'category_id',
+        'author_id',
+        'reviewer_id',
+        'title',
+        'lead',
+        'body_blocks',
+        'body_schema_version',
+    ];
+
     public function __construct(
         private readonly AuditLogService $auditLogService,
     ) {}
@@ -359,6 +372,125 @@ final class ContentArticlePublishingService
             );
 
             return $locked->refresh();
+        });
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    public function applyPublicUpdate(
+        ContentArticle $article,
+        array $payload,
+        int $expectedLockVersion,
+        ?User $actor = null,
+    ): ContentArticle {
+        return DB::transaction(function () use ($article, $payload, $expectedLockVersion, $actor): ContentArticle {
+            $locked = $this->lockArticle($article);
+            NewsroomOptimisticLock::assertVersion($locked, $expectedLockVersion, 'Artykuł');
+
+            if (! $locked->isPubliclyVisible()) {
+                throw new DomainException('Apply public update wymaga publicznie widocznego artykułu.');
+            }
+
+            $bodyVersion = (int) ($payload['body_schema_version'] ?? $locked->body_schema_version ?? 1);
+            $payload = NewsroomBodyEditorAdapter::normalizeArticleData($payload, $bodyVersion);
+
+            $relationPayload = NewsroomArticleRelationsEditorAdapter::extractArticleData($payload);
+            $attributes = $relationPayload['article_data'];
+            $relations = $relationPayload['relations'];
+
+            $sources = NewsroomArticleSourceEditorAdapter::normalize(
+                $locked,
+                $attributes['sources'] ?? [],
+            );
+
+            unset($attributes['sources'], $attributes['_lock_version'], $attributes['type']);
+
+            $requestedSlug = trim((string) ($attributes['slug'] ?? $locked->slug));
+            unset($attributes['slug']);
+
+            $currentRelationPayload = NewsroomArticleRelationsEditorAdapter::extractArticleData(
+                NewsroomArticleRelationsEditorAdapter::hydrateArticleData([], $locked),
+            );
+            $currentRelations = $currentRelationPayload['relations'];
+            $currentSources = NewsroomArticleSourceEditorAdapter::normalize(
+                $locked,
+                NewsroomArticleSourceEditorAdapter::hydrate($locked),
+            );
+
+            $allowed = array_intersect_key(
+                $attributes,
+                array_flip(self::PUBLIC_UPDATE_FIELDS),
+            );
+
+            $locked->fill($allowed);
+
+            $parentChanges = array_keys($locked->getDirty());
+            $slugChanged = $requestedSlug !== (string) $locked->slug;
+            $sourcesChanged = $this->sourceFingerprint($currentSources) !== $this->sourceFingerprint($sources);
+            $relationsChanged = $currentRelations !== $relations;
+
+            if ($parentChanges === [] && ! $slugChanged && ! $sourcesChanged && ! $relationsChanged) {
+                return $locked->refresh();
+            }
+
+            if ($parentChanges !== []) {
+                $locked->save();
+            }
+
+            if ($slugChanged) {
+                $locked = app(ContentArticleSlugService::class)->changeSlug(
+                    $locked,
+                    $requestedSlug,
+                    $actor,
+                );
+            }
+
+            if ($sourcesChanged) {
+                $locked = NewsroomArticleSourceEditorAdapter::sync($locked, $sources);
+            }
+
+            if ($relationsChanged) {
+                $locked = NewsroomArticleRelationsEditorAdapter::sync($locked, $relations);
+            }
+
+            $locked = $locked->refresh();
+            $this->assertPublicationReady($locked);
+
+            $at = now();
+            $locked->last_substantive_update_at = $at;
+            $locked->save();
+            $locked = $locked->refresh();
+
+            $changeKinds = $this->publicUpdateChangeKinds(
+                $parentChanges,
+                $slugChanged,
+                $sourcesChanged,
+                $relationsChanged,
+            );
+
+            $this->auditLogService->record(
+                action: 'content_article.public_updated',
+                entityType: ContentArticle::class,
+                entityId: $locked->getKey(),
+                actor: $actor,
+                metadata: [
+                    'change_kinds' => $changeKinds,
+                    'category_id' => $locked->category_id,
+                    'author_id' => $locked->author_id,
+                    'reviewer_id' => $locked->reviewer_id,
+                    'source_count' => count($sources),
+                    'question_count' => count($relations['questions']),
+                    'legal_unit_count' => count($relations['legal_units']),
+                    'traffic_sign_count' => count($relations['traffic_signs']),
+                    'topic_count' => count($relations['topic_ids']),
+                    'last_substantive_update_at' => $at,
+                    'lock_version' => $locked->optimisticLockVersion(),
+                    'trigger' => $this->triggerForActor($actor),
+                ],
+            );
+
+            return $locked;
         });
     }
 
@@ -701,6 +833,63 @@ final class ContentArticlePublishingService
                 'Legal news with a primary official or legislation source requires a publicly cited http or https URL.',
             );
         }
+    }
+
+    /**
+     * @param  list<array<string, mixed>>  $rows
+     * @return list<array<string, mixed>>
+     */
+    private function sourceFingerprint(array $rows): array
+    {
+        return array_map(function (array $row): array {
+            foreach (['published_at', 'accessed_at'] as $field) {
+                $value = $row[$field] ?? null;
+                $row[$field] = $value instanceof DateTimeInterface
+                    ? $value->format(DATE_ATOM)
+                    : $value;
+            }
+
+            return $row;
+        }, $rows);
+    }
+
+    /**
+     * @param  list<string>  $parentChanges
+     * @return list<string>
+     */
+    private function publicUpdateChangeKinds(
+        array $parentChanges,
+        bool $slugChanged,
+        bool $sourcesChanged,
+        bool $relationsChanged,
+    ): array {
+        $kinds = [];
+
+        if (array_intersect($parentChanges, ['category_id', 'author_id', 'reviewer_id']) !== []) {
+            $kinds[] = 'identity';
+        }
+
+        if (in_array('title', $parentChanges, true)) {
+            $kinds[] = 'headline';
+        }
+
+        if (array_intersect($parentChanges, ['lead', 'body_blocks', 'body_schema_version']) !== []) {
+            $kinds[] = 'content';
+        }
+
+        if ($slugChanged) {
+            $kinds[] = 'slug';
+        }
+
+        if ($sourcesChanged) {
+            $kinds[] = 'sources';
+        }
+
+        if ($relationsChanged) {
+            $kinds[] = 'relations';
+        }
+
+        return $kinds;
     }
 
     private function isSafeHttpUrl(mixed $value): bool
