@@ -2,7 +2,7 @@
 
 ## 1. Status dokumentu
 
-- **Status:** Proposed / canonical design before implementation
+- **Status:** Canonical architecture + live implementation status
 - **Obszar:** publiczny serwis informacyjny, newsroom, aktualności, poradniki i dystrybucja treści
 - **Repozytorium:** `prawkonaraz100/prawkonaraz`
 - **Bazowy stan kodu:** `main@4b10738705f3696bc2bcce730a707473eab8cd2b`

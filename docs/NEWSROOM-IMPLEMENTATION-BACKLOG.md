@@ -2,7 +2,7 @@
 
 ## 1. Status
 
-- Status: Canonical implementation plan before coding
+- Status: Canonical implementation plan and live implementation status
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Specyfikacje wykonawcze:
   - [NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md](./NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md)

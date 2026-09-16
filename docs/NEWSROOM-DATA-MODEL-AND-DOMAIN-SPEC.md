@@ -2,7 +2,7 @@
 
 ## 1. Status
 
-- Status: Proposed / implementation-ready design
+- Status: Canonical domain/data contract + live implementation status
 - Obszar: newsroom / media portal
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Bazowy stan repo przy projektowaniu: main@6a38c95ce76ee05997977d614d795ed8513462f1

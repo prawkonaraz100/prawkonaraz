@@ -2,7 +2,7 @@
 
 ## 1. Status
 
-- Status: Proposed / implementation-ready CMS contract
+- Status: Canonical CMS contract + live implementation status
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Powiązane:
   - [NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md](./NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md)
