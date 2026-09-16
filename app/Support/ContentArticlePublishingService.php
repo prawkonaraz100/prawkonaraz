@@ -544,7 +544,7 @@ final class ContentArticlePublishingService
             $article->breaking_expires_at === null
             || $article->breaking_expires_at->lte($referenceAt)
         ) {
-            throw new DomainException('Breaking article requires an expiration timestamp after the evaluated publication time.');
+            throw new DomainException('Breaking article requires a future expiration timestamp after the evaluated publication time.');
         }
     }
 
