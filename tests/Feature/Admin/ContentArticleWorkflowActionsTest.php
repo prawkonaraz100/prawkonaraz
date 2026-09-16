@@ -221,6 +221,25 @@ test('featured and breaking actions use audited service controlled exposure stat
         ->and($article->is_featured)->toBeFalse();
 });
 
+test('edit workflow action refreshes the optimistic token before the next internal save', function () {
+    Carbon::setTestNow('2026-09-16 19:10:00');
+
+    $admin = User::factory()->admin()->create();
+    $article = ContentArticle::factory()->published()->create();
+    ContentArticleSource::factory()->for($article, 'article')->create();
+
+    $this->actingAs($admin);
+
+    Livewire::test(EditContentArticle::class, ['record' => $article->getRouteKey()])
+        ->callAction('markNeedsReview')
+        ->set('data.editorial_note', 'Notatka po zmianie workflow.')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    expect($article->fresh()->workflow_status)->toBe(ContentArticleWorkflowStatus::NeedsReview)
+        ->and($article->fresh()->editorial_note)->toBe('Notatka po zmianie workflow.');
+});
+
 test('view page exposes the same workflow actions without duplicating transition logic', function () {
     Carbon::setTestNow('2026-09-16 18:00:00');
 

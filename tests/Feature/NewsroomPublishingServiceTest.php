@@ -10,6 +10,7 @@ use App\Models\ContentArticleSource;
 use App\Models\ContentAuthor;
 use App\Models\ContentCategory;
 use App\Models\User;
+use App\Support\ContentArticleEditToken;
 use App\Support\ContentArticlePublishingService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -40,6 +41,57 @@ function newsroomReviewedArticle(array $attributes = [], ?User $actor = null): C
     $article = newsroomReviewReadyArticle($attributes);
 
     return newsroomPublishingService()->markReviewed($article, $actor);
+}
+
+/**
+ * @param  array<string, mixed>  $overrides
+ * @return array<string, mixed>
+ */
+function newsroomPublicUpdatePayload(ContentArticle $article, array $overrides = []): array
+{
+    $article = $article->fresh();
+
+    $sources = $article->sources()
+        ->get()
+        ->map(function (ContentArticleSource $source): array {
+            $type = $source->source_type;
+
+            return [
+                'source_type' => $type instanceof ContentArticleSourceType
+                    ? $type->value
+                    : (string) $type,
+                'publisher' => $source->publisher,
+                'title' => $source->title,
+                'url' => $source->url,
+                'published_at' => $source->published_at,
+                'accessed_at' => $source->accessed_at,
+                'is_primary' => $source->is_primary,
+                'is_official' => $source->is_official,
+                'is_publicly_cited' => $source->is_publicly_cited,
+                'note' => $source->note,
+            ];
+        })
+        ->values()
+        ->all();
+
+    $type = $article->type;
+
+    return array_replace([
+        'type' => $type instanceof ContentArticleType ? $type->value : (string) $type,
+        'category_id' => $article->category_id,
+        'author_id' => $article->author_id,
+        'reviewer_id' => $article->reviewer_id,
+        'title' => $article->title,
+        'slug' => $article->slug,
+        'lead' => $article->lead,
+        'body_blocks' => $article->body_blocks,
+        'body_schema_version' => $article->body_schema_version,
+        'sources' => $sources,
+        'question_relations' => [],
+        'legal_unit_relations' => [],
+        'traffic_sign_relations' => [],
+        'topic_ids' => [],
+    ], $overrides);
 }
 
 test('draft can submit for review and return to draft through audited transitions', function () {
@@ -138,6 +190,185 @@ test('initial publish is atomic audited and keeps user actor separate from conte
         ->and($audit->metadata['trigger'])->toBe('user')
         ->and($audit->metadata)->not->toHaveKey('body_blocks')
         ->and($audit->metadata)->not->toHaveKey('lead');
+});
+
+test('public update is atomic stale guarded audited and marks substantive freshness', function () {
+    Carbon::setTestNow('2026-09-16 18:30:00');
+
+    $actor = User::factory()->admin()->create();
+    $article = ContentArticle::factory()->published()->create([
+        'title' => 'Stary tytuł',
+        'lead' => 'Stary lead',
+    ]);
+    ContentArticleSource::factory()
+        ->for($article, 'article')
+        ->create([
+            'source_type' => ContentArticleSourceType::Official->value,
+            'title' => 'Stare źródło',
+            'url' => 'https://example.test/stare',
+            'is_publicly_cited' => true,
+        ]);
+
+    $firstPublishedAt = $article->first_published_at?->toDateTimeString();
+    $loadedToken = app(ContentArticleEditToken::class)->make($article->fresh());
+
+    $updated = newsroomPublishingService()->applyPublicUpdate(
+        $article,
+        newsroomPublicUpdatePayload($article, [
+            'title' => 'Nowy tytuł publiczny',
+            'lead' => 'Nowy lead publiczny',
+            'body_blocks' => [[
+                'type' => 'context',
+                'data' => [
+                    'variant' => 'uwaga',
+                    'title' => null,
+                    'text' => 'Nowa treść publiczna.',
+                ],
+            ]],
+            'sources' => [[
+                'source_type' => ContentArticleSourceType::Official->value,
+                'publisher' => 'Instytucja',
+                'title' => 'Nowe źródło',
+                'url' => 'https://example.test/nowe',
+                'published_at' => null,
+                'accessed_at' => null,
+                'is_primary' => true,
+                'is_official' => true,
+                'is_publicly_cited' => true,
+                'note' => 'Prywatna notatka źródła.',
+            ]],
+        ]),
+        $loadedToken,
+        $actor,
+    );
+
+    $audit = AuditLog::query()
+        ->where('action', 'content_article.public_updated')
+        ->where('entity_id', (string) $article->id)
+        ->sole();
+
+    expect($updated->title)->toBe('Nowy tytuł publiczny')
+        ->and($updated->lead)->toBe('Nowy lead publiczny')
+        ->and($updated->body_blocks[0]['data']['text'])->toBe('Nowa treść publiczna.')
+        ->and($updated->workflow_status)->toBe(ContentArticleWorkflowStatus::Published)
+        ->and($updated->first_published_at?->toDateTimeString())->toBe($firstPublishedAt)
+        ->and($updated->last_substantive_update_at?->toDateTimeString())->toBe('2026-09-16 18:30:00')
+        ->and($updated->sources()->sole()->title)->toBe('Nowe źródło')
+        ->and($audit->actor_user_id)->toBe($actor->id)
+        ->and($audit->metadata['substantive_change'])->toBeTrue()
+        ->and($audit->metadata['source_count'])->toBe(1)
+        ->and($audit->metadata)->not->toHaveKey('body_blocks')
+        ->and($audit->metadata)->not->toHaveKey('lead')
+        ->and($audit->metadata)->not->toHaveKey('editorial_note')
+        ->and($audit->metadata)->not->toHaveKey('note');
+});
+
+test('public update without a public semantic change does not bump substantive freshness', function () {
+    Carbon::setTestNow('2026-09-16 18:35:00');
+
+    $article = ContentArticle::factory()->published()->create([
+        'last_substantive_update_at' => Carbon::parse('2026-09-15 12:00:00'),
+    ]);
+    ContentArticleSource::factory()
+        ->for($article, 'article')
+        ->create([
+            'sort_order' => 1,
+        ]);
+
+    $loadedToken = app(ContentArticleEditToken::class)->make($article->fresh());
+
+    $updated = newsroomPublishingService()->applyPublicUpdate(
+        $article,
+        newsroomPublicUpdatePayload($article),
+        $loadedToken,
+    );
+
+    $audit = AuditLog::query()
+        ->where('action', 'content_article.public_updated')
+        ->where('entity_id', (string) $article->id)
+        ->sole();
+
+    expect($updated->last_substantive_update_at?->toDateTimeString())->toBe('2026-09-15 12:00:00')
+        ->and($audit->metadata['substantive_change'])->toBeFalse();
+});
+
+test('public update rejects same-second stale source state without overwriting the concurrent change', function () {
+    Carbon::setTestNow('2026-09-16 18:40:00');
+
+    $article = ContentArticle::factory()->published()->create();
+    $source = ContentArticleSource::factory()
+        ->for($article, 'article')
+        ->create([
+            'title' => 'Źródło pierwotne',
+        ]);
+
+    $loadedToken = app(ContentArticleEditToken::class)->make($article->fresh());
+    $loadedUpdatedAt = $article->fresh()->updated_at?->toDateTimeString();
+
+    $source->update([
+        'title' => 'Zmiana równoległa w tej samej sekundzie',
+    ]);
+
+    expect($article->fresh()->updated_at?->toDateTimeString())->toBe($loadedUpdatedAt);
+
+    expect(fn () => newsroomPublishingService()->applyPublicUpdate(
+        $article,
+        newsroomPublicUpdatePayload($article, [
+            'title' => 'Próba nadpisania',
+            'sources' => [[
+                'source_type' => ContentArticleSourceType::Official->value,
+                'publisher' => null,
+                'title' => 'Stara wersja źródła',
+                'url' => 'https://example.test/source',
+                'published_at' => null,
+                'accessed_at' => null,
+                'is_primary' => false,
+                'is_official' => true,
+                'is_publicly_cited' => true,
+                'note' => null,
+            ]],
+        ]),
+        $loadedToken,
+    ))->toThrow(DomainException::class, 'changed after this form was loaded');
+
+    expect($article->fresh()->title)->not->toBe('Próba nadpisania')
+        ->and($source->fresh()->title)->toBe('Zmiana równoległa w tej samej sekundzie')
+        ->and(AuditLog::query()
+            ->where('action', 'content_article.public_updated')
+            ->where('entity_id', (string) $article->id)
+            ->exists())->toBeFalse();
+});
+
+test('invalid public update rolls back article and source mutations', function () {
+    Carbon::setTestNow('2026-09-16 18:50:00');
+
+    $article = ContentArticle::factory()->published()->create([
+        'title' => 'Tytuł przed błędem',
+    ]);
+    $source = ContentArticleSource::factory()
+        ->for($article, 'article')
+        ->create([
+            'title' => 'Źródło przed błędem',
+        ]);
+    $loadedToken = app(ContentArticleEditToken::class)->make($article->fresh());
+
+    expect(fn () => newsroomPublishingService()->applyPublicUpdate(
+        $article,
+        newsroomPublicUpdatePayload($article, [
+            'title' => 'Tytuł nie może zostać',
+            'sources' => [],
+        ]),
+        $loadedToken,
+    ))->toThrow(DomainException::class, 'requires at least one source');
+
+    expect($article->fresh()->title)->toBe('Tytuł przed błędem')
+        ->and($source->fresh()->title)->toBe('Źródło przed błędem')
+        ->and($article->fresh()->sources()->count())->toBe(1)
+        ->and($article->fresh()->last_substantive_update_at)->toBeNull()
+        ->and(AuditLog::query()
+            ->where('action', 'content_article.public_updated')
+            ->where('entity_id', (string) $article->id)
+            ->exists())->toBeFalse();
 });
 
 test('schedule is initial publish only and due publication preserves date semantics', function () {

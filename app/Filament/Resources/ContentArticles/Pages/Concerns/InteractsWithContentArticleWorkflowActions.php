@@ -250,6 +250,8 @@ trait InteractsWithContentArticleWorkflowActions
 
             $this->contentArticleRecord()->refresh();
 
+            $this->refreshContentArticleEditStateAfterWorkflowAction();
+
             Notification::make()
                 ->success()
                 ->title($successMessage)
@@ -265,6 +267,11 @@ trait InteractsWithContentArticleWorkflowActions
 
             return null;
         }
+    }
+
+    protected function refreshContentArticleEditStateAfterWorkflowAction(): void
+    {
+        // Edit pages override this hook to refresh their optimistic-lock form state.
     }
 
     private function contentArticleRecord(): ContentArticle

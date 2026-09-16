@@ -23,6 +23,8 @@ final class ContentArticlePublishingService
 
     public function __construct(
         private readonly AuditLogService $auditLogService,
+        private readonly ContentArticleEditToken $editToken,
+        private readonly ContentArticleSlugService $slugService,
     ) {}
 
     public function submitForReview(ContentArticle $article, ?User $actor = null): ContentArticle
@@ -500,6 +502,133 @@ final class ContentArticlePublishingService
                     'previous_breaking_expires_at' => $previousExpiration,
                     'breaking_expires_at' => null,
                     'public_state_changed_at' => $locked->public_state_changed_at,
+                    'trigger' => $this->triggerForActor($actor),
+                ],
+            );
+
+            return $locked->refresh();
+        });
+    }
+
+    /**
+     * Reject a form that was loaded from an older article/source/relation state.
+     */
+    public function assertFreshEditToken(ContentArticle $article, string $loadedToken): void
+    {
+        $loadedToken = trim($loadedToken);
+
+        if (
+            $loadedToken === ''
+            || ! hash_equals($this->editToken->make($article), $loadedToken)
+        ) {
+            throw new DomainException(
+                'Content article changed after this form was loaded; reload before saving.',
+            );
+        }
+    }
+
+    /**
+     * Apply the currently supported public editor payload to an already public article.
+     *
+     * @param  array<string, mixed>  $payload
+     */
+    public function applyPublicUpdate(
+        ContentArticle $article,
+        array $payload,
+        string $loadedToken,
+        ?User $actor = null,
+    ): ContentArticle {
+        return DB::transaction(function () use ($article, $payload, $loadedToken, $actor): ContentArticle {
+            $locked = $this->lockArticle($article);
+
+            if (! $locked->isPubliclyVisible()) {
+                throw new DomainException('Apply public update requires a publicly visible content article.');
+            }
+
+            $this->assertFreshEditToken($locked, $loadedToken);
+            $beforePublicFingerprint = $this->editToken->publicFingerprint($locked);
+
+            unset($payload['_edit_token'], $payload['editorial_note']);
+
+            $sourcePayload = NewsroomArticleSourcesEditorAdapter::extractArticleData($payload);
+            $payload = $sourcePayload['article_data'];
+            $sources = $sourcePayload['sources'];
+
+            $payload = NewsroomBodyEditorAdapter::normalizeArticleData(
+                $payload,
+                (int) ($locked->body_schema_version ?? 1),
+            );
+
+            $relationPayload = NewsroomArticleRelationsEditorAdapter::extractArticleData($payload);
+            $articleData = array_intersect_key(
+                $relationPayload['article_data'],
+                array_flip([
+                    'type',
+                    'category_id',
+                    'author_id',
+                    'reviewer_id',
+                    'title',
+                    'slug',
+                    'lead',
+                    'body_blocks',
+                    'body_schema_version',
+                ]),
+            );
+            $relations = $relationPayload['relations'];
+
+            $requestedType = $articleData['type'] ?? $locked->type;
+            $requestedType = $requestedType instanceof ContentArticleType
+                ? $requestedType->value
+                : (string) $requestedType;
+
+            $requestedSlug = trim((string) ($articleData['slug'] ?? $locked->slug));
+
+            unset($articleData['type'], $articleData['slug']);
+
+            $locked->fill($articleData);
+            $locked->save();
+
+            $currentType = $locked->type instanceof ContentArticleType
+                ? $locked->type->value
+                : (string) $locked->type;
+
+            if ($requestedType !== $currentType) {
+                $locked = $this->slugService->changeType($locked, $requestedType, $actor);
+            }
+
+            if ($requestedSlug !== '' && $requestedSlug !== (string) $locked->slug) {
+                $locked = $this->slugService->changeSlug($locked, $requestedSlug, $actor);
+            }
+
+            $locked = NewsroomArticleSourcesEditorAdapter::sync($locked, $sources);
+            $locked = NewsroomArticleRelationsEditorAdapter::sync($locked, $relations)->refresh();
+
+            $this->assertPublicationReady($locked);
+
+            $substantiveChange = ! hash_equals(
+                $beforePublicFingerprint,
+                $this->editToken->publicFingerprint($locked),
+            );
+
+            if ($substantiveChange) {
+                $locked->last_substantive_update_at = now();
+                $locked->save();
+            }
+
+            $this->auditLogService->record(
+                action: 'content_article.public_updated',
+                entityType: ContentArticle::class,
+                entityId: $locked->getKey(),
+                actor: $actor,
+                metadata: [
+                    'workflow_status' => $this->statusValue($locked),
+                    'substantive_change' => $substantiveChange,
+                    'last_substantive_update_at' => $locked->last_substantive_update_at,
+                    'source_count' => count($sources),
+                    'question_relation_count' => count($relations['questions']),
+                    'legal_unit_relation_count' => count($relations['legal_units']),
+                    'traffic_sign_relation_count' => count($relations['traffic_signs']),
+                    'topic_count' => count($relations['topic_ids']),
                     'trigger' => $this->triggerForActor($actor),
                 ],
             );

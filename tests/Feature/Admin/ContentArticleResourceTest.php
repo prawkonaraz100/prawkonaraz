@@ -265,6 +265,46 @@ test('admin can persist ordered canonical body blocks through the builder adapte
     }
 });
 
+test('stale draft edit is rejected before relationship state can overwrite a concurrent source change', function () {
+    Carbon::setTestNow('2026-09-16 18:45:00');
+
+    $undoRepeaterFake = Repeater::fake();
+
+    try {
+        $admin = User::factory()->admin()->create();
+        $article = ContentArticle::factory()->draft()->create([
+            'title' => 'Roboczy tytuł',
+        ]);
+        $source = ContentArticleSource::factory()
+            ->for($article, 'article')
+            ->create([
+                'title' => 'Źródło załadowane do formularza',
+                'url' => 'https://example.test/loaded',
+            ]);
+
+        $this->actingAs($admin);
+
+        $component = Livewire::test(EditContentArticle::class, ['record' => $article->getRouteKey()]);
+
+        $source->update([
+            'title' => 'Równoległa zmiana źródła',
+            'url' => 'https://example.test/concurrent',
+        ]);
+
+        $component
+            ->set('data.title', 'Nie wolno nadpisać')
+            ->call('save')
+            ->assertHasErrors(['data.title']);
+
+        expect($article->fresh()->title)->toBe('Roboczy tytuł')
+            ->and($source->fresh()->title)->toBe('Równoległa zmiana źródła')
+            ->and($source->fresh()->url)->toBe('https://example.test/concurrent');
+    } finally {
+        $undoRepeaterFake();
+        Carbon::setTestNow();
+    }
+});
+
 test('draft edit preserves existing canonical body block keys across builder hydration', function () {
     $undoBuilderFake = Builder::fake();
 
@@ -388,6 +428,51 @@ test('ordinary edit of publicly visible article cannot mutate public fields or b
         ->and($article->lead)->toBe('Lead publiczny')
         ->and($article->body_blocks[0]['data']['text'])->toBe('Treść publiczna')
         ->and($article->editorial_note)->toBe('Nowa notatka wewnętrzna');
+});
+
+test('explicit public update mode applies validated public fields and records the user actor', function () {
+    Carbon::setTestNow('2026-09-16 19:00:00');
+
+    $admin = User::factory()->admin()->create();
+    $article = ContentArticle::factory()->published()->create([
+        'title' => 'Tytuł przed public update',
+        'lead' => 'Lead przed public update',
+    ]);
+    ContentArticleSource::factory()
+        ->for($article, 'article')
+        ->create([
+            'source_type' => ContentArticleSourceType::Official->value,
+            'title' => 'Źródło publiczne',
+            'url' => 'https://example.test/public-source',
+            'is_publicly_cited' => true,
+        ]);
+
+    $this->actingAs($admin);
+
+    Livewire::test(EditContentArticle::class, ['record' => $article->getRouteKey()])
+        ->call('beginPublicUpdate')
+        ->assertSet('publicUpdateMode', true)
+        ->set('data.title', 'Tytuł po Apply public update')
+        ->set('data.lead', 'Lead po Apply public update')
+        ->call('applyPublicUpdate')
+        ->assertSet('publicUpdateMode', false)
+        ->assertHasNoErrors();
+
+    $article = $article->fresh();
+    $audit = AuditLog::query()
+        ->where('action', 'content_article.public_updated')
+        ->where('entity_id', (string) $article->id)
+        ->sole();
+
+    expect($article->title)->toBe('Tytuł po Apply public update')
+        ->and($article->lead)->toBe('Lead po Apply public update')
+        ->and($article->last_substantive_update_at?->toDateTimeString())->toBe('2026-09-16 19:00:00')
+        ->and($audit->actor_user_id)->toBe($admin->id)
+        ->and($audit->metadata)->not->toHaveKey('body_blocks')
+        ->and($audit->metadata)->not->toHaveKey('lead')
+        ->and($audit->metadata)->not->toHaveKey('editorial_note');
+
+    Carbon::setTestNow();
 });
 
 test('admin can persist ordered article sources including private evidence without a url', function () {
