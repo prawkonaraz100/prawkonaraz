@@ -422,12 +422,6 @@ final class ContentArticlePublishingService
             throw new DomainException('Content article requires a published author.');
         }
 
-        $reviewer = $article->reviewer()->first();
-
-        if ($reviewer !== null && ! $reviewer->isPubliclyVisible()) {
-            throw new DomainException('Assigned reviewer must be publicly visible.');
-        }
-
         if (filled($article->hero_image_path)) {
             $this->assertRequiredText($article->hero_image_alt, 'hero_image_alt');
 
