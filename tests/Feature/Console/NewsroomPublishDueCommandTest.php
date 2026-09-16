@@ -165,6 +165,9 @@ test('publish due command rejects invalid processing limits', function () {
 
     $this->artisan('newsroom:publish-due', ['--limit' => 1001])
         ->assertFailed();
+
+    $this->artisan('newsroom:publish-due', ['--limit' => '1.5'])
+        ->assertFailed();
 });
 
 test('newsroom publish due command is registered in the production scheduler every minute', function () {
