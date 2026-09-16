@@ -1706,11 +1706,12 @@ Na 2026-09-16:
 - N2-005 dodało `NewsroomArticleRelationsEditorAdapter` oraz article-owned editor pytań/jednostek prawnych/znaków/topiców; ordered pivots zachowują `sort_order`, topics pozostają bez ręcznego rankingu, a targety są walidowane przed sync,
 - N2-006 jest DONE po PR #50: obok workflow/exposure actions istnieje jawny stale-safe `Apply public update`; mutacje publiczne pozostają w `ContentArticlePublishingService`, a AuditLog zachowuje `User` actor / `ContentAuthor` identity separation,
 - N2-007 jest DONE po PR #52: `ContentArticlePublicationChecklist` przejęło istniejące review/publication/fresh-review assertions i jest wspólnym source of truth dla backendowych blockerów oraz adminowej listy readiness; warningi pozostają addytywne i nie osłabiają publish invariants,
+- N2-008 jest DONE po PR #56: istnieje prywatny administrator-only preview zapisanej wersji `ContentArticle`; nie zmienia domenowego public-visibility contract, nie otwiera publicznych controllerów N3 i nie dodaje nowego persisted preview/revision modelu,
 - `ContentArticle`, `ContentTag`, `ContentTopic`, `ContentArticleSource` i `ContentHomePlacement` Eloquent models/factories istnieją; factory workflow states pokrywają dokumentowany baseline,
 - service-level route-family lookup guard istnieje w `ContentArticlePathResolver`; nadal nie jest podłączony do publicznych controllerów N3,
 - NEWSROOM-N1-005 scheduler istnieje jako `newsroom:publish-due`, jest zarejestrowany co minutę w production i deleguje due-time revalidation/publish do `ContentArticlePublishingService`,
 - NEWSROOM-N1-006 jest wdrożone: istnieją `NewsroomHomeCompositionService`, `NewsroomHomePlacementService` i niemutujący `ContentArticlePublishingService::assertScheduledPreviewReady()`; overlap/concurrency jest testowane również na PostgreSQL,
-- newsroom CMS jest częściowo zmaterializowany przez `ContentCategoryResource`, `ContentArticleResource`, kontrolowany body Builder/editor, source relationship editor, article-owned relations/topics editor, N2-006 workflow/exposure actions, stale-safe `Apply public update` oraz N2-007 publication checklist; `ContentTopicResource`, media/origin-regulatory UI, preview UI i HomeComposer nadal nie istnieją, a N2-012 pozostaje PARTIAL dla HomeComposer stale-write.
+- newsroom CMS jest częściowo zmaterializowany przez `ContentCategoryResource`, `ContentArticleResource`, kontrolowany body Builder/editor, source relationship editor, article-owned relations/topics editor, N2-006 workflow/exposure actions, stale-safe `Apply public update`, N2-007 publication checklist oraz N2-008 private article preview; `ContentTopicResource`, media/origin-regulatory UI i HomeComposer nadal nie istnieją, a N2-012 pozostaje PARTIAL dla HomeComposer stale-write.
 
 ---
 
@@ -1726,13 +1727,21 @@ Na 2026-09-16:
 - [x] wdrożyć `applyPublicUpdate` orchestration/stale-write path dla już publicznego `ContentArticle`,
 - [ ] wdrożyć analogiczny stale-write guard dla `NewsroomHomeComposer` po N2-009,
 - [x] NEWSROOM-N2-007: computed publication checklist współdzieląca backend invariants,
-- [ ] NEWSROOM-N2-008: authenticated admin-only private preview bez public exposure,
+- [x] NEWSROOM-N2-008: authenticated admin-only private preview bez public exposure,
 - [ ] podłączyć `ContentArticlePathResolver` do publicznych N3 article controllers i zweryfikować HTTP canonical/301/404/410 behavior,
 - [ ] dodać sitemap/public-discovery regression korzystające wyłącznie z current canonical URL,
 
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.24
+
+- PR #56 zmergowano na `main@9aa621c083e02e157e72294f5e994ea566e45a9f`; exact-head CI #202: `quality` PASS (997 passed / 19 146 assertions / 2 skipped, Pint 1020 files PASS, frontend build PASS) i `newsroom-postgres` PASS,
+- N2-008 dodaje wyłącznie prywatny read surface dla istniejącego `ContentArticle`; nie wprowadza revision/staging schema ani nowego public visibility state,
+- body preview rewaliduje `NewsroomBodyContract`; rich text przechodzi przez allowlisted HTML renderer, a private source evidence nie jest częścią payloadu widoku,
+- publiczne article routes i `ContentArticlePathResolver` integration nadal należą do N3; N2-008 nie zmienia 404 pre-launch contract,
+- następny wykonywalny task to N2-009 NewsroomHomeComposer + future preview; HomeComposer stale-write pozostaje zależną częścią N2-012.
 
 ### 2026-09-16 — v0.23
 

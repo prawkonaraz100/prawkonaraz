@@ -905,6 +905,10 @@ Computed blocking/warning items.
 
 ## NEWSROOM-N2-008 — Article preview
 
+### Status implementacji
+
+**DONE — zmergowano przez PR #56 na `main@9aa621c083e02e157e72294f5e994ea566e45a9f` po exact-head CI #202. Preview działa wyłącznie przez authenticated administrator-only route, używa prywatnego/no-store transportu, `noindex,nofollow`, nie ładuje public analytics ani shareable signed tokenów i nie otwiera publicznych tras N3.**
+
 ### Zakres
 
 - authenticated administrator-only route,
@@ -2031,7 +2035,7 @@ Nie oznaczać tasku DONE przed merge + green verification.
 Na 2026-09-16:
 
 - pakiet projektowy newsroomu obejmuje architekturę, model danych, CMS, UI, governance, SEO, backlog i runbook,
-- foundation N0 oraz pełny etap N1-001..N1-006 są wdrożone; N2 ma już `ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor dla `body_blocks`, source relationship editor, article-owned relations/topics editor, pełne N2-006 workflow actions, stale-safe `Apply public update` oraz N2-007 publication checklist współdzielącą backend invariants; `ContentTopicResource`, media/origin-regulatory UI, preview/HomeComposer, HomeComposer stale-write oraz publiczny newsroom nadal nie są wdrożone,
+- foundation N0 oraz pełny etap N1-001..N1-006 są wdrożone; N2 ma już `ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor dla `body_blocks`, source relationship editor, article-owned relations/topics editor, pełne N2-006 workflow actions, stale-safe `Apply public update`, N2-007 publication checklist oraz N2-008 private Article preview; `ContentTopicResource`, media/origin-regulatory UI, HomeComposer, HomeComposer stale-write oraz publiczny newsroom nadal nie są wdrożone,
 - `/aktualnosci` i `/poradniki` nadal renderują pre-launch placeholder, teraz z dedykowanym `X-Robots-Tag: noindex, follow`; finalne detail/category/topic/feed route namespaces są zarejestrowane, ale pozostają 404 bez publicznych controllerów,
 - fundamenty ContentAuthor/legal/traffic signs/public SEO istnieją,
 - istnieją config/content.php organization, SchemaIds/SchemaRenderer oraz współdzielony SiteIdentitySchema; homepage i istniejące główne publiczne graph services korzystają z kanonicznego Organization/WebSite identity,
@@ -2046,13 +2050,22 @@ Na 2026-09-16:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N2-008 — Article preview.
+NEWSROOM-N2-009 — NewsroomHomeComposer + future preview.
 
-N2-007 jest zamknięte po PR #52. Następnym niezależnym krokiem jest admin-only preview: authenticated administrator-only route, `Cache-Control: private, no-store`, `noindex,nofollow`, public-like renderer i jawny preview banner. N2-012 nadal pozostaje **PARTIAL** wyłącznie dla `NewsroomHomeComposer` stale-write i wróci dopiero po materializacji N2-009.
+N2-008 jest zamknięte po PR #56. Następny krok materializuje brakujący CMS dla homepage placements i future preview, wykorzystując istniejące `NewsroomHomeCompositionService` / `NewsroomHomePlacementService`. W tym samym obszarze należy domknąć pozostałą część N2-012: loaded-token stale-write guard dla `NewsroomHomeComposer`; nie przechodzimy jeszcze do publicznego N3.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.26
+
+- PR #56 zmergowano na `main@9aa621c083e02e157e72294f5e994ea566e45a9f`; exact-head CI #202: `quality` PASS (997 passed / 19 146 assertions / 2 skipped, Pint 1020 files PASS, frontend build PASS) oraz `newsroom-postgres` PASS,
+- dodano authenticated administrator-only article preview pod prywatnym route; anonymous jest kierowany do auth, a non-admin otrzymuje 403,
+- response wymusza `Cache-Control: private, no-store`, `X-Robots-Tag: noindex, nofollow`, meta robots `noindex,nofollow` i nie ładuje Google Analytics/consent UI,
+- preview renderuje zapisany `body_blocks` przez allowlisted rich-text renderer, pokazuje tylko publicznie cytowalne sources i nie ujawnia private evidence/notatek; moduły zależne od finalnego N3 pozostają jawnie oznaczonymi placeholderami,
+- publiczne detail routes newsroomu/poradników nadal pozostają 404; N2-008 nie materializuje N3,
+- NEWSROOM-N2-008 jest **DONE**; następnym taskiem jest NEWSROOM-N2-009 NewsroomHomeComposer + future preview, wraz z domknięciem HomeComposer części N2-012.
 
 ### 2026-09-16 — v0.25
 

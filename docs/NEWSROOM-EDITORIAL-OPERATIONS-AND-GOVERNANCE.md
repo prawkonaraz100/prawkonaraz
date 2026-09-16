@@ -1132,7 +1132,7 @@ Na 2026-09-16:
 - istnieją model `ContentArticleSource`, source types v1, private-evidence flag i source ordering; N2-004 dodaje ich edycję oraz finalną source-policy validation,
 - draft może istnieć bez source, natomiast news nie przechodzi review/publish bez source; prywatny interview/direct evidence może mieć URL null,
 - ordinary Edit publicznie widocznego artykułu nadal nie zmienia publicznych sources ani article relations/topics przez zwykły Save; jawny `Apply public update` zapisuje aktualnie zmaterializowany public editor payload atomowo z loaded-state guardem,
-- publiczny renderer citation/relations, origin/regulatory UI, preview i HomeComposer nadal nie istnieją; computed publication blocking/warning items są już zmaterializowane w adminie, a N2-012 pozostaje otwarte tylko dla HomeComposer stale-write.
+- publiczny renderer citation/relations, origin/regulatory UI i HomeComposer nadal nie istnieją; N2-008 private Article preview jest zmaterializowany i pokazuje wyłącznie publicznie cytowalne źródła, computed publication blocking/warning items są już w adminie, a N2-012 pozostaje otwarte tylko dla HomeComposer stale-write.
 
 ---
 
@@ -1140,7 +1140,7 @@ Na 2026-09-16:
 
 - [ ] wdrożyć admin-only policies bez rozszerzania panel access i spiąć AuditLog User actor,
 - [x] N2-007: mandatory publish readiness jest współdzielone między checklistą i backend validation; warningi są addytywne i nie osłabiają gate'ów,
-- [ ] N2-008: wdrożyć admin-only private/no-store article preview,
+- [x] N2-008: admin-only private/no-store article preview z noindex,nofollow, bez public analytics i private-source leakage,
 - [ ] wdrożyć origin/regulatory governance w CMS,
 - [ ] wdrożyć homepage placements i future home preview,
 - [ ] wdrożyć topic governance,
@@ -1154,6 +1154,14 @@ Na 2026-09-16:
 ---
 
 ## 49. Historia zmian
+
+### 2026-09-16 — v0.12
+
+- PR #56 zmergowano na `main@9aa621c083e02e157e72294f5e994ea566e45a9f` po exact-head CI #202; `quality` i `newsroom-postgres` PASS,
+- Article preview jest dostępny wyłącznie dla administratora, nie ma shareable signed-token flow i nie jest publicznym kanałem dystrybucji,
+- preview nie ładuje public analytics, wymusza noindex/no-store i nie pokazuje źródeł oznaczonych jako private evidence ani ich notatek,
+- jest to podgląd zapisanej wersji redakcyjnej, nie staging/revision workflow ani dowód ukończenia finalnego public renderera N3,
+- N2-008 jest DONE; kolejnym taskiem jest N2-009 NewsroomHomeComposer + future preview, z zależnym stale-write hardeningiem N2-012.
 
 ### 2026-09-16 — v0.11
 
