@@ -1127,12 +1127,12 @@ Proces jest gotowy, gdy:
 Na 2026-09-16:
 
 - istnieją `ContentAuthor` i istniejący `AuditLog`; `User` pozostaje aktorem operacji, a `ContentAuthor` publiczną tożsamością autora/reviewera,
-- backendowy `ContentArticlePublishingService` i `newsroom:publish-due` istnieją, ale Filament workflow actions, publication checklist i correction/apply-public-update orchestration nadal nie są wdrożone,
+- backendowy `ContentArticlePublishingService` i `newsroom:publish-due` istnieją; po PR #48 istnieją także Filament workflow/exposure actions na Edit/View, natomiast publication checklist oraz correction/`Apply public update` + stale-write orchestration nadal nie są wdrożone,
 - istnieją `ContentCategoryResource` i `ContentArticleResource`; article CMS ma kontrolowany body Builder/RichEditor, relationship source editor oraz article-owned questions/legal/signs/topics editor,
 - istnieją model `ContentArticleSource`, source types v1, private-evidence flag i source ordering; N2-004 dodaje ich edycję oraz finalną source-policy validation,
 - draft może istnieć bez source, natomiast news nie przechodzi review/publish bez source; prywatny interview/direct evidence może mieć URL null,
 - ordinary Edit publicznie widocznego artykułu nie może zmieniać publicznych sources ani article relations/topics,
-- publiczny renderer citation/relations, origin/regulatory UI, computed publication warnings, preview, HomeComposer i pełny stale-write reject nadal nie istnieją.
+- publiczny renderer citation/relations, origin/regulatory UI, computed publication warnings, preview, HomeComposer oraz `Apply public update` z pełnym stale-write reject nadal nie istnieją.
 
 ---
 
@@ -1145,7 +1145,7 @@ Na 2026-09-16:
 - [ ] wdrożyć topic governance,
 - [ ] wdrożyć focal-point review,
 - [ ] wdrożyć admin-only private/no-store preview,
-- [ ] wdrożyć Filament workflow/schedule actions nad istniejącym backendowym publishing/scheduler foundation,
+- [ ] domknąć N2-006 przez N2-012: atomowy `Apply public update` + loaded-token stale-write rejection; workflow/schedule/exposure actions nad istniejącym publishing foundation są już wdrożone,
 - [ ] wdrożyć corrections,
 - [ ] wdrożyć freshness filters,
 - [ ] przygotować publiczną stronę zasad redakcyjnych przed większym rolloutem.
@@ -1153,6 +1153,15 @@ Na 2026-09-16:
 ---
 
 ## 49. Historia zmian
+
+### 2026-09-16 — v0.9
+
+- PR #48 zmergowano na `main@88533b04d74a839c3bbccf86b707909ccdd235f8`; exact-head CI #176 przeszedł dla `quality` i `newsroom-postgres`,
+- redaktor ma teraz kontrolowane Edit/View actions dla review/schedule/publish/archive/withdraw/restore/republish oraz featured/breaking,
+- withdraw nadal wymaga jawnego reason, restore nie usuwa tombstone przed skutecznym publish, a breaking wymaga published news z przyszłym expiry,
+- exposure changes zapisują allowlisted audit zamiast pełnej treści,
+- ordinary public Save pozostaje zablokowany; `Apply public update` i stale-write guard nadal są otwartym N2-012,
+- governance nie uznaje N2-006 za DONE, dopóki ta zależność nie zostanie zmaterializowana.
 
 ### 2026-09-16 — v0.8
 
