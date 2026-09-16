@@ -549,7 +549,7 @@ Zamknięte przejścia obejmują draft ↔ review, review mark, initial schedule,
 Istotne granice pozostają otwarte:
 - publiczne HTTP `410 Gone` dla withdrawn nadal należy do N3; N1-004 ustanawia stan/tombstone, ale nie renderuje HTTP,
 - `applyPublicUpdate` dla już publicznego artykułu pozostaje N2 orchestration/stale-write scope,
-- scheduler command/registration pozostaje N1-005,
+- scheduler command/registration został wdrożony w N1-005; N1-004 pozostaje domenowym service boundary używanym przez scheduler,
 - cache/sitemap/IndexNow listeners nie są jeszcze podłączone; PR #30 ustanawia wyłącznie bezpieczny after-commit hook.
 
 ### Zakres
@@ -580,6 +580,30 @@ Istotne granice pozostają otwarte:
 ---
 
 ## NEWSROOM-N1-005 — Scheduler
+
+### Status implementacji
+
+**DONE — scheduled initial publish zmergowany przez PR #33 na `main@7157b60b643fa57e38c111a26a42cf70b5715024`.**
+
+Potwierdzony kod:
+
+- `PublishDueNewsroomArticlesCommand` / komenda `newsroom:publish-due`,
+- produkcyjna rejestracja w `routes/console.php` co minutę z `withoutOverlapping()`,
+- delegacja publikacji do `ContentArticlePublishingService` z istniejącym row lockiem i pełną rewalidacją eligibility,
+- deduplikowany AuditLog `content_article.scheduled_publish_failed` + warning log dla due recordów, które przestały spełniać invariants,
+- service-level guard blokujący scheduled republish, gdy `first_published_at` już istnieje,
+- `NewsroomPublishDueCommandTest`.
+
+Aktualne zachowanie:
+
+- query wybiera wyłącznie `workflow_status=scheduled` z `scheduled_for <= now()`,
+- przyszłe rekordy nie są dotykane,
+- valid due article publikuje się raz; powtórny run jest bezpieczny,
+- due-time failure pozostawia artykuł w `scheduled`, jest audytowalny/logowany i nie blokuje kolejnych rekordów,
+- identyczny powtarzający się failure dla tego samego `scheduled_for`/exception nie tworzy nowego AuditLog przy każdym minutowym uruchomieniu,
+- konkurencyjna/powtórna zmiana stanu po pobraniu ID jest traktowana jako skip po refetchu, a finalna mutacja nadal przechodzi przez row lock serwisu,
+- komenda kończy przetwarzanie całego batcha, ale zwraca non-zero, jeśli pozostały faktyczne due failures,
+- reviewer identity pozostaje opcjonalne zgodnie z policy; scheduler rewaliduje istniejący kontrakt publication-ready oraz fresh `reviewed_at`, nie wprowadza nowej mandatory `reviewer_id` policy.
 
 ### Zakres
 
@@ -1887,13 +1911,24 @@ Na 2026-09-16:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N1-005 — Scheduler.
+NEWSROOM-N1-006 — Home composition service.
 
-NEWSROOM-N1-001, NEWSROOM-N1-002, NEWSROOM-N1-003 i NEWSROOM-N1-004 są zamknięte w zakresie swoich foundation/domain gates. Następny krok wykonawczy to `newsroom:publish-due` dla initial scheduled publish, z idempotency, ponowną walidacją eligibility w due time i izolacją failure jednego rekordu.
+NEWSROOM-N1-001..N1-005 są zamknięte w zakresie swoich foundation/domain gates. Następny krok wykonawczy to deterministyczna kompozycja home: active placements, publication-at-preview-time validation, fallback, global deduplication i context-aware category leads.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.16
+
+- zamknięto NEWSROOM-N1-005 po merge PR #33 na `main@7157b60b643fa57e38c111a26a42cf70b5715024`,
+- dodano `newsroom:publish-due` dla initial scheduled publish oraz produkcyjną rejestrację co minutę z `withoutOverlapping()`,
+- due query ogranicza się do statusu `scheduled` i `scheduled_for <= now()`; publikacja deleguje do `ContentArticlePublishingService`, więc ponownie przechodzi pełny publication/fresh-review contract pod row lockiem,
+- failure jednego due rekordu nie blokuje kolejnych; rekord pozostaje nieopublikowany, dostaje deduplikowany AuditLog + warning log, a batch zwraca non-zero po zakończeniu, jeśli failures pozostały,
+- concurrent/already-transitioned rekord po refetchu jest idempotentnym skipem,
+- scheduled republish wcześniej publicznego artykułu jest blokowany także w samym publishing service,
+- finalny gate PR #33: `quality` 922 passed / 18 734 assertions / 2 skipped, Pint 985 files, frontend build PASS; `newsroom-postgres` 6 passed / 86 assertions,
+- następnym taskiem wykonawczym jest NEWSROOM-N1-006 Home composition service.
 
 ### 2026-09-16 — v0.15
 

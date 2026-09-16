@@ -1454,12 +1454,13 @@ Na moment utworzenia dokumentu za ukończone uznajemy wyłącznie elementy rzecz
 - NEWSROOM-N1-002: 6 modeli Eloquent newsroomu, factories, relacje/reverse relations oraz domenowe scopes/predicates zweryfikowane na SQLite i PostgreSQL,
 - NEWSROOM-N1-003: `ContentArticleSlugService`, `ContentArticleRedirect`, `ContentArticlePathResolver` i PostgreSQL advisory-lock serialization dla canonical/history paths,
 - NEWSROOM-N1-004: `ContentArticlePublishingService` + after-commit `ContentArticleWorkflowTransitioned` dla audytowanych workflow/public-state transitions,
+- NEWSROOM-N1-005: `newsroom:publish-due` + produkcyjny every-minute scheduler, due-time revalidation, idempotent skip/failure isolation i scheduled-republish guard,
 - routes `/aktualnosci` i `/poradniki` jako dedykowane pre-launch 200/noindex placeholders,
 - placeholdery tych tras,
 - publiczna nawigacja prowadząca do aktualności,
 - istniejące klastry pytań, znaków i przepisów, które mogą zostać powiązane z artykułami.
 
-**Newsroom ma już zmaterializowane N1-001..N1-004: schema/enumy, warstwa Eloquent, canonical slug/history/path-resolution oraz publishing/workflow service istnieją. Nadal nie uznajemy pełnej domeny/CMS/public content za wdrożone: scheduler i composition services, N2 article editor/media UI/Apply public update oraz N3 renderer/HTTP 301/410 jeszcze nie istnieją.**
+**Newsroom ma już zmaterializowane N1-001..N1-005: schema/enumy, warstwa Eloquent, canonical slug/history/path-resolution, publishing/workflow service oraz scheduler initial publish istnieją. Nadal nie uznajemy pełnej domeny/CMS/public content za wdrożone: home composition service, N2 article editor/media UI/Apply public update oraz N3 renderer/HTTP 301/410 jeszcze nie istnieją.**
 
 ---
 
@@ -1477,7 +1478,8 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N1-002` — models + factories + relations/scopes + SQLite/PostgreSQL model contract,
 - [x] `NEWSROOM-N1-003` — slug/history service + one-hop redirects + route-family resolver + PostgreSQL concurrency,
 - [x] `NEWSROOM-N1-004` — publishing/workflow service + AuditLog/after-commit boundary,
-- [ ] kontynuować N1 zgodnie z backlogiem; następny task: `NEWSROOM-N1-005` scheduler.
+- [x] `NEWSROOM-N1-005` — due scheduler + revalidation/failure isolation/idempotency,
+- [ ] kontynuować N1 zgodnie z backlogiem; następny task: `NEWSROOM-N1-006` Home composition service.
 
 Pozostałe elementy N2–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu checklistę.
 
@@ -1504,6 +1506,17 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-16 — v0.16
+
+- wdrożono i zmergowano NEWSROOM-N1-005 po zielonych jobach `quality` i `newsroom-postgres`,
+- `newsroom:publish-due` publikuje tylko due initial-scheduled records przez istniejący publishing service i pełną due-time rewalidację,
+- invalid due record pozostaje `scheduled`; failure jest deduplikowanie audytowany/logowany i nie blokuje kolejnych rekordów,
+- row lock serwisu oraz refetch/skip utrzymują idempotency przy powtórnym lub konkurencyjnym przetwarzaniu,
+- production scheduler uruchamia komendę co minutę z `withoutOverlapping()`; distributed single-server guarantee nie jest deklarowany,
+- scheduled republish z istniejącym `first_published_at` jest blokowany,
+- finalny gate: quality 922 passed / 18 734 assertions / 2 skipped, Pint 985 files, frontend build PASS; newsroom-postgres 6 passed / 86 assertions,
+- następnym taskiem wykonawczym jest NEWSROOM-N1-006 Home composition service.
 
 ### 2026-09-16 — v0.15
 
