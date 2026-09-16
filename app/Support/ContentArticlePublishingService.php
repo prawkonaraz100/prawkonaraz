@@ -148,8 +148,9 @@ final class ContentArticlePublishingService
     public function publish(
         ContentArticle $article,
         ?User $actor = null,
-        string $trigger = 'user',
+        ?string $trigger = null,
     ): ContentArticle {
+        $trigger ??= $this->triggerForActor($actor);
         $this->assertTrigger($trigger);
 
         return DB::transaction(function () use ($article, $actor, $trigger): ContentArticle {
@@ -179,6 +180,7 @@ final class ContentArticlePublishingService
         return DB::transaction(function () use ($article, $actor): ContentArticle {
             $locked = $this->lockArticle($article);
             $this->assertStatus($locked, [ContentArticleWorkflowStatus::Published], 'mark needs review');
+            $this->assertPreviouslyPublished($locked);
 
             $from = $locked->workflow_status;
             $at = now();
@@ -210,6 +212,7 @@ final class ContentArticlePublishingService
         return DB::transaction(function () use ($article, $actor): ContentArticle {
             $locked = $this->lockArticle($article);
             $this->assertStatus($locked, [ContentArticleWorkflowStatus::Published], 'archive');
+            $this->assertPreviouslyPublished($locked);
 
             $from = $locked->workflow_status;
             $at = now();
@@ -241,10 +244,16 @@ final class ContentArticlePublishingService
         return DB::transaction(function () use ($article, $actor): ContentArticle {
             $locked = $this->lockArticle($article);
             $this->assertStatus($locked, [ContentArticleWorkflowStatus::Archived], 'republish');
+            $this->assertPreviouslyPublished($locked);
             $this->assertPublicationReady($locked);
             $this->assertFreshReview($locked);
 
-            return $this->publishLocked($locked, $actor, 'user', 'content_article.republished');
+            return $this->publishLocked(
+                $locked,
+                $actor,
+                $this->triggerForActor($actor),
+                'content_article.republished',
+            );
         });
     }
 
@@ -266,6 +275,7 @@ final class ContentArticlePublishingService
                 ContentArticleWorkflowStatus::NeedsReview,
                 ContentArticleWorkflowStatus::Archived,
             ], 'withdraw');
+            $this->assertPreviouslyPublished($locked);
 
             $from = $locked->workflow_status;
             $at = now();
@@ -299,6 +309,7 @@ final class ContentArticlePublishingService
         return DB::transaction(function () use ($article, $actor): ContentArticle {
             $locked = $this->lockArticle($article);
             $this->assertStatus($locked, [ContentArticleWorkflowStatus::Withdrawn], 'restore to review');
+            $this->assertPreviouslyPublished($locked);
 
             $from = $locked->workflow_status;
             $locked->workflow_status = ContentArticleWorkflowStatus::InReview;
@@ -426,7 +437,12 @@ final class ContentArticlePublishingService
         }
 
         if (filled($article->og_image_path)) {
-            $this->assertRequiredText($article->og_image_alt, 'og_image_alt');
+            $canInheritHeroAlt = filled($article->hero_image_alt)
+                && $article->og_image_path === $article->hero_image_path;
+
+            if (! filled($article->og_image_alt) && ! $canInheritHeroAlt) {
+                throw new DomainException('OG image requires its own alt unless it reuses the hero asset.');
+            }
 
             if ((int) $article->og_image_width < 1 || (int) $article->og_image_height < 1) {
                 throw new DomainException('OG image requires positive width and height.');
@@ -434,6 +450,13 @@ final class ContentArticlePublishingService
         }
 
         $this->assertBreakingInvariant($article);
+    }
+
+    private function assertPreviouslyPublished(ContentArticle $article): void
+    {
+        if ($article->first_published_at === null) {
+            throw new DomainException('Content article transition requires a previously published article.');
+        }
     }
 
     private function assertFreshReview(ContentArticle $article): void
