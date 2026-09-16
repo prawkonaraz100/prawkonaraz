@@ -33,7 +33,7 @@ class NewsroomHomeComposer extends Page
      *     ends_at: ?string
      * }>
      */
-    public array $slots = [];
+    public array $placementState = [];
 
     /** @var array<string, string> */
     public array $searches = [];
@@ -97,24 +97,24 @@ class NewsroomHomeComposer extends Page
             return;
         }
 
-        $this->slots[$slotId]['article_id'] = (int) $article->getKey();
+        $this->placementState[$slotId]['article_id'] = (int) $article->getKey();
         $this->searches[$slotId] = (string) $article->title;
     }
 
     public function clearSelection(string $slotId): void
     {
-        if (! isset($this->slots[$slotId])) {
+        if (! isset($this->placementState[$slotId])) {
             return;
         }
 
-        $this->slots[$slotId]['article_id'] = null;
+        $this->placementState[$slotId]['article_id'] = null;
         $this->searches[$slotId] = '';
     }
 
     public function saveSlot(string $slotId): void
     {
         $definition = $this->slotDefinitionMap()[$slotId] ?? null;
-        $state = $this->slots[$slotId] ?? null;
+        $state = $this->placementState[$slotId] ?? null;
 
         if ($definition === null || $state === null) {
             return;
@@ -180,7 +180,7 @@ class NewsroomHomeComposer extends Page
 
     public function removePlacement(string $slotId): void
     {
-        $state = $this->slots[$slotId] ?? null;
+        $state = $this->placementState[$slotId] ?? null;
 
         if ($state === null || ! $state['placement_id']) {
             return;
@@ -230,7 +230,7 @@ class NewsroomHomeComposer extends Page
         $definitions = $this->slotDefinitions();
         $previewAt = $this->previewTime();
 
-        $selectedIds = collect($this->slots)
+        $selectedIds = collect($this->placementState)
             ->pluck('article_id')
             ->filter(fn (mixed $id): bool => (int) $id > 0)
             ->map(fn (mixed $id): int => (int) $id)
@@ -258,7 +258,7 @@ class NewsroomHomeComposer extends Page
 
         foreach ($definitions as $definition) {
             $slotId = $definition['id'];
-            $state = $this->slots[$slotId] ?? [
+            $state = $this->placementState[$slotId] ?? [
                 'placement_id' => null,
                 'edit_token' => null,
                 'article_id' => null,
@@ -324,7 +324,7 @@ class NewsroomHomeComposer extends Page
             ];
         }
 
-        $this->slots = $state;
+        $this->placementState = $state;
         $this->searches = [];
     }
 
