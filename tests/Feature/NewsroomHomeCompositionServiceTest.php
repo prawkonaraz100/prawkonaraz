@@ -382,3 +382,45 @@ test('breaking strip may intentionally repeat the lead article', function () {
     expect($composition['lead']?->id)->toBe($breaking->id)
         ->and($composition['breaking']?->id)->toBe($breaking->id);
 });
+
+
+test('composer can expose deterministic fallback without manual placements for admin UI', function () {
+    Carbon::setTestNow('2026-09-16 09:00:00');
+
+    $category = ContentCategory::factory()->create();
+
+    $manual = ContentArticle::factory()->published()->create([
+        'category_id' => $category->id,
+        'editorial_priority' => -50,
+    ]);
+
+    $fallback = ContentArticle::factory()->published()->featured()->create([
+        'category_id' => $category->id,
+        'editorial_priority' => 100,
+    ]);
+
+    ContentHomePlacement::factory()->create([
+        'slot_key' => ContentHomePlacement::SLOT_LEAD,
+        'article_id' => $manual->id,
+    ]);
+
+    $withManual = newsroomHomeComposer()->compose(
+        secondaryLimit: 0,
+        latestLimit: 0,
+        categoryItemsLimit: 0,
+        guidesItemsLimit: 0,
+        importantNowLimit: 0,
+    );
+
+    $withoutManual = newsroomHomeComposer()->compose(
+        secondaryLimit: 0,
+        latestLimit: 0,
+        categoryItemsLimit: 0,
+        guidesItemsLimit: 0,
+        importantNowLimit: 0,
+        includeManualPlacements: false,
+    );
+
+    expect($withManual['lead']?->id)->toBe($manual->id)
+        ->and($withoutManual['lead']?->id)->toBe($fallback->id);
+});
