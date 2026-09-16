@@ -1,8 +1,10 @@
 <?php
 
+use App\Models\AuditLog;
 use App\Models\ContentArticle;
 use App\Models\ContentCategory;
 use App\Models\ContentHomePlacement;
+use App\Models\User;
 use App\Support\NewsroomHomePlacementService;
 use Illuminate\Support\Carbon;
 
@@ -180,4 +182,81 @@ test('placement writer rejects invalid intervals unknown contexts and unsupporte
             'slot_key' => ContentHomePlacement::SLOT_LEAD,
             'article_id' => $article->id,
         ]))->toThrow(InvalidArgumentException::class);
+});
+
+
+test('placement writer rejects stale same-second update before overwriting concurrent state', function () {
+    Carbon::setTestNow('2026-09-16 18:00:00');
+
+    $first = ContentArticle::factory()->published()->create();
+    $second = ContentArticle::factory()->published()->create();
+    $third = ContentArticle::factory()->published()->create();
+    $service = newsroomHomePlacementWriter();
+
+    $placement = $service->create([
+        'slot_key' => ContentHomePlacement::SLOT_LEAD,
+        'article_id' => $first->id,
+    ]);
+
+    $loadedToken = $service->editToken($placement);
+
+    ContentHomePlacement::query()
+        ->whereKey($placement->id)
+        ->update([
+            'article_id' => $second->id,
+            'updated_at' => $placement->updated_at,
+        ]);
+
+    expect(fn () => $service->update(
+        $placement,
+        [
+            'article_id' => $third->id,
+        ],
+        $loadedToken,
+    ))->toThrow(DomainException::class, 'changed concurrently');
+
+    expect($placement->fresh()->article_id)->toBe($second->id);
+});
+
+test('placement delete uses stale token guard and audit user actor', function () {
+    $admin = User::factory()->admin()->create();
+    $article = ContentArticle::factory()->published()->create();
+    $service = newsroomHomePlacementWriter();
+
+    $placement = $service->create([
+        'slot_key' => ContentHomePlacement::SLOT_IMPORTANT_NOW,
+        'position' => 0,
+        'article_id' => $article->id,
+    ], $admin);
+
+    $loadedToken = $service->editToken($placement);
+
+    expect(AuditLog::query()
+        ->where('action', 'content_home_placement.created')
+        ->where('entity_id', (string) $placement->id)
+        ->where('actor_user_id', $admin->id)
+        ->exists())->toBeTrue();
+
+    $placement->forceFill([
+        'ends_at' => now()->addHour(),
+    ])->save();
+
+    expect(fn () => $service->delete(
+        $placement,
+        $loadedToken,
+        $admin,
+    ))->toThrow(DomainException::class, 'changed concurrently');
+
+    $fresh = $placement->fresh();
+    expect($fresh)->not->toBeNull();
+
+    $freshToken = $service->editToken($fresh);
+    $service->delete($fresh, $freshToken, $admin);
+
+    expect(ContentHomePlacement::query()->whereKey($placement->id)->exists())->toBeFalse()
+        ->and(AuditLog::query()
+            ->where('action', 'content_home_placement.deleted')
+            ->where('entity_id', (string) $placement->id)
+            ->where('actor_user_id', $admin->id)
+            ->exists())->toBeTrue();
 });
