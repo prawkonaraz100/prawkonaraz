@@ -248,7 +248,7 @@ Nie publikować:
 
 Repo ma równolegle statyczny `public/robots.txt` i route `RobotsController`. Zgodnie z `SEO-SITEMAP-REPAIR-PLAN.md` produkcyjnie preferowany jest statyczny plik oraz jawna weryfikacja Nginx/Cloudflare.
 
-Globalny `NEWSROOM_PUBLIC_ENABLED=false` musi wyłączyć newsroomowe URL-e nie tylko w controllers, ale też w sitemap/feed/IndexNow/author-publications/reverse-link discovery. Dark deploy nie może publikować linków do nowych detail routes. Potwierdzony istniejący wyjątek: `/aktualnosci` i `/poradniki` są już linkowanymi MarketingPlaceholder pages i obecny komponent emituje tylko title, bez jawnego noindex. Newsroom rollout ma dla tych dwóch route'ów dodać pre-launch `noindex`/placeholder containment zamiast pozostawiać indeksowalne thin pages. Nie zmieniamy globalnie wszystkich MarketingPlaceholder routes bez osobnego audytu.
+Globalny `NEWSROOM_PUBLIC_ENABLED=false` musi wyłączyć newsroomowe URL-e nie tylko w controllers, ale też w sitemap/feed/IndexNow/author-publications/reverse-link discovery. Dark deploy nie może publikować linków do nowych detail routes. Potwierdzony stan po N0-002: `/aktualnosci` i `/poradniki` pozostają linkowanymi pre-launch placeholder pages, ale dedykowany `NewsroomPlaceholderController` ustawia dla nich `X-Robots-Tag: noindex, follow`; shared MarketingPlaceholder innych routes nie został globalnie zmieniony. Sam `NEWSROOM_PUBLIC_ENABLED` nadal jest zadaniem N3-008, więc obecny pre-launch noindex nie jest jeszcze sterowany tym flagem.
 
 Ta flaga jest przede wszystkim **pre-launch/dark-deploy gate**. Po pierwszym publicznym rollout nie używamy długotrwale `false` jako technicznego rollbacku dla już indeksowanych article URLs, jeśli skutkiem byłyby masowe 404. Dla krótkiej awarii technicznej preferujemy kontrolowane 503/Retry-After lub rollback kodu zachowujący publiczne routes; dla pojedynczej błędnej treści używamy `withdrawn`.
 
@@ -1588,7 +1588,9 @@ Obecnie:
 - newsroom-specific Article schema/news sitemap/feed nie istnieją,
 - newsroom dirty/version refresh coordinator i atomowy child-before-index switch nie istnieją,
 - repo nie gwarantuje async Laravel queue workera (`QUEUE_CONNECTION=sync` w env example), więc newsroom nie może opierać freshness na ShouldQueue,
-- /aktualnosci jest placeholderem.
+- `/aktualnosci` i `/poradniki` są pre-launch placeholderami 200 z `X-Robots-Tag: noindex, follow`,
+- `/aktualnosci/feed.xml` ma zarejestrowany route contract, ale obecnie zwraca 404; feed ani feed discovery nie są jeszcze wdrożone,
+- category/topic/article route namespaces są zarejestrowane, ale pozostają 404 bez publicznych controllerów.
 
 ---
 
@@ -1616,6 +1618,13 @@ Obecnie:
 ---
 
 ## 70. Historia zmian
+
+### 2026-09-16 — v0.8
+
+- zsynchronizowano SEO current state z wdrożonym NEWSROOM-N0-002,
+- pre-launch `/aktualnosci` i `/poradniki` mają jawny crawler-level `X-Robots-Tag: noindex, follow`,
+- odnotowano istniejący route contract `/aktualnosci/feed.xml`, ale feed i discovery pozostają niewdrożone,
+- future article/category/topic routes pozostają 404, więc nie są opisywane jako publiczny corpus.
 
 ### 2026-09-16 — v0.6
 

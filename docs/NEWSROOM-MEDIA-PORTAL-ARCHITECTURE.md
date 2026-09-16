@@ -103,7 +103,7 @@ Na pierwszym etapie nie budujemy:
 
 ## 5. Aktualny stan implementacji
 
-Stan sprawdzony ponownie na `main@37dbfafa2ec491054429d1151d2de16b2470647b` w dniu 2026-09-16.
+Stan sprawdzony ponownie 2026-09-16 względem aktualnego `main` po wdrożeniu NEWSROOM-N0-001 i NEWSROOM-N0-002.
 
 ### 5.1. Elementy już istniejące
 
@@ -135,21 +135,34 @@ Repo ma już istotny fundament:
 - publiczna baza pytań,
 - relacje z podstawami prawnymi,
 - publiczna nawigacja z pozycją „Aktualności”,
-- route `/aktualnosci`,
-- route `/poradniki`,
+- route `/aktualnosci` i `/poradniki` z zachowanymi top-level route names,
+- wykonywalny `NewsroomRouteContract`,
+- zarejestrowane route namespaces feed/category/topic/article zgodne z finalnym kontraktem,
+- przyszłe detail/category/topic/feed routes pozostające 404 do czasu wdrożenia publicznych controllerów,
 - SEO/content roadmap,
 - Filamentowy workflow dla części istniejącego contentu.
 
 ### 5.2. Elementy istniejące tylko jako placeholder
 
-`/aktualnosci` i `/poradniki` obecnie renderują `Public/MarketingPlaceholder.vue`.
+`/aktualnosci` i `/poradniki` nadal renderują `Public/MarketingPlaceholder.vue`, teraz przez dedykowany `NewsroomPlaceholderController`, który ustawia `X-Robots-Tag: noindex, follow`.
+
+Finalne route namespaces są już utrwalone, lecz nie publikują treści:
+
+- `/aktualnosci/feed.xml`,
+- `/aktualnosci/kategoria/{categorySlug}`,
+- `/aktualnosci/temat/{topicSlug}`,
+- `/aktualnosci/{articleSlug}`,
+- `/poradniki/{articleSlug}`
+
+zwracają obecnie 404 do czasu wdrożenia właściwych publicznych controllerów.
 
 To oznacza, że:
 
-- adresy i miejsce w IA już istnieją,
+- adresy, IA i matching/order contract już istnieją,
 - nie istnieje właściwy model publikacji newsroomowej,
 - nie istnieje lista artykułów,
 - nie istnieje widok artykułu informacyjnego,
+- nie istnieje record-level ContentArticle route-family lookup,
 - nie istnieje redakcyjny CMS dla newsów.
 
 ### 5.3. Brakujące elementy
@@ -176,7 +189,7 @@ Przed wdrożeniem schema `NewsArticle` należy uporządkować branding publisher
 
 Historycznie `HomePageController.php` zawierał pozostałości marki „Orły na Drodze”. NEWSROOM-N0-001 usunął ten hardcode: homepage korzysta teraz ze wspólnego kanonicznego site identity PrawkoNaRaz.
 
-Jednocześnie repo już ma właściwy fundament: `config/content.php['organization']`, `SchemaIds` i `SchemaRenderer`. Niespójność polega więc na tym, że homepage omija istniejący source of truth.
+Repo korzysta już ze wspólnego fundamentu `config/content.php['organization']`, `SchemaIds`, `SchemaRenderer` i `SiteIdentitySchema`. Historyczna niespójność homepage została zamknięta przez NEWSROOM-N0-001.
 
 **Gate:** przed uruchomieniem newsroomu `Organization`, `WebSite`, publisher, site name, logo, OG site name i publiczny branding muszą korzystać z jednego istniejącego source of truth oraz stabilnych graph IDs.
 
@@ -1415,12 +1428,13 @@ Na moment utworzenia dokumentu za ukończone uznajemy wyłącznie elementy rzecz
 - homepage oparty o `config/content.php['organization']`, stabilne `/#organization` i `/#website`, bez legacy „Orły na Drodze”,
 - wspólny `og:site_name` oraz Organization logo ImageObject z potwierdzonym baseline 256×256,
 - traffic-sign/public-question/legal-content graph services reużywające wspólnego site identity buildera,
-- routes `/aktualnosci` i `/poradniki`,
+- NEWSROOM-N0-002: `NewsroomRouteContract`, finalne route namespaces, reserved slug policy i route-family transition guard,
+- routes `/aktualnosci` i `/poradniki` jako dedykowane pre-launch 200/noindex placeholders,
 - placeholdery tych tras,
 - publiczna nawigacja prowadząca do aktualności,
 - istniejące klastry pytań, znaków i przepisów, które mogą zostać powiązane z artykułami.
 
-**Nie uznajemy jeszcze właściwego newsroomu (domain/CMS/public content) za zaimplementowany; ukończony jest foundation task NEWSROOM-N0-001.**
+**Nie uznajemy jeszcze właściwego newsroomu (domain/CMS/public content) za zaimplementowany; ukończone są foundation tasks NEWSROOM-N0-001 i NEWSROOM-N0-002.**
 
 ---
 
@@ -1429,7 +1443,7 @@ Na moment utworzenia dokumentu za ukończone uznajemy wyłącznie elementy rzecz
 Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./NEWSROOM-IMPLEMENTATION-BACKLOG.md). Najbliższa kolejność:
 
 - [x] `NEWSROOM-N0-001` — publisher branding source of truth,
-- [ ] `NEWSROOM-N0-002` — test/utrwalenie przyjętego route contract,
+- [x] `NEWSROOM-N0-002` — test/utrwalenie przyjętego route contract,
 - [ ] `NEWSROOM-N0-003` — deterministyczny taxonomy seed contract,
 - [ ] `NEWSROOM-N0-004` — block editor + serialization + sanitization + format-evolution decision,
 - [ ] `NEWSROOM-N0-005` — utrwalić compatibility contract istniejącego SEO delivery,
@@ -1460,6 +1474,15 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-16 — v0.8
+
+- wdrożono i zmergowano NEWSROOM-N0-002 po green CI,
+- utrwalono finalne route namespaces, regex slugów, reserved segments i type -> route family w `NewsroomRouteContract`,
+- pre-launch `/aktualnosci` i `/poradniki` zachowują placeholder UX z `X-Robots-Tag: noindex, follow`,
+- future feed/category/topic/detail routes są zarejestrowane, ale pozostają 404 bez publicznych controllerów,
+- record-level ContentArticle route-family lookup pozostaje zadaniem downstream,
+- poprawiono bieżący opis historycznie zamkniętej niespójności brandingu oraz usunięto przestarzały snapshot SHA z sekcji aktualnego stanu.
 
 ### 2026-09-16 — v0.7
 

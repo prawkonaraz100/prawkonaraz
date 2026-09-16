@@ -6,7 +6,7 @@
 - Obszar: newsroom / media portal
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Bazowy stan repo przy projektowaniu: main@6a38c95ce76ee05997977d614d795ed8513462f1
-- Ostatnia weryfikacja zgodności z kodem: main@37dbfafa2ec491054429d1151d2de16b2470647b (2026-09-16)
+- Ostatnia weryfikacja zgodności z kodem: main@2c6a3a8aaab184179ba86652db981b8c3000a7c7 (2026-09-16)
 - Data: 2026-09-16
 - Zakres: model domenowy, baza danych, invariants, serwisy aplikacyjne, routing domeny i kolejność migracji
 
@@ -1178,6 +1178,21 @@ Resolver canonical path:
 
 Publiczny lookup musi dodatkowo sprawdzić, czy rekord należy do route family obsługiwanej przez dany controller. Ten sam rekord nie może odpowiadać 200 pod oboma adresami.
 
+### 29.3. Aktualny stan implementacji route contract
+
+NEWSROOM-N0-002 jest wdrożone na `main`.
+
+Kod zawiera:
+
+- `NewsroomRouteContract` jako wykonywalny kontrakt dla regexu slugów, reserved newsroom segments, type -> route family, canonical path i cross-family type transition guard po `first_published_at`,
+- zachowane hub route names `public.news` i `public.guides`,
+- `public.news.feed`, `public.news.categories.show`, `public.news.topics.show`, `public.news.show` i `public.guides.show`,
+- routing namespace/catch-all w kolejności zgodnej z tym dokumentem,
+- `/aktualnosci` i `/poradniki` jako nadal działające placeholdery 200 z `X-Robots-Tag: noindex, follow`,
+- przyszłe feed/category/topic/detail routes jako jawne 404 do czasu wdrożenia odpowiadających controllerów.
+
+Nie istnieją jeszcze `ContentArticle` ani publiczne article/category/topic/feed controllery. Z tego powodu record-level family lookup guard pozostaje obowiązkiem downstream N3 i nie jest opisany jako wdrożony.
+
 ---
 
 ## 30. Migracje — kolejność
@@ -1535,15 +1550,18 @@ Model danych jest gotowy, gdy:
 
 ## 43. Stan implementacji
 
-Na moment utworzenia dokumentu:
+Na 2026-09-16:
 
 - ContentAuthor istnieje,
 - legal trust layer istnieje,
 - traffic signs workflow istnieje,
+- NEWSROOM-N0-002 route contract jest wdrożony i przetestowany,
+- `/aktualnosci` i `/poradniki` pozostają placeholderami 200 z dedykowanym noindex header,
+- przyszłe detail/category/topic/feed routes są zarejestrowane, lecz zwracają 404 do czasu publicznej implementacji,
 - newsroom tables nie istnieją,
 - ContentArticle nie istnieje,
-- newsroom CMS nie istnieje,
-- route /aktualnosci jest placeholderem.
+- record-level route-family lookup guard nie jest jeszcze podłączony do modelu/controllerów,
+- newsroom CMS nie istnieje.
 
 ---
 
@@ -1562,11 +1580,21 @@ Na moment utworzenia dokumentu:
 - [ ] wdrożyć publishing service,
 - [ ] wdrożyć scheduling,
 - [ ] wdrożyć slug redirects,
+- [ ] podłączyć `NewsroomRouteContract` do publicznego ContentArticle lookupu i zweryfikować route-family exclusivity na realnych rekordach,
 - [ ] zaktualizować DATABASE-SCHEMA.md po faktycznej implementacji.
 
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.6
+
+- wdrożono N0-002 jako wykonywalny route contract zgodny z §29,
+- zarejestrowano finalne named route namespaces i zabezpieczono kolejność feed/category/topic przed article catch-all,
+- utrwalono `[a-z0-9-]+`, newsroom reserved segments `kategoria`/`temat` oraz type -> route family resolver,
+- dodano post-publication cross-family type transition guard,
+- zachowano pre-launch hub placeholders jako 200/noindex, podczas gdy przyszłe szczegółowe routes pozostają 404,
+- record-level family lookup pozostawiono jawnie otwarty do momentu istnienia `ContentArticle` i publicznych controllerów.
 
 ### 2026-09-16 — v0.5
 
