@@ -97,6 +97,37 @@ class ContentArticleFactory extends Factory
         ];
     }
 
+    public function draft(): static
+    {
+        return $this->state(fn (): array => [
+            'workflow_status' => ContentArticleWorkflowStatus::Draft->value,
+            'published_at' => null,
+            'first_published_at' => null,
+            'scheduled_for' => null,
+            'reviewed_at' => null,
+            'needs_review_at' => null,
+            'archived_at' => null,
+            'withdrawn_at' => null,
+            'withdrawal_reason' => null,
+        ]);
+    }
+
+    public function inReview(): static
+    {
+        return $this->state(fn (): array => [
+            'author_id' => ContentAuthor::factory()->published(),
+            'workflow_status' => ContentArticleWorkflowStatus::InReview->value,
+            'published_at' => null,
+            'first_published_at' => null,
+            'scheduled_for' => null,
+            'reviewed_at' => null,
+            'needs_review_at' => null,
+            'archived_at' => null,
+            'withdrawn_at' => null,
+            'withdrawal_reason' => null,
+        ]);
+    }
+
     public function published(): static
     {
         $publishedAt = now()->subHour();
