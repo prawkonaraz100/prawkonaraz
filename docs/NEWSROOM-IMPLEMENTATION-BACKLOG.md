@@ -851,7 +851,7 @@ Implementacja obejmuje warstwę domenową/read-model kompozycji oraz transakcyjn
 
 ### Status implementacji
 
-**PARTIAL — workflow/exposure action slice zmergowano przez PR #48 na `main@88533b04d74a839c3bbccf86b707909ccdd235f8` po zielonym exact-head CI #176. Pełny DoD pozostaje otwarty do NEWSROOM-N2-012, ponieważ `Apply public update` + loaded-token stale-write rejection nie są jeszcze wdrożone.**
+**DONE — workflow/exposure action slice z PR #48 został domknięty przez stale-safe `Apply public update` dla `ContentArticle` w PR #50, zmergowanym na `main@570f884a89869ec44d24f57f0506f4444d20a7d2` po zielonym exact-head CI #190. Publiczne pola nadal nie mają low-level Save; jedyną ścieżką zmiany już publicznego payloadu jest kontrolowany use case `Apply public update`.**
 
 ### Aktualny stan implementacji
 
@@ -860,9 +860,11 @@ Implementacja obejmuje warstwę domenową/read-model kompozycji oraz transakcyjn
 - exposure actions obejmują featured + `editorial_priority`, unfeature, breaking z wymaganym przyszłym expiry oraz clear breaking,
 - `setFeatured()`, `enableBreaking()` i `clearBreaking()` działają w istniejącym transaction/row-lock boundary i zapisują allowlisted AuditLog z `User` actorem bez body/private notes,
 - featured można włączyć tylko dla scheduled/published; breaking tylko dla published news z przyszłym expiry,
-- ordinary Edit `publiclyVisible()` nadal nie zapisuje publicznych pól; ten PR nie otwiera low-level public Save,
-- `Apply public update` pozostaje N2-012: musi atomowo walidować/zapisywać pełny public payload i odrzucać stale loaded token,
-- exact-head PR #48: CI #176 PASS; joby `quality` i `newsroom-postgres` PASS.
+- ordinary Edit `publiclyVisible()` nadal nie zapisuje publicznych pól przez zwykły Save; wewnętrzna `editorial_note` pozostaje osobnym zapisem,
+- `Apply public update` jest jawnie uruchamianym trybem dla już publicznego artykułu i deleguje atomowy zapis aktualnie zmaterializowanego public editor payloadu do `ContentArticlePublishingService`,
+- stale-write guard używa deterministycznego równoważnego tokenu obejmującego rekord, sources oraz article-owned relations/topics; konflikt jest odrzucany przed mutacją, również przy zmianie child state w tej samej sekundzie,
+- substantive public change aktualizuje `last_substantive_update_at`, no-op public save nie zmienia tej daty, a AuditLog zapisuje `User` actor i allowlisted metadata bez body/lead/private notes,
+- finalny gate domykający N2-006: PR #50 -> `main@570f884a89869ec44d24f57f0506f4444d20a7d2`; exact-head CI #190 PASS (`quality`: 987 passed / 19 088 assertions / 2 skipped, Pint 1015 files PASS, frontend build PASS; `newsroom-postgres` PASS).
 
 ### Zakres
 
@@ -983,6 +985,20 @@ Computed blocking/warning items.
 ---
 
 ## NEWSROOM-N2-012 — Admin stale-write + audit identity hardening
+
+### Status implementacji
+
+**PARTIAL — `ContentArticle` stale-write/public-update slice jest wdrożony i zmergowany przez PR #50 na `main@570f884a89869ec44d24f57f0506f4444d20a7d2` po exact-head CI #190. Task pozostaje otwarty wyłącznie dla analogicznego loaded-token stale-write guard w `NewsroomHomeComposer`, którego UI należy do NEWSROOM-N2-009 i nie istnieje jeszcze.**
+
+### Aktualny stan implementacji
+
+- Edit zapisuje deterministyczny `_edit_token` zamiast polegać wyłącznie na `updated_at`; token obejmuje raw article state, sources oraz article-owned questions/legal/signs/topics i wykrywa także same-second child mutations,
+- draft/internal Save oraz `Apply public update` sprawdzają token pod row lockiem przed jakąkolwiek ręczną synchronizacją sources/relations; konflikt kończy się czytelnym rejectem bez last-write-wins,
+- `Apply public update` zapisuje w jednej transakcji aktualnie zmaterializowany public editor payload, uruchamia pełną service validation i rollbackuje article + child mutations przy błędzie,
+- `last_substantive_update_at` zmienia się tylko przy semantycznej publicznej zmianie,
+- `content_article.public_updated` używa `User` actor i allowlisted metadata; nie zapisuje `body_blocks`, `lead`, `editorial_note` ani source private note,
+- nie dodano `published_by` ani `reviewed_by`; `ContentAuthor` pozostaje publiczną tożsamością author/reviewer,
+- pozostały zakres: analogiczny stale-write guard dla `NewsroomHomeComposer` po materializacji N2-009.
 
 ### Zakres
 
@@ -1767,9 +1783,9 @@ Docs-only:
 - [ ] article preview
 - [ ] home composer + future preview
 - [ ] checklist
-- [ ] workflow — transition/exposure actions są wdrożone, ale pełny N2-006 DoD czeka na N2-012 `Apply public update` + stale-write
+- [x] workflow — transition/exposure actions + stale-safe `Apply public update` dla publicznego `ContentArticle`
 - [x] admin-only authorization bez rozszerzenia panel access
-- [ ] stale-write rejection
+- [ ] stale-write rejection — `ContentArticle` DONE; `NewsroomHomeComposer` pozostaje po N2-009
 - [x] AuditLog User actor / ContentAuthor identity separation
 
 ### Public
@@ -2011,7 +2027,7 @@ Nie oznaczać tasku DONE przed merge + green verification.
 Na 2026-09-16:
 
 - pakiet projektowy newsroomu obejmuje architekturę, model danych, CMS, UI, governance, SEO, backlog i runbook,
-- foundation N0 oraz pełny etap N1-001..N1-006 są wdrożone; N2 ma już `ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor dla `body_blocks`, source relationship editor, article-owned relations/topics editor oraz workflow/exposure action slice z N2-006; `ContentTopicResource`, media/origin-regulatory UI, `Apply public update` + stale-write, checklist/preview/HomeComposer oraz publiczny newsroom nadal nie są wdrożone,
+- foundation N0 oraz pełny etap N1-001..N1-006 są wdrożone; N2 ma już `ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor dla `body_blocks`, source relationship editor, article-owned relations/topics editor, pełne N2-006 workflow actions oraz stale-safe `Apply public update` dla `ContentArticle`; `ContentTopicResource`, media/origin-regulatory UI, publication checklist, preview/HomeComposer, HomeComposer stale-write oraz publiczny newsroom nadal nie są wdrożone,
 - `/aktualnosci` i `/poradniki` nadal renderują pre-launch placeholder, teraz z dedykowanym `X-Robots-Tag: noindex, follow`; finalne detail/category/topic/feed route namespaces są zarejestrowane, ale pozostają 404 bez publicznych controllerów,
 - fundamenty ContentAuthor/legal/traffic signs/public SEO istnieją,
 - istnieją config/content.php organization, SchemaIds/SchemaRenderer oraz współdzielony SiteIdentitySchema; homepage i istniejące główne publiczne graph services korzystają z kanonicznego Organization/WebSite identity,
@@ -2026,13 +2042,22 @@ Na 2026-09-16:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N2-012 — Admin stale-write + audit identity hardening, jako bezpośrednia zależność potrzebna do domknięcia NEWSROOM-N2-006.
+NEWSROOM-N2-007 — Publication checklist.
 
-Workflow/exposure action slice N2-006 jest już na `main@88533b04d74a839c3bbccf86b707909ccdd235f8` po PR #48: Edit/View delegują transition/exposure actions do `ContentArticlePublishingService`, a featured/breaking mają audytowany service boundary. N2-006 pozostaje jednak celowo **PARTIAL**, dopóki N2-012 nie dostarczy atomowego `Apply public update` z loaded-token stale-write rejection.
+N2-006 jest zamknięte po PR #50. N2-012 pozostaje **PARTIAL** tylko dla `NewsroomHomeComposer` stale-write, a ta część zależy od późniejszej materializacji N2-009. Najbliższym niezależnym i wykonywalnym krokiem jest więc N2-007: computed blocking/warning items w adminie, przy zachowaniu `ContentArticlePublishingService` jako autorytatywnego backend gate bez duplikowania reguł publikacyjnych w Filament.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-16 — v0.24
+
+- zmergowano PR #50 na `main@570f884a89869ec44d24f57f0506f4444d20a7d2`; exact-head CI #190: `quality` PASS (987 passed / 19 088 assertions / 2 skipped, Pint 1015 files PASS, frontend build PASS) oraz `newsroom-postgres` PASS,
+- dodano deterministyczny `ContentArticleEditToken`, który obejmuje article + sources + article-owned relations/topics i nie zależy wyłącznie od sekundowej precyzji `updated_at`,
+- ordinary draft/internal Save oraz public `Apply public update` odrzucają stale loaded state przed child sync; same-second source mutation ma test regresyjny i nie może zostać nadpisana,
+- `Apply public update` zapisuje atomowo aktualnie zmaterializowany public editor payload, rollbackuje przy failed validation, aktualizuje `last_substantive_update_at` tylko dla semantycznej zmiany i audytuje przez `User` bez body/private notes,
+- NEWSROOM-N2-006 jest teraz **DONE**; NEWSROOM-N2-012 pozostaje **PARTIAL** tylko dla analogicznego stale-write guard w przyszłym `NewsroomHomeComposer` z N2-009,
+- pierwszym kolejnym taskiem wykonawczym jest NEWSROOM-N2-007 Publication checklist.
 
 ### 2026-09-16 — v0.23
 
