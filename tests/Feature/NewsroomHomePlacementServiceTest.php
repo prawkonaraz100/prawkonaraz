@@ -184,7 +184,6 @@ test('placement writer rejects invalid intervals unknown contexts and unsupporte
         ]))->toThrow(InvalidArgumentException::class);
 });
 
-
 test('placement writer rejects stale same-second update before overwriting concurrent state', function () {
     Carbon::setTestNow('2026-09-16 18:00:00');
 
