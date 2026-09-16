@@ -103,7 +103,7 @@ Na pierwszym etapie nie budujemy:
 
 ## 5. Aktualny stan implementacji
 
-Stan sprawdzony ponownie na `main@4b8a48537ec8973d90c268650994eee46d1841cc` w dniu 2026-09-16.
+Stan sprawdzony ponownie na `main@37dbfafa2ec491054429d1151d2de16b2470647b` w dniu 2026-09-16.
 
 ### 5.1. Elementy już istniejące
 
@@ -380,7 +380,7 @@ Newsroom:
 
 Nagłówki cache/ETag/Last-Modified/304 dla statycznych sitemap są kontraktem warstwy Nginx/CDN/static delivery. Nie zakładamy, że zmiana tylko w Laravel controller wpłynie na produkcyjny artefakt.
 
-Publikacja newsroomu nie może blokować requestu pełnym generowaniem sitemap. Po commit wysyłany jest debounced/asynchroniczny refresh statycznych artefaktów; istniejący daily refresh pozostaje safety netem.
+Publikacja newsroomu nie może blokować requestu pełnym generowaniem sitemap. Po commit zapisywany jest tani dirty/version signal we współdzielonym store; częsty scheduler z distributed lockiem coalescuje zmiany i odświeża statyczne artefakty poza requestem. Nie zakładamy asynchronicznego Laravel queue workera; istniejący daily refresh pozostaje niezależnym safety netem.
 
 ### DEC-NR-016 — route family jest stabilne po pierwszej publikacji
 
@@ -543,13 +543,12 @@ type
 category_id
 author_id
 reviewer_id nullable
-created_by_user_id nullable
-updated_by_user_id nullable
 
 title
 slug
 lead
 body_blocks
+body_schema_version
 key_points nullable
 
 workflow_status
@@ -574,9 +573,13 @@ published_at nullable
 first_published_at nullable
 reviewed_at nullable
 needs_review_at nullable
+archived_at nullable
+withdrawn_at nullable
+withdrawal_reason nullable
 source_checked_at nullable
 freshness_review_due_at nullable
 last_substantive_update_at nullable
+public_state_changed_at nullable
 
 created_at
 updated_at
@@ -631,7 +634,10 @@ z polami m.in.:
 - `url`,
 - `published_at`,
 - `accessed_at`,
-- `is_primary`.
+- `is_primary`,
+- `is_official`,
+- `is_publicly_cited`,
+- wewnętrzne `note`.
 
 To pozwala budować kontrolowany system aktualizacji i weryfikacji.
 
@@ -1021,7 +1027,9 @@ Każdy hero:
 - publiczny SEO image URL jest stabilny, crawlable i nie wymaga auth/signed expiry,
 - może otrzymać deterministyczne cropy do lead/standard/compact,
 - nie powoduje CLS,
-- jest dostarczany przez istniejący media layer.
+- publiczny URL jest rozwiązywany przez istniejący `MediaUrlResolver`/media config,
+- upload newsroomu ma własny adapter/service lub jawny Filament upload contract; obecny `AdminMediaUploadService` jest question-specific i nie jest genericznym uploaderem newsroomu,
+- nie deklaruje fizycznych crop variants, których system realnie nie wygenerował.
 
 ### 17.2. Prawa do materiałów
 
@@ -1141,7 +1149,7 @@ Aktualny `SitemapController` nie ma tej warstwy; jest to zaplanowana praca, nie 
 
 - publiczne endpointy są read-only,
 - zapis wyłącznie przez autoryzowany backoffice,
-- preview wymaga autoryzacji lub podpisanego, krótkotrwałego URL,
+- preview v1 wymaga istniejącej autoryzacji administratora, jest `private, no-store` i nie używa shareable signed URL; ewentualny przyszły signed preview wymaga osobnego threat modelu,
 - body i embed content muszą być sanityzowane,
 - audytujemy publikację i istotne edycje,
 - uploady przechodzą istniejące zasady mediów,
@@ -1218,9 +1226,11 @@ Szczegółowy tasking i granice PR-ów są kanonicznie utrzymywane w [NEWSROOM-I
 - publisher/Organization branding source of truth,
 - finalny route contract,
 - taxonomy v1,
-- block editor + serialization + sanitization decision.
+- block editor + serialization + sanitization + format-evolution decision,
+- existing SEO delivery compatibility contract,
+- admin identity/authorization contract.
 
-**Exit criteria:** nie ma nierozstrzygniętej decyzji, która zmieniałaby schema, routing albo bezpieczeństwo body.
+**Exit criteria:** wszystkie decyzje wymagane przez konkretny downstream gate są zamknięte. N0 nie jest sztuczną barierą „wszystko albo nic”; szczegółową macierz zależności utrzymuje backlog.
 
 ### Etap N1 — domain + database
 
@@ -1327,7 +1337,7 @@ Newsroom v1 jest ukończony, gdy:
 - publikowany topic/dossier ma własną wartość i nie jest aliasem taga,
 - canonical/meta/schema graph są poprawne i spójne z domenowym site identity,
 - statyczny sitemap pipeline uwzględnia właściwe rekordy, pełne news metadata, deterministic sharding i bezpieczny child-before-index switch,
-- newsroom refresh sitemap działa asynchronicznie/debounced po zmianach publicznego corpus, a istniejący daily refresh pozostaje safety netem,
+- newsroom refresh sitemap jest coalesced/debounced bez założenia o działającym Laravel queue workerze; istniejący daily refresh pozostaje safety netem,
 - rzeczywista warstwa static/Nginx/CDN ma zweryfikowane nagłówki/cache validators bez zakładania, że Laravel controller serwuje produkcyjny XML,
 - feed ma własny poprawny cache/validator contract,
 - author ProfilePage/Person jest reużywany, nie duplikowany,
@@ -1370,6 +1380,16 @@ Newsroom v1 jest ukończony, gdy:
 25. `canonical_url` override nie jest częścią newsroom v1: artykuły są self-canonical zgodnie z route contract.
 26. Po pierwszej publikacji route family artykułu jest stabilne; cross-family type change jest zablokowany w zwykłym CMS.
 27. Produkcyjne sitemap newsroomu są statycznymi artefaktami publikowanymi bez okna index -> brakujący child; controller routes pozostają kompatybilnością, nie drugim source of truth.
+28. V1 nie rozszerza dostępu do Filament: `/admin` pozostaje dostępne wyłącznie dla istniejących administratorów. `User` jest aktorem operacji/audytu, a `ContentAuthor` jest publiczną tożsamością autora/reviewera.
+29. Workflow `archived` oznacza wycofanie z aktywnej dystrybucji, nie automatyczne usunięcie URL. Wcześniej opublikowany artykuł archiwalny pozostaje pod canonical URL jako 200; 301/404/410 wymagają osobnego, jawnego use case.
+30. Side effecty po publikacji nie mogą zależeć od nieistniejącego workera. Przy obecnym `QUEUE_CONNECTION=sync` v1 używa lekkiego dirty/version signal + scheduler/lock do coalesced refreshu albo dopiero po wdrożeniu monitorowanego async transportu może użyć queued job.
+31. Publiczny newsroom ma prosty config gate/feature flag. Do N6 można wdrażać dane, admin i renderer bez przełączania istniejących publicznych placeholderów/indeksacji; włączenie publiczne następuje dopiero po release gate. Gdy gate=false, wyłączone są także article discovery w author pages/reverse links, feed, newsroom sitemap entries i IndexNow — private admin preview pozostaje dostępne.
+32. `archived` oznacza historyczny canonical 200 poza aktywną dystrybucją; osobny `withdrawn` służy do jawnego takedownu i daje 410 bez treści (albo 301 przy realnym następcy).
+33. Historyczny publiczny article path jest trwałą rezerwacją względem innych artykułów; current slug uniqueness nie wystarcza bez sprawdzenia redirect history.
+34. Freshness overdue jest computed kolejką review, nie automatycznym `needs_review`; workflow zmienia się tylko przez jawną/audytowaną decyzję.
+35. Media URL resolution jest współdzielone, ale upload nie: question-specific `AdminMediaUploadService` nie może zostać użyty jako newsroom uploader bez osobnej adaptacji.
+36. Po pierwszym publicznym launch `NEWSROOM_PUBLIC_ENABLED=false` nie jest długotrwałym technicznym rollbackiem, jeśli tworzyłby masowe 404; awaria techniczna używa 503/Retry-After lub code rollback, a content takedown używa `withdrawn`.
+37. Ponieważ v1 świadomie nie ma revision/staging systemu, zwykły Save nie może po cichu modyfikować publicznych pól już opublikowanego artykułu. Publiczna zmiana istniejącego 200 przechodzi przez dedykowany atomowy use case `Apply public update`; review-before-live dla takich zmian wymaga w przyszłości osobnej decyzji o staging/revisions.
 
 ### 25.2. Otwarte decyzje N0 wymagające domknięcia przed implementacją zależnych elementów
 
@@ -1408,8 +1428,9 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [ ] `NEWSROOM-N0-001` — publisher branding source of truth,
 - [ ] `NEWSROOM-N0-002` — test/utrwalenie przyjętego route contract,
 - [ ] `NEWSROOM-N0-003` — deterministyczny taxonomy seed contract,
-- [ ] `NEWSROOM-N0-004` — block editor + serialization + sanitization decision,
-- [ ] następnie N1 domain + database.
+- [ ] `NEWSROOM-N0-004` — block editor + serialization + sanitization + format-evolution decision,
+- [ ] `NEWSROOM-N0-005` — utrwalić compatibility contract istniejącego SEO delivery,
+- [ ] następnie wykonywać N1 zgodnie z macierzą hard gates z backlogu.
 
 Pozostałe elementy N2–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu checklistę.
 
@@ -1437,12 +1458,25 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 
 ## 29. Historia zmian
 
+### 2026-09-16 — v0.6
+
+- wykonano finalny audyt planu implementacji, admin panelu, gate'ów i SEO względem aktualnego main,
+- rozdzielono tożsamość `User` (aktor/admin) od `ContentAuthor` (autor/reviewer),
+- zdefiniowano deterministic archive URL policy zamiast pozostawiania 200/404/410 do decyzji podczas kodowania,
+- usunięto założenie o działającym queue workerze dla sitemap freshness,
+- dodano publiczny config gate dla bezpiecznego rollout/rollback obejmujący wszystkie kanały discovery,
+- oddzielono historyczne archived=200 od jawnego withdrawn=410 takedown,
+- zsynchronizowano nadrzędny model z body_schema_version/public_state/withdrawal/public-citation contracts,
+- zamknięto lukę „Save zmienia live content” przy braku revision systemu przez dedykowany atomic Apply public update contract,
+- doprecyzowano historyczne path reservation, overdue-vs-needs_review i faktyczną granicę media upload layer,
+- doprecyzowano, że N0 ma dependency gates, a nie sztuczną sekwencję blokującą każdy N1 task.
+
 ### 2026-09-16 — v0.5
 
 - po głębokim audycie zgodności z istniejącym backendem podporządkowano newsroom istniejącemu statycznemu pipeline sitemap/robots i question graphowi,
 - usunięto ze skrótu architektury stare `body` i ręczny `canonical_url`,
 - zdefiniowano stabilność route family po pierwszej publikacji,
-- zapisano kompatybilny kontrakt async/debounced sitemap refresh bez usuwania istniejących controller routes,
+- historycznie zapisano kontrakt async/debounced sitemap refresh bez usuwania controller routes; **zastąpiony w v0.6** przez dirty/version + scheduler/lock po audycie `QUEUE_CONNECTION=sync`,
 - doprecyzowano, że newsroom reverse links nie modyfikują istniejącego question-question graphu.
 
 ### 2026-09-16 — v0.4

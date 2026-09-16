@@ -34,6 +34,18 @@ W szczególności zachowujemy:
 
 Nie kopiujemy jednak 1:1 pól traffic signs.
 
+### 2.1. V1 auth / identity contract
+
+Aktualny panel `/admin` jest dostępny wyłącznie dla `User::isAdministrator()` przez `User::canAccessPanel()`. Newsroom v1 zachowuje ten kontrakt.
+
+Rozróżnienie bytów:
+
+- `User` — zalogowany administrator i actor operacji/audytu,
+- `ContentAuthor` — publiczna tożsamość autora/reviewera materiału,
+- przypisanie `author_id` albo `reviewer_id` nie nadaje dostępu do Filament.
+
+Nie dodajemy w newsroom v1 roli editor/reviewer/moderator do panelu. Jeśli w przyszłości wielu redaktorów ma logować się z ograniczonymi abilities, jest to osobny projekt RBAC.
+
 ---
 
 ## 3. Resources v1
@@ -67,9 +79,11 @@ Pages:
 - view
 - edit
 
-Optional później:
+Preview v1:
 
-- preview action bez osobnej Filament page, jeśli signed preview jest prostszy.
+- action korzysta z authenticated administrator-only route,
+- nie tworzymy shareable signed preview tokenów w v1,
+- renderer może być public-like, ale transport pozostaje prywatny/no-store.
 
 ---
 
@@ -104,6 +118,7 @@ workflow_status:
 - published -> success
 - needs_review -> warning/danger zależnie od overdue
 - archived -> gray
+- withdrawn -> danger
 
 Kolor jest wsparciem, nie jedynym nośnikiem informacji.
 
@@ -147,9 +162,9 @@ Quick filters mile widziane:
 
 ## 9. Default sort
 
-updated_at desc lub published_at desc zależnie od filtra.
+updated_at desc lub first_published_at desc zależnie od filtra.
 
-Dla standardowego panelu redakcyjnego preferujemy updated_at desc, aby ostatnia praca była na górze.
+Dla standardowego panelu redakcyjnego preferujemy updated_at desc, aby ostatnia praca była na górze. Widok chronologii publikacji używa first_published_at, nie ostatniego wejścia w workflow published.
 
 ---
 
@@ -200,9 +215,12 @@ Po pierwszej publikacji zwykły Select `type` nie może przenieść rekordu pomi
 - generowany z title przy create,
 - po ręcznej zmianie nie nadpisuje się sam po każdej edycji title,
 - unique(ignoreRecord),
-- ostrzeżenie przy zmianie opublikowanego sluga.
+- ostrzeżenie przy zmianie opublikowanego sluga,
+- reserved segments route family (minimum `kategoria`, `temat` dla newsroom) blokowane przez backend/service, nie tylko UI.
 
 Zmiana opublikowanego sluga musi przejść przez ContentArticleSlugService.
+
+Walidacja pola `unique(ignoreRecord)` jest tylko UX. Service dodatkowo rezerwuje/checkuje pełny canonical path wobec historycznych `content_article_redirects.from_path`, aby nowy artykuł nie przejął starego publicznego URL innego artykułu.
 
 Form nie może po prostu zapisać nowego sluga z pominięciem redirect history.
 
@@ -319,6 +337,16 @@ Legal reference, question group i traffic sign group wybierają istniejące reko
 
 Product CTA wybiera kontrolowany typ akcji/destination zamiast dowolnego HTML buttona.
 
+### 13.6. Key points
+
+`key_points` jest publiczną, strukturalną listą „W skrócie”:
+
+- 2–5 krótkich punktów,
+- każdy punkt plain text / bez arbitralnego HTML,
+- opcjonalne dla artykułu,
+- kolejność edytowalna,
+- nie generujemy automatycznie z body.
+
 ---
 
 ## 14. Autosave
@@ -342,31 +370,35 @@ Pola per source:
 - source_type
 - publisher
 - title
-- url
+- url nullable
 - published_at
 - accessed_at
 - is_primary
 - is_official
-- note
+- is_publicly_cited
+- note wewnętrzne
 - sort_order
 
 UI:
 
 - akcja „Dodaj źródło”
-- przycisk otwarcia URL
-- validation URL
-- badge primary/official
+- przycisk otwarcia URL tylko gdy URL istnieje
+- validation URL tylko dla niepustej wartości
+- badge primary/official/public citation
+- wyraźne oznaczenie „tylko wewnętrzne” dla `is_publicly_cited=false`
 
 ---
 
 ## 16. Source warnings
 
-Panel ostrzega:
+Panel ostrzega/blokuje zgodnie z policy:
 
 - news bez żadnego źródła,
-- news w kategorii Przepisy bez official/legislation source,
+- news w kategorii Przepisy bez publicznie cytowalnego official/legislation source z URL, jeśli takie źródło istnieje,
 - dwa primary source nie są błędem globalnym, ale UI powinno pokazać stan,
-- źródło bez title/url jest niekompletne.
+- source bez title jest niekompletny,
+- brak URL jest dozwolony dla interview/direct evidence/other bez publicznego linku,
+- `is_publicly_cited=false` oznacza, że title/publisher/url nie mogą wyciec do publicznego renderera.
 
 Publish service ma finalną walidację, niezależnie od ostrzeżeń UI.
 
@@ -410,9 +442,9 @@ Może być deferred do N3/N4.
 
 ## 18. Relation ordering
 
-Powiązania publiczne mają sort_order.
+Relacje, dla których publiczna kolejność jest redakcyjna (questions/legal/signs), mają `sort_order` i admin umożliwia reorder lub przynajmniej zachowuje kolejność dodania.
 
-Admin powinien umożliwiać reorder lub przynajmniej kolejność dodania.
+`content_article_topic` jest wyjątkiem: topic ma pojedynczy `featured_article_id`, a reszta corpus jest chronologiczna po `first_published_at`; nie utrzymujemy drugiego ręcznego rankingu topicu.
 
 ---
 
@@ -428,10 +460,10 @@ Pola:
 - podgląd cropów lead / standard / compact
 - OG image lub wygenerowany OG variant
 - OG image alt
-- image credit
-- image license note
+- image credit — publiczny, jeśli potrzebny
+- image license note — tylko backoffice, nigdy publicznie
 
-Wykorzystujemy istniejący media layer.
+Reużywamy istniejących reguł storage/media URL, allowlist i size policy, ale **nie** reużywamy bezpośrednio `AdminMediaUploadService`: jest question-specific (`Question`/`QuestionMedia`). Newsroom potrzebuje własnego adaptera/service zapisującego newsroom asset metadata i generującego immutable/unique public paths.
 
 Focal point powinien być ustawiany wizualnie na obrazie, jeśli komponent na to pozwala, z fallbackiem do pól liczbowych/środka. Redaktor nie uploaduje ręcznie osobnych kopii dla każdej karty, jeśli system może wygenerować crop z tego samego źródła.
 
@@ -453,7 +485,7 @@ Dodatkowe warning:
 
 - szerokość < 1200 px dla materiału oznaczonego jako Discover-ready/featured, jeśli taki marker zostanie wdrożony,
 - dedicated OG image bez alt,
-- publiczny SEO image URL wymaga wygasającego podpisu/auth,
+- publiczny SEO image URL wymaga auth lub wygasającego podpisu — blocking; OG/schema asset musi mieć stabilny publiczny URL bez auth,
 - crop usuwa główny subject.
 
 Nie blokować wszystkich publikacji wyłącznie przez Discover recommendation. Natomiast obraz wskazany w publicznym OG/schema musi mieć stabilny publiczny URL.
@@ -503,10 +535,10 @@ index,follow wynika z published/default policy.
 
 Pola/actions:
 
-- workflow_status
-- scheduled_for
-- first_published_at readonly po pierwszym publish
-- published_at
+- workflow_status jako badge/action-driven
+- scheduled_for ustawiane przez Schedule action
+- first_published_at read-only
+- published_at read-only / service-controlled
 - is_featured
 - editorial_priority
 - is_breaking
@@ -515,6 +547,26 @@ Pola/actions:
 Workflow zmieniamy przez actions/service, nie przez dowolny Select, jeśli przejście wymaga walidacji.
 
 Można pokazać pole status jako read-only badge i osobne actions.
+
+---
+
+### 23.1. Published-content edit safety without revisions
+
+V1 nie ma revision/staging copy. Dlatego normalny Filament Edit nie może sugerować, że można zmienić opublikowany body i „zapisać draft”, gdy publiczna strona czyta ten sam rekord.
+
+Dla `publiclyVisible()` article:
+
+- publiczne pola są w zwykłym formularzu read-only albo ich Save jest przechwycony przez dedykowany use case,
+- UI ma jawny action/mode `Apply public update`,
+- przed commit pokazuje checklistę i informację „ta zmiana stanie się publiczna natychmiast po zapisie”,
+- backend ponownie waliduje całość i stale-write token,
+- cały public payload zapisuje się atomowo,
+- meaningful update ustawia `last_substantive_update_at`,
+- cancellation/validation failure pozostawia publiczną wersję bez zmian.
+
+Pola wewnętrzne (np. editorial_note, freshness due) mogą mieć osobny save bez publicznej zmiany.
+
+Jeśli organizacja potrzebuje edycji + review + przyszłego publish **bez zmiany aktualnej publicznej wersji**, jest to jawny future staging/revision scope i nie może zostać zasymulowany tym jednym rekordem.
 
 ---
 
@@ -528,8 +580,12 @@ Record actions:
 - Mark reviewed
 - Schedule
 - Publish now
+- Apply public update — dla już publiclyVisible article
 - Mark needs review
 - Archive
+- Republish — tylko archived, po aktualnym review/checklist
+- Withdraw from public
+- Restore to review — tylko dla withdrawn
 - Preview
 
 Każda action:
@@ -537,6 +593,20 @@ Każda action:
 - ma confirmation, jeśli jest destrukcyjna/publiczna,
 - wywołuje application service,
 - pokazuje błędy checklisty.
+
+`Withdraw from public` jest high-friction action:
+
+- wymaga niepustego `withdrawal_reason`,
+- pokazuje, że URL stanie się 410 i zniknie z dystrybucji,
+- nie jest bulk action,
+- jeśli istnieje realny następca, administrator zamiast tego używa kontrolowanego redirect flow.
+
+`Restore to review`:
+
+- nie przywraca publicznej treści,
+- zmienia workflow do in_review,
+- dawny URL nadal daje 410, dopóki ponowny Publish nie przejdzie pełnej walidacji,
+- ponowny Publish czyści aktywny withdrawal tombstone po zapisaniu historii w AuditLog.
 
 ---
 
@@ -547,9 +617,12 @@ Po kliknięciu:
 1. ContentArticlePublishingService waliduje record,
 2. jeśli braki -> nie publikuje,
 3. UI pokazuje listę braków,
-4. jeśli OK -> transakcja publish,
-5. redirect/notification do view/edit,
-6. event dispatch.
+4. jeśli OK -> transakcja publish + wymagany AuditLog,
+5. commit,
+6. dopiero after commit dispatch public side effects/events,
+7. redirect/notification do view/edit.
+
+Rollback transakcji nie może wyemitować cache/sitemap/IndexNow side effect.
 
 Filament resource nie duplikuje logiki publish.
 
@@ -600,15 +673,33 @@ V1:
 
 ---
 
+### 28.1. Correction action
+
+`correction_note` nie jest zwykłym polem roboczym obok `editorial_note`.
+
+Dla istotnej korekty publicznego artykułu action `Apply correction`:
+
+- wymaga krótkiego publicznego `correction_note`,
+- wymaga aktualnego review zgodnie z policy,
+- korzysta z tego samego atomowego `Apply public update`,
+- ustawia `last_substantive_update_at`,
+- zapisuje AuditLog bez pełnego body,
+- publikuje note i zmianę treści w jednym commit.
+
+Drobna korekta bez wpływu na sens może użyć `Apply public update` bez public correction note, ale nadal ma audit.
+
+---
+
 ## 29. Freshness section
 
 Pola:
 
 - source_checked_at
 - freshness_review_due_at
-- last_substantive_update_at
-- reviewed_at
-- review notes
+- last_substantive_update_at read-only / service-controlled
+- public_state_changed_at read-only / service-controlled
+- reviewed_at read-only, ustawiane przez Mark reviewed/workflow service
+- `editorial_note` edytowalne jako planowane pole wewnętrzne na notatki review/redakcyjne; nie tworzymy osobnego `review_notes` bez decyzji modelowej
 
 Status computed:
 
@@ -616,6 +707,8 @@ Status computed:
 - due soon
 - overdue
 - not scheduled
+
+`overdue` jest filtrem/kolejką pracy, **nie** automatycznym workflow transition. Upływ `freshness_review_due_at` nie może sam wyrzucić artykułu z home/category/feed. Akcja `Mark needs review` pozostaje oddzielną, audytowaną decyzją.
 
 ---
 
@@ -631,7 +724,7 @@ Minimum:
 - category
 - author
 - lead
-- body
+- co najmniej jeden renderowalny `body_blocks`
 - source
 - hero alt if hero
 - review if policy requires
@@ -652,7 +745,7 @@ Nie wszystko musi blokować.
 
 Blocking:
 
-- brak body,
+- brak renderowalnego `body_blocks`,
 - brak author,
 - brak category,
 - brak source dla news,
@@ -671,16 +764,24 @@ Warning:
 
 ## 32. Preview action
 
-Action otwiera:
+V1 używa wyłącznie authenticated administrator-only preview route.
 
-- signed preview URL lub authenticated preview route,
-- nowa karta opcjonalnie.
+Action może otwierać nową kartę, ale:
+
+- anonymous -> denied,
+- non-admin -> denied przez istniejący panel/auth contract,
+- response ma `Cache-Control: private, no-store`,
+- robots = `noindex,nofollow`,
+- preview URL nie trafia do publicznych linków, sitemap, feed ani analytics page-view liczonego jako publiczny artykuł.
+
+Nie projektujemy shareable signed preview tokenów w v1. Jeśli kiedyś będzie potrzebny external review, dostaje osobny threat model, TTL/revocation i audit.
 
 Preview banner zawiera:
 
 - status,
 - article id,
 - planned publish time,
+- informację „Podgląd — niepubliczne”,
 - link „Edytuj”.
 
 ---
@@ -706,7 +807,7 @@ Każdy slot pokazuje:
 - aktualnie przypisany artykuł,
 - okres aktywności,
 - fallback, który zostałby użyty bez ręcznego przypisania,
-- warning, jeśli artykuł jest archiwalny, draftem lub nie będzie publiczny w wybranym czasie.
+- warning i brak możliwości aktywnego zapisu, jeśli artykuł nie będzie `activelyDistributed()` w wybranym czasie; dotyczy m.in. needs_review, archived, active-withdrawal tombstone, draft i future scheduled poza wybranym czasem.
 
 ### 33.2. Obsługa placementu
 
@@ -745,7 +846,7 @@ Resolver preview uwzględnia:
 - fallbacki,
 - deduplikację modułów.
 
-Preview jest noindex i zabezpieczone jak zwykły preview artykułu.
+Preview jest authenticated admin-only, `private, no-store`, noindex/nofollow i zabezpieczone identycznie jak preview artykułu.
 
 ---
 
@@ -766,11 +867,21 @@ Publiczny route topicu:
 
 `/aktualnosci/temat/{topicSlug}`
 
-Publicacja topicu powinna ostrzegać/blokować, jeśli:
+Publicacja topicu blokuje, jeśli:
 
-- brak opisu,
-- brak odpowiedniego corpus,
-- featured article nie jest publiczny.
+- brak własnego opisu redakcyjnego,
+- mniej niż 3 actively-distributed, indeksowalne artykuły w corpus,
+- featured article jest ustawiony, ale nie jest actively-distributed + indexable albo nie należy do tego topicu.
+
+Dodatkowo:
+
+- slug można edytować w draft,
+- po pierwszej publikacji slug topicu jest read-only w v1,
+- próg >=3 jest blocking przy publish/republish,
+- jeśli już opublikowany topic później spadnie poniżej 3, CMS pokazuje `corpus below baseline` warning i wyłącza go z redakcyjnej promocji/featured-topic selection, ale nie zmienia automatycznie statusu ani HTTP,
+- administrator uzupełnia corpus albo jawnie archiwizuje topic; archived topic po wcześniejszej publikacji daje 410.
+
+Próg 3 jest baseline jakości produktu v1, nie gwarancją rankingu Google.
 
 Tag creation pozostaje oddzielnym lekkim mechanizmem.
 
@@ -835,7 +946,13 @@ List:
 - published articles count
 - position
 
-Nie pozwala delete kategorii z artykułami.
+Nie pozwala:
+
+- delete kategorii z artykułami,
+- zmienić sluga kategorii po utworzeniu/seedzie w v1,
+- ustawić inactive, jeśli istnieją publicznie widoczne/aktywnie dystrybuowane artykuły w tej kategorii.
+
+Przed dezaktywacją administrator musi przepiąć lub wycofać zależne publiczne materiały.
 
 ---
 
@@ -860,11 +977,11 @@ Nie tworzyć tagów przez literówki typu:
 
 Select author używa ContentAuthor.
 
-W UI warto pokazać:
+W UI pokazujemy:
 
 - name
 - role/title
-- active/public state jeśli model ma pole
+- public state z istniejącego `ContentAuthor::isPubliclyVisible()`
 
 Nie tworzymy autora ad hoc w article form bez pełnego profilu, chyba że Filament flow create-related jest bezpieczny.
 
@@ -880,16 +997,26 @@ Policy logic pozostaje po stronie service/policy, nie tylko JS/Filament visibili
 
 ---
 
-## 41. Concurrent editing
+## 41. Concurrent editing / stale-write guard
 
-V1 minimum:
+V1 wymaga ochrony przed cichym nadpisaniem co najmniej dla:
 
-- pokaż updated_at,
-- ostrzeżenie jeśli rekord został zmieniony od otwarcia formularza, jeśli łatwe do wdrożenia.
+- ContentArticle edit,
+- NewsroomHomeComposer placement write.
 
-Nie jest akceptowalne ciche nadpisywanie istotnego materiału przy rosnącej redakcji.
+Przy otwarciu formularza zapamiętujemy wersję/timestamp rekordu. Przed zapisem backend porównuje bieżący `updated_at` (lub równoważny token) z wartością załadowaną przez edytora.
 
-Można wdrożyć optimistic lock później po realnej potrzebie.
+Jeśli rekord zmienił się w międzyczasie:
+
+- zapis jest odrzucony,
+- UI pokazuje komunikat „rekord został zmieniony przez inną operację/użytkownika”,
+- redaktor musi odświeżyć i świadomie ponowić zmiany.
+
+Nie dokładamy kolumny `lock_version`, jeśli `updated_at` wystarcza. Warning bez blokady nie spełnia v1.
+
+Aby guard był wiarygodny, każda zmiana article-owned child data wykonywana z tego edytora (sources, topics, relations, media metadata) musi w tej samej operacji dotknąć/bumpnąć parent `ContentArticle.updated_at` albo równoważny edit token. Relation manager nie może zmienić istotnego child recordu „za plecami” wersji formularza.
+
+Dla placement overlap dodatkowo obowiązuje transakcyjny row/advisory lock opisany w Data Model; stale-write guard nie zastępuje concurrency locka.
 
 ---
 
@@ -907,13 +1034,14 @@ Filament:
 
 Na view/edit:
 
-- created by
-- updated by
-- last publish actor
-- last review actor
-- slug change history opcjonalnie.
+- created by / updated by jako `User` actor,
+- author / reviewer jako osobne `ContentAuthor` identities,
+- ostatnia akcja publish/review/archive wyprowadzona z istniejącego `AuditLog`,
+- slug redirect history.
 
-Pełny audit może pozostać w istniejącym Audit Logs resource.
+Nie dodajemy `published_by` / `reviewed_by` tylko na potrzeby UI. Pełny audit pozostaje w istniejącym read-only Audit Logs resource.
+
+Audit metadata nie może zawierać pełnego `body_blocks`, leadu ani prywatnych notatek; panel ma pokazywać zmianę stanu/IDs, nie kopię treści.
 
 Nie projektujemy osobnego panelu snapshotów wersji/diff/restore artykułu. Jest to świadomie poza zakresem.
 
@@ -1025,7 +1153,8 @@ Panel newsroom v1 jest gotowy, gdy redaktor może:
 - ustawić typ/kategorię/autora,
 - wpisać lead i zbudować body z kontrolowanych bloków,
 - ustawić pochodzenie i kontekst regulacyjny, jeśli dotyczy,
-- dodać źródła,
+- dodać key points,
+- dodać publiczne lub wewnętrzne źródła, w tym źródło bez URL, bez wycieku `is_publicly_cited=false`,
 - powiązać pytania/legal,
 - dodać hero, alt i focal point,
 - zarządzać topicami,
@@ -1033,14 +1162,14 @@ Panel newsroom v1 jest gotowy, gdy redaktor może:
 - podejrzeć bieżący lub przyszły stan całego `/aktualnosci`,
 - zobaczyć SEO fallback,
 - wysłać do review,
-- podejrzeć,
+- podejrzeć wyłącznie jako zalogowany administrator bez publicznego cache,
 - zaplanować,
 - opublikować,
 - poprawić,
 - oznaczyć freshness,
 - zarchiwizować,
 
-a wszystkie publiczne przejścia statusu przechodzą przez serwis domenowy.
+a wszystkie publiczne przejścia statusu przechodzą przez serwis domenowy, `User` actor trafia do AuditLog, stale-write jest odrzucany i panel nie rozszerza dostępu poza istniejących administratorów.
 
 ---
 
@@ -1050,7 +1179,10 @@ Feature/Livewire/Filament tests zależnie od obecnego test pattern:
 
 - create draft,
 - validation,
-- source repeater persistence,
+- key_points 0 albo 2–5 ordered plain-text items,
+- correction action atomically updates correction_note + substantive timestamp + content,
+- source repeater persistence + nullable URL + public/internal citation behavior,
+- newsroom media upload MIME/size/dimensions/stable-path validation bez użycia question-specific upload service,
 - body blocks validation/persistence,
 - origin/regulatory context persistence,
 - relation persistence,
@@ -1060,8 +1192,16 @@ Feature/Livewire/Filament tests zależnie od obecnego test pattern:
 - publish blocked by missing fields,
 - schedule validation,
 - slug change redirect,
-- permissions,
-- preview action.
+- admin-only panel/abilities; moderator/student/non-admin denied,
+- User actor vs ContentAuthor author/reviewer identity,
+- AuditLog without body/private notes payload,
+- stale article edit rejected,
+- concurrent placement overlap cannot be committed,
+- category slug/deactivation guards,
+- historical article-path reservation / same-article reclaim tests,
+- ContentAuthor unpublish blocked while dependent public/indexable newsroom articles exist,
+- topic slug/corpus guards,
+- preview action admin-only + private,no-store.
 
 E2E:
 
@@ -1096,14 +1236,33 @@ Na 2026-09-16:
 - [ ] wdrożyć focal-point/crop UX,
 - [ ] wdrożyć origin/regulatory fields,
 - [ ] wdrożyć relations pickers,
-- [ ] wdrożyć workflow actions,
+- [ ] wdrożyć workflow actions + AuditLog actor contract,
 - [ ] wdrożyć checklist computed state,
-- [ ] wdrożyć preview,
+- [ ] wdrożyć stale-write guard dla articles/home placements,
+- [ ] wdrożyć admin-only private preview,
+- [ ] wdrożyć category/topic identity guards,
 - [ ] wdrożyć tests.
 
 ---
 
 ## 55. Historia zmian
+
+### 2026-09-16 — v0.5
+
+- utrwalono admin-only V1: User jest aktorem auth/audytu, ContentAuthor publiczną tożsamością autora/reviewera,
+- signed/shareable preview usunięto z v1 na rzecz authenticated admin-only + private,no-store,
+- stale-write rejection awansowano z opcjonalnego warningu do gate'u v1,
+- przy braku revisions zablokowano zwykły live Save publicznych pól i dodano jawny Apply public update contract,
+- dodano high-friction Withdraw from public z obowiązkowym reason i bez bulk action,
+- dodano category/topic public-identity guards i minimalny topic corpus baseline,
+- ujednolicono wewnętrzne notatki do editorial_note oraz checklistę do body_blocks,
+- audit UI opiera się na istniejącym AuditLog bez nowych published_by/reviewed_by pól,
+- źródła wspierają nullable URL oraz jawne is_publicly_cited, aby prywatny evidence nie wyciekał publicznie,
+- freshness overdue oddzielono od jawnego needs_review transition,
+- slug service waliduje historyczne public paths, nie tylko current unique(slug),
+- media uploader opisano zgodnie z kodem: resolver jest wspólny, ale istniejący upload service jest question-specific,
+- dodano ContentAuthor unpublish guard dla zależnych publicznych artykułów,
+- service-owned timestamps są read-only, a article-owned child writes muszą bumpować parent edit token dla stale-write guard.
 
 ### 2026-09-16 — v0.4
 

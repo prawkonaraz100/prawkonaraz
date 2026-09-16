@@ -126,9 +126,11 @@ Kod definiuje layout i sloty. Redaktor obsadza sloty w CMS.
 
 Priorytet rozwiązywania:
 
-1. aktywne ręczne placement,
-2. fallback redakcyjny na podstawie published/type/category/featured/priority,
+1. aktywne ręczne placement wskazujące `activelyDistributed()` article,
+2. fallback redakcyjny wyłącznie z `activelyDistributed()` na podstawie type/category/featured/priority,
 3. brak kandydata -> krótszy moduł zamiast sztucznego placeholdera.
+
+`needs_review` i `archived` mogą nadal mieć publiczny canonical detail URL, ale nie są kandydatami do lead/latest/category promotion.
 
 ### 7.2. Deduplikacja
 
@@ -272,7 +274,7 @@ Lead musi być czytelny bez poziomego przewijania całej strony.
 
 ## 13. Latest stream
 
-Sekcja „Najnowsze” ma być chronologiczna.
+Sekcja „Najnowsze” ma być chronologiczna po `first_published_at DESC`, z deterministycznym tie-breakerem. Ponowne publish/unarchive nie przesuwa starego materiału na początek listy; istotna aktualizacja może być oznaczona osobnym „Aktualizacja”, ale nie udaje nowej daty publikacji.
 
 Row desktop:
 
@@ -385,7 +387,7 @@ Nie indeksujemy losowych kombinacji filtrów.
 
 ---
 
-## 18.1. Breadcrumb contract
+### 18.1. Breadcrumb contract
 
 Newsroom article:
 
@@ -414,7 +416,7 @@ Kolejność:
 3. H1
 4. lead
 5. byline + provenance + datePublished/dateModified
-6. hero + credit
+6. hero + public credit
 7. key points opcjonalnie
 8. regulatory/exam context box, jeśli ma zastosowanie
 9. body blocks
@@ -666,11 +668,15 @@ Wygląd:
 
 - heading „Źródła”,
 - numerowana lub zwykła lista,
+- tylko rekordy `is_publicly_cited=true`,
 - publisher/title,
-- link,
+- link tylko jeśli source URL istnieje,
+- bez-URL interview/direct citation może być pokazana jako tekst,
 - opcjonalna data.
 
-Nie ukrywamy źródeł w małym szarym tekście.
+`is_publicly_cited=false` oraz wewnętrzne `note` nigdy nie są renderowane. Nie ukrywamy publicznych źródeł w małym szarym tekście.
+
+`image_license_note` jest polem backoffice i nigdy nie jest renderowane publicznie; publiczny hero może pokazać wyłącznie `image_credit`.
 
 ---
 
@@ -848,7 +854,35 @@ Nie używamy przypadkowego placeholder photo.
 
 ---
 
-## 44. Error states
+### 43.1. Needs-review transparency
+
+Jeśli artykuł ma workflow `needs_review` i nadal zwraca 200:
+
+- nad treścią/byline pokazujemy dyskretny, ale czytelny komunikat „Materiał jest w trakcie ponownej weryfikacji”,
+- pokazujemy datę ostatniej merytorycznej aktualizacji / „stan informacji”, jeśli dostępna,
+- nie oznaczamy go jako breaking/featured/current,
+- jeśli pozostaje indexable, musi zachować crawlable inbound link (fallback przez profil autora),
+- banner nie zmienia `dateModified` sam z siebie; public-state change może zmienić sitemap lastmod.
+
+---
+
+## 44. Error and archive states
+
+Archived article, jeśli był wcześniej opublikowany:
+
+- canonical detail URL pozostaje 200,
+- nie pojawia się w aktywnych listingach,
+- może pokazać dyskretną informację „Materiał archiwalny”, jeśli pomaga uniknąć wrażenia aktualności,
+- data publikacji/aktualizacji pozostaje widoczna,
+- renderer nie może przedstawiać archiwalnego materiału jako breaking/current tylko dlatego, że stary body używa czasu teraźniejszego.
+
+Withdrawn article:
+
+- standardowa publiczna 410/Gone surface,
+- bez renderowania treści artykułu/body/source,
+- bez related/product modules z wycofanego materiału,
+- może zawierać neutralny link do /aktualnosci,
+- bez automatycznego przekierowania do homepage.
 
 404 article:
 
@@ -869,12 +903,15 @@ Nie redirectujemy każdego 404 do homepage.
 
 Preview:
 
+- dostępne wyłącznie w authenticated admin flow,
 - pasek u góry „PODGLĄD — materiał nieopublikowany”,
 - informacja o statusie,
-- opcjonalny link do edycji dla zalogowanego admina,
-- noindex.
+- link do edycji dla zalogowanego admina,
+- noindex,nofollow,
+- `Cache-Control: private, no-store`,
+- brak public analytics article-view.
 
-Preview nie może być pomylony z produkcyjną stroną przez redaktora.
+Preview nie może być pomylony z produkcyjną stroną przez redaktora ani zostać udostępniony jako publiczny signed link w v1.
 
 ---
 
@@ -1228,7 +1265,7 @@ Frontend newsroom v1 jest UI-complete, gdy:
 - brak hero ma poprawny wariant,
 - long title nie rozwala layoutu,
 - breadcrumbs poprawne,
-- source block czytelny,
+- source block czytelny i nie ujawnia internal evidence/notes,
 - hero caption/alt/credit mają rozdzielone semantyczne role,
 - guide i newsroom article mają właściwy, różny breadcrumb path,
 - news ma widoczną datę i czas publikacji przy byline,
@@ -1279,6 +1316,17 @@ Na moment utworzenia:
 ---
 
 ## 69. Historia zmian
+
+### 2026-09-16 — v0.6
+
+- latest/category/home chronology związano z activelyDistributed + first_published_at, bez sztucznego odświeżania po republish,
+- dodano transparentny publiczny needs_review banner i inbound requirement dla indexable review-state content,
+- source block rozróżnia public citation, citation bez URL i internal evidence.
+
+### 2026-09-16 — v0.5
+
+- dodano UI contract dla archived historical 200 page oraz withdrawn 410 bez renderowania treści,
+- preview v1 wyrównano do admin-only/private-no-store/noindex-nofollow bez shareable signed URL.
 
 ### 2026-09-16 — v0.4
 

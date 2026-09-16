@@ -6,7 +6,7 @@
 - Obszar: newsroom / media portal
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Bazowy stan repo przy projektowaniu: main@6a38c95ce76ee05997977d614d795ed8513462f1
-- Ostatnia weryfikacja zgodności z kodem: main@4b8a48537ec8973d90c268650994eee46d1841cc (2026-09-16)
+- Ostatnia weryfikacja zgodności z kodem: main@37dbfafa2ec491054429d1151d2de16b2470647b (2026-09-16)
 - Data: 2026-09-16
 - Zakres: model domenowy, baza danych, invariants, serwisy aplikacyjne, routing domeny i kolejność migracji
 
@@ -106,8 +106,6 @@ Pola:
 - category_id: FK -> content_categories, wymagane
 - author_id: FK -> content_authors, wymagane przy publikacji
 - reviewer_id: FK -> content_authors, nullable
-- created_by_user_id: FK -> users, nullable
-- updated_by_user_id: FK -> users, nullable
 - origin_type: varchar(32), default original
 
 ### 5.2. Treść
@@ -116,6 +114,7 @@ Pola:
 - slug: varchar(255), unique
 - lead: text, wymagane przy publikacji
 - body_blocks: jsonb, wymagane przy publikacji
+- body_schema_version: smallint default 1
 - key_points: jsonb nullable
 - correction_note: text nullable
 - editorial_note: text nullable, tylko backoffice
@@ -144,7 +143,7 @@ Dozwolone typy v1:
 
 Payload każdego typu ma osobny kontrakt walidacyjny. Arbitrary HTML/JS/CSS nie jest typem bloku.
 
-### 5.2.1. Kontekst regulacyjny / egzaminacyjny
+#### 5.2.1. Kontekst regulacyjny / egzaminacyjny
 
 Dla materiałów, w których ma to zastosowanie:
 
@@ -174,6 +173,17 @@ Te pola nie zastępują body ani źródeł. Służą do kontroli redakcyjnej i r
 - reviewed_at: timestamptz nullable
 - needs_review_at: timestamptz nullable
 - archived_at: timestamptz nullable
+- withdrawn_at: timestamptz nullable
+- withdrawal_reason: text nullable, tylko backoffice
+
+Semantyka aktywnych timestampów:
+
+- `scheduled_for` jest aktywne tylko w statusie `scheduled`; po successful publish jest czyszczone,
+- `needs_review_at` ustawiamy przy wejściu w `needs_review`; po successful republish wraca do null, historia pozostaje w AuditLog,
+- `archived_at` ustawiamy przy archive; po dedykowanym Republish wraca do null,
+- `withdrawn_at` + `withdrawal_reason` pozostają aktywnym tombstonem aż do successful publish po restore-to-review,
+- `reviewed_at` oznacza ostatnie zatwierdzenie review i może pozostać jako historyczny timestamp,
+- `first_published_at` nigdy nie jest czyszczone po pierwszej publikacji.
 
 Zalecenie: w PostgreSQL używać timestamp with time zone dla zdarzeń publikacyjnych. Warstwa aplikacyjna prezentuje daty publiczne w Europe/Warsaw.
 
@@ -199,10 +209,26 @@ Nie kodujemy layoutu strony głównej ani konkretnej pozycji w rekordzie artyku�
 - og_image_alt: varchar(500) nullable
 - og_image_width: unsigned integer nullable
 - og_image_height: unsigned integer nullable
-- image_credit: varchar(500) nullable
-- image_license_note: text nullable
+- image_credit: varchar(500) nullable, publiczny credit jeśli potrzebny
+- image_license_note: text nullable, tylko backoffice
 
-Storage i public URL rozwiązujemy przez istniejący media layer, nie przez ręczne sklejanie URL.
+Stan kodu podczas audytu:
+
+- istnieje `MediaUrlResolver` i wspólna konfiguracja public/upload disk,
+- istniejący `AdminMediaUploadService` jest **question-specific** i zapisuje `QuestionMedia`; nie jest gotowym uploaderem newsroomu,
+- Traffic Signs/ContentAuthor przechowują obecnie ścieżki assetów bez wspólnego newsroom asset modelu,
+- nie ma potwierdzonego automatycznego pipeline'u cropów 1:1/4:3/16:9 dla newsroomu.
+
+Target:
+
+- URL-e publiczne rozwiązujemy przez istniejący `MediaUrlResolver` / public media config,
+- newsroom dostaje własny bezpieczny upload adapter/service lub jawnie skonfigurowany Filament upload do newsroom prefix; **nie reużywa question-specific AdminMediaUploadService**,
+- storage path, MIME, bytes i rzeczywiste dimensions są walidowane po stronie backendu przed uznaniem assetu za gotowy,
+- newsroom media path jest unikalny/immutable (np. ULID/hash w nazwie); replacement zapisuje nowy object/path zamiast overwrite pod istniejącym publicznym URL,
+- dozwolone obrazy v1: raster MIME zgodny z security/media config (JPEG/PNG/WebP/AVIF); SVG nie jest domyślnie dopuszczone dla newsroom upload,
+- crop/variant jest deklarowany w schema/SEO tylko jeśli rzeczywisty plik został wygenerowany i jest publicznie osiągalny.
+
+Nie sklejamy ręcznie publicznych URL-i i nie zapisujemy signed/temporary URLs jako hero/OG.
 
 Focal point używa znormalizowanych współrzędnych 0..1. Brak wartości oznacza środek obrazu. Warianty lead/standard/compact/OG są pochodnymi assetu i nie powinny być ręcznie przechowywanymi, niezależnymi kopiami, jeśli media layer może wygenerować je deterministycznie.
 
@@ -214,15 +240,18 @@ Publiczny resolver obrazu używany przez OG/schema nie może zwracać wygasając
 
 - seo_title: varchar(255) nullable
 - seo_description: varchar(320) nullable
-- robots: varchar(128) nullable
+- robots: varchar(128) nullable, ale zapisywane wyłącznie z allowlistowanej policy
 
 V1 nie przechowuje ręcznego `canonical_url`.
 
 Zasady:
 
 - canonical jest zawsze wyliczany z route family + slug,
+- article slug nie może być reserved segmentem swojej route family,
 - article page jest self-canonical,
 - brak robots oznacza policy wynikające ze statusu,
+- CMS nie przyjmuje dowolnego free-text robots; v1 używa kontrolowanych wartości/policy, np. default index policy albo `noindex,follow`,
+- sprzeczne/nieobsługiwane kombinacje są odrzucane,
 - draft/in_review/scheduled preview nie jest indeksowalny,
 - published domyślnie index,follow,max-image-preview:large,
 - cross-domain/cross-URL canonical override wymaga w przyszłości osobnej decyzji architektonicznej i nie może zostać dodany jako zwykłe pole redaktora.
@@ -232,8 +261,15 @@ Zasady:
 - source_checked_at: timestamptz nullable
 - freshness_review_due_at: timestamptz nullable
 - last_substantive_update_at: timestamptz nullable
+- public_state_changed_at: timestamptz nullable
 
-updated_at nie jest automatycznie równoważne istotnej aktualizacji merytorycznej.
+`freshness_review_due_at <= now()` tworzy **computed overdue state / kolejkę pracy**, ale samo w sobie NIE zmienia `workflow_status`.
+
+`needs_review` jest jawną decyzją workflow, że materiał ma pozostać pod publicznym URL-em, ale ma wypaść z aktywnej dystrybucji do czasu review. Może zostać ustawione przez administratora albo przez przyszłą, jawnie zdefiniowaną regułę bezpieczeństwa (np. potwierdzona utrata wiarygodności primary source), ale nie przez sam upływ terminu.
+
+`updated_at` nie jest automatycznie równoważne istotnej aktualizacji merytorycznej.
+
+`public_state_changed_at` zmienia się tylko przy zmianie mającej wpływ na publiczną dyspozycję/SEO bez zmiany treści, np. archive/withdraw/restore, robots/indexability lub inna jawna zmiana public state. Nie zastępuje `last_substantive_update_at`.
 
 ### 5.8. Standardowe timestamps
 
@@ -268,6 +304,7 @@ W pierwszej wersji walidacja może być aplikacyjna przez PHP enum. Jeżeli doda
 - published
 - needs_review
 - archived
+- withdrawn
 
 ### 6.4. Invariants publikacji
 
@@ -285,18 +322,43 @@ Status published wymaga:
 Status scheduled wymaga:
 
 - scheduled_for != null,
-- kompletności jak dla publikacji,
-- scheduled_for > moment przyjęcia komendy schedule.
+- kompletności pól treści/źródeł/autora/kategorii jak dla publikacji,
+- **nie wymaga** ustawienia `first_published_at` ani `published_at` przed faktycznym publish,
+- scheduled_for > moment przyjęcia komendy schedule,
+- v1 pozwala schedule dla never-published article; scheduled republish istniejącego publicznego 200 nie jest wspierany bez staging/revision systemu,
+- wyjątek: withdrawn article może zostać przygotowany w review, ale publiczny tombstone pozostaje 410 aż do jawnego publish; v1 nie potrzebuje scheduled restore.
+
+Status `needs_review` wymaga:
+
+- first_published_at != null,
+- needs_review_at != null.
+
+Status `archived` wymaga:
+
+- first_published_at != null,
+- archived_at != null.
+
+Status withdrawn wymaga:
+
+- first_published_at != null,
+- withdrawn_at != null,
+- niepustego withdrawal_reason.
+
+Restore-to-review zmienia workflow_status na in_review, ale pozostawia withdrawn_at/withdrawal_reason jako aktywny tombstone do czasu udanego ponownego Publish. Publish po review zapisuje historię w AuditLog, a następnie czyści bieżące withdrawn_at/withdrawal_reason w tej samej transakcji.
+
+Archiwalny artykuł nie przechodzi przez `in_review`, jeśli miałoby to zamienić historyczny 200 w chwilowe 404. V1 ma dedykowany `Republish` z `archived -> published`, który wymaga aktualnego review/checklisty i czyści `archived_at` w tej samej transakcji.
 
 ### 6.5. Invariants breaking
 
-is_breaking = true wymaga:
+`is_breaking = true` wymaga:
 
 - status = published,
 - type = news,
 - breaking_expires_at != null.
 
-Po breaking_expires_at materiał nie powinien być renderowany w module „pilne”, nawet jeśli flaga nie została jeszcze fizycznie wyzerowana.
+Transition z `published` do `needs_review`, `archived` albo `withdrawn` automatycznie czyści `is_breaking=false` i `breaking_expires_at=null` w tej samej transakcji. Nie zostawiamy rekordu łamiącego własny invariant.
+
+Po `breaking_expires_at` materiał nie jest renderowany w module „pilne”, nawet zanim housekeeping fizycznie wyzeruje flagę.
 
 ### 6.6. Route family invariant
 
@@ -322,15 +384,34 @@ Przyszła uprzywilejowana migracja route family, jeśli kiedykolwiek zostanie do
 Wymagane:
 
 - unique index na slug
-- index(workflow_status, published_at desc)
-- index(category_id, workflow_status, published_at desc)
-- index(type, workflow_status, published_at desc)
+- canonical path wyliczony z route family + slug nie może kolidować z żadnym `content_article_redirects.from_path` należącym do innego artykułu
+- slug nie może należeć do reserved segments określonych przez route contract
+- index(workflow_status, first_published_at desc)
+- index(category_id, workflow_status, first_published_at desc)
+- index(type, workflow_status, first_published_at desc)
 - index(is_featured, workflow_status, editorial_priority desc)
 - index(is_breaking, breaking_expires_at)
 - index(freshness_review_due_at)
 - index(scheduled_for, workflow_status)
 
 Nie dodawać indeksów „na zapas” dla pól, których nie używamy w zapytaniach.
+
+### 7.1. Indeksy relacji pod reverse lookup
+
+Ponieważ newsroom renderuje także reverse links z istniejących encji, unique index zaczynający się od `article_id` nie wystarcza.
+
+Wymagane/przewidywane:
+
+- `content_article_topic(topic_id, article_id)`,
+- `content_article_tag(tag_id, article_id)`,
+- `content_article_question(question_id, sort_order, article_id)`,
+- `content_article_legal_unit(legal_unit_id, sort_order, article_id)`,
+- `content_article_traffic_sign(traffic_sign_id, sort_order, article_id)`,
+- `content_article_sources(article_id, sort_order)`,
+- `content_home_placements(surface_key, slot_key, context_key, position, starts_at, ends_at)`,
+- `content_topics(status, published_at)`.
+
+Finalny PR migracyjny ma potwierdzić query plan/use case i nie dodawać dubli indeksów, które PostgreSQL już pokrywa przez unique prefix.
 
 ---
 
@@ -360,8 +441,10 @@ Kategorie v1:
 
 ### 8.1. Invariants
 
-- slug stabilny po publikacji kategorii,
-- kategoria nie może być usunięta, jeśli ma artykuły; użyć is_active=false,
+- w v1 slug kategorii jest immutable po utworzeniu/seedzie; nie mamy category redirect history,
+- kategoria nie może być usunięta, jeśli ma artykuły,
+- `is_active=false` jest dozwolone tylko, gdy kategoria nie ma publicznie widocznych/aktywnie dystrybuowanych artykułów; najpierw należy je przepiąć lub wycofać,
+- publikacja/scheduling artykułu wymaga aktywnej primary category,
 - jedna kategoria główna na artykuł w v1.
 
 ---
@@ -419,16 +502,21 @@ content_article_topic
 
 - article_id
 - topic_id
-- sort_order smallint default 0
 - created_at
 - unique(article_id, topic_id)
 
+V1 nie ma ręcznego rankingu całego corpus topicu. `featured_article_id` daje pojedynczy lead, a pozostała lista jest chronologiczna po `ContentArticle.first_published_at DESC`.
+
 Reguły:
 
-- publiczny topic wymaga własnego opisu i statusu published,
+- publiczny topic wymaga własnego, niepustego opisu redakcyjnego i statusu published,
+- v1 baseline publikacji topicu: co najmniej 3 `activelyDistributed()` i indeksowalne artykuły przypięte do topicu; to reguła jakości produktu, nie gwarancja SEO,
 - samo przypięcie taga nie tworzy topicu,
-- featured_article_id musi wskazywać publiczny artykuł przy renderowaniu,
-- brak wystarczającego corpus oznacza, że topic pozostaje draftem.
+- `featured_article_id`, jeśli ustawione, musi wskazywać `activelyDistributed()` i indeksowalny artykuł należący do tego samego topicu,
+- slug topicu może zmieniać się w draft; po pierwszej publikacji jest immutable w v1, ponieważ nie mamy topic redirect history,
+- baseline >=3 jest gate'em przy pierwszym publish/ponownym publish topicu; chwilowy późniejszy spadek corpus nie zmienia automatycznie HTTP/indexability,
+- published topic poniżej baseline dostaje health warning w CMS/audycie i nie powinien być promowany jako featured topic do czasu naprawy,
+- jeśli corpus trwale utraci wartość, administrator ustawia status archived; archived topic jest usuwany z nawigacji/sitemap i jego wcześniej publiczny URL zwraca 410, chyba że istnieje realny następca.
 
 ---
 
@@ -443,17 +531,18 @@ Pola:
 - source_type varchar(32)
 - publisher varchar(255) nullable
 - title varchar(500)
-- url varchar(2048)
+- url varchar(2048) nullable
 - published_at timestamptz nullable
 - accessed_at timestamptz nullable
 - is_primary boolean default false
 - is_official boolean default false
+- is_publicly_cited boolean default true
 - note text nullable
 - sort_order smallint default 0
 - created_at
 - updated_at
 
-### 10.1. source_type v1
+### 11.1. source_type v1
 
 - official
 - legislation
@@ -464,11 +553,14 @@ Pola:
 - media
 - other
 
-### 10.2. Reguły
+### 11.2. Reguły
 
-- news o zmianie prawa powinien mieć co najmniej jedno źródło official lub legislation, jeśli takie istnieje,
+- news o zmianie prawa powinien mieć co najmniej jedno publicznie cytowalne źródło official lub legislation z URL, jeśli takie istnieje,
 - media konkurencyjne nie są domyślnym źródłem pierwotnym,
-- URL źródła publicznego jest renderowany tylko jeśli redakcja oznaczy go jako bezpieczny do publikacji,
+- `url` może być null dla interview/direct evidence/źródła bez publicznego linku,
+- `is_publicly_cited=true` oznacza, że publiczny renderer może pokazać citation; jeśli URL istnieje, renderuje bezpieczny link, a jeśli nie — tekstową citation bez linku,
+- `is_publicly_cited=false` zachowuje source jako wewnętrzny dowód i nigdy nie renderuje jego title/publisher/url,
+- `note` jest zawsze wewnętrzne i nigdy nie jest częścią publicznej citation,
 - accessed_at zapisujemy dla źródeł webowych, gdy ma znaczenie weryfikacyjne.
 
 ---
@@ -584,6 +676,12 @@ Pola:
 ### 15.1. Reguły
 
 - zmiana sluga opublikowanego artykułu tworzy redirect,
+- każdy wcześniej publiczny `from_path` jest trwałą rezerwacją ścieżki przed użyciem przez **inny** artykuł,
+- create/slug change sprawdza kolizję nie tylko z bieżącymi slugami, ale też z historycznymi `from_path`,
+- ponowne użycie własnego historycznego path przez **ten sam** artykuł jest dozwolone tylko przez `ContentArticleSlugService`: usuwa/aktualizuje kolidujący redirect dla odzyskanego path i przepisuje wszystkie pozostałe historyczne redirecty bezpośrednio do nowego canonical,
+- zwykły Filament unique(slug) nie jest wystarczającym zabezpieczeniem historycznej ścieżki,
+- ponieważ invariant obejmuje `content_articles` i `content_article_redirects`, create/slug-change/reclaim serializują mutację pełnego path w PostgreSQL (np. transaction-level advisory lock na znormalizowanym full path); check-then-insert bez locka ma race TOCTOU,
+- przy operacji dotykającej starego i nowego path locki bierzemy w deterministycznej kolejności, aby nie tworzyć deadlocków,
 - v1 nie pozwala zwykłą edycją zmienić route family opublikowanego artykułu,
 - jeśli przyszła kontrolowana migracja route family zostanie kiedyś wdrożona, zapisuje poprzedni pełny path w tej samej tabeli,
 - nie tworzymy redirect chain; nowy wpis powinien wskazywać canonical destination,
@@ -634,8 +732,9 @@ Nie pozwalamy administratorowi tworzyć dowolnych nowych nazw modułów w bazie.
 
 - null starts_at oznacza aktywność od razu po spełnieniu innych warunków,
 - null ends_at oznacza brak automatycznego końca,
-- artykuł musi być publiczny w czasie, dla którego rozwiązujemy kompozycję,
-- scheduled article może być widoczny w future preview, ale nie w bieżącej stronie przed publikacją.
+- bieżący publiczny render placementu może wskazać wyłącznie `activelyDistributed()` article,
+- `needs_review`, `archived`, active-withdrawal tombstone, draft i future scheduled są niekwalifikowane do bieżącego placementu,
+- scheduled article może być widoczny w future preview tylko wtedy, gdy dla wybranego czasu resolver przewiduje stan `published`; preview nie zmienia danych.
 
 ### 16.3. Kolizje placements
 
@@ -646,7 +745,11 @@ Application service nie pozwala na nierozstrzygnięte nakładanie się dwóch ak
 - context_key,
 - position.
 
-Nie próbujemy modelować przedziałów czasowych przez skomplikowany DB exclusion constraint w pierwszej wersji; invariant ma testy domenowe i transakcyjne.
+Nie próbujemy modelować przedziałów czasowych przez skomplikowany DB exclusion constraint w pierwszej wersji.
+
+Application service musi jednak serializować zapis dla danego `surface_key + slot_key + context_key + position`: transakcja + row lock na istniejących kandydackich rekordach albo PostgreSQL advisory lock, następnie walidacja overlap wewnątrz locka. Dwa równoległe requesty nie mogą oba przejść walidacji i utworzyć kolizji.
+
+Invariant ma test domenowy/transakcyjny oraz test konkurencji na PostgreSQL.
 
 ### 16.4. Fallback i deduplikacja
 
@@ -736,32 +839,41 @@ Model nie powinien:
 - key_points: array
 - hero_focal_x: decimal
 - hero_focal_y: decimal
+- body_schema_version: integer
 - effective_from: immutable_date
 - published_at: immutable_datetime
 - first_published_at: immutable_datetime
 - scheduled_for: immutable_datetime
 - reviewed_at: immutable_datetime
 - needs_review_at: immutable_datetime
+- archived_at: immutable_datetime
+- withdrawn_at: immutable_datetime
 - breaking_expires_at: immutable_datetime
 - source_checked_at: immutable_datetime
 - freshness_review_due_at: immutable_datetime
 - last_substantive_update_at: immutable_datetime
+- public_state_changed_at: immutable_datetime
 
-### 18.2. Scopes
+### 19.2. Scopes / public visibility
 
-- published()
-- scheduled()
-- latestPublished()
-- forCategory()
-- featured()
-- activeBreaking()
-- needsFreshnessReview()
+Nazwy scope'ów nie mogą utożsamiać `workflow_status=published` z całą widocznością publiczną, bo `needs_review` pozostaje publiczne, a `archived` zachowuje historyczny canonical URL.
 
-Definicja published:
+Wymagane rozróżnienie:
 
-- workflow_status = published
-- published_at != null
-- published_at <= now()
+- `publiclyVisible()` — artykuł po pierwszej publikacji, którego workflow dopuszcza publiczny detail URL: `published`, `needs_review` oraz `archived`,
+- `activelyDistributed()` — wyłącznie `workflow_status=published` z poprawnym `published_at <= now()`; używane przez home/category/topic/latest/feed/news sitemap,
+- `indexable()` — publiclyVisible + aktualna robots/SEO policy nie jest noindex,
+- `scheduled()`,
+- `forCategory()`,
+- `featured()`,
+- `activeBreaking()`,
+- `needsFreshnessReview()`.
+
+Zwykłe read modele list/hubów nie mogą używać `publiclyVisible()` zamiast `activelyDistributed()`. `needs_review` pozostaje osiągalne pod canonical URL, ale świadomie znika z aktywnej promocji do czasu ponownego review. Jeśli nadal jest `indexable()`, musi zachować crawlable inbound; fallback v1 to oznaczona sekcja „w trakcie weryfikacji” na publicznym profilu autora.
+
+Artykuł `archived`, który nigdy nie był publiczny (`first_published_at=null`), nie uzyskuje publicznego detail URL tylko dlatego, że ma status archived.
+
+`withdrawn` nigdy nie jest `publiclyVisible()`: rekord i historia pozostają w backoffice, ale jego kanoniczny dawny path jest rozpoznawany przez resolver jako celowe `410 Gone`, chyba że istnieje jawny redirect do rzeczywistego następcy.
 
 ---
 
@@ -773,13 +885,31 @@ Rekomendowane klasy w app/Support/Newsroom lub analogicznej, jasno wydzielonej p
 
 Odpowiada za:
 
-- publish,
-- schedule,
+- initial publish,
+- atomic public update dla już publicznego artykułu,
+- schedule wyłącznie initial publish v1,
 - unpublish do in_review/draft zgodnie z policy,
 - archive,
+- withdraw/restore-to-review,
 - timestamps,
 - walidację invariants,
+- zapis wymaganych zdarzeń AuditLog,
 - dispatch domenowych eventów.
+
+Transakcja stanu publicznego obejmuje co najmniej rekord artykułu, krytyczne timestampy/invariants i audit opisujący tę zmianę. Eventy uruchamiające zewnętrzne side effecty (cache invalidation, sitemap dirty signal, IndexNow, notification) są dispatchowane dopiero po udanym commit. Rollback transakcji nie może zostawić „ghost publish” w cache/sitemap/IndexNow.
+
+#### 20.1.1. Edycja już opublikowanego artykułu bez revisions
+
+V1 nie ma staged revision/snapshot systemu. Dlatego:
+
+- zwykły CRUD Save może edytować publiczne pola swobodnie tylko przed pierwszą publikacją albo gdy article jest aktywnie withdrawn/tombstoned,
+- dla `publiclyVisible()` article publiczne pola (`title`, `slug`, `lead`, `body_blocks`, public source/citation, author/category, hero/SEO/public context`) nie mogą być zapisywane przez zwykły low-level Filament save,
+- dedykowany `applyPublicUpdate(payload, actor)` waliduje cały nowy publiczny stan i zapisuje go atomowo,
+- meaningful public change ustawia `last_substantive_update_at`; zmiana tylko public-state/robots używa właściwej semantyki `public_state_changed_at`,
+- audit zapisuje typy/IDs/summary zmiany, ale nie pełny body,
+- wewnętrzne pola niepubliczne mogą mieć osobny, bezpieczny save path bez fałszowania SEO freshness.
+
+Konsekwencja: v1 **nie zapewnia review-before-live dla zmian już opublikowanego 200**. Jeśli taki workflow stanie się wymagany, należy świadomie dodać staging/revision model; nie wolno udawać go statusem na jednym rekordzie.
 
 ### 20.2. ContentArticleSlugService
 
@@ -826,10 +956,13 @@ Odpowiada za:
 
 Odpowiada za:
 
-- due dates,
-- needs_review transitions,
+- wyliczanie due dates,
+- computed states fresh/due-soon/overdue,
 - listę materiałów przeterminowanych,
-- politykę freshness per type/category.
+- politykę freshness per type/category,
+- jawne rekomendowanie/wywołanie transition do `needs_review` tylko gdy istnieje osobny trigger bezpieczeństwa.
+
+**Nie** zmienia automatycznie każdego overdue rekordu na `needs_review` tylko dlatego, że minął termin.
 
 ---
 
@@ -840,15 +973,18 @@ Rekomendowane domain/application events:
 - ContentArticlePublished
 - ContentArticleSubstantivelyUpdated
 - ContentArticleArchived
+- ContentArticleWithdrawn
 - ContentArticleSlugChanged
 - ContentArticleBreakingChanged
 
-Listenery mogą:
+Listenery po commit mogą:
 
 - czyścić cache,
-- zgłaszać URL do IndexNow, jeśli policy to dopuszcza,
+- zgłaszać URL do istniejącego IndexNow pipeline, jeśli policy to dopuszcza,
 - odświeżać feed cache,
-- odświeżać sitemap cache.
+- oznaczać statyczne sitemap jako wymagające refreshu.
+
+Nie zakładamy, że `ShouldQueue` oznacza asynchroniczność: aktualny repo contract ma `QUEUE_CONNECTION=sync`. Pełny refresh sitemap nie może wykonywać się w request publikacji.
 
 `ContentArticleSubstantivelyUpdated` jest emitowany wyłącznie, gdy zmieniła się publiczna treść/meaningful metadata i ustawiono `last_substantive_update_at`. Techniczny zapis, audit note, cache touch lub pole niewidoczne publicznie nie emituje tego eventu tylko po to, by odświeżyć SEO freshness.
 
@@ -864,6 +1000,8 @@ Rekomendacja:
 
 - scheduler uruchamia komendę np. newsroom:publish-due,
 - query pobiera tylko workflow_status=scheduled i scheduled_for <= now(),
+- przed faktycznym publish serwis **ponownie** waliduje pełną checklistę/invariants w aktualnym stanie: aktywna category, publiczny author, reviewer/source policy, body/media/security,
+- jeśli record przestał być eligible między schedule a due time, pozostaje nieopublikowany, failure jest audytowalny/logowany i nie blokuje kolejnych rekordów,
 - publikacja przechodzi przez ContentArticlePublishingService,
 - komenda jest idempotentna.
 
@@ -884,8 +1022,9 @@ Rekomendacja:
 Publiczne daty:
 
 - first_published_at: pierwsza publikacja; nigdy nie resetować przy zwykłej edycji,
-- published_at: bieżący timestamp aktywnej publikacji; w v1 może równać się first_published_at po pierwszym publish,
-- last_substantive_update_at: istotna zmiana treści,
+- published_at: timestamp ostatniego wejścia w stan published; nie jest źródłem daty pierwotnej ani automatycznego „najnowsze”,
+- last_substantive_update_at: istotna zmiana treści/claimu/publicznej merytorycznej metadata,
+- public_state_changed_at: istotna zmiana publicznego stanu bez twierdzenia, że treść została merytorycznie zaktualizowana,
 - updated_at: techniczny timestamp rekordu.
 
 Structured data:
@@ -895,24 +1034,32 @@ Structured data:
 
 Publiczny label „Aktualizacja” pojawia się tylko, gdy `last_substantive_update_at` rzeczywiście istnieje i jest późniejszy od pierwszej publikacji.
 
-Article sitemap `lastmod` i feed `updated` używają tej samej merytorycznej semantyki, nigdy technicznego `updated_at`.
+Structured data `dateModified` i feed `updated` używają merytorycznej semantyki `last_substantive_update_at ?? first_published_at`.
+
+Article sitemap `lastmod` może dodatkowo uwzględnić `public_state_changed_at`, ponieważ archive/restore/robots mogą realnie zmienić odpowiedź publiczną bez zmiany treści. Nigdy nie używa technicznego `updated_at`.
+
+Chronologia publicznych list „najnowsze”, kategorii i topiców używa `first_published_at DESC` (z deterministycznym tie-breakerem, np. id DESC). Ponowne wejście w published nie robi ze starego materiału nowego. Jeśli chcemy ponownie promować istotnie zaktualizowany materiał, robimy to przez placement/featured, nie przez fałszowanie daty pierwszej publikacji.
 
 ---
 
-## 24. Author i reviewer
+## 24. Author, reviewer i actor
 
-Używamy istniejącego ContentAuthor.
+Używamy istniejącego `ContentAuthor` jako publicznej/redakcyjnej tożsamości autora i reviewera. Nie tworzymy `NewsroomAuthor`.
 
-Nie tworzymy NewsroomAuthor.
+Osobnym bytem jest `User`:
+
+- tylko istniejący administrator może wejść do Filament v1,
+- `User` jest aktorem create/update/review/publish/archive i trafia do `AuditLog.actor_user_id`,
+- `ContentAuthor.author_id/reviewer_id` nie nadaje dostępu do panelu i nie jest kontem logowania.
 
 Wymagania do publikacji:
 
-- author aktywny/publiczny,
-- author ma slug,
-- publiczny profil autora dostępny pod istniejącym route,
-- reviewer opcjonalny zależnie od policy.
+- author jest `isPubliclyVisible()`,
+- author ma slug i publiczny profil pod istniejącym route,
+- po wdrożeniu relacji newsroomu nie wolno odpublikować ContentAuthor, jeśli istnieje zależny indexable/publiclyVisible artykuł, dopóki artykuły nie zostaną przepisane do innego publicznego autora albo wycofane/noindex zgodnie z policy,
+- reviewer opcjonalny zależnie od policy; jeśli jest pokazywany publicznie, również musi być publiczny.
 
-Dla treści prawnie wrażliwych reviewer może być wymagany przez Editorial Policy, nie przez wszystkie typy globalnie.
+Dla treści prawnie wrażliwych policy może wymagać `reviewer_id + reviewed_at`. V1 nie udaje jednak kryptograficznej separacji obowiązków: bez osobnego RBAC/linku ContentAuthor↔User system nie może dowieść, że reviewer był innym zalogowanym człowiekiem. AuditLog pokazuje faktycznego administratora, który wykonał akcję.
 
 ---
 
@@ -921,10 +1068,14 @@ Dla treści prawnie wrażliwych reviewer może być wymagany przez Editorial Pol
 Dokładny komponent edytora i serializacja wewnętrzna są decyzją N0-004, ale kontrakt domenowy jest stały:
 
 - `body_blocks` jest jednym kanonicznym źródłem body,
-- każdy `type` ma allowlistowany schema payloadu,
-- rich_text sanitizuje HTML/doc nodes,
+- dokument body ma jawny `body_schema_version`,
+- każdy `type` bloku ma allowlistowany schema payloadu,
+- rich_text sanitizuje HTML/doc nodes po stronie serwera; nie polegamy wyłącznie na Filament/browser sanitization,
+- aktualny composer nie zawiera jawnej backendowej biblioteki HTML sanitizer, więc N0-004 musi wybrać i przetestować konkretny sanitizer albo format strukturalny niewymagający arbitralnego HTML,
+- aktualny bootstrap nie pokazuje newsroom-ready CSP middleware; nie wprowadzamy szerokiej CSP zmiany przy okazji edytora bez zgodności z istniejącymi analytics/fonts/scripts,
 - script/style/event handlers są zabronione,
-- embed przyjmuje tylko allowlisted providers/URL,
+- `embed` jest domyślnie wyłączony w CMS, dopóki nie istnieje jawna provider allowlista, sandbox/referrer policy oraz zgodny z produkcją CSP/`frame-src` contract,
+- po włączeniu embed przyjmuje tylko allowlisted providers/URL i renderer nie emituje arbitralnego iframe HTML,
 - linki z `target=_blank` otrzymują bezpieczne `rel`,
 - block renderer ignoruje/odrzuca nieznany typ zamiast wykonywać go jako HTML,
 - publiczny renderer nie interpretuje arbitralnych klas CSS przekazanych z CMS.
@@ -968,11 +1119,20 @@ ContentArticle:
 
 Publiczny controller nie powinien polegać tylko na implicit binding, jeśli musimy rozróżnić opublikowany vs nieopublikowany rekord.
 
-Preferowany publiczny lookup:
+Preferowany publiczny lookup nie jest surowym route bindingiem, lecz resolverem dyspozycji:
 
-ContentArticleCatalogService::findPublishedBySlug($slug)
+`ContentArticleCatalogService::resolvePublicPath($slug, $routeFamily)`
 
-Preview używa oddzielnej ścieżki i policy.
+Resolver rozstrzyga jawnie:
+
+- visible article -> 200,
+- redirect history -> 301 do canonical,
+- aktywny withdrawal tombstone (`withdrawn_at != null`), także po restore-to-review przed ponownym Publish -> 410,
+- draft/scheduled/never-public/unknown -> 404.
+
+Listy/home/feed używają osobnych `activelyDistributed()` queries. Controller nie może utożsamić publicznego detail URL z aktywną dystrybucją.
+
+Preview używa oddzielnej ścieżki i admin-only policy.
 
 ---
 
@@ -987,9 +1147,9 @@ V1:
 - GET /poradniki
 - GET /poradniki/{slug}
 - GET /aktualnosci/feed.xml
-- sitemap endpoints zgodne z istniejącym SitemapController pattern
+- newsroom/news sitemap jako statyczne artefakty rozszerzające istniejący `SeoSitemapGenerator`; istniejące controller routes mogą pozostać kompatybilnością, ale nie są produkcyjnym source of truth
 
-### 29.1. Konflikt slug vs category
+### 29.1. Konflikt slug vs category / reserved segments
 
 Nie wolno pozostawić niejednoznaczności:
 
@@ -1003,7 +1163,11 @@ Przyjęty wariant:
 - /aktualnosci/kategoria/{categorySlug}
 - /aktualnosci/{articleSlug}
 
-Jest jednoznaczny dla routingu i przyszłych zmian. Zmiana na krótsze category URLs wymaga zmiany decyzji architektonicznej, reserved-slug policy i testów konfliktów.
+Jest jednoznaczny dla routingu i przyszłych zmian.
+
+V1 route params używają slug regex `[a-z0-9-]+`. Dla article sluga w rodzinie newsroom rezerwujemy co najmniej segmenty `kategoria` i `temat`, aby nie tworzyć mylących URL-i będących jednocześnie namespace hubów. Route `/aktualnosci/feed.xml` jest deklarowany przed catch-all article route i nie pasuje do slug regex z powodu kropki.
+
+Zmiana na krótsze category URLs wymaga zmiany decyzji architektonicznej, reserved-slug policy i testów konfliktów.
 
 ### 29.2. Type -> route family
 
@@ -1034,6 +1198,22 @@ Rekomendowane migracje:
 12. create_content_home_placements_table
 
 Nie łączymy wszystkiego w jedną migrację, jeżeli utrudnia to rollback i review.
+
+### 30.1. FK / on-delete safety
+
+Nowe FK nie mogą pozwolić newsroomowi skasować istniejących bytów produktu.
+
+Docelowe zasady:
+
+- `content_articles.category_id -> content_categories`: restrict/no cascade,
+- `author_id/reviewer_id -> content_authors`: restrict/no cascade, aby nie utracić attribution/review identity,
+- `content_topics.featured_article_id -> content_articles`: nullable + nullOnDelete,
+- child records należące wyłącznie do artykułu (`sources`, redirects, home placements, article-* pivots) mogą cascade-delete przy dopuszczalnym hard delete artykułu,
+- pivot FK do istniejącego question/legal/sign może cascade-delete wyłącznie **wiersz pivotu**, gdy target zostaje usunięty; nigdy nie ma ścieżki kasującej question/legal/sign z powodu usunięcia artykułu,
+- tag/topic membership pivots mogą cascade-delete własny pivot przy usunięciu jednego końca,
+- `content_home_placements.created_by_user_id/updated_by_user_id`: nullOnDelete.
+
+Migration tests muszą sprawdzać co najmniej krytyczne restrict/cascade directions na PostgreSQL.
 
 ---
 
@@ -1078,12 +1258,36 @@ Factories mają umożliwiać czytelne testy workflow.
 
 ---
 
-## 33. Deletion policy
+## 33. Archive / deletion policy
 
-Artykuł opublikowany:
+`archived` w v1 jest stanem dystrybucji, nie stanem HTTP „gone”.
 
-- domyślnie archiwizujemy zamiast hard delete,
-- hard delete tylko administracyjnie dla błędnych/testowych rekordów bez historii publicznej.
+Artykuł wcześniej opublikowany po archive:
+
+- znika z home/latest/category/topic active listings, feed, reverse-link promotion i news sitemap,
+- canonical detail URL nadal zwraca 200,
+- pozostaje w standardowej article sitemap tylko jeśli nadal jest indexable,
+- jeśli pozostaje indexable, musi zachować co najmniej jeden crawlable inbound link; gwarantowanym fallbackiem v1 jest publiczny profil autora, który może listować archived+indexable publikacje z jawnym oznaczeniem „archiwalne”,
+- może mieć `noindex` przez kontrolowaną robots policy, jeśli istnieje merytoryczny powód; wtedy nie wymagamy obecności w author archive/public sitemap,
+- nie dostaje automatycznego 301/404/410.
+
+301 wymaga rzeczywistego następcy.
+
+### 33.1. Withdrawn / takedown
+
+V1 zawiera jawny status `withdrawn` dla materiału, który musi przestać być publicznie dostępny, ale którego nie chcemy kasować z historii administracyjnej.
+
+- transition wymaga confirmation + `withdrawal_reason`,
+- ustawia `withdrawn_at`,
+- usuwa URL z home/list/topic/feed/news/article sitemap oraz reverse-link modules,
+- dawny canonical path zwraca `410 Gone`, jeśli nie ma realnego następcy,
+- jeśli istnieje rzeczywisty następca, jawny redirect może zwracać 301 zamiast 410,
+- treść/body/source pozostają dostępne wyłącznie w adminie dla audytu/ewentualnego review,
+- restore nie wraca bezpośrednio do published; przechodzi przez in_review zgodnie z policy,
+- podczas restore-to-review publiczny tombstone pozostaje nieaktywny jako treść; URL nie wraca do 200 article przed udanym Publish,
+- successful Publish po review zapisuje withdrawal history w AuditLog, czyści bieżące `withdrawn_at` + `withdrawal_reason` i aktualizuje `public_state_changed_at` w tej samej transakcji.
+
+Hard delete jest dopuszczalny tylko administracyjnie dla błędnych/testowych rekordów bez historii publicznej.
 
 Category:
 
@@ -1101,7 +1305,9 @@ Redirect history:
 
 ## 34. Audit
 
-Istniejący AuditLog powinien być użyty tam, gdzie pasuje do architektury.
+Istniejący `AuditLog` / `AuditLogService` jest kanoniczną warstwą audytu. Nie dodajemy do `content_articles` pól `created_by_user_id`, `updated_by_user_id`, `published_by` ani `reviewed_by` tylko po to, by powielać historię aktorów. Bieżącego/pierwszego aktora UI wyprowadza z audytu.
+
+`actor_user_id` wskazuje zalogowanego `User` administratora; scheduled/system action może mieć actor=null z jawnym metadata `trigger=scheduler`.
 
 Minimum audit events:
 
@@ -1115,13 +1321,17 @@ Minimum audit events:
 - source removal po publikacji,
 - author/reviewer change po publikacji.
 
-Audit nie zastępuje zwykłego updated_at.
+Audit nie zastępuje zwykłego updated_at ani revision history.
+
+Metadata audytu ma być małe i allowlistowane: IDs, status before/after, timestamps, reason/trigger, powiązane entity IDs. Nie zapisujemy w metadata pełnego `body_blocks`, leadu, notatek źródłowych, raw source payloadów ani dużych fragmentów treści.
 
 ---
 
 ## 35. Uprawnienia
 
-N1 może korzystać z istniejącej roli administratora, ale kod ma przygotować policies.
+V1 zachowuje aktualny kontrakt `User::canAccessPanel()`: panel Filament jest admin-only. Newsroom nie rozszerza dostępu moderatorom ani nie tworzy roli editor/reviewer w tym module.
+
+Policies nadal są wymagane jako backendowe zabezpieczenie operacji newsroomu oraz przygotowanie pod ewentualny przyszły RBAC.
 
 Docelowe abilities:
 
@@ -1135,7 +1345,7 @@ Docelowe abilities:
 - manage categories
 - manage sources
 
-Nie zakładamy roli wyłącznie na podstawie ukrycia przycisku Filament. Backend policy jest źródłem autoryzacji.
+W v1 wszystkie te abilities mapują się do istniejącego administratora. Nie zakładamy uprawnienia wyłącznie na podstawie ukrycia przycisku Filament. Backend policy/service jest źródłem autoryzacji. Rozszerzenie panelu na nie-adminów wymaga osobnego projektu auth/RBAC i nie jest częścią newsroom v1.
 
 ---
 
@@ -1213,7 +1423,9 @@ Nazwy można dostosować do konwencji repo, ale granice odpowiedzialności powin
 
 ### 38.1. Newsroom home
 
-Musi zwrócić gotowy, ograniczony read model:
+Musi zwrócić gotowy, ograniczony read model z `activelyDistributed()`; `needs_review` i `archived` nie są kandydatami do promocji:
+
+
 
 - lead story,
 - secondary stories,
@@ -1228,15 +1440,15 @@ Nie pobieramy całego corpusu i nie filtrujemy w PHP.
 
 ### 38.2. Category page
 
-- published only,
+- activelyDistributed only,
 - category_id,
-- ordered by published_at desc,
+- ordered by first_published_at desc + deterministic tie-breaker,
 - stabilna paginacja,
 - eager load author + minimal media metadata.
 
 ### 38.3. Article show
 
-- published by slug,
+- `resolvePublicPath(slug, routeFamily)` disposition,
 - author,
 - reviewer jeśli publiczny,
 - category,
@@ -1300,14 +1512,23 @@ Model danych jest gotowy, gdy:
 - cross-route-family type change po first publish jest zablokowany,
 - slug change zachowuje redirect history,
 - relations do questions/legal są jawne,
-- `body_blocks` przechodzą walidację per block type,
+- sources rozróżniają public citation od wewnętrznego evidence i wspierają źródło bez URL,
+- `body_blocks` + `body_schema_version` przechodzą walidację i compatibility policy per block type,
 - homepage placements mają fallback i deduplikację,
 - focal point ma poprawny zakres 0..1,
 - hero caption, jeśli istnieje, jest zwykłym tekstem redakcyjnym renderowanym jako figcaption i nie zastępuje alt/credit,
 - OG alt/fallback jest spójny z faktycznym assetem,
 - publiczne URL-e obrazów dla SEO nie wygasają,
 - topic nie powstaje automatycznie z taga,
-- admin policies nie opierają się wyłącznie na UI,
+- admin policies nie opierają się wyłącznie na UI i nie rozszerzają dostępu poza istniejących administratorów,
+- AuditLog rozróżnia `User` actora od `ContentAuthor` author/reviewer identity i nie przechowuje pełnej treści artykułu,
+- public visibility i active distribution są osobnymi scope'ami; needs_review/archived nie są aktywnie promowane, archive ma deterministyczny 200-history policy, a withdrawn ma deterministyczny 410/tombstone policy,
+- public chronology używa first_published_at, nie ostatniego published_at/updated_at,
+- public_state_changed_at oddziela sitemap/public-state freshness od merytorycznego dateModified,
+- FK delete directions nie mogą kaskadować z newsroom article do istniejącego question/legal/sign/author/category,
+- category/topic identity nie może zostać złamana przez zmianę publicznego sluga/dezaktywację,
+- homepage placement overlap jest chroniony również przed równoległymi zapisami,
+- public side effecty są emitowane after-commit,
 - current DATABASE-SCHEMA.md odzwierciedla faktyczny kod.
 
 ---
@@ -1346,6 +1567,26 @@ Na moment utworzenia dokumentu:
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-16 — v0.5
+
+- po finalnym audycie rozdzielono `User` actora od `ContentAuthor` author/reviewer identity i uszczelniono audit metadata,
+- zdefiniowano publicVisible vs activelyDistributed (needs_review pozostaje URL-em, ale nie aktywną dystrybucją) oraz deterministyczne zachowanie archive,
+- chronologię publiczną związano z first_published_at zamiast published_at,
+- poprawiono source model: URL może być null, a is_publicly_cited rozdziela public citation od wewnętrznego evidence,
+- dodano jawny status withdrawn z backoffice reason/timestamp i 410 public disposition, oddzielając historyczne archive od takedownu,
+- dodano public_state_changed_at dla uczciwego sitemap lastmod bez zanieczyszczania dateModified/updated_at,
+- zdefiniowano bezpieczne kierunki FK/on-delete, aby newsroom nie mógł kaskadowo usuwać istniejących bytów produktu,
+- usunięto redundantne created_by/updated_by z ContentArticle; AuditLog pozostaje jedynym źródłem aktorów artykułu,
+- dodano immutable public slugs/active-category guards, trwałą rezerwację historycznych article paths i minimalny topic corpus baseline,
+- rozdzielono freshness overdue od jawnego workflow needs_review,
+- doprecyzowano faktyczny media baseline: resolver/config istnieją, ale uploader jest question-specific; newsroom wymaga własnego bezpiecznego adaptera,
+- dodano body_schema_version i wymóg rzeczywistego backend sanitizera/structured format,
+- dodano guard przed odpublikowaniem autora zależnych publicznych artykułów,
+- dodano serializację concurrent homepage placements przez DB/advisory lock,
+- zapisano transaction + after-commit contract dla publikacji i side effectów,
+- usunięto założenie o async queue workerze przy `QUEUE_CONNECTION=sync`,
+- poprawiono numerację source/scopes oraz kontrakt statycznych sitemap routes.
 
 ### 2026-09-16 — v0.4
 

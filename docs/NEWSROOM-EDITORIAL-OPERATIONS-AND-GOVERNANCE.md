@@ -193,6 +193,7 @@ Publisher sprawdza checklistę, ale nie zastępuje autora i reviewera.
 | Publish | I | C | I | R |
 | Correction | R | R | C | A |
 | Archive | C | R | C | A |
+| Withdraw | C | R | C | A |
 
 Legenda:
 
@@ -202,6 +203,10 @@ Legenda:
 - I — Informed
 
 W małym zespole jedna osoba może pełnić kilka ról, ale checklisty i audit trail nadal obowiązują.
+
+Ważne: role Author/Editor/Reviewer/Publisher w tym dokumencie są rolami procesu redakcyjnego, nie osobnymi rolami logowania Filament. V1 panel pozostaje admin-only. `ContentAuthor` opisuje autora/reviewera treści, a `User` z AuditLog opisuje faktycznego zalogowanego administratora wykonującego akcję.
+
+Dlatego v1 może wymagać reviewer identity + reviewed_at, ale bez osobnego RBAC/linku ContentAuthor↔User nie twierdzimy, że system technicznie wymusza „four eyes” jako dwie różne zalogowane osoby.
 
 ---
 
@@ -221,7 +226,7 @@ Warunki wejścia:
 
 - tytuł,
 - lead,
-- body,
+- renderowalne body_blocks,
 - kategoria,
 - autor,
 - źródła,
@@ -248,9 +253,27 @@ Nie należy automatycznie noindexować materiału tylko dlatego, że data review
 
 ### 7.6. Archived
 
-Materiał wycofany z normalnej dystrybucji.
+Materiał wycofany z normalnej dystrybucji, ale nie automatycznie usunięty z historii.
 
-Decyzja o 200/404/410/redirect zależy od konkretnego przypadku i jest opisana w release/SEO docs.
+Dla wcześniej opublikowanego materiału v1:
+
+- canonical URL nadal zwraca 200,
+- znika z aktywnych hubów/latest/feed/news sitemap,
+- może pozostać indexable albo otrzymać kontrolowane noindex z merytorycznego powodu,
+- archive samo w sobie nie oznacza 301/404/410.
+
+Jeśli materiał ma faktycznie zniknąć albo ma następcę, nie przeciążamy workflow `archived`.
+
+### 7.7. Withdrawn
+
+Używamy tylko dla jawnego takedownu:
+
+- poważny błąd, którego nie można bezpiecznie pozostawić publicznie,
+- wymóg prawny,
+- naruszenie praw/licencji,
+- przypadkowa publikacja materiału, który nie powinien być publiczny.
+
+Wymaga `withdrawal_reason` i audit trail. Publiczny dawny URL zwraca 410, chyba że istnieje rzeczywisty następca z 301. Restore zawsze wraca do review, nie bezpośrednio do published.
 
 ---
 
@@ -304,6 +327,18 @@ Preferowane:
 - publikacje ekspertów.
 
 Tier 3 może naprowadzać na temat, ale dla zmian regulacyjnych należy szukać Tier 1/2.
+
+### 9.1. Public citation vs internal evidence
+
+Nie każde prawdziwe źródło ma publiczny URL.
+
+- official/legislation/institution/report/media zwykle powinny mieć publiczny URL, jeśli taki istnieje,
+- interview, odpowiedź bezpośrednia lub inne evidence może nie mieć URL,
+- `is_publicly_cited=true` oznacza zgodę/redakcyjną decyzję na pokazanie citation,
+- `is_publicly_cited=false` przechowuje źródło jako wewnętrzny evidence i nie ujawnia title/publisher/url publicznie,
+- source `note` jest zawsze wewnętrzne.
+
+Dla newsa prawnego, jeśli istnieje jawne źródło Tier 1, co najmniej jedno takie źródło powinno być publicznie cytowalne z linkiem.
 
 ---
 
@@ -445,7 +480,9 @@ Wymaga:
 Jeśli cały materiał jest nieprawdziwy lub nie powinien być publiczny:
 
 - natychmiast zdejmujemy z modułów,
-- publisher podejmuje decyzję o archive/404/410/redirect,
+- używamy `Withdraw from public`, co daje 410 i zachowuje rekord/audit w backoffice,
+- jeśli istnieje rzeczywisty następca, zamiast 410 stosujemy jawny 301,
+- `archive` nie jest takedownem — zachowuje historyczny 200,
 - dokumentujemy przyczynę,
 - nie zostawiamy fałszywego tekstu tylko „dla SEO”.
 
@@ -687,13 +724,15 @@ Złe przykłady:
 
 ### 26.1. Materiały prawne
 
-Trigger review:
+Trigger kolejki review:
 
 - nowelizacja aktu,
 - nowy komunikat organu,
 - zmiana daty wejścia w życie,
 - sygnał o błędzie,
 - osiągnięcie freshness_review_due_at.
+
+Sam termin `freshness_review_due_at` oznacza overdue i podnosi priorytet pracy, ale nie zmienia automatycznie workflow na `needs_review`. `needs_review` stosujemy, gdy istnieje konkretna przesłanka, że dalsza aktywna promocja bez ponownej weryfikacji jest niewłaściwa.
 
 ### 26.2. Guides
 
@@ -838,11 +877,14 @@ Dla ważnego materiału:
 Jeśli opublikowano potencjalnie szkodliwy błąd:
 
 1. publisher może natychmiast zdjąć featured/breaking,
-2. poprawa lub tymczasowe archive,
-3. weryfikacja źródła,
-4. correction note,
-5. audit,
-6. ponowne opublikowanie po review.
+2. jeśli pozostawienie URL 200 jest ryzykowne, administrator używa Withdraw from public,
+3. weryfikujemy źródło i zakres błędu,
+4. przygotowujemy poprawę poza publicznym low-level Save,
+5. dodajemy correction note, jeśli korekta jest istotna,
+6. zapisujemy audit,
+7. po review używamy Apply public update albo — po wcześniejszym Withdraw — Restore to review + Publish.
+
+`Archive` stosujemy tylko wtedy, gdy historyczny 200 jest świadomie właściwym rezultatem, nie jako „tymczasowe ukrycie” fałszywej treści.
 
 Nie czekamy na pełny cykl redakcyjny, jeśli błędna informacja jest publiczna.
 
@@ -928,7 +970,7 @@ Usuwamy/noindex/410 tylko, gdy:
 
 ---
 
-## 40.1. Anti-scaled-content / programmatic publishing policy
+### 40.1. Anti-scaled-content / programmatic publishing policy
 
 Automatyzacja nie może tworzyć indeksowalnych stron wyłącznie dlatego, że istnieje kombinacja słów kluczowych, taga, miasta albo rekordu w bazie.
 
@@ -1022,14 +1064,18 @@ W formularzu powinny być ostrzeżenia:
 
 ## 44. Preview
 
-Preview artykułu musi:
+Preview v1:
 
-- wyglądać możliwie identycznie jak publiczna strona,
-- mieć noindex,
-- nie wejść do sitemap/feed,
-- nie pojawiać się w publicznych hubach,
-- wymagać auth lub signed URL,
-- nie ujawniać nieopublikowanych materiałów przypadkowym użytkownikom.
+- wygląda możliwie identycznie jak publiczna strona,
+- jest dostępne wyłącznie dla zalogowanego administratora,
+- ma `Cache-Control: private, no-store`,
+- ma noindex,nofollow,
+- nie wchodzi do sitemap/feed,
+- nie pojawia się w publicznych hubach,
+- nie jest liczone jako public article view,
+- nie ma shareable signed tokenu.
+
+Jeśli kiedyś potrzebny będzie external reviewer preview, wymaga osobnego threat modelu, TTL/revocation i audytu.
 
 Preview całego `/aktualnosci` powinien dodatkowo pozwalać wybrać przyszły czas i zobaczyć zaplanowane placements/fallbacki przed publikacją.
 
@@ -1037,9 +1083,11 @@ Preview całego `/aktualnosci` powinien dodatkowo pozwalać wybrać przyszły cz
 
 ## 45. Audit trail
 
-Audit powinien odpowiedzieć:
+Audit używa istniejącego `AuditLog`.
 
-- kto utworzył,
+Powinien odpowiedzieć:
+
+- który `User` administrator utworzył,
 - kto edytował,
 - kto zmienił status,
 - kto opublikował,
@@ -1047,6 +1095,8 @@ Audit powinien odpowiedzieć:
 - kto usunął źródło,
 - kto ustawił breaking/featured,
 - kiedy wykonano istotną korektę.
+
+Author/reviewer to osobne `ContentAuthor` identities. Audit metadata przechowuje stan/IDs/timestamps/reason, nie pełny body, lead ani prywatne notatki.
 
 ---
 
@@ -1085,14 +1135,14 @@ Na 2026-09-16:
 
 ## 48. Pozostałe zadania
 
-- [ ] wdrożyć role/policies przynajmniej na poziomie admina,
+- [ ] wdrożyć admin-only policies bez rozszerzania panel access i spiąć AuditLog User actor,
 - [ ] odwzorować mandatory checklist w walidacji,
 - [ ] wdrożyć source model,
 - [ ] wdrożyć origin/regulatory governance w CMS,
 - [ ] wdrożyć homepage placements i future home preview,
 - [ ] wdrożyć topic governance,
 - [ ] wdrożyć focal-point review,
-- [ ] wdrożyć preview,
+- [ ] wdrożyć admin-only private/no-store preview,
 - [ ] wdrożyć scheduling,
 - [ ] wdrożyć corrections,
 - [ ] wdrożyć freshness filters,
@@ -1101,6 +1151,18 @@ Na 2026-09-16:
 ---
 
 ## 49. Historia zmian
+
+### 2026-09-16 — v0.6
+
+- rozdzielono public citation od internal evidence i dopuszczono wiarygodne źródła bez URL bez wycieku prywatnych danych.
+
+### 2026-09-16 — v0.5
+
+- rozdzielono pojęciowe role redakcyjne od auth/RBAC; v1 Filament pozostaje admin-only,
+- ContentAuthor reviewer/author oddzielono od User actora w AuditLog,
+- preview v1 zamknięto do authenticated admin + private,no-store,
+- archive otrzymało deterministyczną historyczną semantykę 200, a osobny withdrawn obsługuje jawny takedown 410,
+- checklistę in-review wyrównano do body_blocks.
 
 ### 2026-09-16 — v0.4
 
