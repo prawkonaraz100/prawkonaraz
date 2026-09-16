@@ -388,6 +388,19 @@ UI:
 - badge primary/official/public citation
 - wyraźne oznaczenie „tylko wewnętrzne” dla `is_publicly_cited=false`
 
+### 15.1. Aktualny stan implementacji N2-004
+
+Sekcja źródeł jest zmaterializowana w istniejącym `ContentArticleResource` jako relationship Repeater `sources`:
+
+- korzysta z istniejącej relacji `ContentArticle::sources()` i modelu `ContentArticleSource`,
+- startuje z `defaultItems(0)`, więc zwykły draft może zostać zapisany bez sztucznego pustego źródła,
+- reorder zapisuje `sort_order`,
+- formularz pokazuje stany PRIMARY / OFFICIAL / PUBLIC / TYLKO WEWNĘTRZNE i wszystkie source types v1,
+- URL jest opcjonalny; dla niepustej wartości UI wymaga HTTP(S), a akcja „Otwórz źródło” pojawia się tylko dla bezpiecznego HTTP(S) URL,
+- ordinary Edit `publiclyVisible()` ma source Repeater disabled, a server-side public edit path nie zapisuje source relationship,
+- `ContentArticleSource` bumpuje parent `ContentArticle.updated_at`; pełny loaded-token stale-write reject pozostaje osobnym N2-012,
+- publiczny renderer źródeł nadal nie istnieje, więc N2-004 nie jest deklarowane jako wdrożenie public citation UI.
+
 ---
 
 ## 16. Source warnings
@@ -402,6 +415,15 @@ Panel ostrzega/blokuje zgodnie z policy:
 - `is_publicly_cited=false` oznacza, że title/publisher/url nie mogą wyciec do publicznego renderera.
 
 Publish service ma finalną walidację, niezależnie od ostrzeżeń UI.
+
+Aktualny backend po N2-004 egzekwuje mechanicznie:
+
+- co najmniej jeden source dla news,
+- wymagany title i wspierany source type dla każdego source,
+- poprawny HTTP(S) dla każdego niepustego URL,
+- dla kategorii `przepisy`: jeśli istnieje primary `official`/`legislation`, co najmniej jeden taki primary musi być publicznie cytowalny z HTTP(S) URL.
+
+Nie wdrożono jeszcze osobnego computed warningu „brak primary source dla prawnego newsa”; pozostaje on w późniejszym publication checklist/provenance scope. To jest granica implementacji, a nie zmiana policy redakcyjnej.
 
 ---
 
@@ -1241,17 +1263,18 @@ Na 2026-09-16:
 - custom Filament `NewsroomHomeComposer` nadal nie istnieje; N1-006 nie dostarcza UI, stale-write UX ani admin preview route,
 - `ContentCategoryResource` istnieje: index/create/view/edit, article counts, active filter, `position` reorder oraz category invariants,
 - N2-002 dodało podstawowy `ContentArticleResource` shell z index/create/view/edit, Form/Infolist/Table, search/filter setem oraz eager loadingiem category/author/reviewer,
+- N2-004 dodało relationship source editor na istniejącym `ContentArticleSource`, reorder/status indicators, nullable-evidence URL handling oraz finalną source-policy validation w `ContentArticlePublishingService`,
 - create draft oraz draftowe zmiany type/sluga delegują do `ContentArticleSlugService`; `User` actor i `ContentAuthor` author/reviewer pozostają rozdzielone,
 - ordinary Edit dla `publiclyVisible()` nie zapisuje publicznych pól również server-side i pozwala w tej ścieżce tylko na osobny zapis `editorial_note`,
 - `ContentTopicResource` i custom `NewsroomHomeComposer` nadal nie istnieją,
-- workflow actions, stale-write guard, media/sources/relations/origin-regulatory UI i private preview nadal nie istnieją; kontrolowany article Builder/RichEditor jest już wdrożony,
+- workflow actions, stale-write guard, media/relations/origin-regulatory UI i private preview nadal nie istnieją; kontrolowany article Builder/RichEditor i source relationship editor są już wdrożone,
 - publiczny renderer bloków nie istnieje.
 
 ---
 
 ## 54. Pozostałe zadania
 
-- [ ] wdrożyć Sources editor zgodnie z N2-004 i istniejącym `ContentArticleSource`/publish-source contract,
+- [ ] wdrożyć relations/topics editor zgodnie z N2-005 bez preloadu dużych corpusów,
 - [ ] wdrożyć ContentTopicResource,
 - [ ] wdrożyć NewsroomHomeComposer + future preview,
 - [ ] wdrożyć hero/OG uploader korzystający z `NewsroomMediaStorage` i zapis verified metadata do `ContentArticle`,
@@ -1268,6 +1291,17 @@ Na 2026-09-16:
 ---
 
 ## 55. Historia zmian
+
+### 2026-09-16 — v0.13
+
+- N2-004 zmaterializowało sekcję źródeł jako relationship Repeater w istniejącym `ContentArticleResource`, bez nowego source resource/modelu/migracji,
+- `defaultItems(0)` zachowuje lekki draft flow; źródła są wymagane przez service boundary przy review/publish news, nie przy pierwszym zapisie,
+- editor utrzymuje `sort_order`, source types v1, nullable interview/internal URL, bezpieczną akcję otwarcia HTTP(S) oraz jawne stany PRIMARY/OFFICIAL/PUBLIC/TYLKO WEWNĘTRZNE,
+- ordinary Edit `publiclyVisible()` nie może mutować sources; source model bumpuje parent `updated_at`, ale właściwy stale-write loaded-token reject nadal nie istnieje,
+- backend source policy jest finalnie walidowana przez `ContentArticlePublishingService`; osobny warning o braku primary source dla prawnego newsa pozostaje N2-007/N2-010,
+- public source/citation renderer nadal pozostaje N3,
+- finalny exact-head gate PR #44: `quality` 968 passed / 18 917 assertions / 2 skipped, Pint 1010 files PASS, frontend build PASS; `newsroom-postgres` 7 passed / 89 assertions,
+- następnym taskiem jest `NEWSROOM-N2-005` Relations and topics editor.
 
 ### 2026-09-16 — v0.12
 
