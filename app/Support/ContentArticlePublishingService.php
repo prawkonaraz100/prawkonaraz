@@ -145,6 +145,30 @@ final class ContentArticlePublishingService
         });
     }
 
+    public function assertScheduledPreviewReady(
+        ContentArticle $article,
+        DateTimeInterface $at,
+    ): void {
+        $previewAt = Carbon::parse($at->format(DATE_ATOM));
+
+        $this->assertStatus(
+            $article,
+            [ContentArticleWorkflowStatus::Scheduled],
+            'preview scheduled publication',
+        );
+
+        if ($article->first_published_at !== null) {
+            throw new DomainException('Newsroom v1 does not support scheduled republish.');
+        }
+
+        if ($article->scheduled_for === null || $article->scheduled_for->gt($previewAt)) {
+            throw new DomainException('Scheduled article is not due at the requested preview time.');
+        }
+
+        $this->assertPublicationReady($article, $previewAt);
+        $this->assertFreshReview($article);
+    }
+
     public function publish(
         ContentArticle $article,
         ?User $actor = null,
@@ -409,7 +433,10 @@ final class ContentArticlePublishingService
         $this->assertKeyPoints($article);
     }
 
-    private function assertPublicationReady(ContentArticle $article): void
+    private function assertPublicationReady(
+        ContentArticle $article,
+        ?DateTimeInterface $at = null,
+    ): void
     {
         $this->assertReviewReady($article);
 
@@ -446,7 +473,7 @@ final class ContentArticlePublishingService
             }
         }
 
-        $this->assertBreakingInvariant($article);
+        $this->assertBreakingInvariant($article, $at);
     }
 
     private function assertPreviouslyPublished(ContentArticle $article): void
@@ -497,8 +524,10 @@ final class ContentArticlePublishingService
         }
     }
 
-    private function assertBreakingInvariant(ContentArticle $article): void
-    {
+    private function assertBreakingInvariant(
+        ContentArticle $article,
+        ?DateTimeInterface $at = null,
+    ): void {
         if (! $article->is_breaking) {
             return;
         }
@@ -507,8 +536,15 @@ final class ContentArticlePublishingService
             throw new DomainException('Breaking article must be a news article.');
         }
 
-        if ($article->breaking_expires_at === null || ! $article->breaking_expires_at->isFuture()) {
-            throw new DomainException('Breaking article requires a future expiration timestamp.');
+        $referenceAt = $at === null
+            ? now()
+            : Carbon::parse($at->format(DATE_ATOM));
+
+        if (
+            $article->breaking_expires_at === null
+            || $article->breaking_expires_at->lte($referenceAt)
+        ) {
+            throw new DomainException('Breaking article requires an expiration timestamp after the evaluated publication time.');
         }
     }
 
