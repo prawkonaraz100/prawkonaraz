@@ -290,7 +290,7 @@ Domknąć techniczny sposób edycji kanonicznego `body_blocks`.
 - unknown block type, unknown payload field i unsupported `body_schema_version` failują zamknięcie,
 - rich text allowlistuje tylko paragraph, H2/H3, lists, text, hard break oraz marks bold/italic/link; raw HTML/style nodes nie są formatem wejściowym,
 - `javascript:` i nieobsługiwane targety linków są odrzucane; `target=_blank` otrzymuje wymuszone `rel="noopener noreferrer"`,
-- image block przyjmuje tylko storage-relative path; finalny upload/storage/crop contract nadal należy do N0-006,
+- image block przyjmuje tylko storage-relative path; N0-006 dostarcza już `NewsroomMediaStorage`, a faktyczny N2 upload UI/persistence i crop pipeline pozostają downstream,
 - domain blocks zapisują kontrolowane IDs, a nie skopiowane HTML/card payloady,
 - block `key` ma stabilny format, jest unikalny i nie może być sprzeczny z Builder item key.
 
