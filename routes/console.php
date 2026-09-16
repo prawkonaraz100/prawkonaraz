@@ -2419,6 +2419,11 @@ Schedule::command('seo:monitor-question-relation-v2-canary --report=storage/app/
         && (bool) config('question_relations.v2_canary_enabled', false))
     ->withoutOverlapping();
 
+Schedule::command('newsroom:publish-due')
+    ->everyMinute()
+    ->environments(['production'])
+    ->withoutOverlapping();
+
 Schedule::command('seo:indexnow-drain-queue --limit='.(int) config('indexnow.queue_batch_size', 50))
     ->everyTenMinutes()
     ->environments(['production'])
