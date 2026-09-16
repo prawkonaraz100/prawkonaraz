@@ -2,14 +2,17 @@
 
 namespace App\Filament\Resources\ContentArticles\Schemas;
 
+use App\Enums\ContentArticleSourceType;
 use App\Enums\ContentArticleType;
 use App\Models\ContentArticle;
 use App\Models\LegalUnit;
 use App\Models\Question;
 use App\Models\TrafficSign;
 use App\Support\NewsroomBodyContract;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Builder as FormBuilder;
 use Filament\Forms\Components\Builder\Block;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
@@ -17,9 +20,12 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Support\Str;
 
@@ -33,7 +39,7 @@ class ContentArticleForm
                     'lg' => 12,
                 ])->schema([
                     Section::make('Tożsamość i klasyfikacja')
-                        ->description('Podstawowe pola artykułu. Workflow, źródła, media i relacje redakcyjne mają osobne etapy N2.')
+                        ->description('Podstawowe pola artykułu. Workflow, media i relacje redakcyjne mają osobne etapy N2.')
                         ->columnSpan([
                             'lg' => 8,
                         ])
@@ -120,6 +126,80 @@ class ContentArticleForm
                             ->blockPickerColumns(2)
                             ->reorderableWithButtons()
                             ->collapsible()
+                            ->disabled(fn (?ContentArticle $record): bool => static::publicFieldsLocked($record))
+                            ->columnSpanFull(),
+                    ]),
+                Section::make('Źródła')
+                    ->description('Źródła są rekordami relacyjnymi artykułu. Prywatne evidence pozostaje w backoffice i nie może być cytowane publicznie.')
+                    ->schema([
+                        Repeater::make('sources')
+                            ->relationship('sources')
+                            ->label('Źródła')
+                            ->defaultItems(0)
+                            ->addActionLabel('Dodaj źródło')
+                            ->orderColumn('sort_order')
+                            ->reorderableWithButtons()
+                            ->collapsible()
+                            ->itemLabel(fn (array $state): string => static::sourceItemLabel($state))
+                            ->schema([
+                                Select::make('source_type')
+                                    ->label('Typ źródła')
+                                    ->options(static::sourceTypeOptions())
+                                    ->native(false)
+                                    ->required(),
+                                TextInput::make('publisher')
+                                    ->label('Wydawca / instytucja')
+                                    ->maxLength(255),
+                                TextInput::make('title')
+                                    ->label('Tytuł źródła')
+                                    ->required()
+                                    ->maxLength(500)
+                                    ->live(onBlur: true)
+                                    ->columnSpanFull(),
+                                TextInput::make('url')
+                                    ->label('URL')
+                                    ->helperText('Opcjonalny. Jeśli podany, musi używać http lub https.')
+                                    ->maxLength(2048)
+                                    ->rules(['nullable', 'url:http,https'])
+                                    ->live(onBlur: true)
+                                    ->suffixAction(
+                                        Action::make('openSourceUrl')
+                                            ->icon(Heroicon::ArrowTopRightOnSquare)
+                                            ->tooltip('Otwórz źródło')
+                                            ->url(fn (Get $get): ?string => static::safeSourceUrl($get('url')))
+                                            ->openUrlInNewTab()
+                                            ->visible(fn (Get $get): bool => static::safeSourceUrl($get('url')) !== null),
+                                    )
+                                    ->columnSpanFull(),
+                                DateTimePicker::make('published_at')
+                                    ->label('Opublikowano')
+                                    ->timezone('Europe/Warsaw')
+                                    ->seconds(false),
+                                DateTimePicker::make('accessed_at')
+                                    ->label('Sprawdzono / dostęp')
+                                    ->timezone('Europe/Warsaw')
+                                    ->seconds(false),
+                                Toggle::make('is_primary')
+                                    ->label('Źródło primary')
+                                    ->live(),
+                                Toggle::make('is_official')
+                                    ->label('Źródło oficjalne')
+                                    ->live(),
+                                Toggle::make('is_publicly_cited')
+                                    ->label('Cytowane publicznie')
+                                    ->helperText('Wyłącz dla wewnętrznego evidence; title/publisher/url nie mogą wtedy trafić do publicznego renderera.')
+                                    ->default(true)
+                                    ->live(),
+                                Placeholder::make('source_status')
+                                    ->label('Status źródła')
+                                    ->content(fn (Get $get): string => static::sourceStatusLabel($get)),
+                                Textarea::make('note')
+                                    ->label('Notatka wewnętrzna')
+                                    ->rows(3)
+                                    ->helperText('Nigdy nie jest częścią publicznej citation.')
+                                    ->columnSpanFull(),
+                            ])
+                            ->columns(2)
                             ->disabled(fn (?ContentArticle $record): bool => static::publicFieldsLocked($record))
                             ->columnSpanFull(),
                     ]),
@@ -440,6 +520,66 @@ class ContentArticleForm
         $prompt = Str::limit(trim((string) $question->prompt), 120);
 
         return $externalId !== '' ? $externalId.' · '.$prompt : $prompt;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected static function sourceTypeOptions(): array
+    {
+        return [
+            ContentArticleSourceType::Official->value => 'Oficjalne',
+            ContentArticleSourceType::Legislation->value => 'Akt prawny / legislacja',
+            ContentArticleSourceType::Institution->value => 'Instytucja',
+            ContentArticleSourceType::PrimaryData->value => 'Dane pierwotne',
+            ContentArticleSourceType::Interview->value => 'Wywiad / rozmowa',
+            ContentArticleSourceType::Report->value => 'Raport',
+            ContentArticleSourceType::Media->value => 'Media',
+            ContentArticleSourceType::Other->value => 'Inne',
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $state
+     */
+    protected static function sourceItemLabel(array $state): string
+    {
+        $title = trim((string) ($state['title'] ?? ''));
+        $title = $title !== '' ? Str::limit($title, 90) : 'Nowe źródło';
+
+        $flags = array_values(array_filter([
+            ($state['is_primary'] ?? false) ? 'PRIMARY' : null,
+            ($state['is_official'] ?? false) ? 'OFFICIAL' : null,
+            ($state['is_publicly_cited'] ?? true) ? 'PUBLIC' : 'TYLKO WEWNĘTRZNE',
+        ]));
+
+        return $flags === [] ? $title : $title.' · '.implode(' · ', $flags);
+    }
+
+    protected static function sourceStatusLabel(Get $get): string
+    {
+        return implode(' · ', array_values(array_filter([
+            $get('is_primary') ? 'PRIMARY' : null,
+            $get('is_official') ? 'OFFICIAL' : null,
+            ($get('is_publicly_cited') ?? true) ? 'PUBLIC' : 'TYLKO WEWNĘTRZNE',
+        ])));
+    }
+
+    protected static function safeSourceUrl(mixed $value): ?string
+    {
+        if (! is_string($value)) {
+            return null;
+        }
+
+        $url = trim($value);
+
+        if ($url === '' || filter_var($url, FILTER_VALIDATE_URL) === false) {
+            return null;
+        }
+
+        $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
+
+        return in_array($scheme, ['http', 'https'], true) ? $url : null;
     }
 
     /**
