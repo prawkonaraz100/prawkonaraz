@@ -2,7 +2,7 @@
 
 ## 1. Status
 
-- Status: Proposed / implementation-ready specification
+- Status: Canonical specification + live implementation status
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Powiązane:
   - [SEO-CONTENT-ROADMAP.md](./SEO-CONTENT-ROADMAP.md)
@@ -1576,6 +1576,7 @@ Nie linkujemy do przypadkowego SEO bloga jako źródła normatywnego.
 Obecnie:
 
 - public-content layout ma canonical/OG/Twitter/article times support,
+- NEWSROOM-N3-002 jest wdrożone na `main@d9be735eee1915f4b53a6de42ec665a37442acae`: `ContentArticleSeoService` generuje layout-compatible title/description/self-canonical/robots/social-image/article-time metadata wyłącznie dla publicznie widocznego artykułu,
 - istnieją statycznie generowane sitemapy innych content types przez `SeoSitemapGenerator`, `SeoSitemapBuilder` i `SeoSitemapAuditor`,
 - scheduler uruchamia `seo:refresh-sitemaps` codziennie jako istniejący safety net,
 - istnieje zarówno `public/robots.txt`, jak i route `RobotsController`; production delivery trzeba traktować zgodnie z `SEO-SITEMAP-REPAIR-PLAN.md`,
@@ -1585,7 +1586,7 @@ Obecnie:
 - HomePageController korzysta z kanonicznego Organization/WebSite graph; legacy „Orły na Drodze” nie jest już emitowane przez homepage,
 - wspólny public-content layout emituje `og:site_name` z kanonicznego identity,
 - istnieje również runtime `SitemapController`, ale statyczne pliki są nadrzędnym produkcyjnym modelem; samo dodanie headerów do kontrolera nie rozwiązuje static delivery,
-- newsroom-specific Article schema/news sitemap/feed nie istnieją,
+- newsroom-specific Article schema/news sitemap/feed nie istnieją; schema graph pozostaje NEWSROOM-N3-003,
 - newsroom dirty/version refresh coordinator i atomowy child-before-index switch nie istnieją,
 - repo nie gwarantuje async Laravel queue workera (`QUEUE_CONNECTION=sync` w env example), więc newsroom nie może opierać freshness na ShouldQueue,
 - `/aktualnosci` i `/poradniki` są pre-launch placeholderami 200 z `X-Robots-Tag: noindex, follow`,
@@ -1599,7 +1600,7 @@ Obecnie:
 - [x] ujednolicić Organization/WebSite/site name na istniejącym config/schema infrastructure,
 - [x] dodać `og:site_name` do wspólnego public layout contract,
 - [ ] dodać feed discovery do wspólnego public layout contract,
-- [ ] wdrożyć ContentArticleSeoService,
+- [x] wdrożyć ContentArticleSeoService,
 - [ ] wdrożyć ContentArticleSchemaService,
 - [ ] rozszerzyć istniejący statyczny generator o article sitemap z deterministic sharding readiness,
 - [ ] wdrożyć statyczny news sitemap z pełnymi wymaganymi news tags,
@@ -1618,6 +1619,13 @@ Obecnie:
 ---
 
 ## 70. Historia zmian
+
+### 2026-09-17 — v0.9
+
+- NEWSROOM-N3-002 zmergowano przez PR #66 na `main@d9be735eee1915f4b53a6de42ec665a37442acae`; finalny push-CI #237 potwierdził pełny PASS: 1034 tests / 19 376 assertions / 2 skipped, Pint 1043 files, frontend build 8.50 s, PostgreSQL 7/94,
+- wdrożono `ContentArticleSeoService` bez ręcznego canonical override: canonical pochodzi z `NewsroomRouteContract` i `PublicUrlResolver`,
+- service generuje title/description/robots, OG-image z hero fallbackiem oraz `first_published_at` / `last_substantive_update_at` times; techniczne `updated_at` nie steruje dateModified,
+- metadata są zgodne z istniejącym public-content layout contract, ale article HTTP renderer pozostaje pre-launch 404; schema graph jest kolejnym NEWSROOM-N3-003.
 
 ### 2026-09-16 — v0.8
 

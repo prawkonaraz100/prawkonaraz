@@ -1286,7 +1286,7 @@ Frontend newsroom v1 jest UI-complete, gdy:
 
 ## 67. Stan implementacji
 
-Na 2026-09-16:
+Na 2026-09-17:
 
 - `/aktualnosci` i `/poradniki` renderują `MarketingPlaceholder.vue` przez dedykowany `NewsroomPlaceholderController`,
 - oba pre-launch huby zwracają 200 i `X-Robots-Tag: noindex, follow`,
@@ -1297,7 +1297,8 @@ Na 2026-09-16:
 - globalna nawigacja zawiera Aktualności,
 - backendowy `NewsroomHomeCompositionService` istnieje i materializuje lead/secondary/latest/category/guides/important-now/breaking composition contract,
 - backendowy `ContentArticlePublicCatalogService` istnieje po NEWSROOM-N3-001 i materializuje route-family current-canonical detail lookup, explicit visible/gone/not-found resolution oraz osobny `activelyDistributed()` list query z public-safe eager loading,
-- ten catalog service nie jest jeszcze podłączony do publicznych detail controllerów/Blade; `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}` nadal pozostają 404 w pre-launch stanie,
+- backendowy `ContentArticleSeoService` istnieje po NEWSROOM-N3-002 i przygotowuje layout-compatible title/description/self-canonical/robots/OG-image/article-time metadata; nie jest jeszcze podłączony do publicznego article renderera,
+- ten catalog/SEO boundary nie jest jeszcze podłączony do publicznych detail controllerów/Blade; `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}` nadal pozostają 404 w pre-launch stanie,
 - `NewsroomHomeCompositionService` nadal nie jest podłączony do publicznego `/aktualnosci`; hub pozostaje placeholderem i właściwe newsroom-specific list/article/category/topic components nie istnieją.
 
 ---
@@ -1322,6 +1323,12 @@ Na 2026-09-16:
 ---
 
 ## 69. Historia zmian
+
+### 2026-09-17 — v0.10
+
+- odnotowano wdrożony NEWSROOM-N3-002 backendowy `ContentArticleSeoService`,
+- zapisano, że metadata service jest kompatybilny z istniejącym public-content layoutem, ale nie oznacza wdrożenia article page ani publicznego 200 renderer surface,
+- detail routes `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}` nadal pozostają 404; schema graph jest N3-003, a właściwy article Blade page N3-004.
 
 ### 2026-09-17 — v0.9
 

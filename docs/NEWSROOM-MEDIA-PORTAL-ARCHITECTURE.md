@@ -5,7 +5,7 @@
 - **Status:** Canonical architecture + live implementation status
 - **Obszar:** publiczny serwis informacyjny, newsroom, aktualności, poradniki i dystrybucja treści
 - **Repozytorium:** `prawkonaraz100/prawkonaraz`
-- **Bazowy stan kodu:** `main@8215e142af2cd88c7335f17bc085bbd0c04d5790`
+- **Bazowy stan kodu:** `main@d9be735eee1915f4b53a6de42ec665a37442acae`
 - **Data utworzenia:** 2026-09-15
 - **Właściciel decyzji produktowej:** PrawkoNaRaz
 - **Cel:** zaprojektować profesjonalny pion medialny bez dublowania istniejącej platformy, bez osobnego CMS/WordPressa i bez rozbijania modularnego monolitu.
@@ -103,7 +103,7 @@ Na pierwszym etapie nie budujemy:
 
 ## 5. Aktualny stan implementacji
 
-Stan sprawdzony ponownie 2026-09-17 względem `main@8215e142af2cd88c7335f17bc085bbd0c04d5790` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-012 oraz NEWSROOM-N3-001. Zakres admin/domain N2 jest zamknięty, a backendowy public read boundary N3-001 jest wdrożony; publiczne kontrolery/renderery, SEO/schema i dalsze N3/N4/N5 pozostają otwarte.
+Stan sprawdzony ponownie 2026-09-17 względem `main@d9be735eee1915f4b53a6de42ec665a37442acae` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-012 oraz NEWSROOM-N3-001..N3-002. Zakres admin/domain N2 jest zamknięty, backendowy public read boundary N3-001 i article SEO metadata service N3-002 są wdrożone; publiczne kontrolery/renderery, schema graph oraz dalsze N3/N4/N5 pozostają otwarte.
 
 ### 5.1. Elementy już istniejące
 
@@ -162,6 +162,7 @@ To oznacza, że:
 - model domenowy artykułów/kategorii/tagów/topiców i relacji oraz backendowy publishing/scheduling foundation już istnieją,
 - nie istnieje jeszcze publiczna lista artykułów ani widok pojedynczego artykułu,
 - `ContentArticlePublicCatalogService` materializuje backendowy public read boundary: route-family-scoped lookup dla publicznie widocznego detailu, jawne `visible/gone/not_found` (200/410/404 na poziomie resolution), osobny `activelyDistributed()` query dla listingów oraz public-safe eager loading/column allowlists,
+- `ContentArticleSeoService` materializuje backendowy article metadata contract: self-canonical z route family + slug przez `NewsroomRouteContract`/`PublicUrlResolver`, title/description/robots, OG/hero fallback oraz `first_published_at` / `last_substantive_update_at` dates w formacie konsumowanym przez istniejący public-content layout; nie jest jeszcze podłączony do publicznego detail controllera,
 - `ContentArticlePathResolver` nadal przechowuje canonical/history path foundation; publiczne kontrolery nie są jeszcze podłączone, a historyczny old-path -> 301 resolver pozostaje NEWSROOM-N3-006,
 - zakres admin/domain CMS N2 jest zmaterializowany: obok `ContentCategoryResource`, `ContentArticleResource`, Builder/sources/relations/workflow/public-update/checklist/preview/HomeComposer/provenance-media istnieje `ContentTopicResource` + kontrolowany topic publish/archive/republish workflow; publiczne route’y pozostają nieuruchomione.
 
@@ -1494,7 +1495,8 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N2-010` — provenance, regulatory context and media art direction,
 - [x] `NEWSROOM-N2-011` — ContentTopicResource + topic publication/identity guards,
 - [x] `NEWSROOM-N3-001` — Public catalog service: backendowy route-family read boundary, active-list query i jawna visible/gone/not-found semantyka.
-- [ ] `NEWSROOM-N3-002` — Article SEO service jako następny wykonywalny task.
+- [x] `NEWSROOM-N3-002` — Article SEO service: route-family self-canonical, title/description/robots/social-image/date metadata.
+- [ ] `NEWSROOM-N3-003` — Article schema graph service jako następny wykonywalny task.
 
 Pozostałe elementy N3–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu checklistę.
 
@@ -1521,6 +1523,13 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-17 — v0.31
+
+- PR #66 zmergowano na `main@d9be735eee1915f4b53a6de42ec665a37442acae`; exact-head PR CI #236 i finalny push-CI #237 zakończyły się pełnym PASS, a #237 potwierdził 1034 passed / 19 376 assertions / 2 skipped, Pint 1043 files PASS, frontend build 8.50 s i PostgreSQL 7 passed / 94 assertions,
+- NEWSROOM-N3-002 jest **DONE**: `ContentArticleSeoService` generuje jeden self-canonical z route family + slug, canonical organization title branding, sanitized description fallback, robots, OG/hero image metadata oraz publication/substantive-modification dates,
+- service nie korzysta z technicznego `updated_at` jako dateModified i odrzuca niepubliczne/withdrawn states; nie dodano CMS canonical override,
+- publiczne article controllers/renderery nadal pozostają wyłączone i detail routes są 404; następnym taskiem jest N3-003 schema graph, następnie N3-004 article page i N3-006 historyczne redirecty.
 
 ### 2026-09-17 — v0.30
 

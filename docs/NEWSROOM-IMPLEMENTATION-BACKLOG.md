@@ -1102,6 +1102,21 @@ Computed blocking/warning items.
 
 ## NEWSROOM-N3-002 — Article SEO service
 
+### Status implementacji
+
+**DONE — PR #66 zmergowano na `main@d9be735eee1915f4b53a6de42ec665a37442acae`. Exact-head PR CI #236 zakończył się pełnym PASS; finalny push-CI #237 na `main` również był pełnym PASS: `quality` 1034 passed / 19 376 assertions / 2 skipped, Pint 1043 files PASS, frontend build PASS (8.50 s), `newsroom-postgres` 7 passed / 94 assertions.**
+
+### Aktualny stan implementacji
+
+- `ContentArticleSeoService` generuje layout-compatible metadata tylko dla `isPubliclyVisible()`; draft/scheduled/withdrawn nie dostają publicznego SEO payloadu,
+- self-canonical jest liczony wyłącznie z `NewsroomRouteContract::canonicalPath(type, slug)` i normalizowany przez `PublicUrlResolver`; brak CMS canonical override,
+- title używa `seo_title` z fallbackiem do `title` i jednego canonical organization brand bez podwójnego suffixu; description używa `seo_description` z fallbackiem do `lead`, po sanitizacji/plain-text i limicie 160 znaków,
+- robots zachowuje jawne pole artykułu albo bezpieczny default `index,follow,max-image-preview:large`,
+- social image wybiera dedykowany OG asset, potem hero fallback; zachowuje alt/dimensions, a hero może być wskazany do preload,
+- `published_time` = `first_published_at`; `modified_time` = `last_substantive_update_at` z fallbackiem do pierwszej publikacji — nigdy techniczne `updated_at`,
+- service zwraca format konsumowalny przez istniejący `public-content.blade.php`, który emituje canonical/OG/Twitter/article times,
+- N3-002 nie uruchamia publicznego article controller/Blade, nie buduje jeszcze schema graphu i nie implementuje historycznych 301; detail routes nadal pozostają 404 w pre-launch stanie.
+
 ### Zakres
 
 - title,
@@ -2104,13 +2119,20 @@ Na 2026-09-16:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N3-002 — Article SEO service.
+NEWSROOM-N3-003 — Article schema graph service.
 
-N2-001..N2-012 oraz NEWSROOM-N3-001 są zamknięte implementacyjnie. Następny krok buduje SEO metadata/canonical/robots/OG/Twitter/date policy nad istniejącym `ContentArticlePublicCatalogService`; nie uruchamia jeszcze Blade article page ani historycznych redirectów. Publiczne huby kategorii/topiców i ich HTTP lifecycle pozostają kolejnymi zadaniami N4.
+N2-001..N2-012 oraz NEWSROOM-N3-001..N3-002 są zamknięte implementacyjnie. Następny krok buduje stabilny WebPage/NewsArticle-or-Article/Person/Breadcrumb/ImageObject graph nad tym samym canonical i datami z `ContentArticleSeoService`, reużywając istniejące `SchemaIds` / `SchemaRenderer`. Publiczny Blade article page pozostaje N3-004, a historyczne redirecty N3-006.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-17 — v0.31
+
+- NEWSROOM-N3-002 zmergowano przez PR #66 na `main@d9be735eee1915f4b53a6de42ec665a37442acae`; exact-head PR CI #236 PASS, finalny push-CI #237 PASS: 1034 passed / 19 376 assertions / 2 skipped, Pint 1043 files PASS, frontend build 8.50 s, PostgreSQL 7 passed / 94 assertions,
+- `ContentArticleSeoService` materializuje self-canonical z route family + slug, title/description fallbacks, robots policy, OG/hero image fallback oraz publication/substantive-modification dates bez CMS canonical override,
+- metadata są kompatybilne z istniejącym `public-content.blade.php`, ale publiczne detail controllers/Blade nadal są wyłączone; schema graph pozostaje N3-003, article page N3-004, historyczny redirect N3-006,
+- następnym taskiem wykonawczym jest NEWSROOM-N3-003 `Article schema graph service`.
 
 ### 2026-09-17 — v0.30
 
