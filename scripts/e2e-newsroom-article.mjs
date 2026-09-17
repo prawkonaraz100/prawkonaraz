@@ -68,6 +68,21 @@ try {
             throw new Error(`Article snapshot returned ${response?.status() ?? 'no response'} at ${viewport.name}px.`);
         }
 
+        const cssHealth = await page.evaluate(() => {
+            const shell = document.querySelector('.content-shell');
+
+            return {
+                bodyMarginLeft: getComputedStyle(document.body).marginLeft,
+                shellBoxSizing: shell ? getComputedStyle(shell).boxSizing : null,
+            };
+        });
+
+        if (cssHealth.bodyMarginLeft !== '0px' || cssHealth.shellBoxSizing !== 'border-box') {
+            throw new Error(
+                `Built stylesheet did not load at ${viewport.name}px: body margin ${cssHealth.bodyMarginLeft}, shell box-sizing ${cssHealth.shellBoxSizing}.`,
+            );
+        }
+
         const h1 = page.locator('h1');
         await h1.waitFor();
 
@@ -179,6 +194,13 @@ file_put_contents(base_path('output/playwright/newsroom-article/render-status.tx
     if (status !== 200) {
         throw new Error(`Laravel kernel render returned ${status}.`);
     }
+
+    const snapshotHtml = await fs.readFile(snapshotPath, 'utf8');
+    const normalizedHtml = snapshotHtml.replace(
+        /https?:\/\/[^/"']+\/build\//g,
+        `${baseUrl}/build/`,
+    );
+    await fs.writeFile(snapshotPath, normalizedHtml);
 
     return status;
 }
