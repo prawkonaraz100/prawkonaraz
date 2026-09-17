@@ -13,6 +13,17 @@ const articlePath = `/aktualnosci/${slug}`;
 const title = 'Długi testowy tytuł artykułu newsroomu sprawdzający poprawne zawijanie na małych ekranach';
 const port = process.env.E2E_NEWSROOM_PORT ?? '8127';
 const baseUrl = `http://127.0.0.1:${port}`;
+const laravelServerRouter = path.join(
+    cwd,
+    'vendor',
+    'laravel',
+    'framework',
+    'src',
+    'Illuminate',
+    'Foundation',
+    'resources',
+    'server.php',
+);
 const viewports = [
     { name: '360', width: 360, height: 800 },
     { name: '390', width: 390, height: 844 },
@@ -174,16 +185,22 @@ $article = \App\Models\ContentArticle::factory()->published()->create([
 }
 
 function startServer() {
-    const child = spawn('php', ['artisan', 'serve', '--host=127.0.0.1', `--port=${port}`], {
-        cwd,
-        env: {
-            ...process.env,
-            CACHE_STORE: 'array',
-            SESSION_DRIVER: 'file',
+    const child = spawn(
+        'php',
+        ['-S', `127.0.0.1:${port}`, '-t', 'public', laravelServerRouter],
+        {
+            cwd,
+            env: {
+                ...process.env,
+                CACHE_STORE: 'array',
+                SESSION_DRIVER: 'file',
+                PHP_CLI_SERVER_WORKERS: '4',
+            },
+            stdio: ['ignore', 'pipe', 'pipe'],
+            windowsHide: true,
+            detached: process.platform !== 'win32',
         },
-        stdio: ['ignore', 'pipe', 'pipe'],
-        windowsHide: true,
-    });
+    );
 
     child.stdout?.on('data', appendServerLog);
     child.stderr?.on('data', appendServerLog);
@@ -231,17 +248,31 @@ async function runCommand(command, args) {
     });
 }
 
+function signalServer(child, signal) {
+    if (!child || child.exitCode !== null) return;
+
+    try {
+        if (process.platform === 'win32') {
+            child.kill(signal);
+        } else {
+            process.kill(-child.pid, signal);
+        }
+    } catch {
+        child.kill(signal);
+    }
+}
+
 async function terminateServer(child) {
     if (!child || child.exitCode !== null) return;
 
-    child.kill('SIGTERM');
+    signalServer(child, 'SIGTERM');
     await Promise.race([
         new Promise((resolve) => child.once('exit', resolve)),
         delay(1_000),
     ]);
 
     if (child.exitCode === null) {
-        child.kill('SIGKILL');
+        signalServer(child, 'SIGKILL');
         await delay(250);
     }
 }
