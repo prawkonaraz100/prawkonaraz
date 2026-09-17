@@ -62,6 +62,7 @@ class ContentAuthorController extends Controller
             ->get();
         $newsroomArticles = $author->authoredContentArticles()
             ->indexable()
+            ->whereHas('category', fn ($query) => $query->active())
             ->with('category:id,name,slug')
             ->orderByDesc('published_at')
             ->orderByDesc('updated_at')
