@@ -2,7 +2,7 @@
 
 ## 1. Status
 
-- Status: Proposed / canonical quality and release plan before implementation
+- Status: Canonical quality/release plan + live test state
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Backlog: [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./NEWSROOM-IMPLEMENTATION-BACKLOG.md)
 - Powiązane:
@@ -10,7 +10,7 @@
   - [CI-CD.md](./CI-CD.md)
   - [RUNBOOK-OPS.md](./RUNBOOK-OPS.md)
   - [NEWSROOM-SEO-DISTRIBUTION-AND-OBSERVABILITY.md](./NEWSROOM-SEO-DISTRIBUTION-AND-OBSERVABILITY.md)
-- Data: 2026-09-16
+- Data: 2026-09-17
 - Cel: zapewnić, że newsroom jest wdrażany i wycofywany bez zgadywania.
 
 ---
@@ -302,7 +302,7 @@ Pokrywają już service/domain layer:
 
 Finalny N1-003 PostgreSQL gate: 6 testów / 86 asercji PASS. Finalny ogólny gate: 906 passed / 18 565 assertions / 2 skipped; Pint 980 files i frontend build PASS.
 
-Nie istnieją jeszcze publiczne N3 article controllers, dlatego poniższe HTTP-level old path -> 301, new path -> 200 oraz sitemap-only-current-canonical pozostają testami przyszłej integracji, a nie stanem wykonanym.
+N3-004 uruchomiło current-canonical public detail 200/404/410, ale historyczny old path -> 301 nadal pozostaje NEWSROOM-N3-006. Poniższe HTTP-level old path -> 301 i sitemap-only-current-canonical nie są jeszcze stanem wykonanym.
 
 - initial slug unique,
 - duplicate current slug rejected/resolved zgodnie z service,
@@ -353,11 +353,13 @@ V1 nie ma shareable signed preview.
 
 ## 13. Block validation and sanitization security tests
 
-### 13.0. Aktualny stan po N0-004
+### 13.0. Aktualny stan po N0-004 / N2-003 / N3-004
 
 Istnieje unit/security regression `tests/Unit/Support/NewsroomBodyContractTest.php` dla wykonywalnego `NewsroomBodyContract`. Pokrywa m.in. unknown/disabled block, schema version fail-closed, structured rich-text node/mark allowlist, unsafe URLs/targets, XSS escaping przez `RichContentRenderer`, block keys, image paths, relation IDs oraz table shape.
 
-Nie istnieją jeszcze testy faktycznego N2 Filament article editora ani N3 publicznego renderera. Poniższy kontrakt pozostaje wymaganiem dla tych warstw; checkboxy/testy integracyjne nie mogą być uznane za wykonane tylko na podstawie N0-004 unit contract.
+Warstwa N2 editor jest zmaterializowana i ma feature regression dla Builder/RichEditor persistence, reorder, canonical key round-trip oraz unsafe payload rejection. Po N3-004 istnieje również publiczny `NewsroomArticleBodyRenderer` i `NewsroomPublicArticlePageTest`, a admin preview reużywa ten sam renderer z `includeDeferredBlocks: true`.
+
+Publicznie N3-004 renderuje `rich_text`, `image`, `quote`, `table`, `context` i public-safe `related_article`; `legal_reference`, `question_group`, `traffic_sign_group` i `product_cta` pozostają celowo deferred do N3-005. `embed` pozostaje feature-disabled/fail-closed zgodnie z N0-004.
 
 Payloads:
 
@@ -403,11 +405,17 @@ Po N0-006 istnieje `NewsroomMediaStorageTest` i pokrywa:
 - path traversal/absolute URL/manual unmanaged path rejection,
 - public URL przez współdzielony `MediaUrlResolver` bez signed-expiry semantics.
 
-To jest unit/storage foundation. Nie zastępuje przyszłych N2 uploader integration, focal-point/crop tests ani publicznego N3 media rendering/E2E.
+N2-010 materializuje newsroom article media persistence i focal-point CMS; N3-004 wykorzystuje zapisane dimensions oraz focal `object-position` w publicznym renderze. Fizyczne crop variants nie są deklarowane jako istniejące.
 
 ---
 
 ## 14. Public article HTTP tests
+
+### 14.0. Aktualny stan po N3-004
+
+`tests/Feature/NewsroomPublicArticlePageTest.php`, `tests/Feature/NewsroomPublicCatalogServiceTest.php` i `tests/Feature/Public/NewsroomRouteContractTest.php` pokrywają current-canonical article detail HTTP/render boundary. Publicznie widoczny rekord zwraca 200 w poprawnej route family, hidden/not-found 404, a historycznie publiczny withdrawn rekord neutralną 410 surface bez body/source/product leakage. 404/410 mają `noindex,follow` także w `X-Robots-Tag`.
+
+N3-004 nie wdraża historycznych 301; old-slug redirect HTTP pozostaje N3-006.
 
 Published:
 
@@ -438,7 +446,7 @@ Unknown slug:
 
 Old slug:
 
-- 301 canonical.
+- 301 canonical — **pozostaje N3-006**.
 
 ---
 
@@ -459,6 +467,8 @@ Assertions:
 - article:modified_time when applicable,
 - twitter card,
 - RSS/Atom discovery link.
+
+N3-004 podłącza istniejący `ContentArticleSeoService` do publicznego `newsroom.article`; RSS/Atom discovery nadal pozostaje N5.
 
 ---
 
@@ -511,6 +521,8 @@ Homepage-specific:
 
 Nie snapshotować dynamicznych pól bez stabilizacji czasu/config.
 
+N3-003 pokrywa service-level graph; N3-004 dodatkowo sprawdza JSON-LD emission w publicznym article response/browser QA.
+
 ---
 
 ## 17. Breadcrumb tests
@@ -543,6 +555,8 @@ Visual breadcrumb i BreadcrumbList są zgodne; URLs absolute/canonical zgodnie z
 ---
 
 ## 19. Product bridge tests
+
+Pozostają zakresem NEWSROOM-N3-005:
 
 - linked public question appears,
 - inactive/nonpublic question omitted,
@@ -935,6 +949,8 @@ Sprawdzić:
 - table overflow,
 - CTA.
 
+N3-004 ma dedykowany automatyczny article Browser QA dla dokładnie tej macierzy; pełny hub/category/topic/CTA QA pozostaje downstream.
+
 ---
 
 ## 34. Accessibility QA
@@ -952,7 +968,7 @@ Automated + manual:
 - error association,
 - reduced motion.
 
-Nie uznajemy samego Lighthouse score za pełny accessibility test.
+Nie uznajemy samego Lighthouse score za pełny accessibility test. PASS N3-004 Browser QA nie oznacza zamknięcia pełnego accessibility gate.
 
 ---
 
@@ -990,16 +1006,29 @@ Production after rollout:
 
 ## 37. CI integration
 
-Zachowujemy istniejący szybki SQLite CI i dodajemy tylko brakujący gate.
+Zachowujemy istniejący szybki SQLite CI i addytywny PostgreSQL gate.
 
 Wymagane:
 
 - istniejący php tests / smoke / Pint / frontend build bez regresji,
 - addytywny `newsroom-postgres` job od PR C dla migracji, constraints, transactional/concurrency paths,
 - Filament/feature tests w automatycznym CI,
-- `newsroom-editorial.spec.ts` i `newsroom-public.spec.ts` jako jawny browser release gate po ustabilizowaniu CMS/public renderer.
+- dedykowane browser E2E dla publicznych powierzchni, gdy dany renderer jest zmaterializowany.
 
-Istniejący `browser-smoke.yml` dotyczy produktu i nie jest dowodem przejścia newsroom E2E. Newsroom E2E może początkowo działać jako osobny manual/workflow gate przed produkcją, ale nie może pozostać lokalną, nieweryfikowalną instrukcją.
+Po N3-004 `.github/workflows/browser-smoke.yml` ma osobny job `newsroom-article`, uruchamiany dla relevant PR paths oraz manualnie. Genericzny historyczny `browser-smoke` pozostaje `workflow_dispatch` i nie jest dowodem newsroom QA.
+
+Dedykowany harness `npm run e2e:newsroom-article`:
+
+- buduje frontend assets,
+- tworzy deterministyczny SQLite fixture,
+- renderuje article route przez Laravel HTTP kernel do SSR snapshotu,
+- uruchamia Chromium z JavaScript disabled i service workers blocked,
+- sprawdza H1, breadcrumbs, body/source, canonical, JSON-LD i brak deferred N3-005 placeholderów,
+- weryfikuje, że realny zbudowany stylesheet jest zastosowany,
+- sprawdza brak horizontal overflow na 360/390/430/768/1024/1440,
+- zapisuje screenshot/report artifact.
+
+External Google Fonts są w harnessie deterministycznie stubowane, ale realny zbudowany `pwa-*.css` aplikacji nadal jest ładowany i walidowany; rozwiązanie nie maskuje produkcyjnych reguł layoutu.
 
 ---
 
@@ -1016,7 +1045,9 @@ Przy pre-launch `NEWSROOM_PUBLIC_ENABLED=false`:
 - IndexNow collector nie zgłasza newsroom URLs,
 - admin resource + private preview nadal działają.
 
-Przy `true` te powierzchnie działają zgodnie z public eligibility.
+Ten gate nie jest jeszcze wdrożony; `NEWSROOM_PUBLIC_ENABLED` pozostaje NEWSROOM-N3-008. N3-004 nie może być interpretowane jako zamknięcie rollout gate.
+
+Przy `true` te powierzchnie mają działać zgodnie z public eligibility po implementacji N3-008.
 
 ---
 
@@ -1158,15 +1189,15 @@ Nie uruchamiać migrate:rollback automatycznie po tym, jak redakcja stworzyła d
 
 ## 44. Emergency disable strategy
 
-Prosty config gate `NEWSROOM_PUBLIC_ENABLED` jest wymaganym elementem v1 release.
+Prosty config gate `NEWSROOM_PUBLIC_ENABLED` jest wymaganym elementem v1 release i pozostaje NEWSROOM-N3-008.
 
-- wyłącza publiczny newsroom/article/category/topic rollout bez usuwania admin/data,
+- docelowo wyłącza publiczny newsroom/article/category/topic rollout bez usuwania admin/data,
 - nie wymaga rozbudowanego feature flag service,
-- jest sprawdzany w config cache/deploy smoke,
+- ma być sprawdzany w config cache/deploy smoke,
 - przed launch przy false blokuje też author/reverse-link/feed/sitemap/IndexNow discovery,
 - po launch emergency procedure rozróżnia technical 503/code rollback od content withdrawn; nie masowo 404 przez flagę.
 
-Nie cofamy migracji ani treści tylko po to, by wyłączyć publiczną ekspozycję.
+N3-004 nie wdrożyło tego gate'u. Nie cofamy migracji ani treści tylko po to, by wyłączyć publiczną ekspozycję.
 
 ---
 
@@ -1417,41 +1448,51 @@ Runbook jest spełniony, gdy:
 
 ## 58. Stan implementacji
 
-Na 2026-09-17:
+Na 2026-09-17 po NEWSROOM-N3-004:
 
-- istnieją globalne backend tests,
-- istnieje Playwright smoke dla produktu,
-- istnieją ops backup/restore/health commands,
-- istnieją newsroom-specific unit/security tests dla `NewsroomBodyContract`, storage/security regression dla `NewsroomMediaStorage`, enum/schema/model regression, N1-003 slug/history tests, `NewsroomPublishingServiceTest` dla N1-004 workflow/invariants/audit/after-commit rollback boundary, N1-006 `NewsroomHomeCompositionServiceTest`/`NewsroomHomePlacementServiceTest` oraz N2-008 `NewsroomArticlePreviewTest` pokrywający auth/admin gate, no-store/noindex, analytics suppression, XSS escaping, private-source leakage i brak signed-token contract; PostgreSQL gate obejmuje migration/model/slug concurrency oraz home-placement advisory-lock regression; browser E2E nadal nie istnieje,
-- N2 HomeComposer ma już Livewire/feature integration regression dla fixed slots, search, fallback, create/update/delete, audit, stale-write, duplicate warning i private future preview; newsroom-specific browser E2E oraz topic/media CMS integration tests nadal nie istnieją,
-- `tests/Feature/NewsroomArticleSchemaServiceTest.php` po N3-003 pokrywa service-level entity graph: stable IDs, Organization/WebSite dedupe, canonical/date consistency, Article/NewsArticle mapping, author/publisher refs, breadcrumbs, path-backed/deduplicated images i fail-closed visibility/author/category guards,
-- publiczne HTTP/Blade JSON-LD emission, news sitemap/sharding/feed-discovery/static-delivery tests jeszcze nie istnieją; detail routes pozostają 404 do N3-004,
-- atomic static publication i dirty/version newsroom refresh coordinator jeszcze nie istnieją,
-- canonical CI ma dwa uzupełniające joby: `quality` na SQLite oraz addytywny `newsroom-postgres` na PostgreSQL 16,
-- newsroom-specific browser E2E nie jest pokryty istniejącym product browser smoke,
-- istniejący SeoSitemapAuditor nie obsługuje jeszcze newsroom/news namespace.
+- istnieją globalne backend tests, ops backup/restore/health commands i kanoniczny CI z `quality` na SQLite oraz addytywnym `newsroom-postgres` na PostgreSQL 16,
+- istnieją newsroom-specific unit/security i feature regression dla body contract/editor, media storage/article media, enum/schema/model, slug/history, publishing workflow, home composition/placements, article preview, topic/CMS oraz N3-001 catalog, N3-002 SEO i N3-003 schema service,
+- N3-004 dodało `NewsroomArticleBodyRenderer`, `NewsroomArticlePresentationService`, publiczny `ContentArticleController`, Blade `newsroom.article`/`article-unavailable` i feature tests publicznego article response,
+- current-canonical public detail ma automatyczne 200/404/410 coverage; 410/404 nie renderują treści i są noindex, a old-slug 301 pozostaje N3-006,
+- publiczny response emituje SEO metadata i JSON-LD z istniejących N3-002/N3-003 services, route-family breadcrumbs, hero/provenance/regulatory context, public sources, correction, author box i public-safe related article,
+- N3-005 domain blocks (`legal_reference`, `question_group`, `traffic_sign_group`, `product_cta`) są jawnie deferred i nie są fałszywie oznaczone jako wdrożone,
+- dedicated `.github/workflows/browser-smoke.yml` job `newsroom-article` istnieje; Browser Smoke #18 zakończył się PASS na 360x800, 390x844, 430x932, 768x1024, 1024x768 i 1440x900,
+- harness działa z JS disabled, sprawdza built CSS, H1/breadcrumb/body/source/canonical/JSON-LD/no-deferred-placeholder oraz horizontal overflow i zapisuje artifact,
+- finalny merge PR #71 dał `main@7398c5d930d38d6cc9d9953e53b4298df41cfce8`; push CI #270 zakończył się PASS dla `quality` i `newsroom-postgres`,
+- finalny `quality` evidence: 1048 passed / 19 473 assertions / 2 skipped, Pint 1049 files PASS i frontend build PASS; PostgreSQL: 7 passed / 94 assertions,
+- hub/category/topic/feed browser surfaces, product bridge N3-005, old-slug redirects N3-006, author profile integration N3-007 i rollout config gate N3-008 pozostają otwarte,
+- atomic static publication, dirty/version newsroom refresh coordinator, newsroom/news sitemap output i `SeoSitemapAuditor` extension pozostają N5.
 
 ---
 
 ## 59. Pozostałe zadania
 
-- [ ] dodać test files w trakcie N1–N5,
-- [ ] stworzyć newsroom E2E,
-- [ ] dodać N2 media uploader + topic/focal-point/crop integration oraz N3 renderer/browser E2E; HomeComposer composition/integration regression jest już zmaterializowany,
-- [x] dodać service-level site-identity/entity-graph/date-consistency regression; publiczne HTML emission pozostaje N3-004,
+- [ ] dodać dalsze test files w trakcie N3-005..N5,
+- [x] dodać dedykowany browser E2E dla publicznego article detail N3-004,
+- [x] dodać N2 media/topic/focal-point integration i N3-004 renderer/browser regression; pełne crop-variant generation nadal nie istnieje,
+- [x] dodać service-level site-identity/entity-graph/date-consistency regression oraz publiczne HTML/JSON-LD emission dla article detail,
+- [ ] dodać N3-005 Product Bridge tests dla questions/legal/signs/contextual CTA,
 - [ ] dodać semantic silo/orphan/reverse-link/click-depth tests,
-- [ ] dodać public HTTP route-family/canonical/old-slug redirect integration/E2E; service-level exclusivity i slug history są już pokryte w N1-003,
+- [ ] dodać old-slug 301 HTTP integration/E2E w N3-006; current route-family/canonical detail i service-level slug history są już pokryte,
 - [x] dodać N2 stale-write/Apply-public-update oraz HomeComposer stale-write regression; ContentArticle i placement same-second conflicts są blokowane,
-- [ ] dodać pozostałe category-topic guard tests; podstawowy N1-004 AuditLog/after-commit workflow oraz N1-006 placement-concurrency/domain-composition contracts mają już regression coverage,
 - [ ] dodać news namespace + sitemap sharding + atomic publish + dirty-marker refresh/feed-discovery tests,
 - [ ] dodać production-like static robots/sitemap delivery smoke,
 - [ ] rozszerzyć istniejący SeoSitemapAuditor,
 - [ ] stworzyć production smoke checklist w praktyce,
+- [ ] wdrożyć i przetestować `NEWSROOM_PUBLIC_ENABLED` w N3-008 przed publicznym rolloutem,
 - [ ] po pierwszym release wpisać rzeczywiste wyniki i ewentualne różnice od planu.
 
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-17 — v0.16
+
+- NEWSROOM-N3-004 zmergowano przez PR #71 na `main@7398c5d930d38d6cc9d9953e53b4298df41cfce8`; publiczny article HTTP/Blade renderer i jego feature regression są teraz stanem rzeczywistym, nie planem,
+- dedykowany Browser Smoke #18 zakończył się PASS na całej wymaganej macierzy 360/390/430/768/1024/1440 z JS disabled, realnym built CSS, canonical/JSON-LD/content assertions i horizontal-overflow guard,
+- finalny push CI #270 na merge commit zakończył się pełnym PASS: quality 1048 passed / 19 473 assertions / 2 skipped, Pint 1049 files PASS, frontend build PASS; newsroom-postgres 7 passed / 94 assertions,
+- genericzny product browser smoke nie jest używany jako dowód N3-004; dedykowany `newsroom-article` job jest automatycznym PR gate dla relevant public article changes,
+- N3-005 Product Bridge, N3-006 old-slug 301, N3-007 author integration i N3-008 rollout gate pozostają otwarte; pełny accessibility/hub/category/topic/feed/release E2E nadal nie jest uznany za wykonany.
 
 ### 2026-09-17 — v0.15
 

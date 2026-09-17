@@ -8,7 +8,7 @@
   - [MENU-SYSTEM-REFERENCE.md](./MENU-SYSTEM-REFERENCE.md)
   - [NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md](./NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md)
   - [NEWSROOM-EDITORIAL-OPERATIONS-AND-GOVERNANCE.md](./NEWSROOM-EDITORIAL-OPERATIONS-AND-GOVERNANCE.md)
-- Data: 2026-09-15
+- Data: 2026-09-17
 - Cel: zablokować główne decyzje UX przed implementacją, aby frontend nie powstawał metodą prób i cofek.
 
 ---
@@ -1286,44 +1286,58 @@ Frontend newsroom v1 jest UI-complete, gdy:
 
 ## 67. Stan implementacji
 
-Na 2026-09-17:
+Na 2026-09-17 po NEWSROOM-N3-004:
 
-- `/aktualnosci` i `/poradniki` renderują `MarketingPlaceholder.vue` przez dedykowany `NewsroomPlaceholderController`,
-- oba pre-launch huby zwracają 200 i `X-Robots-Tag: noindex, follow`,
-- shared MarketingPlaceholder innych sekcji nie dziedziczy newsroom noindex,
-- finalne detail/category/topic/feed route namespaces są zarejestrowane, ale obecnie zwracają 404,
-- public-content Blade layout istnieje,
-- public header/footer istnieją,
-- globalna nawigacja zawiera Aktualności,
-- backendowy `NewsroomHomeCompositionService` istnieje i materializuje lead/secondary/latest/category/guides/important-now/breaking composition contract,
-- backendowy `ContentArticlePublicCatalogService` istnieje po NEWSROOM-N3-001 i materializuje route-family current-canonical detail lookup, explicit visible/gone/not-found resolution oraz osobny `activelyDistributed()` list query z public-safe eager loading,
-- backendowy `ContentArticleSeoService` istnieje po NEWSROOM-N3-002 i przygotowuje layout-compatible title/description/self-canonical/robots/OG-image/article-time metadata; nie jest jeszcze podłączony do publicznego article renderera,
-- backendowy `ContentArticleSchemaService` istnieje po NEWSROOM-N3-003 i materializuje stabilny public-safe entity graph nad tym samym canonical/date contract; nie jest jeszcze osadzony w publicznym article HTML,
-- catalog/SEO/schema boundary nie jest jeszcze podłączony do publicznych detail controllerów/Blade; `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}` nadal pozostają 404 w pre-launch stanie,
-- `NewsroomHomeCompositionService` nadal nie jest podłączony do publicznego `/aktualnosci`; hub pozostaje placeholderem i właściwe newsroom-specific list/article/category/topic components nie istnieją.
+- `/aktualnosci` i `/poradniki` nadal renderują pre-launch `MarketingPlaceholder.vue` przez dedykowany `NewsroomPlaceholderController`; oba huby zwracają 200 i `X-Robots-Tag: noindex, follow`,
+- category/topic/feed routes pozostają downstream i nie zostały uruchomione przez N3-004,
+- detail routes `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}` są podłączone do `ContentArticleController`; publicznie widoczny rekord renderuje `newsroom.article`, withdrawn historyczny rekord otrzymuje neutralną 410 surface, a hidden/not-found 404,
+- 404/410 article surfaces używają `noindex,follow` i `X-Robots-Tag: noindex, follow` bez renderowania body/source/product modules,
+- publiczny article renderer reużywa istniejący `public-content` layout, header/footer oraz gotowe N3-001 catalog, N3-002 SEO metadata i N3-003 schema graph; canonical/OG/article dates i JSON-LD są obecne w initial HTML,
+- `NewsroomArticlePresentationService` materializuje route-family breadcrumbs, category kicker, H1, lead, byline, provenance, widoczne publication/update dates, key points, hero, regulatory/exam context, public sources, correction note, author box i transparentne `needs_review`/archived states,
+- `NewsroomArticleBodyRenderer` renderuje publicznie `rich_text`, `image`, `quote`, `table`, `context` i public-safe `related_article`; rich text korzysta z istniejącego structured renderer contract,
+- hero i image blocks zachowują dimensions/alt/caption/credit oraz focal-point-aware `object-position`; N3-004 nie deklaruje nieistniejących fizycznych crop variants,
+- tylko `is_publicly_cited=true` sources mogą wejść do presentation; private source evidence/note oraz `image_license_note` nie są publicznym payloadem,
+- `legal_reference`, `question_group`, `traffic_sign_group` i `product_cta` pozostają celowo odroczone do NEWSROOM-N3-005 i są pomijane w publicznym rendererze; admin preview zachowuje je jako deferred blocks przez wspólny renderer,
+- related article block rozwiązuje tylko publicznie widoczny target z aktywną kategorią i opublikowanym autorem; nie renderuje draft targetu,
+- publiczny artykuł nie wymaga JavaScript do odczytania; dedykowany Browser QA przeszedł na 360x800, 390x844, 430x932, 768x1024, 1024x768 i 1440x900 bez horizontal overflow,
+- `NEWSROOM_PUBLIC_ENABLED` nie został wdrożony w N3-004 i pozostaje NEWSROOM-N3-008; historyczne old-slug 301 pozostaje NEWSROOM-N3-006, a newsroomowe rozszerzenie profilu autora NEWSROOM-N3-007,
+- `NewsroomHomeCompositionService` nadal nie jest podłączony do publicznego `/aktualnosci`; hub/category/topic/feed pozostają dalszym zakresem N4/N5.
 
 ---
 
 ## 68. Pozostałe zadania
 
-- [ ] zatwierdzić design tokens N0,
-- [ ] przygotować low-fidelity implementation layout,
+- [ ] zatwierdzić finalne wspólne design tokens po audycie publicznego UI,
+- [ ] przygotować low-fidelity implementation layout dla pozostałych hub/category/topic surfaces,
 - [ ] zdefiniować finalny visual contract stałych homepage slots,
-- [ ] zbudować renderer kontrolowanych body blocks,
-- [ ] zbudować regulatory context box,
-- [ ] zbudować focal-point-aware image variants,
+- [x] zbudować publiczny renderer kontrolowanych body blocks w zakresie N3-004,
+- [x] zbudować regulatory context box dla article detail,
+- [x] podłączyć focal-point-aware rendering istniejących hero/image assets; fizyczne crop variants nie są deklarowane jako istniejące,
 - [ ] zbudować topic page,
-- [ ] zbudować Blade components,
+- [ ] zbudować pozostałe hub/category Blade components,
 - [ ] zbudować hub,
 - [ ] zbudować category page,
-- [ ] zbudować article page,
-- [ ] dodać responsive QA,
-- [ ] dodać accessibility QA,
-- [ ] dodać browser snapshots/golden E2E.
+- [x] zbudować article page,
+- [x] dodać responsive Browser QA dla article detail na wymaganej macierzy N3-004,
+- [ ] domknąć pełny accessibility QA newsroomu,
+- [x] dodać dedykowany browser snapshot/E2E dla article detail,
+- [ ] zbudować NEWSROOM-N3-005 Product Bridge dla questions/legal/signs/contextual CTA,
+- [ ] zbudować NEWSROOM-N3-006 historical redirect resolver HTTP,
+- [ ] zbudować NEWSROOM-N3-007 author-profile integration,
+- [ ] zbudować NEWSROOM-N3-008 public rollout config gate.
 
 ---
 
 ## 69. Historia zmian
+
+### 2026-09-17 — v0.12
+
+- NEWSROOM-N3-004 zmergowano przez PR #71 na `main@7398c5d930d38d6cc9d9953e53b4298df41cfce8`; publiczne article detail routes są podłączone do `ContentArticleController` i SSR Blade zamiast pre-launch 404,
+- `newsroom.article` reużywa wspólny public layout i łączy N3-001 catalog, N3-002 SEO metadata oraz N3-003 schema graph z route-family breadcrumbs, byline/provenance, hero, regulatory context, body, sources, correction i author box,
+- publiczny renderer obsługuje `rich_text`, `image`, `quote`, `table`, `context` i public-safe `related_article`; questions/legal/signs/product CTA pozostają świadomie odroczone do N3-005 i nie wyciekają jako placeholdery,
+- archived/needs-review transparency oraz 404/410 unavailable surfaces są zmaterializowane; historyczne old-slug 301 nadal należy do N3-006, author-profile integration do N3-007, a `NEWSROOM_PUBLIC_ENABLED` do N3-008,
+- dedykowany Browser Smoke #18 przeszedł całą macierz 360/390/430/768/1024/1440, a finalny CI #270 na merge commit zakończył się pełnym PASS,
+- następnym taskiem wykonawczym jest NEWSROOM-N3-005 Product Bridge.
 
 ### 2026-09-17 — v0.11
 
