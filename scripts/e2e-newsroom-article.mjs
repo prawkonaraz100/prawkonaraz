@@ -59,6 +59,13 @@ try {
         page.setDefaultTimeout(10_000);
         page.setDefaultNavigationTimeout(15_000);
 
+        const stylesheetResponsePromise = page.waitForResponse(
+            (candidate) => (
+                candidate.request().resourceType() === 'stylesheet'
+                && candidate.url().startsWith(`${baseUrl}/build/`)
+            ),
+            { timeout: 15_000 },
+        );
         const response = await page.goto(`${baseUrl}${articlePath}`, {
             waitUntil: 'domcontentloaded',
             timeout: 15_000,
@@ -67,6 +74,25 @@ try {
         if (!response || response.status() !== 200) {
             throw new Error(`Article snapshot returned ${response?.status() ?? 'no response'} at ${viewport.name}px.`);
         }
+
+        const stylesheetResponse = await stylesheetResponsePromise;
+        if (!stylesheetResponse.ok()) {
+            throw new Error(
+                `Built stylesheet returned HTTP ${stylesheetResponse.status()} at ${viewport.name}px.`,
+            );
+        }
+
+        await page.waitForFunction(
+            () => {
+                const shell = document.querySelector('.content-shell');
+
+                return getComputedStyle(document.body).marginLeft === '0px'
+                    && shell !== null
+                    && getComputedStyle(shell).boxSizing === 'border-box';
+            },
+            null,
+            { timeout: 10_000 },
+        );
 
         const cssHealth = await page.evaluate(() => {
             const shell = document.querySelector('.content-shell');
