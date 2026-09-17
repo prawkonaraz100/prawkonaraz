@@ -13,6 +13,7 @@ const articlePath = `/aktualnosci/${slug}`;
 const title = 'Długi testowy tytuł artykułu newsroomu sprawdzający poprawne zawijanie na małych ekranach';
 const port = process.env.E2E_NEWSROOM_PORT ?? '8127';
 const baseUrl = `http://127.0.0.1:${port}`;
+const sqliteDatabase = path.join(cwd, 'database', 'database.sqlite');
 const laravelServerRouter = path.join(
     cwd,
     'vendor',
@@ -182,6 +183,7 @@ function startServer() {
             cwd: path.join(cwd, 'public'),
             env: {
                 ...process.env,
+                DB_DATABASE: sqliteDatabase,
                 CACHE_STORE: 'array',
                 SESSION_DRIVER: 'file',
             },
