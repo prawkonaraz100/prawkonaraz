@@ -2,6 +2,7 @@
 
 namespace App\SEO\Schema;
 
+use App\Models\ContentAuthor;
 use App\Models\LegalContentPage;
 use App\Models\LegalTopic;
 use App\Models\LegalUnit;
@@ -31,6 +32,36 @@ class SchemaIds
     public function website(): string
     {
         return $this->root().'/#website';
+    }
+
+    public function contentArticleWebPage(string $canonicalUrl): string
+    {
+        return $this->fragment($canonicalUrl, 'webpage');
+    }
+
+    public function contentArticle(string $canonicalUrl): string
+    {
+        return $this->fragment($canonicalUrl, 'article');
+    }
+
+    public function contentArticleBreadcrumb(string $canonicalUrl): string
+    {
+        return $this->fragment($canonicalUrl, 'breadcrumb');
+    }
+
+    public function contentArticleHeroImage(string $canonicalUrl): string
+    {
+        return $this->fragment($canonicalUrl, 'hero-image');
+    }
+
+    public function contentArticleOgImage(string $canonicalUrl): string
+    {
+        return $this->fragment($canonicalUrl, 'og-image');
+    }
+
+    public function contentAuthorPerson(ContentAuthor $author): string
+    {
+        return $this->fragment(route('content-authors.show', $author->slug), 'person');
     }
 
     public function trafficSignTermSet(): string
