@@ -353,13 +353,13 @@ V1 nie ma shareable signed preview.
 
 ## 13. Block validation and sanitization security tests
 
-### 13.0. Aktualny stan po N0-004 / N2-003 / N3-004
+### 13.0. Aktualny stan po N0-004 / N2-003 / N3-005
 
 Istnieje unit/security regression `tests/Unit/Support/NewsroomBodyContractTest.php` dla wykonywalnego `NewsroomBodyContract`. Pokrywa m.in. unknown/disabled block, schema version fail-closed, structured rich-text node/mark allowlist, unsafe URLs/targets, XSS escaping przez `RichContentRenderer`, block keys, image paths, relation IDs oraz table shape.
 
-Warstwa N2 editor jest zmaterializowana i ma feature regression dla Builder/RichEditor persistence, reorder, canonical key round-trip oraz unsafe payload rejection. Po N3-004 istnieje również publiczny `NewsroomArticleBodyRenderer` i `NewsroomPublicArticlePageTest`, a admin preview reużywa ten sam renderer z `includeDeferredBlocks: true`.
+Warstwa N2 editor jest zmaterializowana i ma feature regression dla Builder/RichEditor persistence, reorder, canonical key round-trip oraz unsafe payload rejection. Po N3-004 istnieje publiczny `NewsroomArticleBodyRenderer` i `NewsroomPublicArticlePageTest`, a admin preview reużywa ten sam renderer z `includeDeferredBlocks: true`.
 
-Publicznie N3-004 renderuje `rich_text`, `image`, `quote`, `table`, `context` i public-safe `related_article`; `legal_reference`, `question_group`, `traffic_sign_group` i `product_cta` pozostają celowo deferred do N3-005. `embed` pozostaje feature-disabled/fail-closed zgodnie z N0-004.
+Po N3-005 publiczny renderer obsługuje `rich_text`, `image`, `quote`, `table`, `context`, public-safe `related_article` oraz `legal_reference`, `question_group`, `traffic_sign_group` i `product_cta` przygotowane przez `NewsroomArticleProductBridgeService`. Dla question/legal/sign sam identyfikator w body nie wystarcza: target musi być jawnie powiązany przez article-owned pivot i spełnić istniejący public eligibility contract. `embed` pozostaje feature-disabled/fail-closed zgodnie z N0-004.
 
 Payloads:
 
@@ -556,13 +556,17 @@ Visual breadcrumb i BreadcrumbList są zgodne; URLs absolute/canonical zgodnie z
 
 ## 19. Product bridge tests
 
-Pozostają zakresem NEWSROOM-N3-005:
+NEWSROOM-N3-005 jest zmaterializowane przez `tests/Feature/NewsroomProductBridgeTest.php`. Regression sprawdza:
 
-- linked public question appears,
-- inactive/nonpublic question omitted,
-- legal relation valid,
-- traffic sign relation valid,
-- destination URLs canonical.
+- linked public question pojawia się z canonical URL z istniejącego `PublicQuestionCatalogService`,
+- inactive/nonpublic question oraz question wskazane tylko w body bez article-owned pivotu są pomijane,
+- legal reference pojawia się wyłącznie dla jawnie powiązanej verified jednostki/verified aktu z published page pod published topic,
+- draft/unlinked legal target jest pomijany,
+- pivot/internal notes i pełny `official_excerpt` nie wyciekają do publicznego HTML,
+- traffic sign musi być jawnie powiązany z artykułem i spełniać published sign + published author + published category contract,
+- traffic sign pivot `relation_type=related` jest fail-closed; publiczny bridge dopuszcza `direct` i `example`,
+- niepowiązany/ukryty sign jest pomijany,
+- contextual CTA mapuje wyłącznie istniejące canonical destinations: `public.tests`, `public.questions.hub`, `session.index`.
 
 ---
 
@@ -949,7 +953,7 @@ Sprawdzić:
 - table overflow,
 - CTA.
 
-N3-004 ma dedykowany automatyczny article Browser QA dla dokładnie tej macierzy; pełny hub/category/topic/CTA QA pozostaje downstream.
+Po N3-005 dedykowany automatyczny article Browser QA obejmuje dokładnie tę macierz i dodatkowo sprawdza publiczny Product Bridge/CTA. Hub/category/topic pozostają downstream, a pełny accessibility gate nadal nie jest zastąpiony przez ten smoke.
 
 ---
 
@@ -968,7 +972,7 @@ Automated + manual:
 - error association,
 - reduced motion.
 
-Nie uznajemy samego Lighthouse score za pełny accessibility test. PASS N3-004 Browser QA nie oznacza zamknięcia pełnego accessibility gate.
+Nie uznajemy samego Lighthouse score za pełny accessibility test. PASS N3-005 Browser QA nie oznacza zamknięcia pełnego accessibility gate.
 
 ---
 
@@ -1015,7 +1019,7 @@ Wymagane:
 - Filament/feature tests w automatycznym CI,
 - dedykowane browser E2E dla publicznych powierzchni, gdy dany renderer jest zmaterializowany.
 
-Po N3-004 `.github/workflows/browser-smoke.yml` ma osobny job `newsroom-article`, uruchamiany dla relevant PR paths oraz manualnie. Genericzny historyczny `browser-smoke` pozostaje `workflow_dispatch` i nie jest dowodem newsroom QA.
+Po N3-005 `.github/workflows/browser-smoke.yml` ma osobny job `newsroom-article`, uruchamiany dla relevant PR paths oraz manualnie. Genericzny historyczny `browser-smoke` pozostaje `workflow_dispatch` i nie jest dowodem newsroom QA.
 
 Dedykowany harness `npm run e2e:newsroom-article`:
 
@@ -1023,12 +1027,14 @@ Dedykowany harness `npm run e2e:newsroom-article`:
 - tworzy deterministyczny SQLite fixture,
 - renderuje article route przez Laravel HTTP kernel do SSR snapshotu,
 - uruchamia Chromium z JavaScript disabled i service workers blocked,
-- sprawdza H1, breadcrumbs, body/source, canonical, JSON-LD i brak deferred N3-005 placeholderów,
+- sprawdza H1, breadcrumbs, body/source, canonical, JSON-LD oraz publiczny Product Bridge/CTA,
 - weryfikuje, że realny zbudowany stylesheet jest zastosowany,
 - sprawdza brak horizontal overflow na 360/390/430/768/1024/1440,
 - zapisuje screenshot/report artifact.
 
 External Google Fonts są w harnessie deterministycznie stubowane, ale realny zbudowany `pwa-*.css` aplikacji nadal jest ładowany i walidowany; rozwiązanie nie maskuje produkcyjnych reguł layoutu.
+
+Browser Smoke #20 na finalnym N3-005 head `7d795b895865cda49ba94a4fec50533d7b0f7a97` zakończył się PASS. Artifact `newsroom-article-browser-qa` ma ID `10508254861`, rozmiar 1 124 509 bytes i SHA256 `753b717cb5f0319e2e7799552b181fd972b41cd3b3a66bba7dd9a82d7ce96a2a`.
 
 ---
 
@@ -1045,7 +1051,7 @@ Przy pre-launch `NEWSROOM_PUBLIC_ENABLED=false`:
 - IndexNow collector nie zgłasza newsroom URLs,
 - admin resource + private preview nadal działają.
 
-Ten gate nie jest jeszcze wdrożony; `NEWSROOM_PUBLIC_ENABLED` pozostaje NEWSROOM-N3-008. N3-004 nie może być interpretowane jako zamknięcie rollout gate.
+Ten gate nie jest jeszcze wdrożony; `NEWSROOM_PUBLIC_ENABLED` pozostaje NEWSROOM-N3-008. N3-005 nie może być interpretowane jako zamknięcie rollout gate.
 
 Przy `true` te powierzchnie mają działać zgodnie z public eligibility po implementacji N3-008.
 
@@ -1197,7 +1203,7 @@ Prosty config gate `NEWSROOM_PUBLIC_ENABLED` jest wymaganym elementem v1 release
 - przed launch przy false blokuje też author/reverse-link/feed/sitemap/IndexNow discovery,
 - po launch emergency procedure rozróżnia technical 503/code rollback od content withdrawn; nie masowo 404 przez flagę.
 
-N3-004 nie wdrożyło tego gate'u. Nie cofamy migracji ani treści tylko po to, by wyłączyć publiczną ekspozycję.
+N3-005 nie wdrożyło tego gate'u. Nie cofamy migracji ani treści tylko po to, by wyłączyć publiczną ekspozycję.
 
 ---
 
@@ -1448,32 +1454,33 @@ Runbook jest spełniony, gdy:
 
 ## 58. Stan implementacji
 
-Na 2026-09-17 po NEWSROOM-N3-004:
+Na 2026-09-17 po NEWSROOM-N3-005:
 
 - istnieją globalne backend tests, ops backup/restore/health commands i kanoniczny CI z `quality` na SQLite oraz addytywnym `newsroom-postgres` na PostgreSQL 16,
-- istnieją newsroom-specific unit/security i feature regression dla body contract/editor, media storage/article media, enum/schema/model, slug/history, publishing workflow, home composition/placements, article preview, topic/CMS oraz N3-001 catalog, N3-002 SEO i N3-003 schema service,
-- N3-004 dodało `NewsroomArticleBodyRenderer`, `NewsroomArticlePresentationService`, publiczny `ContentArticleController`, Blade `newsroom.article`/`article-unavailable` i feature tests publicznego article response,
+- istnieją newsroom-specific unit/security i feature regression dla body contract/editor, media storage/article media, enum/schema/model, slug/history, publishing workflow, home composition/placements, article preview, topic/CMS oraz N3-001 catalog, N3-002 SEO, N3-003 schema service i N3-005 Product Bridge,
+- N3-004 dostarcza `NewsroomArticleBodyRenderer`, `NewsroomArticlePresentationService`, publiczny `ContentArticleController`, Blade `newsroom.article`/`article-unavailable` i feature tests publicznego article response,
+- N3-005 dodaje `NewsroomArticleProductBridgeService`, `newsroom.product-bridge-block` i `NewsroomProductBridgeTest`; publiczny article renderer obsługuje teraz questions/legal/signs/contextual CTA bez losowych relacji i bez draft targetów,
 - current-canonical public detail ma automatyczne 200/404/410 coverage; 410/404 nie renderują treści i są noindex, a old-slug 301 pozostaje N3-006,
-- publiczny response emituje SEO metadata i JSON-LD z istniejących N3-002/N3-003 services, route-family breadcrumbs, hero/provenance/regulatory context, public sources, correction, author box i public-safe related article,
-- N3-005 domain blocks (`legal_reference`, `question_group`, `traffic_sign_group`, `product_cta`) są jawnie deferred i nie są fałszywie oznaczone jako wdrożone,
-- dedicated `.github/workflows/browser-smoke.yml` job `newsroom-article` istnieje; Browser Smoke #18 zakończył się PASS na 360x800, 390x844, 430x932, 768x1024, 1024x768 i 1440x900,
-- harness działa z JS disabled, sprawdza built CSS, H1/breadcrumb/body/source/canonical/JSON-LD/no-deferred-placeholder oraz horizontal overflow i zapisuje artifact,
-- finalny merge PR #71 dał `main@7398c5d930d38d6cc9d9953e53b4298df41cfce8`; push CI #270 zakończył się PASS dla `quality` i `newsroom-postgres`,
-- finalny `quality` evidence: 1048 passed / 19 473 assertions / 2 skipped, Pint 1049 files PASS i frontend build PASS; PostgreSQL: 7 passed / 94 assertions,
-- hub/category/topic/feed browser surfaces, product bridge N3-005, old-slug redirects N3-006, author profile integration N3-007 i rollout config gate N3-008 pozostają otwarte,
+- Product Bridge wymaga body target + article-owned pivot + istniejący public eligibility; question group ma limit 5, legal wymaga verified act/unit + published legal page/topic, a signs wymagają published sign/author/category i pivot `direct` albo `example`; luźny `related` jest fail-closed,
+- publiczny response emituje SEO metadata i JSON-LD z istniejących N3-002/N3-003 services, route-family breadcrumbs, hero/provenance/regulatory context, public sources, correction, author box, public-safe related article oraz Product Bridge,
+- dedicated `.github/workflows/browser-smoke.yml` job `newsroom-article` istnieje; Browser Smoke #20 na finalnym head `7d795b895865cda49ba94a4fec50533d7b0f7a97` zakończył się PASS na 360x800, 390x844, 430x932, 768x1024, 1024x768 i 1440x900,
+- harness działa z JS disabled, sprawdza realny built CSS, H1/breadcrumb/body/source/canonical/JSON-LD/Product Bridge/CTA oraz horizontal overflow i zapisuje artifact,
+- artifact `newsroom-article-browser-qa`: ID `10508254861`, 1 124 509 bytes, SHA256 `753b717cb5f0319e2e7799552b181fd972b41cd3b3a66bba7dd9a82d7ce96a2a`,
+- finalny exact-head CI #275 dla PR #73 zakończył się PASS; post-merge `main@fcc8074f89db141d522c5000742afc2e07a68565` przeszedł CI #276 z `quality` 1049 passed / 19 498 assertions / 2 skipped, Pint 1051 files PASS, frontend build PASS i `newsroom-postgres` PASS,
+- hub/category/topic/feed browser surfaces, old-slug redirects N3-006, author profile integration N3-007, rollout config gate N3-008 i reverse links N4-008 pozostają otwarte,
 - atomic static publication, dirty/version newsroom refresh coordinator, newsroom/news sitemap output i `SeoSitemapAuditor` extension pozostają N5.
 
 ---
 
 ## 59. Pozostałe zadania
 
-- [ ] dodać dalsze test files w trakcie N3-005..N5,
+- [ ] dodać dalsze test files w trakcie N3-006..N5,
 - [x] dodać dedykowany browser E2E dla publicznego article detail N3-004,
 - [x] dodać N2 media/topic/focal-point integration i N3-004 renderer/browser regression; pełne crop-variant generation nadal nie istnieje,
 - [x] dodać service-level site-identity/entity-graph/date-consistency regression oraz publiczne HTML/JSON-LD emission dla article detail,
-- [ ] dodać N3-005 Product Bridge tests dla questions/legal/signs/contextual CTA,
+- [x] dodać N3-005 Product Bridge tests dla questions/legal/signs/contextual CTA,
 - [ ] dodać semantic silo/orphan/reverse-link/click-depth tests,
-- [ ] dodać old-slug 301 HTTP integration/E2E w N3-006; current route-family/canonical detail i service-level slug history są już pokryte,
+- [ ] dodać old-slug 301 HTTP integration/E2E w N3-006 — **następny wykonywalny task**; current route-family/canonical detail i service-level slug history są już pokryte,
 - [x] dodać N2 stale-write/Apply-public-update oraz HomeComposer stale-write regression; ContentArticle i placement same-second conflicts są blokowane,
 - [ ] dodać news namespace + sitemap sharding + atomic publish + dirty-marker refresh/feed-discovery tests,
 - [ ] dodać production-like static robots/sitemap delivery smoke,
@@ -1485,6 +1492,14 @@ Na 2026-09-17 po NEWSROOM-N3-004:
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-17 — v0.17
+
+- NEWSROOM-N3-005 zmergowano przez PR #73; finalny implementation head `7d795b895865cda49ba94a4fec50533d7b0f7a97`, a zweryfikowany post-merge `main` to `fcc8074f89db141d522c5000742afc2e07a68565`,
+- dodano `tests/Feature/NewsroomProductBridgeTest.php` dla explicit body+pivot+public eligibility, omission inactive/draft/unlinked targets, private-note/official-excerpt leakage guard, traffic-sign `related` fail-closed i trzech contextual CTA destinations,
+- Browser Smoke #20 zakończył się PASS na pełnej macierzy 360/390/430/768/1024/1440 z JS disabled, realnym built CSS i Product Bridge/CTA assertions; artifact `newsroom-article-browser-qa` ma SHA256 `753b717cb5f0319e2e7799552b181fd972b41cd3b3a66bba7dd9a82d7ce96a2a`,
+- finalny exact-head CI #275 na PR head był PASS, a post-merge CI #276 na `main@fcc8074f...` zakończył się pełnym PASS: quality 1049 passed / 19 498 assertions / 2 skipped, Pint 1051 files PASS, frontend build PASS i newsroom-postgres PASS,
+- N3-006 old-slug 301 jest następnym wykonywalnym taskiem; N3-007 author integration, N3-008 rollout gate, N4-008 reverse links oraz pełny accessibility/hub/category/topic/feed/release E2E pozostają otwarte.
 
 ### 2026-09-17 — v0.16
 
