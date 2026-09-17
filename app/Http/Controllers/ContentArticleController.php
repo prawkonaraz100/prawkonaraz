@@ -7,6 +7,7 @@ use App\Support\ContentArticlePublicCatalogService;
 use App\Support\ContentArticleSchemaService;
 use App\Support\ContentArticleSeoService;
 use App\Support\NewsroomArticlePresentationService;
+use App\Support\NewsroomPublicGate;
 use App\Support\NewsroomRouteContract;
 use DomainException;
 use Illuminate\Http\RedirectResponse;
@@ -22,6 +23,7 @@ class ContentArticleController extends Controller
         private readonly ContentArticleSeoService $seoService,
         private readonly ContentArticleSchemaService $schemaService,
         private readonly NewsroomArticlePresentationService $presentationService,
+        private readonly NewsroomPublicGate $publicGate,
     ) {}
 
     public function news(string $articleSlug): Response|RedirectResponse
@@ -36,6 +38,10 @@ class ContentArticleController extends Controller
 
     private function show(string $family, string $articleSlug): Response|RedirectResponse
     {
+        if ($this->publicGate->disabled()) {
+            return $this->unavailable($family, Response::HTTP_NOT_FOUND);
+        }
+
         $resolution = $this->catalog->resolveDetailBySlug($family, $articleSlug);
 
         if ($resolution->isGone()) {
