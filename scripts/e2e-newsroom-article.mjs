@@ -34,20 +34,27 @@ let serverProcess;
 
 try {
     await fs.mkdir(outputDir, { recursive: true });
+    console.log('[newsroom-e2e] migrate');
     await runCommand('php', ['artisan', 'migrate', '--force']);
+    console.log('[newsroom-e2e] seed');
     await seedArticle();
+    console.log('[newsroom-e2e] start server');
     serverProcess = startServer();
     await waitForHealth(`${baseUrl}/api/v1/health`);
 
     browser = await chromium.launch({ headless: true });
 
     for (const viewport of viewports) {
+        console.log(`[newsroom-e2e] viewport ${viewport.name}`);
         const page = await browser.newPage({
             viewport: { width: viewport.width, height: viewport.height },
         });
+        page.setDefaultTimeout(10_000);
+        page.setDefaultNavigationTimeout(15_000);
 
         const response = await page.goto(`${baseUrl}${articlePath}`, {
-            waitUntil: 'networkidle',
+            waitUntil: 'domcontentloaded',
+            timeout: 15_000,
         });
 
         if (!response || response.status() !== 200) {
@@ -95,7 +102,7 @@ try {
         }
 
         const screenshot = path.join(outputDir, `article-${viewport.name}.png`);
-        await page.screenshot({ path: screenshot, fullPage: true });
+        await page.screenshot({ path: screenshot, fullPage: true, timeout: 15_000 });
         report.viewports.push({
             ...viewport,
             status: 'ok',
@@ -107,9 +114,11 @@ try {
     }
 
     report.status = 'ok';
+    console.log('[newsroom-e2e] PASS');
 } catch (error) {
     report.status = 'failed';
     report.error = error instanceof Error ? error.message : String(error);
+    console.error('[newsroom-e2e] FAIL', report.error);
     throw error;
 } finally {
     report.finished_at = new Date().toISOString();
@@ -154,7 +163,7 @@ function startServer() {
             CACHE_STORE: 'array',
             SESSION_DRIVER: 'file',
         },
-        stdio: ['ignore', 'pipe', 'pipe'],
+        stdio: 'ignore',
     });
 }
 
@@ -182,11 +191,16 @@ async function runCommand(command, args) {
 }
 
 async function terminateServer(child) {
-    if (!child || child.killed) return;
+    if (!child || child.exitCode !== null) return;
+
     child.kill('SIGTERM');
     await Promise.race([
         new Promise((resolve) => child.once('exit', resolve)),
-        delay(2_000),
+        delay(1_000),
     ]);
-    if (!child.killed) child.kill('SIGKILL');
+
+    if (child.exitCode === null) {
+        child.kill('SIGKILL');
+        await delay(250);
+    }
 }
