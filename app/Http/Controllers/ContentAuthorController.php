@@ -9,6 +9,7 @@ use App\Models\LegalContentPage;
 use App\Models\TrafficSign;
 use App\Support\ContentAuthorSchemaService;
 use App\Support\MediaUrlResolver;
+use App\Support\NewsroomPublicGate;
 use App\Support\NewsroomRouteContract;
 use App\Support\TrafficSignBreadcrumbs;
 use App\Support\TrafficSignRedirectPolicy;
@@ -25,6 +26,7 @@ class ContentAuthorController extends Controller
         TrafficSignBreadcrumbs $trafficSignBreadcrumbs,
         TrafficSignRedirectPolicy $trafficSignRedirectPolicy,
         MediaUrlResolver $mediaUrlResolver,
+        NewsroomPublicGate $newsroomPublicGate,
     ): View|RedirectResponse {
         $author = ContentAuthor::query()
             ->published()
@@ -60,13 +62,15 @@ class ContentAuthorController extends Controller
             ->orderBy('updated_at', 'desc')
             ->orderBy('title')
             ->get();
-        $newsroomArticles = $author->authoredContentArticles()
-            ->indexable()
-            ->whereHas('category', fn ($query) => $query->active())
-            ->with('category:id,name,slug')
-            ->orderByDesc('published_at')
-            ->orderByDesc('public_state_changed_at')
-            ->get();
+        $newsroomArticles = $newsroomPublicGate->enabled()
+            ? $author->authoredContentArticles()
+                ->indexable()
+                ->whereHas('category', fn ($query) => $query->active())
+                ->with('category:id,name,slug')
+                ->orderByDesc('published_at')
+                ->orderByDesc('public_state_changed_at')
+                ->get()
+            : collect();
         $publishedNewsroomCards = $newsroomArticles
             ->filter(fn (ContentArticle $article): bool => $article->workflow_status === ContentArticleWorkflowStatus::Published)
             ->map(fn (ContentArticle $article): array => $this->newsroomPublicationCard($article));
