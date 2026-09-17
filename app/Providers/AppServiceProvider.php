@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Models\QuestionPublicExplanation;
 use App\Observers\QuestionPublicExplanationObserver;
+use App\Support\SharedAuthorTrafficSignSchemaService;
+use App\Support\TrafficSignSchemaService;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -16,7 +18,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(TrafficSignSchemaService::class, SharedAuthorTrafficSignSchemaService::class);
     }
 
     /**

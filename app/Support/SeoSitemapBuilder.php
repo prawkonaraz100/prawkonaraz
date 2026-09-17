@@ -225,7 +225,8 @@ class SeoSitemapBuilder
                 $query
                     ->whereHas('trafficSigns', fn ($query) => $query->published()->whereHas('category', fn ($query) => $query->published()))
                     ->orWhereHas('authoredLegalContentPages', fn ($query) => $query->published())
-                    ->orWhereHas('reviewedLegalContentPages', fn ($query) => $query->published());
+                    ->orWhereHas('reviewedLegalContentPages', fn ($query) => $query->published())
+                    ->orWhereHas('authoredContentArticles', fn ($query) => $query->indexable()->whereHas('category', fn ($query) => $query->active()));
             })
             ->withMax([
                 'trafficSigns as latest_published_sign_updated_at' => fn ($query) => $query->published(),
@@ -236,6 +237,9 @@ class SeoSitemapBuilder
             ->withMax([
                 'reviewedLegalContentPages as latest_reviewed_legal_content_updated_at' => fn ($query) => $query->published(),
             ], 'updated_at')
+            ->withMax([
+                'authoredContentArticles as latest_indexable_content_article_public_state_changed_at' => fn ($query) => $query->indexable()->whereHas('category', fn ($query) => $query->active()),
+            ], 'public_state_changed_at')
             ->orderBy('name')
             ->get()
             ->map(function (ContentAuthor $author): array {
@@ -246,6 +250,7 @@ class SeoSitemapBuilder
                         $author->latest_published_sign_updated_at,
                         $author->latest_authored_legal_content_updated_at,
                         $author->latest_reviewed_legal_content_updated_at,
+                        $author->latest_indexable_content_article_public_state_changed_at,
                     ]),
                     'images' => [],
                 ];
@@ -354,7 +359,8 @@ class SeoSitemapBuilder
                     $query
                         ->whereHas('trafficSigns', fn ($query) => $query->published())
                         ->orWhereHas('authoredLegalContentPages', fn ($query) => $query->published())
-                        ->orWhereHas('reviewedLegalContentPages', fn ($query) => $query->published());
+                        ->orWhereHas('reviewedLegalContentPages', fn ($query) => $query->published())
+                        ->orWhereHas('authoredContentArticles', fn ($query) => $query->indexable()->whereHas('category', fn ($query) => $query->active()));
                 })
                 ->withMax([
                     'trafficSigns as latest_published_sign_updated_at' => fn ($query) => $query->published(),
@@ -365,12 +371,16 @@ class SeoSitemapBuilder
                 ->withMax([
                     'reviewedLegalContentPages as latest_reviewed_legal_content_updated_at' => fn ($query) => $query->published(),
                 ], 'updated_at')
+                ->withMax([
+                    'authoredContentArticles as latest_indexable_content_article_public_state_changed_at' => fn ($query) => $query->indexable()->whereHas('category', fn ($query) => $query->active()),
+                ], 'public_state_changed_at')
                 ->get()
                 ->flatMap(fn (ContentAuthor $author): array => [
                     $author->updated_at?->toIso8601String(),
                     $author->latest_published_sign_updated_at,
                     $author->latest_authored_legal_content_updated_at,
                     $author->latest_reviewed_legal_content_updated_at,
+                    $author->latest_indexable_content_article_public_state_changed_at,
                 ])
                 ->filter()
                 ->max(),

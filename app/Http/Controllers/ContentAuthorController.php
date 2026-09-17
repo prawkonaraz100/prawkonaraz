@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ContentArticleWorkflowStatus;
+use App\Models\ContentArticle;
 use App\Models\ContentAuthor;
 use App\Models\LegalContentPage;
 use App\Models\TrafficSign;
+use App\Support\ContentAuthorSchemaService;
 use App\Support\MediaUrlResolver;
+use App\Support\NewsroomRouteContract;
 use App\Support\TrafficSignBreadcrumbs;
 use App\Support\TrafficSignRedirectPolicy;
-use App\Support\TrafficSignSchemaService;
 use App\Support\TrafficSignSeoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -18,7 +21,7 @@ class ContentAuthorController extends Controller
     public function __invoke(
         string $authorSlug,
         TrafficSignSeoService $trafficSignSeoService,
-        TrafficSignSchemaService $trafficSignSchemaService,
+        ContentAuthorSchemaService $contentAuthorSchemaService,
         TrafficSignBreadcrumbs $trafficSignBreadcrumbs,
         TrafficSignRedirectPolicy $trafficSignRedirectPolicy,
         MediaUrlResolver $mediaUrlResolver,
@@ -57,11 +60,30 @@ class ContentAuthorController extends Controller
             ->orderBy('updated_at', 'desc')
             ->orderBy('title')
             ->get();
+        $newsroomArticles = $author->authoredContentArticles()
+            ->indexable()
+            ->whereHas('category', fn ($query) => $query->active())
+            ->with('category:id,name,slug')
+            ->orderByDesc('published_at')
+            ->orderByDesc('public_state_changed_at')
+            ->get();
+        $publishedNewsroomCards = $newsroomArticles
+            ->filter(fn (ContentArticle $article): bool => $article->workflow_status === ContentArticleWorkflowStatus::Published)
+            ->map(fn (ContentArticle $article): array => $this->newsroomPublicationCard($article));
+        $needsReviewNewsroomCards = $newsroomArticles
+            ->filter(fn (ContentArticle $article): bool => $article->workflow_status === ContentArticleWorkflowStatus::NeedsReview)
+            ->map(fn (ContentArticle $article): array => $this->newsroomPublicationCard($article))
+            ->values();
+        $archivedNewsroomCards = $newsroomArticles
+            ->filter(fn (ContentArticle $article): bool => $article->workflow_status === ContentArticleWorkflowStatus::Archived)
+            ->map(fn (ContentArticle $article): array => $this->newsroomPublicationCard($article))
+            ->values();
 
         $breadcrumbs = $trafficSignBreadcrumbs->author($author);
         $publicationCards = $signs
             ->map(fn (TrafficSign $sign): array => $this->publicationCard($sign, $mediaUrlResolver))
             ->concat($legalPages->map(fn (LegalContentPage $page): array => $this->legalPublicationCard($page)))
+            ->concat($publishedNewsroomCards)
             ->sortByDesc('updated_at_sort')
             ->values();
 
@@ -69,10 +91,16 @@ class ContentAuthorController extends Controller
             'author' => $author,
             'signs' => $signs,
             'publicationCards' => $publicationCards,
+            'needsReviewNewsroomCards' => $needsReviewNewsroomCards,
+            'archivedNewsroomCards' => $archivedNewsroomCards,
             'authorPhotoUrl' => $mediaUrlResolver->resolve($author->photo_path, 'public'),
             'meta' => $trafficSignSeoService->author($author),
             'breadcrumbs' => $breadcrumbs,
-            'structuredData' => $trafficSignSchemaService->author($author, $breadcrumbs, $signs),
+            'structuredData' => $contentAuthorSchemaService->profile(
+                $author,
+                $trafficSignBreadcrumbs->toSchema($breadcrumbs),
+                $signs->take(5)->map(fn (TrafficSign $sign): string => $sign->publicTitle()),
+            ),
         ]);
     }
 
@@ -113,6 +141,31 @@ class ContentAuthorController extends Controller
             'category_url' => route('public.regulations', absolute: false),
             'updated_at' => ($page->last_reviewed_at ?: $page->updated_at)?->format('d.m.Y'),
             'updated_at_sort' => ($page->last_reviewed_at ?: $page->updated_at)?->timestamp ?? 0,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function newsroomPublicationCard(ContentArticle $article): array
+    {
+        $type = $article->type?->value ?? (string) $article->type;
+        $family = NewsroomRouteContract::familyForType($type);
+        $updatedAt = $article->last_substantive_update_at ?: $article->updated_at;
+
+        return [
+            'code' => $family === NewsroomRouteContract::FAMILY_GUIDES ? 'Poradnik' : 'Artykuł',
+            'title' => $article->title,
+            'intro' => $article->lead,
+            'url' => NewsroomRouteContract::canonicalPath($type, $article->slug),
+            'image_url' => null,
+            'image_alt' => null,
+            'category_name' => $article->category?->name,
+            'category_url' => $family === NewsroomRouteContract::FAMILY_NEWSROOM && $article->category
+                ? route('public.news.categories.show', $article->category->slug, absolute: false)
+                : null,
+            'updated_at' => $updatedAt?->format('d.m.Y'),
+            'updated_at_sort' => $updatedAt?->timestamp ?? 0,
         ];
     }
 

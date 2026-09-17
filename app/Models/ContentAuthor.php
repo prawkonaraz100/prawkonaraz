@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Validation\ValidationException;
 
 class ContentAuthor extends Model
 {
@@ -26,6 +27,31 @@ class ContentAuthor extends Model
         'is_published',
         'published_at',
     ];
+
+    protected static function booted(): void
+    {
+        static::updating(function (self $author): void {
+            if (! $author->isDirty(['is_published', 'published_at'])) {
+                return;
+            }
+
+            $wasPubliclyVisible = (bool) $author->getOriginal('is_published')
+                && $author->getOriginal('published_at') !== null
+                && $author->asDateTime($author->getOriginal('published_at'))->lte(now());
+
+            if (! $wasPubliclyVisible || $author->isPubliclyVisible()) {
+                return;
+            }
+
+            if (! $author->authoredContentArticles()->indexable()->exists()) {
+                return;
+            }
+
+            throw ValidationException::withMessages([
+                'is_published' => 'Nie można odpublikować autora, dopóki ma publiczne, indeksowalne artykuły Newsroomu. Najpierw przypisz je do innego publicznego autora albo wycofaj/noindexuj publikacje.',
+            ]);
+        });
+    }
 
     protected function casts(): array
     {

@@ -4,6 +4,8 @@
 
 @php
     $publicationCards = collect($publicationCards ?? []);
+    $needsReviewNewsroomCards = collect($needsReviewNewsroomCards ?? []);
+    $archivedNewsroomCards = collect($archivedNewsroomCards ?? []);
     $publicationCount = $publicationCards->count();
     $authorPhotoUrl = $authorPhotoUrl ?? null;
     $publishedAt = $author->published_at?->format('d.m.Y');
@@ -105,66 +107,44 @@
             <div class="flex flex-col gap-4 border-b border-slate-200 pb-8 md:flex-row md:items-end md:justify-between">
                 <div>
                     <h2 class="text-3xl font-semibold tracking-tight text-slate-950">Publikacje</h2>
-                    <p class="mt-2 text-base text-slate-600">Opublikowane strony autora</p>
+                    <p class="mt-2 text-base text-slate-600">Aktualne, opublikowane materiały autora</p>
                 </div>
 
                 <p class="text-base font-semibold text-slate-950">{{ number_format($publicationCount, 0, ',', ' ') }} publikacji</p>
             </div>
 
-            <ul class="divide-y divide-slate-200">
-                @forelse ($publicationCards as $card)
-                    <li>
-                        <div class="group grid gap-5 py-5 transition md:grid-cols-[170px_minmax(0,1fr)_150px_32px] md:items-center md:py-6">
-                            <a href="{{ $card['url'] }}" class="flex h-28 w-44 max-w-full items-center justify-center md:h-24 md:w-36" aria-label="{{ $card['title'] }}">
-                                @if ($card['image_url'])
-                                    <img
-                                        src="{{ $card['image_url'] }}"
-                                        alt="{{ $card['image_alt'] }}"
-                                        class="max-h-full max-w-full object-contain"
-                                        loading="lazy"
-                                    >
-                                @else
-                                    <span class="flex h-20 w-24 items-center justify-center border border-slate-200 text-sm font-semibold text-slate-400">
-                                        {{ $card['code'] }}
-                                    </span>
-                                @endif
-                            </a>
+            @include('authors._publication-cards', [
+                'cards' => $publicationCards,
+                'emptyMessage' => 'Ten autor nie ma jeszcze aktualnych publikacji.',
+            ])
 
-                            <div class="min-w-0">
-                                <a href="{{ $card['url'] }}" class="block text-xl font-semibold text-slate-950 hover:text-red-600">{{ $card['title'] }}</a>
+            @if ($needsReviewNewsroomCards->isNotEmpty())
+                <section class="mt-12" aria-labelledby="author-needs-review-heading">
+                    <div class="border-b border-amber-200 pb-6">
+                        <p class="text-xs font-bold uppercase tracking-[0.12em] text-amber-700">Status redakcyjny</p>
+                        <h2 id="author-needs-review-heading" class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">W trakcie weryfikacji</h2>
+                        <p class="mt-2 max-w-3xl text-base leading-7 text-slate-600">Materiały pozostają publiczne, ale oczekują na ponowną weryfikację redakcyjną.</p>
+                    </div>
 
-                                @if ($card['intro'])
-                                    <span class="mt-3 block max-w-4xl text-base leading-7 text-slate-700">{{ $card['intro'] }}</span>
-                                @endif
+                    @include('authors._publication-cards', [
+                        'cards' => $needsReviewNewsroomCards,
+                    ])
+                </section>
+            @endif
 
-                                @if ($card['category_name'])
-                                    <span class="mt-2 block text-base text-slate-700">
-                                        Kategoria:
-                                        @if ($card['category_url'])
-                                            <a href="{{ $card['category_url'] }}" class="font-medium text-blue-600 hover:text-red-600">{{ $card['category_name'] }}</a>
-                                        @else
-                                            <span>{{ $card['category_name'] }}</span>
-                                        @endif
-                                    </span>
-                                @endif
-                            </div>
+            @if ($archivedNewsroomCards->isNotEmpty())
+                <section class="mt-12" aria-labelledby="author-archive-heading">
+                    <div class="border-b border-slate-200 pb-6">
+                        <p class="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Historia publikacji</p>
+                        <h2 id="author-archive-heading" class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Archiwum</h2>
+                        <p class="mt-2 max-w-3xl text-base leading-7 text-slate-600">Starsze materiały zachowane publicznie jako część historii publikacji autora.</p>
+                    </div>
 
-                            <span class="text-sm text-slate-700 md:text-right">
-                                <span class="block">Aktualizacja</span>
-                                <span class="mt-1 block text-base text-slate-950">{{ $card['updated_at'] ?? '-' }}</span>
-                            </span>
-
-                            <a href="{{ $card['url'] }}" class="hidden justify-self-end text-slate-950 transition hover:translate-x-1 hover:text-red-600 md:block" aria-label="{{ $card['title'] }}">
-                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                    <path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </a>
-                        </div>
-                    </li>
-                @empty
-                    <li class="py-8 text-base text-slate-600">Ten autor nie ma jeszcze opublikowanych stron.</li>
-                @endforelse
-            </ul>
+                    @include('authors._publication-cards', [
+                        'cards' => $archivedNewsroomCards,
+                    ])
+                </section>
+            @endif
 
             <div class="pt-8">
                 <a href="{{ route('traffic-signs.index') }}" class="inline-flex items-center gap-3 border-l border-slate-300 py-3 pl-4 text-sm font-semibold text-slate-950 hover:text-red-600">

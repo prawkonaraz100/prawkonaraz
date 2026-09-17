@@ -275,6 +275,7 @@ class TrafficSignSchemaService
                 'dateModified' => $author->updated_at->toIso8601String(),
                 'mainEntity' => [
                     '@type' => 'Person',
+                    '@id' => $this->schemaIds->contentAuthorPerson($author),
                     'name' => $author->name,
                     'jobTitle' => $author->job_title,
                     'description' => $author->bio,
