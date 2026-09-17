@@ -2,6 +2,17 @@ name: Browser Smoke
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/browser-smoke.yml'
+      - 'app/Http/Controllers/ContentArticleController.php'
+      - 'app/Support/ContentArticlePublicCatalogService.php'
+      - 'app/Support/NewsroomArticleBodyRenderer.php'
+      - 'app/Support/NewsroomArticlePresentationService.php'
+      - 'resources/views/newsroom/**'
+      - 'routes/web.php'
+      - 'scripts/e2e-newsroom-article.mjs'
+      - 'package.json'
 
 jobs:
   browser-smoke:
@@ -53,6 +64,9 @@ jobs:
 
       - name: Run browser smoke
         run: npm run e2e:smoke
+
+      - name: Run newsroom article browser QA
+        run: npm run e2e:newsroom-article
 
       - name: Upload browser smoke artifacts
         if: always()
