@@ -1583,7 +1583,7 @@ Obecnie:
 - scheduler uruchamia `seo:refresh-sitemaps` codziennie jako istniejący safety net,
 - istnieje zarówno `public/robots.txt`, jak i route `RobotsController`; production delivery trzeba traktować zgodnie z `SEO-SITEMAP-REPAIR-PLAN.md`,
 - istnieje IndexNowUrlSubmission,
-- author pages istnieją; po NEWSROOM-N3-007 ProfilePage/Article współdzielą stabilny Person `@id`, a author sitemap uwzględnia indexable Newsroom corpus z `public_state_changed_at` (`main@c68672f6aa7c41defaeec56debb541d5a60d9f4f`),
+- author pages istnieją; N3-007 utrzymuje wspólny ProfilePage/Article Person `@id`, a po N3-008 przy `NEWSROOM_PUBLIC_ENABLED=false` profil nie pokazuje Newsroom corpus, zaś author sitemap nie używa newsroom-only eligibility ani newsroomowego `public_state_changed_at`; aktualny zweryfikowany kod to `main@23b952b77e39cd25fb39edc252faf05849946bd7`,
 - `config/content.php['organization']`, `SchemaIds`, `SchemaRenderer` i współdzielony `SiteIdentitySchema` stanowią fundament entity graph,
 - HomePageController korzysta z kanonicznego Organization/WebSite graph; legacy „Orły na Drodze” nie jest już emitowane przez homepage,
 - wspólny public-content layout emituje `og:site_name` z kanonicznego identity,
@@ -1594,6 +1594,7 @@ Obecnie:
 - `/aktualnosci` i `/poradniki` są pre-launch placeholderami 200 z `X-Robots-Tag: noindex, follow`,
 - `/aktualnosci/feed.xml` ma zarejestrowany route contract, ale obecnie zwraca 404; feed ani feed discovery nie są jeszcze wdrożone,
 - category/topic route namespaces są zarejestrowane i nadal pozostają 404 bez publicznych controllerów; article detail routes są aktywne od N3-004.
+- NEWSROOM-N3-008 jest wdrożone: `NEWSROOM_PUBLIC_ENABLED=false` blokuje current detail/guide i historyczne redirecty, zachowuje top-level placeholdery oraz filtruje newsroom namespace z obecnego IndexNow collectora; przyszłe N4/N5 discovery surfaces pozostają otwarte.
 
 ---
 
