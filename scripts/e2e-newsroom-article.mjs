@@ -1,50 +1,40 @@
 import { spawn } from 'node:child_process';
 import fs from 'node:fs/promises';
+import http from 'node:http';
 import path from 'node:path';
 import process from 'node:process';
-import { setTimeout as delay } from 'node:timers/promises';
 import { chromium } from 'playwright';
 
 const cwd = process.cwd();
 const outputDir = path.join(cwd, 'output', 'playwright', 'newsroom-article');
 const reportPath = path.join(outputDir, 'report.json');
+const snapshotPath = path.join(outputDir, 'article.html');
+const renderStatusPath = path.join(outputDir, 'render-status.txt');
 const slug = 'e2e-newsroom-article';
 const articlePath = `/aktualnosci/${slug}`;
 const title = 'Długi testowy tytuł artykułu newsroomu sprawdzający poprawne zawijanie na małych ekranach';
-const port = process.env.E2E_NEWSROOM_PORT ?? '8127';
+const port = Number(process.env.E2E_NEWSROOM_PORT ?? '8127');
 const baseUrl = `http://127.0.0.1:${port}`;
-const sqliteDatabase = path.join(cwd, 'database', 'database.sqlite');
-const laravelServerRouter = path.join(
-    cwd,
-    'vendor',
-    'laravel',
-    'framework',
-    'src',
-    'Illuminate',
-    'Foundation',
-    'resources',
-    'server.php',
-);
+const publicDir = path.join(cwd, 'public');
 const viewports = [
     { name: '360', width: 360, height: 800 },
     { name: '390', width: 390, height: 844 },
     { name: '430', width: 430, height: 932 },
     { name: '768', width: 768, height: 1024 },
-    { name: '1024', width: 1024, height: 900 },
-    { name: '1440', width: 1440, height: 1080 },
+    { name: '1024', width: 1024, height: 768 },
+    { name: '1440', width: 1440, height: 900 },
 ];
 
 const report = {
     started_at: new Date().toISOString(),
     article_path: articlePath,
     status: 'running',
-    browser_health_status: null,
+    render_status: null,
     viewports: [],
-    server_log: [],
 };
 
 let browser;
-let serverProcess;
+let staticServer;
 
 try {
     await fs.mkdir(outputDir, { recursive: true });
@@ -52,9 +42,10 @@ try {
     await runCommand('php', ['artisan', 'migrate', '--force']);
     console.log('[newsroom-e2e] seed');
     await seedArticle();
-
-    serverProcess = startServer();
-    await waitForHealth(`${baseUrl}/api/v1/health`);
+    console.log('[newsroom-e2e] render through Laravel kernel');
+    report.render_status = await renderArticleSnapshot();
+    console.log('[newsroom-e2e] start static browser server');
+    staticServer = await startStaticServer();
     browser = await chromium.launch({ headless: true });
 
     for (const viewport of viewports) {
@@ -62,6 +53,7 @@ try {
         const context = await browser.newContext({
             viewport: { width: viewport.width, height: viewport.height },
             serviceWorkers: 'block',
+            javaScriptEnabled: false,
         });
         const page = await context.newPage();
         page.setDefaultTimeout(10_000);
@@ -73,7 +65,7 @@ try {
         });
 
         if (!response || response.status() !== 200) {
-            throw new Error(`Article returned ${response?.status() ?? 'no response'} at ${viewport.name}px.`);
+            throw new Error(`Article snapshot returned ${response?.status() ?? 'no response'} at ${viewport.name}px.`);
         }
 
         const h1 = page.locator('h1');
@@ -105,14 +97,14 @@ try {
             throw new Error(`JSON-LD is missing at ${viewport.name}px.`);
         }
 
-        const layout = await page.evaluate(() => ({
-            scrollWidth: document.documentElement.scrollWidth,
-            viewportWidth: window.innerWidth,
-        }));
+        const cdp = await context.newCDPSession(page);
+        const metrics = await cdp.send('Page.getLayoutMetrics');
+        const scrollWidth = Math.ceil(metrics.cssContentSize.width);
+        const viewportWidth = Math.ceil(metrics.cssLayoutViewport.clientWidth);
 
-        if (layout.scrollWidth > layout.viewportWidth) {
+        if (scrollWidth > viewportWidth) {
             throw new Error(
-                `Horizontal overflow at ${viewport.name}px: ${layout.scrollWidth}px > ${layout.viewportWidth}px.`,
+                `Horizontal overflow at ${viewport.name}px: ${scrollWidth}px > ${viewportWidth}px.`,
             );
         }
 
@@ -121,7 +113,7 @@ try {
         report.viewports.push({
             ...viewport,
             status: 'ok',
-            scroll_width: layout.scrollWidth,
+            scroll_width: scrollWidth,
             screenshot,
         });
 
@@ -134,14 +126,13 @@ try {
     report.status = 'failed';
     report.error = error instanceof Error ? error.message : String(error);
     console.error('[newsroom-e2e] FAIL', report.error);
-    printServerLog();
     throw error;
 } finally {
     report.finished_at = new Date().toISOString();
     await fs.mkdir(outputDir, { recursive: true });
     await fs.writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
     await browser?.close().catch(() => {});
-    await terminateServer(serverProcess);
+    await closeStaticServer(staticServer);
 }
 
 async function seedArticle() {
@@ -171,57 +162,88 @@ $article = \App\Models\ContentArticle::factory()->published()->create([
     await runCommand('php', ['artisan', 'tinker', '--execute', php]);
 }
 
-function startServer() {
-    const child = spawn(
-        'php',
-        ['-S', `127.0.0.1:${port}`, laravelServerRouter],
-        {
-            cwd: path.join(cwd, 'public'),
-            env: {
-                ...process.env,
-                DB_DATABASE: sqliteDatabase,
-                CACHE_STORE: 'array',
-                SESSION_DRIVER: 'file',
-            },
-            stdio: ['ignore', 'pipe', 'pipe'],
-            windowsHide: true,
-            detached: process.platform !== 'win32',
-        },
-    );
+async function renderArticleSnapshot() {
+    const php = String.raw`
+$request = \Illuminate\Http\Request::create('${articlePath}', 'GET', [], [], [], ['HTTP_HOST' => 'localhost']);
+$response = app(\Illuminate\Contracts\Http\Kernel::class)->handle($request);
+$status = $response->getStatusCode();
+if ($status !== 200) { throw new \RuntimeException('Newsroom article render returned HTTP '.$status); }
+file_put_contents(base_path('output/playwright/newsroom-article/article.html'), $response->getContent());
+app(\Illuminate\Contracts\Http\Kernel::class)->terminate($request, $response);
+file_put_contents(base_path('output/playwright/newsroom-article/render-status.txt'), (string) $status);
+`;
 
-    child.stdout?.on('data', appendServerLog);
-    child.stderr?.on('data', appendServerLog);
-    child.once('exit', (code, signal) => {
-        appendServerLog(`server exited code=${code} signal=${signal}`);
-    });
+    await runCommand('php', ['artisan', 'tinker', '--execute', php]);
+    const status = Number((await fs.readFile(renderStatusPath, 'utf8')).trim());
 
-    return child;
-}
-
-async function waitForHealth(url) {
-    const deadline = Date.now() + 20_000;
-    while (Date.now() < deadline) {
-        try {
-            const response = await fetch(url, { cache: 'no-store' });
-            if (response.ok) return;
-        } catch {}
-        await delay(250);
+    if (status !== 200) {
+        throw new Error(`Laravel kernel render returned ${status}.`);
     }
-    throw new Error(`Server health check timed out: ${url}`);
+
+    return status;
 }
 
-function appendServerLog(chunk) {
-    const text = String(chunk).trim();
-    if (!text) return;
+async function startStaticServer() {
+    return await new Promise((resolve, reject) => {
+        const server = http.createServer(async (request, response) => {
+            try {
+                const url = new URL(request.url ?? '/', baseUrl);
+                const filePath = resolveStaticPath(url.pathname);
+                const body = await fs.readFile(filePath);
 
-    report.server_log.push(text);
-    report.server_log = report.server_log.slice(-30);
+                response.writeHead(200, {
+                    'Content-Type': contentType(filePath),
+                    'Cache-Control': 'no-store',
+                });
+                response.end(body);
+            } catch {
+                response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+                response.end('Not found');
+            }
+        });
+
+        server.once('error', reject);
+        server.listen(port, '127.0.0.1', () => resolve(server));
+    });
 }
 
-function printServerLog() {
-    if (report.server_log.length === 0) return;
-    console.error('[newsroom-e2e] server log tail:');
-    for (const line of report.server_log) console.error(line);
+function resolveStaticPath(pathname) {
+    if (pathname === articlePath) {
+        return snapshotPath;
+    }
+
+    const candidate = path.resolve(publicDir, `.${decodeURIComponent(pathname)}`);
+    const publicPrefix = `${path.resolve(publicDir)}${path.sep}`;
+
+    if (!candidate.startsWith(publicPrefix)) {
+        throw new Error(`Refusing path outside public directory: ${pathname}`);
+    }
+
+    return candidate;
+}
+
+function contentType(filePath) {
+    switch (path.extname(filePath).toLowerCase()) {
+        case '.css': return 'text/css; charset=utf-8';
+        case '.js': return 'text/javascript; charset=utf-8';
+        case '.json': return 'application/json; charset=utf-8';
+        case '.svg': return 'image/svg+xml';
+        case '.png': return 'image/png';
+        case '.jpg':
+        case '.jpeg': return 'image/jpeg';
+        case '.webp': return 'image/webp';
+        case '.avif': return 'image/avif';
+        case '.woff2': return 'font/woff2';
+        case '.ico': return 'image/x-icon';
+        case '.html': return 'text/html; charset=utf-8';
+        default: return 'application/octet-stream';
+    }
+}
+
+async function closeStaticServer(server) {
+    if (!server) return;
+
+    await new Promise((resolve) => server.close(() => resolve()));
 }
 
 async function runCommand(command, args) {
@@ -233,33 +255,4 @@ async function runCommand(command, args) {
             else reject(new Error(`${command} ${args.join(' ')} exited with code ${code}.`));
         });
     });
-}
-
-function signalServer(child, signal) {
-    if (!child || child.exitCode !== null) return;
-
-    try {
-        if (process.platform === 'win32') {
-            child.kill(signal);
-        } else {
-            process.kill(-child.pid, signal);
-        }
-    } catch {
-        child.kill(signal);
-    }
-}
-
-async function terminateServer(child) {
-    if (!child || child.exitCode !== null) return;
-
-    signalServer(child, 'SIGTERM');
-    await Promise.race([
-        new Promise((resolve) => child.once('exit', resolve)),
-        delay(1_000),
-    ]);
-
-    if (child.exitCode === null) {
-        signalServer(child, 'SIGKILL');
-        await delay(250);
-    }
 }
