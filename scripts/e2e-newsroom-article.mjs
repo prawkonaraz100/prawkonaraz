@@ -44,7 +44,10 @@ try {
     await waitForHealth(`${baseUrl}/api/v1/health`);
     await probeArticle();
 
-    browser = await chromium.launch({ headless: true });
+    browser = await chromium.launch({
+        headless: true,
+        args: ['--no-proxy-server'],
+    });
 
     for (const viewport of viewports) {
         console.log(`[newsroom-e2e] viewport ${viewport.name}`);
@@ -159,15 +162,22 @@ $article = \App\Models\ContentArticle::factory()->published()->create([
 }
 
 function startServer() {
-    const child = spawn('php', ['artisan', 'serve', '--host=127.0.0.1', `--port=${port}`], {
-        cwd,
-        env: {
-            ...process.env,
-            CACHE_STORE: 'array',
-            SESSION_DRIVER: 'file',
+    const child = spawn(
+        'php',
+        ['artisan', 'serve', '--host=127.0.0.1', `--port=${port}`, '--no-reload'],
+        {
+            cwd,
+            env: {
+                ...process.env,
+                CACHE_STORE: 'array',
+                SESSION_DRIVER: 'file',
+                PHP_CLI_SERVER_WORKERS: '4',
+                NO_PROXY: '127.0.0.1,localhost',
+                no_proxy: '127.0.0.1,localhost',
+            },
+            stdio: ['ignore', 'pipe', 'pipe'],
         },
-        stdio: ['ignore', 'pipe', 'pipe'],
-    });
+    );
 
     child.stdout?.on('data', appendServerLog);
     child.stderr?.on('data', appendServerLog);
