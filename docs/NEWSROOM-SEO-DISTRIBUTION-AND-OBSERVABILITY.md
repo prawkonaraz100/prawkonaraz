@@ -250,7 +250,7 @@ Nie publikować:
 
 Repo ma równolegle statyczny `public/robots.txt` i route `RobotsController`. Zgodnie z `SEO-SITEMAP-REPAIR-PLAN.md` produkcyjnie preferowany jest statyczny plik oraz jawna weryfikacja Nginx/Cloudflare.
 
-Globalny `NEWSROOM_PUBLIC_ENABLED=false` musi wyłączyć newsroomowe URL-e nie tylko w controllers, ale też w sitemap/feed/IndexNow/author-publications/reverse-link discovery. Dark deploy nie może publikować linków do nowych detail routes. Potwierdzony stan po N0-002: `/aktualnosci` i `/poradniki` pozostają linkowanymi pre-launch placeholder pages, ale dedykowany `NewsroomPlaceholderController` ustawia dla nich `X-Robots-Tag: noindex, follow`; shared MarketingPlaceholder innych routes nie został globalnie zmieniony. Sam `NEWSROOM_PUBLIC_ENABLED` nadal jest zadaniem N3-008, więc obecny pre-launch noindex nie jest jeszcze sterowany tym flagem.
+Globalny `NEWSROOM_PUBLIC_ENABLED=false` jest wdrożony przez N3-008 jako pre-launch/dark-deploy gate. `config/newsroom.php` ma bezpieczny default `false`, a `NewsroomPublicGate` centralizuje decyzję. Przy `false` publiczne article/guide detail oraz historyczne old-path redirecty failują do 404 przed lookupem/redirect resolverem; `/aktualnosci` i `/poradniki` pozostają linkowanymi pre-launch placeholder pages z `X-Robots-Tag: noindex, follow`. Profil autora nie emituje newsroom publications, a `SeoSitemapBuilder` nie uwzględnia newsroom-only author eligibility ani newsroomowego freshness contribution. Istniejący `IndexNowUrlCollector` dodatkowo odrzuca namespace `/aktualnosci` i `/poradniki` przy wyłączonym gate. Feed, article/news sitemap oraz reverse-link surfaces nadal nie istnieją i muszą konsumować ten sam gate dopiero przy wdrożeniu w N4/N5.
 
 Ta flaga jest przede wszystkim **pre-launch/dark-deploy gate**. Po pierwszym publicznym rollout nie używamy długotrwale `false` jako technicznego rollbacku dla już indeksowanych article URLs, jeśli skutkiem byłyby masowe 404. Dla krótkiej awarii technicznej preferujemy kontrolowane 503/Retry-After lub rollback kodu zachowujący publiczne routes; dla pojedynczej błędnej treści używamy `withdrawn`.
 
@@ -1605,6 +1605,7 @@ Obecnie:
 - [x] wdrożyć ContentArticleSeoService,
 - [x] wdrożyć ContentArticleSchemaService i publiczne osadzenie graphu w article HTML w N3-004,
 - [x] zintegrować ProfilePage/Article author identity i author sitemap z Newsroom corpus w N3-007,
+- [x] wdrożyć NEWSROOM-N3-008 public rollout gate dla istniejących detail/redirect, author profile/author sitemap contribution i obecnego IndexNow collectora; przyszłe feed/article sitemap/reverse links nadal muszą respektować ten sam gate,
 - [ ] rozszerzyć istniejący statyczny generator o article sitemap z deterministic sharding readiness,
 - [ ] wdrożyć statyczny news sitemap z pełnymi wymaganymi news tags,
 - [ ] wdrożyć child-before-index atomic publication i cleanup obsolete shards po switchu,
@@ -1622,6 +1623,14 @@ Obecnie:
 ---
 
 ## 70. Historia zmian
+
+### 2026-09-18 — v0.13
+
+- NEWSROOM-N3-008 zmergowano przez PR #79 na `main@23b952b77e39cd25fb39edc252faf05849946bd7`; exact implementation head `c8484aa1529eb41805a76ceb7be1f55db63aec14`,
+- przy `NEWSROOM_PUBLIC_ENABLED=false` detail/guide i historyczne redirecty nie ujawniają dark-deployed content, top-level placeholdery pozostają 200 + noindex, a Newsroom znika z author profile i newsroomowego wkładu do author sitemap,
+- obecny `IndexNowUrlCollector` defensywnie filtruje `/aktualnosci` i `/poradniki` przy wyłączonym gate; article-specific IndexNow automation pozostaje N5-005,
+- feed, article/news sitemap i reverse-link discovery nadal nie są wdrożone; exact-head CI #308, Browser Smoke #23 i post-merge CI #309 zakończyły się PASS.
+
 
 ### 2026-09-17 — v0.12
 
