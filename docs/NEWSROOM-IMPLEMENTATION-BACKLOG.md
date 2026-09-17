@@ -1137,6 +1137,12 @@ Computed blocking/warning items.
 
 ## NEWSROOM-N3-003 — Article schema graph service
 
+### Status implementacji
+
+**DONE na poziomie backendowego schema service — PR #68 zmergowany.** Feature merge: `main@cdef77c66459537c98b2e044a76a97c082af2ef2`; finalny zweryfikowany HEAD po deterministycznym fixture fixie: `main@5f85bec331428a73f3859ae40b555f55e7e7820d`. Exact-head PR CI #242 PASS, finalny push-CI #245 PASS.
+
+N3-003 nie uruchamia publicznego article controller/Blade. Detail routes pozostają 404, a faktyczne osadzenie JSON-LD w publicznym response należy do N3-004.
+
 ### Zakres
 
 Re-use istniejących `SchemaIds` / `SchemaRenderer`.
@@ -1158,6 +1164,17 @@ Dodatkowo:
 - articleSection/inLanguage,
 - datePublished/dateModified policy,
 - realne image variants, jeśli istnieją.
+
+### Aktualny stan implementacji
+
+- `ContentArticleSchemaService::article()` reużywa `SiteIdentitySchema`, `SchemaIds`, `SchemaRenderer` i canonical/date metadata z `ContentArticleSeoService`,
+- graph zawiera Organization, WebSite, WebPage, NewsArticle/Article, Person, BreadcrumbList i ImageObject nodes wyłącznie dla ustawionych hero/OG media paths,
+- news -> `NewsArticle`; explainer/analysis/report/guide -> `Article`,
+- author/publisher/isPartOf/mainEntityOfPage są relacjami przez stabilne `@id`, a `articleSection`, `inLanguage`, `datePublished` i `dateModified` są spójne z publicznym kontraktem,
+- newsroom breadcrumb zawiera primary category; guide breadcrumb pozostaje bez category hop,
+- hero/OG images są deduplikowane, a brak ustawionego hero/OG media path nie tworzy ImageObject,
+- hidden article, unpublished author i inactive category są fail-closed,
+- regression: `tests/Feature/NewsroomArticleSchemaServiceTest.php`.
 
 ### DoD
 
@@ -2119,13 +2136,21 @@ Na 2026-09-16:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N3-003 — Article schema graph service.
+NEWSROOM-N3-004 — Article Blade page + block renderer.
 
-N2-001..N2-012 oraz NEWSROOM-N3-001..N3-002 są zamknięte implementacyjnie. Następny krok buduje stabilny WebPage/NewsArticle-or-Article/Person/Breadcrumb/ImageObject graph nad tym samym canonical i datami z `ContentArticleSeoService`, reużywając istniejące `SchemaIds` / `SchemaRenderer`. Publiczny Blade article page pozostaje N3-004, a historyczne redirecty N3-006.
+N2-001..N2-012 oraz NEWSROOM-N3-001..N3-003 są zamknięte implementacyjnie w swoich warstwach backendowych. Następny krok łączy gotowy public catalog, SEO metadata i schema graph z właściwym publicznym article controller/Blade + bezpiecznym block rendererem. Historyczne redirecty pozostają osobnym N3-006.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-17 — v0.32
+
+- NEWSROOM-N3-003 zmergowano przez PR #68 na `main@cdef77c66459537c98b2e044a76a97c082af2ef2`; exact-head PR CI #242 PASS. Finalny zweryfikowany `main@5f85bec331428a73f3859ae40b555f55e7e7820d` po osobnym deterministic fixture fixie przeszedł push-CI #245: 1043 passed / 19 418 assertions / 2 skipped, Pint 1045 files, frontend build 9.04 s, PostgreSQL 7/94,
+- `ContentArticleSchemaService` materializuje stabilny Organization/WebSite/WebPage/NewsArticle-or-Article/Person/Breadcrumb/ImageObject graph nad canonical/date metadata z N3-002, bez duplikowania publisher/author literals,
+- testy pokrywają type mapping, canonical/date consistency, breadcrumbs, stable entity IDs, path-backed/deduplicated images oraz fail-closed hidden-author/category states,
+- publiczne detail controllers/Blade nadal pozostają 404; N3-003 nie jest utożsamiany z publicznym JSON-LD response surface,
+- następnym taskiem wykonawczym jest NEWSROOM-N3-004 `Article Blade page + block renderer`; historyczne 301 pozostają N3-006.
 
 ### 2026-09-17 — v0.31
 

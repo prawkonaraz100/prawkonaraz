@@ -1417,14 +1417,15 @@ Runbook jest spełniony, gdy:
 
 ## 58. Stan implementacji
 
-Na 2026-09-16:
+Na 2026-09-17:
 
 - istnieją globalne backend tests,
 - istnieje Playwright smoke dla produktu,
 - istnieją ops backup/restore/health commands,
 - istnieją newsroom-specific unit/security tests dla `NewsroomBodyContract`, storage/security regression dla `NewsroomMediaStorage`, enum/schema/model regression, N1-003 slug/history tests, `NewsroomPublishingServiceTest` dla N1-004 workflow/invariants/audit/after-commit rollback boundary, N1-006 `NewsroomHomeCompositionServiceTest`/`NewsroomHomePlacementServiceTest` oraz N2-008 `NewsroomArticlePreviewTest` pokrywający auth/admin gate, no-store/noindex, analytics suppression, XSS escaping, private-source leakage i brak signed-token contract; PostgreSQL gate obejmuje migration/model/slug concurrency oraz home-placement advisory-lock regression; browser E2E nadal nie istnieje,
 - N2 HomeComposer ma już Livewire/feature integration regression dla fixed slots, search, fallback, create/update/delete, audit, stale-write, duplicate warning i private future preview; newsroom-specific browser E2E oraz topic/media CMS integration tests nadal nie istnieją,
-- newsroom entity graph/news sitemap/sharding/feed-discovery/static-delivery tests jeszcze nie istnieją,
+- `tests/Feature/NewsroomArticleSchemaServiceTest.php` po N3-003 pokrywa service-level entity graph: stable IDs, Organization/WebSite dedupe, canonical/date consistency, Article/NewsArticle mapping, author/publisher refs, breadcrumbs, path-backed/deduplicated images i fail-closed visibility/author/category guards,
+- publiczne HTTP/Blade JSON-LD emission, news sitemap/sharding/feed-discovery/static-delivery tests jeszcze nie istnieją; detail routes pozostają 404 do N3-004,
 - atomic static publication i dirty/version newsroom refresh coordinator jeszcze nie istnieją,
 - canonical CI ma dwa uzupełniające joby: `quality` na SQLite oraz addytywny `newsroom-postgres` na PostgreSQL 16,
 - newsroom-specific browser E2E nie jest pokryty istniejącym product browser smoke,
@@ -1437,7 +1438,7 @@ Na 2026-09-16:
 - [ ] dodać test files w trakcie N1–N5,
 - [ ] stworzyć newsroom E2E,
 - [ ] dodać N2 media uploader + topic/focal-point/crop integration oraz N3 renderer/browser E2E; HomeComposer composition/integration regression jest już zmaterializowany,
-- [ ] dodać site-identity/entity-graph/date-consistency tests,
+- [x] dodać service-level site-identity/entity-graph/date-consistency regression; publiczne HTML emission pozostaje N3-004,
 - [ ] dodać semantic silo/orphan/reverse-link/click-depth tests,
 - [ ] dodać public HTTP route-family/canonical/old-slug redirect integration/E2E; service-level exclusivity i slug history są już pokryte w N1-003,
 - [x] dodać N2 stale-write/Apply-public-update oraz HomeComposer stale-write regression; ContentArticle i placement same-second conflicts są blokowane,
@@ -1451,6 +1452,13 @@ Na 2026-09-16:
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-17 — v0.15
+
+- NEWSROOM-N3-003 dodał rzeczywisty `tests/Feature/NewsroomArticleSchemaServiceTest.php` dla backendowego schema graph service; proponowana mapa testów w sekcji 4 pozostaje jawnie targetem, nie listą istniejących plików,
+- regression sprawdza stabilne entity IDs, canonical/date consistency, Organization/WebSite dedupe, author/publisher relations, NewsArticle/Article mapping, newsroom/guide breadcrumbs, path-backed/deduplicated image nodes oraz fail-closed invalid public inputs,
+- finalny zweryfikowany `main@5f85bec331428a73f3859ae40b555f55e7e7820d` przeszedł CI #245: quality 1043 passed / 19 418 assertions / 2 skipped, Pint 1045 files, frontend build 9.04 s; newsroom-postgres 7 passed / 94 assertions,
+- publiczny article controller/Blade oraz browser/E2E JSON-LD response regression nadal nie istnieją i pozostają częścią N3-004/release gate.
 
 ### 2026-09-16 — v0.14
 

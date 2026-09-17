@@ -1076,6 +1076,19 @@ Odpowiada za:
 - publisher Organization,
 - BreadcrumbList.
 
+#### Aktualny stan implementacji — NEWSROOM-N3-003
+
+Na `main@5f85bec331428a73f3859ae40b555f55e7e7820d` istnieje `App\Support\ContentArticleSchemaService`. Service nie zmienia schema DB ani migracji i materializuje backendowy graph nad tym samym canonical/date contract co `ContentArticleSeoService`:
+
+- reużywa `SiteIdentitySchema`, `SchemaIds` i `SchemaRenderer`, dzięki czemu Organization `/#organization` i WebSite `/#website` nie są duplikowane literalnie,
+- tworzy stabilne WebPage `{canonical}#webpage`, article `{canonical}#article`, Person `/autorzy/{slug}#person`, BreadcrumbList i ImageObject nodes dla ustawionych media paths,
+- `news` mapuje na `NewsArticle`, a explainer/analysis/report/guide na `Article`,
+- `mainEntityOfPage`, `author`, `publisher`, `isPartOf`, `articleSection`, `inLanguage`, `datePublished` i `dateModified` są wiązane z istniejącymi publicznymi bytami i polityką N3-002,
+- ImageObject dla hero/OG powstaje tylko przy ustawionym media path i URL rozwiązanym przez `NewsroomMediaStorage`; ten sam URL jest deduplikowany, a primaryImageOfPage preferuje hero,
+- niepubliczny artykuł, nieopublikowany autor lub nieaktywna kategoria powodują fail-closed `DomainException`.
+
+To jest wyłącznie backendowy schema graph service. Publiczne detail controllers/Blade nadal nie emitują tego graphu i pozostają 404 do NEWSROOM-N3-004.
+
 ### 20.6. ContentArticleFreshnessService
 
 Odpowiada za:
@@ -1757,12 +1770,21 @@ Na 2026-09-16:
 - [x] NEWSROOM-N2-010: provenance, regulatory context and media art direction,
 - [x] NEWSROOM-N2-012: ContentArticle + HomeComposer stale-write/audit identity hardening,
 - [x] NEWSROOM-N3-001: wdrożyć `ContentArticlePublicCatalogService` z route-family current-canonical lookup, `activelyDistributed()` list query i visible/gone/not-found resolution,
+- [x] NEWSROOM-N3-002: wdrożyć `ContentArticleSeoService` z route-family self-canonical i publicznymi meta/date semantics,
+- [x] NEWSROOM-N3-003: wdrożyć `ContentArticleSchemaService` z jednym stabilnym publicznym entity graph nad canonical/date contract N3-002,
 - [ ] podłączyć publiczne article controllers/renderery oraz NEWSROOM-N3-006 historyczny `ContentArticlePathResolver` redirect flow i zweryfikować HTTP canonical/301/404/410 behavior,
 - [ ] dodać sitemap/public-discovery regression korzystające wyłącznie z current canonical URL,
 
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-17 — v0.29
+
+- NEWSROOM-N3-003 zmergowano przez PR #68; feature merge to `main@cdef77c66459537c98b2e044a76a97c082af2ef2`, a finalny zweryfikowany HEAD po deterministycznym test-fixture fixie to `main@5f85bec331428a73f3859ae40b555f55e7e7820d`,
+- `ContentArticleSchemaService` implementuje stabilne ID graphu, Article/NewsArticle type mapping, Person/Organization/WebSite references, breadcrumbs, articleSection/language, SEO-aligned dates oraz path-backed/deduplikowane image nodes,
+- `NewsroomArticleSchemaServiceTest` potwierdza canonical/date consistency, stabilne IDs, typy, breadcrumb variants, image policy oraz fail-closed guards; finalny CI #245: 1043 passed / 19 418 assertions / 2 skipped, Pint 1045, frontend 9.04 s, PostgreSQL 7/94,
+- schema service nie uruchamia publicznego HTTP renderera; detail routes pozostają 404 do N3-004, a historyczne redirecty pozostają N3-006.
 
 ### 2026-09-17 — v0.28
 

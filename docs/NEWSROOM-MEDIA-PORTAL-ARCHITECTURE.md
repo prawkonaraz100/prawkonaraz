@@ -103,7 +103,7 @@ Na pierwszym etapie nie budujemy:
 
 ## 5. Aktualny stan implementacji
 
-Stan sprawdzony ponownie 2026-09-17 względem `main@d9be735eee1915f4b53a6de42ec665a37442acae` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-012 oraz NEWSROOM-N3-001..N3-002. Zakres admin/domain N2 jest zamknięty, backendowy public read boundary N3-001 i article SEO metadata service N3-002 są wdrożone; publiczne kontrolery/renderery, schema graph oraz dalsze N3/N4/N5 pozostają otwarte.
+Stan sprawdzony ponownie 2026-09-17 względem `main@5f85bec331428a73f3859ae40b555f55e7e7820d` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-012 oraz NEWSROOM-N3-001..N3-003. Zakres admin/domain N2 jest zamknięty, backendowy public read boundary N3-001, article SEO metadata service N3-002 oraz backendowy article schema graph service N3-003 są wdrożone; publiczne kontrolery/renderery i dalsze N3/N4/N5 pozostają otwarte.
 
 ### 5.1. Elementy już istniejące
 
@@ -1496,7 +1496,8 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N2-011` — ContentTopicResource + topic publication/identity guards,
 - [x] `NEWSROOM-N3-001` — Public catalog service: backendowy route-family read boundary, active-list query i jawna visible/gone/not-found semantyka.
 - [x] `NEWSROOM-N3-002` — Article SEO service: route-family self-canonical, title/description/robots/social-image/date metadata.
-- [ ] `NEWSROOM-N3-003` — Article schema graph service jako następny wykonywalny task.
+- [x] `NEWSROOM-N3-003` — Article schema graph service: stabilny WebPage/NewsArticle-or-Article/Person/Breadcrumb/ImageObject graph nad canonical i datami z N3-002.
+- [ ] `NEWSROOM-N3-004` — Article Blade page + block renderer jako następny wykonywalny task.
 
 Pozostałe elementy N3–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu checklistę.
 
@@ -1523,6 +1524,14 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-17 — v0.32
+
+- NEWSROOM-N3-003 zmergowano przez PR #68 na `main@cdef77c66459537c98b2e044a76a97c082af2ef2`; exact-head PR CI #242 był PASS. Następnie na `main@5f85bec331428a73f3859ae40b555f55e7e7820d` poprawiono wyłącznie deterministyczność niezwiązanego fixture testowego i finalny push-CI #245 potwierdził pełny PASS: 1043 passed / 19 418 assertions / 2 skipped, Pint 1045 files PASS, frontend build 9.04 s oraz PostgreSQL 7 passed / 94 assertions,
+- `ContentArticleSchemaService` reużywa `SiteIdentitySchema`, `SchemaIds`, `SchemaRenderer` i `ContentArticleSeoService`; buduje jeden stabilny graph Organization/WebSite/WebPage/NewsArticle-or-Article/Person/BreadcrumbList oraz ImageObject nodes dla ustawionych hero/OG media paths,
+- schema canonical i daty są zgodne z N3-002; news używa `NewsArticle`, pozostałe typy `Article`, newsroom breadcrumb zawiera primary category, a guide breadcrumb nie dodaje category hop,
+- service odrzuca niepubliczny artykuł, nieopublikowanego autora i nieaktywną kategorię, nie tworzy ImageObject bez ustawionego hero/OG media path i deduplikuje ten sam URL; publiczne detail controllers/Blade nadal pozostają 404, więc emission JSON-LD w HTTP należy do N3-004, a historyczne redirecty pozostają N3-006,
+- następnym taskiem wykonawczym jest NEWSROOM-N3-004 `Article Blade page + block renderer`.
 
 ### 2026-09-17 — v0.31
 

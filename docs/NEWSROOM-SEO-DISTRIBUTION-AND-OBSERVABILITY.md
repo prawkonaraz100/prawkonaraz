@@ -1586,7 +1586,7 @@ Obecnie:
 - HomePageController korzysta z kanonicznego Organization/WebSite graph; legacy „Orły na Drodze” nie jest już emitowane przez homepage,
 - wspólny public-content layout emituje `og:site_name` z kanonicznego identity,
 - istnieje również runtime `SitemapController`, ale statyczne pliki są nadrzędnym produkcyjnym modelem; samo dodanie headerów do kontrolera nie rozwiązuje static delivery,
-- newsroom-specific Article schema/news sitemap/feed nie istnieją; schema graph pozostaje NEWSROOM-N3-003,
+- backendowy newsroom Article schema graph istnieje przez `ContentArticleSchemaService` po NEWSROOM-N3-003, ale nie jest jeszcze emitowany przez publiczny article HTTP renderer; news sitemap i feed nadal nie istnieją,
 - newsroom dirty/version refresh coordinator i atomowy child-before-index switch nie istnieją,
 - repo nie gwarantuje async Laravel queue workera (`QUEUE_CONNECTION=sync` w env example), więc newsroom nie może opierać freshness na ShouldQueue,
 - `/aktualnosci` i `/poradniki` są pre-launch placeholderami 200 z `X-Robots-Tag: noindex, follow`,
@@ -1601,7 +1601,7 @@ Obecnie:
 - [x] dodać `og:site_name` do wspólnego public layout contract,
 - [ ] dodać feed discovery do wspólnego public layout contract,
 - [x] wdrożyć ContentArticleSeoService,
-- [ ] wdrożyć ContentArticleSchemaService,
+- [x] wdrożyć ContentArticleSchemaService; publiczne osadzenie graphu w article HTML pozostaje częścią N3-004,
 - [ ] rozszerzyć istniejący statyczny generator o article sitemap z deterministic sharding readiness,
 - [ ] wdrożyć statyczny news sitemap z pełnymi wymaganymi news tags,
 - [ ] wdrożyć child-before-index atomic publication i cleanup obsolete shards po switchu,
@@ -1619,6 +1619,13 @@ Obecnie:
 ---
 
 ## 70. Historia zmian
+
+### 2026-09-17 — v0.10
+
+- NEWSROOM-N3-003 zmergowano przez PR #68; finalny zweryfikowany `main@5f85bec331428a73f3859ae40b555f55e7e7820d` przeszedł push-CI #245 z pełnym PASS: 1043 tests / 19 418 assertions / 2 skipped, Pint 1045 files, frontend 9.04 s, PostgreSQL 7/94,
+- wdrożony `ContentArticleSchemaService` reużywa kanonicznego site identity i metadata N3-002, emituje stabilne entity IDs oraz Article/NewsArticle, Person, BreadcrumbList i ImageObject nodes dla ustawionych media paths,
+- service-level regression potwierdza spójność canonical/dateModified/datePublished, publisher/author references, route-family breadcrumbs, type mapping i image dedupe,
+- publiczny article renderer nadal jest 404, więc JSON-LD nie jest jeszcze newsroomowym publicznym HTML outputem; to pozostaje N3-004. News sitemap/feed/static distribution pozostają otwarte.
 
 ### 2026-09-17 — v0.9
 
