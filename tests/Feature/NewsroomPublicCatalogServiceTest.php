@@ -156,7 +156,10 @@ test('actively distributed query is family scoped chronological and excludes non
 });
 
 test('public detail eager load policy exposes public relations without private source or article notes', function () {
-    $author = ContentAuthor::factory()->published()->create();
+    $author = ContentAuthor::factory()->published()->create([
+        'linkedin_url' => 'https://www.linkedin.com/in/public-author',
+        'external_profile_url' => 'https://example.test/public-author',
+    ]);
     $reviewer = ContentAuthor::factory()->published()->create();
     $article = ContentArticle::factory()->published()->create([
         'slug' => 'bezpieczne-relacje',
@@ -189,6 +192,8 @@ test('public detail eager load policy exposes public relations without private s
     expect($resolved)->not->toBeNull()
         ->and($resolved?->relationLoaded('category'))->toBeTrue()
         ->and($resolved?->relationLoaded('author'))->toBeTrue()
+        ->and($resolved?->author?->linkedin_url)->toBe('https://www.linkedin.com/in/public-author')
+        ->and($resolved?->author?->external_profile_url)->toBe('https://example.test/public-author')
         ->and($resolved?->relationLoaded('reviewer'))->toBeTrue()
         ->and($resolved?->relationLoaded('sources'))->toBeTrue()
         ->and($resolved?->relationLoaded('tags'))->toBeTrue()

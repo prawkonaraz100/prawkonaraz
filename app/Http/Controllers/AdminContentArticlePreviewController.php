@@ -4,8 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ContentArticle;
 use App\Support\MediaUrlResolver;
-use App\Support\NewsroomBodyContract;
-use App\Support\NewsroomRichTextHtmlRenderer;
+use App\Support\NewsroomArticleBodyRenderer;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -14,7 +13,7 @@ class AdminContentArticlePreviewController extends Controller
     public function __invoke(
         Request $request,
         ContentArticle $contentArticle,
-        NewsroomRichTextHtmlRenderer $richTextRenderer,
+        NewsroomArticleBodyRenderer $bodyRenderer,
         MediaUrlResolver $mediaUrlResolver,
     ): Response {
         abort_unless($request->user()?->isAdministrator(), 403);
@@ -26,30 +25,7 @@ class AdminContentArticlePreviewController extends Controller
         ]);
 
         $disk = (string) config('media.newsroom_disk', config('media.public_disk', 'public'));
-        $bodyBlocks = NewsroomBodyContract::normalize(
-            is_array($contentArticle->body_blocks) ? $contentArticle->body_blocks : [],
-            (int) ($contentArticle->body_schema_version ?? NewsroomBodyContract::CURRENT_SCHEMA_VERSION),
-        );
-
-        $bodyBlocks = array_map(
-            function (array $block) use ($richTextRenderer, $mediaUrlResolver, $disk): array {
-                if ($block['type'] === NewsroomBodyContract::BLOCK_RICH_TEXT) {
-                    $block['preview_html'] = $richTextRenderer->render($block['data']['content']);
-
-                    return $block;
-                }
-
-                if ($block['type'] === NewsroomBodyContract::BLOCK_IMAGE) {
-                    $block['preview_url'] = $mediaUrlResolver->resolve(
-                        $block['data']['path'] ?? null,
-                        $disk,
-                    );
-                }
-
-                return $block;
-            },
-            $bodyBlocks,
-        );
+        $bodyBlocks = $bodyRenderer->render($contentArticle, includeDeferredBlocks: true);
 
         $publicSources = $contentArticle->sources()
             ->where('is_publicly_cited', true)
