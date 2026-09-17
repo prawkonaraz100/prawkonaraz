@@ -184,7 +184,6 @@ function startServer() {
                 ...process.env,
                 CACHE_STORE: 'array',
                 SESSION_DRIVER: 'file',
-                PHP_CLI_SERVER_WORKERS: '4',
             },
             stdio: ['ignore', 'pipe', 'pipe'],
             windowsHide: true,
