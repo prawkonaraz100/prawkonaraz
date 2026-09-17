@@ -28,6 +28,16 @@ test('disabled newsroom public gate prevents dark deployed public discovery whil
         ->assertHeader('X-Robots-Tag', 'noindex, follow')
         ->assertDontSee('Ukryty dark-deploy artykuł');
 
+    $guide = ContentArticle::factory()->published()->guide()->create([
+        'title' => 'Ukryty dark-deploy poradnik',
+        'slug' => 'ukryty-dark-deploy-poradnik',
+    ]);
+
+    $this->get(route('public.guides.show', ['articleSlug' => $guide->slug]))
+        ->assertNotFound()
+        ->assertHeader('X-Robots-Tag', 'noindex, follow')
+        ->assertDontSee('Ukryty dark-deploy poradnik');
+
     app(ContentArticleSlugService::class)->changeSlug($article, 'aktualny-dark-deploy-artykul');
 
     $this->get('/aktualnosci/ukryty-dark-deploy-artykul')
