@@ -2,9 +2,21 @@ name: Browser Smoke
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/browser-smoke.yml'
+      - 'app/Http/Controllers/ContentArticleController.php'
+      - 'app/Support/ContentArticlePublicCatalogService.php'
+      - 'app/Support/NewsroomArticleBodyRenderer.php'
+      - 'app/Support/NewsroomArticlePresentationService.php'
+      - 'resources/views/newsroom/**'
+      - 'routes/web.php'
+      - 'scripts/e2e-newsroom-article.mjs'
+      - 'package.json'
 
 jobs:
   browser-smoke:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     env:
       APP_ENV: testing
@@ -60,5 +72,68 @@ jobs:
         with:
           name: browser-smoke-artifacts
           path: output/playwright
+          if-no-files-found: warn
+          retention-days: 3
+
+  newsroom-article:
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    env:
+      APP_ENV: testing
+      DB_CONNECTION: sqlite
+      DB_DATABASE: database/database.sqlite
+      DB_URL: ''
+      CACHE_STORE: file
+      SESSION_DRIVER: file
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: log
+      MEDIA_LOCAL_ROOT: ${{ github.workspace }}/storage/app/public-media
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          extensions: mbstring, sqlite3, pdo_sqlite, fileinfo
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Prepare application environment
+        run: |
+          cp .env.example .env
+          mkdir -p database storage/app/public storage/app/public-media
+          touch database/database.sqlite
+          php artisan key:generate --force
+          php artisan storage:link
+
+      - name: Build frontend assets
+        run: npm run build
+
+      - name: Run newsroom article browser QA
+        run: npm run e2e:newsroom-article
+
+      - name: Upload newsroom article QA artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newsroom-article-browser-qa
+          path: output/playwright/newsroom-article
           if-no-files-found: warn
           retention-days: 3

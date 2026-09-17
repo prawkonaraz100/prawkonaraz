@@ -32,6 +32,7 @@ use App\Http\Controllers\CategoryAnalyticsController;
 use App\Http\Controllers\CategoryAnalyticsPageController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ContactPageController;
+use App\Http\Controllers\ContentArticleController;
 use App\Http\Controllers\ContentAuthorController;
 use App\Http\Controllers\DashboardApiController;
 use App\Http\Controllers\FriendInvitationClaimController;
@@ -185,7 +186,7 @@ Route::get('/aktualnosci/kategoria/{categorySlug}', fn () => abort(404))
 Route::get('/aktualnosci/temat/{topicSlug}', fn () => abort(404))
     ->where('topicSlug', NewsroomRouteContract::SLUG_PATTERN)
     ->name('public.news.topics.show');
-Route::get('/aktualnosci/{articleSlug}', fn () => abort(404))
+Route::get('/aktualnosci/{articleSlug}', [ContentArticleController::class, 'news'])
     ->where('articleSlug', NewsroomRouteContract::NEWSROOM_ARTICLE_SLUG_PATTERN)
     ->name('public.news.show');
 Route::get('/reklama', fn () => Inertia::render('Public/MarketingPlaceholder', [
@@ -204,7 +205,7 @@ Route::get('/metodologia/przepisy-i-podstawy-prawne', [LegalContentController::c
     ->name('public.regulations.methodology');
 Route::get('/poradniki', [NewsroomPlaceholderController::class, 'guides'])
     ->name('public.guides');
-Route::get('/poradniki/{articleSlug}', fn () => abort(404))
+Route::get('/poradniki/{articleSlug}', [ContentArticleController::class, 'guides'])
     ->where('articleSlug', NewsroomRouteContract::SLUG_PATTERN)
     ->name('public.guides.show');
 Route::get('/spolecznosc', fn () => Inertia::render('Public/MarketingPlaceholder', [

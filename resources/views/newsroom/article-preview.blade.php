@@ -107,15 +107,15 @@
                         @switch($block['type'])
                             @case('rich_text')
                                 <section class="newsroom-preview-prose text-[16px] leading-8 text-slate-800">
-                                    {!! $block['preview_html'] !!}
+                                    {!! $block['render_html'] !!}
                                 </section>
                                 @break
 
                             @case('image')
                                 <figure class="overflow-hidden rounded-md bg-slate-100">
-                                    @if ($block['preview_url'] ?? null)
+                                    @if ($block['public_url'] ?? null)
                                         <img
-                                            src="{{ $block['preview_url'] }}"
+                                            src="{{ $block['public_url'] }}"
                                             alt="{{ $block['data']['alt'] }}"
                                             @if ($block['data']['width']) width="{{ $block['data']['width'] }}" @endif
                                             @if ($block['data']['height']) height="{{ $block['data']['height'] }}" @endif

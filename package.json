@@ -5,6 +5,7 @@
     "scripts": {
         "build": "vue-tsc && vite build",
         "dev": "vite",
+        "e2e:newsroom-article": "node scripts/e2e-newsroom-article.mjs",
         "e2e:public-auth-drawers": "node scripts/e2e-public-auth-drawers.mjs",
         "e2e:smoke": "node scripts/e2e-smoke.mjs",
         "stress:session": "node scripts/session-stress.mjs",

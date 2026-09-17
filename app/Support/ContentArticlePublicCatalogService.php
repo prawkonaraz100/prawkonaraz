@@ -177,7 +177,7 @@ final class ContentArticlePublicCatalogService
     {
         return [
             'category:id,name,slug,description,is_active,seo_title,seo_description',
-            'author:id,name,slug,job_title,bio,photo_path,is_published,published_at',
+            'author:id,name,slug,job_title,bio,photo_path,linkedin_url,external_profile_url,is_published,published_at',
             'reviewer:id,name,slug,job_title,bio,photo_path,is_published,published_at',
             'sources' => fn ($query) => $query
                 ->publiclyCited()
