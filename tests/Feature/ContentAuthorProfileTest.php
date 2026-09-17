@@ -5,6 +5,7 @@ use App\Models\ContentAuthor;
 use App\Models\ContentCategory;
 use App\Support\SeoSitemapBuilder;
 use Illuminate\Support\Carbon;
+use Illuminate\Validation\ValidationException;
 
 it('integrates indexable newsroom contributions into the existing author profile by lifecycle state', function () {
     $author = ContentAuthor::factory()->published()->create([
@@ -37,6 +38,11 @@ it('integrates indexable newsroom contributions into the existing author profile
         'title' => 'Zaplanowany artykuł autora',
         'slug' => 'zaplanowany-artykul-autora',
     ]);
+    ContentArticle::factory()->withdrawn()->create([
+        'author_id' => $author->id,
+        'title' => 'Wycofany artykuł autora',
+        'slug' => 'wycofany-artykul-autora',
+    ]);
     $inactiveCategory = ContentCategory::factory()->inactive()->create();
     ContentArticle::factory()->published()->create([
         'author_id' => $author->id,
@@ -60,13 +66,16 @@ it('integrates indexable newsroom contributions into the existing author profile
         ->assertSee('href="/aktualnosci/'.$archived->slug.'"', false)
         ->assertDontSee('Artykuł noindex autora')
         ->assertDontSee('Zaplanowany artykuł autora')
+        ->assertDontSee('Wycofany artykuł autora')
         ->assertDontSee('Artykuł w nieaktywnej kategorii')
         ->assertSee('"@type":"Person"', false)
-        ->assertSee(route('content-authors.show', $author->slug).'#person', false);
+        ->assertSee(route('content-authors.show', $author->slug).'#person', false)
+        ->assertSee('"worksFor":{"@id":"'.url('/').'#organization"}', false);
 });
 
-it('includes published authors in the author sitemap only when they have an indexable public contribution', function () {
-    $articleUpdatedAt = Carbon::parse('2026-09-17 12:00:00');
+it('uses public state changes rather than technical article updates for author sitemap freshness', function () {
+    $publicStateChangedAt = Carbon::parse('2026-09-17 12:00:00');
+    $technicalUpdatedAt = Carbon::parse('2026-09-17 18:00:00');
     $articleAuthor = ContentAuthor::factory()->published()->create([
         'name' => 'Autor artykułu',
         'slug' => 'autor-artykulu',
@@ -76,7 +85,8 @@ it('includes published authors in the author sitemap only when they have an inde
         'author_id' => $articleAuthor->id,
         'title' => 'Publiczny artykuł do sitemap',
         'slug' => 'publiczny-artykul-do-sitemap',
-        'updated_at' => $articleUpdatedAt,
+        'public_state_changed_at' => $publicStateChangedAt,
+        'updated_at' => $technicalUpdatedAt,
     ]);
 
     $needsReviewAuthor = ContentAuthor::factory()->published()->create([
@@ -134,5 +144,29 @@ it('includes published authors in the author sitemap only when they have an inde
         ->not->toHaveKey(route('content-authors.show', $inactiveCategoryAuthor->slug));
 
     expect($rows->get(route('content-authors.show', $articleAuthor->slug))['lastmod'])
-        ->toBe($articleUpdatedAt->toIso8601String());
+        ->toBe($publicStateChangedAt->toIso8601String())
+        ->not->toBe($technicalUpdatedAt->toIso8601String());
+});
+
+it('blocks unpublishing an author while indexable public newsroom articles still depend on that identity', function () {
+    $author = ContentAuthor::factory()->published()->create();
+    ContentArticle::factory()->published()->create([
+        'author_id' => $author->id,
+    ]);
+
+    expect(fn () => $author->update(['is_published' => false]))
+        ->toThrow(ValidationException::class);
+
+    expect($author->fresh()->is_published)->toBeTrue();
+});
+
+it('allows unpublishing an author after dependent newsroom articles are noindex', function () {
+    $author = ContentAuthor::factory()->published()->create();
+    ContentArticle::factory()->published()->noindex()->create([
+        'author_id' => $author->id,
+    ]);
+
+    $author->update(['is_published' => false]);
+
+    expect($author->fresh()->is_published)->toBeFalse();
 });

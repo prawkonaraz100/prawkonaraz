@@ -7,11 +7,11 @@ use App\Models\ContentArticle;
 use App\Models\ContentAuthor;
 use App\Models\LegalContentPage;
 use App\Models\TrafficSign;
+use App\Support\ContentAuthorSchemaService;
 use App\Support\MediaUrlResolver;
 use App\Support\NewsroomRouteContract;
 use App\Support\TrafficSignBreadcrumbs;
 use App\Support\TrafficSignRedirectPolicy;
-use App\Support\TrafficSignSchemaService;
 use App\Support\TrafficSignSeoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -21,7 +21,7 @@ class ContentAuthorController extends Controller
     public function __invoke(
         string $authorSlug,
         TrafficSignSeoService $trafficSignSeoService,
-        TrafficSignSchemaService $trafficSignSchemaService,
+        ContentAuthorSchemaService $contentAuthorSchemaService,
         TrafficSignBreadcrumbs $trafficSignBreadcrumbs,
         TrafficSignRedirectPolicy $trafficSignRedirectPolicy,
         MediaUrlResolver $mediaUrlResolver,
@@ -65,7 +65,7 @@ class ContentAuthorController extends Controller
             ->whereHas('category', fn ($query) => $query->active())
             ->with('category:id,name,slug')
             ->orderByDesc('published_at')
-            ->orderByDesc('updated_at')
+            ->orderByDesc('public_state_changed_at')
             ->get();
         $publishedNewsroomCards = $newsroomArticles
             ->filter(fn (ContentArticle $article): bool => $article->workflow_status === ContentArticleWorkflowStatus::Published)
@@ -96,7 +96,11 @@ class ContentAuthorController extends Controller
             'authorPhotoUrl' => $mediaUrlResolver->resolve($author->photo_path, 'public'),
             'meta' => $trafficSignSeoService->author($author),
             'breadcrumbs' => $breadcrumbs,
-            'structuredData' => $trafficSignSchemaService->author($author, $breadcrumbs, $signs),
+            'structuredData' => $contentAuthorSchemaService->profile(
+                $author,
+                $trafficSignBreadcrumbs->toSchema($breadcrumbs),
+                $signs->take(5)->map(fn (TrafficSign $sign): string => $sign->publicTitle()),
+            ),
         ]);
     }
 
