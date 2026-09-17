@@ -1,0 +1,66 @@
+name: NEWSROOM N3-007 Schema Identity Fix
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.head_ref == 'feat/newsroom-n3-007-author-profile-integration'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Add stable Person id and remove one-off workflow
+        shell: bash
+        run: |
+          python <<'PY'
+          from pathlib import Path
+
+          path = Path('app/Support/TrafficSignSchemaService.php')
+          text = path.read_text()
+          old = """                'mainEntity' => [
+                    '@type' => 'Person',
+                    'name' => $author->name,
+          """
+          new = """                'mainEntity' => [
+                    '@type' => 'Person',
+                    '@id' => $this->schemaIds->contentAuthorPerson($author),
+                    'name' => $author->name,
+          """
+          count = text.count(old)
+          if count != 1:
+              raise SystemExit(f'Expected exactly one author Person mainEntity block, found {count}')
+          path.write_text(text.replace(old, new, 1))
+          PY
+
+          rm .github/workflows/newsroom-n3-007-schema-identity-fix.yml
+
+          git diff --check
+
+          mapfile -t changed < <(git diff --name-only | sort)
+          expected=(
+            ".github/workflows/newsroom-n3-007-schema-identity-fix.yml"
+            "app/Support/TrafficSignSchemaService.php"
+          )
+          if [[ "${changed[*]}" != "${expected[*]}" ]]; then
+            printf 'Unexpected changed files:\n%s\n' "${changed[*]}"
+            exit 1
+          fi
+
+      - name: Commit exact schema correction
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/Support/TrafficSignSchemaService.php .github/workflows/newsroom-n3-007-schema-identity-fix.yml
+          git commit -m "fix(newsroom): align author profile Person identity"
+          git push origin HEAD:${GITHUB_HEAD_REF}
