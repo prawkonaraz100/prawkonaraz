@@ -1286,21 +1286,26 @@ Frontend newsroom v1 jest UI-complete, gdy:
 
 ## 67. Stan implementacji
 
-Na 2026-09-17 po NEWSROOM-N3-004:
+Na 2026-09-17 po NEWSROOM-N3-005:
 
 - `/aktualnosci` i `/poradniki` nadal renderują pre-launch `MarketingPlaceholder.vue` przez dedykowany `NewsroomPlaceholderController`; oba huby zwracają 200 i `X-Robots-Tag: noindex, follow`,
-- category/topic/feed routes pozostają downstream i nie zostały uruchomione przez N3-004,
+- category/topic/feed routes pozostają downstream i nie zostały uruchomione przez N3-005,
 - detail routes `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}` są podłączone do `ContentArticleController`; publicznie widoczny rekord renderuje `newsroom.article`, withdrawn historyczny rekord otrzymuje neutralną 410 surface, a hidden/not-found 404,
 - 404/410 article surfaces używają `noindex,follow` i `X-Robots-Tag: noindex, follow` bez renderowania body/source/product modules,
 - publiczny article renderer reużywa istniejący `public-content` layout, header/footer oraz gotowe N3-001 catalog, N3-002 SEO metadata i N3-003 schema graph; canonical/OG/article dates i JSON-LD są obecne w initial HTML,
 - `NewsroomArticlePresentationService` materializuje route-family breadcrumbs, category kicker, H1, lead, byline, provenance, widoczne publication/update dates, key points, hero, regulatory/exam context, public sources, correction note, author box i transparentne `needs_review`/archived states,
-- `NewsroomArticleBodyRenderer` renderuje publicznie `rich_text`, `image`, `quote`, `table`, `context` i public-safe `related_article`; rich text korzysta z istniejącego structured renderer contract,
-- hero i image blocks zachowują dimensions/alt/caption/credit oraz focal-point-aware `object-position`; N3-004 nie deklaruje nieistniejących fizycznych crop variants,
+- `NewsroomArticleBodyRenderer` renderuje publicznie `rich_text`, `image`, `quote`, `table`, `context`, public-safe `related_article` oraz po N3-005 jawnie rozwiązane bloki `legal_reference`, `question_group`, `traffic_sign_group` i `product_cta`,
+- `NewsroomArticleProductBridgeService` traktuje identyfikator w body jako niewystarczający sam w sobie: question/legal/sign target musi również istnieć w article-owned pivot i spełniać istniejący public eligibility contract,
+- question group używa istniejącego `PublicQuestionCatalogService` i pokazuje maksymalnie 5 publicznych pytań; inactive/nonpublic oraz niepowiązane pytania są pomijane,
+- legal reference pokazuje wyłącznie zweryfikowaną jednostkę z verified aktem i opublikowaną stroną przepisu w opublikowanym topicu; private note i pełny `official_excerpt` nie trafiają do publicznego payloadu,
+- traffic sign group pokazuje tylko opublikowane znaki z opublikowanym autorem i kategorią; luźny pivot `relation_type=related` jest fail-closed zgodnie z sekcją 35, a publiczny bridge dopuszcza relacje bezpośrednie/przykładowe wynikające z istniejącego kontraktu,
+- contextual CTA reużywa istniejące trasy produktu: publiczny test, hub oficjalnej bazy pytań i naukę; N3-005 nie dodaje sticky popupu ani nowego systemu routingu,
 - tylko `is_publicly_cited=true` sources mogą wejść do presentation; private source evidence/note oraz `image_license_note` nie są publicznym payloadem,
-- `legal_reference`, `question_group`, `traffic_sign_group` i `product_cta` pozostają celowo odroczone do NEWSROOM-N3-005 i są pomijane w publicznym rendererze; admin preview zachowuje je jako deferred blocks przez wspólny renderer,
-- related article block rozwiązuje tylko publicznie widoczny target z aktywną kategorią i opublikowanym autorem; nie renderuje draft targetu,
-- publiczny artykuł nie wymaga JavaScript do odczytania; dedykowany Browser QA przeszedł na 360x800, 390x844, 430x932, 768x1024, 1024x768 i 1440x900 bez horizontal overflow,
-- `NEWSROOM_PUBLIC_ENABLED` nie został wdrożony w N3-004 i pozostaje NEWSROOM-N3-008; historyczne old-slug 301 pozostaje NEWSROOM-N3-006, a newsroomowe rozszerzenie profilu autora NEWSROOM-N3-007,
+- hero i image blocks zachowują dimensions/alt/caption/credit oraz focal-point-aware `object-position`; N3-005 nie deklaruje nieistniejących fizycznych crop variants,
+- related article block nadal rozwiązuje tylko publicznie widoczny target z aktywną kategorią i opublikowanym autorem; nie renderuje draft targetu,
+- publiczny artykuł nie wymaga JavaScript do odczytania; finalny Browser Smoke #20 na N3-005 przeszedł pełną macierz 360x800, 390x844, 430x932, 768x1024, 1024x768 i 1440x900,
+- N3-005 nie implementuje reverse links; semantic silo/reverse-link integration pozostaje NEWSROOM-N4-008,
+- `NEWSROOM_PUBLIC_ENABLED` pozostaje NEWSROOM-N3-008; historyczne old-slug 301 pozostaje NEWSROOM-N3-006, a newsroomowe rozszerzenie profilu autora NEWSROOM-N3-007,
 - `NewsroomHomeCompositionService` nadal nie jest podłączony do publicznego `/aktualnosci`; hub/category/topic/feed pozostają dalszym zakresem N4/N5.
 
 ---
@@ -1321,14 +1326,24 @@ Na 2026-09-17 po NEWSROOM-N3-004:
 - [x] dodać responsive Browser QA dla article detail na wymaganej macierzy N3-004,
 - [ ] domknąć pełny accessibility QA newsroomu,
 - [x] dodać dedykowany browser snapshot/E2E dla article detail,
-- [ ] zbudować NEWSROOM-N3-005 Product Bridge dla questions/legal/signs/contextual CTA,
-- [ ] zbudować NEWSROOM-N3-006 historical redirect resolver HTTP,
+- [x] zbudować NEWSROOM-N3-005 Product Bridge dla questions/legal/signs/contextual CTA,
+- [ ] zbudować NEWSROOM-N3-006 historical redirect resolver HTTP — **następny wykonywalny task**,
 - [ ] zbudować NEWSROOM-N3-007 author-profile integration,
 - [ ] zbudować NEWSROOM-N3-008 public rollout config gate.
 
 ---
 
 ## 69. Historia zmian
+
+### 2026-09-17 — v0.13
+
+- NEWSROOM-N3-005 zmergowano przez PR #73; finalny PR implementation head `7d795b895865cda49ba94a4fec50533d7b0f7a97`, a zweryfikowany post-merge `main` to `fcc8074f89db141d522c5000742afc2e07a68565`,
+- `NewsroomArticleProductBridgeService` i `newsroom/product-bridge-block.blade.php` materializują publiczne, fail-closed bloki questions/legal/signs/contextual CTA bez tworzenia drugiego systemu kart lub routingu,
+- body target dla pytania, przepisu lub znaku musi być jednocześnie jawnie powiązany przez article-owned pivot i przejść istniejący public eligibility contract; inactive/draft/unlinked targets oraz private notes/official excerpt są pomijane,
+- traffic sign z luźnym `relation_type=related` nie jest renderowany; finalna poprawka utrzymuje nadrzędny kontrakt sekcji 35 zamiast dopasowywać dokument do błędnego zachowania kodu,
+- CTA prowadzą do istniejących tras testu, oficjalnej bazy pytań i nauki; reverse links pozostają NEWSROOM-N4-008,
+- finalny exact-head CI #275 i Browser Smoke #20 są PASS; Browser Smoke #20 przeszedł pełną macierz 360/390/430/768/1024/1440, a post-merge CI #276 na `main@fcc8074f...` zakończył się pełnym PASS,
+- następnym taskiem wykonawczym jest NEWSROOM-N3-006 historical redirect resolver; N3-007 author integration i N3-008 rollout gate pozostają otwarte.
 
 ### 2026-09-17 — v0.12
 
