@@ -40,12 +40,10 @@ jobs:
               raise SystemExit('replacement script end marker not found')
           script_lines = []
           for line in source[start:end]:
-              if line.strip() == '':
-                  script_lines.append('\n')
-                  continue
-              if not line.startswith('          '):
-                  raise SystemExit(f'unexpected indentation in embedded script: {line!r}')
-              script_lines.append(line[10:])
+              if line.startswith('          '):
+                  script_lines.append(line[10:])
+              else:
+                  script_lines.append(line)
           Path('/tmp/newsroom-n3-006-docs-sync.py').write_text(''.join(script_lines), encoding='utf-8')
           PY
           python /tmp/newsroom-n3-006-docs-sync.py
