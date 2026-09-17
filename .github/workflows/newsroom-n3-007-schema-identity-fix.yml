@@ -27,15 +27,17 @@ jobs:
 
           path = Path('app/Support/TrafficSignSchemaService.php')
           text = path.read_text()
-          old = """                'mainEntity' => [
-                    '@type' => 'Person',
-                    'name' => $author->name,
-          """
-          new = """                'mainEntity' => [
-                    '@type' => 'Person',
-                    '@id' => $this->schemaIds->contentAuthorPerson($author),
-                    'name' => $author->name,
-          """
+          old = (
+              "                'mainEntity' => [\n"
+              "                    '@type' => 'Person',\n"
+              "                    'name' => $author->name,\n"
+          )
+          new = (
+              "                'mainEntity' => [\n"
+              "                    '@type' => 'Person',\n"
+              "                    '@id' => $this->schemaIds->contentAuthorPerson($author),\n"
+              "                    'name' => $author->name,\n"
+          )
           count = text.count(old)
           if count != 1:
               raise SystemExit(f'Expected exactly one author Person mainEntity block, found {count}')
