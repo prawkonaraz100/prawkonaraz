@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\ContentArticlePathResolver;
 use App\Support\ContentArticlePublicCatalogService;
 use App\Support\ContentArticleSchemaService;
 use App\Support\ContentArticleSeoService;
 use App\Support\NewsroomArticlePresentationService;
 use App\Support\NewsroomRouteContract;
 use DomainException;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
 use RuntimeException;
@@ -16,22 +18,23 @@ class ContentArticleController extends Controller
 {
     public function __construct(
         private readonly ContentArticlePublicCatalogService $catalog,
+        private readonly ContentArticlePathResolver $pathResolver,
         private readonly ContentArticleSeoService $seoService,
         private readonly ContentArticleSchemaService $schemaService,
         private readonly NewsroomArticlePresentationService $presentationService,
     ) {}
 
-    public function news(string $articleSlug): Response
+    public function news(string $articleSlug): Response|RedirectResponse
     {
         return $this->show(NewsroomRouteContract::FAMILY_NEWSROOM, $articleSlug);
     }
 
-    public function guides(string $articleSlug): Response
+    public function guides(string $articleSlug): Response|RedirectResponse
     {
         return $this->show(NewsroomRouteContract::FAMILY_GUIDES, $articleSlug);
     }
 
-    private function show(string $family, string $articleSlug): Response
+    private function show(string $family, string $articleSlug): Response|RedirectResponse
     {
         $resolution = $this->catalog->resolveDetailBySlug($family, $articleSlug);
 
@@ -40,6 +43,12 @@ class ContentArticleController extends Controller
         }
 
         if ($resolution->isNotFound() || $resolution->article === null) {
+            $redirectTarget = $this->pathResolver->findCanonicalRedirectTarget(request()->getPathInfo());
+
+            if ($redirectTarget !== null) {
+                return redirect($redirectTarget, Response::HTTP_MOVED_PERMANENTLY);
+            }
+
             return $this->unavailable($family, Response::HTTP_NOT_FOUND);
         }
 

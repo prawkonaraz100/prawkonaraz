@@ -52,4 +52,36 @@ final class ContentArticlePathResolver
             ->where('from_path', $fromPath)
             ->first();
     }
+
+    public function findCanonicalRedirectTarget(string $fromPath): ?string
+    {
+        $fromPath = '/'.ltrim(trim($fromPath), '/');
+        $redirect = $this->findRedirect($fromPath);
+
+        if ($redirect === null || $redirect->http_status !== 301) {
+            return null;
+        }
+
+        $article = $redirect->article;
+
+        if (! $article instanceof ContentArticle) {
+            return null;
+        }
+
+        $type = $article->type instanceof ContentArticleType
+            ? $article->type->value
+            : (string) $article->type;
+
+        try {
+            $canonicalPath = NewsroomRouteContract::canonicalPath($type, (string) $article->slug);
+        } catch (InvalidArgumentException) {
+            return null;
+        }
+
+        if ($canonicalPath === $fromPath || $redirect->to_path !== $canonicalPath) {
+            return null;
+        }
+
+        return $canonicalPath;
+    }
 }
