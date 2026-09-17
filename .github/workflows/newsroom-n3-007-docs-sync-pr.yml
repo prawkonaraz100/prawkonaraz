@@ -17,29 +17,6 @@ jobs:
         with:
           ref: docs/newsroom-n3-007-sync
           fetch-depth: 0
-      - name: Execute validated docs-sync script
+      - name: Finalize and validate N3-007 documentation
         shell: bash
-        run: |
-          python3 <<'PY'
-          from pathlib import Path
-          import subprocess
-
-          path = Path('.github/workflows/newsroom-n3-007-docs-sync.yml')
-          lines = path.read_text().splitlines()
-          marker = '        run: |'
-          try:
-              start = lines.index(marker) + 1
-          except ValueError:
-              raise SystemExit('validated sync run block not found')
-
-          script_lines = []
-          for line in lines[start:]:
-              if line.startswith('          '):
-                  script_lines.append(line[10:])
-              else:
-                  script_lines.append(line)
-
-          script = Path('/tmp/newsroom-n3-007-docs-sync.sh')
-          script.write_text('\n'.join(script_lines) + '\n')
-          subprocess.run(['bash', str(script)], check=True)
-          PY
+        run: bash .github/newsroom-n3-007-docs-finalize.sh
