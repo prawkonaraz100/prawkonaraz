@@ -231,6 +231,8 @@ Zmiana sluga opublikowanego artykułu:
 
 Unikać zmian slugów bez realnej potrzeby.
 
+Aktualny stan implementacji po NEWSROOM-N3-006: publiczny old article path jest rozwiązywany dopiero po nieudanym current-canonical lookup i zwraca dokładnie jeden 301 wyłącznie wtedy, gdy zapisany redirect ma status 301 oraz `to_path` równe bieżącemu canonical route family + slug. Stale/malformed/self-loop history failuje do 404. Redirect target jest path-only, więc query params/tracking nie są kopiowane. Internal-link i sitemap migration pozostają osobnymi downstream obowiązkami; N3-006 nie deklaruje ich jako wykonanych.
+
 ---
 
 ## 8. Duplicate prevention
@@ -1619,6 +1621,13 @@ Obecnie:
 ---
 
 ## 70. Historia zmian
+
+### 2026-09-17 — v0.11
+
+- NEWSROOM-N3-006 zmergowano przez PR #75 na `main@33d9946219595a4be75d789b19cc8d10efc2ecc0` i materializuje HTTP część istniejącej slug-change policy: old path -> exactly one 301 -> current canonical 200,
+- resolver honoruje wyłącznie persisted 301 bezpośrednio do recomputed current canonical; stale/malformed/self-loop redirect nie tworzy alternatywnego URL i failuje do 404,
+- redirect nie forwarduje query params; current canonical/OG/schema contracts N3-002/N3-003 pozostają bez zmian,
+- sitemap/internal-link cleanup nadal należy do downstream discovery/linking i nie jest oznaczony jako wykonany przez N3-006; post-merge CI #280 był pełnym PASS.
 
 ### 2026-09-17 — v0.10
 

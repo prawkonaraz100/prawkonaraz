@@ -6,11 +6,11 @@
 - Obszar: newsroom / media portal
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Bazowy stan repo przy projektowaniu: main@6a38c95ce76ee05997977d614d795ed8513462f1
-- Ostatnia weryfikacja zgodności z kodem: main@ff81f92fe75442b60e67297f3945d2a63b7c5128 (2026-09-16)
-- Data: 2026-09-16
+- Ostatnia weryfikacja zgodności z kodem: main@33d9946219595a4be75d789b19cc8d10efc2ecc0 (2026-09-17)
+- Data: 2026-09-17
 - Zakres: model domenowy, baza danych, invariants, serwisy aplikacyjne, routing domeny i kolejność migracji
 
-Ten dokument opisuje docelowy model danych newsroomu. Schema, modele/factories/scopes oraz serwisy aplikacyjne N1 są już zmaterializowane; zakres admin/domain N2 jest zmaterializowany po PR #62, natomiast publiczne N3/N4 i discovery N5 pozostają dalszym etapem. Stan wdrożenia należy czytać z sekcji 43 i aktualizować po każdej zmianie kodu.
+Ten dokument opisuje docelowy model danych newsroomu. Schema, modele/factories/scopes oraz serwisy aplikacyjne N1 są już zmaterializowane; zakres admin/domain N2 jest zmaterializowany, a publiczny article stack N3-001..N3-006 obejmuje current-canonical detail, SEO/schema, renderer/Product Bridge i historyczny one-hop 301. N3-007/N3-008, N4 i discovery N5 pozostają dalszym etapem. Stan wdrożenia należy czytać z sekcji 43 i aktualizować po każdej zmianie kodu.
 
 ---
 
@@ -756,7 +756,7 @@ Kod zawiera:
 
 PostgreSQL 16 gate wykonuje realny contention test na drugim połączeniu i potwierdza serialization tego samego full path. Finalny wynik po N1-003: 6 testów / 86 asercji.
 
-Publiczne article controllers nadal nie istnieją. NEWSROOM-N3-001 dodało `ContentArticlePublicCatalogService` dla current-canonical public detail/list read boundary, reużywając `NewsroomRouteContract` i istniejące scope'y zamiast dublować visibility logic. Historyczne old-path -> 301 nadal ma konsumować `ContentArticlePathResolver` w NEWSROOM-N3-006; HTTP 200/410/301 nie są jeszcze podłączone do publicznych route controllerów.
+Sam zakres N1-003 nie podłączał jeszcze publicznych article controllers. Downstream NEWSROOM-N3-004 podłączyło current-canonical HTTP 200/404/410, a NEWSROOM-N3-006 podłączyło istniejący `ContentArticlePathResolver` do historycznego old-path -> current-canonical 301 bez zmiany domenowego modelu redirectów.
 
 ---
 
@@ -971,7 +971,7 @@ Na `main@8215e142af2cd88c7335f17bc085bbd0c04d5790` istnieje `ContentArticlePubli
 - archived po wcześniejszej publikacji może zostać zwrócone dla canonical detailu, ale jest wykluczone z active query; needs_review pozostaje detail-visible, lecz nie jest aktywnie dystrybuowane,
 - draft, scheduled, never-published archived oraz never-published withdrawn pozostają ukryte.
 
-Ta warstwa nie uruchamia jeszcze publicznego HTTP renderera. Zarejestrowane detail routes nadal zwracają 404 do czasu N3-004/rollout, a historyczne old-path -> 301 pozostaje NEWSROOM-N3-006.
+Sam zakres N3-001 nie uruchamiał publicznego HTTP renderera. Downstream N3-004 podłączyło current-canonical 200/404/410, a N3-006 podłączyło historyczne old-path -> current-canonical 301 przez istniejący resolver; aktualny stan całego systemu opisuje sekcja 43.
 
 ---
 
@@ -1718,7 +1718,7 @@ Model danych jest gotowy, gdy:
 
 ## 43. Stan implementacji
 
-Na 2026-09-16:
+Na 2026-09-17:
 
 - ContentAuthor istnieje,
 - legal trust layer istnieje,
@@ -1772,12 +1772,20 @@ Na 2026-09-16:
 - [x] NEWSROOM-N3-001: wdrożyć `ContentArticlePublicCatalogService` z route-family current-canonical lookup, `activelyDistributed()` list query i visible/gone/not-found resolution,
 - [x] NEWSROOM-N3-002: wdrożyć `ContentArticleSeoService` z route-family self-canonical i publicznymi meta/date semantics,
 - [x] NEWSROOM-N3-003: wdrożyć `ContentArticleSchemaService` z jednym stabilnym publicznym entity graph nad canonical/date contract N3-002,
-- [ ] podłączyć publiczne article controllers/renderery oraz NEWSROOM-N3-006 historyczny `ContentArticlePathResolver` redirect flow i zweryfikować HTTP canonical/301/404/410 behavior,
+- [x] podłączyć publiczne article controllers/renderery i zweryfikować current-canonical HTTP 200/404/410 behavior (NEWSROOM-N3-004),
+- [x] podłączyć historyczny `ContentArticlePathResolver` old-path -> current-canonical 301 flow z one-hop/fail-closed HTTP regression (NEWSROOM-N3-006),
 - [ ] dodać sitemap/public-discovery regression korzystające wyłącznie z current canonical URL,
 
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-17 — v0.30
+
+- NEWSROOM-N3-006 zmergowano przez PR #75 na `main@33d9946219595a4be75d789b19cc8d10efc2ecc0` bez zmian schema/migracji i bez tworzenia drugiego redirect modelu,
+- publiczny controller reużywa domenowy `ContentArticlePathResolver` po current-canonical `not_found`; persisted redirect jest honorowany tylko, gdy ma status 301 i `to_path` równe bieżącemu canonical wyliczonemu z route family + slug,
+- stale/malformed/self-loop history failuje zamknięcie do 404, old paths pozostają one-hop, a query params nie są kopiowane do redirect target,
+- `NewsroomArticleRedirectTest` potwierdza newsroom/guides HTTP 301 i fail-closed behavior; post-merge CI #280 na `main@33d99462...` był pełnym PASS.
 
 ### 2026-09-17 — v0.29
 
