@@ -187,9 +187,9 @@ $article = \App\Models\ContentArticle::factory()->published()->create([
 function startServer() {
     const child = spawn(
         'php',
-        ['-S', `127.0.0.1:${port}`, '-t', 'public', laravelServerRouter],
+        ['-S', `127.0.0.1:${port}`, laravelServerRouter],
         {
-            cwd,
+            cwd: path.join(cwd, 'public'),
             env: {
                 ...process.env,
                 CACHE_STORE: 'array',
