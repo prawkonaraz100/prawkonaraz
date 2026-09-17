@@ -40,6 +40,9 @@ jobs:
               raise SystemExit('replacement script end marker not found')
           script_lines = []
           for line in source[start:end]:
+              if line.strip() == '':
+                  script_lines.append('\n')
+                  continue
               if not line.startswith('          '):
                   raise SystemExit(f'unexpected indentation in embedded script: {line!r}')
               script_lines.append(line[10:])
