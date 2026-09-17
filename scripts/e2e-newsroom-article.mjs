@@ -52,12 +52,13 @@ try {
     await runCommand('php', ['artisan', 'migrate', '--force']);
     console.log('[newsroom-e2e] seed');
     await seedArticle();
+
+    serverProcess = startServer();
+    await waitForHealth(`${baseUrl}/api/v1/health`);
+    browser = await chromium.launch({ headless: true });
+
     for (const viewport of viewports) {
         console.log(`[newsroom-e2e] viewport ${viewport.name}`);
-        serverProcess = startServer();
-        await waitForHealth(`${baseUrl}/api/v1/health`);
-        browser = await chromium.launch({ headless: true });
-
         const context = await browser.newContext({
             viewport: { width: viewport.width, height: viewport.height },
             serviceWorkers: 'block',
@@ -125,11 +126,6 @@ try {
         });
 
         await context.close();
-        await browser.close();
-        browser = undefined;
-        await terminateServer(serverProcess);
-        serverProcess = undefined;
-        await delay(250);
     }
 
     report.status = 'ok';
