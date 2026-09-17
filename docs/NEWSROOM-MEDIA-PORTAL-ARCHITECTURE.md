@@ -1501,8 +1501,9 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N3-004` — Article Blade page + block renderer,
 - [x] `NEWSROOM-N3-005` — Product Bridge: questions/legal/signs/contextual CTA,
 - [x] `NEWSROOM-N3-006` — old-path -> canonical 301.
+- [x] `NEWSROOM-N3-007` — author-profile integration.
 
-N3-007 author-profile integration jest następnym wykonywalnym taskiem; N3-008 rollout gate pozostaje otwarte po N3-008. Pozostałe elementy N4–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu pełną checklistę.
+N3-007 author-profile integration jest zmaterializowane; N3-008 rollout gate jest następnym wykonywalnym taskiem. Pozostałe elementy N4–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu pełną checklistę.
 
 ---
 ## 28. Zasady utrzymania dokumentu
@@ -1545,7 +1546,7 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 - `ContentArticlePathResolver::findCanonicalRedirectTarget()` zwraca cel wyłącznie dla zapisanego HTTP 301, którego `to_path` jest dokładnie bieżącym canonical wyliczonym z route family + slug; stale/malformed/self-loop records failują zamknięcie do 404,
 - historyczne ścieżki zwracają dokładnie jeden 301 do bieżącego canonical, a tracking query params nie są kopiowane; `NewsroomArticleRedirectTest` chroni newsroom i guide route family oraz fail-closed behavior,
 - exact-head CI #279 i Browser Smoke #21 zakończyły się PASS; post-merge CI #280 na `main@33d99462...` zakończył się pełnym PASS (`quality` 1051 passed / 19 512 assertions / 2 skipped, Pint 1052 files PASS, frontend build PASS; `newsroom-postgres` PASS),
-- następnym taskiem wykonawczym jest NEWSROOM-N3-008 author-profile integration; N3-008 rollout gate, N4 reverse links/huby oraz N5 discovery pozostają otwarte.
+- następnym taskiem wykonawczym jest NEWSROOM-N3-007 author-profile integration; N3-008 rollout gate, N4 reverse links/huby oraz N5 discovery pozostają otwarte.
 
 ### 2026-09-17 — v0.34
 
@@ -1555,7 +1556,7 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 - traffic signs są dodatkowo filtrowane przez pivot `relation_type in ['direct','example']`; luźny `related` pozostaje fail-closed zgodnie z nadrzędnym UI/UX contract,
 - contextual CTA reużywają istniejące trasy testu, oficjalnej bazy pytań i nauki; reverse links nie zostały wdrożone i pozostają N4-008,
 - finalny CI #275 i Browser Smoke #20 dla PR head zakończyły się PASS; post-merge CI #276 na `main@fcc8074f...` zakończył się pełnym PASS (`quality` 1049 passed / 19 498 assertions / 2 skipped, Pint 1051 files PASS, frontend build PASS; `newsroom-postgres` PASS),
-- następnym taskiem wykonawczym jest NEWSROOM-N3-006 historical old-path -> canonical 301; N3-008 i N3-008 pozostają otwarte.
+- następnym taskiem wykonawczym jest NEWSROOM-N3-006 historical old-path -> canonical 301; N3-007 i N3-008 pozostają otwarte.
 
 ### 2026-09-17 — v0.33
 

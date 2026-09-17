@@ -1309,7 +1309,7 @@ Old article path -> 301 canonical.
 
 ### Status implementacji
 
-**DONE w kodzie — PR #77 zmergowany i zweryfikowany na `main@c68672f6aa7c41defaeec56debb541d5a60d9f4f`.** Dokumentacyjny docs-sync jest osobnym krokiem po potwierdzonym post-merge gate.
+**DONE w kodzie — PR #77 zmergowany i zweryfikowany na `main@c68672f6aa7c41defaeec56debb541d5a60d9f4f`.** Ten osobny docs-sync synchronizuje źródła prawdy po potwierdzonym post-merge gate.
 
 ### Cel
 
@@ -2274,7 +2274,7 @@ N3-006 jest zamknięte implementacyjnie na `main@33d9946219595a4be75d789b19cc8d1
 - traffic signs są filtrowane przez pivot `relation_type in ['direct','example']`; luźny `related` jest fail-closed zgodnie z nadrzędnym UI/UX contract,
 - contextual CTA reużywa istniejące trasy `public.tests`, `public.questions.hub` i `session.index`; nie dodano migracji, reverse links, N3-006 ani N3-008,
 - `NewsroomProductBridgeTest` oraz Browser Smoke #20 chronią Product Bridge; finalny CI #275 i Browser #20 były PASS, a post-merge CI #276 na `main@fcc8074f...` zakończył się pełnym PASS (`quality` 1049 passed / 19 498 assertions / 2 skipped, Pint 1051 files PASS, frontend build PASS; `newsroom-postgres` PASS),
-- następnym taskiem wykonawczym jest NEWSROOM-N3-006 historical redirect resolver; N3-008/N3-008 pozostają otwarte.
+- następnym taskiem wykonawczym jest NEWSROOM-N3-006 historical redirect resolver; N3-007/N3-008 pozostają otwarte.
 
 ### 2026-09-17 — v0.33
 

@@ -1286,7 +1286,7 @@ Frontend newsroom v1 jest UI-complete, gdy:
 
 ## 67. Stan implementacji
 
-Na 2026-09-17 po NEWSROOM-N3-006:
+Na 2026-09-17 po NEWSROOM-N3-007, zweryfikowanym na `main@c68672f6aa7c41defaeec56debb541d5a60d9f4f`:
 
 - `/aktualnosci` i `/poradniki` nadal renderują pre-launch `MarketingPlaceholder.vue` przez dedykowany `NewsroomPlaceholderController`; oba huby zwracają 200 i `X-Robots-Tag: noindex, follow`,
 - category/topic/feed routes pozostają downstream i nie zostały uruchomione przez N3-005,
@@ -1305,7 +1305,8 @@ Na 2026-09-17 po NEWSROOM-N3-006:
 - related article block nadal rozwiązuje tylko publicznie widoczny target z aktywną kategorią i opublikowanym autorem; nie renderuje draft targetu,
 - publiczny artykuł nie wymaga JavaScript do odczytania; finalny Browser Smoke #20 na N3-005 przeszedł pełną macierz 360x800, 390x844, 430x932, 768x1024, 1024x768 i 1440x900,
 - N3-005 nie implementuje reverse links; semantic silo/reverse-link integration pozostaje NEWSROOM-N4-008,
-- historyczne old-slug -> current canonical 301 są wdrożone przez NEWSROOM-N3-006 bez dodatkowego UI surface; `NEWSROOM_PUBLIC_ENABLED` pozostaje NEWSROOM-N3-008, a newsroomowe rozszerzenie profilu autora NEWSROOM-N3-007,
+- historyczne old-slug -> current canonical 301 są wdrożone przez NEWSROOM-N3-006 bez dodatkowego UI surface; `NEWSROOM_PUBLIC_ENABLED` pozostaje NEWSROOM-N3-008,
+- NEWSROOM-N3-007 rozszerza istniejący `/autorzy/{slug}`: `published` trafia do aktualnych publikacji, `needs_review+indexable` do osobnej sekcji „W trakcie weryfikacji”, `archived+indexable` do osobnego „Archiwum”, a noindex/scheduled/withdrawn/inactive-category nie są listowane,
 - `NewsroomHomeCompositionService` nadal nie jest podłączony do publicznego `/aktualnosci`; hub/category/topic/feed pozostają dalszym zakresem N4/N5.
 
 ---
@@ -1328,12 +1329,19 @@ Na 2026-09-17 po NEWSROOM-N3-006:
 - [x] dodać dedykowany browser snapshot/E2E dla article detail,
 - [x] zbudować NEWSROOM-N3-005 Product Bridge dla questions/legal/signs/contextual CTA,
 - [x] zbudować NEWSROOM-N3-006 historical redirect resolver HTTP,
-- [ ] zbudować NEWSROOM-N3-007 author-profile integration — **następny wykonywalny task**,
-- [ ] zbudować NEWSROOM-N3-008 public rollout config gate.
+- [x] zbudować NEWSROOM-N3-007 author-profile integration,
+- [ ] zbudować NEWSROOM-N3-008 public rollout config gate — **następny wykonywalny task**.
 
 ---
 
 ## 69. Historia zmian
+
+### 2026-09-17 — v0.15
+
+- NEWSROOM-N3-007 zmergowano przez PR #77 na `main@c68672f6aa7c41defaeec56debb541d5a60d9f4f` bez tworzenia drugiej strony autora,
+- istniejący `/autorzy/{slug}` pokazuje Newsroom corpus z osobnymi stanami bieżącym, „W trakcie weryfikacji” i „Archiwum”; stany noindex/scheduled/withdrawn/inactive-category nie są listowane,
+- `ContentAuthorProfileTest` chroni profile lifecycle i author links; exact-head CI #295 oraz post-merge CI #296 są PASS,
+- następnym publicznym taskiem jest NEWSROOM-N3-008 rollout gate.
 
 ### 2026-09-17 — v0.14
 

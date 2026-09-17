@@ -538,7 +538,7 @@ Nie tworzymy fikcyjnych autorów typu „Redakcja”, jeśli nie ma publicznej s
 
 Po wdrożeniu newsroomu publiczny profil autora i sitemap lastmod autorów muszą uwzględniać również opublikowane ContentArticle, a nie tylko starsze moduły contentowe.
 
-Stan obecny: `ContentAuthorController` i `TrafficSignSchemaService::author()` już renderują publiczny ProfilePage, ale podczas integracji newsroomu jego `mainEntity Person` należy wyrównać do tego samego stabilnego `/autorzy/{slug}#person` i `worksFor -> /#organization`, którego używa article graph. Nie tworzymy drugiego ProfilePage.
+Stan obecny po NEWSROOM-N3-007: `ContentAuthorSchemaService` jest współdzielonym builderem `ProfilePage -> Person`, a `SharedAuthorTrafficSignSchemaService` deleguje do niego istniejących consumers. ProfilePage i Article używają identycznego stabilnego `/autorzy/{slug}#person` oraz `worksFor -> /#organization`. `SeoSitemapBuilder::authorUrls()` kwalifikuje również autorów przez indeksowalne Newsroom articles w aktywnych kategoriach i używa ich `public_state_changed_at` dla newsroomowego author lastmod zamiast technicznego article `updated_at`. Nie utworzono drugiego ProfilePage.
 
 ---
 
@@ -1583,17 +1583,17 @@ Obecnie:
 - scheduler uruchamia `seo:refresh-sitemaps` codziennie jako istniejący safety net,
 - istnieje zarówno `public/robots.txt`, jak i route `RobotsController`; production delivery trzeba traktować zgodnie z `SEO-SITEMAP-REPAIR-PLAN.md`,
 - istnieje IndexNowUrlSubmission,
-- author pages istnieją i mają istniejący ProfilePage pattern,
+- author pages istnieją; po NEWSROOM-N3-007 ProfilePage/Article współdzielą stabilny Person `@id`, a author sitemap uwzględnia indexable Newsroom corpus z `public_state_changed_at` (`main@c68672f6aa7c41defaeec56debb541d5a60d9f4f`),
 - `config/content.php['organization']`, `SchemaIds`, `SchemaRenderer` i współdzielony `SiteIdentitySchema` stanowią fundament entity graph,
 - HomePageController korzysta z kanonicznego Organization/WebSite graph; legacy „Orły na Drodze” nie jest już emitowane przez homepage,
 - wspólny public-content layout emituje `og:site_name` z kanonicznego identity,
 - istnieje również runtime `SitemapController`, ale statyczne pliki są nadrzędnym produkcyjnym modelem; samo dodanie headerów do kontrolera nie rozwiązuje static delivery,
-- backendowy newsroom Article schema graph istnieje przez `ContentArticleSchemaService` po NEWSROOM-N3-003, ale nie jest jeszcze emitowany przez publiczny article HTTP renderer; news sitemap i feed nadal nie istnieją,
+- newsroom Article schema graph istnieje przez `ContentArticleSchemaService` po NEWSROOM-N3-003 i jest emitowany przez publiczny article HTTP renderer od N3-004; news sitemap i feed nadal nie istnieją,
 - newsroom dirty/version refresh coordinator i atomowy child-before-index switch nie istnieją,
 - repo nie gwarantuje async Laravel queue workera (`QUEUE_CONNECTION=sync` w env example), więc newsroom nie może opierać freshness na ShouldQueue,
 - `/aktualnosci` i `/poradniki` są pre-launch placeholderami 200 z `X-Robots-Tag: noindex, follow`,
 - `/aktualnosci/feed.xml` ma zarejestrowany route contract, ale obecnie zwraca 404; feed ani feed discovery nie są jeszcze wdrożone,
-- category/topic/article route namespaces są zarejestrowane, ale pozostają 404 bez publicznych controllerów.
+- category/topic route namespaces są zarejestrowane i nadal pozostają 404 bez publicznych controllerów; article detail routes są aktywne od N3-004.
 
 ---
 
@@ -1603,7 +1603,8 @@ Obecnie:
 - [x] dodać `og:site_name` do wspólnego public layout contract,
 - [ ] dodać feed discovery do wspólnego public layout contract,
 - [x] wdrożyć ContentArticleSeoService,
-- [x] wdrożyć ContentArticleSchemaService; publiczne osadzenie graphu w article HTML pozostaje częścią N3-004,
+- [x] wdrożyć ContentArticleSchemaService i publiczne osadzenie graphu w article HTML w N3-004,
+- [x] zintegrować ProfilePage/Article author identity i author sitemap z Newsroom corpus w N3-007,
 - [ ] rozszerzyć istniejący statyczny generator o article sitemap z deterministic sharding readiness,
 - [ ] wdrożyć statyczny news sitemap z pełnymi wymaganymi news tags,
 - [ ] wdrożyć child-before-index atomic publication i cleanup obsolete shards po switchu,
@@ -1621,6 +1622,13 @@ Obecnie:
 ---
 
 ## 70. Historia zmian
+
+### 2026-09-17 — v0.12
+
+- NEWSROOM-N3-007 zmergowano przez PR #77 na `main@c68672f6aa7c41defaeec56debb541d5a60d9f4f`: ProfilePage i Article współdzielą stabilny Person `@id` i canonical Organization reference,
+- `SeoSitemapBuilder::authorUrls()` kwalifikuje autorów przez indexable Newsroom corpus w aktywnych kategoriach i używa newsroomowego `public_state_changed_at` zamiast technicznego article `updated_at`,
+- `ContentAuthorProfileTest` chroni identity i sitemap freshness; exact-head CI #295 oraz post-merge CI #296 są PASS,
+- news sitemap/feed i rollout gate pozostają dalszym zakresem; N3-007 nie oznacza ich jako wdrożonych.
 
 ### 2026-09-17 — v0.11
 
