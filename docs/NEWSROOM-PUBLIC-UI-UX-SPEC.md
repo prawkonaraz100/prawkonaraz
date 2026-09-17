@@ -1305,7 +1305,7 @@ Na 2026-09-17 po NEWSROOM-N3-005:
 - related article block nadal rozwiązuje tylko publicznie widoczny target z aktywną kategorią i opublikowanym autorem; nie renderuje draft targetu,
 - publiczny artykuł nie wymaga JavaScript do odczytania; finalny Browser Smoke #20 na N3-005 przeszedł pełną macierz 360x800, 390x844, 430x932, 768x1024, 1024x768 i 1440x900,
 - N3-005 nie implementuje reverse links; semantic silo/reverse-link integration pozostaje NEWSROOM-N4-008,
-- `NEWSROOM_PUBLIC_ENABLED` pozostaje NEWSROOM-N3-008; historyczne old-slug 301 pozostaje NEWSROOM-N3-006, a newsroomowe rozszerzenie profilu autora NEWSROOM-N3-007,
+- historyczne old-slug -> current canonical 301 są wdrożone przez NEWSROOM-N3-006 bez dodatkowego UI surface; `NEWSROOM_PUBLIC_ENABLED` pozostaje NEWSROOM-N3-008, a newsroomowe rozszerzenie profilu autora NEWSROOM-N3-007,
 - `NewsroomHomeCompositionService` nadal nie jest podłączony do publicznego `/aktualnosci`; hub/category/topic/feed pozostają dalszym zakresem N4/N5.
 
 ---
@@ -1327,13 +1327,20 @@ Na 2026-09-17 po NEWSROOM-N3-005:
 - [ ] domknąć pełny accessibility QA newsroomu,
 - [x] dodać dedykowany browser snapshot/E2E dla article detail,
 - [x] zbudować NEWSROOM-N3-005 Product Bridge dla questions/legal/signs/contextual CTA,
-- [ ] zbudować NEWSROOM-N3-006 historical redirect resolver HTTP — **następny wykonywalny task**,
-- [ ] zbudować NEWSROOM-N3-007 author-profile integration,
+- [x] zbudować NEWSROOM-N3-006 historical redirect resolver HTTP,
+- [ ] zbudować NEWSROOM-N3-007 author-profile integration — **następny wykonywalny task**,
 - [ ] zbudować NEWSROOM-N3-008 public rollout config gate.
 
 ---
 
 ## 69. Historia zmian
+
+### 2026-09-17 — v0.14
+
+- NEWSROOM-N3-006 zmergowano przez PR #75 i nie wprowadza nowej warstwy wizualnej: old article path wykonuje one-hop 301 do bieżącego canonical, a current article UI pozostaje powierzchnią N3-004/N3-005,
+- current-canonical 200 oraz withdrawn 410 zachowują pierwszeństwo; stale/malformed redirect state failuje do istniejącej neutralnej 404 surface,
+- query params nie są kopiowane do redirect target, więc historyczny link nie utrwala trackingowego wariantu URL,
+- CI #279, Browser Smoke #21 i post-merge CI #280 są PASS; NEWSROOM-N3-007 author-profile integration jest następnym wykonywalnym taskiem.
 
 ### 2026-09-17 — v0.13
 

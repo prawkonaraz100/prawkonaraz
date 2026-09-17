@@ -1271,7 +1271,15 @@ Finalny post-merge CI #270 na `main@7398c5d...` potwierdził: `quality` PASS —
 
 ### Status implementacji
 
-**NEXT — następny wykonywalny task po zamknięciu NEWSROOM-N3-005.** Domenowy/historyczny redirect foundation istnieje od N1-003, ale publiczny old-path HTTP 301 nadal nie został podłączony.
+**DONE — NEWSROOM-N3-006 zmergowany przez PR #75 i potwierdzony post-merge CI #280 na `main@33d9946219595a4be75d789b19cc8d10efc2ecc0`.** Domenowy/historyczny redirect foundation z N1-003 jest teraz podłączony do publicznego HTTP.
+
+Aktualny stan implementacji:
+
+- `ContentArticleController` konsultuje redirect history wyłącznie po current-canonical `not_found`; bieżące 200/410 zachowują pierwszeństwo,
+- `ContentArticlePathResolver::findCanonicalRedirectTarget()` akceptuje wyłącznie zapisany HTTP 301 wskazujący dokładnie bieżący canonical route family + slug i odrzuca stale/malformed/self-loop records,
+- old path zwraca dokładnie jeden 301 do current canonical; query params nie są kopiowane,
+- `tests/Feature/NewsroomArticleRedirectTest.php` pokrywa newsroom i guide route family, one-hop history oraz fail-closed invalid redirect state,
+- exact-head CI #279 i Browser Smoke #21 były PASS; post-merge CI #280 był pełnym PASS.
 
 ### Zakres
 
@@ -2176,7 +2184,7 @@ Na 2026-09-17:
 - traffic sign bridge dodatkowo dopuszcza tylko pivot `direct` lub `example`; luźny `related` nie jest renderowany,
 - `/aktualnosci` i `/poradniki` nadal renderują pre-launch placeholder z `X-Robots-Tag: noindex, follow`; category/topic/feed routes pozostają downstream i nie są uruchomione jako publiczne huby,
 - current-canonical article detail działa przez route-family public catalog; withdrawn historyczny detail ma 410, hidden/not-found 404, archived historyczny detail pozostaje 200 zgodnie z policy,
-- historyczne old-path -> 301 pozostają NEWSROOM-N3-006; author profile integration N3-007 i `NEWSROOM_PUBLIC_ENABLED` N3-008 również pozostają otwarte,
+- historyczne old-path -> current canonical 301 są wdrożone przez NEWSROOM-N3-006; author profile integration N3-007 i `NEWSROOM_PUBLIC_ENABLED` N3-008 pozostają otwarte,
 - fundamenty ContentAuthor/legal/traffic signs/public SEO istnieją,
 - istnieją config/content.php organization, SchemaIds/SchemaRenderer oraz współdzielony SiteIdentitySchema; homepage i article graph korzystają z kanonicznego Organization/WebSite identity,
 - istnieją public/robots.txt i RobotsController; newsroom nie zmienia tej warstwy bez osobnego production-delivery audit,
@@ -2189,13 +2197,21 @@ Na 2026-09-17:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N3-006 — Redirect resolver.
+NEWSROOM-N3-007 — Author profile integration.
 
-N3-005 jest zamknięte implementacyjnie na `main@fcc8074f89db141d522c5000742afc2e07a68565` po PR #73, finalnym exact-head CI #275, Browser Smoke #20 i post-merge CI #276. Następny krok ma podłączyć istniejący historyczny `ContentArticlePathResolver` do publicznego HTTP tak, aby old article path zwracał dokładnie jeden 301 do aktualnego canonical. Nie obejmuje author-profile integration N3-007, rollout gate N3-008 ani reverse links N4-008.
+N3-006 jest zamknięte implementacyjnie na `main@33d9946219595a4be75d789b19cc8d10efc2ecc0` po PR #75, exact-head CI #279, Browser Smoke #21 i post-merge CI #280. Następny krok ma rozszerzyć istniejący publiczny profil `ContentAuthor` o newsroom publications bez tworzenia drugiego profilu autora ani traffic-sign-specific schema source of truth. Nie obejmuje rollout gate N3-008, reverse links N4-008 ani discovery N5.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-17 — v0.35
+
+- NEWSROOM-N3-006 zmergowano przez PR #75; finalny implementation head `f48e7a12fa6c53422cd2ef8c369af81769163b9d`, a zweryfikowany post-merge `main` to `33d9946219595a4be75d789b19cc8d10efc2ecc0`,
+- publiczny old-path flow reużywa istniejący `ContentArticlePathResolver` i działa tylko po current-canonical `not_found`; current 200 oraz withdrawn 410 nie są nadpisywane,
+- resolver akceptuje tylko persisted 301 bezpośrednio do bieżącego canonical; stale/malformed/self-loop records failują do 404, a query params nie są forwardowane,
+- `NewsroomArticleRedirectTest` pokrywa one-hop redirects dla newsroom/guides oraz invalid redirect state; CI #279, Browser Smoke #21 i post-merge CI #280 są PASS,
+- NEWSROOM-N3-007 author-profile integration staje się pierwszym następnym taskiem; N3-008/N4/N5 pozostają otwarte.
 
 ### 2026-09-17 — v0.34
 

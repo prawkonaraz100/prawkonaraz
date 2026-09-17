@@ -302,7 +302,7 @@ Pokrywają już service/domain layer:
 
 Finalny N1-003 PostgreSQL gate: 6 testów / 86 asercji PASS. Finalny ogólny gate: 906 passed / 18 565 assertions / 2 skipped; Pint 980 files i frontend build PASS.
 
-N3-004 uruchomiło current-canonical public detail 200/404/410, ale historyczny old path -> 301 nadal pozostaje NEWSROOM-N3-006. Poniższe HTTP-level old path -> 301 i sitemap-only-current-canonical nie są jeszcze stanem wykonanym.
+N3-004 uruchomiło current-canonical public detail 200/404/410, a NEWSROOM-N3-006 dodało `tests/Feature/NewsroomArticleRedirectTest.php` i publiczny old path -> exactly one 301 do current canonical dla newsroom/guides. Invalid/non-301/stale redirect state failuje do 404, a query params nie są forwardowane. Poniższe HTTP-level old path -> 301 jest stanem wykonanym; sitemap-only-current-canonical pozostaje downstream N5 i nie jest jeszcze uznane za wykonane.
 
 - initial slug unique,
 - duplicate current slug rejected/resolved zgodnie z service,
@@ -411,11 +411,11 @@ N2-010 materializuje newsroom article media persistence i focal-point CMS; N3-00
 
 ## 14. Public article HTTP tests
 
-### 14.0. Aktualny stan po N3-004
+### 14.0. Aktualny stan po N3-006
 
 `tests/Feature/NewsroomPublicArticlePageTest.php`, `tests/Feature/NewsroomPublicCatalogServiceTest.php` i `tests/Feature/Public/NewsroomRouteContractTest.php` pokrywają current-canonical article detail HTTP/render boundary. Publicznie widoczny rekord zwraca 200 w poprawnej route family, hidden/not-found 404, a historycznie publiczny withdrawn rekord neutralną 410 surface bez body/source/product leakage. 404/410 mają `noindex,follow` także w `X-Robots-Tag`.
 
-N3-004 nie wdraża historycznych 301; old-slug redirect HTTP pozostaje N3-006.
+N3-006 wdraża historyczne old-slug 301 przez istniejący `ContentArticlePathResolver`; redirect jest konsultowany po current-canonical `not_found`, wymaga persisted 301 bezpośrednio do bieżącego canonical i failuje zamknięcie do 404 przy stale/malformed state.
 
 Published:
 
@@ -446,7 +446,7 @@ Unknown slug:
 
 Old slug:
 
-- 301 canonical — **pozostaje N3-006**.
+- 301 canonical — **wdrożone w N3-006**.
 
 ---
 
@@ -1460,27 +1460,27 @@ Na 2026-09-17 po NEWSROOM-N3-005:
 - istnieją newsroom-specific unit/security i feature regression dla body contract/editor, media storage/article media, enum/schema/model, slug/history, publishing workflow, home composition/placements, article preview, topic/CMS oraz N3-001 catalog, N3-002 SEO, N3-003 schema service i N3-005 Product Bridge,
 - N3-004 dostarcza `NewsroomArticleBodyRenderer`, `NewsroomArticlePresentationService`, publiczny `ContentArticleController`, Blade `newsroom.article`/`article-unavailable` i feature tests publicznego article response,
 - N3-005 dodaje `NewsroomArticleProductBridgeService`, `newsroom.product-bridge-block` i `NewsroomProductBridgeTest`; publiczny article renderer obsługuje teraz questions/legal/signs/contextual CTA bez losowych relacji i bez draft targetów,
-- current-canonical public detail ma automatyczne 200/404/410 coverage; 410/404 nie renderują treści i są noindex, a old-slug 301 pozostaje N3-006,
+- current-canonical public detail ma automatyczne 200/404/410 coverage; 410/404 nie renderują treści i są noindex, a `NewsroomArticleRedirectTest` pokrywa old-slug one-hop 301/fail-closed behavior N3-006,
 - Product Bridge wymaga body target + article-owned pivot + istniejący public eligibility; question group ma limit 5, legal wymaga verified act/unit + published legal page/topic, a signs wymagają published sign/author/category i pivot `direct` albo `example`; luźny `related` jest fail-closed,
 - publiczny response emituje SEO metadata i JSON-LD z istniejących N3-002/N3-003 services, route-family breadcrumbs, hero/provenance/regulatory context, public sources, correction, author box, public-safe related article oraz Product Bridge,
 - dedicated `.github/workflows/browser-smoke.yml` job `newsroom-article` istnieje; Browser Smoke #20 na finalnym head `7d795b895865cda49ba94a4fec50533d7b0f7a97` zakończył się PASS na 360x800, 390x844, 430x932, 768x1024, 1024x768 i 1440x900,
 - harness działa z JS disabled, sprawdza realny built CSS, H1/breadcrumb/body/source/canonical/JSON-LD/Product Bridge/CTA oraz horizontal overflow i zapisuje artifact,
 - artifact `newsroom-article-browser-qa`: ID `10508254861`, 1 124 509 bytes, SHA256 `753b717cb5f0319e2e7799552b181fd972b41cd3b3a66bba7dd9a82d7ce96a2a`,
 - finalny exact-head CI #275 dla PR #73 zakończył się PASS; post-merge `main@fcc8074f89db141d522c5000742afc2e07a68565` przeszedł CI #276 z `quality` 1049 passed / 19 498 assertions / 2 skipped, Pint 1051 files PASS, frontend build PASS i `newsroom-postgres` PASS,
-- hub/category/topic/feed browser surfaces, old-slug redirects N3-006, author profile integration N3-007, rollout config gate N3-008 i reverse links N4-008 pozostają otwarte,
+- hub/category/topic/feed browser surfaces, author profile integration N3-007, rollout config gate N3-008 i reverse links N4-008 pozostają otwarte; old-slug redirects N3-006 są zamknięte,
 - atomic static publication, dirty/version newsroom refresh coordinator, newsroom/news sitemap output i `SeoSitemapAuditor` extension pozostają N5.
 
 ---
 
 ## 59. Pozostałe zadania
 
-- [ ] dodać dalsze test files w trakcie N3-006..N5,
+- [ ] dodać dalsze test files w trakcie N3-007..N5,
 - [x] dodać dedykowany browser E2E dla publicznego article detail N3-004,
 - [x] dodać N2 media/topic/focal-point integration i N3-004 renderer/browser regression; pełne crop-variant generation nadal nie istnieje,
 - [x] dodać service-level site-identity/entity-graph/date-consistency regression oraz publiczne HTML/JSON-LD emission dla article detail,
 - [x] dodać N3-005 Product Bridge tests dla questions/legal/signs/contextual CTA,
 - [ ] dodać semantic silo/orphan/reverse-link/click-depth tests,
-- [ ] dodać old-slug 301 HTTP integration/E2E w N3-006 — **następny wykonywalny task**; current route-family/canonical detail i service-level slug history są już pokryte,
+- [x] dodać old-slug 301 HTTP integration w N3-006; `NewsroomArticleRedirectTest` pokrywa newsroom/guides one-hop redirect, current canonical 200 oraz invalid redirect fail-closed 404,
 - [x] dodać N2 stale-write/Apply-public-update oraz HomeComposer stale-write regression; ContentArticle i placement same-second conflicts są blokowane,
 - [ ] dodać news namespace + sitemap sharding + atomic publish + dirty-marker refresh/feed-discovery tests,
 - [ ] dodać production-like static robots/sitemap delivery smoke,
@@ -1492,6 +1492,14 @@ Na 2026-09-17 po NEWSROOM-N3-005:
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-17 — v0.18
+
+- NEWSROOM-N3-006 zmergowano przez PR #75; finalny implementation head `f48e7a12fa6c53422cd2ef8c369af81769163b9d`, post-merge `main@33d9946219595a4be75d789b19cc8d10efc2ecc0`,
+- dodano `tests/Feature/NewsroomArticleRedirectTest.php`: newsroom i guide historical paths zwracają one-hop 301 do bieżącego canonical; current canonical pozostaje 200, a invalid/non-301/stale redirect state failuje do 404 z istniejącą noindex unavailable policy,
+- query params nie są przenoszone do redirect target; domenowe one-hop history/locking pozostają pokryte istniejącymi N1-003 tests,
+- exact-head CI #279 i Browser Smoke #21 były PASS; post-merge CI #280 zakończył się pełnym PASS (`quality` 1051 passed / 19 512 assertions / 2 skipped, Pint 1052 files PASS, frontend build PASS; `newsroom-postgres` PASS),
+- N3-007 author profile integration jest następnym taskiem; sitemap-only-current-canonical pozostaje N5.
 
 ### 2026-09-17 — v0.17
 

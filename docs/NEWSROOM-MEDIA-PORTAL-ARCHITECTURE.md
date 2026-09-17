@@ -5,7 +5,7 @@
 - **Status:** Canonical architecture + live implementation status
 - **Obszar:** publiczny serwis informacyjny, newsroom, aktualności, poradniki i dystrybucja treści
 - **Repozytorium:** `prawkonaraz100/prawkonaraz`
-- **Bazowy stan kodu:** `main@fcc8074f89db141d522c5000742afc2e07a68565`
+- **Bazowy stan kodu:** `main@33d9946219595a4be75d789b19cc8d10efc2ecc0`
 - **Data utworzenia:** 2026-09-15
 - **Właściciel decyzji produktowej:** PrawkoNaRaz
 - **Cel:** zaprojektować profesjonalny pion medialny bez dublowania istniejącej platformy, bez osobnego CMS/WordPressa i bez rozbijania modularnego monolitu.
@@ -103,7 +103,7 @@ Na pierwszym etapie nie budujemy:
 
 ## 5. Aktualny stan implementacji
 
-Stan sprawdzony ponownie 2026-09-17 względem `main@fcc8074f89db141d522c5000742afc2e07a68565` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-012 oraz NEWSROOM-N3-001..N3-005. Zakres admin/domain N2 jest zamknięty. Public read boundary N3-001, article SEO metadata N3-002, article schema graph N3-003, publiczny article controller/Blade/body renderer N3-004 oraz Product Bridge N3-005 są wdrożone. Historyczne HTTP 301 N3-006, author-profile integration N3-007, rollout gate N3-008 oraz N4/N5 pozostają otwarte.
+Stan sprawdzony ponownie 2026-09-17 względem `main@33d9946219595a4be75d789b19cc8d10efc2ecc0` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-012 oraz NEWSROOM-N3-001..N3-006. Zakres admin/domain N2 jest zamknięty. Public read boundary N3-001, article SEO metadata N3-002, article schema graph N3-003, publiczny article controller/Blade/body renderer N3-004, Product Bridge N3-005 oraz publiczny historical redirect resolver N3-006 są wdrożone. Author-profile integration N3-007, rollout gate N3-008 oraz N4/N5 pozostają otwarte.
 
 ### 5.1. Elementy już istniejące
 
@@ -178,7 +178,7 @@ To oznacza, że:
 - traffic sign group dopuszcza tylko article pivot `relation_type` `direct` lub `example`, a następnie wymaga published znaku, autora i kategorii; luźny `related` jest fail-closed,
 - contextual CTA reużywa istniejące trasy testu, publicznej bazy pytań i nauki,
 - reverse links nie są częścią N3-005 i pozostają N4-008,
-- `ContentArticlePathResolver` nadal przechowuje canonical/history path foundation; historyczny old-path -> 301 pozostaje NEWSROOM-N3-006,
+- `ContentArticlePathResolver` pozostaje canonical/history path foundation; NEWSROOM-N3-006 podłącza go do publicznego HTTP po current-canonical `not_found` i zwraca one-hop 301 wyłącznie dla zapisanego 301 wskazującego bieżący canonical; stale/malformed/self-loop redirect failuje zamknięcie do 404, a query string nie jest przenoszony do celu,
 - `NEWSROOM_PUBLIC_ENABLED` nie został wdrożony przez N3-005 i pozostaje NEWSROOM-N3-008,
 - zakres admin/domain CMS N2 pozostaje zmaterializowany, w tym `ContentCategoryResource`, `ContentArticleResource`, Builder/sources/relations/workflow/public-update/checklist/preview/HomeComposer/provenance-media i `ContentTopicResource`.
 
@@ -188,7 +188,6 @@ Nie ma obecnie kompletnego end-to-end odpowiednika:
 
 - publicznego topic lifecycle pod `/aktualnosci/temat/{topicSlug}`; publiczne 200/410, nav i sitemap consequences pozostają N4/N5,
 - publicznego hub/list/category/topic/feed renderera,
-- historycznego old-path HTTP 301,
 - newsroomowej integracji publikacji z profilem autora,
 - reverse-link surface z istniejących entity pages do newsroom article,
 - rollout gate `NEWSROOM_PUBLIC_ENABLED`,
@@ -1328,7 +1327,7 @@ Szczegółowy tasking i granice PR-ów są kanonicznie utrzymywane w [NEWSROOM-I
 - product bridge,
 - old-slug redirects.
 
-**Stan:** N3-001..N3-005 są zmaterializowane. Historyczne redirecty N3-006, author integration N3-007 i rollout gate N3-008 pozostają do wykonania.
+**Stan:** N3-001..N3-006 są zmaterializowane. Author integration N3-007 i rollout gate N3-008 pozostają do wykonania.
 
 **Exit criteria:** pojedynczy opublikowany artykuł jest poprawnie renderowany, indeksowalny i połączony z istniejącym produktem.
 
@@ -1498,9 +1497,9 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N3-003` — Article schema graph service,
 - [x] `NEWSROOM-N3-004` — Article Blade page + block renderer,
 - [x] `NEWSROOM-N3-005` — Product Bridge: questions/legal/signs/contextual CTA,
-- [ ] `NEWSROOM-N3-006` — old-path -> canonical 301 — **następny wykonywalny task**.
+- [x] `NEWSROOM-N3-006` — old-path -> canonical 301.
 
-N3-007 author-profile integration i N3-008 rollout gate pozostają otwarte po N3-006. Pozostałe elementy N4–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu pełną checklistę.
+N3-007 author-profile integration jest następnym wykonywalnym taskiem; N3-008 rollout gate pozostaje otwarte po N3-007. Pozostałe elementy N4–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu pełną checklistę.
 
 ---
 ## 28. Zasady utrzymania dokumentu
@@ -1525,6 +1524,15 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-17 — v0.35
+
+- NEWSROOM-N3-006 zmergowano przez PR #75; finalny implementation head `f48e7a12fa6c53422cd2ef8c369af81769163b9d`, a zweryfikowany post-merge `main` to `33d9946219595a4be75d789b19cc8d10efc2ecc0`,
+- `ContentArticleController` konsultuje historyczny resolver dopiero po current-canonical `not_found`, więc istniejące current 200 oraz withdrawn 410 pozostają bez zmian,
+- `ContentArticlePathResolver::findCanonicalRedirectTarget()` zwraca cel wyłącznie dla zapisanego HTTP 301, którego `to_path` jest dokładnie bieżącym canonical wyliczonym z route family + slug; stale/malformed/self-loop records failują zamknięcie do 404,
+- historyczne ścieżki zwracają dokładnie jeden 301 do bieżącego canonical, a tracking query params nie są kopiowane; `NewsroomArticleRedirectTest` chroni newsroom i guide route family oraz fail-closed behavior,
+- exact-head CI #279 i Browser Smoke #21 zakończyły się PASS; post-merge CI #280 na `main@33d99462...` zakończył się pełnym PASS (`quality` 1051 passed / 19 512 assertions / 2 skipped, Pint 1052 files PASS, frontend build PASS; `newsroom-postgres` PASS),
+- następnym taskiem wykonawczym jest NEWSROOM-N3-007 author-profile integration; N3-008 rollout gate, N4 reverse links/huby oraz N5 discovery pozostają otwarte.
 
 ### 2026-09-17 — v0.34
 
