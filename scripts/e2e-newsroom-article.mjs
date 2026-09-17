@@ -164,7 +164,7 @@ $article = \App\Models\ContentArticle::factory()->published()->create([
 
 async function renderArticleSnapshot() {
     const php = String.raw`
-$request = \Illuminate\Http\Request::create('${articlePath}', 'GET', [], [], [], ['HTTP_HOST' => 'localhost']);
+$request = \Illuminate\Http\Request::create('${baseUrl}${articlePath}', 'GET');
 $response = app(\Illuminate\Contracts\Http\Kernel::class)->handle($request);
 $status = $response->getStatusCode();
 if ($status !== 200) { throw new \RuntimeException('Newsroom article render returned HTTP '.$status); }
