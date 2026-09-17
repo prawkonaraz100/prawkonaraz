@@ -234,6 +234,8 @@
                                 </aside>
                                 @break
                         @endswitch
+
+                        @include('newsroom.product-bridge-block', ['block' => $block])
                     @endforeach
                 </div>
 

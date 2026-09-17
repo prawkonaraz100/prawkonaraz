@@ -12,6 +12,7 @@ final class NewsroomArticleBodyRenderer
     public function __construct(
         private readonly NewsroomRichTextHtmlRenderer $richTextRenderer,
         private readonly MediaUrlResolver $mediaUrlResolver,
+        private readonly NewsroomArticleProductBridgeService $productBridge,
     ) {}
 
     /**
@@ -24,11 +25,18 @@ final class NewsroomArticleBodyRenderer
             (int) ($article->body_schema_version ?? NewsroomBodyContract::CURRENT_SCHEMA_VERSION),
         );
         $relatedArticles = $this->relatedArticles($blocks);
+        $productBridgeBlocks = $includeDeferredBlocks ? [] : $this->productBridge->prepare($article, $blocks);
         $disk = (string) config('media.newsroom_disk', config('media.public_disk', 'public'));
         $rendered = [];
 
-        foreach ($blocks as $block) {
-            $prepared = $this->prepareBlock($block, $relatedArticles, $disk, $includeDeferredBlocks);
+        foreach ($blocks as $index => $block) {
+            $prepared = $this->prepareBlock(
+                $block,
+                $relatedArticles,
+                $disk,
+                $includeDeferredBlocks,
+                $productBridgeBlocks[$index] ?? null,
+            );
 
             if ($prepared !== null) {
                 $rendered[] = $prepared;
@@ -41,10 +49,16 @@ final class NewsroomArticleBodyRenderer
     /**
      * @param  array{type:string,data:array<string,mixed>,key?:string}  $block
      * @param  Collection<int, ContentArticle>  $relatedArticles
+     * @param  array<string,mixed>|null  $productBridgeBlock
      * @return array<string,mixed>|null
      */
-    private function prepareBlock(array $block, Collection $relatedArticles, string $disk, bool $includeDeferredBlocks): ?array
-    {
+    private function prepareBlock(
+        array $block,
+        Collection $relatedArticles,
+        string $disk,
+        bool $includeDeferredBlocks,
+        ?array $productBridgeBlock,
+    ): ?array {
         return match ($block['type']) {
             NewsroomBodyContract::BLOCK_RICH_TEXT => [
                 ...$block,
@@ -71,7 +85,7 @@ final class NewsroomArticleBodyRenderer
             NewsroomBodyContract::BLOCK_LEGAL_REFERENCE,
             NewsroomBodyContract::BLOCK_QUESTION_GROUP,
             NewsroomBodyContract::BLOCK_TRAFFIC_SIGN_GROUP,
-            NewsroomBodyContract::BLOCK_PRODUCT_CTA => $includeDeferredBlocks ? $block : null,
+            NewsroomBodyContract::BLOCK_PRODUCT_CTA => $includeDeferredBlocks ? $block : $productBridgeBlock,
             default => null,
         };
     }

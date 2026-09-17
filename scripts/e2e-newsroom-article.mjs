@@ -126,14 +126,29 @@ try {
         await page.locator('nav[aria-label="Breadcrumb"]').waitFor();
 
         const bodyText = await page.locator('body').innerText();
-        for (const expected of ['Kontekst zmian i egzaminu', 'Źródła', 'E2E źródło oficjalne']) {
+        for (const expected of [
+            'Kontekst zmian i egzaminu',
+            'Źródła',
+            'E2E źródło oficjalne',
+            'Sprawdź się w teście',
+        ]) {
             if (!bodyText.includes(expected)) {
                 throw new Error(`Missing "${expected}" at ${viewport.name}px.`);
             }
         }
 
         if (bodyText.includes('Moduł publiczny N3')) {
-            throw new Error(`Deferred N3-005 placeholder leaked at ${viewport.name}px.`);
+            throw new Error(`Internal Product Bridge placeholder leaked at ${viewport.name}px.`);
+        }
+
+        const productCta = page.getByRole('link', { name: 'Sprawdź się w teście' });
+        if (await productCta.count() !== 1) {
+            throw new Error(`Product Bridge CTA contract failed at ${viewport.name}px.`);
+        }
+
+        const productCtaHref = await productCta.getAttribute('href');
+        if (!productCtaHref?.endsWith('/testy-na-prawo-jazdy')) {
+            throw new Error(`Product Bridge CTA target failed at ${viewport.name}px: ${productCtaHref}`);
         }
 
         const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
@@ -191,6 +206,12 @@ $article = \App\Models\ContentArticle::factory()->published()->create([
     'title' => '${title}',
     'slug' => '${slug}',
     'lead' => 'Lead E2E sprawdzający publiczny widok artykułu newsroomu na pełnej macierzy szerokości.',
+    'body_blocks' => \App\Support\NewsroomBodyContract::normalize([
+        [
+            'type' => \App\Support\NewsroomBodyContract::BLOCK_PRODUCT_CTA,
+            'data' => ['kind' => 'test'],
+        ],
+    ]),
     'key_points' => ['Pierwszy punkt E2E', 'Drugi punkt E2E'],
     'regulatory_status' => 'in_force',
     'effective_from' => now()->subDay()->toDateString(),
