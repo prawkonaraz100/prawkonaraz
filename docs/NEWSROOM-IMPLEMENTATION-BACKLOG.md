@@ -828,7 +828,7 @@ Implementacja obejmuje warstwę domenową/read-model kompozycji oraz transakcyjn
 - sync zapisuje tylko article-owned pivots i nie mutuje target Question/LegalUnit/TrafficSign ani ich innych grafów/źródeł,
 - ordinary Edit `publiclyVisible()` nie może zmieniać relations/topics,
 - relation sync nadal bumpuje parent `ContentArticle.updated_at`, a po PR #50 deterministic edit token obejmuje także article-owned relation/topic state; stale relation/topic mutation jest odrzucana przed sync,
-- publiczny renderer N3-004 świadomie nie publikuje jeszcze question/legal/sign/product bridge; te targety pozostają N3-005, a reverse links N4-008,
+- publiczny Product Bridge N3-005 konsumuje article-owned questions/legal/signs tylko wtedy, gdy body wskazuje ten sam target i istniejący public eligibility contract go dopuszcza; reverse links pozostają N4-008,
 - finalny exact-head gate PR #46: `quality` 972 passed / 18 940 assertions / 2 skipped, Pint 1011 files PASS, frontend build PASS (9.49 s); `newsroom-postgres` 7 passed / 89 assertions.
 
 ### Zakres
@@ -1193,7 +1193,7 @@ Dodatkowo:
 - visible article renderuje publiczny Blade; withdrawn/historycznie publiczny tombstone zwraca neutralne 410, a hidden/not-found 404 bez ujawniania treści,
 - `NewsroomArticlePresentationService` składa breadcrumbs, hero/focal-point metadata, public sources, provenance, regulatory context, daty publikacji/aktualizacji, correction note i author box,
 - `NewsroomArticleBodyRenderer` renderuje publicznie `rich_text`, image, quote, table, context i bezpiecznie rozwiązany `related_article`; admin preview reużywa ten renderer z jawnym `includeDeferredBlocks=true`,
-- publiczny detail świadomie **nie renderuje jeszcze** `legal_reference`, `question_group`, `traffic_sign_group` ani `product_cta`; te bloki pozostają NEWSROOM-N3-005 i testy blokują ich wyciek,
+- zakres N3-004 świadomie nie renderował jeszcze `legal_reference`, `question_group`, `traffic_sign_group` ani `product_cta`; te bloki zostały później podłączone przez NEWSROOM-N3-005,
 - publiczny controller podłącza metadata z N3-002 i graph z N3-003 do istniejącego `public-content` layoutu,
 - publiczne sources obejmują wyłącznie `is_publicly_cited=true`; private evidence i `image_license_note` nie są emitowane,
 - hero zachowuje alt, caption, credit, dimensions, focal `object-position` i preload/fetch priority contract,
@@ -1233,7 +1233,18 @@ Finalny post-merge CI #270 na `main@7398c5d...` potwierdził: `quality` PASS —
 
 ### Status implementacji
 
-**NEXT — nie rozpoczęto w N3-004.** Publiczny renderer celowo pomija te bloki, a regresje potwierdzają brak ich wycieku.
+**DONE — PR #73 zmergowano; finalny implementation head `7d795b895865cda49ba94a4fec50533d7b0f7a97`, a zweryfikowany post-merge `main` to `fcc8074f89db141d522c5000742afc2e07a68565`. CI #275 i Browser Smoke #20 na finalnym PR head były PASS, a post-merge CI #276 na exact `main` również zakończył się pełnym PASS.**
+
+### Aktualny stan implementacji
+
+- dodano `NewsroomArticleProductBridgeService`; `NewsroomArticleBodyRenderer` deleguje do niego publiczne `question_group`, `legal_reference`, `traffic_sign_group` i `product_cta`,
+- nowy partial `resources/views/newsroom/product-bridge-block.blade.php` renderuje public-safe payloady zamiast kopiować HTML/card data do body,
+- body block ID dla question/legal/sign nie wystarcza: target musi być również jawnie powiązany z artykułem przez istniejący article-owned pivot i przejść istniejący public eligibility contract,
+- questions reużywają `PublicQuestionCatalogService`, zachowują kanoniczne URL-e i są limitowane do 5 pozycji na blok; inactive/nonpublic/unlinked targets są pomijane,
+- legal reference wymaga verified `LegalUnit`, verified `LegalAct` i co najmniej jednej published `LegalContentPage` pod published `LegalTopic`; publiczny payload nie zawiera pivot notes ani pełnego `official_excerpt`,
+- traffic signs wymagają `relation_type` `direct` lub `example` na article pivot oraz published znaku, autora i kategorii; luźny `related` jest fail-closed zgodnie z Public UI/UX Spec,
+- contextual CTA mapują tylko kontrolowane `kind`: `test` -> `public.tests`, `related_questions` -> `public.questions.hub`, `learning` -> `session.index`,
+- N3-005 nie dodaje migracji, reverse links, historycznych redirectów ani rollout gate.
 
 ### Zakres
 
@@ -1242,14 +1253,25 @@ Finalny post-merge CI #270 na `main@7398c5d...` potwierdził: `quality` PASS —
 - signs,
 - contextual CTA.
 
+### Testy / evidence
+
+- `tests/Feature/NewsroomProductBridgeTest.php` pokrywa linked public target, inactive/draft/unlinked omission, brak wycieku internal notes/official excerpt, canonical destination routes, `related` sign fail-closed oraz trzy CTA,
+- Browser Smoke #20 przeszedł 360/390/430/768/1024/1440 i zachował existing article/CSS/overflow assertions,
+- finalny CI #275 na PR head: `quality` PASS — 1049 passed / 19 498 assertions / 2 skipped, Pint 1051 files PASS, frontend build PASS; `newsroom-postgres` PASS,
+- post-merge CI #276 na `main@fcc8074f...` potwierdził ten sam pełny Quality Gate.
+
 ### DoD
 
-- no random relations,
-- no draft targets.
+- [x] no random relations — target wymaga body + article-owned pivot,
+- [x] no draft targets — każdy target przechodzi istniejący public eligibility contract.
 
 ---
 
 ## NEWSROOM-N3-006 — Redirect resolver
+
+### Status implementacji
+
+**NEXT — następny wykonywalny task po zamknięciu NEWSROOM-N3-005.** Domenowy/historyczny redirect foundation istnieje od N1-003, ale publiczny old-path HTTP 301 nadal nie został podłączony.
 
 ### Zakres
 
@@ -1912,13 +1934,14 @@ Docs-only:
 
 - [x] article + controlled block renderer
 - [x] regulatory context box/provenance
+- [x] Product Bridge questions/legal/signs/contextual CTA z explicit-pivot/public-eligibility guard
 - [ ] author profile/newsroom publication integration
 - [ ] semantic silo + controlled reverse links
 - [ ] newsroom hub with placements/fallback/dedupe
 - [ ] category
 - [ ] topic/dossier
 - [ ] guides
-- [ ] responsive/accessibility — N3-004 ma PASS wymaganej macierzy responsive, ale pełny accessibility gate pozostaje dalszym hardeningiem
+- [ ] responsive/accessibility — article detail/Product Bridge ma PASS wymaganej macierzy responsive, ale pełny accessibility gate pozostaje dalszym hardeningiem
 
 ### SEO
 
@@ -2147,9 +2170,10 @@ Nie oznaczać tasku DONE przed merge + green verification.
 Na 2026-09-17:
 
 - pakiet projektowy newsroomu obejmuje architekturę, model danych, CMS, UI, governance, SEO, backlog i runbook,
-- foundation N0, pełny etap N1-001..N1-006, admin/domain N2-001..N2-012 oraz NEWSROOM-N3-001..N3-004 są wdrożone,
+- foundation N0, pełny etap N1-001..N1-006, admin/domain N2-001..N2-012 oraz NEWSROOM-N3-001..N3-005 są wdrożone,
 - PR #71 wdrożył publiczny article detail dla `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}` z Blade rendererem, SEO/schema integration, public sources/provenance/regulatory context, hero/focal-point handling, correction i author box,
-- publiczny renderer N3-004 celowo pomija `legal_reference`, `question_group`, `traffic_sign_group` i `product_cta`; to zakres następnego NEWSROOM-N3-005 Product Bridge,
+- PR #73 rozszerzył istniejący renderer o fail-closed Product Bridge: jawnie powiązane publiczne questions/legal/signs oraz contextual CTA; body target bez article-owned pivotu albo public eligibility jest pomijany,
+- traffic sign bridge dodatkowo dopuszcza tylko pivot `direct` lub `example`; luźny `related` nie jest renderowany,
 - `/aktualnosci` i `/poradniki` nadal renderują pre-launch placeholder z `X-Robots-Tag: noindex, follow`; category/topic/feed routes pozostają downstream i nie są uruchomione jako publiczne huby,
 - current-canonical article detail działa przez route-family public catalog; withdrawn historyczny detail ma 410, hidden/not-found 404, archived historyczny detail pozostaje 200 zgodnie z policy,
 - historyczne old-path -> 301 pozostają NEWSROOM-N3-006; author profile integration N3-007 i `NEWSROOM_PUBLIC_ENABLED` N3-008 również pozostają otwarte,
@@ -2157,7 +2181,7 @@ Na 2026-09-17:
 - istnieją config/content.php organization, SchemaIds/SchemaRenderer oraz współdzielony SiteIdentitySchema; homepage i article graph korzystają z kanonicznego Organization/WebSite identity,
 - istnieją public/robots.txt i RobotsController; newsroom nie zmienia tej warstwy bez osobnego production-delivery audit,
 - newsroom dirty/version refresh coordinator, atomic child-before-index publication i newsroom/news sitemap output jeszcze nie istnieją,
-- canonical CI zachowuje szybki SQLite job `quality` i addytywny `newsroom-postgres`; finalny post-merge CI #270 na `main@7398c5d...` był pełnym PASS,
+- canonical CI zachowuje szybki SQLite job `quality` i addytywny `newsroom-postgres`; finalny post-merge CI #276 na `main@fcc8074f89db141d522c5000742afc2e07a68565` był pełnym PASS,
 - QUEUE_CONNECTION w env example jest sync; stały queue worker nie jest gwarantowany,
 - panel Filament pozostaje admin-only i ten kontrakt pozostaje wymaganiem v1.
 
@@ -2165,13 +2189,23 @@ Na 2026-09-17:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N3-005 — Product Bridge.
+NEWSROOM-N3-006 — Redirect resolver.
 
-N3-004 jest zamknięte implementacyjnie na `main@7398c5d930d38d6cc9d9953e53b4298df41cfce8` po PR #71, Browser Smoke #18, exact-head CI #269 i post-merge CI #270. Następny krok rozszerza istniejący publiczny renderer wyłącznie o jawnie powiązane questions/legal/signs oraz contextual product CTA. Nie obejmuje losowych rekomendacji, draft targets, historycznych redirectów N3-006 ani rollout gate N3-008.
+N3-005 jest zamknięte implementacyjnie na `main@fcc8074f89db141d522c5000742afc2e07a68565` po PR #73, finalnym exact-head CI #275, Browser Smoke #20 i post-merge CI #276. Następny krok ma podłączyć istniejący historyczny `ContentArticlePathResolver` do publicznego HTTP tak, aby old article path zwracał dokładnie jeden 301 do aktualnego canonical. Nie obejmuje author-profile integration N3-007, rollout gate N3-008 ani reverse links N4-008.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-17 — v0.34
+
+- NEWSROOM-N3-005 zmergowano przez PR #73; finalny implementation head `7d795b895865cda49ba94a4fec50533d7b0f7a97`, a zweryfikowany post-merge `main` to `fcc8074f89db141d522c5000742afc2e07a68565`,
+- dodano `NewsroomArticleProductBridgeService` i `newsroom/product-bridge-block.blade.php`; existing article renderer obsługuje teraz `question_group`, `legal_reference`, `traffic_sign_group` i `product_cta`,
+- question/legal/sign target wymaga równocześnie wskazania w body, article-owned pivotu i public eligibility; inactive/draft/unlinked targety oraz internal notes/official excerpt nie wyciekają,
+- traffic signs są filtrowane przez pivot `relation_type in ['direct','example']`; luźny `related` jest fail-closed zgodnie z nadrzędnym UI/UX contract,
+- contextual CTA reużywa istniejące trasy `public.tests`, `public.questions.hub` i `session.index`; nie dodano migracji, reverse links, N3-006 ani N3-008,
+- `NewsroomProductBridgeTest` oraz Browser Smoke #20 chronią Product Bridge; finalny CI #275 i Browser #20 były PASS, a post-merge CI #276 na `main@fcc8074f...` zakończył się pełnym PASS (`quality` 1049 passed / 19 498 assertions / 2 skipped, Pint 1051 files PASS, frontend build PASS; `newsroom-postgres` PASS),
+- następnym taskiem wykonawczym jest NEWSROOM-N3-006 historical redirect resolver; N3-007/N3-008 pozostają otwarte.
 
 ### 2026-09-17 — v0.33
 
