@@ -1286,7 +1286,7 @@ Frontend newsroom v1 jest UI-complete, gdy:
 
 ## 67. Stan implementacji
 
-Na 2026-09-17 po NEWSROOM-N3-005:
+Na 2026-09-17 po NEWSROOM-N3-006:
 
 - `/aktualnosci` i `/poradniki` nadal renderują pre-launch `MarketingPlaceholder.vue` przez dedykowany `NewsroomPlaceholderController`; oba huby zwracają 200 i `X-Robots-Tag: noindex, follow`,
 - category/topic/feed routes pozostają downstream i nie zostały uruchomione przez N3-005,
