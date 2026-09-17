@@ -6,8 +6,8 @@ use App\Models\ContentAuthor;
 use App\Models\ContentCategory;
 use App\SEO\Schema\SchemaIds;
 use App\Support\ContentArticleSchemaService;
+use App\Support\ContentArticleSeoService;
 use App\Support\NewsroomMediaStorage;
-use DomainException;
 use Illuminate\Support\Carbon;
 
 function newsroomSchemaNode(array $graph, string $id): array
@@ -178,7 +178,7 @@ test('explainer analysis report and guide use Article rather than NewsArticle', 
         'slug' => 'typ-'.$type->value,
     ])->load(['author', 'category']);
 
-    $canonical = app(\App\Support\ContentArticleSeoService::class)->canonicalUrl($article);
+    $canonical = app(ContentArticleSeoService::class)->canonicalUrl($article);
     $node = newsroomSchemaNode(
         app(ContentArticleSchemaService::class)->article($article),
         app(SchemaIds::class)->contentArticle($canonical),
@@ -196,7 +196,7 @@ test('schema refuses hidden articles unpublished authors and inactive categories
     $service = app(ContentArticleSchemaService::class);
 
     expect(fn () => $service->article(ContentArticle::factory()->draft()->create()))
-        ->toThrow(DomainException::class);
+        ->toThrow(\DomainException::class);
 
     $unpublishedAuthor = ContentAuthor::factory()->create();
     $articleWithHiddenAuthor = ContentArticle::factory()->published()->create([
@@ -204,7 +204,7 @@ test('schema refuses hidden articles unpublished authors and inactive categories
     ]);
 
     expect(fn () => $service->article($articleWithHiddenAuthor))
-        ->toThrow(DomainException::class);
+        ->toThrow(\DomainException::class);
 
     $inactiveCategory = ContentCategory::factory()->inactive()->create();
     $articleWithInactiveCategory = ContentArticle::factory()->published()->create([
@@ -212,5 +212,5 @@ test('schema refuses hidden articles unpublished authors and inactive categories
     ]);
 
     expect(fn () => $service->article($articleWithInactiveCategory))
-        ->toThrow(DomainException::class);
+        ->toThrow(\DomainException::class);
 });
