@@ -57,9 +57,11 @@ try {
 
     browser = await chromium.launch({ headless: true });
 
-    const healthPage = await browser.newPage({
+    const healthContext = await browser.newContext({
         viewport: { width: 360, height: 800 },
+        serviceWorkers: 'block',
     });
+    const healthPage = await healthContext.newPage();
     healthPage.setDefaultNavigationTimeout(15_000);
     console.log('[newsroom-e2e] browser health probe');
     const healthResponse = await healthPage.goto(`${baseUrl}/api/v1/health`, {
@@ -70,13 +72,15 @@ try {
     if (!healthResponse || !healthResponse.ok()) {
         throw new Error(`Browser health probe returned ${healthResponse?.status() ?? 'no response'}.`);
     }
-    await healthPage.close();
+    await healthContext.close();
 
     for (const viewport of viewports) {
         console.log(`[newsroom-e2e] viewport ${viewport.name}`);
-        const page = await browser.newPage({
+        const context = await browser.newContext({
             viewport: { width: viewport.width, height: viewport.height },
+            serviceWorkers: 'block',
         });
+        const page = await context.newPage();
         page.setDefaultTimeout(10_000);
         page.setDefaultNavigationTimeout(15_000);
 
@@ -138,7 +142,7 @@ try {
             screenshot,
         });
 
-        await page.close();
+        await context.close();
     }
 
     report.status = 'ok';
