@@ -1,0 +1,75 @@
+name: NEWSROOM N3-006 docs consistency fix
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  fix-docs:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'docs/newsroom-n3-006-sync'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout documentation branch
+        uses: actions/checkout@v4
+        with:
+          ref: docs/newsroom-n3-006-sync
+          fetch-depth: 0
+
+      - name: Fix exact current-state headings
+        shell: bash
+        run: |
+          python <<'PY'
+          from pathlib import Path
+
+          replacements = {
+              'docs/NEWSROOM-PUBLIC-UI-UX-SPEC.md': (
+                  'Na 2026-09-17 po NEWSROOM-N3-005:',
+                  'Na 2026-09-17 po NEWSROOM-N3-006:',
+              ),
+              'docs/NEWSROOM-TEST-RELEASE-AND-ROLLBACK-RUNBOOK.md': (
+                  'Na 2026-09-17 po NEWSROOM-N3-005:',
+                  'Na 2026-09-17 po NEWSROOM-N3-006:',
+              ),
+          }
+
+          for path, (old, new) in replacements.items():
+              file = Path(path)
+              text = file.read_text(encoding='utf-8')
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected exactly 1 match, got {count}')
+              file.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
+
+      - name: Validate exact final diff
+        shell: bash
+        run: |
+          rm .github/workflows/newsroom-n3-006-consistency-fix.yml
+          git diff --check
+          python <<'PY'
+          import subprocess
+          expected = {
+              '.github/workflows/newsroom-n3-006-consistency-fix.yml',
+              'docs/NEWSROOM-PUBLIC-UI-UX-SPEC.md',
+              'docs/NEWSROOM-TEST-RELEASE-AND-ROLLBACK-RUNBOOK.md',
+          }
+          actual = set(subprocess.check_output(['git', 'diff', '--name-only'], text=True).splitlines())
+          if actual != expected:
+              raise SystemExit(f'unexpected changed files: expected={sorted(expected)} actual={sorted(actual)}')
+          PY
+
+      - name: Commit consistency fix and remove one-off workflow
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/NEWSROOM-PUBLIC-UI-UX-SPEC.md \
+                  docs/NEWSROOM-TEST-RELEASE-AND-ROLLBACK-RUNBOOK.md \
+                  .github/workflows/newsroom-n3-006-consistency-fix.yml
+          git commit -m "docs(newsroom): align N3-006 current-state headings"
+          git push origin HEAD:docs/newsroom-n3-006-sync
