@@ -5,7 +5,7 @@
 - **Status:** Canonical architecture + live implementation status
 - **Obszar:** publiczny serwis informacyjny, newsroom, aktualności, poradniki i dystrybucja treści
 - **Repozytorium:** `prawkonaraz100/prawkonaraz`
-- **Bazowy stan kodu:** `main@33d9946219595a4be75d789b19cc8d10efc2ecc0`
+- **Bazowy stan kodu:** `main@c68672f6aa7c41defaeec56debb541d5a60d9f4f`
 - **Data utworzenia:** 2026-09-15
 - **Właściciel decyzji produktowej:** PrawkoNaRaz
 - **Cel:** zaprojektować profesjonalny pion medialny bez dublowania istniejącej platformy, bez osobnego CMS/WordPressa i bez rozbijania modularnego monolitu.
@@ -103,7 +103,7 @@ Na pierwszym etapie nie budujemy:
 
 ## 5. Aktualny stan implementacji
 
-Stan sprawdzony ponownie 2026-09-17 względem `main@33d9946219595a4be75d789b19cc8d10efc2ecc0` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-012 oraz NEWSROOM-N3-001..N3-006. Zakres admin/domain N2 jest zamknięty. Public read boundary N3-001, article SEO metadata N3-002, article schema graph N3-003, publiczny article controller/Blade/body renderer N3-004, Product Bridge N3-005 oraz publiczny historical redirect resolver N3-006 są wdrożone. Author-profile integration N3-007, rollout gate N3-008 oraz N4/N5 pozostają otwarte.
+Stan sprawdzony ponownie 2026-09-17 względem `main@c68672f6aa7c41defaeec56debb541d5a60d9f4f` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-012 oraz NEWSROOM-N3-001..N3-007. Zakres admin/domain N2 jest zamknięty. Public read boundary N3-001, article SEO metadata N3-002, article schema graph N3-003, publiczny article controller/Blade/body renderer N3-004, Product Bridge N3-005, publiczny historical redirect resolver N3-006 oraz integracja profilu autora N3-007 są wdrożone. Rollout gate N3-008 oraz N4/N5 pozostają otwarte.
 
 ### 5.1. Elementy już istniejące
 
@@ -122,6 +122,10 @@ Repo ma już istotny fundament:
   - published/modified time,
   - JSON-LD,
 - modele i publiczne profile `ContentAuthor`,
+- N3-007: profil `/autorzy/{slug}` agreguje indeksowalne publikacje Newsroomu z aktywnych kategorii; `published` trafia do bieżących publikacji, `needs_review` do osobnej sekcji „W trakcie weryfikacji”, a `archived` do osobnego „Archiwum”,
+- N3-007: `ContentAuthorSchemaService` jest współdzielonym builderem `ProfilePage -> Person`; ten sam stabilny `/autorzy/{slug}#person` jest używany przez profil i article graph, a `worksFor` wskazuje `/#organization`,
+- N3-007: author sitemap kwalifikuje również autorów z indeksowalnym Newsroom corpus i używa `public_state_changed_at` dla newsroomowej świeżości zamiast technicznego `updated_at`,
+- N3-007: model `ContentAuthor` blokuje odpublikowanie autora, dopóki zależny artykuł Newsroomu pozostaje indexable; noindex usuwa tę blokadę,
 - route `/autorzy/{authorSlug}`,
 - statyczny produkcyjny pipeline sitemap `SeoSitemapGenerator` + `SeoSitemapBuilder` + `SeoSitemapAuditor`, z codziennym `seo:refresh-sitemaps` jako istniejącym safety netem,
 - dynamiczny `SitemapController`, który współistnieje z generowanymi artefaktami i nie jest samodzielnym source of truth produkcyjnego XML,
@@ -188,7 +192,6 @@ Nie ma obecnie kompletnego end-to-end odpowiednika:
 
 - publicznego topic lifecycle pod `/aktualnosci/temat/{topicSlug}`; publiczne 200/410, nav i sitemap consequences pozostają N4/N5,
 - publicznego hub/list/category/topic/feed renderera,
-- newsroomowej integracji publikacji z profilem autora,
 - reverse-link surface z istniejących entity pages do newsroom article,
 - rollout gate `NEWSROOM_PUBLIC_ENABLED`,
 - news sitemap,
@@ -1327,7 +1330,7 @@ Szczegółowy tasking i granice PR-ów są kanonicznie utrzymywane w [NEWSROOM-I
 - product bridge,
 - old-slug redirects.
 
-**Stan:** N3-001..N3-006 są zmaterializowane. Author integration N3-007 i rollout gate N3-008 pozostają do wykonania.
+**Stan:** N3-001..N3-007 są zmaterializowane. Rollout gate N3-008 pozostaje do wykonania.
 
 **Exit criteria:** pojedynczy opublikowany artykuł jest poprawnie renderowany, indeksowalny i połączony z istniejącym produktem.
 
@@ -1499,7 +1502,7 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N3-005` — Product Bridge: questions/legal/signs/contextual CTA,
 - [x] `NEWSROOM-N3-006` — old-path -> canonical 301.
 
-N3-007 author-profile integration jest następnym wykonywalnym taskiem; N3-008 rollout gate pozostaje otwarte po N3-007. Pozostałe elementy N4–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu pełną checklistę.
+N3-007 author-profile integration jest następnym wykonywalnym taskiem; N3-008 rollout gate pozostaje otwarte po N3-008. Pozostałe elementy N4–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu pełną checklistę.
 
 ---
 ## 28. Zasady utrzymania dokumentu
@@ -1525,6 +1528,16 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 
 ## 29. Historia zmian
 
+
+### 2026-09-17 — v0.36
+
+- NEWSROOM-N3-007 zmergowano przez PR #77; finalny implementation head `bf7981d23ff99a6335b55ecaeb6ce36b6622a042`, a zweryfikowany post-merge `main` to `c68672f6aa7c41defaeec56debb541d5a60d9f4f`,
+- istniejący `ContentAuthor` i `/autorzy/{slug}` pozostają jedyną publiczną tożsamością autora; nie utworzono drugiego modelu/profile surface,
+- profil autora agreguje publiczne/indexowalne publikacje Newsroomu z rozdzieleniem `published`, `needs_review` i `archived`, a noindex/scheduled/withdrawn/inactive-category pozostają poza listą,
+- wspólny `ContentAuthorSchemaService` utrwala identyczny `Person @id` dla ProfilePage i Article oraz `worksFor -> /#organization`; author sitemap używa newsroomowego `public_state_changed_at`,
+- odpublikowanie `ContentAuthor` jest blokowane, gdy zależne artykuły Newsroomu pozostają indexable; regresje potwierdza `ContentAuthorProfileTest`,
+- exact-head CI #295 oraz post-merge CI #296 były pełnym PASS; po N3-007 następnym taskiem jest NEWSROOM-N3-008.
+
 ### 2026-09-17 — v0.35
 
 - NEWSROOM-N3-006 zmergowano przez PR #75; finalny implementation head `f48e7a12fa6c53422cd2ef8c369af81769163b9d`, a zweryfikowany post-merge `main` to `33d9946219595a4be75d789b19cc8d10efc2ecc0`,
@@ -1532,7 +1545,7 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 - `ContentArticlePathResolver::findCanonicalRedirectTarget()` zwraca cel wyłącznie dla zapisanego HTTP 301, którego `to_path` jest dokładnie bieżącym canonical wyliczonym z route family + slug; stale/malformed/self-loop records failują zamknięcie do 404,
 - historyczne ścieżki zwracają dokładnie jeden 301 do bieżącego canonical, a tracking query params nie są kopiowane; `NewsroomArticleRedirectTest` chroni newsroom i guide route family oraz fail-closed behavior,
 - exact-head CI #279 i Browser Smoke #21 zakończyły się PASS; post-merge CI #280 na `main@33d99462...` zakończył się pełnym PASS (`quality` 1051 passed / 19 512 assertions / 2 skipped, Pint 1052 files PASS, frontend build PASS; `newsroom-postgres` PASS),
-- następnym taskiem wykonawczym jest NEWSROOM-N3-007 author-profile integration; N3-008 rollout gate, N4 reverse links/huby oraz N5 discovery pozostają otwarte.
+- następnym taskiem wykonawczym jest NEWSROOM-N3-008 author-profile integration; N3-008 rollout gate, N4 reverse links/huby oraz N5 discovery pozostają otwarte.
 
 ### 2026-09-17 — v0.34
 
@@ -1542,7 +1555,7 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 - traffic signs są dodatkowo filtrowane przez pivot `relation_type in ['direct','example']`; luźny `related` pozostaje fail-closed zgodnie z nadrzędnym UI/UX contract,
 - contextual CTA reużywają istniejące trasy testu, oficjalnej bazy pytań i nauki; reverse links nie zostały wdrożone i pozostają N4-008,
 - finalny CI #275 i Browser Smoke #20 dla PR head zakończyły się PASS; post-merge CI #276 na `main@fcc8074f...` zakończył się pełnym PASS (`quality` 1049 passed / 19 498 assertions / 2 skipped, Pint 1051 files PASS, frontend build PASS; `newsroom-postgres` PASS),
-- następnym taskiem wykonawczym jest NEWSROOM-N3-006 historical old-path -> canonical 301; N3-007 i N3-008 pozostają otwarte.
+- następnym taskiem wykonawczym jest NEWSROOM-N3-006 historical old-path -> canonical 301; N3-008 i N3-008 pozostają otwarte.
 
 ### 2026-09-17 — v0.33
 

@@ -17,18 +17,32 @@
 
 ## 2. Zasada wykonywania
 
-Każdy task przechodzi kolejno:
+Każdy task przechodzi przez ten sam kontrakt dowodowy, ale kod i dokumentacja mogą być rozdzielone na dwa PR-y, jeżeli implementation PR ma jawny guardrail „no documentation changes”.
+
+### Wariant A — kod i dokumentacja w jednym PR
 
 1. implementacja,
-2. testy lokalne,
-3. review kodu,
+2. testy lokalne pomocniczo,
+3. review faktycznie zmienionego kodu,
 4. aktualizacja tylko powiązanej dokumentacji,
-5. CI,
+5. pełny GitHub Actions Quality Gate na finalnym HEAD zawierającym kod i dokumentację,
 6. merge,
-7. weryfikacja main,
+7. post-merge weryfikacja `main`,
 8. dopiero kolejny task.
 
-Nie łączymy kilku dużych etapów w jeden PR.
+### Wariant B — implementation PR + osobny docs-sync PR
+
+1. implementacja bez dokumentacji zgodnie z guardrailem PR,
+2. review faktycznie zmienionego kodu,
+3. pełny GitHub Actions Quality Gate na exact final implementation HEAD,
+4. merge implementation PR,
+5. post-merge pełny Quality Gate na `main`,
+6. dopiero po jego PASS osobny docs-sync PR aktualizujący wyłącznie dokumenty związane z faktycznie wdrożonym zakresem,
+7. pełny GitHub Actions Quality Gate na exact final docs-sync HEAD,
+8. merge docs-sync PR i post-merge weryfikacja `main`,
+9. dopiero wtedy task może zostać oznaczony jako w pełni zamknięty dokumentacyjnie i można przejść dalej.
+
+Nie łączymy kilku dużych etapów w jeden PR. Starszy PASS nie jest dowodem dla HEAD zmienionego później; finalny status zawsze odnosi się do konkretnego SHA.
 
 ---
 
@@ -1293,35 +1307,64 @@ Old article path -> 301 canonical.
 
 ## NEWSROOM-N3-007 — Author profile integration
 
-### Potwierdzony stan
+### Status implementacji
 
-- `ContentAuthorController` już agreguje Traffic Signs i legal content,
-- structured data autora jest dziś budowane przez traffic-sign-specific `TrafficSignSchemaService::author(..., $signs)`,
-- obecny ProfilePage Person nie ma jeszcze docelowego stabilnego `/autorzy/{slug}#person` ani `worksFor -> /#organization`,
-- `SeoSitemapBuilder::authorUrls()` kwalifikuje autora tylko przez signs/legal content.
+**DONE w kodzie — PR #77 zmergowany i zweryfikowany na `main@c68672f6aa7c41defaeec56debb541d5a60d9f4f`.** Dokumentacyjny docs-sync jest osobnym krokiem po potwierdzonym post-merge gate.
+
+### Cel
+
+Rozszerzyć istniejący publiczny profil `ContentAuthor` o Newsroom bez tworzenia drugiego modelu autora, drugiej strony profilowej ani rozbieżnej tożsamości schema.
+
+### Stan przed implementacją
+
+- `ContentAuthorController` agregował Traffic Signs i legal content,
+- structured data autora było budowane przez traffic-sign-specific `TrafficSignSchemaService::author(...)`,
+- article graph używał `SchemaIds::contentAuthorPerson(...)`, ale profil autora nie gwarantował jeszcze wspólnego buildera tej samej tożsamości,
+- author sitemap kwalifikował autorów przez starsze moduły contentowe i nie uwzględniał Newsroom-only corpus.
+
+### Aktualny stan implementacji
+
+- `ContentAuthorController` pobiera `authoredContentArticles()->indexable()` wyłącznie z aktywnych kategorii,
+- `published` jest dołączane do bieżących publikacji autora, `needs_review` jest renderowane w osobnej sekcji „W trakcie weryfikacji”, a `archived` w osobnym „Archiwum”,
+- noindex, scheduled, withdrawn oraz artykuły z nieaktywnych kategorii nie są listowane na publicznym profilu autora,
+- `ContentAuthorSchemaService` jest neutralnym, współdzielonym builderem `ProfilePage -> Person`; `SharedAuthorTrafficSignSchemaService` deleguje do niego istniejące traffic-sign schema consumers,
+- profil i article graph używają identycznego `SchemaIds::contentAuthorPerson($author)` (`/autorzy/{slug}#person`), a `Person.worksFor` wskazuje stabilne `/#organization`,
+- `SeoSitemapBuilder::authorUrls()` kwalifikuje autorów również przez indeksowalne artykuły Newsroomu w aktywnych kategoriach; newsroomowa świeżość author sitemap używa maksimum `public_state_changed_at`, nie technicznego `updated_at`,
+- model `ContentAuthor` blokuje przejście z publicznego do niepublicznego, gdy istnieje zależny `authoredContentArticles()->indexable()`; po noindex blokada znika,
+- nie zmieniono `ContentArticle::dateModified` semantics ani nie utworzono drugiego autora/profile modelu.
+
+### Potwierdzone testy i Quality Gate
+
+- `tests/Feature/ContentAuthorProfileTest.php` pokrywa lifecycle visibility, wspólną tożsamość Person/Organization, public-state freshness author sitemap oraz blokadę/odblokowanie odpublikowania autora,
+- exact implementation HEAD `bf7981d23ff99a6335b55ecaeb6ce36b6622a042`: CI #295 — PASS,
+- merge commit `main@c68672f6aa7c41defaeec56debb541d5a60d9f4f`: post-merge CI #296 — PASS,
+- post-merge `quality`: 1055 passed / 19 540 assertions / 2 skipped, Pint 1055 files PASS, frontend build PASS; `newsroom-postgres` PASS.
 
 ### Zakres
 
-Re-use istniejącego `ContentAuthorController` i route, ale wyekstrahować współdzielony author/ProfilePage schema builder zamiast dokładania newsroom semantics do `TrafficSignSchemaService`.
-
-- publiczny profil autora pokazuje activelyDistributed publications oraz osobno/oznaczone archived+indexable publications; needs_review/withdrawn/draft/scheduled są wykluczone,
-- ujednolicić ProfilePage mainEntity Person do stabilnego `/autorzy/{slug}#person`,
-- Person worksFor -> canonical `/#organization`,
-- `authorUrls()` uwzględnia autora także wtedy, gdy jego jedynym publicznym/indexable dorobkiem jest newsroom,
-- author sitemap lastmod uwzględnia zmianę outputu profilu wynikającą z publish/archive/needs-review/withdraw/restore przez public-state timestamps, nie techniczny updated_at,
-- article graph referuje dokładnie ten sam Person @id.
+- reużyć istniejący `ContentAuthor` i `/autorzy/{slug}`,
+- utrzymać jedną stabilną tożsamość Person pomiędzy ProfilePage i Article,
+- listować `published`, `needs_review+indexable` i `archived+indexable` zgodnie z ich lifecycle semantics; `needs_review` musi być wyraźnie oznaczone i nie może być promowane jako aktywna publikacja,
+- wykluczać noindex, draft, scheduled, withdrawn i nieaktywną kategorię,
+- rozszerzyć author sitemap o publiczny/indexowalny Newsroom corpus i public-state freshness,
+- blokować odpublikowanie autora, jeśli pozostają zależne indeksowalne publikacje Newsroomu.
 
 ### DoD
 
-- nie istnieje drugi newsroom author/profile model,
-- article -> author URL działa,
-- author page -> article działa,
-- ProfilePage i Article mają identyczną identity autora,
-- archived+indexable pozostaje crawlable przez author profile i jest oznaczone jako archiwalne; archived+noindex nie musi być listowane,
-- needs_review+indexable pozostaje w osobnej/oznaczonej sekcji autora jako „w trakcie weryfikacji”, aby zachować inbound bez aktywnej promocji,
-- withdrawn/draft/scheduled nie są listowane,
-- zmiana public eligibility artykułu aktualizuje author-page/sitemap freshness bez fałszowania article dateModified,
-- próba odpublikowania ContentAuthor z zależnymi indexable/publiclyVisible newsroom articles jest blokowana do reassignment/withdraw/noindex.
+- [x] brak drugiego Newsroom author/profile modelu,
+- [x] article -> author URL działa,
+- [x] author page -> indexable article działa,
+- [x] ProfilePage i Article wskazują identyczne author `Person @id`,
+- [x] archived+indexable pozostaje crawlable z profilu i jest oznaczone jako archiwalne; archived+noindex nie musi być listowane,
+- [x] `needs_review+indexable` zachowuje inbound przez osobną sekcję „W trakcie weryfikacji” bez aktywnej promocji,
+- [x] withdrawn/draft/scheduled nie są listowane,
+- [x] zmiana public eligibility wpływa na author-page/sitemap freshness przez `public_state_changed_at` bez fałszowania article `dateModified`,
+- [x] próba odpublikowania `ContentAuthor` z zależnym indexable Newsroom article jest blokowana do reassignment/withdraw/noindex,
+- [x] exact-head implementation CI i post-merge CI na `main` są PASS.
+
+### Pozostała praca
+
+- NEWSROOM-N3-008 — Public rollout config gate.
 
 ---
 
@@ -2205,6 +2248,16 @@ N3-006 jest zamknięte implementacyjnie na `main@33d9946219595a4be75d789b19cc8d1
 
 # 12. Historia zmian
 
+
+### 2026-09-17 — v0.36
+
+- NEWSROOM-N3-007 implementation PR #77 zmergowano jako `main@c68672f6aa7c41defaeec56debb541d5a60d9f4f` po exact-head CI #295 PASS; post-merge CI #296 również zakończył się pełnym PASS,
+- finalny kod reużywa `ContentAuthor`, rozdziela published/needs_review/archived na profilu, współdzieli stabilny Person schema builder i rozszerza author sitemap o Newsroom z `public_state_changed_at`,
+- modelowy invariant blokuje odpublikowanie autora z zależnym indexable Newsroom article; `ContentAuthorProfileTest` pokrywa lifecycle, schema, sitemap freshness i unpublish guard,
+- skorygowano wcześniejszy sprzeczny zapis zakresu: `needs_review+indexable` nie jest wykluczane z profilu, tylko pozostaje w osobnej, jawnie oznaczonej sekcji,
+- wykonawczy workflow doprecyzowano o legalny split implementation PR -> post-merge main gate -> osobny docs-sync PR z własnym exact-head gate,
+- następny task: NEWSROOM-N3-008 — Public rollout config gate.
+
 ### 2026-09-17 — v0.35
 
 - NEWSROOM-N3-006 zmergowano przez PR #75; finalny implementation head `f48e7a12fa6c53422cd2ef8c369af81769163b9d`, a zweryfikowany post-merge `main` to `33d9946219595a4be75d789b19cc8d10efc2ecc0`,
@@ -2221,7 +2274,7 @@ N3-006 jest zamknięte implementacyjnie na `main@33d9946219595a4be75d789b19cc8d1
 - traffic signs są filtrowane przez pivot `relation_type in ['direct','example']`; luźny `related` jest fail-closed zgodnie z nadrzędnym UI/UX contract,
 - contextual CTA reużywa istniejące trasy `public.tests`, `public.questions.hub` i `session.index`; nie dodano migracji, reverse links, N3-006 ani N3-008,
 - `NewsroomProductBridgeTest` oraz Browser Smoke #20 chronią Product Bridge; finalny CI #275 i Browser #20 były PASS, a post-merge CI #276 na `main@fcc8074f...` zakończył się pełnym PASS (`quality` 1049 passed / 19 498 assertions / 2 skipped, Pint 1051 files PASS, frontend build PASS; `newsroom-postgres` PASS),
-- następnym taskiem wykonawczym jest NEWSROOM-N3-006 historical redirect resolver; N3-007/N3-008 pozostają otwarte.
+- następnym taskiem wykonawczym jest NEWSROOM-N3-006 historical redirect resolver; N3-008/N3-008 pozostają otwarte.
 
 ### 2026-09-17 — v0.33
 
