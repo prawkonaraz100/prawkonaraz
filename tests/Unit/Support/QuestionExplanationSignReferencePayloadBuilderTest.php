@@ -54,6 +54,7 @@ test('it ignores unavailable sign graphics and can be disabled without changing 
         ->published()
         ->create([
             'code' => 'S-3',
+            'slug' => 'test-fixture-missing-s-3-asset',
             'name' => 'Sygnalizator kierunkowy',
             'image_path' => 'traffic-signs/missing-s-3.webp',
         ]);
