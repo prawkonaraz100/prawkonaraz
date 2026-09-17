@@ -1,0 +1,264 @@
+name: NEWSROOM N3-006 docs sync
+
+on:
+  push:
+    branches:
+      - docs/newsroom-n3-006-sync
+
+permissions:
+  contents: write
+
+jobs:
+  sync-docs:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout documentation branch
+        uses: actions/checkout@v4
+        with:
+          ref: docs/newsroom-n3-006-sync
+          fetch-depth: 0
+
+      - name: Apply exact N3-006 documentation sync
+        shell: bash
+        run: |
+          python <<'PY'
+          from pathlib import Path
+
+          def replace_once(path: str, old: str, new: str) -> None:
+              file = Path(path)
+              text = file.read_text(encoding='utf-8')
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected exactly 1 match, got {count}: {old[:100]!r}')
+              file.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          architecture = 'docs/NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md'
+          replace_once(architecture,
+              '- **Bazowy stan kodu:** `main@fcc8074f89db141d522c5000742afc2e07a68565`',
+              '- **Bazowy stan kodu:** `main@33d9946219595a4be75d789b19cc8d10efc2ecc0`')
+          replace_once(architecture,
+              'Stan sprawdzony ponownie 2026-09-17 względem `main@fcc8074f89db141d522c5000742afc2e07a68565` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-012 oraz NEWSROOM-N3-001..N3-005. Zakres admin/domain N2 jest zamknięty. Public read boundary N3-001, article SEO metadata N3-002, article schema graph N3-003, publiczny article controller/Blade/body renderer N3-004 oraz Product Bridge N3-005 są wdrożone. Historyczne HTTP 301 N3-006, author-profile integration N3-007, rollout gate N3-008 oraz N4/N5 pozostają otwarte.',
+              'Stan sprawdzony ponownie 2026-09-17 względem `main@33d9946219595a4be75d789b19cc8d10efc2ecc0` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-012 oraz NEWSROOM-N3-001..N3-006. Zakres admin/domain N2 jest zamknięty. Public read boundary N3-001, article SEO metadata N3-002, article schema graph N3-003, publiczny article controller/Blade/body renderer N3-004, Product Bridge N3-005 oraz publiczny historical redirect resolver N3-006 są wdrożone. Author-profile integration N3-007, rollout gate N3-008 oraz N4/N5 pozostają otwarte.')
+          replace_once(architecture,
+              '- `ContentArticlePathResolver` nadal przechowuje canonical/history path foundation; historyczny old-path -> 301 pozostaje NEWSROOM-N3-006,',
+              '- `ContentArticlePathResolver` pozostaje canonical/history path foundation; NEWSROOM-N3-006 podłącza go do publicznego HTTP po current-canonical `not_found` i zwraca one-hop 301 wyłącznie dla zapisanego 301 wskazującego bieżący canonical; stale/malformed/self-loop redirect failuje zamknięcie do 404, a query string nie jest przenoszony do celu,')
+          replace_once(architecture,
+              '- historycznego old-path HTTP 301,\n',
+              '')
+          replace_once(architecture,
+              '**Stan:** N3-001..N3-005 są zmaterializowane. Historyczne redirecty N3-006, author integration N3-007 i rollout gate N3-008 pozostają do wykonania.',
+              '**Stan:** N3-001..N3-006 są zmaterializowane. Author integration N3-007 i rollout gate N3-008 pozostają do wykonania.')
+          replace_once(architecture,
+              '- [ ] `NEWSROOM-N3-006` — old-path -> canonical 301 — **następny wykonywalny task**.',
+              '- [x] `NEWSROOM-N3-006` — old-path -> canonical 301.')
+          replace_once(architecture,
+              'N3-007 author-profile integration i N3-008 rollout gate pozostają otwarte po N3-006. Pozostałe elementy N4–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu pełną checklistę.',
+              'N3-007 author-profile integration jest następnym wykonywalnym taskiem; N3-008 rollout gate pozostaje otwarte po N3-007. Pozostałe elementy N4–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu pełną checklistę.')
+          replace_once(architecture,
+              '## 29. Historia zmian\n\n### 2026-09-17 — v0.34',
+              '''## 29. Historia zmian
+
+### 2026-09-17 — v0.35
+
+- NEWSROOM-N3-006 zmergowano przez PR #75; finalny implementation head `f48e7a12fa6c53422cd2ef8c369af81769163b9d`, a zweryfikowany post-merge `main` to `33d9946219595a4be75d789b19cc8d10efc2ecc0`,
+- `ContentArticleController` konsultuje historyczny resolver dopiero po current-canonical `not_found`, więc istniejące current 200 oraz withdrawn 410 pozostają bez zmian,
+- `ContentArticlePathResolver::findCanonicalRedirectTarget()` zwraca cel wyłącznie dla zapisanego HTTP 301, którego `to_path` jest dokładnie bieżącym canonical wyliczonym z route family + slug; stale/malformed/self-loop records failują zamknięcie do 404,
+- historyczne ścieżki zwracają dokładnie jeden 301 do bieżącego canonical, a tracking query params nie są kopiowane; `NewsroomArticleRedirectTest` chroni newsroom i guide route family oraz fail-closed behavior,
+- exact-head CI #279 i Browser Smoke #21 zakończyły się PASS; post-merge CI #280 na `main@33d99462...` zakończył się pełnym PASS (`quality` 1051 passed / 19 512 assertions / 2 skipped, Pint 1052 files PASS, frontend build PASS; `newsroom-postgres` PASS),
+- następnym taskiem wykonawczym jest NEWSROOM-N3-007 author-profile integration; N3-008 rollout gate, N4 reverse links/huby oraz N5 discovery pozostają otwarte.
+
+### 2026-09-17 — v0.34''')
+
+          backlog = 'docs/NEWSROOM-IMPLEMENTATION-BACKLOG.md'
+          replace_once(backlog,
+              '**NEXT — następny wykonywalny task po zamknięciu NEWSROOM-N3-005.** Domenowy/historyczny redirect foundation istnieje od N1-003, ale publiczny old-path HTTP 301 nadal nie został podłączony.',
+              '''**DONE — NEWSROOM-N3-006 zmergowany przez PR #75 i potwierdzony post-merge CI #280 na `main@33d9946219595a4be75d789b19cc8d10efc2ecc0`.** Domenowy/historyczny redirect foundation z N1-003 jest teraz podłączony do publicznego HTTP.
+
+Aktualny stan implementacji:
+
+- `ContentArticleController` konsultuje redirect history wyłącznie po current-canonical `not_found`; bieżące 200/410 zachowują pierwszeństwo,
+- `ContentArticlePathResolver::findCanonicalRedirectTarget()` akceptuje wyłącznie zapisany HTTP 301 wskazujący dokładnie bieżący canonical route family + slug i odrzuca stale/malformed/self-loop records,
+- old path zwraca dokładnie jeden 301 do current canonical; query params nie są kopiowane,
+- `tests/Feature/NewsroomArticleRedirectTest.php` pokrywa newsroom i guide route family, one-hop history oraz fail-closed invalid redirect state,
+- exact-head CI #279 i Browser Smoke #21 były PASS; post-merge CI #280 był pełnym PASS.''')
+          replace_once(backlog,
+              '- historyczne old-path -> 301 pozostają NEWSROOM-N3-006; author profile integration N3-007 i `NEWSROOM_PUBLIC_ENABLED` N3-008 również pozostają otwarte,',
+              '- historyczne old-path -> current canonical 301 są wdrożone przez NEWSROOM-N3-006; author profile integration N3-007 i `NEWSROOM_PUBLIC_ENABLED` N3-008 pozostają otwarte,')
+          replace_once(backlog,
+              '''# 11. Pierwszy następny task
+
+NEWSROOM-N3-006 — Redirect resolver.
+
+N3-005 jest zamknięte implementacyjnie na `main@fcc8074f89db141d522c5000742afc2e07a68565` po PR #73, finalnym exact-head CI #275, Browser Smoke #20 i post-merge CI #276. Następny krok ma podłączyć istniejący historyczny `ContentArticlePathResolver` do publicznego HTTP tak, aby old article path zwracał dokładnie jeden 301 do aktualnego canonical. Nie obejmuje author-profile integration N3-007, rollout gate N3-008 ani reverse links N4-008.''',
+              '''# 11. Pierwszy następny task
+
+NEWSROOM-N3-007 — Author profile integration.
+
+N3-006 jest zamknięte implementacyjnie na `main@33d9946219595a4be75d789b19cc8d10efc2ecc0` po PR #75, exact-head CI #279, Browser Smoke #21 i post-merge CI #280. Następny krok ma rozszerzyć istniejący publiczny profil `ContentAuthor` o newsroom publications bez tworzenia drugiego profilu autora ani traffic-sign-specific schema source of truth. Nie obejmuje rollout gate N3-008, reverse links N4-008 ani discovery N5.''')
+          replace_once(backlog,
+              '# 12. Historia zmian\n\n### 2026-09-17 — v0.34',
+              '''# 12. Historia zmian
+
+### 2026-09-17 — v0.35
+
+- NEWSROOM-N3-006 zmergowano przez PR #75; finalny implementation head `f48e7a12fa6c53422cd2ef8c369af81769163b9d`, a zweryfikowany post-merge `main` to `33d9946219595a4be75d789b19cc8d10efc2ecc0`,
+- publiczny old-path flow reużywa istniejący `ContentArticlePathResolver` i działa tylko po current-canonical `not_found`; current 200 oraz withdrawn 410 nie są nadpisywane,
+- resolver akceptuje tylko persisted 301 bezpośrednio do bieżącego canonical; stale/malformed/self-loop records failują do 404, a query params nie są forwardowane,
+- `NewsroomArticleRedirectTest` pokrywa one-hop redirects dla newsroom/guides oraz invalid redirect state; CI #279, Browser Smoke #21 i post-merge CI #280 są PASS,
+- NEWSROOM-N3-007 author-profile integration staje się pierwszym następnym taskiem; N3-008/N4/N5 pozostają otwarte.
+
+### 2026-09-17 — v0.34''')
+
+          domain = 'docs/NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md'
+          replace_once(domain,
+              '- Ostatnia weryfikacja zgodności z kodem: main@ff81f92fe75442b60e67297f3945d2a63b7c5128 (2026-09-16)',
+              '- Ostatnia weryfikacja zgodności z kodem: main@33d9946219595a4be75d789b19cc8d10efc2ecc0 (2026-09-17)')
+          replace_once(domain,
+              '- Data: 2026-09-16',
+              '- Data: 2026-09-17')
+          replace_once(domain,
+              'Ten dokument opisuje docelowy model danych newsroomu. Schema, modele/factories/scopes oraz serwisy aplikacyjne N1 są już zmaterializowane; zakres admin/domain N2 jest zmaterializowany po PR #62, natomiast publiczne N3/N4 i discovery N5 pozostają dalszym etapem. Stan wdrożenia należy czytać z sekcji 43 i aktualizować po każdej zmianie kodu.',
+              'Ten dokument opisuje docelowy model danych newsroomu. Schema, modele/factories/scopes oraz serwisy aplikacyjne N1 są już zmaterializowane; zakres admin/domain N2 jest zmaterializowany, a publiczny article stack N3-001..N3-006 obejmuje current-canonical detail, SEO/schema, renderer/Product Bridge i historyczny one-hop 301. N3-007/N3-008, N4 i discovery N5 pozostają dalszym etapem. Stan wdrożenia należy czytać z sekcji 43 i aktualizować po każdej zmianie kodu.')
+          replace_once(domain,
+              'Publiczne article controllers nadal nie istnieją. NEWSROOM-N3-001 dodało `ContentArticlePublicCatalogService` dla current-canonical public detail/list read boundary, reużywając `NewsroomRouteContract` i istniejące scope\'y zamiast dublować visibility logic. Historyczne old-path -> 301 nadal ma konsumować `ContentArticlePathResolver` w NEWSROOM-N3-006; HTTP 200/410/301 nie są jeszcze podłączone do publicznych route controllerów.',
+              'Sam zakres N1-003 nie podłączał jeszcze publicznych article controllers. Downstream NEWSROOM-N3-004 podłączyło current-canonical HTTP 200/404/410, a NEWSROOM-N3-006 podłączyło istniejący `ContentArticlePathResolver` do historycznego old-path -> current-canonical 301 bez zmiany domenowego modelu redirectów.')
+          replace_once(domain,
+              'Ta warstwa nie uruchamia jeszcze publicznego HTTP renderera. Zarejestrowane detail routes nadal zwracają 404 do czasu N3-004/rollout, a historyczne old-path -> 301 pozostaje NEWSROOM-N3-006.',
+              'Sam zakres N3-001 nie uruchamiał publicznego HTTP renderera. Downstream N3-004 podłączyło current-canonical 200/404/410, a N3-006 podłączyło historyczne old-path -> current-canonical 301 przez istniejący resolver; aktualny stan całego systemu opisuje sekcja 43.')
+          replace_once(domain,
+              'Na 2026-09-16:',
+              'Na 2026-09-17:')
+          replace_once(domain,
+              '- [ ] podłączyć publiczne article controllers/renderery oraz NEWSROOM-N3-006 historyczny `ContentArticlePathResolver` redirect flow i zweryfikować HTTP canonical/301/404/410 behavior,',
+              '- [x] podłączyć publiczne article controllers/renderery i zweryfikować current-canonical HTTP 200/404/410 behavior (NEWSROOM-N3-004),\n- [x] podłączyć historyczny `ContentArticlePathResolver` old-path -> current-canonical 301 flow z one-hop/fail-closed HTTP regression (NEWSROOM-N3-006),')
+          replace_once(domain,
+              '## 45. Historia zmian\n\n### 2026-09-17 — v0.29',
+              '''## 45. Historia zmian
+
+### 2026-09-17 — v0.30
+
+- NEWSROOM-N3-006 zmergowano przez PR #75 na `main@33d9946219595a4be75d789b19cc8d10efc2ecc0` bez zmian schema/migracji i bez tworzenia drugiego redirect modelu,
+- publiczny controller reużywa domenowy `ContentArticlePathResolver` po current-canonical `not_found`; persisted redirect jest honorowany tylko, gdy ma status 301 i `to_path` równe bieżącemu canonical wyliczonemu z route family + slug,
+- stale/malformed/self-loop history failuje zamknięcie do 404, old paths pozostają one-hop, a query params nie są kopiowane do redirect target,
+- `NewsroomArticleRedirectTest` potwierdza newsroom/guides HTTP 301 i fail-closed behavior; post-merge CI #280 na `main@33d99462...` był pełnym PASS.
+
+### 2026-09-17 — v0.29''')
+
+          ui = 'docs/NEWSROOM-PUBLIC-UI-UX-SPEC.md'
+          replace_once(ui,
+              '- `NEWSROOM_PUBLIC_ENABLED` pozostaje NEWSROOM-N3-008; historyczne old-slug 301 pozostaje NEWSROOM-N3-006, a newsroomowe rozszerzenie profilu autora NEWSROOM-N3-007,',
+              '- historyczne old-slug -> current canonical 301 są wdrożone przez NEWSROOM-N3-006 bez dodatkowego UI surface; `NEWSROOM_PUBLIC_ENABLED` pozostaje NEWSROOM-N3-008, a newsroomowe rozszerzenie profilu autora NEWSROOM-N3-007,')
+          replace_once(ui,
+              '- [ ] zbudować NEWSROOM-N3-006 historical redirect resolver HTTP — **następny wykonywalny task**,',
+              '- [x] zbudować NEWSROOM-N3-006 historical redirect resolver HTTP,')
+          replace_once(ui,
+              '- [ ] zbudować NEWSROOM-N3-007 author-profile integration,',
+              '- [ ] zbudować NEWSROOM-N3-007 author-profile integration — **następny wykonywalny task**,')
+          replace_once(ui,
+              '## 69. Historia zmian\n\n### 2026-09-17 — v0.13',
+              '''## 69. Historia zmian
+
+### 2026-09-17 — v0.14
+
+- NEWSROOM-N3-006 zmergowano przez PR #75 i nie wprowadza nowej warstwy wizualnej: old article path wykonuje one-hop 301 do bieżącego canonical, a current article UI pozostaje powierzchnią N3-004/N3-005,
+- current-canonical 200 oraz withdrawn 410 zachowują pierwszeństwo; stale/malformed redirect state failuje do istniejącej neutralnej 404 surface,
+- query params nie są kopiowane do redirect target, więc historyczny link nie utrwala trackingowego wariantu URL,
+- CI #279, Browser Smoke #21 i post-merge CI #280 są PASS; NEWSROOM-N3-007 author-profile integration jest następnym wykonywalnym taskiem.
+
+### 2026-09-17 — v0.13''')
+
+          seo = 'docs/NEWSROOM-SEO-DISTRIBUTION-AND-OBSERVABILITY.md'
+          replace_once(seo,
+              'Unikać zmian slugów bez realnej potrzeby.',
+              '''Unikać zmian slugów bez realnej potrzeby.
+
+Aktualny stan implementacji po NEWSROOM-N3-006: publiczny old article path jest rozwiązywany dopiero po nieudanym current-canonical lookup i zwraca dokładnie jeden 301 wyłącznie wtedy, gdy zapisany redirect ma status 301 oraz `to_path` równe bieżącemu canonical route family + slug. Stale/malformed/self-loop history failuje do 404. Redirect target jest path-only, więc query params/tracking nie są kopiowane. Internal-link i sitemap migration pozostają osobnymi downstream obowiązkami; N3-006 nie deklaruje ich jako wykonanych.''')
+          replace_once(seo,
+              '## 70. Historia zmian\n\n### 2026-09-17 — v0.10',
+              '''## 70. Historia zmian
+
+### 2026-09-17 — v0.11
+
+- NEWSROOM-N3-006 zmergowano przez PR #75 na `main@33d9946219595a4be75d789b19cc8d10efc2ecc0` i materializuje HTTP część istniejącej slug-change policy: old path -> exactly one 301 -> current canonical 200,
+- resolver honoruje wyłącznie persisted 301 bezpośrednio do recomputed current canonical; stale/malformed/self-loop redirect nie tworzy alternatywnego URL i failuje do 404,
+- redirect nie forwarduje query params; current canonical/OG/schema contracts N3-002/N3-003 pozostają bez zmian,
+- sitemap/internal-link cleanup nadal należy do downstream discovery/linking i nie jest oznaczony jako wykonany przez N3-006; post-merge CI #280 był pełnym PASS.
+
+### 2026-09-17 — v0.10''')
+
+          runbook = 'docs/NEWSROOM-TEST-RELEASE-AND-ROLLBACK-RUNBOOK.md'
+          replace_once(runbook,
+              'N3-004 uruchomiło current-canonical public detail 200/404/410, ale historyczny old path -> 301 nadal pozostaje NEWSROOM-N3-006. Poniższe HTTP-level old path -> 301 i sitemap-only-current-canonical nie są jeszcze stanem wykonanym.',
+              'N3-004 uruchomiło current-canonical public detail 200/404/410, a NEWSROOM-N3-006 dodało `tests/Feature/NewsroomArticleRedirectTest.php` i publiczny old path -> exactly one 301 do current canonical dla newsroom/guides. Invalid/non-301/stale redirect state failuje do 404, a query params nie są forwardowane. Poniższe HTTP-level old path -> 301 jest stanem wykonanym; sitemap-only-current-canonical pozostaje downstream N5 i nie jest jeszcze uznane za wykonane.')
+          replace_once(runbook,
+              '### 14.0. Aktualny stan po N3-004',
+              '### 14.0. Aktualny stan po N3-006')
+          replace_once(runbook,
+              'N3-004 nie wdraża historycznych 301; old-slug redirect HTTP pozostaje N3-006.',
+              'N3-006 wdraża historyczne old-slug 301 przez istniejący `ContentArticlePathResolver`; redirect jest konsultowany po current-canonical `not_found`, wymaga persisted 301 bezpośrednio do bieżącego canonical i failuje zamknięcie do 404 przy stale/malformed state.')
+          replace_once(runbook,
+              'Old slug:\n\n- 301 canonical — **pozostaje N3-006**.',
+              'Old slug:\n\n- 301 canonical — **wdrożone w N3-006**.')
+          replace_once(runbook,
+              '- current-canonical public detail ma automatyczne 200/404/410 coverage; 410/404 nie renderują treści i są noindex, a old-slug 301 pozostaje N3-006,',
+              '- current-canonical public detail ma automatyczne 200/404/410 coverage; 410/404 nie renderują treści i są noindex, a `NewsroomArticleRedirectTest` pokrywa old-slug one-hop 301/fail-closed behavior N3-006,')
+          replace_once(runbook,
+              '- hub/category/topic/feed browser surfaces, old-slug redirects N3-006, author profile integration N3-007, rollout config gate N3-008 i reverse links N4-008 pozostają otwarte,',
+              '- hub/category/topic/feed browser surfaces, author profile integration N3-007, rollout config gate N3-008 i reverse links N4-008 pozostają otwarte; old-slug redirects N3-006 są zamknięte,')
+          replace_once(runbook,
+              '- [ ] dodać dalsze test files w trakcie N3-006..N5,',
+              '- [ ] dodać dalsze test files w trakcie N3-007..N5,')
+          replace_once(runbook,
+              '- [ ] dodać old-slug 301 HTTP integration/E2E w N3-006 — **następny wykonywalny task**; current route-family/canonical detail i service-level slug history są już pokryte,',
+              '- [x] dodać old-slug 301 HTTP integration w N3-006; `NewsroomArticleRedirectTest` pokrywa newsroom/guides one-hop redirect, current canonical 200 oraz invalid redirect fail-closed 404,')
+          replace_once(runbook,
+              '## 60. Historia zmian\n\n### 2026-09-17 — v0.17',
+              '''## 60. Historia zmian
+
+### 2026-09-17 — v0.18
+
+- NEWSROOM-N3-006 zmergowano przez PR #75; finalny implementation head `f48e7a12fa6c53422cd2ef8c369af81769163b9d`, post-merge `main@33d9946219595a4be75d789b19cc8d10efc2ecc0`,
+- dodano `tests/Feature/NewsroomArticleRedirectTest.php`: newsroom i guide historical paths zwracają one-hop 301 do bieżącego canonical; current canonical pozostaje 200, a invalid/non-301/stale redirect state failuje do 404 z istniejącą noindex unavailable policy,
+- query params nie są przenoszone do redirect target; domenowe one-hop history/locking pozostają pokryte istniejącymi N1-003 tests,
+- exact-head CI #279 i Browser Smoke #21 były PASS; post-merge CI #280 zakończył się pełnym PASS (`quality` 1051 passed / 19 512 assertions / 2 skipped, Pint 1052 files PASS, frontend build PASS; `newsroom-postgres` PASS),
+- N3-007 author profile integration jest następnym taskiem; sitemap-only-current-canonical pozostaje N5.
+
+### 2026-09-17 — v0.17''')
+          PY
+
+      - name: Validate exact documentation-only diff
+        shell: bash
+        run: |
+          rm .github/workflows/newsroom-n3-006-docs-sync.yml
+          git diff --check
+          python <<'PY'
+          import subprocess
+          expected = {
+              '.github/workflows/newsroom-n3-006-docs-sync.yml',
+              'docs/NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md',
+              'docs/NEWSROOM-IMPLEMENTATION-BACKLOG.md',
+              'docs/NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md',
+              'docs/NEWSROOM-PUBLIC-UI-UX-SPEC.md',
+              'docs/NEWSROOM-SEO-DISTRIBUTION-AND-OBSERVABILITY.md',
+              'docs/NEWSROOM-TEST-RELEASE-AND-ROLLBACK-RUNBOOK.md',
+          }
+          actual = set(subprocess.check_output(['git', 'diff', '--name-only'], text=True).splitlines())
+          if actual != expected:
+              raise SystemExit(f'unexpected changed files: expected={sorted(expected)} actual={sorted(actual)}')
+          PY
+
+      - name: Commit documentation sync and remove one-off workflow
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md \
+                  docs/NEWSROOM-IMPLEMENTATION-BACKLOG.md \
+                  docs/NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md \
+                  docs/NEWSROOM-PUBLIC-UI-UX-SPEC.md \
+                  docs/NEWSROOM-SEO-DISTRIBUTION-AND-OBSERVABILITY.md \
+                  docs/NEWSROOM-TEST-RELEASE-AND-ROLLBACK-RUNBOOK.md \
+                  .github/workflows/newsroom-n3-006-docs-sync.yml
+          git commit -m "docs(newsroom): sync N3-006 redirect resolver"
+          git push origin HEAD:docs/newsroom-n3-006-sync
