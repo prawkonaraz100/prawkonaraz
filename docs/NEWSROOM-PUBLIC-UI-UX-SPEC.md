@@ -1286,7 +1286,7 @@ Frontend newsroom v1 jest UI-complete, gdy:
 
 ## 67. Stan implementacji
 
-Na 2026-09-17 po NEWSROOM-N3-007, zweryfikowanym na `main@c68672f6aa7c41defaeec56debb541d5a60d9f4f`:
+Na 2026-09-18 po NEWSROOM-N3-008, zweryfikowanym na `main@23b952b77e39cd25fb39edc252faf05849946bd7`:
 
 - `/aktualnosci` i `/poradniki` nadal renderują pre-launch `MarketingPlaceholder.vue` przez dedykowany `NewsroomPlaceholderController`; oba huby zwracają 200 i `X-Robots-Tag: noindex, follow`,
 - category/topic/feed routes pozostają downstream i nie zostały uruchomione przez N3-005,
@@ -1303,7 +1303,7 @@ Na 2026-09-17 po NEWSROOM-N3-007, zweryfikowanym na `main@c68672f6aa7c41defaeec5
 - tylko `is_publicly_cited=true` sources mogą wejść do presentation; private source evidence/note oraz `image_license_note` nie są publicznym payloadem,
 - hero i image blocks zachowują dimensions/alt/caption/credit oraz focal-point-aware `object-position`; N3-005 nie deklaruje nieistniejących fizycznych crop variants,
 - related article block nadal rozwiązuje tylko publicznie widoczny target z aktywną kategorią i opublikowanym autorem; nie renderuje draft targetu,
-- publiczny artykuł nie wymaga JavaScript do odczytania; finalny Browser Smoke #20 na N3-005 przeszedł pełną macierz 360x800, 390x844, 430x932, 768x1024, 1024x768 i 1440x900,
+- publiczny artykuł nie wymaga JavaScript do odczytania; Browser Smoke #23 na finalnym N3-008 implementation head `c8484aa1529eb41805a76ceb7be1f55db63aec14` przeszedł dedykowany `newsroom-article` QA, zachowując public renderer po wprowadzeniu gate,
 - N3-005 nie implementuje reverse links; semantic silo/reverse-link integration pozostaje NEWSROOM-N4-008,
 - historyczne old-slug -> current canonical 301 są wdrożone przez NEWSROOM-N3-006 bez dodatkowego UI surface; `NEWSROOM_PUBLIC_ENABLED` jest wdrożone przez NEWSROOM-N3-008; przy `false` publiczne article/guide detail i historyczne redirecty failują do 404 przed lookupem, podczas gdy top-level placeholdery pozostają 200 + noindex,
 - NEWSROOM-N3-007 rozszerza istniejący `/autorzy/{slug}`: `published` trafia do aktualnych publikacji, `needs_review+indexable` do osobnej sekcji „W trakcie weryfikacji”, `archived+indexable` do osobnego „Archiwum”, a noindex/scheduled/withdrawn/inactive-category nie są listowane,
