@@ -6,11 +6,11 @@
 - Obszar: newsroom / media portal
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Bazowy stan repo przy projektowaniu: main@6a38c95ce76ee05997977d614d795ed8513462f1
-- Ostatnia weryfikacja zgodności z kodem: main@33d9946219595a4be75d789b19cc8d10efc2ecc0 (2026-09-17)
+- Ostatnia weryfikacja zgodności z kodem: main@c68672f6aa7c41defaeec56debb541d5a60d9f4f (2026-09-17)
 - Data: 2026-09-17
 - Zakres: model domenowy, baza danych, invariants, serwisy aplikacyjne, routing domeny i kolejność migracji
 
-Ten dokument opisuje docelowy model danych newsroomu. Schema, modele/factories/scopes oraz serwisy aplikacyjne N1 są już zmaterializowane; zakres admin/domain N2 jest zmaterializowany, a publiczny article stack N3-001..N3-006 obejmuje current-canonical detail, SEO/schema, renderer/Product Bridge i historyczny one-hop 301. N3-007/N3-008, N4 i discovery N5 pozostają dalszym etapem. Stan wdrożenia należy czytać z sekcji 43 i aktualizować po każdej zmianie kodu.
+Ten dokument opisuje docelowy model danych newsroomu. Schema, modele/factories/scopes oraz serwisy aplikacyjne N1 są już zmaterializowane; zakres admin/domain N2 jest zmaterializowany, a publiczny article stack N3-001..N3-007 obejmuje current-canonical detail, SEO/schema, renderer/Product Bridge, historyczny one-hop 301 oraz integrację istniejącego profilu autora z Newsroom corpus. N3-008, N4 i discovery N5 pozostają dalszym etapem. Stan wdrożenia należy czytać z sekcji 43 i aktualizować po każdej zmianie kodu.
 
 ---
 
@@ -1215,6 +1215,13 @@ Dla treści prawnie wrażliwych policy może wymagać `reviewer_id + reviewed_at
 
 ---
 
+**Aktualny stan implementacji po NEWSROOM-N3-007:**
+
+- nie powstał `NewsroomAuthor`; istniejący `ContentAuthor` i `/autorzy/{slug}` pozostają jedyną publiczną author identity,
+- `ContentAuthor` blokuje public -> non-public transition, gdy istnieje zależny `authoredContentArticles()->indexable()`, a noindex usuwa tę blokadę,
+- wspólny `ContentAuthorSchemaService` zapewnia stabilne `/autorzy/{slug}#person` i `worksFor -> /#organization` zarówno profilowi, jak i istniejącym schema consumers,
+- author sitemap uwzględnia indeksowalne Newsroom articles w aktywnych kategoriach i używa ich `public_state_changed_at` jako public-state freshness; techniczne `updated_at` artykułu nie zastępuje tej semantyki.
+
 ## 25. Walidacja i sanitization body_blocks
 
 NEWSROOM-N0-004 jest zamknięte przez wykonywalny `App\Support\NewsroomBodyContract`.
@@ -1718,6 +1725,8 @@ Model danych jest gotowy, gdy:
 
 ## 43. Stan implementacji
 
+
+- NEWSROOM-N3-007 jest wdrożone na `main@c68672f6aa7c41defaeec56debb541d5a60d9f4f`: istniejący author profile agreguje indexable Newsroom corpus z osobnymi lifecycle sections, współdzieli stabilny Person schema builder, author sitemap używa newsroomowego `public_state_changed_at`, a model blokuje odpublikowanie autora z zależnym indexable article,
 Na 2026-09-17:
 
 - ContentAuthor istnieje,
@@ -1779,6 +1788,14 @@ Na 2026-09-17:
 ---
 
 ## 45. Historia zmian
+
+
+### 2026-09-17 — v0.31
+
+- NEWSROOM-N3-007 zmergowano przez PR #77 na `main@c68672f6aa7c41defaeec56debb541d5a60d9f4f` bez nowego author modelu i bez zmiany schema/migracji,
+- `ContentAuthor` otrzymał modelowy unpublish invariant względem zależnych `indexable()` Newsroom articles,
+- współdzielony `ContentAuthorSchemaService` utrwala tę samą Person identity dla ProfilePage/Article, a author sitemap używa Newsroom `public_state_changed_at`,
+- `ContentAuthorProfileTest` oraz exact-head CI #295 i post-merge CI #296 potwierdzają lifecycle, schema identity, sitemap freshness i guard.
 
 ### 2026-09-17 — v0.30
 

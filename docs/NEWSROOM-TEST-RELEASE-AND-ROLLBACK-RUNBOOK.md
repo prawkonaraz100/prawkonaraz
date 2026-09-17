@@ -1454,33 +1454,35 @@ Runbook jest spełniony, gdy:
 
 ## 58. Stan implementacji
 
-Na 2026-09-17 po NEWSROOM-N3-006:
+Na 2026-09-17 po NEWSROOM-N3-007, zweryfikowanym na `main@c68672f6aa7c41defaeec56debb541d5a60d9f4f`:
 
 - istnieją globalne backend tests, ops backup/restore/health commands i kanoniczny CI z `quality` na SQLite oraz addytywnym `newsroom-postgres` na PostgreSQL 16,
 - istnieją newsroom-specific unit/security i feature regression dla body contract/editor, media storage/article media, enum/schema/model, slug/history, publishing workflow, home composition/placements, article preview, topic/CMS oraz N3-001 catalog, N3-002 SEO, N3-003 schema service i N3-005 Product Bridge,
 - N3-004 dostarcza `NewsroomArticleBodyRenderer`, `NewsroomArticlePresentationService`, publiczny `ContentArticleController`, Blade `newsroom.article`/`article-unavailable` i feature tests publicznego article response,
 - N3-005 dodaje `NewsroomArticleProductBridgeService`, `newsroom.product-bridge-block` i `NewsroomProductBridgeTest`; publiczny article renderer obsługuje teraz questions/legal/signs/contextual CTA bez losowych relacji i bez draft targetów,
 - current-canonical public detail ma automatyczne 200/404/410 coverage; 410/404 nie renderują treści i są noindex, a `NewsroomArticleRedirectTest` pokrywa old-slug one-hop 301/fail-closed behavior N3-006,
+- `ContentAuthorProfileTest` pokrywa N3-007 lifecycle profilu autora, wspólną Person/Organization identity, author-sitemap freshness z `public_state_changed_at` oraz blokadę odpublikowania autora z zależnym indexable article i odblokowanie po noindex,
 - Product Bridge wymaga body target + article-owned pivot + istniejący public eligibility; question group ma limit 5, legal wymaga verified act/unit + published legal page/topic, a signs wymagają published sign/author/category i pivot `direct` albo `example`; luźny `related` jest fail-closed,
 - publiczny response emituje SEO metadata i JSON-LD z istniejących N3-002/N3-003 services, route-family breadcrumbs, hero/provenance/regulatory context, public sources, correction, author box, public-safe related article oraz Product Bridge,
 - dedicated `.github/workflows/browser-smoke.yml` job `newsroom-article` istnieje; Browser Smoke #20 na finalnym head `7d795b895865cda49ba94a4fec50533d7b0f7a97` zakończył się PASS na 360x800, 390x844, 430x932, 768x1024, 1024x768 i 1440x900,
 - harness działa z JS disabled, sprawdza realny built CSS, H1/breadcrumb/body/source/canonical/JSON-LD/Product Bridge/CTA oraz horizontal overflow i zapisuje artifact,
 - artifact `newsroom-article-browser-qa`: ID `10508254861`, 1 124 509 bytes, SHA256 `753b717cb5f0319e2e7799552b181fd972b41cd3b3a66bba7dd9a82d7ce96a2a`,
 - finalny exact-head CI #275 dla PR #73 zakończył się PASS; post-merge `main@fcc8074f89db141d522c5000742afc2e07a68565` przeszedł CI #276 z `quality` 1049 passed / 19 498 assertions / 2 skipped, Pint 1051 files PASS, frontend build PASS i `newsroom-postgres` PASS,
-- hub/category/topic/feed browser surfaces, author profile integration N3-007, rollout config gate N3-008 i reverse links N4-008 pozostają otwarte; old-slug redirects N3-006 są zamknięte,
+- hub/category/topic/feed browser surfaces, rollout config gate N3-008 i reverse links N4-008 pozostają otwarte; author profile integration N3-007 i old-slug redirects N3-006 są zamknięte,
 - atomic static publication, dirty/version newsroom refresh coordinator, newsroom/news sitemap output i `SeoSitemapAuditor` extension pozostają N5.
 
 ---
 
 ## 59. Pozostałe zadania
 
-- [ ] dodać dalsze test files w trakcie N3-007..N5,
+- [ ] dodać dalsze test files w trakcie N3-008..N5,
 - [x] dodać dedykowany browser E2E dla publicznego article detail N3-004,
 - [x] dodać N2 media/topic/focal-point integration i N3-004 renderer/browser regression; pełne crop-variant generation nadal nie istnieje,
 - [x] dodać service-level site-identity/entity-graph/date-consistency regression oraz publiczne HTML/JSON-LD emission dla article detail,
 - [x] dodać N3-005 Product Bridge tests dla questions/legal/signs/contextual CTA,
 - [ ] dodać semantic silo/orphan/reverse-link/click-depth tests,
 - [x] dodać old-slug 301 HTTP integration w N3-006; `NewsroomArticleRedirectTest` pokrywa newsroom/guides one-hop redirect, current canonical 200 oraz invalid redirect fail-closed 404,
+- [x] dodać N3-007 `ContentAuthorProfileTest` dla author-profile lifecycle, shared schema identity, public-state sitemap freshness i unpublish guard,
 - [x] dodać N2 stale-write/Apply-public-update oraz HomeComposer stale-write regression; ContentArticle i placement same-second conflicts są blokowane,
 - [ ] dodać news namespace + sitemap sharding + atomic publish + dirty-marker refresh/feed-discovery tests,
 - [ ] dodać production-like static robots/sitemap delivery smoke,
@@ -1492,6 +1494,13 @@ Na 2026-09-17 po NEWSROOM-N3-006:
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-17 — v0.19
+
+- NEWSROOM-N3-007 implementation PR #77 zakończył exact-head CI #295 PASS na `bf7981d23ff99a6335b55ecaeb6ce36b6622a042`; post-merge CI #296 zakończył PASS na `main@c68672f6aa7c41defaeec56debb541d5a60d9f4f`,
+- `ContentAuthorProfileTest` potwierdza lifecycle author profile, public-state sitemap freshness, blokadę unpublish z indexable article oraz odblokowanie po noindex,
+- post-merge `quality`: 1055 passed / 19 540 assertions / 2 skipped; Pint 1055 files PASS; frontend build PASS; `newsroom-postgres` PASS,
+- N3-007 nie miało osobnego Browser Smoke i dokument nie dopisuje takiego dowodu; następny zakres zaczyna się od N3-008.
 
 ### 2026-09-17 — v0.18
 
