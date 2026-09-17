@@ -51,31 +51,12 @@ try {
     await runCommand('php', ['artisan', 'migrate', '--force']);
     console.log('[newsroom-e2e] seed');
     await seedArticle();
-    console.log('[newsroom-e2e] start server');
-    serverProcess = startServer();
-    await waitForHealth(`${baseUrl}/api/v1/health`);
-
-    browser = await chromium.launch({ headless: true });
-
-    const healthContext = await browser.newContext({
-        viewport: { width: 360, height: 800 },
-        serviceWorkers: 'block',
-    });
-    const healthPage = await healthContext.newPage();
-    healthPage.setDefaultNavigationTimeout(15_000);
-    console.log('[newsroom-e2e] browser health probe');
-    const healthResponse = await healthPage.goto(`${baseUrl}/api/v1/health`, {
-        waitUntil: 'domcontentloaded',
-        timeout: 15_000,
-    });
-    report.browser_health_status = healthResponse?.status() ?? null;
-    if (!healthResponse || !healthResponse.ok()) {
-        throw new Error(`Browser health probe returned ${healthResponse?.status() ?? 'no response'}.`);
-    }
-    await healthContext.close();
-
     for (const viewport of viewports) {
         console.log(`[newsroom-e2e] viewport ${viewport.name}`);
+        serverProcess = startServer();
+        await waitForHealth(`${baseUrl}/api/v1/health`);
+        browser = await chromium.launch({ headless: true });
+
         const context = await browser.newContext({
             viewport: { width: viewport.width, height: viewport.height },
             serviceWorkers: 'block',
@@ -143,6 +124,11 @@ try {
         });
 
         await context.close();
+        await browser.close();
+        browser = undefined;
+        await terminateServer(serverProcess);
+        serverProcess = undefined;
+        await delay(250);
     }
 
     report.status = 'ok';
