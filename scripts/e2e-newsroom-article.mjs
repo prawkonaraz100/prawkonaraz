@@ -26,6 +26,7 @@ const report = {
     started_at: new Date().toISOString(),
     article_path: articlePath,
     status: 'running',
+    browser_health_status: null,
     viewports: [],
     server_log: [],
 };
@@ -42,12 +43,23 @@ try {
     console.log('[newsroom-e2e] start server');
     serverProcess = startServer();
     await waitForHealth(`${baseUrl}/api/v1/health`);
-    await probeArticle();
 
-    browser = await chromium.launch({
-        headless: true,
-        args: ['--no-proxy-server'],
+    browser = await chromium.launch({ headless: true });
+
+    const healthPage = await browser.newPage({
+        viewport: { width: 360, height: 800 },
     });
+    healthPage.setDefaultNavigationTimeout(15_000);
+    console.log('[newsroom-e2e] browser health probe');
+    const healthResponse = await healthPage.goto(`${baseUrl}/api/v1/health`, {
+        waitUntil: 'domcontentloaded',
+        timeout: 15_000,
+    });
+    report.browser_health_status = healthResponse?.status() ?? null;
+    if (!healthResponse || !healthResponse.ok()) {
+        throw new Error(`Browser health probe returned ${healthResponse?.status() ?? 'no response'}.`);
+    }
+    await healthPage.close();
 
     for (const viewport of viewports) {
         console.log(`[newsroom-e2e] viewport ${viewport.name}`);
@@ -162,22 +174,16 @@ $article = \App\Models\ContentArticle::factory()->published()->create([
 }
 
 function startServer() {
-    const child = spawn(
-        'php',
-        ['artisan', 'serve', '--host=127.0.0.1', `--port=${port}`, '--no-reload'],
-        {
-            cwd,
-            env: {
-                ...process.env,
-                CACHE_STORE: 'array',
-                SESSION_DRIVER: 'file',
-                PHP_CLI_SERVER_WORKERS: '4',
-                NO_PROXY: '127.0.0.1,localhost',
-                no_proxy: '127.0.0.1,localhost',
-            },
-            stdio: ['ignore', 'pipe', 'pipe'],
+    const child = spawn('php', ['artisan', 'serve', '--host=127.0.0.1', `--port=${port}`], {
+        cwd,
+        env: {
+            ...process.env,
+            CACHE_STORE: 'array',
+            SESSION_DRIVER: 'file',
         },
-    );
+        stdio: ['ignore', 'pipe', 'pipe'],
+        windowsHide: true,
+    });
 
     child.stdout?.on('data', appendServerLog);
     child.stderr?.on('data', appendServerLog);
@@ -198,21 +204,6 @@ async function waitForHealth(url) {
         await delay(250);
     }
     throw new Error(`Server health check timed out: ${url}`);
-}
-
-async function probeArticle() {
-    console.log('[newsroom-e2e] probe article');
-    const response = await fetch(`${baseUrl}${articlePath}`, {
-        headers: { Accept: 'text/html' },
-        signal: AbortSignal.timeout(15_000),
-    });
-
-    if (response.status !== 200) {
-        const body = await response.text();
-        throw new Error(`Article probe returned ${response.status}: ${body.slice(0, 500)}`);
-    }
-
-    await response.arrayBuffer();
 }
 
 function appendServerLog(chunk) {
