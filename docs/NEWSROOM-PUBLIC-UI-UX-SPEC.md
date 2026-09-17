@@ -1298,7 +1298,8 @@ Na 2026-09-17:
 - backendowy `NewsroomHomeCompositionService` istnieje i materializuje lead/secondary/latest/category/guides/important-now/breaking composition contract,
 - backendowy `ContentArticlePublicCatalogService` istnieje po NEWSROOM-N3-001 i materializuje route-family current-canonical detail lookup, explicit visible/gone/not-found resolution oraz osobny `activelyDistributed()` list query z public-safe eager loading,
 - backendowy `ContentArticleSeoService` istnieje po NEWSROOM-N3-002 i przygotowuje layout-compatible title/description/self-canonical/robots/OG-image/article-time metadata; nie jest jeszcze podłączony do publicznego article renderera,
-- ten catalog/SEO boundary nie jest jeszcze podłączony do publicznych detail controllerów/Blade; `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}` nadal pozostają 404 w pre-launch stanie,
+- backendowy `ContentArticleSchemaService` istnieje po NEWSROOM-N3-003 i materializuje stabilny public-safe entity graph nad tym samym canonical/date contract; nie jest jeszcze osadzony w publicznym article HTML,
+- catalog/SEO/schema boundary nie jest jeszcze podłączony do publicznych detail controllerów/Blade; `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}` nadal pozostają 404 w pre-launch stanie,
 - `NewsroomHomeCompositionService` nadal nie jest podłączony do publicznego `/aktualnosci`; hub pozostaje placeholderem i właściwe newsroom-specific list/article/category/topic components nie istnieją.
 
 ---
@@ -1323,6 +1324,12 @@ Na 2026-09-17:
 ---
 
 ## 69. Historia zmian
+
+### 2026-09-17 — v0.11
+
+- odnotowano wdrożony NEWSROOM-N3-003 backendowy `ContentArticleSchemaService` i jego service-level regression,
+- schema service nie jest utożsamiany z gotowym article UI: nie dodano publicznego controller/Blade, body renderer ani JSON-LD response surface,
+- detail routes `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}` nadal pozostają 404; następnym krokiem jest N3-004 article Blade page + block renderer.
 
 ### 2026-09-17 — v0.10
 
