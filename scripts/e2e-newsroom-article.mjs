@@ -55,6 +55,13 @@ try {
             serviceWorkers: 'block',
             javaScriptEnabled: false,
         });
+        await context.route('https://fonts.googleapis.com/**', async (route) => {
+            await route.fulfill({
+                status: 200,
+                contentType: 'text/css; charset=utf-8',
+                body: '/* Browser QA font stylesheet stub. */',
+            });
+        });
         const page = await context.newPage();
         page.setDefaultTimeout(10_000);
         page.setDefaultNavigationTimeout(15_000);
