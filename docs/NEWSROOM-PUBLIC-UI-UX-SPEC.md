@@ -1305,7 +1305,7 @@ Na 2026-09-17 po NEWSROOM-N3-007, zweryfikowanym na `main@c68672f6aa7c41defaeec5
 - related article block nadal rozwiązuje tylko publicznie widoczny target z aktywną kategorią i opublikowanym autorem; nie renderuje draft targetu,
 - publiczny artykuł nie wymaga JavaScript do odczytania; finalny Browser Smoke #20 na N3-005 przeszedł pełną macierz 360x800, 390x844, 430x932, 768x1024, 1024x768 i 1440x900,
 - N3-005 nie implementuje reverse links; semantic silo/reverse-link integration pozostaje NEWSROOM-N4-008,
-- historyczne old-slug -> current canonical 301 są wdrożone przez NEWSROOM-N3-006 bez dodatkowego UI surface; `NEWSROOM_PUBLIC_ENABLED` pozostaje NEWSROOM-N3-008,
+- historyczne old-slug -> current canonical 301 są wdrożone przez NEWSROOM-N3-006 bez dodatkowego UI surface; `NEWSROOM_PUBLIC_ENABLED` jest wdrożone przez NEWSROOM-N3-008; przy `false` publiczne article/guide detail i historyczne redirecty failują do 404 przed lookupem, podczas gdy top-level placeholdery pozostają 200 + noindex,
 - NEWSROOM-N3-007 rozszerza istniejący `/autorzy/{slug}`: `published` trafia do aktualnych publikacji, `needs_review+indexable` do osobnej sekcji „W trakcie weryfikacji”, `archived+indexable` do osobnego „Archiwum”, a noindex/scheduled/withdrawn/inactive-category nie są listowane,
 - `NewsroomHomeCompositionService` nadal nie jest podłączony do publicznego `/aktualnosci`; hub/category/topic/feed pozostają dalszym zakresem N4/N5.
 
@@ -1330,11 +1330,19 @@ Na 2026-09-17 po NEWSROOM-N3-007, zweryfikowanym na `main@c68672f6aa7c41defaeec5
 - [x] zbudować NEWSROOM-N3-005 Product Bridge dla questions/legal/signs/contextual CTA,
 - [x] zbudować NEWSROOM-N3-006 historical redirect resolver HTTP,
 - [x] zbudować NEWSROOM-N3-007 author-profile integration,
-- [ ] zbudować NEWSROOM-N3-008 public rollout config gate — **następny wykonywalny task**.
+- [x] zbudować NEWSROOM-N3-008 public rollout config gate; `NEWSROOM_PUBLIC_ENABLED=false` jest bezpiecznym defaultem, a N4-001 jest następnym wykonywalnym taskiem.
 
 ---
 
 ## 69. Historia zmian
+
+### 2026-09-18 — v0.16
+
+- NEWSROOM-N3-008 zmergowano przez PR #79 na `main@23b952b77e39cd25fb39edc252faf05849946bd7`,
+- `NEWSROOM_PUBLIC_ENABLED=false` pozostawia `/aktualnosci` i `/poradniki` jako istniejące pre-launch placeholdery 200 + noindex, ale blokuje detail/guide oraz historyczne redirecty przed ujawnieniem dark-deployed content,
+- profil autora przy gate=false nie pokazuje publikacji Newsroomu; admin/private preview pozostają dostępne,
+- exact-head CI #308, Browser Smoke #23 i post-merge CI #309 są PASS; publiczny hub/layout nadal należy do N4 i nie jest fałszywie oznaczony jako wdrożony.
+
 
 ### 2026-09-17 — v0.15
 
