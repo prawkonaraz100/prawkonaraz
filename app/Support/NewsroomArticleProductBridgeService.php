@@ -174,6 +174,7 @@ final class NewsroomArticleProductBridgeService
         }
 
         $linkedIds = $article->trafficSigns()
+            ->wherePivotIn('relation_type', ['direct', 'example'])
             ->whereIn('traffic_signs.id', $requestedIds)
             ->pluck('traffic_signs.id')
             ->map(fn (mixed $id): int => (int) $id)

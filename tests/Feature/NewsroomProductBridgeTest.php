@@ -166,7 +166,7 @@ class NewsroomProductBridgeTest extends TestCase
             ->assertDontSee('LEGAL INTERNAL NOTE')
             ->assertSee($linkedSign->publicTitle())
             ->assertSee(route('traffic-signs.show', $linkedSign->slug), false)
-            ->assertSee($linkedRelatedSign->publicTitle())
+            ->assertDontSee($linkedRelatedSign->publicTitle())
             ->assertDontSee($linkedHiddenSign->publicTitle())
             ->assertDontSee($unlinkedSign->publicTitle())
             ->assertSee('Sprawdź się w teście')
