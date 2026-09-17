@@ -103,7 +103,7 @@ Na pierwszym etapie nie budujemy:
 
 ## 5. Aktualny stan implementacji
 
-Stan sprawdzony 2026-09-17 względem `main@7398c5d930d38d6cc9d9953e53b4298df41cfce8` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-012 oraz NEWSROOM-N3-001..N3-004. Zakres admin/domain N2 jest zamknięty. N3-001 dostarcza public catalog/read boundary, N3-002 metadata SEO, N3-003 schema graph, a N3-004 publiczny current-canonical article controller, Blade page, presentation service i kontrolowany block renderer. Następnym zadaniem wykonawczym jest NEWSROOM-N3-005 Product Bridge; historyczne 301 pozostają N3-006, author-profile integration N3-007, a rollout gate `NEWSROOM_PUBLIC_ENABLED` N3-008.
+Stan sprawdzony ponownie 2026-09-17 względem `main@7398c5d930d38d6cc9d9953e53b4298df41cfce8` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-012 oraz NEWSROOM-N3-001..N3-004. Zakres admin/domain N2 jest zamknięty. Public read boundary N3-001, article SEO metadata N3-002, article schema graph N3-003 oraz publiczny article controller/Blade/body renderer N3-004 są wdrożone. Product Bridge N3-005, historyczne HTTP 301 N3-006, author-profile integration N3-007, rollout gate N3-008 oraz N4/N5 pozostają otwarte.
 
 ### 5.1. Elementy już istniejące
 
@@ -113,57 +113,93 @@ Repo ma już istotny fundament:
 - Inertia + Vue 3 + TypeScript,
 - Filament jako backoffice,
 - PostgreSQL,
-- publiczny layout Blade z canonical, robots, OpenGraph, Twitter Cards, author metadata, published/modified time i JSON-LD,
-- modele i publiczne profile `ContentAuthor` oraz route `/autorzy/{authorSlug}`,
+- publiczny layout Blade z:
+  - canonical,
+  - robots,
+  - OpenGraph,
+  - Twitter Cards,
+  - author metadata,
+  - published/modified time,
+  - JSON-LD,
+- modele i publiczne profile `ContentAuthor`,
+- route `/autorzy/{authorSlug}`,
 - statyczny produkcyjny pipeline sitemap `SeoSitemapGenerator` + `SeoSitemapBuilder` + `SeoSitemapAuditor`, z codziennym `seo:refresh-sitemaps` jako istniejącym safety netem,
 - dynamiczny `SitemapController`, który współistnieje z generowanymi artefaktami i nie jest samodzielnym source of truth produkcyjnego XML,
 - statyczny `public/robots.txt` oraz istniejący `RobotsController`; produkcyjny kontrakt robots pozostaje zgodny z `SEO-SITEMAP-REPAIR-PLAN.md`,
-- `config/content.php['organization']`, `SchemaIds`, `SchemaRenderer` i współdzielony `SiteIdentitySchema`,
-- publiczne klastry pytań, znaków i treści prawnych oraz ich istniejące modele/relacje,
-- wykonywalny `NewsroomRouteContract` z utrwalonym route-family contract,
+- breadcrumbs,
+- `config/content.php['organization']` jako istniejące dane organizacji,
+- `SchemaIds` ze stabilnymi `/#organization` i `/#website`,
+- `SchemaRenderer` i istniejący graph pattern,
+- schema services dla treści prawnych i znaków,
+- publiczny klaster znaków drogowych,
+- publiczna baza pytań,
+- relacje z podstawami prawnymi,
+- publiczna nawigacja z pozycją „Aktualności”,
+- route `/aktualnosci` i `/poradniki` z zachowanymi top-level route names,
+- wykonywalny `NewsroomRouteContract`,
+- zarejestrowane route namespaces feed/category/topic/article zgodne z finalnym kontraktem,
 - `ContentArticlePublicCatalogService`, `ContentArticleSeoService` i `ContentArticleSchemaService`,
-- `ContentArticleController` dla `/aktualnosci/{articleSlug}` oraz `/poradniki/{articleSlug}`,
-- Blade `newsroom.article` i `newsroom.article-unavailable`, `NewsroomArticlePresentationService` oraz `NewsroomArticleBodyRenderer`,
-- current-canonical public detail: visible 200, hidden/not-found 404, historycznie publiczny withdrawn 410 i historycznie opublikowany archived 200 zgodnie z policy,
-- publiczny article response z self-canonical/OG/dates/JSON-LD, route-family breadcrumbs, byline/provenance, hero/focal point, regulatory context, public sources, correction i author box,
-- publiczne body blocks `rich_text`, `image`, `quote`, `table`, `context` oraz public-safe `related_article`,
-- dedykowany Browser QA article detail przechodzący 360/390/430/768/1024/1440 bez horizontal overflow,
-- zakres admin/domain CMS N2, w tym `ContentCategoryResource`, `ContentArticleResource`, kontrolowany Builder/RichEditor, sources, relations/topics, workflow/public-update/checklist/preview/HomeComposer, provenance/media oraz `ContentTopicResource`.
+- `ContentArticleController` dla route families news/guides,
+- `NewsroomArticlePresentationService` i `NewsroomArticleBodyRenderer`,
+- Blade `newsroom.article` oraz neutralny `newsroom.article-unavailable`,
+- publiczne article detail 200/404/410 zgodne z catalog resolution i fail-closed handling,
+- initial HTML article detail z canonical/OG/article dates/JSON-LD, breadcrumbs, byline/provenance, hero, regulatory context, public sources, correction i author box,
+- dedykowany browser QA article detail z JS disabled na 360/390/430/768/1024/1440,
+- SEO/content roadmap,
+- Filamentowy workflow newsroomu.
 
-### 5.2. Elementy istniejące tylko jako placeholder / jeszcze nieuruchomione publicznie
+### 5.2. Elementy nadal pre-launch / odroczone
 
-`/aktualnosci` i `/poradniki` nadal renderują `Public/MarketingPlaceholder.vue` przez dedykowany `NewsroomPlaceholderController` z `X-Robots-Tag: noindex, follow`.
+`/aktualnosci` i `/poradniki` nadal renderują `Public/MarketingPlaceholder.vue` przez dedykowany `NewsroomPlaceholderController`, który ustawia `X-Robots-Tag: noindex, follow`.
 
-N3-004 uruchomiło article detail, ale nie uruchomiło pozostałych powierzchni:
+Następujące namespaces pozostają downstream i nie zostały uruchomione przez N3-004:
 
 - `/aktualnosci/feed.xml`,
 - `/aktualnosci/kategoria/{categorySlug}`,
-- `/aktualnosci/temat/{topicSlug}`,
-- publicznego huba/listingu `/aktualnosci`,
-- publicznego huba/listingu `/poradniki`.
+- `/aktualnosci/temat/{topicSlug}`.
 
-Historyczny `ContentArticlePathResolver` i redirect history foundation istnieją, ale publiczny old-path -> 301 pozostaje NEWSROOM-N3-006. `NEWSROOM_PUBLIC_ENABLED` nie został dodany przez N3-004 i pozostaje NEWSROOM-N3-008.
+Detail routes są już podłączone:
+
+- `/aktualnosci/{articleSlug}`,
+- `/poradniki/{articleSlug}`.
+
+To oznacza, że:
+
+- adresy, IA i matching/order contract istnieją,
+- model domenowy artykułów/kategorii/tagów/topiców i relacji oraz backendowy publishing/scheduling foundation istnieją,
+- publiczna lista/hub/category/topic/feed nadal nie istnieją, ale widok pojedynczego artykułu jest wdrożony,
+- `ContentArticlePublicCatalogService` jest konsumowany przez publiczny detail controller i rozróżnia `visible/gone/not_found`,
+- `ContentArticleSeoService` i `ContentArticleSchemaService` są podłączone do publicznego article response,
+- `NewsroomArticleBodyRenderer` renderuje publicznie `rich_text`, `image`, `quote`, `table`, `context` i public-safe `related_article`,
+- `legal_reference`, `question_group`, `traffic_sign_group` i `product_cta` pozostają celowo odroczone do NEWSROOM-N3-005 i nie wyciekają jako publiczne placeholdery,
+- `ContentArticlePathResolver` nadal przechowuje canonical/history path foundation; historyczny old-path -> 301 pozostaje NEWSROOM-N3-006,
+- `NEWSROOM_PUBLIC_ENABLED` nie został wdrożony przez N3-004 i pozostaje NEWSROOM-N3-008,
+- zakres admin/domain CMS N2 pozostaje zmaterializowany, w tym `ContentCategoryResource`, `ContentArticleResource`, Builder/sources/relations/workflow/public-update/checklist/preview/HomeComposer/provenance-media i `ContentTopicResource`.
 
 ### 5.3. Brakujące elementy
 
 Nie ma obecnie kompletnego end-to-end odpowiednika:
 
-- NEWSROOM-N3-005 Product Bridge dla jawnie powiązanych questions/legal/signs i contextual product CTA; publiczny N3-004 renderer celowo pomija `legal_reference`, `question_group`, `traffic_sign_group` i `product_cta`,
-- historycznego old-path -> canonical 301 HTTP z N3-006,
-- newsroomowego rozszerzenia author-profile integration N3-007,
-- public rollout config gate `NEWSROOM_PUBLIC_ENABLED` N3-008,
-- publicznego hub/category/topic/feed renderera i navigation/cache integration z N4/N5,
-- news/article sitemap extension, RSS/Atom, atomic child-before-index publication i dirty/version refresh coordinator z N5,
-- rankingów najnowsze / najczęściej czytane opartych o właściwe dane,
+- publicznego topic lifecycle pod `/aktualnosci/temat/{topicSlug}`; publiczne 200/410, nav i sitemap consequences pozostają N4/N5,
+- publicznego hub/list/category/topic/feed renderera,
+- publicznego Product Bridge dla `legal_reference`, `question_group`, `traffic_sign_group` i `product_cta`,
+- historycznego old-path HTTP 301,
+- newsroomowej integracji publikacji z profilem autora,
+- rollout gate `NEWSROOM_PUBLIC_ENABLED`,
+- news sitemap,
+- feedu RSS/Atom,
+- rankingów najnowsze / najczęściej czytane,
 - pomiaru ekspozycji i CTR modułów redakcyjnych.
 
 ### 5.4. Znana niespójność brandingu
 
+Przed wdrożeniem schema `NewsArticle` należało uporządkować branding publishera.
+
 Historycznie `HomePageController.php` zawierał pozostałości marki „Orły na Drodze”. NEWSROOM-N0-001 usunął ten hardcode: homepage korzysta teraz ze wspólnego kanonicznego site identity PrawkoNaRaz.
 
-Repo korzysta ze wspólnego fundamentu `config/content.php['organization']`, `SchemaIds`, `SchemaRenderer` i `SiteIdentitySchema`; N3-002/N3-003/N3-004 reużywają ten sam publisher/site graph zamiast tworzyć równoległy newsroom identity.
+Repo korzysta ze wspólnego fundamentu `config/content.php['organization']`, `SchemaIds`, `SchemaRenderer` i `SiteIdentitySchema`. Historyczna niespójność homepage została zamknięta przez NEWSROOM-N0-001, a N3-003/N3-004 reużywają tę samą identity w publicznym article graph.
 
-**Gate:** przed uruchomieniem newsroomu `Organization`, `WebSite`, publisher, site name, logo, OG site name i publiczny branding muszą korzystać z jednego istniejącego source of truth oraz stabilnych graph IDs.
+**Gate:** przed uruchomieniem newsroomu `Organization`, `WebSite`, publisher, site name, logo, OG site name i publiczny branding muszą nadal korzystać z jednego istniejącego source of truth oraz stabilnych graph IDs.
 
 ---
 
@@ -261,7 +297,7 @@ Newsroom v1 przewiduje uporządkowany dokument z kontrolowanymi typami bloków, 
 
 To nadal nie jest uniwersalny page builder: redaktor nie definiuje dowolnego HTML, CSS, layoutu ani nowych typów komponentów.
 
-NEWSROOM-N0-004 domknęło tę decyzję: `NewsroomBodyContract` v1 zapisuje kanonicznie uporządkowaną listę `{key?, type, data}`, niezależną od wewnętrznego associative state Filament Buildera. Przyszły N2 editor używa Buildera jako adaptera UI, a `rich_text` przechowuje structured TipTap JSON z RichEditor, bez równoległego `body_html`. Nieznany typ/wersja failuje zamknięcie. Nowy writer/block type nie może wyprzedzić kompatybilnego readera/renderera lub jawnej migracji danych.
+NEWSROOM-N0-004 domknęło tę decyzję: `NewsroomBodyContract` v1 zapisuje kanonicznie uporządkowaną listę `{key?, type, data}`, niezależną od wewnętrznego associative state Filament Buildera. N2 editor używa Buildera jako adaptera UI, a `rich_text` przechowuje structured TipTap JSON z RichEditor, bez równoległego `body_html`. N3-004 materializuje zgodny reader/public renderer dla wspieranych publicznie bloków. Nieznany typ/wersja failuje zamknięcie. Nowy writer/block type nie może wyprzedzić kompatybilnego readera/renderera lub jawnej migracji danych.
 
 ### DEC-NR-008 — topic jest innym bytem niż tag
 
@@ -333,7 +369,6 @@ Kontrakt obejmuje:
 - feed discovery w publicznym HTML.
 
 Limity zewnętrzne są ponownie weryfikowane przy implementacji, ale architektura nie może zakładać, że corpus zawsze zmieści się w jednym pliku.
-
 
 ### DEC-NR-014 — semantic silo = primary hierarchy + controlled cross-domain graph
 
@@ -486,7 +521,7 @@ Zmiana opublikowanego sluga:
 
 NEWSROOM-N0-003 jest wdrożone jako `NewsroomTaxonomyContract` v1. Kontrakt utrwala tę samą kolejność przez pozycje 10, 20, 30, 40, 50, 60 oraz dokładne pary slug/nazwa publiczna. Description i pola SEO pozostają jawnie niezatwierdzone (`null`).
 
-To jest foundation contract dla danych systemowych kategorii. Po N1-001 tabela `content_categories` jest już zmaterializowana w DB; nadal nie istnieją `ContentCategory` ani dedykowany seeder konsumujący `NewsroomTaxonomyContract`, więc sama taksonomia nie jest jeszcze automatycznie seedowana.
+To jest foundation contract dla danych systemowych kategorii. Po N1-001 tabela `content_categories` jest już zmaterializowana w DB; model `ContentCategory` i admin resource istnieją. Dedykowany seeder konsumujący `NewsroomTaxonomyContract` nie jest tu deklarowany jako część N3-004.
 
 ### 8.2. Tagi
 
@@ -804,6 +839,8 @@ Nie projektujemy pełnego page buildera: redaktor nie zmienia struktury layoutu,
 - informacje o autorze,
 - link do metodologii / zasad redakcyjnych.
 
+Aktualnie N3-004 materializuje publiczny detail wraz z breadcrumbs, H1/lead, byline/provenance, datami, hero, body, public sources, correction i author box. Powiązane pytania/legal/signs i contextual CTA pozostają N3-005, więc pełny Product Bridge nie jest jeszcze częścią stanu wdrożonego.
+
 ### 13.2. Kontrolowane bloki artykułu
 
 Body jest renderowane z kontrolowanej biblioteki bloków. Pozwala to zachować ten sam standard na desktopie, mobile, preview i przyszłych kanałach bez dopuszczania dowolnego HTML/CSS.
@@ -822,6 +859,8 @@ Bloki v1 obejmują co najmniej:
 - product CTA,
 - allowlisted embed.
 
+W N3-004 publiczny renderer ma aktywne `rich_text`, `image`, `quote`, `table`, `context` i public-safe `related_article`. `legal_reference`, `question_group`, `traffic_sign_group` i `product_cta` są świadomie deferred do N3-005. `embed` pozostaje feature-disabled zgodnie z N0-004.
+
 ### 13.3. W skrócie i kontekst branżowy
 
 Dla dłuższych materiałów można stosować blok „W skrócie”, ale:
@@ -830,7 +869,7 @@ Dla dłuższych materiałów można stosować blok „W skrócie”, ale:
 - nie może powtarzać całego leadu,
 - nie może być ukrytym tekstem SEO.
 
-Dla newsów regulacyjnych i egzaminacyjnych model powinien dodatkowo wspierać strukturalne informacje:
+Dla newsów regulacyjnych i egzaminacyjnych model wspiera strukturalne informacje:
 
 - co się zmienia,
 - status zmiany/prawa,
@@ -838,7 +877,7 @@ Dla newsów regulacyjnych i egzaminacyjnych model powinien dodatkowo wspierać s
 - kogo dotyczy,
 - wpływ na egzamin.
 
-Dane te mają być używane do czytelnego boxu publicznego oraz kontroli redakcyjnej, a nie do automatycznego wymyślania treści.
+N3-004 renderuje ten kontekst publicznie, jeśli dane istnieją; renderer nie wymyśla brakujących wartości.
 
 ### 13.4. Product bridge
 
@@ -850,6 +889,8 @@ Przykłady:
 - poradnik → właściwy etap procesu użytkownika.
 
 CTA powinno wynikać z kontekstu, nie być globalnym banerem „kup teraz”.
+
+**Aktualny stan:** Product Bridge nie jest jeszcze wdrożony publicznie; to następny task NEWSROOM-N3-005.
 
 ---
 
@@ -927,7 +968,7 @@ Typ schema wynika z typu treści:
 - `Person` dla autora,
 - spójny `Organization` jako publisher.
 
-Nie deklarujemy schema, którego treść nie wspiera.
+N3-003 materializuje graph, a N3-004 emituje go w publicznym article response. Nie deklarujemy schema, którego treść nie wspiera.
 
 ### 15.3. Sitemap
 
@@ -1022,7 +1063,7 @@ Każdy hero:
 - upload newsroomu ma własny adapter/service lub jawny Filament upload contract; obecny `AdminMediaUploadService` jest question-specific i nie jest genericznym uploaderem newsroomu,
 - nie deklaruje fizycznych crop variants, których system realnie nie wygenerował.
 
-### 17.1.1. Aktualny foundation po N0-006 / N2-010 / N3-004
+### 17.1.1. Aktualny foundation i article media state
 
 `NewsroomMediaStorage` jest wdrożonym storage/validation contractem:
 
@@ -1033,7 +1074,7 @@ Każdy hero:
 - stabilny publiczny URL rozwiązuje przez `MediaUrlResolver`,
 - nie generuje ani nie deklaruje crop/variant files.
 
-N2-010 dodało `NewsroomArticleMediaService`, zapis article hero/OG metadata, focal X/Y 0..1 i CMS crop previews bez deklarowania fizycznych wariantów. N3-004 używa zapisanych dimensions, alt/caption/credit oraz focal-point-aware `object-position` w publicznym article rendererze. Fizyczny crop/variant generator nadal nie istnieje i nie jest oznaczany jako wykonany.
+N2-010 dodało `NewsroomArticleMediaService`, hero/OG persistence oraz focal X/Y 0..1 z CSS crop previews 16:9/4:3/1:1. N3-004 wykorzystuje istniejące focal point w publicznym `object-position` dla hero/image blocks. Fizyczny crop/variant generator nadal nie istnieje i dokumentacja nie deklaruje takich plików jako wdrożonych.
 
 ### 17.2. Prawa do materiałów
 
@@ -1195,6 +1236,8 @@ Testy:
 - related content,
 - mobile layout.
 
+N3-004 ma już feature regression publicznego article response oraz dedykowany Browser QA na 360/390/430/768/1024/1440. Pełny release E2E dla całego newsroomu pozostaje N6.
+
 ### 22.3. E2E
 
 Golden path:
@@ -1278,6 +1321,8 @@ Szczegółowy tasking i granice PR-ów są kanonicznie utrzymywane w [NEWSROOM-I
 - sources/byline,
 - product bridge,
 - old-slug redirects.
+
+**Stan:** N3-001..N3-004 są zmaterializowane. Product Bridge N3-005, historyczne redirecty N3-006, author integration N3-007 i rollout gate N3-008 pozostają do wykonania.
 
 **Exit criteria:** pojedynczy opublikowany artykuł jest poprawnie renderowany, indeksowalny i połączony z istniejącym produktem.
 
@@ -1404,17 +1449,28 @@ Pozostałe szczegóły nie powinny blokować N1, jeśli nie wpływają na schema
 ---
 ## 26. Ukończone prace związane z tym obszarem
 
-Za ukończone uznajemy wyłącznie elementy rzeczywiście istniejące w kodzie:
+Za ukończone uznajemy wyłącznie elementy rzeczywiście istniejące w kodzie i zweryfikowane na `main`:
 
-- publiczny shell SEO, autorzy/profile autorów, breadcrumbs, trust/legal foundation oraz wspólny site identity graph,
-- statyczny sitemap generator + builder/auditor + daily refresh oraz istniejący robots contract,
-- NEWSROOM-N0 foundation, N1-001..N1-006 oraz N2-001..N2-012 zgodnie z wykonawczym backlogiem,
-- NEWSROOM-N3-001: `ContentArticlePublicCatalogService` z route-family current-canonical detail resolution i active-distribution list query,
-- NEWSROOM-N3-002: `ContentArticleSeoService` z self-canonical/robots/OG/date metadata,
-- NEWSROOM-N3-003: `ContentArticleSchemaService` ze stabilnym Organization/WebSite/WebPage/NewsArticle-or-Article/Person/Breadcrumb/Image graph,
-- NEWSROOM-N3-004: `ContentArticleController`, `NewsroomArticlePresentationService`, `NewsroomArticleBodyRenderer`, publiczne Blade article/unavailable surfaces, shared admin-preview renderer, public sources/provenance/regulatory context/hero/correction/author box oraz dedykowany Browser QA.
+- publiczny shell SEO,
+- autorzy i publiczne profile autorów,
+- część warstwy trust/legal,
+- breadcrumbs,
+- statyczny sitemap generator + builder/auditor + daily refresh,
+- statyczny public/robots.txt oraz istniejący RobotsController,
+- SchemaIds/SchemaRenderer i organization config,
+- NEWSROOM-N0-001: współdzielony `SiteIdentitySchema` dla Organization/WebSite,
+- NEWSROOM-N0-002: `NewsroomRouteContract`, finalne route namespaces, reserved slug policy i route-family transition guard,
+- NEWSROOM-N0-003: `NewsroomTaxonomyContract` v1,
+- NEWSROOM-N0-004: `NewsroomBodyContract` v1,
+- NEWSROOM-N0-006: `NewsroomMediaStorage`,
+- NEWSROOM-N1-001..N1-006: schema/models/slug/workflow/scheduler/home composition foundation,
+- NEWSROOM-N2-001..N2-012: kategorie, artykuły, body editor, sources/relations, workflow/public update, checklist, private preview, HomeComposer, provenance/regulatory/media art direction, topics oraz stale-write/audit hardening,
+- NEWSROOM-N3-001: public catalog/read boundary,
+- NEWSROOM-N3-002: article SEO metadata service,
+- NEWSROOM-N3-003: article schema graph service,
+- NEWSROOM-N3-004: publiczny `ContentArticleController`, `NewsroomArticlePresentationService`, `NewsroomArticleBodyRenderer`, Blade article/unavailable, public response SEO/JSON-LD oraz feature/browser regression.
 
-N3-004 zmergowano przez PR #71 na `main@7398c5d930d38d6cc9d9953e53b4298df41cfce8`. Finalny exact-head implementacji `5d164e10ca83e6003b52ec279a16234ec5bcea96` przeszedł CI #269 i Browser Smoke #18, a post-merge push-CI #270 na exact `main` zakończył się pełnym PASS. N3 product bridge/redirect/author-integration/rollout i publiczne huby N4 pozostają otwarte.
+N3-004 zmergowano przez PR #71. Finalny merge commit `main@7398c5d930d38d6cc9d9953e53b4298df41cfce8` przeszedł CI #270: `quality` 1048 passed / 19 473 assertions / 2 skipped, Pint 1049 files PASS, frontend build PASS; `newsroom-postgres` 7 passed / 94 assertions. Dedykowany Browser Smoke #18 na finalnym PR head przeszedł 360/390/430/768/1024/1440.
 
 ---
 
@@ -1422,19 +1478,21 @@ N3-004 zmergowano przez PR #71 na `main@7398c5d930d38d6cc9d9953e53b4298df41cfce8
 
 Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./NEWSROOM-IMPLEMENTATION-BACKLOG.md). Najbliższa kolejność:
 
-- [x] `NEWSROOM-N0-001..N0-006` — foundation wymagane przed downstream implementation,
-- [x] `NEWSROOM-N1-001..N1-006` — domain/database/publishing/scheduling/home-composition foundation,
-- [x] `NEWSROOM-N2-001..N2-012` — admin/domain CMS scope,
+- [x] `NEWSROOM-N0-001` — publisher branding source of truth,
+- [x] `NEWSROOM-N0-002` — test/utrwalenie przyjętego route contract,
+- [x] `NEWSROOM-N0-003` — deterministyczny taxonomy seed contract,
+- [x] `NEWSROOM-N0-004` — block editor + serialization + sanitization + format-evolution decision,
+- [x] `NEWSROOM-N0-005` — compatibility decision istniejącego SEO delivery jest udokumentowana; kodowy regression gate pozostaje w N5,
+- [x] `NEWSROOM-N0-006` — media upload/storage contract,
+- [x] `NEWSROOM-N1-001..N1-006` — domain/database/publishing/scheduling/home composition,
+- [x] `NEWSROOM-N2-001..N2-012` — CMS/workflow/admin hardening,
 - [x] `NEWSROOM-N3-001` — Public catalog service,
 - [x] `NEWSROOM-N3-002` — Article SEO service,
 - [x] `NEWSROOM-N3-003` — Article schema graph service,
-- [x] `NEWSROOM-N3-004` — Article Blade page + controlled public block renderer,
-- [ ] `NEWSROOM-N3-005` — **NEXT:** Product Bridge dla jawnie powiązanych questions/legal/signs + contextual CTA; bez random relations i bez draft targets,
-- [ ] `NEWSROOM-N3-006` — historical old-path redirect HTTP,
-- [ ] `NEWSROOM-N3-007` — author-profile/newsroom publication integration,
-- [ ] `NEWSROOM-N3-008` — `NEWSROOM_PUBLIC_ENABLED` rollout gate.
+- [x] `NEWSROOM-N3-004` — Article Blade page + block renderer,
+- [ ] `NEWSROOM-N3-005` — Product Bridge: questions/legal/signs/contextual CTA — **następny wykonywalny task**.
 
-Pozostałe elementy N4–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu pełną checklistę.
+N3-006 old-path 301, N3-007 author-profile integration i N3-008 rollout gate pozostają otwarte po N3-005. Pozostałe elementy N4–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu pełną checklistę.
 
 ---
 ## 28. Zasady utrzymania dokumentu
@@ -1462,13 +1520,12 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 
 ### 2026-09-17 — v0.33
 
-- NEWSROOM-N3-004 zmergowano przez PR #71 na `main@7398c5d930d38d6cc9d9953e53b4298df41cfce8`; finalny exact-head implementacji `5d164e10ca83e6003b52ec279a16234ec5bcea96` przeszedł CI #269 i Browser Smoke #18, a post-merge push-CI #270 na exact `main` zakończył się pełnym PASS,
-- publiczne detail routes `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}` są obsługiwane przez `ContentArticleController`; current-canonical visible renderuje 200, hidden/not-found 404, historycznie publiczny withdrawn neutralne 410, a historycznie opublikowany archived pozostaje 200 zgodnie z policy,
-- `NewsroomArticlePresentationService` i `NewsroomArticleBodyRenderer` materializują route-family breadcrumbs, hero/focal point, public sources, provenance/regulatory context, correction/author box oraz publiczne `rich_text`, `image`, `quote`, `table`, `context` i public-safe `related_article`,
-- N3-002 SEO metadata i N3-003 schema graph są emitowane w publicznym initial HTML; private source evidence i `image_license_note` nie są publicznym payloadem,
-- `legal_reference`, `question_group`, `traffic_sign_group` i `product_cta` pozostają świadomie deferred do N3-005; historyczne old-path 301 pozostają N3-006, author integration N3-007, a `NEWSROOM_PUBLIC_ENABLED` N3-008,
-- Browser Smoke #18 przeszedł 360/390/430/768/1024/1440; finalny CI #270 potwierdził `quality` 1048 passed / 19 473 assertions / 2 skipped, Pint 1049 files PASS, frontend build PASS (9.06 s) oraz `newsroom-postgres` 7 passed / 94 assertions,
-- następnym taskiem wykonawczym jest NEWSROOM-N3-005 Product Bridge.
+- NEWSROOM-N3-004 zmergowano przez PR #71; finalny PR implementation head `5d164e10ca83e6003b52ec279a16234ec5bcea96`, a merge commit na `main` to `7398c5d930d38d6cc9d9953e53b4298df41cfce8`,
+- publiczne detail routes `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}` konsumują `ContentArticlePublicCatalogService`, SEO N3-002 i schema N3-003; visible renderuje 200, historyczny withdrawn 410, hidden/not-found 404,
+- `NewsroomArticlePresentationService` i `NewsroomArticleBodyRenderer` materializują SSR Blade article surface z breadcrumbs/byline/provenance/hero/regulatory context/public sources/correction/author box oraz publicznymi `rich_text`, `image`, `quote`, `table`, `context` i bezpiecznym `related_article`,
+- `legal_reference`, `question_group`, `traffic_sign_group` i `product_cta` pozostają celowo deferred do N3-005; old-slug 301 pozostaje N3-006, author-profile integration N3-007, a `NEWSROOM_PUBLIC_ENABLED` N3-008,
+- Browser Smoke #18 przeszedł 360/390/430/768/1024/1440; finalny push-CI #270 na merge commit zakończył się pełnym PASS: quality 1048 passed / 19 473 assertions / 2 skipped, Pint 1049 files PASS, frontend build PASS; newsroom-postgres 7 passed / 94 assertions,
+- następnym taskiem wykonawczym jest NEWSROOM-N3-005 `Product Bridge`.
 
 ### 2026-09-17 — v0.32
 
@@ -1651,7 +1708,7 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 - dodano 6 modeli Eloquent newsroomu, factories i reverse relations do `ContentAuthor`, `Question`, `LegalUnit` i `TrafficSign`,
 - `ContentArticle` implementuje odrębne `publiclyVisible`, `activelyDistributed`, `indexable` oraz pozostałe N1-002 scopes/predicates bez wprowadzania jeszcze workflow services,
 - factories mają dokumentowane workflow states i reużywają `NewsroomBodyContract` dla body fixture,
-- PostgreSQL gate obejmuje teraz cały `tests/Postgres`; finalnie 4 testy / 81 asercji PASS, a ogólny gate: 895 passed / 18 532 assertions / 2 skipped, Pint 974 files, frontend build PASS,
+- PostgreSQL gate obejmuje teraz cały `tests/Postgres`; finalnie 4 testy / 81 asercji PASS, a ogólny gate: 895 passed / 18 532 assertions / 2 skipped, Pint 974 files PASS, frontend build PASS,
 - dedykowany category DB seeder oraz N1-003 slug/redirect service i dalsze N1 services pozostają otwarte,
 - następnym taskiem wykonawczym jest NEWSROOM-N1-003.
 
