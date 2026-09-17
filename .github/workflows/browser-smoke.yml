@@ -9,6 +9,7 @@ on:
       - 'app/Support/ContentArticlePublicCatalogService.php'
       - 'app/Support/NewsroomArticleBodyRenderer.php'
       - 'app/Support/NewsroomArticlePresentationService.php'
+      - 'app/Support/NewsroomArticleProductBridgeService.php'
       - 'resources/views/newsroom/**'
       - 'routes/web.php'
       - 'scripts/e2e-newsroom-article.mjs'
