@@ -103,7 +103,7 @@ Na pierwszym etapie nie budujemy:
 
 ## 5. Aktualny stan implementacji
 
-Stan sprawdzony ponownie 2026-09-17 względem `main@c68672f6aa7c41defaeec56debb541d5a60d9f4f` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-012 oraz NEWSROOM-N3-001..N3-007. Zakres admin/domain N2 jest zamknięty. Public read boundary N3-001, article SEO metadata N3-002, article schema graph N3-003, publiczny article controller/Blade/body renderer N3-004, Product Bridge N3-005, publiczny historical redirect resolver N3-006 oraz integracja profilu autora N3-007 są wdrożone. Rollout gate N3-008 oraz N4/N5 pozostają otwarte.
+Stan sprawdzony ponownie 2026-09-18 względem `main@23b952b77e39cd25fb39edc252faf05849946bd7` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-012 oraz NEWSROOM-N3-001..N3-008. Zakres admin/domain N2 jest zamknięty. Public read boundary N3-001, article SEO metadata N3-002, article schema graph N3-003, publiczny article controller/Blade/body renderer N3-004, Product Bridge N3-005, publiczny historical redirect resolver N3-006, integracja profilu autora N3-007 oraz public rollout config gate N3-008 są wdrożone. N4/N5 pozostają otwarte.
 
 ### 5.1. Elementy już istniejące
 
@@ -126,6 +126,9 @@ Repo ma już istotny fundament:
 - N3-007: `ContentAuthorSchemaService` jest współdzielonym builderem `ProfilePage -> Person`; ten sam stabilny `/autorzy/{slug}#person` jest używany przez profil i article graph, a `worksFor` wskazuje `/#organization`,
 - N3-007: author sitemap kwalifikuje również autorów z indeksowalnym Newsroom corpus i używa `public_state_changed_at` dla newsroomowej świeżości zamiast technicznego `updated_at`,
 - N3-007: model `ContentAuthor` blokuje odpublikowanie autora, dopóki zależny artykuł Newsroomu pozostaje indexable; noindex usuwa tę blokadę,
+- N3-008: `config/newsroom.php` + `NewsroomPublicGate` centralizują `NEWSROOM_PUBLIC_ENABLED` z bezpiecznym defaultem `false`; `.env.example` również utrwala `false`,
+- N3-008: przy gate=false publiczne article/guide detail oraz historyczne old-path redirecty failują do 404 przed lookupem/redirect resolverem; top-level `/aktualnosci` i `/poradniki` pozostają pre-launch placeholderami 200 + `X-Robots-Tag: noindex, follow`,
+- N3-008: gate=false usuwa Newsroom z author profile oraz newsroom-only author sitemap eligibility/freshness i filtruje namespace `/aktualnosci` + `/poradniki` z istniejącego `IndexNowUrlCollector`; admin/private preview pozostają dostępne,
 - route `/autorzy/{authorSlug}`,
 - statyczny produkcyjny pipeline sitemap `SeoSitemapGenerator` + `SeoSitemapBuilder` + `SeoSitemapAuditor`, z codziennym `seo:refresh-sitemaps` jako istniejącym safety netem,
 - dynamiczny `SitemapController`, który współistnieje z generowanymi artefaktami i nie jest samodzielnym source of truth produkcyjnego XML,
@@ -193,7 +196,6 @@ Nie ma obecnie kompletnego end-to-end odpowiednika:
 - publicznego topic lifecycle pod `/aktualnosci/temat/{topicSlug}`; publiczne 200/410, nav i sitemap consequences pozostają N4/N5,
 - publicznego hub/list/category/topic/feed renderera,
 - reverse-link surface z istniejących entity pages do newsroom article,
-- rollout gate `NEWSROOM_PUBLIC_ENABLED`,
 - news sitemap,
 - feedu RSS/Atom,
 - rankingów najnowsze / najczęściej czytane,
@@ -1502,8 +1504,9 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N3-005` — Product Bridge: questions/legal/signs/contextual CTA,
 - [x] `NEWSROOM-N3-006` — old-path -> canonical 301.
 - [x] `NEWSROOM-N3-007` — author-profile integration.
+- [x] `NEWSROOM-N3-008` — public rollout config gate.
 
-N3-007 author-profile integration jest zmaterializowane; N3-008 rollout gate jest następnym wykonywalnym taskiem. Pozostałe elementy N4–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu pełną checklistę.
+N3-008 rollout gate jest zmaterializowane i potwierdzone na `main@23b952b77e39cd25fb39edc252faf05849946bd7`; następnym wykonywalnym taskiem jest `NEWSROOM-N4-001` — `/aktualnosci` editorial composition read model. Pozostałe elementy N4–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu pełną checklistę.
 
 ---
 ## 28. Zasady utrzymania dokumentu
@@ -1528,6 +1531,14 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-18 — v0.37
+
+- NEWSROOM-N3-008 zmergowano przez PR #79; finalny implementation head `c8484aa1529eb41805a76ceb7be1f55db63aec14`, merge `main@23b952b77e39cd25fb39edc252faf05849946bd7`,
+- wdrożono prosty `NewsroomPublicGate` oparty o `config/newsroom.php` i `NEWSROOM_PUBLIC_ENABLED=false` jako bezpieczny dark-deploy default,
+- gate=false blokuje publiczne detail/guide i historyczne redirecty, usuwa newsroom corpus z profilu autora oraz jego wkład do author sitemap, filtruje newsroom namespace z obecnego IndexNow collectora i pozostawia admin/private preview dostępne,
+- exact-head CI #308 i Browser Smoke #23 oraz post-merge CI #309 zakończyły się PASS; N4-001 jest kolejnym taskiem wykonawczym.
+
 
 
 ### 2026-09-17 — v0.36

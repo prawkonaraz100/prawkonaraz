@@ -1040,20 +1040,22 @@ Browser Smoke #20 na finalnym N3-005 head `7d795b895865cda49ba94a4fec50533d7b0f7
 
 ### 37.1. Public gate integration tests
 
-Przy pre-launch `NEWSROOM_PUBLIC_ENABLED=false`:
+NEWSROOM-N3-008 jest wdrożone i ma rzeczywisty regression `tests/Feature/NewsroomPublicGateTest.php`.
 
-- article/category/topic public routes nie ujawniają newsroom content,
-- /aktualnosci i /poradniki zachowują placeholder UX, ale mają jawne noindex; test potwierdza, że shared MarketingPlaceholder innych routes nie został globalnie zmieniony przez przypadek,
+Przy pre-launch `NEWSROOM_PUBLIC_ENABLED=false` test potwierdza:
+
+- news i guide detail failują do 404 bez ujawnienia treści,
+- historyczny old-path nie wykonuje 301 do dark-deployed canonical,
+- `/aktualnosci` i `/poradniki` zachowują istniejący placeholder 200 + `X-Robots-Tag: noindex, follow`,
+- category/topic/feed route contract pozostaje publicznie 404, ponieważ te powierzchnie nadal należą do N4/N5,
 - author page nie pokazuje newsroom publications,
-- existing question/legal/sign pages nie pokazują newsroom reverse links,
-- feed nie ujawnia newsroom items,
-- sitemap generator nie dodaje newsroom URLs,
-- IndexNow collector nie zgłasza newsroom URLs,
-- admin resource + private preview nadal działają.
+- newsroom-only author nie jest kwalifikowany przez author sitemap, a newsroomowy `public_state_changed_at` nie wnosi freshness contribution przy wyłączonym gate,
+- obecny `IndexNowUrlCollector` nie przepuszcza namespace `/aktualnosci` ani `/poradniki`,
+- authenticated admin private preview nadal działa.
 
-Ten gate nie jest jeszcze wdrożony; `NEWSROOM_PUBLIC_ENABLED` pozostaje NEWSROOM-N3-008. N3-005 nie może być interpretowane jako zamknięcie rollout gate.
+Przy `NEWSROOM_PUBLIC_ENABLED=true` regression potwierdza obecnie istniejące powierzchnie: public article detail, author publication, author sitemap eligibility i historyczny redirect. Public hub/category/topic/feed, reverse links oraz article/news sitemap pozostają przyszłym N4/N5 i nie są fałszywie zaliczane przez N3-008.
 
-Przy `true` te powierzchnie mają działać zgodnie z public eligibility po implementacji N3-008.
+Existing public-article PHPUnit baseline i dedykowany Browser Smoke `newsroom-article` jawnie ustawiają gate na `true`, dzięki czemu bezpieczny produkcyjny default `false` nie maskuje regresji publicznego renderer'a.
 
 ---
 
@@ -1195,15 +1197,16 @@ Nie uruchamiać migrate:rollback automatycznie po tym, jak redakcja stworzyła d
 
 ## 44. Emergency disable strategy
 
-Prosty config gate `NEWSROOM_PUBLIC_ENABLED` jest wymaganym elementem v1 release i pozostaje NEWSROOM-N3-008.
+Prosty config gate `NEWSROOM_PUBLIC_ENABLED` jest wdrożony przez NEWSROOM-N3-008 jako wymagany element v1 dark deploy.
 
-- docelowo wyłącza publiczny newsroom/article/category/topic rollout bez usuwania admin/data,
-- nie wymaga rozbudowanego feature flag service,
-- ma być sprawdzany w config cache/deploy smoke,
-- przed launch przy false blokuje też author/reverse-link/feed/sitemap/IndexNow discovery,
-- po launch emergency procedure rozróżnia technical 503/code rollback od content withdrawn; nie masowo 404 przez flagę.
+- `config/newsroom.php` czyta env z bezpiecznym defaultem `false`,
+- przy `false` blokuje obecnie istniejące public article/guide detail i historyczne redirecty bez usuwania admin/data/private preview,
+- przy `false` wyłącza newsroom contribution w author profile/author sitemap oraz filtruje newsroom namespace z obecnego IndexNow collectora,
+- przyszłe reverse-link/feed/article-sitemap/news-sitemap implementacje muszą respektować ten sam gate,
+- podczas cutover zmiana env wymaga odświeżenia config cache zgodnie z Phase B,
+- po launch emergency procedure nadal rozróżnia technical 503/code rollback od content withdrawn; nie używamy długiego `false` do masowego 404 już indeksowanych URL-i.
 
-N3-005 nie wdrożyło tego gate'u. Nie cofamy migracji ani treści tylko po to, by wyłączyć publiczną ekspozycję.
+Nie cofamy migracji ani treści tylko po to, by wyłączyć publiczną ekspozycję.
 
 ---
 
@@ -1454,21 +1457,20 @@ Runbook jest spełniony, gdy:
 
 ## 58. Stan implementacji
 
-Na 2026-09-17 po NEWSROOM-N3-007, zweryfikowanym na `main@c68672f6aa7c41defaeec56debb541d5a60d9f4f`:
+Na 2026-09-18 po NEWSROOM-N3-008, zweryfikowanym na `main@23b952b77e39cd25fb39edc252faf05849946bd7`:
 
 - istnieją globalne backend tests, ops backup/restore/health commands i kanoniczny CI z `quality` na SQLite oraz addytywnym `newsroom-postgres` na PostgreSQL 16,
-- istnieją newsroom-specific unit/security i feature regression dla body contract/editor, media storage/article media, enum/schema/model, slug/history, publishing workflow, home composition/placements, article preview, topic/CMS oraz N3-001 catalog, N3-002 SEO, N3-003 schema service i N3-005 Product Bridge,
+- istnieją newsroom-specific unit/security i feature regression dla body contract/editor, media storage/article media, enum/schema/model, slug/history, publishing workflow, home composition/placements, article preview, topic/CMS oraz N3-001 catalog, N3-002 SEO, N3-003 schema service, N3-005 Product Bridge, N3-006 redirect, N3-007 author profile i N3-008 public gate,
 - N3-004 dostarcza `NewsroomArticleBodyRenderer`, `NewsroomArticlePresentationService`, publiczny `ContentArticleController`, Blade `newsroom.article`/`article-unavailable` i feature tests publicznego article response,
 - N3-005 dodaje `NewsroomArticleProductBridgeService`, `newsroom.product-bridge-block` i `NewsroomProductBridgeTest`; publiczny article renderer obsługuje teraz questions/legal/signs/contextual CTA bez losowych relacji i bez draft targetów,
 - current-canonical public detail ma automatyczne 200/404/410 coverage; 410/404 nie renderują treści i są noindex, a `NewsroomArticleRedirectTest` pokrywa old-slug one-hop 301/fail-closed behavior N3-006,
 - `ContentAuthorProfileTest` pokrywa N3-007 lifecycle profilu autora, wspólną Person/Organization identity, author-sitemap freshness z `public_state_changed_at` oraz blokadę odpublikowania autora z zależnym indexable article i odblokowanie po noindex,
 - Product Bridge wymaga body target + article-owned pivot + istniejący public eligibility; question group ma limit 5, legal wymaga verified act/unit + published legal page/topic, a signs wymagają published sign/author/category i pivot `direct` albo `example`; luźny `related` jest fail-closed,
 - publiczny response emituje SEO metadata i JSON-LD z istniejących N3-002/N3-003 services, route-family breadcrumbs, hero/provenance/regulatory context, public sources, correction, author box, public-safe related article oraz Product Bridge,
-- dedicated `.github/workflows/browser-smoke.yml` job `newsroom-article` istnieje; Browser Smoke #20 na finalnym head `7d795b895865cda49ba94a4fec50533d7b0f7a97` zakończył się PASS na 360x800, 390x844, 430x932, 768x1024, 1024x768 i 1440x900,
+- dedicated `.github/workflows/browser-smoke.yml` job `newsroom-article` istnieje; Browser Smoke #23 na finalnym N3-008 head `c8484aa1529eb41805a76ceb7be1f55db63aec14` zakończył się PASS po jawnym ustawieniu `NEWSROOM_PUBLIC_ENABLED=true`,
 - harness działa z JS disabled, sprawdza realny built CSS, H1/breadcrumb/body/source/canonical/JSON-LD/Product Bridge/CTA oraz horizontal overflow i zapisuje artifact,
-- artifact `newsroom-article-browser-qa`: ID `10508254861`, 1 124 509 bytes, SHA256 `753b717cb5f0319e2e7799552b181fd972b41cd3b3a66bba7dd9a82d7ce96a2a`,
-- finalny exact-head CI #275 dla PR #73 zakończył się PASS; post-merge `main@fcc8074f89db141d522c5000742afc2e07a68565` przeszedł CI #276 z `quality` 1049 passed / 19 498 assertions / 2 skipped, Pint 1051 files PASS, frontend build PASS i `newsroom-postgres` PASS,
-- hub/category/topic/feed browser surfaces, rollout config gate N3-008 i reverse links N4-008 pozostają otwarte; author profile integration N3-007 i old-slug redirects N3-006 są zamknięte,
+- finalny exact-head CI #308 dla PR #79 zakończył się PASS na `c8484aa1529eb41805a76ceb7be1f55db63aec14`; post-merge CI #309 na `main@23b952b77e39cd25fb39edc252faf05849946bd7` potwierdził `quality` PASS i `newsroom-postgres` PASS,
+- hub/category/topic/feed browser surfaces i reverse links N4-008 pozostają otwarte; N3-006 redirect, N3-007 author profile i N3-008 rollout gate są zamknięte implementacyjnie,
 - atomic static publication, dirty/version newsroom refresh coordinator, newsroom/news sitemap output i `SeoSitemapAuditor` extension pozostają N5.
 
 ---
@@ -1488,12 +1490,20 @@ Na 2026-09-17 po NEWSROOM-N3-007, zweryfikowanym na `main@c68672f6aa7c41defaeec5
 - [ ] dodać production-like static robots/sitemap delivery smoke,
 - [ ] rozszerzyć istniejący SeoSitemapAuditor,
 - [ ] stworzyć production smoke checklist w praktyce,
-- [ ] wdrożyć i przetestować `NEWSROOM_PUBLIC_ENABLED` w N3-008 przed publicznym rolloutem,
+- [x] wdrożyć i przetestować `NEWSROOM_PUBLIC_ENABLED` w N3-008 dla obecnie istniejących public detail/redirect + author + IndexNow surfaces; przyszłe N4/N5 discovery surfaces nadal wymagają tego samego gate,
 - [ ] po pierwszym release wpisać rzeczywiste wyniki i ewentualne różnice od planu.
 
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-18 — v0.20
+
+- NEWSROOM-N3-008 implementation PR #79 zakończył exact-head CI #308 PASS na `c8484aa1529eb41805a76ceb7be1f55db63aec14`; dedykowany Browser Smoke #23 również zakończył się PASS, a post-merge CI #309 przeszedł pełny gate na `main@23b952b77e39cd25fb39edc252faf05849946bd7`,
+- dodano `tests/Feature/NewsroomPublicGateTest.php` dla enabled/disabled route, guide, old-path redirect, placeholder, author profile, author sitemap contribution, IndexNow collector i private preview,
+- `phpunit.xml` i job `newsroom-article` jawnie ustawiają public gate na `true`, podczas gdy `.env.example` utrwala bezpieczny dark-deploy default `false`,
+- public hub/category/topic/feed, reverse links oraz article/news sitemap pozostają N4/N5; N4-001 jest następnym taskiem po dokumentacyjnym zamknięciu N3-008.
+
 
 ### 2026-09-17 — v0.19
 

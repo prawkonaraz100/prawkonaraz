@@ -1370,6 +1370,23 @@ Rozszerzyć istniejący publiczny profil `ContentAuthor` o Newsroom bez tworzeni
 
 ## NEWSROOM-N3-008 — Public rollout config gate
 
+### Status implementacji
+
+**DONE w kodzie — PR #79 zmergowano na `main@23b952b77e39cd25fb39edc252faf05849946bd7`.** Finalny implementation head `c8484aa1529eb41805a76ceb7be1f55db63aec14` przeszedł CI #308 oraz Browser Smoke #23; post-merge CI #309 na exact `main` zakończył się pełnym PASS. Ten docs-sync synchronizuje wyłącznie istniejące źródła prawdy po potwierdzonym gate.
+
+### Aktualny stan implementacji
+
+- `config/newsroom.php` czyta `NEWSROOM_PUBLIC_ENABLED` z bezpiecznym defaultem `false`; `.env.example` również utrwala `NEWSROOM_PUBLIC_ENABLED=false`,
+- `NewsroomPublicGate` jest jednym prostym source of truth dla publicznego dark-deploy gate; nie dodano równoległego feature-flag frameworka,
+- przy `false` `ContentArticleController` failuje zamknięcie do publicznego 404 przed lookupem artykułu i przed historycznym redirect resolverem, więc zarówno current detail, jak i old-path 301 nie ujawniają dark-deployed content,
+- top-level `/aktualnosci` i `/poradniki` zachowują istniejący pre-launch placeholder 200 z `X-Robots-Tag: noindex, follow`; category/topic/feed nadal pozostają niezaimplementowanymi publicznie 404 zgodnie z N4/N5,
+- przy `false` profil autora nie pobiera publikacji Newsroomu, a `SeoSitemapBuilder` nie kwalifikuje newsroom-only authora ani nie dodaje newsroomowego `public_state_changed_at` do freshness author sitemap,
+- `IndexNowUrlCollector` defensywnie odrzuca namespace `/aktualnosci` i `/poradniki` przy wyłączonym gate; faktyczna article-specific automatyzacja IndexNow nadal należy do N5-005,
+- admin/data i authenticated private preview pozostają dostępne przy `false`,
+- istniejące public-article testy i dedykowany Browser Smoke jawnie ustawiają gate na `true`; `NewsroomPublicGateTest` pokrywa disabled/enabled state dla news + guide detail, old-path redirect, placeholderów, category/topic/feed 404, author discovery, author sitemap contribution, IndexNow collector i private preview,
+- reverse links, public hub/category/topic, feed oraz article/news sitemap nadal nie istnieją; przyszłe N4/N5 implementacje muszą konsumować ten sam gate zamiast tworzyć własne przełączniki.
+
+
 ### Cel
 
 Wdrożyć publiczną warstwę bez natychmiastowego przełączania istniejących placeholderów/indeksacji.
@@ -1384,10 +1401,11 @@ Wdrożyć publiczną warstwę bez natychmiastowego przełączania istniejących 
 
 ### DoD
 
-- public switch nie wymaga rollbacku migracji,
-- disabled state ma zero public newsroom discovery leakage poza świadomie zachowanym placeholderem,
-- test enabled/disabled dla routes + author/reverse links + feed/sitemap/IndexNow,
-- config cache/deploy semantics udokumentowane.
+- [x] public switch nie wymaga rollbacku migracji,
+- [x] disabled state blokuje wszystkie **obecnie istniejące** publiczne wejścia Newsroomu poza świadomie zachowanymi placeholderami,
+- [x] enabled/disabled regression obejmuje current detail, guide detail, old-path redirect, author profile, author sitemap contribution, IndexNow collector i private preview,
+- [x] config/env ma bezpieczny default `false`, a istniejący release runbook opisuje `config cache`/cutover semantics,
+- [ ] reverse-link/feed/article-sitemap/news-sitemap behavior zostanie objęte tym samym gate w N4/N5 w momencie materializacji tych powierzchni; N3-008 nie opisuje nieistniejących funkcji jako wdrożonych.
 
 ---
 
@@ -2247,6 +2265,14 @@ N3-006 jest zamknięte implementacyjnie na `main@33d9946219595a4be75d789b19cc8d1
 ---
 
 # 12. Historia zmian
+
+### 2026-09-18 — v0.37
+
+- NEWSROOM-N3-008 zmergowano przez PR #79; finalny implementation head `c8484aa1529eb41805a76ceb7be1f55db63aec14`, merge `main@23b952b77e39cd25fb39edc252faf05849946bd7`,
+- `NEWSROOM_PUBLIC_ENABLED` ma bezpieczny default `false`, `NewsroomPublicGate` centralizuje decyzję, public article/guide detail i historyczne redirecty są fail-closed przed cutoverem, a top-level placeholdery pozostają 200 + noindex,
+- przy `false` Newsroom znika z author profile/author sitemap contribution oraz z namespace'ów zbieranych przez istniejący IndexNow collector; admin i private preview pozostają dostępne,
+- exact-head CI #308, Browser Smoke #23 oraz post-merge CI #309 zakończyły się PASS; N4-001 `/aktualnosci` editorial composition read model jest następnym taskiem po dokumentacyjnym domknięciu N3-008.
+
 
 
 ### 2026-09-17 — v0.36
