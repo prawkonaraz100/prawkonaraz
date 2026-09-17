@@ -27,6 +27,7 @@ const report = {
     article_path: articlePath,
     status: 'running',
     viewports: [],
+    server_log: [],
 };
 
 let browser;
@@ -41,6 +42,7 @@ try {
     console.log('[newsroom-e2e] start server');
     serverProcess = startServer();
     await waitForHealth(`${baseUrl}/api/v1/health`);
+    await probeArticle();
 
     browser = await chromium.launch({ headless: true });
 
@@ -119,6 +121,7 @@ try {
     report.status = 'failed';
     report.error = error instanceof Error ? error.message : String(error);
     console.error('[newsroom-e2e] FAIL', report.error);
+    printServerLog();
     throw error;
 } finally {
     report.finished_at = new Date().toISOString();
@@ -156,15 +159,23 @@ $article = \App\Models\ContentArticle::factory()->published()->create([
 }
 
 function startServer() {
-    return spawn('php', ['artisan', 'serve', '--host=127.0.0.1', `--port=${port}`], {
+    const child = spawn('php', ['artisan', 'serve', '--host=127.0.0.1', `--port=${port}`], {
         cwd,
         env: {
             ...process.env,
             CACHE_STORE: 'array',
             SESSION_DRIVER: 'file',
         },
-        stdio: 'ignore',
+        stdio: ['ignore', 'pipe', 'pipe'],
     });
+
+    child.stdout?.on('data', appendServerLog);
+    child.stderr?.on('data', appendServerLog);
+    child.once('exit', (code, signal) => {
+        appendServerLog(`server exited code=${code} signal=${signal}`);
+    });
+
+    return child;
 }
 
 async function waitForHealth(url) {
@@ -177,6 +188,35 @@ async function waitForHealth(url) {
         await delay(250);
     }
     throw new Error(`Server health check timed out: ${url}`);
+}
+
+async function probeArticle() {
+    console.log('[newsroom-e2e] probe article');
+    const response = await fetch(`${baseUrl}${articlePath}`, {
+        headers: { Accept: 'text/html' },
+        signal: AbortSignal.timeout(15_000),
+    });
+
+    if (response.status !== 200) {
+        const body = await response.text();
+        throw new Error(`Article probe returned ${response.status}: ${body.slice(0, 500)}`);
+    }
+
+    await response.arrayBuffer();
+}
+
+function appendServerLog(chunk) {
+    const text = String(chunk).trim();
+    if (!text) return;
+
+    report.server_log.push(text);
+    report.server_log = report.server_log.slice(-30);
+}
+
+function printServerLog() {
+    if (report.server_log.length === 0) return;
+    console.error('[newsroom-e2e] server log tail:');
+    for (const line of report.server_log) console.error(line);
 }
 
 async function runCommand(command, args) {
