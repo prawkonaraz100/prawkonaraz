@@ -1,0 +1,87 @@
+name: NEWSROOM N3-006 PR docs runner
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  sync-docs:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'docs/newsroom-n3-006-sync'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout documentation branch
+        uses: actions/checkout@v4
+        with:
+          ref: docs/newsroom-n3-006-sync
+          fetch-depth: 0
+
+      - name: Execute exact replacement script from one-off workflow
+        shell: bash
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          source = Path('.github/workflows/newsroom-n3-006-docs-sync.yml').read_text(encoding='utf-8').splitlines(keepends=True)
+          marker = "          python <<'PY'\n"
+          try:
+              start = source.index(marker) + 1
+          except ValueError:
+              raise SystemExit('replacement script start marker not found')
+          end = None
+          for index in range(start, len(source)):
+              if source[index] == '          PY\n':
+                  end = index
+                  break
+          if end is None:
+              raise SystemExit('replacement script end marker not found')
+          script_lines = []
+          for line in source[start:end]:
+              if not line.startswith('          '):
+                  raise SystemExit(f'unexpected indentation in embedded script: {line!r}')
+              script_lines.append(line[10:])
+          Path('/tmp/newsroom-n3-006-docs-sync.py').write_text(''.join(script_lines), encoding='utf-8')
+          PY
+          python /tmp/newsroom-n3-006-docs-sync.py
+
+      - name: Validate final documentation-only diff
+        shell: bash
+        run: |
+          rm .github/workflows/newsroom-n3-006-docs-sync.yml
+          rm .github/workflows/newsroom-n3-006-pr-runner.yml
+          git diff --check
+          python <<'PY'
+          import subprocess
+          expected = {
+              '.github/workflows/newsroom-n3-006-docs-sync.yml',
+              '.github/workflows/newsroom-n3-006-pr-runner.yml',
+              'docs/NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md',
+              'docs/NEWSROOM-IMPLEMENTATION-BACKLOG.md',
+              'docs/NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md',
+              'docs/NEWSROOM-PUBLIC-UI-UX-SPEC.md',
+              'docs/NEWSROOM-SEO-DISTRIBUTION-AND-OBSERVABILITY.md',
+              'docs/NEWSROOM-TEST-RELEASE-AND-ROLLBACK-RUNBOOK.md',
+          }
+          actual = set(subprocess.check_output(['git', 'diff', '--name-only'], text=True).splitlines())
+          if actual != expected:
+              raise SystemExit(f'unexpected changed files: expected={sorted(expected)} actual={sorted(actual)}')
+          PY
+
+      - name: Commit documentation sync
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md \
+                  docs/NEWSROOM-IMPLEMENTATION-BACKLOG.md \
+                  docs/NEWSROOM-DATA-MODEL-AND-DOMAIN-SPEC.md \
+                  docs/NEWSROOM-PUBLIC-UI-UX-SPEC.md \
+                  docs/NEWSROOM-SEO-DISTRIBUTION-AND-OBSERVABILITY.md \
+                  docs/NEWSROOM-TEST-RELEASE-AND-ROLLBACK-RUNBOOK.md \
+                  .github/workflows/newsroom-n3-006-docs-sync.yml \
+                  .github/workflows/newsroom-n3-006-pr-runner.yml
+          git commit -m "docs(newsroom): sync N3-006 redirect resolver"
+          git push origin HEAD:docs/newsroom-n3-006-sync
