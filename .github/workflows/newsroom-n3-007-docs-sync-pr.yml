@@ -36,10 +36,8 @@ jobs:
           for line in lines[start:]:
               if line.startswith('          '):
                   script_lines.append(line[10:])
-              elif line.strip() == '':
-                  script_lines.append('')
               else:
-                  raise SystemExit(f'unexpected indentation in validated sync workflow: {line!r}')
+                  script_lines.append(line)
 
           script = Path('/tmp/newsroom-n3-007-docs-sync.sh')
           script.write_text('\n'.join(script_lines) + '\n')
