@@ -3,6 +3,7 @@
 use App\Models\ContentArticle;
 use App\Models\ContentAuthor;
 use App\Models\ContentCategory;
+use App\SEO\Schema\SchemaIds;
 use App\Support\SeoSitemapBuilder;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
@@ -70,7 +71,7 @@ it('integrates indexable newsroom contributions into the existing author profile
         ->assertDontSee('Artykuł w nieaktywnej kategorii')
         ->assertSee('"@type":"Person"', false)
         ->assertSee(route('content-authors.show', $author->slug).'#person', false)
-        ->assertSee('"worksFor":{"@id":"'.url('/').'#organization"}', false);
+        ->assertSee('"worksFor":{"@id":"'.app(SchemaIds::class)->organization().'"}', false);
 });
 
 it('uses public state changes rather than technical article updates for author sitemap freshness', function () {
