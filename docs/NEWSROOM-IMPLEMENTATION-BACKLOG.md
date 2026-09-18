@@ -1426,7 +1426,7 @@ Wdrożyć publiczną warstwę bez natychmiastowego przełączania istniejących 
 - `NewsroomHomeReadModelService` materializuje publiczny scalar-array projection dla lead/secondary/latest/categories/guides/important_now/breaking, z canonical path, category/author i hero metadata; wynik jest serializowalny i gotowy do późniejszego cache,
 - publiczny read model respektuje istniejący `NewsroomPublicGate`: przy `NEWSROOM_PUBLIC_ENABLED=false` zwraca `null`; admin preview nadal korzysta bezpośrednio z domenowego composera i pozostaje dostępny,
 - `tests/Feature/NewsroomHomeReadModelServiceTest.php` chroni rollout gate, scalar/cacheable projection oraz stały query budget przy wzroście liczby aktywnych kategorii,
-- N4-001 nie wdraża jeszcze cache store/invalidation z N4-006 ani publicznego Blade/controllera; `/aktualnosci` pozostaje dotychczasowym placeholderem do NEWSROOM-N4-002.
+- N4-001 samo nie wdrażało cache store/invalidation z N4-006 ani publicznego Blade/controllera; ten ostatni zakres został następnie zmaterializowany przez NEWSROOM-N4-002, natomiast faktyczny cache/invalidation nadal pozostaje N4-006.
 
 ### Zakres
 
@@ -1450,15 +1450,34 @@ Wdrożyć publiczną warstwę bez natychmiastowego przełączania istniejących 
 
 ## NEWSROOM-N4-002 — Hub Blade layout
 
+### Status implementacji
+
+**DONE w kodzie — PR #83 zmergowano na `main@04a3e961a40207bd65c41b684a5bf1cd8d2c5e10`.** Finalny implementation head `1036b67aa44b56fffb0bc1e9083d3a0d1d3963d0` przeszedł exact-head CI #321 i Browser Smoke #27; post-merge CI #322 na exact `main` zakończył się pełnym PASS.
+
+### Aktualny stan implementacji
+
+- istniejący route `public.news` nadal używa `NewsroomPlaceholderController::news()`; nie dodano drugiego route ani równoległego controllera,
+- przy `NEWSROOM_PUBLIC_ENABLED=false` `NewsroomHomeReadModelService::build()` zwraca `null`, a controller zachowuje dotychczasowy `Public/MarketingPlaceholder` 200 + `X-Robots-Tag: noindex, follow`,
+- przy `NEWSROOM_PUBLIC_ENABLED=true` controller renderuje SSR `resources/views/newsroom/home.blade.php` z istniejącego N4-001 read modelu i ustawia self-canonical oraz `index,follow,max-image-preview:large`,
+- Hub Blade renderuje tylko niepuste moduły: newsroom subnavigation, important-now, breaking, lead/secondary, latest, category blocks, guides i Product Bridge; brak danych nie tworzy sztucznych kart ani pustych placeholderów,
+- category links w samym hubie nie otwierają jeszcze downstream category pages: subnavigation kotwiczy do sekcji na `/aktualnosci`; publiczne category/topic/feed routes pozostają 404 do kolejnych tasków,
+- Product Bridge reużywa istniejący route `public.tests`; wspólny `layouts.public-content`, header i footer pozostają bez zmian,
+- `tests/Feature/NewsroomHomePageTest.php` pokrywa gate=false, gate=true i empty-section behavior; istniejące `NewsroomPublicGateTest` i `Public/NewsroomRouteContractTest` zostały zsynchronizowane z nowym enabled-state huba,
+- dedykowany `scripts/e2e-newsroom-home.mjs` działa z JavaScript disabled, realnym built CSS i viewportami 360/390/430/768/1024/1280/1440; workflow `Browser Smoke` ma automatyczny job `newsroom-home` dla relewantnych PR-ów.
+
 ### Zakres
 
-- UI spec implementation,
-- responsive,
-- empty section behavior.
+- [x] UI spec implementation dla publicznego `/aktualnosci`,
+- [x] responsive,
+- [x] empty section behavior.
 
 ### DoD
 
-- no MarketingPlaceholder.
+- [x] przy gate=true brak `MarketingPlaceholder` na `/aktualnosci`,
+- [x] przy gate=false zachowany bezpieczny pre-launch placeholder/noindex,
+- [x] dedicated hub Browser QA PASS.
+
+N4-002 nie obejmuje category/topic/feed, osobnego huba `/poradniki`, cache/invalidation ani sitemap/discovery.
 
 ---
 
@@ -2280,6 +2299,14 @@ N3-006 jest zamknięte implementacyjnie na `main@33d9946219595a4be75d789b19cc8d1
 ---
 
 # 12. Historia zmian
+
+### 2026-09-18 — v0.39
+
+- NEWSROOM-N4-002 zmergowano przez PR #83; finalny implementation head `1036b67aa44b56fffb0bc1e9083d3a0d1d3963d0`, merge `main@04a3e961a40207bd65c41b684a5bf1cd8d2c5e10`,
+- `public.news` przy gate=true renderuje SSR `newsroom.home` z N4-001 read modelu, a gate=false zachowuje MarketingPlaceholder 200 + noindex; nie uruchomiono category/topic/feed ani `/poradniki` hub,
+- dodano `NewsroomHomePageTest` i dedykowany Playwright `e2e:newsroom-home`; Browser Smoke #27 zakończył PASS dla `newsroom-home` i `newsroom-article`,
+- exact-head CI #321 i post-merge CI #322 zakończyły się PASS; post-merge: 1062 passed / 19 638 assertions / 2 skipped, Pint 1061 files PASS, frontend build 7.59 s, PostgreSQL 7 passed / 94 assertions,
+- następnym wykonywalnym taskiem jest NEWSROOM-N4-003 — Category pages.
 
 ### 2026-09-18 — v0.38
 
