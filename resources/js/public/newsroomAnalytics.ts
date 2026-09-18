@@ -149,8 +149,12 @@ const setupClickTracking = (): void => {
 
         if (link.matches(PAGINATION_SELECTOR)) {
             const path = destinationPath(link.getAttribute('href'));
+            const position = cleanValue(
+                link.getAttribute('rel') ?? link.textContent ?? undefined,
+            );
 
             track('newsroom_pagination_click', {
+                ...(position ? { position } : {}),
                 ...(path ? { destination_path: path } : {}),
             });
 
