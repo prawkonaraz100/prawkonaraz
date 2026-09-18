@@ -101,7 +101,7 @@ try {
         const bodyText = await page.locator('body').innerText();
         for (const expected of [
             'Praktyczne poradniki',
-            'Evergreen',
+            'EVERGREEN',
             'Poradnik E2E 1',
             'Następna',
         ]) {
