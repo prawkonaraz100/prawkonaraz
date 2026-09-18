@@ -16,7 +16,9 @@ function newsroomRouteNameForPath(string $path): ?string
     }
 }
 
-test('newsroom top level placeholders keep existing route names and are explicitly noindex', function () {
+test('disabled newsroom top level placeholders keep existing route names and are explicitly noindex', function () {
+    config(['newsroom.public_enabled' => false]);
+
     $this->get(route('public.news'))
         ->assertOk()
         ->assertHeader('X-Robots-Tag', 'noindex, follow');
