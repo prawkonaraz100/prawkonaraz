@@ -1542,8 +1542,9 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N5-004` — privacy-safe delegated analytics hooks reużywające istniejący `trackAnalyticsEvent` i GA/consent layer, bez backendowego event store i zmian schema.
 - [x] `NEWSROOM-N5-005` — article-specific IndexNow lifecycle integration przez dedicated after-commit event/listener nad istniejącym `IndexNowQueueService`/submission pipeline, bez nowego klienta, kolejki ani schema.
 - [x] `NEWSROOM-N5-006` — istniejący `SeoSitemapAuditor` rozszerzony o newsroom/news audit hardening oraz site-wide `newsroom:audit-links` nad istniejącym semantic graph, bez drugiego validatora, graph subsystemu, migracji ani schema.
+- [ ] `NEWSROOM-N5-007` — **IN PROGRESS**: PR #109 domknął pre-validation, child-before-index atomic publication i post-switch cleanup zarządzanych article/news sitemap files w istniejącym static pipeline; dirty/version coordinator, scheduler/distributed lock, topology gate i production static delivery verification pozostają otwarte.
 
-N5-001..N5-006 są zmaterializowane i potwierdzone na `main@18300baf3a91ffc5e3c549ab664c471bfd34ffe4`; decyzje o jednym static sitemap pipeline, jednym `NewsroomPublicGate`, jednym semantic-link graph i jednym IndexNow queue/submission pipeline pozostały bez zmian. Następnym wykonywalnym taskiem jest `NEWSROOM-N5-007` — Static sitemap publication + freshness + delivery hardening. Child-before-index atomic publication, post-switch obsolete-shard cleanup, dirty/version refresh coordinator i produkcyjna static/Nginx/CDN verification nie są deklarowane jako wykonane przez N5-006.
+N5-001..N5-006 oraz pierwszy podkrok N5-007 są zmaterializowane i potwierdzone na `main@1744a93fd8f0bddfe7fc5bff90b146fdea24b016`; decyzje o jednym static sitemap pipeline, jednym `NewsroomPublicGate`, jednym semantic-link graph i jednym IndexNow queue/submission pipeline pozostały bez zmian. PR #109 materializuje pre-validation całego generated setu, child-before-index atomic publication oraz post-switch cleanup wyłącznie zarządzanych article/news sitemap files. Następnym wykonywalnym podkrokiem N5-007 jest dirty/version freshness coordinator + frequent scheduler/shared lock; topology gate i produkcyjna static/Nginx/Cloudflare/GSC verification nadal nie są potwierdzone.
 
 ---
 ## 28. Zasady utrzymania dokumentu
@@ -1568,6 +1569,15 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-18 — v0.52
+
+- pierwszy podkrok NEWSROOM-N5-007 zmergowano przez PR #109; finalny implementation head `dbcd5cdb2f0e6663c998f930c034624f8fe36bf4`, merge `main@1744a93fd8f0bddfe7fc5bff90b146fdea24b016`,
+- decyzja architektoniczna nie zmieniła się: istnieje nadal jeden statyczny `SeoSitemapGenerator`/builder/renderer pipeline i produkcyjnym kierunkiem nie jest runtime generation,
+- generator waliduje kompletny set przed publication, zapisuje child files przed root `sitemap.xml`, przełącza root index na końcu i dopiero potem usuwa obsolete zarządzane article/news sitemap files; cleanup nie obejmuje unrelated XML,
+- implementation nie dodaje tabel, migracji, kolejki ani nowego subsystemu; dirty/version coordinator, distributed lock/scheduler i version-safe marker clearing pozostają kolejnym podzakresem N5-007,
+- exact-head CI #403 i post-merge CI #404 były pełnym PASS: 1130 passed / 20 144 assertions / 2 skipped, PostgreSQL 7/94, Pint 1093 files PASS i frontend build PASS,
+- topology gate oraz production static/Nginx/Cloudflare/GSC verification nadal pozostają warunkiem domknięcia N5-007.
 
 ### 2026-09-18 — v0.51
 
