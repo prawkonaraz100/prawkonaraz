@@ -16,6 +16,7 @@ final class NewsroomCategoryReadModelService
     public function __construct(
         private readonly ContentArticlePublicCatalogService $catalogService,
         private readonly NewsroomPublicGate $publicGate,
+        private readonly NewsroomPublicReadCache $cache,
         private readonly MediaUrlResolver $mediaUrlResolver,
     ) {}
 
@@ -39,6 +40,18 @@ final class NewsroomCategoryReadModelService
             return null;
         }
 
+        $categorySlug = trim($categorySlug);
+
+        return $this->cache->rememberCategory(
+            $categorySlug,
+            $page,
+            fn (): ?array => $this->buildFresh($categorySlug, $page),
+        );
+    }
+
+    /** @return array<string,mixed>|null */
+    private function buildFresh(string $categorySlug, int $page): ?array
+    {
         $category = ContentCategory::query()
             ->active()
             ->select([
@@ -50,7 +63,7 @@ final class NewsroomCategoryReadModelService
                 'seo_title',
                 'seo_description',
             ])
-            ->where('slug', trim($categorySlug))
+            ->where('slug', $categorySlug)
             ->first();
 
         if (! $category instanceof ContentCategory) {
