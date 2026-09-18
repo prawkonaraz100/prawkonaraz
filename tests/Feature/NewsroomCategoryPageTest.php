@@ -121,7 +121,7 @@ test('category page renders only actively distributed newsroom articles in deter
         ->assertDontSee('Archiwalny materiał nie jest aktywnie dystrybuowany')
         ->assertDontSee('Materiał w ponownej weryfikacji nie jest aktywnie dystrybuowany')
         ->assertDontSee('Draft nie może wyciec')
-        ->assertSee(route('public.news.categories.show', ['categorySlug' => $relatedCategory->slug]), false)
+        ->assertSee(route('public.news.categories.show', ['categorySlug' => $relatedCategory->slug], false), false)
         ->assertSee('Przepisy drogowe — aktualności')
         ->assertSee('Aktualne informacje o zmianach przepisów drogowych.');
 
