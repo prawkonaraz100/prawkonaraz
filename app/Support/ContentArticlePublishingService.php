@@ -4,9 +4,11 @@ namespace App\Support;
 
 use App\Enums\ContentArticleType;
 use App\Enums\ContentArticleWorkflowStatus;
+use App\Events\ContentArticleIndexNowRequested;
 use App\Events\ContentArticlePublicReadChanged;
 use App\Events\ContentArticleWorkflowTransitioned;
 use App\Models\ContentArticle;
+use App\Models\IndexNowUrlSubmission;
 use App\Models\User;
 use DateTimeInterface;
 use DomainException;
@@ -331,6 +333,12 @@ final class ContentArticlePublishingService
                 ],
             );
 
+            $this->dispatchIndexNow(
+                $locked,
+                IndexNowUrlSubmission::EVENT_DELETED,
+                'content_article.withdrawn',
+            );
+
             return $locked->refresh();
         });
     }
@@ -554,6 +562,7 @@ final class ContentArticlePublishingService
 
             $this->assertFreshEditToken($locked, $loadedToken);
             $beforePublicFingerprint = $this->editToken->publicFingerprint($locked);
+            $canonicalPathBefore = $this->canonicalPath($locked);
 
             unset($payload['_edit_token'], $payload['editorial_note']);
 
@@ -631,6 +640,11 @@ final class ContentArticlePublishingService
             $locked = NewsroomArticleSourcesEditorAdapter::sync($locked, $sources);
             $locked = NewsroomArticleRelationsEditorAdapter::sync($locked, $relations)->refresh();
 
+            $canonicalPathChanged = ! hash_equals(
+                $canonicalPathBefore,
+                $this->canonicalPath($locked),
+            );
+
             $this->publicationChecklist->assertPublicationReady($locked);
 
             $substantiveChange = ! hash_equals(
@@ -663,6 +677,14 @@ final class ContentArticlePublishingService
 
             $this->dispatchPublicReadChange($locked, 'content_article.public_updated');
 
+            if ($substantiveChange && ! $canonicalPathChanged) {
+                $this->dispatchIndexNow(
+                    $locked,
+                    IndexNowUrlSubmission::EVENT_UPDATED,
+                    'content_article.public_updated',
+                );
+            }
+
             return $locked->refresh();
         });
     }
@@ -675,6 +697,7 @@ final class ContentArticlePublishingService
     ): ContentArticle {
         $from = $article->workflow_status;
         $at = now();
+        $firstPublication = $article->first_published_at === null;
 
         $article->workflow_status = ContentArticleWorkflowStatus::Published;
         $article->first_published_at ??= $at;
@@ -699,6 +722,14 @@ final class ContentArticlePublishingService
                 'public_state_changed_at' => $at,
             ],
             $trigger,
+        );
+
+        $this->dispatchIndexNow(
+            $article,
+            $firstPublication
+                ? IndexNowUrlSubmission::EVENT_CREATED
+                : IndexNowUrlSubmission::EVENT_UPDATED,
+            $action,
         );
 
         return $article->refresh();
@@ -811,6 +842,31 @@ final class ContentArticlePublishingService
         ContentArticlePublicReadChanged::dispatch(
             (int) $article->getKey(),
             $action,
+        );
+    }
+
+    private function dispatchIndexNow(
+        ContentArticle $article,
+        string $eventType,
+        string $source,
+    ): void {
+        ContentArticleIndexNowRequested::dispatch(
+            (int) $article->getKey(),
+            $this->canonicalPath($article),
+            $eventType,
+            $source,
+        );
+    }
+
+    private function canonicalPath(ContentArticle $article): string
+    {
+        $type = $article->type instanceof ContentArticleType
+            ? $article->type->value
+            : (string) $article->type;
+
+        return NewsroomRouteContract::canonicalPath(
+            $type,
+            (string) $article->slug,
         );
     }
 
