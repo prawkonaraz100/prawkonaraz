@@ -250,7 +250,7 @@ Nie publikować:
 
 Repo ma równolegle statyczny `public/robots.txt` i route `RobotsController`. Zgodnie z `SEO-SITEMAP-REPAIR-PLAN.md` produkcyjnie preferowany jest statyczny plik oraz jawna weryfikacja Nginx/Cloudflare.
 
-Globalny `NEWSROOM_PUBLIC_ENABLED=false` jest wdrożony przez N3-008 jako pre-launch/dark-deploy gate. `config/newsroom.php` ma bezpieczny default `false`, a `NewsroomPublicGate` centralizuje decyzję. Przy `false` publiczne article/guide detail oraz historyczne old-path redirecty failują do 404 przed lookupem/redirect resolverem; `/aktualnosci` i `/poradniki` pozostają linkowanymi pre-launch placeholder pages z `X-Robots-Tag: noindex, follow`. Profil autora nie emituje newsroom publications, a `SeoSitemapBuilder` nie uwzględnia newsroom-only author eligibility ani newsroomowego freshness contribution. Istniejący `IndexNowUrlCollector` dodatkowo odrzuca namespace `/aktualnosci` i `/poradniki` przy wyłączonym gate. Od N4-008 również semantic/reverse-link resolver failuje do pustego wyniku przy wyłączonym gate. Feed oraz article/news sitemap nadal nie istnieją i muszą konsumować ten sam gate przy wdrożeniu w N5.
+Globalny `NEWSROOM_PUBLIC_ENABLED=false` jest wdrożony przez N3-008 jako pre-launch/dark-deploy gate. `config/newsroom.php` ma bezpieczny default `false`, a `NewsroomPublicGate` centralizuje decyzję. Przy `false` publiczne article/guide detail oraz historyczne old-path redirecty failują do 404 przed lookupem/redirect resolverem; `/aktualnosci` i `/poradniki` pozostają linkowanymi pre-launch placeholder pages z `X-Robots-Tag: noindex, follow`. Profil autora nie emituje newsroom publications, a `SeoSitemapBuilder` nie uwzględnia newsroom-only author eligibility ani newsroomowego freshness contribution. Istniejący `IndexNowUrlCollector` dodatkowo odrzuca namespace `/aktualnosci` i `/poradniki` przy wyłączonym gate. Od N4-008 semantic/reverse-link resolver failuje do pustego wyniku, a N5-001/N5-002 nie emitują article/news sitemap coverage przy wyłączonym gate. Feed nadal nie istnieje i N5-003 musi konsumować ten sam gate przy wdrożeniu.
 
 Ta flaga jest przede wszystkim **pre-launch/dark-deploy gate**. Po pierwszym publicznym rollout nie używamy długotrwale `false` jako technicznego rollbacku dla już indeksowanych article URLs, jeśli skutkiem byłyby masowe 404. Dla krótkiej awarii technicznej preferujemy kontrolowane 503/Retry-After lub rollback kodu zachowujący publiczne routes; dla pojedynczej błędnej treści używamy `withdrawn`.
 
@@ -1346,7 +1346,7 @@ Przed pierwszym production launch:
 - [ ] visible published/updated dates zgodne z schema
 - [ ] publication/publisher/contact transparency widoczna
 - [ ] articles sitemap/shard
-- [ ] news sitemap required tags i first_published_at eligibility
+- [ ] production sample News Sitemap potwierdzony HTTP: required tags i `first_published_at` eligibility zgodne z wdrożonym N5-002
 - [ ] feed + head auto-discovery
 - [ ] sitemap/feed HTTP validator + 304 sample
 - [ ] Search Console main sitemap index submit
