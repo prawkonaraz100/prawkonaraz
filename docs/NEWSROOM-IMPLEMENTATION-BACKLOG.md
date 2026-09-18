@@ -1211,7 +1211,7 @@ Dodatkowo:
 - publiczny controller podłącza metadata z N3-002 i graph z N3-003 do istniejącego `public-content` layoutu,
 - publiczne sources obejmują wyłącznie `is_publicly_cited=true`; private evidence i `image_license_note` nie są emitowane,
 - hero zachowuje alt, caption, credit, dimensions, focal `object-position` i preload/fetch priority contract,
-- top-level `/aktualnosci` i `/poradniki` są dziś rollout-gated publicznymi hubami (placeholder/noindex tylko przy gate=false); category pages są publiczne od N4-003, topic dossier od N4-007, a feed pozostaje downstream N5,
+- top-level `/aktualnosci` i `/poradniki` są dziś rollout-gated publicznymi hubami (placeholder/noindex tylko przy gate=false); category pages są publiczne od N4-003, topic dossier od N4-007, a Atom feed `/aktualnosci/feed.xml` jest publiczny od N5-003 przy gate=true,
 - historyczny old-path -> 301 pozostaje NEWSROOM-N3-006; `NEWSROOM_PUBLIC_ENABLED` pozostaje NEWSROOM-N3-008.
 
 ### Zakres
