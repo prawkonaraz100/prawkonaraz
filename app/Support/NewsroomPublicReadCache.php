@@ -12,6 +12,8 @@ final class NewsroomPublicReadCache
 
     private const CATEGORY_GENERATION_KEY = 'newsroom:cache:category:generation:v1';
 
+    private const FEED_GENERATION_KEY = 'newsroom:cache:feed:generation:v1';
+
     public function rememberHome(Closure $resolver): ?array
     {
         return Cache::remember(
@@ -30,6 +32,15 @@ final class NewsroomPublicReadCache
         );
     }
 
+    public function rememberFeed(Closure $resolver): ?array
+    {
+        return Cache::remember(
+            $this->feedKey(),
+            $this->ttlSeconds(),
+            $resolver,
+        );
+    }
+
     public function invalidateHome(): void
     {
         $this->rotate(self::HOME_GENERATION_KEY);
@@ -40,10 +51,16 @@ final class NewsroomPublicReadCache
         $this->rotate(self::CATEGORY_GENERATION_KEY);
     }
 
+    public function invalidateFeed(): void
+    {
+        $this->rotate(self::FEED_GENERATION_KEY);
+    }
+
     public function invalidateAll(): void
     {
         $this->invalidateHome();
         $this->invalidateCategories();
+        $this->invalidateFeed();
     }
 
     public function homeKey(): string
@@ -63,6 +80,11 @@ final class NewsroomPublicReadCache
             'g',
             $this->generation(self::CATEGORY_GENERATION_KEY),
         ]);
+    }
+
+    public function feedKey(): string
+    {
+        return 'newsroom:feed:v1:g:'.$this->generation(self::FEED_GENERATION_KEY);
     }
 
     private function generation(string $key): string

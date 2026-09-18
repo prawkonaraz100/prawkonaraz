@@ -82,6 +82,7 @@ final class ContentArticlePublicCatalogService
         'hero_focal_x',
         'hero_focal_y',
         'robots',
+        'last_substantive_update_at',
         'public_state_changed_at',
         'updated_at',
     ];

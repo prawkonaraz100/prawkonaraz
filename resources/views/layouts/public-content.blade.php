@@ -30,6 +30,9 @@
     $viteHotPath = public_path('hot');
     $viteManifestPath = public_path('build/manifest.json');
     $hasViteAssets = file_exists($viteHotPath) || file_exists($viteManifestPath);
+    $newsroomFeedDiscovery = (bool) config('newsroom.public_enabled', false)
+        && ! str_contains(strtolower((string) $robots), 'noindex')
+        && request()->routeIs('public.news', 'public.news.*', 'public.guides', 'public.guides.*');
 @endphp
 <!DOCTYPE html>
 <html lang="pl">
@@ -47,6 +50,9 @@
             <meta name="author" content="{{ $authorName }}">
         @endif
         <link rel="canonical" href="{{ $canonical }}">
+        @if ($newsroomFeedDiscovery)
+            <link rel="alternate" type="application/atom+xml" title="{{ $siteName }} — Aktualności" href="{{ route('public.news.feed') }}">
+        @endif
         <meta property="og:locale" content="pl_PL">
         <meta property="og:site_name" content="{{ $siteName }}">
         <meta property="og:type" content="{{ $ogType }}">

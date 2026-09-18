@@ -47,6 +47,7 @@ use App\Http\Controllers\MeProfileController;
 use App\Http\Controllers\MethodologyPageController;
 use App\Http\Controllers\ModeratorAccountsController;
 use App\Http\Controllers\NewsroomCategoryController;
+use App\Http\Controllers\NewsroomFeedController;
 use App\Http\Controllers\NewsroomPlaceholderController;
 use App\Http\Controllers\NewsroomTopicController;
 use App\Http\Controllers\PartnersPageController;
@@ -180,7 +181,16 @@ Route::get('/szkolenia-z-instruktorem', fn () => Inertia::render('Public/Marketi
 ]))->name('public.instructor-training');
 Route::get('/aktualnosci', [NewsroomPlaceholderController::class, 'news'])
     ->name('public.news');
-Route::get('/aktualnosci/feed.xml', fn () => abort(404))
+Route::get('/aktualnosci/feed.xml', NewsroomFeedController::class)
+    ->withoutMiddleware([
+        EnsureUserIsNotBanned::class,
+        HandleInertiaRequests::class,
+        MarkReturningUser::class,
+        TrackUserIpActivity::class,
+        VerifyCsrfToken::class,
+        StartSession::class,
+        ShareErrorsFromSession::class,
+    ])
     ->name('public.news.feed');
 Route::get('/aktualnosci/kategoria/{categorySlug}', NewsroomCategoryController::class)
     ->where('categorySlug', NewsroomRouteContract::SLUG_PATTERN)

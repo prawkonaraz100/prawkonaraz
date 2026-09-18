@@ -14,4 +14,7 @@ return [
     // Google News currently allows at most 1,000 news:news entries per file.
     // Keep this configurable downward for deterministic boundary regression.
     'news_sitemap_max_entries' => 1000,
+
+    // Bounded latest-news window for the public Atom feed.
+    'feed_items_limit' => 50,
 ];
