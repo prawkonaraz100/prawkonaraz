@@ -38,8 +38,32 @@ server {
     }
 
     location = /robots.txt {
+        default_type text/plain;
+        etag on;
+        if_modified_since exact;
+        add_header Cache-Control "public, max-age=3600";
+        add_header X-Content-Type-Options "nosniff";
         access_log off;
         log_not_found off;
+        try_files $uri /index.php?$query_string;
+    }
+
+    location = /sitemap.xml {
+        default_type application/xml;
+        etag on;
+        if_modified_since exact;
+        add_header Cache-Control "public, max-age=3600";
+        add_header X-Content-Type-Options "nosniff";
+        try_files $uri /index.php?$query_string;
+    }
+
+    location ^~ /sitemaps/ {
+        default_type application/xml;
+        etag on;
+        if_modified_since exact;
+        add_header Cache-Control "public, max-age=3600";
+        add_header X-Content-Type-Options "nosniff";
+        try_files $uri /index.php?$query_string;
     }
 
     location = /service-worker.js {
