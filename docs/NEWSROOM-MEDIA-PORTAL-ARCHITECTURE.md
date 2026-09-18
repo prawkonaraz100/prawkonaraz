@@ -1542,9 +1542,9 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N5-004` — privacy-safe delegated analytics hooks reużywające istniejący `trackAnalyticsEvent` i GA/consent layer, bez backendowego event store i zmian schema.
 - [x] `NEWSROOM-N5-005` — article-specific IndexNow lifecycle integration przez dedicated after-commit event/listener nad istniejącym `IndexNowQueueService`/submission pipeline, bez nowego klienta, kolejki ani schema.
 - [x] `NEWSROOM-N5-006` — istniejący `SeoSitemapAuditor` rozszerzony o newsroom/news audit hardening oraz site-wide `newsroom:audit-links` nad istniejącym semantic graph, bez drugiego validatora, graph subsystemu, migracji ani schema.
-- [ ] `NEWSROOM-N5-007` — **IN PROGRESS**: PR #109 domknął pre-validation, child-before-index atomic publication i post-switch cleanup zarządzanych article/news sitemap files w istniejącym static pipeline; dirty/version coordinator, scheduler/distributed lock, topology gate i production static delivery verification pozostają otwarte.
+- [ ] `NEWSROOM-N5-007` — **IN PROGRESS**: PR #109 domknął pre-validation, child-before-index atomic publication i post-switch cleanup zarządzanych article/news sitemap files; PR #112 domknął cache-backed dirty/version coordinator, shared lock, every-minute scheduler i aktualny single-node topology gate. Production static HTTP/Nginx/Cloudflare/GSC delivery verification nadal pozostaje otwarte.
 
-N5-001..N5-006 oraz pierwszy podkrok N5-007 są zmaterializowane i potwierdzone na `main@1744a93fd8f0bddfe7fc5bff90b146fdea24b016`; decyzje o jednym static sitemap pipeline, jednym `NewsroomPublicGate`, jednym semantic-link graph i jednym IndexNow queue/submission pipeline pozostały bez zmian. PR #109 materializuje pre-validation całego generated setu, child-before-index atomic publication oraz post-switch cleanup wyłącznie zarządzanych article/news sitemap files. Następnym wykonywalnym podkrokiem N5-007 jest dirty/version freshness coordinator + frequent scheduler/shared lock; topology gate i produkcyjna static/Nginx/Cloudflare/GSC verification nadal nie są potwierdzone.
+N5-001..N5-006 oraz dwa repo-level podkroki N5-007 są zmaterializowane i potwierdzone na `main@79b6de0276ba8cdce500c366a4f98098e528dcd8`; decyzje o jednym static sitemap pipeline, jednym `NewsroomPublicGate`, jednym semantic-link graph i jednym IndexNow queue/submission pipeline pozostały bez zmian. PR #109 materializuje pre-validation + child-before-index atomic publication + post-switch cleanup, a PR #112 cache-backed dirty/version coordinator, shared lock, every-minute scheduler i version-safe marker clearing bez queue workera. Aktualne deployment docs potwierdzają 1x Mikrus 4.1 z lokalnym `public/`, więc topology gate jest spełniony dla obecnego single-node contractu. Następnym wykonywalnym podkrokiem N5-007 jest production static/Nginx/Cloudflare/GSC delivery verification; N5-007 nadal nie jest DONE.
 
 ---
 ## 28. Zasady utrzymania dokumentu
@@ -1569,6 +1569,16 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-18 — v0.53
+
+- drugi podkrok NEWSROOM-N5-007 zmergowano przez PR #112; finalny implementation head `6f1c3b99d11796f74987c7fe640302b2d76578b7`, merge `main@79b6de0276ba8cdce500c366a4f98098e528dcd8`,
+- architektura nie zmieniła się: statyczny `SeoSitemapGenerator` pozostaje source of truth, a freshness jest realizowane przez tani dirty/version signal + scheduler/lock zamiast runtime generation albo nieistniejącego queue workera,
+- `NewsroomSeoArtifactRefreshCoordinator` utrzymuje version/clean-version oraz lock w skonfigurowanym cache store; full refresh uruchamia się poza publish requestem i nie czyści dirty state po failure albo version race,
+- after-commit article/home events oraz category/topic/author observers ustawiają dirty signal; scheduler production odpala coordinator co minutę z `onOneServer()` + `withoutOverlapping()`, a daily `seo:refresh-sitemaps` pozostaje recovery path,
+- aktualne canonical deployment docs potwierdzają 1x Mikrus 4.1, lokalny `public/`, lokalny Redis i jeden cron `schedule:run`; dla tej topologii topology gate jest spełniony, natomiast przyszły multi-node wymaga shared artifact distribution i ponownej weryfikacji,
+- exact-head CI #409 i post-merge CI #410 były pełnym PASS: 1136 passed / 20 182 assertions / 2 skipped, PostgreSQL 7/94, Pint 1101 files PASS i frontend build PASS,
+- production static HTTP/Nginx/Cloudflare/GSC delivery verification nadal pozostaje warunkiem domknięcia NEWSROOM-N5-007; nie przedstawiamy również dedykowanego scheduler/lock contention regression jako istniejącego.
 
 ### 2026-09-18 — v0.52
 

@@ -787,7 +787,7 @@ Newsroom sitemap rozszerza istniejący statyczny pipeline:
 
 Nie przenosimy produkcyjnego source of truth do runtime `SitemapController`.
 
-**Potwierdzony stan po pierwszym podkroku N5-007:** PR #109 usunął wcześniejszy broken-set window. `SeoSitemapGenerator` waliduje kompletny generated set przed publication, zapisuje child XML przed głównym `sitemap.xml`, przełącza root index na końcu i dopiero potem usuwa obsolete zarządzane article/news sitemap files. Dirty/version freshness coordinator, frequent scheduler/shared lock, topology gate i production static delivery verification nadal pozostają otwarte.
+**Potwierdzony stan po PR #109 i #112:** PR #109 usunął wcześniejszy broken-set window: `SeoSitemapGenerator` waliduje kompletny generated set przed publication, zapisuje child XML przed głównym `sitemap.xml`, przełącza root index na końcu i dopiero potem usuwa obsolete zarządzane article/news sitemap files. PR #112 wdrożył dirty/version freshness coordinator, shared cache lock oraz every-minute scheduler z `onOneServer()` + `withoutOverlapping()` przy zachowaniu daily safety net. Aktualne deployment docs potwierdzają single-node topology z lokalnym `public/`; production static HTTP/Nginx/Cloudflare/GSC delivery verification nadal pozostaje otwarte.
 
 ### 30.2. Refresh po zmianie publicznego corpus — bez założenia o queue workerze
 
@@ -819,6 +819,15 @@ Po udanym commit:
 6. failure pozostawia dirty state i jest logowany/monitorowany,
 7. istniejący daily `seo:refresh-sitemaps` pozostaje niezależnym safety netem na wypadek utraty cache markeru.
 
+Potwierdzona implementacja po PR #112:
+- `NewsroomSeoArtifactRefreshCoordinator` przechowuje `version` i `clean-version` w skonfigurowanym cache store i udostępnia cache-backed lock,
+- `newsroom:refresh-seo-artifacts-if-dirty` przy clean state nie uruchamia generatora; przy dirty wykonuje istniejący `SeoSitemapGenerator` + `SeoSitemapAuditor`,
+- failure generatora/audytu nie czyści dirty state,
+- `markCleanIfUnchanged()` czyści marker tylko wtedy, gdy version nie zmieniła się podczas generation/audit,
+- auto-discovered listenery ustawiają dirty po commit dla article workflow/public-read/home-placement events; category/topic/author observers implementują `ShouldHandleEventsAfterCommit`,
+- produkcyjny scheduler uruchamia coordinator co minutę z `onOneServer()` i `withoutOverlapping()`,
+- nie dodano queue workera i nie zmieniono istniejącego daily `seo:refresh-sitemaps`.
+
 Jeśli w przyszłości wdrożymy realny non-sync queue worker, coordinator może używać queued joba, ale dopiero po osobnym deploy/monitoring gate.
 
 Target operacyjny dla news sitemap: świeży statyczny artefakt powinien pojawić się w ciągu kilku minut od publikacji, nie dopiero przy następnym daily cron.
@@ -842,13 +851,14 @@ Przy błędzie przed krokiem 5 stary kompletny zestaw pozostaje aktywny.
 
 Atomic rename jest wystarczające tylko w obrębie filesystemu widzianego przez requesty.
 
-Przed N5 release trzeba potwierdzić:
+Aktualne canonical deployment docs potwierdzają bieżący single-node contract:
+- `docs/INFRA-MVP-MIKRUS-4.1-R2.md`: 1x VPS Mikrus 4.1, Nginx + PHP-FPM + PostgreSQL + Redis na jednej maszynie,
+- `docs/DEPLOYMENT-RUNBOOK.md`: statyczne `public/sitemap.xml` / `public/sitemaps/*.xml` są lokalnymi artefaktami tego deploymentu,
+- `docs/RUNBOOK-OPS.md`: 1x VPS i jeden scheduler `cron -> php artisan schedule:run`.
 
-- czy produkcja ma jeden web node,
-- czy `public/` jest współdzielone między node'ami,
-- czy CDN/origin publikuje jeden wspólny artifact set.
+Dla obecnej topologii wszystkie requesty origin widzą ten sam lokalny `public/`, więc same-filesystem atomic replace jest właściwym modelem i topology gate jest spełniony dla aktualnego contractu.
 
-Przy wielu node'ach generator uruchomiony na jednym hostcie nie może zostawić pozostałych z inną wersją sitemap. Redis lock/`onOneServer` rozwiązuje concurrency generatora, ale nie dystrybucję plików.
+Przy przyszłej topologii multi-node generator uruchomiony na jednym hostcie nie może zostawić pozostałych z inną wersją sitemap. Redis lock/`onOneServer` rozwiązuje concurrency generatora, ale nie dystrybucję plików; przejście na wiele node'ów wymaga ponownego topology gate i shared artifact distribution.
 
 ### 30.5. HTTP validators na właściwej warstwie
 
@@ -1598,7 +1608,7 @@ Obecnie:
 - wspólny public-content layout emituje `og:site_name` z kanonicznego identity,
 - istnieje również runtime `SitemapController`, ale statyczne pliki są nadrzędnym produkcyjnym modelem; samo dodanie headerów do kontrolera nie rozwiązuje static delivery,
 - newsroom Article schema graph istnieje przez `ContentArticleSchemaService` po NEWSROOM-N3-003 i jest emitowany przez publiczny article HTTP renderer od N3-004; od NEWSROOM-N5-002 istnieje statyczna rollout-gated News Sitemap, od NEWSROOM-N5-003 publiczny rollout-gated Atom 1.0 feed z auto-discovery i application-level validators, a od NEWSROOM-N5-004 privacy-safe public analytics hooks reużywające istniejący GA/consent layer,
-- newsroom dirty/version refresh coordinator nadal nie istnieje; atomowy child-before-index switch i post-switch cleanup zarządzanych article/news sitemap files są wdrożone po NEWSROOM-N5-007 PR #109,
+- NEWSROOM-N5-007 PR #109 wdrożył atomowy child-before-index switch i post-switch cleanup zarządzanych article/news sitemap files, a PR #112 wdrożył cache-backed dirty/version refresh coordinator, shared lock oraz every-minute scheduler z `onOneServer()` + `withoutOverlapping()` przy zachowaniu daily safety net,
 - repo nie gwarantuje async Laravel queue workera (`QUEUE_CONNECTION=sync` w env example), więc newsroom nie może opierać freshness na ShouldQueue,
 - po NEWSROOM-N4-002 `/aktualnosci` jest rollout-gated: przy `NEWSROOM_PUBLIC_ENABLED=false` pozostaje pre-launch placeholderem 200 + `X-Robots-Tag: noindex, follow`, a przy `true` renderuje SSR `newsroom.home` z self-canonical i `index,follow,max-image-preview:large`; od N4-004 `/poradniki` konsumuje ten sam gate: przy `false` pozostaje placeholderem 200 + noindex, a przy `true` renderuje SSR `newsroom.guides`,
 - `/aktualnosci/feed.xml` przy gate=true zwraca Atom 1.0 `application/atom+xml` z ETag/Last-Modified/public Cache-Control i conditional 304, a przy gate=false zwraca 404; crawlable public newsroom/guide surfaces emitują Atom discovery w head,
@@ -1611,7 +1621,7 @@ Obecnie:
 - NEWSROOM-N5-002 rozszerza ten sam static pipeline o News Sitemap: gate=true emituje wyłącznie `type=news`, aktywnie dystrybuowane `published` + indexable current-canonical articles z aktywną kategorią i publicznym autorem, kwalifikowane wyłącznie przez `first_published_at >= now()-2 days`,
 - `news:name` reużywa canonical identity z `SiteIdentitySchema::siteName()`, `news:language=pl`, `news:publication_date=first_published_at`, a `news:title` bierze widoczny `ContentArticle.title`; przy <=1000 entries używany jest `/sitemaps/news.xml`, a powyżej limitu deterministic fixed-ID-range shards trafiają bezpośrednio do root `/sitemap.xml`,
 - NEWSROOM-N5-006 rozszerza istniejący `SeoSitemapAuditor` bez równoległego validatora: poza legalnym article/news overlap sprawdza duplicate index loc, missing child, current-canonical/indexability/category/author/redirect-source eligibility, Google News namespace/required tags/name/language/title/publication-date/2-day window, single-vs-sharded topology, invalid/overlapping shard ranges oraz obsolete unreferenced article/news files,
-- NEWSROOM-N5-007 jest częściowo zmaterializowane po PR #109: `SeoSitemapGenerator` waliduje kompletny generated set przed publication, atomowo zapisuje wszystkie child XML przed root `sitemap.xml`, przełącza root index na końcu i dopiero potem usuwa obsolete zarządzane `articles*.xml` / `news*.xml`; unrelated XML nie są objęte cleanupem. Dirty/version coordinator, frequent scheduler lock, topology gate i production static delivery verification pozostają otwarte,
+- NEWSROOM-N5-007 jest częściowo zmaterializowane po PR #109 i #112: publication hardening, dirty/version coordinator, shared lock, every-minute scheduler oraz aktualny single-node topology gate są potwierdzone; unrelated XML nadal nie są objęte cleanupem. Production static HTTP/Nginx/Cloudflare/GSC delivery verification i production-like delivery smoke pozostają otwarte,
 - NEWSROOM-N3-008 jest wdrożone, N4-002 konsumuje ten sam gate dla publicznego huba `/aktualnosci`, N4-003 dla category pages, N4-004 dla `/poradniki`, N4-007 dla topic dossier, N4-008 dla topic/related/reverse-link resolvers, N5-001 dla standard article sitemap/hub coverage, N5-002 dla News Sitemap, N5-003 dla Atom feed/discovery, a N5-005 dla article-specific IndexNow automation. Przy gate=false category/topic/feed routes failują do 404, top-level `/poradniki` pozostaje noindex placeholderem, N4-008 nie emituje reverse targets, N5-001/N5-002 nie emitują newsroom article/news sitemap discovery, feed discovery jest suppressowane, a `QueueNewsroomArticleIndexNow` kończy bez enqueue; N5-004 nie tworzy osobnego rollout gate i emituje eventy tylko na rzeczywiście zrenderowanych publicznych surface'ach z analytics-ready istniejącego GA layer. Przy gate=true opublikowany topic ma self-canonical `index,follow,max-image-preview:large`, draft/future/unknown pozostają 404, a historyczny archived topic zwraca 410 + noindex. N5-005 reużywa istniejący queue/submission pipeline i nie zmienia protokołu HTTP IndexNow.
 
 ---
@@ -1630,7 +1640,7 @@ Obecnie:
 - [x] rozszerzyć istniejący statyczny generator o article sitemap z deterministic sharding readiness i rollout-gated hub coverage w NEWSROOM-N5-001,
 - [x] wdrożyć statyczny News Sitemap z wymaganymi news tags, 2-dniowym `first_published_at` window i 1000-entry deterministic split w NEWSROOM-N5-002,
 - [x] wdrożyć child-before-index atomic publication i cleanup obsolete zarządzanych article/news shards po switchu — potwierdzone w NEWSROOM-N5-007 PR #109; unrelated XML pozostają nietknięte,
-- [ ] wdrożyć dirty/version refresh coordinator + frequent scheduler lock; zachować daily cron jako safety net i nie wymagać queue workera,
+- [x] wdrożyć dirty/version refresh coordinator + frequent scheduler lock; zachować daily cron jako safety net i nie wymagać queue workera — potwierdzone w NEWSROOM-N5-007 PR #112,
 - [x] rozszerzyć istniejący `SeoSitemapAuditor` w NEWSROOM-N5-006 o newsroom/news namespace/tag/date/window/eligibility/topology/shard/obsolete-file checks, zachowując ogólne entry-count/byte-size guards i bez drugiego validatora,
 - [ ] zweryfikować rzeczywiste static/Nginx/CDN headers/304 bez przenoszenia source of truth do SitemapController,
 - [x] wdrożyć Atom feed + auto-discovery + application-level validators w NEWSROOM-N5-003,
@@ -1647,6 +1657,17 @@ Obecnie:
 ---
 
 ## 70. Historia zmian
+
+### 2026-09-18 — v0.26
+
+- drugi podkrok NEWSROOM-N5-007 zmergowano przez PR #112; finalny implementation head `6f1c3b99d11796f74987c7fe640302b2d76578b7`, merge `main@79b6de0276ba8cdce500c366a4f98098e528dcd8`,
+- `NewsroomSeoArtifactRefreshCoordinator` implementuje version/clean-version i shared cache lock bez nowej tabeli, migracji ani queue workera,
+- `newsroom:refresh-seo-artifacts-if-dirty` skipuje clean state, używa istniejącego generatora/audytora, pozostawia dirty po failure i nie czyści markera, jeśli version zmieniła się podczas pracy,
+- after-commit article workflow/public-read/home-placement listenery oraz category/topic/author observers ustawiają tani dirty signal zamiast wykonywać pełną generację w request,
+- scheduler uruchamia coordinator co minutę z `onOneServer()` + `withoutOverlapping()`; istniejący daily `seo:refresh-sitemaps` pozostał niezależnym safety netem,
+- canonical deployment docs potwierdzają aktualny single-node Mikrus 4.1 z lokalnym `public/`, Redisem i jednym `schedule:run`; topology gate jest spełniony dla tej topologii, ale przyszły multi-node wymaga shared artifact distribution,
+- exact-head CI #409 i post-merge CI #410 zakończyły pełny PASS: 1136 passed / 20 182 assertions / 2 skipped, PostgreSQL 7/94, Pint 1101 files PASS i frontend build PASS,
+- NEWSROOM-N5-007 pozostaje IN PROGRESS: production static/Nginx/Cloudflare/GSC HTTP delivery verification i production-like delivery smoke nadal nie są wykonane; dedykowany scheduler/lock contention regression również nie jest deklarowany jako istniejący.
 
 ### 2026-09-18 — v0.25
 

@@ -1990,26 +1990,32 @@ Nie zmieniamy produkcyjnego modelu na runtime generation.
 
 Nie implementować tego jako zwykłego `ShouldQueue`, dopóki produkcja ma `QUEUE_CONNECTION=sync` i brak monitorowanego workera.
 
-### Potwierdzony stan implementacji po PR #109
+### Potwierdzony stan implementacji po PR #109 i #112
 
 NEWSROOM-N5-007 pozostaje **IN PROGRESS**.
 
-Zakończony jest wyłącznie pierwszy podkrok publication hardening:
-- `SeoSitemapGenerator::generate()` buduje cały replacement set i waliduje protocol limits oraz XML przed modyfikacją opublikowanych plików,
+Potwierdzone podkroki:
+- PR #109: `SeoSitemapGenerator::generate()` buduje cały replacement set i waliduje protocol limits oraz XML przed modyfikacją opublikowanych plików,
 - child XML są zapisywane atomowo przed głównym `sitemap.xml`,
 - root `sitemap.xml` jest przełączany dopiero po zapisaniu child files,
 - obsolete zarządzane `articles*.xml` / `news*.xml` są usuwane dopiero po przełączeniu root indexu,
 - niezwiązane XML w `public/sitemaps` nie są usuwane przez ten cleanup,
-- regression tests potwierdzają kolejność publication, fail-before-switch dla invalid XML oraz post-switch cleanup.
+- PR #112: `NewsroomSeoArtifactRefreshCoordinator` utrzymuje version/clean-version w skonfigurowanym cache store oraz shared lock,
+- `newsroom:refresh-seo-artifacts-if-dirty` kończy się tanio przy clean state, generuje i audytuje tylko przy dirty, a failure albo zmiana version podczas pracy nie czyści dirty state,
+- after-commit article workflow/public-read/home-placement events ustawiają dirty signal przez auto-discovered listenery; category/topic/author observers również działają after commit,
+- produkcyjny scheduler uruchamia lekką komendę co minutę z `onOneServer()` i `withoutOverlapping()`,
+- istniejący daily `seo:refresh-sitemaps` pozostaje niezależnym recovery path; nie dodano queue workera ani zmiany `QUEUE_CONNECTION=sync`.
 
 Implementation PR #109 miał finalny head `dbcd5cdb2f0e6663c998f930c034624f8fe36bf4` i został zmergowany do `main@1744a93fd8f0bddfe7fc5bff90b146fdea24b016`. Exact-head CI #403 oraz post-merge CI #404 zakończyły pełny PASS: 1130 passed / 20 144 assertions / 2 skipped, PostgreSQL 7/94, Pint 1093 files PASS i frontend build PASS.
 
+Implementation PR #112 miał finalny head `6f1c3b99d11796f74987c7fe640302b2d76578b7` i został zmergowany do `main@79b6de0276ba8cdce500c366a4f98098e528dcd8`. Exact-head CI #409 i post-merge CI #410 zakończyły pełny PASS: 1136 passed / 20 182 assertions / 2 skipped, PostgreSQL 7/94, Pint 1101 files PASS i frontend build PASS.
+
+Topology evidence z aktualnych dokumentów wdrożeniowych potwierdza bieżący kontrakt produkcyjny jako 1x VPS Mikrus 4.1 z Nginx/PHP/PostgreSQL/Redis na jednej maszynie, lokalnym `public/` i jednym cronem `schedule:run`. Dla tej topologii same-filesystem atomic replace jest właściwym modelem. Ewentualne przejście na wiele web node'ów ponownie otwiera wymóg wspólnej dystrybucji artifact setu; Redis lock/`onOneServer()` nie synchronizuje lokalnych plików między node'ami.
+
 Nadal niewykonane w N5-007:
-- after-commit dirty/version signal,
-- frequent refresh coordinator i shared Redis/distributed lock / single-execution scheduler semantics,
-- version-safe marker clearing,
-- topology gate dla single-node vs multi-node,
-- production HTTP/static/Nginx/Cloudflare/GSC verification.
+- production HTTP/static/Nginx/Cloudflare/GSC verification,
+- production-like static delivery smoke i rzeczywiste potwierdzenie headerów/cache/validators,
+- dedykowany regression dla scheduler definition / lock contention poza już istniejącymi testami version-state i failure/race semantics.
 
 ### Robots compatibility
 
@@ -2020,13 +2026,18 @@ Nadal niewykonane w N5-007:
 
 ### Topology gate
 
-Przed wdrożeniem częstego refreshu potwierdzić rzeczywistą topologię produkcji:
+Potwierdzony aktualny kontrakt deploymentu:
+- `docs/INFRA-MVP-MIKRUS-4.1-R2.md`, `docs/DEPLOYMENT-RUNBOOK.md` i `docs/RUNBOOK-OPS.md` opisują 1x VPS Mikrus 4.1,
+- Nginx + PHP-FPM + PostgreSQL + Redis działają na tej samej maszynie,
+- statyczny `public/` jest lokalny dla tego app node,
+- jeden systemowy cron uruchamia `php artisan schedule:run` co minutę.
 
-- single web node + lokalny `public/` -> same-filesystem atomic replace jest wystarczającym modelem,
-- multiple web nodes -> wygenerowany set musi trafić atomowo/spójnie do współdzielonego volume, artifact distribution lub edge/origin wspólnego dla wszystkich node'ów,
-- `onOneServer()`/Redis lock zapobiega podwójnej generacji, ale **nie synchronizuje lokalnych plików pomiędzy node'ami**.
+Dla obecnego single-node kontraktu same-filesystem atomic replace jest wystarczającym modelem, więc topology gate jest spełniony na poziomie aktualnej kanonicznej topologii repo/deployment docs.
 
-N5-007 nie jest DONE bez tego dowodu.
+Jeśli topologia zmieni się na wiele web node'ów:
+- wygenerowany set musi trafić atomowo/spójnie do współdzielonego volume, artifact distribution lub edge/origin wspólnego dla wszystkich node'ów,
+- `onOneServer()`/Redis lock zapobiega podwójnej generacji, ale **nie synchronizuje lokalnych plików pomiędzy node'ami**,
+- topology gate trzeba wtedy ponownie otworzyć i potwierdzić nowy model dystrybucji.
 
 ### HTTP delivery
 
@@ -2337,7 +2348,7 @@ Docs-only:
 - [x] self-canonical + route-family exclusivity dla current article detail
 - [x] article sitemap przez istniejący static generator + deterministic sharding readiness + rollout-gated hub coverage (NEWSROOM-N5-001)
 - [x] News Sitemap full required metadata + `first_published_at` eligibility + 1000-entry deterministic split (NEWSROOM-N5-002)
-- [ ] dirty/version scheduled refresh bez queue-worker assumption
+- [x] dirty/version scheduled refresh bez queue-worker assumption — potwierdzone w NEWSROOM-N5-007 PR #112: version/clean-version, shared lock, every-minute scheduler, `onOneServer()` + `withoutOverlapping()`, daily recovery
 - [x] child-before-index atomic static publication — potwierdzone w NEWSROOM-N5-007 PR #109; dirty/version refresh i production delivery smoke pozostają osobnymi otwartymi gate'ami
 - [x] istniejący `SeoSitemapAuditor` rozszerzony o newsroom/news namespace/tag/date/window/eligibility/topology/shard/obsolete-file checks w NEWSROOM-N5-006; generic protocol-limit guards nadal są reużywane
 - [ ] rzeczywisty static/Nginx/CDN delivery smoke (Content-Type/cache/Set-Cookie/validators)
@@ -2580,11 +2591,24 @@ NEWSROOM-N5-007 — Static sitemap publication + freshness + delivery hardening 
 
 Pierwszy podkrok N5-007, czyli pre-validation + child-before-index atomic publication + post-switch cleanup zarządzanych article/news sitemap files, jest potwierdzony po PR #109 i post-merge CI #404 na `main@1744a93fd8f0bddfe7fc5bff90b146fdea24b016`.
 
-Następnym wykonywalnym podkrokiem pozostaje dirty/version freshness coordinator z częstym schedulerem i shared lockiem zgodnie z zapisanym kontraktem N5-007. Przed rolloutem częstego refreshu nadal obowiązuje topology gate; production static/Nginx/Cloudflare/GSC delivery verification nie jest jeszcze wykonana.
+Drugi podkrok N5-007, czyli dirty/version freshness coordinator + shared lock + every-minute scheduler, jest potwierdzony po PR #112 i post-merge CI #410 na `main@79b6de0276ba8cdce500c366a4f98098e528dcd8`. Aktualne deployment docs potwierdzają single-node topology z lokalnym `public/`, więc obecny topology gate jest spełniony dla tej topologii.
+
+Następnym wykonywalnym podkrokiem pozostaje production static/Nginx/Cloudflare/GSC delivery verification, w tym rzeczywisty HTTP smoke dla Content-Type/cache/Set-Cookie/validators. NEWSROOM-N5-007 nadal nie jest DONE.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-18 — v0.53
+
+- drugi podkrok NEWSROOM-N5-007 zmergowano przez PR #112; finalny implementation head `6f1c3b99d11796f74987c7fe640302b2d76578b7`, merge `main@79b6de0276ba8cdce500c366a4f98098e528dcd8`,
+- dodano cache-backed `NewsroomSeoArtifactRefreshCoordinator` z version/clean-version oraz shared lockiem; marker jest czyszczony tylko dla niezmienionej wersji,
+- `newsroom:refresh-seo-artifacts-if-dirty` nie generuje przy clean state, po dirty uruchamia istniejący generator + auditor, a failure lub nowa version pozostawia recovery signal,
+- after-commit article workflow/public-read/home-placement events oraz category/topic/author observers ustawiają dirty signal bez wykonywania pełnej generacji w publish request,
+- produkcyjny scheduler uruchamia coordinator co minutę z `onOneServer()` + `withoutOverlapping()`; daily `seo:refresh-sitemaps` pozostał bez zmian jako safety net, bez założenia queue workera,
+- aktualne canonical deployment docs potwierdzają single-node Mikrus 4.1 z lokalnym `public/`, lokalnym Redisem i jednym cronem `schedule:run`; dla tej topologii topology gate jest spełniony, ale multi-node wymagałby ponownego otwarcia gate'u,
+- exact-head CI #409: 1136 passed / 20 182 assertions / 2 skipped, PostgreSQL 7/94, Pint 1101 files PASS, frontend build 10.03 s; post-merge CI #410 powtórzył 1136 / 20 182 / 2 skipped, PostgreSQL 7/94, Pint PASS i build 7.54 s,
+- NEWSROOM-N5-007 pozostaje IN PROGRESS: production static/Nginx/Cloudflare/GSC HTTP delivery verification oraz production-like static delivery smoke nadal są otwarte; dedykowany scheduler/lock contention regression również nie jest przedstawiany jako wykonany.
 
 ### 2026-09-18 — v0.52
 
