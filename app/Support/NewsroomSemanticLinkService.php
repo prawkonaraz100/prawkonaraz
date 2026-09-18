@@ -8,7 +8,6 @@ use App\Models\ContentCategory;
 use App\Models\ContentTopic;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
-use InvalidArgumentException;
 
 final class NewsroomSemanticLinkService
 {
@@ -232,6 +231,10 @@ final class NewsroomSemanticLinkService
         return ContentArticle::query()
             ->activelyDistributed()
             ->indexable()
+            ->whereIn('type', [
+                ...NewsroomRouteContract::NEWSROOM_TYPES,
+                ...NewsroomRouteContract::GUIDE_TYPES,
+            ])
             ->whereHas('category', fn (Builder $query): Builder => $query->active())
             ->whereHas('author', fn (Builder $query): Builder => $query->published())
             ->with([
@@ -247,11 +250,7 @@ final class NewsroomSemanticLinkService
             ? $article->type->value
             : (string) $article->type;
 
-        try {
-            $url = NewsroomRouteContract::canonicalPath($type, (string) $article->slug);
-        } catch (InvalidArgumentException) {
-            $url = '#';
-        }
+        $url = NewsroomRouteContract::canonicalPath($type, (string) $article->slug);
 
         return [
             'id' => (int) $article->getKey(),
