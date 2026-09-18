@@ -8,7 +8,6 @@ use App\Models\ContentAuthor;
 use App\Models\ContentCategory;
 use App\Models\ContentTopic;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
 
 final class NewsroomSemanticLinkService
 {
@@ -251,7 +250,7 @@ final class NewsroomSemanticLinkService
             + $article->trafficSigns()->count();
 
         $estimatedHubDepth = match (true) {
-            !$isIndexable => null,
+            ! $isIndexable => null,
             $isActive && $hub !== null && $hub['url'] === route('public.guides', absolute: false) => 1,
             $isActive && $category !== null => 2,
             $author !== null => 3,
