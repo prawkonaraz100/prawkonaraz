@@ -1444,7 +1444,7 @@ Wdrożyć publiczną warstwę bez natychmiastowego przełączania istniejących 
 
 - [x] bounded queries niezależne od liczby aktywnych kategorii,
 - [x] eager loads dla category/author,
-- [x] cacheable scalar-array read model; faktyczny cache/invalidation pozostaje N4-006.
+- [x] cacheable scalar-array read model; faktyczny home/category cache/invalidation został zmaterializowany w N4-006.
 
 ---
 
