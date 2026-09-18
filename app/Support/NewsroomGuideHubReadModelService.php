@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Enums\ContentArticleType;
 use App\Models\ContentArticle;
 use App\Models\ContentAuthor;
+use App\Models\ContentCategory;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 final class NewsroomGuideHubReadModelService
