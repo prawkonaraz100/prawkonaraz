@@ -122,11 +122,42 @@ test('semantic resolver is deterministic bounded and excludes ineligible targets
     $audit = $service->audit($source->fresh(['category', 'topics']));
 
     expect($audit['has_crawlable_inbound'])->toBeTrue()
+        ->and($audit['hub']['url'])->toBe(route('public.news', absolute: false))
         ->and($audit['category']['url'])->toBe(
             route('public.news.categories.show', ['categorySlug' => $category->slug], false),
         )
         ->and($audit['topics'])->toHaveCount(1)
+        ->and(collect($audit['inbound_sources'])->pluck('kind'))->toContain('hub', 'category', 'topic', 'author')
         ->and($audit['estimated_hub_depth'])->toBe(2);
+
+    $guide = ContentArticle::factory()->published()->guide()->create([
+        'category_id' => $category->id,
+        'title' => 'Poradnik z bezpośrednim inboundem',
+        'slug' => 'poradnik-z-bezposrednim-inboundem',
+    ]);
+    $guideAudit = $service->audit($guide->fresh(['category', 'author']));
+
+    expect($guideAudit['has_crawlable_inbound'])->toBeTrue()
+        ->and($guideAudit['hub']['url'])->toBe(route('public.guides', absolute: false))
+        ->and($guideAudit['estimated_hub_depth'])->toBe(1);
+
+    $needsReview = ContentArticle::factory()->needsReview()->create([
+        'category_id' => $category->id,
+        'title' => 'Materiał w ponownej weryfikacji',
+        'slug' => 'material-w-ponownej-weryfikacji-audit',
+    ]);
+    $needsReviewAudit = $service->audit($needsReview->fresh(['category', 'author']));
+
+    expect($needsReviewAudit['has_crawlable_inbound'])->toBeTrue()
+        ->and($needsReviewAudit['hub'])->toBeNull()
+        ->and(collect($needsReviewAudit['inbound_sources'])->pluck('kind')->all())->toBe(['author'])
+        ->and($needsReviewAudit['estimated_hub_depth'])->toBe(3);
+
+    $noindexAudit = $service->audit($noindex->fresh(['category', 'author']));
+
+    expect($noindexAudit['has_crawlable_inbound'])->toBeFalse()
+        ->and($noindexAudit['inbound_sources'])->toBe([])
+        ->and($noindexAudit['estimated_hub_depth'])->toBeNull();
 });
 
 test('article page renders crawlable category topic and deterministic related links', function () {
