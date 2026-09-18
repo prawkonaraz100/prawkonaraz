@@ -2,20 +2,35 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\NewsroomHomeReadModelService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response;
 
 class NewsroomPlaceholderController extends Controller
 {
-    public function news(Request $request): Response
+    public function news(Request $request, NewsroomHomeReadModelService $readModelService): Response
     {
-        return $this->placeholder(
-            $request,
-            'Aktualności',
-            'Serwis',
-            'Tu pojawią się aktualności dla kandydatów, kursantów i instruktorów prawa jazdy.',
-        );
+        $home = $readModelService->build();
+
+        if ($home === null) {
+            return $this->placeholder(
+                $request,
+                'Aktualności',
+                'Serwis',
+                'Tu pojawią się aktualności dla kandydatów, kursantów i instruktorów prawa jazdy.',
+            );
+        }
+
+        return response()->view('newsroom.home', [
+            'home' => $home,
+            'meta' => [
+                'title' => 'Aktualności o prawie jazdy, egzaminach i przepisach | prawkonaraz.pl',
+                'description' => 'Aktualności, wyjaśnienia i poradniki o prawie jazdy, egzaminach, przepisach, WORD i bezpieczeństwie ruchu.',
+                'canonical' => route('public.news'),
+                'robots' => 'index,follow,max-image-preview:large',
+            ],
+        ]);
     }
 
     public function guides(Request $request): Response
