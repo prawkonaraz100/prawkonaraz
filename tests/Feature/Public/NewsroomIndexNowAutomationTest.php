@@ -10,6 +10,7 @@ use App\Support\ContentArticleEditToken;
 use App\Support\ContentArticlePublishingService;
 use App\Support\ContentArticleSlugService;
 use App\Support\IndexNowQueueService;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use Mockery\MockInterface;
@@ -27,6 +28,7 @@ beforeEach(function (): void {
 });
 
 afterEach(function (): void {
+    Carbon::setTestNow();
     URL::forceRootUrl(null);
     URL::forceScheme(null);
 });
@@ -115,13 +117,16 @@ test('archive does not queue delete while republish queues updated', function ()
     ContentArticleSource::factory()->for($article, 'article')->create();
 
     $service = app(ContentArticlePublishingService::class);
+    Carbon::setTestNow('2026-09-18 12:00:00');
     $archived = $service->archive($article);
 
     expect($archived->workflow_status)->toBe(ContentArticleWorkflowStatus::Archived)
         ->and($archived->isPubliclyVisible())->toBeTrue()
         ->and(IndexNowUrlSubmission::query()->count())->toBe(0);
 
+    Carbon::setTestNow('2026-09-18 12:01:00');
     $reviewed = $service->markReviewed($archived);
+    Carbon::setTestNow('2026-09-18 12:02:00');
     $republished = $service->republish($reviewed);
 
     $submission = IndexNowUrlSubmission::query()->sole();
@@ -139,6 +144,7 @@ test('withdraw queues deleted only after 410 state and restore to review stays s
     ContentArticleSource::factory()->for($article, 'article')->create();
 
     $service = app(ContentArticlePublishingService::class);
+    Carbon::setTestNow('2026-09-18 13:00:00');
     $withdrawn = $service->withdraw($article, 'Test wycofania.');
 
     $deleted = IndexNowUrlSubmission::query()->sole();
@@ -155,7 +161,9 @@ test('withdraw queues deleted only after 410 state and restore to review stays s
     expect($restored->workflow_status)->toBe(ContentArticleWorkflowStatus::InReview)
         ->and(IndexNowUrlSubmission::query()->count())->toBe(0);
 
+    Carbon::setTestNow('2026-09-18 13:01:00');
     $reviewed = $service->markReviewed($restored);
+    Carbon::setTestNow('2026-09-18 13:02:00');
     $published = $service->publish($reviewed);
     $updated = IndexNowUrlSubmission::query()->sole();
 
