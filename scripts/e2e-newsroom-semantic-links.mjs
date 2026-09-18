@@ -154,8 +154,16 @@ try {
                 }
             }
 
+            const anchorPaths = await page.locator('a').evaluateAll((anchors) => anchors.map((anchor) => {
+                try {
+                    return new URL(anchor.href, document.baseURI).pathname;
+                } catch {
+                    return '';
+                }
+            }));
+
             for (const href of surface.hrefs) {
-                if (await page.locator(`a[href="${href}"]`).count() < 1) {
+                if (!anchorPaths.includes(href)) {
                     throw new Error(`${surface.key} missing crawlable href ${href} at ${viewport.name}px.`);
                 }
             }
