@@ -694,13 +694,29 @@ test('newsroom article shards cross deterministic id ranges and keep stable assi
 test('sitemap generator rejects payloads above the configured url count guard', function () {
     config()->set('seo.sitemap_max_urls_per_file', 1);
 
-    expect(fn () => app(SeoSitemapGenerator::class)->generate(true))
-        ->toThrow(RuntimeException::class, 'Generated sitemap exceeds URL limit');
+    $exception = null;
+
+    try {
+        app(SeoSitemapGenerator::class)->generate(true);
+    } catch (RuntimeException $caught) {
+        $exception = $caught;
+    }
+
+    expect($exception)->toBeInstanceOf(RuntimeException::class);
+    expect($exception?->getMessage())->toContain('Generated sitemap exceeds URL limit');
 });
 
 test('sitemap generator rejects payloads above the configured byte size guard', function () {
     config()->set('seo.sitemap_max_uncompressed_bytes', 128);
 
-    expect(fn () => app(SeoSitemapGenerator::class)->generate(true))
-        ->toThrow(RuntimeException::class, 'Generated sitemap exceeds uncompressed byte limit');
+    $exception = null;
+
+    try {
+        app(SeoSitemapGenerator::class)->generate(true);
+    } catch (RuntimeException $caught) {
+        $exception = $caught;
+    }
+
+    expect($exception)->toBeInstanceOf(RuntimeException::class);
+    expect($exception?->getMessage())->toContain('Generated sitemap exceeds uncompressed byte limit');
 });
