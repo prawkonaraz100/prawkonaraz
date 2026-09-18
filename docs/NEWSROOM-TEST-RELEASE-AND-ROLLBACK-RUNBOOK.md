@@ -1349,7 +1349,8 @@ Jeśli draft stał się publiczny:
 - [ ] OG image + alt + stable public URL
 - [ ] og:site_name
 - [ ] articles sitemap/shard z istniejącego static generatora
-- [ ] news sitemap required metadata + fresh dirty-marker/scheduled refresh
+- [ ] production sample News Sitemap ma wymagane metadata/eligibility zgodne z wdrożonym N5-002
+- [ ] fresh dirty-marker/scheduled refresh dla News Sitemap
 - [ ] child-before-index atomic publication
 - [ ] feed + head discovery
 - [ ] sitemap static delivery headers/304 na faktycznej warstwie
