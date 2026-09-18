@@ -1,10 +1,16 @@
 <?php
 
+use App\Models\ContentArticle;
+use App\Models\ContentArticleRedirect;
+use App\Models\ContentAuthor;
+use App\Models\ContentCategory;
+use App\Models\ContentTopic;
 use App\Models\LicenseCategory;
 use App\Models\Question;
 use App\Models\QuestionMedia;
 use App\Models\QuestionPublicExplanation;
 use App\Support\QuestionVideoSeoDescriptionService;
+use App\Support\SeoSitemapGenerator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\URL;
@@ -13,6 +19,10 @@ beforeEach(function (): void {
     config()->set('app.url', 'https://prawkonaraz.pl');
     config()->set('filesystems.disks.public.url', 'https://prawkonaraz.pl/storage');
     config()->set('media.public_base_url', 'https://prawkonaraz.pl/storage');
+    config()->set('newsroom.public_enabled', false);
+    config()->set('newsroom.article_sitemap_shard_id_span', 10000);
+    config()->set('seo.sitemap_max_urls_per_file', SeoSitemapGenerator::MAX_URLS_PER_FILE);
+    config()->set('seo.sitemap_max_uncompressed_bytes', SeoSitemapGenerator::MAX_UNCOMPRESSED_BYTES);
     URL::forceRootUrl('https://prawkonaraz.pl');
     URL::forceScheme('https');
 
@@ -24,6 +34,7 @@ beforeEach(function (): void {
 });
 
 afterEach(function (): void {
+    Carbon::setTestNow();
     URL::forceRootUrl(null);
     URL::forceScheme(null);
 
@@ -442,4 +453,254 @@ test('seo refresh command generates files and runs the audit', function () {
 
     expect(File::exists(public_path('sitemap.xml')))->toBeTrue();
     expect(File::exists(public_path('sitemaps/questions-b.xml')))->toBeTrue();
+});
+
+
+test('newsroom article sitemap includes only indexable canonical public articles and indexable hubs', function () {
+    Carbon::setTestNow('2026-09-18 12:00:00');
+    config()->set('newsroom.public_enabled', true);
+
+    $category = ContentCategory::factory()->create([
+        'name' => 'Egzaminy',
+        'slug' => 'egzaminy-sitemap',
+        'updated_at' => now()->subMinutes(20),
+    ]);
+    $author = ContentAuthor::factory()->published()->create([
+        'name' => 'Autor sitemap',
+        'slug' => 'autor-sitemap',
+    ]);
+
+    $publishedLastmod = now()->subMinutes(5);
+    $published = ContentArticle::factory()->published()->create([
+        'category_id' => $category->id,
+        'author_id' => $author->id,
+        'title' => 'Publiczna aktualność sitemap',
+        'slug' => 'publiczna-aktualnosc-sitemap',
+        'first_published_at' => now()->subDays(2),
+        'published_at' => now()->subDays(2),
+        'last_substantive_update_at' => now()->subHour(),
+        'public_state_changed_at' => $publishedLastmod,
+    ]);
+    $guide = ContentArticle::factory()->published()->guide()->create([
+        'category_id' => $category->id,
+        'author_id' => $author->id,
+        'title' => 'Publiczny poradnik sitemap',
+        'slug' => 'publiczny-poradnik-sitemap',
+    ]);
+    $needsReview = ContentArticle::factory()->needsReview()->create([
+        'category_id' => $category->id,
+        'author_id' => $author->id,
+        'title' => 'Materiał needs review sitemap',
+        'slug' => 'material-needs-review-sitemap',
+    ]);
+    $archived = ContentArticle::factory()->archived()->create([
+        'category_id' => $category->id,
+        'author_id' => $author->id,
+        'title' => 'Archiwalny indeksowalny sitemap',
+        'slug' => 'archiwalny-indeksowalny-sitemap',
+    ]);
+
+    ContentArticle::factory()->published()->noindex()->create([
+        'category_id' => $category->id,
+        'author_id' => $author->id,
+        'title' => 'Noindex poza sitemap',
+        'slug' => 'noindex-poza-sitemap',
+    ]);
+    ContentArticle::factory()->draft()->create([
+        'category_id' => $category->id,
+        'author_id' => $author->id,
+        'title' => 'Draft poza sitemap',
+        'slug' => 'draft-poza-sitemap',
+    ]);
+    ContentArticle::factory()->withdrawn()->create([
+        'category_id' => $category->id,
+        'author_id' => $author->id,
+        'title' => 'Withdrawn poza sitemap',
+        'slug' => 'withdrawn-poza-sitemap',
+    ]);
+
+    $inactiveCategory = ContentCategory::factory()->inactive()->create([
+        'name' => 'Nieaktywna',
+        'slug' => 'nieaktywna-sitemap',
+    ]);
+    ContentArticle::factory()->published()->create([
+        'category_id' => $inactiveCategory->id,
+        'author_id' => $author->id,
+        'title' => 'Nieaktywna kategoria poza sitemap',
+        'slug' => 'nieaktywna-kategoria-poza-sitemap',
+    ]);
+
+    $unpublishedAuthor = ContentAuthor::factory()->create([
+        'name' => 'Niepubliczny autor sitemap',
+        'slug' => 'niepubliczny-autor-sitemap',
+    ]);
+    ContentArticle::factory()->published()->create([
+        'category_id' => $category->id,
+        'author_id' => $unpublishedAuthor->id,
+        'title' => 'Niepubliczny autor poza sitemap',
+        'slug' => 'niepubliczny-autor-poza-sitemap',
+    ]);
+
+    $redirectSource = ContentArticle::factory()->published()->create([
+        'category_id' => $category->id,
+        'author_id' => $author->id,
+        'title' => 'Kolizja redirect source',
+        'slug' => 'kolizja-redirect-source',
+    ]);
+    ContentArticleRedirect::query()->create([
+        'article_id' => $redirectSource->id,
+        'from_path' => '/aktualnosci/kolizja-redirect-source',
+        'to_path' => '/aktualnosci/publiczna-aktualnosc-sitemap',
+        'http_status' => 301,
+    ]);
+
+    $topic = ContentTopic::factory()->published()->create([
+        'title' => 'Topic sitemap',
+        'slug' => 'topic-sitemap',
+        'updated_at' => now()->subMinutes(15),
+    ]);
+    $topic->articles()->attach($published->id);
+
+    $this->artisan('seo:generate-sitemaps')
+        ->assertSuccessful();
+
+    expect(File::exists(public_path('sitemaps/articles.xml')))->toBeTrue();
+
+    $articles = File::get(public_path('sitemaps/articles.xml'));
+    $static = File::get(public_path('sitemaps/static.xml'));
+    $index = File::get(public_path('sitemap.xml'));
+
+    expect($index)->toContain('https://prawkonaraz.pl/sitemaps/articles.xml');
+
+    expect($articles)
+        ->toContain('https://prawkonaraz.pl/aktualnosci/publiczna-aktualnosc-sitemap')
+        ->toContain('https://prawkonaraz.pl/poradniki/publiczny-poradnik-sitemap')
+        ->toContain('https://prawkonaraz.pl/aktualnosci/material-needs-review-sitemap')
+        ->toContain('https://prawkonaraz.pl/aktualnosci/archiwalny-indeksowalny-sitemap')
+        ->toContain('<lastmod>'.$publishedLastmod->toIso8601String().'</lastmod>')
+        ->not->toContain('noindex-poza-sitemap')
+        ->not->toContain('draft-poza-sitemap')
+        ->not->toContain('withdrawn-poza-sitemap')
+        ->not->toContain('nieaktywna-kategoria-poza-sitemap')
+        ->not->toContain('niepubliczny-autor-poza-sitemap')
+        ->not->toContain('kolizja-redirect-source');
+
+    expect($static)
+        ->toContain('https://prawkonaraz.pl/aktualnosci')
+        ->toContain('https://prawkonaraz.pl/poradniki')
+        ->toContain('https://prawkonaraz.pl/aktualnosci/kategoria/egzaminy-sitemap')
+        ->toContain('https://prawkonaraz.pl/aktualnosci/temat/topic-sitemap')
+        ->not->toContain('https://prawkonaraz.pl/aktualnosci/kategoria/nieaktywna-sitemap');
+
+    $this->artisan('seo:audit-sitemaps')
+        ->assertSuccessful();
+});
+
+test('newsroom sitemap coverage stays disabled behind the public gate', function () {
+    config()->set('newsroom.public_enabled', false);
+
+    ContentArticle::factory()->published()->create([
+        'title' => 'Dark deployed article',
+        'slug' => 'dark-deployed-article-sitemap',
+    ]);
+
+    $this->artisan('seo:generate-sitemaps')
+        ->assertSuccessful();
+
+    expect(File::exists(public_path('sitemaps/articles.xml')))->toBeFalse();
+
+    $static = File::get(public_path('sitemaps/static.xml'));
+    $index = File::get(public_path('sitemap.xml'));
+
+    expect($index)->not->toContain('/sitemaps/articles');
+    expect($static)
+        ->not->toContain('<loc>https://prawkonaraz.pl/aktualnosci</loc>')
+        ->not->toContain('<loc>https://prawkonaraz.pl/poradniki</loc>');
+});
+
+test('newsroom article shards cross deterministic id ranges and keep stable assignment', function () {
+    config()->set('newsroom.public_enabled', true);
+    config()->set('newsroom.article_sitemap_shard_id_span', 2);
+
+    $category = ContentCategory::factory()->create();
+    $author = ContentAuthor::factory()->published()->create();
+
+    $articles = collect(range(1, 3))
+        ->map(fn (int $index): ContentArticle => ContentArticle::factory()->published()->create([
+            'category_id' => $category->id,
+            'author_id' => $author->id,
+            'title' => 'Shard article '.$index,
+            'slug' => 'shard-article-'.$index,
+        ]));
+
+    $shardPathFor = static function (int $id): string {
+        $bucket = intdiv($id - 1, 2);
+        $start = ($bucket * 2) + 1;
+        $end = ($bucket + 1) * 2;
+
+        return sprintf('sitemaps/articles-%06d-%06d.xml', $start, $end);
+    };
+
+    $this->artisan('seo:generate-sitemaps')
+        ->assertSuccessful();
+
+    expect(File::exists(public_path('sitemaps/articles.xml')))->toBeFalse();
+
+    $paths = $articles
+        ->map(fn (ContentArticle $article): string => $shardPathFor((int) $article->id))
+        ->unique()
+        ->values();
+
+    expect($paths->count())->toBeGreaterThan(1);
+
+    $index = File::get(public_path('sitemap.xml'));
+
+    foreach ($paths as $relativePath) {
+        expect(File::exists(public_path($relativePath)))->toBeTrue();
+        expect($index)->toContain('https://prawkonaraz.pl/'.$relativePath);
+    }
+
+    foreach ($articles as $article) {
+        $relativePath = $shardPathFor((int) $article->id);
+        $xml = File::get(public_path($relativePath));
+
+        expect($xml)->toContain('/aktualnosci/'.$article->slug);
+    }
+
+    $stableArticle = $articles->last();
+    $stableShardPath = $shardPathFor((int) $stableArticle->id);
+
+    $articles->first()->update(['robots' => 'noindex,follow']);
+
+    $this->artisan('seo:generate-sitemaps')
+        ->assertSuccessful();
+
+    expect(File::exists(public_path($stableShardPath)))->toBeTrue();
+    expect(File::get(public_path($stableShardPath)))
+        ->toContain('/aktualnosci/'.$stableArticle->slug);
+
+    $allArticleXml = collect(File::glob(public_path('sitemaps/articles-*.xml')) ?: [])
+        ->map(fn (string $file): string => File::get($file))
+        ->implode("\n");
+
+    foreach ($articles->slice(1) as $article) {
+        expect(substr_count($allArticleXml, '/aktualnosci/'.$article->slug))->toBe(1);
+    }
+
+    $this->artisan('seo:audit-sitemaps')
+        ->assertSuccessful();
+});
+
+test('sitemap generator rejects payloads above the configured url count guard', function () {
+    config()->set('seo.sitemap_max_urls_per_file', 1);
+
+    expect(fn () => app(SeoSitemapGenerator::class)->generate(true))
+        ->toThrow(RuntimeException::class, 'Generated sitemap exceeds URL limit');
+});
+
+test('sitemap generator rejects payloads above the configured byte size guard', function () {
+    config()->set('seo.sitemap_max_uncompressed_bytes', 128);
+
+    expect(fn () => app(SeoSitemapGenerator::class)->generate(true))
+        ->toThrow(RuntimeException::class, 'Generated sitemap exceeds uncompressed byte limit');
 });
