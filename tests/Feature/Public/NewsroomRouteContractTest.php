@@ -66,8 +66,12 @@ test('newsroom article catch all excludes reserved namespace segments and invali
         ->and(newsroomRouteNameForPath('/poradniki/kategoria'))->toBe('public.guides.show');
 });
 
-test('unimplemented feed and unknown public slugs fail closed', function () {
-    $this->get('/aktualnosci/feed.xml')->assertNotFound();
+test('implemented feed and unknown public slugs follow the current route contract', function () {
+    config(['newsroom.public_enabled' => true]);
+
+    $this->get('/aktualnosci/feed.xml')
+        ->assertOk()
+        ->assertHeader('Content-Type', 'application/atom+xml; charset=UTF-8');
     $this->get('/aktualnosci/kategoria/nie-istnieje')->assertNotFound();
     $this->get('/aktualnosci/temat/pkk')->assertNotFound();
     $this->get('/aktualnosci/nowe-zasady')->assertNotFound();
