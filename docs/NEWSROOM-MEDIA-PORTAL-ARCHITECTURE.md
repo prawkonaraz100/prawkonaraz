@@ -103,7 +103,7 @@ Na pierwszym etapie nie budujemy:
 
 ## 5. Aktualny stan implementacji
 
-Stan sprawdzony ponownie 2026-09-18 względem `main@04a3e961a40207bd65c41b684a5bf1cd8d2c5e10` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-012, NEWSROOM-N3-001..N3-008 oraz NEWSROOM-N4-001..N4-002. Zakres admin/domain N2 i public article layer N3 są zamknięte. N4-001 materializuje bounded/cacheable read-model kompozycji huba, a N4-002 podłącza go do publicznego SSR Blade `/aktualnosci`; pozostałe N4/N5 pozostają otwarte.
+Stan sprawdzony ponownie 2026-09-18 względem `main@84bcb2aeff57a1374def7af411c39db07a8fb38d` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-012, NEWSROOM-N3-001..N3-008 oraz NEWSROOM-N4-001..N4-003. Zakres admin/domain N2 i public article layer N3 są zamknięte. N4-001 materializuje bounded/cacheable read-model kompozycji huba, N4-002 podłącza go do publicznego SSR Blade `/aktualnosci`, a N4-003 materializuje publiczne category pages; pozostałe N4/N5 pozostają otwarte.
 
 ### 5.1. Elementy już istniejące
 
@@ -132,6 +132,9 @@ Repo ma już istotny fundament:
 - N4-001: istniejący `NewsroomHomeCompositionService` pozostaje jedynym resolverem fixed placements/fallback/dedupe; category composition korzysta z batched placements, per-category SQL window rankingu i wspólnego eager-loadu zamiast query-per-category,
 - N4-001: `NewsroomHomeReadModelService` wystawia rollout-gated scalar-array projection lead/secondary/latest/categories/guides/important_now/breaking z canonical path, category/author i hero metadata; wynik jest serializowalny i gotowy do późniejszego cache,
 - N4-002: przy `NEWSROOM_PUBLIC_ENABLED=true` `NewsroomPlaceholderController::news()` konsumuje istniejący `NewsroomHomeReadModelService` i renderuje SSR `newsroom.home` z self-canonical oraz `index,follow,max-image-preview:large`; przy gate=false zachowuje wcześniejszy placeholder 200 + `X-Robots-Tag: noindex, follow`,
+- N4-003: istniejący route `public.news.categories.show` jest podłączony do `NewsroomCategoryController`; przy gate=false category route failuje do 404, a przy gate=true aktywna kategoria renderuje SSR `newsroom.category`,
+- N4-003: `NewsroomCategoryReadModelService` reużywa `ContentArticlePublicCatalogService::activelyDistributedQuery()` dla newsroom-family corpus, sortuje `first_published_at DESC, id DESC`, paginuje po 20 rekordów i emituje tylko public-safe scalar data,
+- N4-003: `NewsroomCategorySchemaService` emituje `CollectionPage`, `BreadcrumbList` i — tylko przy niepustym corpus — `ItemList`; pusta aktywna kategoria pozostaje użytecznym 200, ale ma `noindex,follow`,
 - route `/autorzy/{authorSlug}`,
 - statyczny produkcyjny pipeline sitemap `SeoSitemapGenerator` + `SeoSitemapBuilder` + `SeoSitemapAuditor`, z codziennym `seo:refresh-sitemaps` jako istniejącym safety netem,
 - dynamiczny `SitemapController`, który współistnieje z generowanymi artefaktami i nie jest samodzielnym source of truth produkcyjnego XML,
@@ -163,11 +166,12 @@ Repo ma już istotny fundament:
 
 `/aktualnosci` jest po N4-002 dwustanową powierzchnią rolloutową w istniejącym `NewsroomPlaceholderController`: przy `NEWSROOM_PUBLIC_ENABLED=false` nadal renderuje `Public/MarketingPlaceholder.vue` jako 200 + `X-Robots-Tag: noindex, follow`, a przy `true` renderuje SSR Blade `newsroom.home` z danych `NewsroomHomeReadModelService`. `/poradniki` nadal pozostaje pre-launch placeholderem 200 + noindex do NEWSROOM-N4-004.
 
-Następujące namespaces pozostają downstream i nie zostały uruchomione przez N3-005:
+Następujące namespaces nadal pozostają downstream:
 
 - `/aktualnosci/feed.xml`,
-- `/aktualnosci/kategoria/{categorySlug}`,
 - `/aktualnosci/temat/{topicSlug}`.
+
+Category namespace `/aktualnosci/kategoria/{categorySlug}` jest od N4-003 aktywny wyłącznie przy `NEWSROOM_PUBLIC_ENABLED=true`; przy wyłączonym gate failuje do 404.
 
 Detail routes są już podłączone:
 
@@ -178,7 +182,7 @@ To oznacza, że:
 
 - adresy, IA i matching/order contract istnieją,
 - model domenowy artykułów/kategorii/tagów/topiców i relacji oraz backendowy publishing/scheduling foundation istnieją,
-- publiczny hub `/aktualnosci` istnieje po N4-002 przy włączonym gate; category/topic/feed oraz osobny hub `/poradniki` nadal nie istnieją,
+- publiczny hub `/aktualnosci` istnieje po N4-002 przy włączonym gate, a publiczne category pages istnieją po N4-003; topic/feed oraz osobny hub `/poradniki` nadal nie istnieją,
 - `ContentArticlePublicCatalogService` jest konsumowany przez publiczny detail controller i rozróżnia `visible/gone/not_found`,
 - `ContentArticleSeoService` i `ContentArticleSchemaService` są podłączone do publicznego article response,
 - `NewsroomArticleBodyRenderer` renderuje publicznie `rich_text`, `image`, `quote`, `table`, `context`, public-safe `related_article` oraz przygotowane przez Product Bridge `legal_reference`, `question_group`, `traffic_sign_group` i `product_cta`,
@@ -197,7 +201,7 @@ To oznacza, że:
 Nie ma obecnie kompletnego end-to-end odpowiednika:
 
 - publicznego topic lifecycle pod `/aktualnosci/temat/{topicSlug}`; publiczne 200/410, nav i sitemap consequences pozostają N4/N5,
-- publicznych category/topic/feed rendererów oraz osobnego huba `/poradniki`,
+- publicznych topic/feed rendererów oraz osobnego huba `/poradniki`,
 - reverse-link surface z istniejących entity pages do newsroom article,
 - news sitemap,
 - feedu RSS/Atom,
@@ -1510,8 +1514,9 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N3-008` — public rollout config gate.
 - [x] `NEWSROOM-N4-001` — `/aktualnosci` editorial composition read model.
 - [x] `NEWSROOM-N4-002` — publiczny Hub Blade `/aktualnosci`.
+- [x] `NEWSROOM-N4-003` — publiczne category pages `/aktualnosci/kategoria/{categorySlug}`.
 
-N4-002 jest zmaterializowane i potwierdzone na `main@04a3e961a40207bd65c41b684a5bf1cd8d2c5e10`; następnym wykonywalnym taskiem jest `NEWSROOM-N4-003` — Category pages. Pozostałe elementy N4–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu pełną checklistę.
+N4-003 jest zmaterializowane i potwierdzone na `main@84bcb2aeff57a1374def7af411c39db07a8fb38d`; następnym wykonywalnym taskiem jest `NEWSROOM-N4-004` — `/poradniki` hub. Pozostałe elementy N4–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu pełną checklistę.
 
 ---
 ## 28. Zasady utrzymania dokumentu
@@ -1536,6 +1541,15 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-18 — v0.40
+
+- NEWSROOM-N4-003 zmergowano przez PR #85; finalny implementation head `8e4f707060fbaa348e9392f0b19beb7b4517beca`, merge `main@84bcb2aeff57a1374def7af411c39db07a8fb38d`,
+- aktywowano istniejący `public.news.categories.show` bez zmiany route contract: gate=false -> 404, gate=true -> SSR `newsroom.category` dla aktywnej kategorii,
+- listing reużywa `activelyDistributedQuery()` dla newsroom-family corpus, sortuje `first_published_at DESC, id DESC`, paginuje po 20 rekordów; strona 1 nie emituje redundantnego `?page=1`, a dalsze strony mają self-canonical,
+- aktywna pusta kategoria renderuje użyteczny 200 + `noindex,follow`; SEO graph category page używa `CollectionPage` + `BreadcrumbList` oraz `ItemList` tylko dla niepustego corpus,
+- Browser Smoke #29 zakończył PASS dla `newsroom-category`, `newsroom-home` i `newsroom-article`; exact-head CI #326 PASS na `8e4f7070...`, post-merge CI #327 PASS na `main@84bcb2ae...`: 1067 passed / 19 684 assertions / 2 skipped, Pint 1065 files PASS, frontend build 9.40 s, `newsroom-postgres` 7 passed / 94 assertions,
+- NEWSROOM-N4-004 `/poradniki` hub jest następnym wykonywalnym taskiem; topic/feed, cache/invalidation, reverse links i N5 discovery pozostają otwarte.
 
 ### 2026-09-18 — v0.39
 

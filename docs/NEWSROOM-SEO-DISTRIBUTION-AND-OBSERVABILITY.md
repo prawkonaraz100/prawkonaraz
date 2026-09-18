@@ -1593,8 +1593,8 @@ Obecnie:
 - repo nie gwarantuje async Laravel queue workera (`QUEUE_CONNECTION=sync` w env example), więc newsroom nie może opierać freshness na ShouldQueue,
 - po NEWSROOM-N4-002 `/aktualnosci` jest rollout-gated: przy `NEWSROOM_PUBLIC_ENABLED=false` pozostaje pre-launch placeholderem 200 + `X-Robots-Tag: noindex, follow`, a przy `true` renderuje SSR `newsroom.home` z self-canonical i `index,follow,max-image-preview:large`; `/poradniki` nadal jest pre-launch placeholderem 200 + noindex,
 - `/aktualnosci/feed.xml` ma zarejestrowany route contract, ale obecnie zwraca 404; feed ani feed discovery nie są jeszcze wdrożone,
-- category/topic route namespaces są zarejestrowane i nadal pozostają 404 bez publicznych controllerów; article detail routes są aktywne od N3-004.
-- NEWSROOM-N3-008 jest wdrożone, a N4-002 konsumuje ten sam gate dla publicznego huba `/aktualnosci`; przy `false` hub nie staje się indeksowalną thin page, przy `true` może być indeksowany. Category/topic/feed, reverse links, newsroom/article/news sitemap i article-specific IndexNow automation pozostają otwarte w dalszym N4/N5.
+- category route `/aktualnosci/kategoria/{categorySlug}` jest od N4-003 aktywnym publicznym SSR surface przy gate=true; topic route nadal pozostaje 404 bez publicznego controllera, a article detail routes są aktywne od N3-004.
+- NEWSROOM-N3-008 jest wdrożone, N4-002 konsumuje ten sam gate dla publicznego huba `/aktualnosci`, a N4-003 dla category pages. Przy gate=false category route failuje do 404; przy gate=true aktywna kategoria może być indeksowana. Topic/feed, reverse links, newsroom/article/news sitemap i article-specific IndexNow automation pozostają otwarte w dalszym N4/N5.
 
 ---
 
@@ -1615,6 +1615,7 @@ Obecnie:
 - [ ] zweryfikować rzeczywiste static/Nginx/CDN headers/304 bez przenoszenia source of truth do SitemapController,
 - [ ] wdrożyć feed + auto-discovery + własne validators,
 - [ ] wdrożyć analytics hooks/events,
+- [x] wdrożyć N4-003 category SEO: self-canonical pagination, category title/description fallback, `CollectionPage` + `BreadcrumbList` oraz conditional `ItemList`,
 - [ ] wdrożyć topic SEO dla faktycznie publikowanych dossier,
 - [ ] zweryfikować crop/OG output z focal point,
 - [ ] podłączyć monitoring,
@@ -1624,6 +1625,14 @@ Obecnie:
 ---
 
 ## 70. Historia zmian
+
+### 2026-09-18 — v0.15
+
+- NEWSROOM-N4-003 zmergowano przez PR #85 na `main@84bcb2aeff57a1374def7af411c39db07a8fb38d`; category route konsumuje istniejący `NewsroomPublicGate`,
+- gate=false zwraca 404 dla category route; gate=true aktywna kategoria renderuje SSR z self-canonical, a każda kolejna strona paginacji ma własny canonical `?page=N` bez tworzenia wariantu `?page=1`,
+- category SEO korzysta z `seo_title`/`seo_description` z fallbackiem, `CollectionPage` + `BreadcrumbList` i `ItemList` tylko dla niepustego corpus; aktywna pusta kategoria ma meta robots oraz `X-Robots-Tag: noindex, follow`,
+- task nie wdrożył topic/feed, article/news sitemap, reverse links ani nowej IndexNow automatyzacji,
+- Browser Smoke #29 potwierdził canonical/robots category page oraz page-2 canonical z JS disabled; exact-head CI #326 i post-merge CI #327 zakończyły się PASS.
 
 ### 2026-09-18 — v0.14
 
