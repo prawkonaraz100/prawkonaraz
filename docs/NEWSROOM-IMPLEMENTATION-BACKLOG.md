@@ -1036,7 +1036,7 @@ Computed blocking/warning items.
 - spadek corpus poniżej baseline po publikacji daje warning/wyłączenie z promocji, ale nie automatyczny HTTP flip,
 - explicit topic archive usuwa go z sitemap/nav i zwraca 410 dla wcześniej publicznego URL.
 
-**Stan tego cross-stage punktu DoD:** domenowe `archived` i blokada dalszej promocji są wdrożone w N2-011, a publiczny route/410 został domknięty przez N4-007. Sitemap coverage/exclusion nadal należy do N5-001. N4-007 nie zmienia faktu, że N2/G2 było zamknięte wcześniej na poziomie domeny/CMS.
+**Stan tego cross-stage punktu DoD:** domenowe `archived` i blokada dalszej promocji są wdrożone w N2-011, publiczny route/410 został domknięty przez N4-007, a N5-001 domknęło standard article sitemap coverage/exclusion dla indexable archived content. N4-007 nie zmienia faktu, że N2/G2 było zamknięte wcześniej na poziomie domeny/CMS.
 
 ---
 
