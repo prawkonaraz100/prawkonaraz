@@ -19,14 +19,18 @@ class NewsroomFeedController extends Controller
 
         $xml = $feedService->render($feed);
         $response = response($xml, Response::HTTP_OK);
+        $lastModified = Carbon::parse($feed['updated'])->utc();
 
         $response->headers->set('Content-Type', 'application/atom+xml; charset=UTF-8');
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->setEtag(hash('sha256', $xml));
-        $response->setLastModified(Carbon::parse($feed['updated'])->utc());
+        $response->setLastModified($lastModified);
         $response->setPublic();
         $response->setMaxAge(max(1, (int) config('newsroom.cache_ttl_seconds', 60)));
-        $response->isNotModified($request);
+
+        if ($response->isNotModified($request)) {
+            $response->setLastModified($lastModified);
+        }
 
         return $response;
     }
