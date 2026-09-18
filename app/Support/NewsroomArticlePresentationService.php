@@ -14,6 +14,7 @@ final class NewsroomArticlePresentationService
 {
     public function __construct(
         private readonly NewsroomArticleBodyRenderer $bodyRenderer,
+        private readonly NewsroomSemanticLinkService $semanticLinks,
         private readonly MediaUrlResolver $mediaUrlResolver,
     ) {}
 
@@ -45,6 +46,9 @@ final class NewsroomArticlePresentationService
             'isNeedsReview' => $workflow === ContentArticleWorkflowStatus::NeedsReview,
             'isArchived' => $workflow === ContentArticleWorkflowStatus::Archived,
             'authorBox' => $this->authorBox($article),
+            'topicLinks' => $this->semanticLinks->topics($article),
+            'relatedArticles' => $this->semanticLinks->relatedArticles($article),
+            'internalLinkAudit' => $this->semanticLinks->audit($article),
         ];
     }
 
