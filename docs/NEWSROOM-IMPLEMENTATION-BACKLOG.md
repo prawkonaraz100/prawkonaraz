@@ -1706,24 +1706,46 @@ Site-wide orphan/click-depth crawler/komenda pozostaje osobnym możliwym hardeni
 
 ## NEWSROOM-N5-001 — Extend static generator: articles + hub sitemap coverage + deterministic sharding
 
-Rozszerzyć istniejący `SeoSitemapGenerator` / `SeoSitemapBuilder`, nie tworzyć osobnego generatora.
+### Status implementacji
 
-- wszystkie publiczne indexable articles,
-- `/aktualnosci`, `/poradniki`, active categories i published/indexable topics mają jawne sitemap coverage,
-- meaningful lastmod,
-- absolute canonical HTTPS URLs,
-- exclude noindex/draft/redirect-source,
-- istniejący sitemap index jako parent,
-- deterministic sharding readiness przed limitami pojedynczego pliku,
-- żadnego niestabilnego offset-shardingu.
+**DONE w kodzie — PR #97 zmergowano na `main@5ddfa48c0646fa89cc802d129e6d9ccee9d18957`.** Finalny implementation head `b4ff321011c3d58438876c9d69f324e342ec9021` przeszedł exact-head CI #367; post-merge CI #368 na exact `main` również zakończył pełny PASS.
+
+### Aktualny stan implementacji
+
+- istniejące `SeoSitemapBuilder`, `SeoSitemapGenerator` i `SeoSitemapAuditor` zostały rozszerzone; nie powstał drugi sitemap engine,
+- przy `NEWSROOM_PUBLIC_ENABLED=false` article shards i newsroom hub coverage nie są emitowane,
+- standard article sitemap obejmuje indexable newsroom/guide detail URLs z aktywną kategorią i publicznym autorem oraz wyklucza noindex/draft/withdrawn i current canonical path kolidujący z historycznym `ContentArticleRedirect.from_path`,
+- przy corpus mieszczącym się w jednym zakresie generator używa `/sitemaps/articles.xml`; po przekroczeniu skonfigurowanego zakresu używa stabilnych shardów `articles-{id-range}.xml` opartych o niezmienne zakresy `content_articles.id`, bez OFFSET shardingu,
+- wynikowe article files są wpisywane bezpośrednio do istniejącego root `/sitemap.xml`; nie dodano zagnieżdżonego newsroom sitemap-index,
+- `static.xml` otrzymuje rollout-gated coverage dla `/aktualnosci`, warunkowo `/poradniki`, aktywnych category hubs i published topic hubs,
+- article `lastmod` używa `max(first_published_at, last_substantive_update_at, public_state_changed_at)`; huby używają deterministycznych timestampów publicznego outputu zamiast czasu generowania,
+- generator i auditor mają guardy 50 000 wpisów / 50 MB nieskompresowanego XML,
+- N5-001 nie wdraża news sitemap, feedu, dirty/version refresh coordinatora, article-specific IndexNow, child-before-index set switch/obsolete-shard cleanup ani produkcyjnej weryfikacji Nginx/CDN/GSC.
+
+### Zakres
+
+- [x] wszystkie publiczne indexable articles,
+- [x] `/aktualnosci`, `/poradniki`, active categories i published/indexable topics mają jawne sitemap coverage,
+- [x] meaningful lastmod,
+- [x] absolute canonical HTTPS URLs,
+- [x] exclude noindex/draft/withdrawn/redirect-source,
+- [x] istniejący sitemap index jako parent,
+- [x] deterministic sharding readiness przed limitami pojedynczego pliku,
+- [x] żadnego niestabilnego offset-shardingu.
 
 ### Testy
 
-- single shard,
-- boundary crossing,
-- stable shard assignment,
-- no duplicate URL across shards,
-- XML size/URL-count guard.
+- [x] single shard,
+- [x] boundary crossing,
+- [x] stable shard assignment,
+- [x] no duplicate URL across shards,
+- [x] XML size/URL-count guard,
+- [x] public-gate suppression i eligibility regression w istniejącym `SeoSitemapGenerationTest`.
+
+### Dowód Quality Gate
+
+- exact-head CI #367: 1098 passed / 19 926 assertions / 2 skipped, `newsroom-postgres` 7 passed / 94 assertions, Pint PASS, frontend build PASS,
+- post-merge CI #368 na `main@5ddfa48c0646fa89cc802d129e6d9ccee9d18957`: 1098 passed / 19 926 assertions / 2 skipped, `newsroom-postgres` 7 passed / 94 assertions, Pint PASS, frontend build PASS.
 
 ---
 
@@ -2414,6 +2436,15 @@ N4-008 jest zamknięte implementacyjnie po PR #95, exact-head CI #361, Browser S
 ---
 
 # 12. Historia zmian
+
+### 2026-09-18 — v0.46
+
+- NEWSROOM-N5-001 zmergowano przez PR #97; finalny implementation head `b4ff321011c3d58438876c9d69f324e342ec9021`, merge `main@5ddfa48c0646fa89cc802d129e6d9ccee9d18957`,
+- rozszerzono istniejący static sitemap pipeline o rollout-gated standard article sitemap, hub coverage i deterministic fixed-ID-range sharding bez tworzenia drugiego generatora ani nested sitemap-index,
+- article corpus wyklucza noindex/draft/withdrawn, niepublicznego autora, nieaktywną kategorię i canonical path będący historycznym redirect source; `lastmod` korzysta z publicznych timestampów domenowych,
+- generator i auditor egzekwują 50 000 entries / 50 MB; istniejący `SeoSitemapGenerationTest` pokrywa single-shard, boundary crossing, stabilność assignment, brak duplikatów, public gate i oba protocol guards,
+- exact-head CI #367 i post-merge CI #368 zakończyły pełny PASS: 1098 passed / 19 926 assertions / 2 skipped, Pint PASS, frontend build PASS i PostgreSQL 7/94,
+- N5-001 nie wdraża news sitemap, feedu, dirty/version coordinatora, article-specific IndexNow, child-before-index atomic set switch/obsolete-shard cleanup ani produkcyjnej weryfikacji static/Nginx/CDN; następnym wykonywalnym taskiem jest NEWSROOM-N5-002 — News sitemap.
 
 ### 2026-09-18 — v0.45
 
