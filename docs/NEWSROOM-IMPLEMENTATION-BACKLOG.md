@@ -1036,7 +1036,7 @@ Computed blocking/warning items.
 - spadek corpus poniżej baseline po publikacji daje warning/wyłączenie z promocji, ale nie automatyczny HTTP flip,
 - explicit topic archive usuwa go z sitemap/nav i zwraca 410 dla wcześniej publicznego URL.
 
-**Stan tego cross-stage punktu DoD:** domenowe `archived` i blokada dalszej promocji są wdrożone w N2-011, ale publiczny route/410 należy do N4-007, a sitemap coverage/exclusion do N5-001. Te publiczne elementy pozostają otwarte i nie są dowodem zamknięcia N2/G2.
+**Stan tego cross-stage punktu DoD:** domenowe `archived` i blokada dalszej promocji są wdrożone w N2-011, a publiczny route/410 został domknięty przez N4-007. Sitemap coverage/exclusion nadal należy do N5-001. N4-007 nie zmienia faktu, że N2/G2 było zamknięte wcześniej na poziomie domeny/CMS.
 
 ---
 
@@ -1211,7 +1211,7 @@ Dodatkowo:
 - publiczny controller podłącza metadata z N3-002 i graph z N3-003 do istniejącego `public-content` layoutu,
 - publiczne sources obejmują wyłącznie `is_publicly_cited=true`; private evidence i `image_license_note` nie są emitowane,
 - hero zachowuje alt, caption, credit, dimensions, focal `object-position` i preload/fetch priority contract,
-- top-level `/aktualnosci` i `/poradniki` pozostają pre-launch placeholderami; category/topic/feed pozostają downstream N4/N5,
+- top-level `/aktualnosci` i `/poradniki` są dziś rollout-gated publicznymi hubami (placeholder/noindex tylko przy gate=false); category pages są publiczne od N4-003, topic dossier od N4-007, a feed pozostaje downstream N5,
 - historyczny old-path -> 301 pozostaje NEWSROOM-N3-006; `NEWSROOM_PUBLIC_ENABLED` pozostaje NEWSROOM-N3-008.
 
 ### Zakres
@@ -1379,12 +1379,12 @@ Rozszerzyć istniejący publiczny profil `ContentAuthor` o Newsroom bez tworzeni
 - `config/newsroom.php` czyta `NEWSROOM_PUBLIC_ENABLED` z bezpiecznym defaultem `false`; `.env.example` również utrwala `NEWSROOM_PUBLIC_ENABLED=false`,
 - `NewsroomPublicGate` jest jednym prostym source of truth dla publicznego dark-deploy gate; nie dodano równoległego feature-flag frameworka,
 - przy `false` `ContentArticleController` failuje zamknięcie do publicznego 404 przed lookupem artykułu i przed historycznym redirect resolverem, więc zarówno current detail, jak i old-path 301 nie ujawniają dark-deployed content,
-- top-level `/aktualnosci` i `/poradniki` zachowują istniejący pre-launch placeholder 200 z `X-Robots-Tag: noindex, follow`; category/topic/feed nadal pozostają niezaimplementowanymi publicznie 404 zgodnie z N4/N5,
+- przy `false` top-level `/aktualnosci` i `/poradniki` zachowują pre-launch placeholder 200 z `X-Robots-Tag: noindex, follow`, a article/category/topic routes failują do 404 przed ujawnieniem publicznego corpus; przy `true` home/category/guides/topic surfaces są aktywne po N4-002/N4-003/N4-004/N4-007, natomiast feed pozostaje 404 do N5,
 - przy `false` profil autora nie pobiera publikacji Newsroomu, a `SeoSitemapBuilder` nie kwalifikuje newsroom-only authora ani nie dodaje newsroomowego `public_state_changed_at` do freshness author sitemap,
 - `IndexNowUrlCollector` defensywnie odrzuca namespace `/aktualnosci` i `/poradniki` przy wyłączonym gate; faktyczna article-specific automatyzacja IndexNow nadal należy do N5-005,
 - admin/data i authenticated private preview pozostają dostępne przy `false`,
-- istniejące public-article testy i dedykowany Browser Smoke jawnie ustawiają gate na `true`; `NewsroomPublicGateTest` pokrywa disabled/enabled state dla news + guide detail, old-path redirect, placeholderów, category/topic/feed 404, author discovery, author sitemap contribution, IndexNow collector i private preview,
-- reverse links, public hub/category/topic, feed oraz article/news sitemap nadal nie istnieją; przyszłe N4/N5 implementacje muszą konsumować ten sam gate zamiast tworzyć własne przełączniki.
+- istniejące publiczne testy i dedykowane Browser Smoke jawnie ustawiają gate na `true`; `NewsroomPublicGateTest` pokrywa disabled/enabled state dla news + guide detail, old-path redirect, top-level placeholderów, category/topic gate behavior, feed 404, author discovery, author sitemap contribution, IndexNow collector i private preview,
+- public hub/category/guides/topic konsumują dziś ten sam gate; reverse links, feed oraz article/news sitemap nadal nie istnieją i N4-008/N5 muszą nadal używać tego samego `NewsroomPublicGate` zamiast tworzyć własne przełączniki.
 
 
 ### Cel
@@ -1460,7 +1460,7 @@ Wdrożyć publiczną warstwę bez natychmiastowego przełączania istniejących 
 - przy `NEWSROOM_PUBLIC_ENABLED=false` `NewsroomHomeReadModelService::build()` zwraca `null`, a controller zachowuje dotychczasowy `Public/MarketingPlaceholder` 200 + `X-Robots-Tag: noindex, follow`,
 - przy `NEWSROOM_PUBLIC_ENABLED=true` controller renderuje SSR `resources/views/newsroom/home.blade.php` z istniejącego N4-001 read modelu i ustawia self-canonical oraz `index,follow,max-image-preview:large`,
 - Hub Blade renderuje tylko niepuste moduły: newsroom subnavigation, important-now, breaking, lead/secondary, latest, category blocks, guides i Product Bridge; brak danych nie tworzy sztucznych kart ani pustych placeholderów,
-- category links w samym hubie nie otwierają jeszcze downstream category pages: subnavigation kotwiczy do sekcji na `/aktualnosci`; publiczne category/topic/feed routes pozostają 404 do kolejnych tasków,
+- subnavigation kategorii nadal kotwiczy do sekcji na `/aktualnosci`, ale category blocks mają crawlable wejścia do publicznych category pages od N4-003; publiczny topic route istnieje od N4-007, jego jawne discovery/reverse links pozostają N4-008, a feed pozostaje 404 do N5,
 - Product Bridge reużywa istniejący route `public.tests`; wspólny `layouts.public-content`, header i footer pozostają bez zmian,
 - `tests/Feature/NewsroomHomePageTest.php` pokrywa gate=false, gate=true i empty-section behavior; istniejące `NewsroomPublicGateTest` i `Public/NewsroomRouteContractTest` zostały zsynchronizowane z nowym enabled-state huba,
 - dedykowany `scripts/e2e-newsroom-home.mjs` działa z JavaScript disabled, realnym built CSS i viewportami 360/390/430/768/1024/1280/1440; workflow `Browser Smoke` ma automatyczny job `newsroom-home` dla relewantnych PR-ów.
@@ -1625,21 +1625,39 @@ N4-006 nie obejmuje topic/feed, guide-hub/article cache ani N5 discovery side ef
 
 ## NEWSROOM-N4-007 — Topic / dossier pages
 
+### Status implementacji
+
+**DONE w kodzie — PR #93 zmergowano na `main@a97373003c5a249a28761df15342f19e656c50c5`.** Finalny implementation head `812313afc38e30e53c59901d46c2d24188e3f6fa` przeszedł exact-head CI #348, Browser Smoke #39 i post-merge CI #349.
+
+### Aktualny stan implementacji
+
+- istniejący route `/aktualnosci/temat/{topicSlug}` używa `NewsroomTopicController`,
+- `NEWSROOM_PUBLIC_ENABLED=false`, draft, future i unknown topic failują do 404 + noindex; wcześniej publiczny archived topic zwraca 410 + noindex,
+- publiczny topic reużywa istniejący `ContentTopic`, jego publish/archive/republish workflow oraz jawny `content_article_topic` pivot; nie powstał drugi topic/tag model ani nowa migracja,
+- `NewsroomTopicReadModelService` wybiera `activelyDistributed()+indexable()` corpus typów news/explainer/analysis/report/guide i sortuje `first_published_at DESC, id DESC`,
+- opcjonalny eligible `featured_article_id` jest pojedynczym leadem na page 1 i jest wykluczony z chronologicznego listingu/paginacji,
+- późniejszy spadek corpus poniżej baseline 3 nie przełącza automatycznie HTTP/indexability; baseline pozostaje gate'em publish/republish i health signalem,
+- `newsroom.topic` jest SSR/Blade-first, ma editorial description, featured, chronological listing i crawlable pagination,
+- `NewsroomTopicSchemaService` emituje `CollectionPage` + `BreadcrumbList` + `ItemList`; page 1 jest self-canonical bez `?page=1`, a page N używa `?page=N`,
+- brak automatycznych tag pages, topic cache, reverse links i N5 sitemap/feed/IndexNow.
+
 ### Zakres
 
-- public topic route,
-- intro/description,
-- featured article,
-- activelyDistributed/indexable topic corpus,
-- latest ordering by first_published_at,
-- pagination,
-- SEO.
+- [x] public topic route,
+- [x] intro/description,
+- [x] featured article,
+- [x] activelyDistributed/indexable topic corpus,
+- [x] latest ordering by first_published_at + id tie-breaker,
+- [x] pagination,
+- [x] SEO metadata + CollectionPage schema.
 
 ### DoD
 
-- only published topics public,
-- no automatic tag pages,
-- thin/empty topic not launched.
+- [x] only published topics public,
+- [x] no automatic tag pages,
+- [x] thin topic nie jest publikowany automatycznie: publish/republish zachowuje minimum 3 eligible articles; późniejszy spadek corpus nie tworzy ukrytego HTTP flipu.
+
+N4-007 nie obejmuje semantic silo/reverse links N4-008 ani N5 discovery.
 
 ---
 
@@ -2353,19 +2371,19 @@ Nie oznaczać tasku DONE przed merge + green verification.
 
 # 10. Aktualny stan
 
-Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-006 na `main@5f1880e03469fc6e340a86fdb1b4246c7afd116b`:
+Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-007 na `main@a97373003c5a249a28761df15342f19e656c50c5`:
 
 - pakiet projektowy newsroomu obejmuje architekturę, model danych, CMS, UI, governance, SEO, backlog i runbook,
-- foundation N0, pełny etap N1-001..N1-006, admin/domain N2-001..N2-012, cały etap NEWSROOM-N3-001..N3-008 oraz NEWSROOM-N4-001..N4-006 są wdrożone,
-- publiczne article detail `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}`, fail-closed Product Bridge, old-path 301, author-profile integration, public hub/category/guides surfaces, navigation integration i globalny `NEWSROOM_PUBLIC_ENABLED` gate są zmaterializowane,
-- `NewsroomPublicReadCache` cache’uje istniejące publiczne home/category read models przez generation-based keys i 60-sekundowy TTL safety net,
-- publish/archive workflow oraz aktywne public/exposure updates invalidują home+category after-commit; placement changes invalidują tylko home; category save/delete invaliduje home+category after-commit,
-- preview, guide hub, article detail, topic/feed i N5 dirty/version/sitemap/IndexNow nie są częścią N4-006,
-- `NewsroomPublicReadCacheTest` chroni reuse, publish, placement, archive, category metadata i outer-transaction rollback/commit boundary,
-- feature-test harness czyści trwały file cache między testami, zgodnie z izolowanym per-test SQLite database contract,
-- Browser Smoke #36 potwierdził brak regresji w `newsroom-guides`, `newsroom-category`, `newsroom-home` i `newsroom-article`,
-- topic/feed routes nadal pozostają 404, a newsroom dirty/version refresh coordinator nadal nie istnieje,
-- canonical CI zachowuje SQLite `quality` i addytywny `newsroom-postgres`; post-merge CI #343 na exact `main@5f1880e0...` był pełnym PASS,
+- foundation N0, pełny etap N1-001..N1-006, admin/domain N2-001..N2-012, cały etap NEWSROOM-N3-001..N3-008 oraz NEWSROOM-N4-001..N4-007 są wdrożone,
+- publiczne article detail, hub/category/guides oraz topic dossier route `/aktualnosci/temat/{topicSlug}` są zmaterializowane za globalnym `NEWSROOM_PUBLIC_ENABLED` gate,
+- publiczny topic reużywa istniejący `ContentTopic` i jawny pivot; published -> 200, draft/future/unknown/gate=false -> 404 + noindex, historyczny archived -> 410 + noindex,
+- eligible topic corpus to `activelyDistributed()+indexable()` news/explainer/analysis/report/guide, z opcjonalnym featured leadem i chronologią `first_published_at DESC, id DESC`,
+- późniejszy spadek corpus poniżej baseline 3 nie przełącza automatycznie publicznego HTTP/indexability; publish/republish nadal egzekwują quality gate,
+- topic SSR emituje self-canonical pagination oraz `CollectionPage` + `BreadcrumbList` + `ItemList`; automatyczne tag pages nie istnieją,
+- `NewsroomPublicReadCache` nadal cache’uje tylko home/category; N4-007 nie dodaje topic cache,
+- Browser Smoke #39 potwierdził `newsroom-topic` oraz brak regresji w `newsroom-guides`, `newsroom-category`, `newsroom-home`, `newsroom-article`,
+- feed route nadal pozostaje 404, reverse links N4-008 i newsroom dirty/version/sitemap/IndexNow N5 nadal nie istnieją,
+- canonical CI zachowuje SQLite `quality` i addytywny `newsroom-postgres`; post-merge CI #349 na exact `main@a9737300...` był pełnym PASS,
 - QUEUE_CONNECTION w env example jest sync; stały queue worker nie jest gwarantowany,
 - panel Filament pozostaje admin-only i ten kontrakt pozostaje wymaganiem v1.
 
@@ -2373,13 +2391,23 @@ Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-006 na `main@5f1880e03469fc6e340a86
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N4-007 — Topic / dossier pages.
+NEWSROOM-N4-008 — Semantic silo / reverse-link integration.
 
-N4-006 jest zamknięte implementacyjnie po PR #91, exact-head CI #342, Browser Smoke #36 i post-merge CI #343. Następny krok ma zmaterializować istniejący topic route jako publiczną, rollout-gated dossier surface dla opublikowanych topiców i activelyDistributed/indexable corpus, bez automatycznych tag pages. Nie obejmuje reverse links N4-008 ani discovery N5.
+N4-007 jest zamknięte implementacyjnie po PR #93, exact-head CI #348, Browser Smoke #39 i post-merge CI #349. Następny krok ma zmaterializować jawny, bounded internal-link graph zgodnie z istniejącymi relacjami i bez automatycznej link farmy. Nie obejmuje discovery N5.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-18 — v0.44
+
+- NEWSROOM-N4-007 zmergowano przez PR #93; finalny implementation head `812313afc38e30e53c59901d46c2d24188e3f6fa`, merge `main@a97373003c5a249a28761df15342f19e656c50c5`,
+- istniejący public topic route został aktywowany bez zmian schema/CMS; reużywa `ContentTopic`, explicit pivot i istniejący publish/archive contract,
+- topic renderer obsługuje eligible featured lead, mixed newsroom/guide corpus, deterministic chronology, SSR pagination/canonical oraz CollectionPage/BreadcrumbList/ItemList,
+- draft/future/unknown/gate=false failują do 404 + noindex, archived historyczny do 410 + noindex; późniejszy below-baseline corpus nie powoduje automatycznego HTTP/indexability flipu,
+- `NewsroomTopicPageTest`, public-gate/route regressions i dedykowany Browser Smoke #39 chronią publiczny kontrakt,
+- exact-head CI #348 PASS; post-merge CI #349 PASS: 1087 passed / 19 827 assertions / 2 skipped, Pint 1081 files PASS, frontend build 9.48 s, PostgreSQL 7/94,
+- NEWSROOM-N4-008 Semantic silo / reverse-link integration jest następnym wykonywalnym taskiem.
 
 ### 2026-09-18 — v0.43
 
