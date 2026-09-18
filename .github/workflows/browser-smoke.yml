@@ -8,11 +8,16 @@ on:
       - 'app/Http/Controllers/ContentArticleController.php'
       - 'app/Http/Controllers/NewsroomPlaceholderController.php'
       - 'app/Http/Controllers/NewsroomCategoryController.php'
+      - 'app/Http/Controllers/NewsroomTopicController.php'
       - 'app/Support/ContentArticlePublicCatalogService.php'
       - 'app/Support/NewsroomHomeCompositionService.php'
       - 'app/Support/NewsroomHomeReadModelService.php'
       - 'app/Support/NewsroomCategoryReadModelService.php'
       - 'app/Support/NewsroomCategorySchemaService.php'
+      - 'app/Support/NewsroomTopicReadModelService.php'
+      - 'app/Support/NewsroomTopicSchemaService.php'
+      - 'app/Models/ContentTopic.php'
+      - 'app/Support/ContentTopicPublishingService.php'
       - 'app/Support/NewsroomGuideHubReadModelService.php'
       - 'app/Support/NewsroomGuideHubSchemaService.php'
       - 'app/Support/PublicFooter.php'
@@ -32,6 +37,7 @@ on:
       - 'scripts/e2e-newsroom-category.mjs'
       - 'scripts/e2e-newsroom-guides.mjs'
       - 'scripts/e2e-newsroom-home.mjs'
+      - 'scripts/e2e-newsroom-topic.mjs'
       - 'package.json'
 
 jobs:
@@ -351,5 +357,69 @@ jobs:
         with:
           name: newsroom-guides-browser-qa
           path: output/playwright/newsroom-guides
+          if-no-files-found: warn
+          retention-days: 3
+
+  newsroom-topic:
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    env:
+      APP_ENV: testing
+      NEWSROOM_PUBLIC_ENABLED: 'true'
+      DB_CONNECTION: sqlite
+      DB_DATABASE: database/database.sqlite
+      DB_URL: ''
+      CACHE_STORE: file
+      SESSION_DRIVER: file
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: log
+      MEDIA_LOCAL_ROOT: ${{ github.workspace }}/storage/app/public-media
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          extensions: mbstring, sqlite3, pdo_sqlite, fileinfo
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Prepare application environment
+        run: |
+          cp .env.example .env
+          mkdir -p database storage/app/public storage/app/public-media
+          touch database/database.sqlite
+          php artisan key:generate --force
+          php artisan storage:link
+
+      - name: Build frontend assets
+        run: npm run build
+
+      - name: Run newsroom topic browser QA
+        run: npm run e2e:newsroom-topic
+
+      - name: Upload newsroom topic QA artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newsroom-topic-browser-qa
+          path: output/playwright/newsroom-topic
           if-no-files-found: warn
           retention-days: 3
