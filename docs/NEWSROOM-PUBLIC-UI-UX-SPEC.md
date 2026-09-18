@@ -1286,7 +1286,7 @@ Frontend newsroom v1 jest UI-complete, gdy:
 
 ## 67. Stan implementacji
 
-Na 2026-09-18 po NEWSROOM-N3-008, zweryfikowanym na `main@23b952b77e39cd25fb39edc252faf05849946bd7`:
+Na 2026-09-18 po NEWSROOM-N4-001, zweryfikowanym na `main@e0e06e9af8a6b02a63ef4b3e1eb2d772409ad974`:
 
 - `/aktualnosci` i `/poradniki` nadal renderują pre-launch `MarketingPlaceholder.vue` przez dedykowany `NewsroomPlaceholderController`; oba huby zwracają 200 i `X-Robots-Tag: noindex, follow`,
 - category/topic/feed routes pozostają downstream i nie zostały uruchomione przez N3-005,
@@ -1307,7 +1307,9 @@ Na 2026-09-18 po NEWSROOM-N3-008, zweryfikowanym na `main@23b952b77e39cd25fb39ed
 - N3-005 nie implementuje reverse links; semantic silo/reverse-link integration pozostaje NEWSROOM-N4-008,
 - historyczne old-slug -> current canonical 301 są wdrożone przez NEWSROOM-N3-006 bez dodatkowego UI surface; `NEWSROOM_PUBLIC_ENABLED` jest wdrożone przez NEWSROOM-N3-008; przy `false` publiczne article/guide detail i historyczne redirecty failują do 404 przed lookupem, podczas gdy top-level placeholdery pozostają 200 + noindex,
 - NEWSROOM-N3-007 rozszerza istniejący `/autorzy/{slug}`: `published` trafia do aktualnych publikacji, `needs_review+indexable` do osobnej sekcji „W trakcie weryfikacji”, `archived+indexable` do osobnego „Archiwum”, a noindex/scheduled/withdrawn/inactive-category nie są listowane,
-- `NewsroomHomeCompositionService` nadal nie jest podłączony do publicznego `/aktualnosci`; hub/category/topic/feed pozostają dalszym zakresem N4/N5.
+- N4-001 rozszerza istniejący `NewsroomHomeCompositionService` bez tworzenia drugiego systemu kompozycji: fixed placements, fallback, globalna deduplikacja i breaking exception pozostają tym samym kontraktem, a category blocks korzystają z batched placements i bounded per-category ranking zamiast query-per-category,
+- `NewsroomHomeReadModelService` daje przyszłemu hubowi rollout-gated scalar-array projection lead/secondary/latest/categories/guides/important_now/breaking z canonical path, category/author i hero metadata; przy `NEWSROOM_PUBLIC_ENABLED=false` publiczny read model zwraca `null`,
+- N4-001 nie dodaje żadnej nowej warstwy wizualnej i nie było podstaw do osobnego Browser Smoke: `NewsroomHomeCompositionService` / read model nadal nie są podłączone do publicznego `/aktualnosci`; Hub Blade pozostaje N4-002, category/topic/feed dalszym N4/N5, a faktyczny cache N4-006.
 
 ---
 
@@ -1330,11 +1332,21 @@ Na 2026-09-18 po NEWSROOM-N3-008, zweryfikowanym na `main@23b952b77e39cd25fb39ed
 - [x] zbudować NEWSROOM-N3-005 Product Bridge dla questions/legal/signs/contextual CTA,
 - [x] zbudować NEWSROOM-N3-006 historical redirect resolver HTTP,
 - [x] zbudować NEWSROOM-N3-007 author-profile integration,
-- [x] zbudować NEWSROOM-N3-008 public rollout config gate; `NEWSROOM_PUBLIC_ENABLED=false` jest bezpiecznym defaultem, a N4-001 jest następnym wykonywalnym taskiem.
+- [x] zbudować NEWSROOM-N3-008 public rollout config gate; `NEWSROOM_PUBLIC_ENABLED=false` jest bezpiecznym defaultem,
+- [x] zbudować NEWSROOM-N4-001 editorial composition read model bez uruchamiania publicznego huba,
+- [ ] zbudować NEWSROOM-N4-002 Hub Blade layout; to jest następny wykonywalny task.
 
 ---
 
 ## 69. Historia zmian
+
+### 2026-09-18 — v0.17
+
+- NEWSROOM-N4-001 zmergowano przez PR #81 na `main@e0e06e9af8a6b02a63ef4b3e1eb2d772409ad974`,
+- istniejący composer zachowuje fixed placements/fallback/dedupe/breaking contract, a category candidate loading ma teraz bounded query budget niezależny od liczby kategorii,
+- `NewsroomHomeReadModelService` materializuje public-safe scalar arrays z canonical/category/author/hero metadata i respektuje `NewsroomPublicGate`,
+- publiczny `/aktualnosci` nadal renderuje pre-launch placeholder 200 + noindex; N4-001 nie jest fałszywie utożsamione z Hub Blade ani cache,
+- exact-head CI #314 i post-merge CI #315 są PASS; N4-002 jest następnym UI taskiem.
 
 ### 2026-09-18 — v0.16
 
