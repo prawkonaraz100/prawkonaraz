@@ -1459,10 +1459,10 @@ Runbook jest spełniony, gdy:
 
 ## 58. Stan implementacji
 
-Na 2026-09-18 po NEWSROOM-N4-002, zweryfikowanym na `main@04a3e961a40207bd65c41b684a5bf1cd8d2c5e10`:
+Na 2026-09-18 po NEWSROOM-N4-003, zweryfikowanym na `main@84bcb2aeff57a1374def7af411c39db07a8fb38d`:
 
 - istnieją globalne backend tests, ops backup/restore/health commands i kanoniczny CI z `quality` na SQLite oraz addytywnym `newsroom-postgres` na PostgreSQL 16,
-- istnieją newsroom-specific unit/security i feature regression dla body contract/editor, media storage/article media, enum/schema/model, slug/history, publishing workflow, home composition/placements, article preview, topic/CMS oraz N3-001 catalog, N3-002 SEO, N3-003 schema service, N3-005 Product Bridge, N3-006 redirect, N3-007 author profile, N3-008 public gate, N4-001 home read model i N4-002 public home renderer,
+- istnieją newsroom-specific unit/security i feature regression dla body contract/editor, media storage/article media, enum/schema/model, slug/history, publishing workflow, home composition/placements, article preview, topic/CMS oraz N3-001 catalog, N3-002 SEO, N3-003 schema service, N3-005 Product Bridge, N3-006 redirect, N3-007 author profile, N3-008 public gate, N4-001 home read model, N4-002 public home renderer i N4-003 category pages,
 - N3-004 dostarcza `NewsroomArticleBodyRenderer`, `NewsroomArticlePresentationService`, publiczny `ContentArticleController`, Blade `newsroom.article`/`article-unavailable` i feature tests publicznego article response,
 - N3-005 dodaje `NewsroomArticleProductBridgeService`, `newsroom.product-bridge-block` i `NewsroomProductBridgeTest`; publiczny article renderer obsługuje teraz questions/legal/signs/contextual CTA bez losowych relacji i bez draft targetów,
 - current-canonical public detail ma automatyczne 200/404/410 coverage; 410/404 nie renderują treści i są noindex, a `NewsroomArticleRedirectTest` pokrywa old-slug one-hop 301/fail-closed behavior N3-006,
@@ -1476,14 +1476,17 @@ Na 2026-09-18 po NEWSROOM-N4-002, zweryfikowanym na `main@04a3e961a40207bd65c41b
 - N4-002 dodaje `NewsroomHomePageTest` dla gate=false/gate=true/empty-section behavior oraz aktualizuje `NewsroomPublicGateTest` i `Public/NewsroomRouteContractTest` do nowego enabled-state huba,
 - dedykowany Browser Smoke #27 na finalnym N4-002 head `1036b67a...` zakończył PASS dla `newsroom-home` i `newsroom-article`; hub harness działa z JS disabled na 360/390/430/768/1024/1280/1440 i sprawdza realny built CSS, canonical/robots, CTA oraz horizontal overflow,
 - exact-head CI #321 dla PR #83 zakończył PASS, a post-merge CI #322 na `main@04a3e961a40207bd65c41b684a5bf1cd8d2c5e10` zakończył się pełnym PASS: `quality` 1062 passed / 19 638 assertions / 2 skipped, Pint 1061 files PASS, frontend build 7.59 s; `newsroom-postgres` 7 passed / 94 assertions,
-- publiczny Hub Blade jest zamknięty implementacyjnie; category/topic/feed browser surfaces, osobny hub `/poradniki` i reverse links N4-008 pozostają otwarte, a następnym taskiem jest N4-003,
+- N4-003 dodaje `NewsroomCategoryPageTest` dla gate, active/inactive/unknown/out-of-range, eligibility, deterministic order, pagination, empty-state/noindex i schema; istniejące `NewsroomPublicGateTest`, `Public/NewsroomRouteContractTest` i `NewsroomHomePageTest` zostały zsynchronizowane z nowym category surface,
+- workflow `Browser Smoke` ma osobny automatyczny job `newsroom-category`; Browser Smoke #29 na finalnym N4-003 head `8e4f707060fbaa348e9392f0b19beb7b4517beca` zakończył PASS dla `newsroom-category`, `newsroom-home` i `newsroom-article`; category harness działa z JS disabled na 360/390/430/768/1024/1280/1440 i sprawdza page 2/canonical,
+- exact-head CI #326 zakończył PASS, a post-merge CI #327 na `main@84bcb2aeff57a1374def7af411c39db07a8fb38d` zakończył pełny gate: `quality` 1067 passed / 19 684 assertions / 2 skipped, Pint 1065 files PASS, frontend build 9.40 s; `newsroom-postgres` 7 passed / 94 assertions,
+- publiczny Hub Blade i category pages są zamknięte implementacyjnie; topic/feed surfaces, osobny hub `/poradniki` i reverse links N4-008 pozostają otwarte, a następnym taskiem jest N4-004,
 - atomic static publication, dirty/version newsroom refresh coordinator, newsroom/news sitemap output i `SeoSitemapAuditor` extension pozostają N5.
 
 ---
 
 ## 59. Pozostałe zadania
 
-- [ ] dodać dalsze test files w trakcie N4-003..N5; N4-001 dodało `NewsroomHomeReadModelServiceTest`, a N4-002 `NewsroomHomePageTest` i `e2e-newsroom-home.mjs`,
+- [ ] dodać dalsze test files w trakcie N4-004..N5; N4-001 dodało `NewsroomHomeReadModelServiceTest`, N4-002 `NewsroomHomePageTest` i `e2e-newsroom-home.mjs`, a N4-003 `NewsroomCategoryPageTest` i `e2e-newsroom-category.mjs`,
 - [x] dodać dedykowany browser E2E dla publicznego article detail N3-004,
 - [x] dodać N2 media/topic/focal-point integration i N3-004 renderer/browser regression; pełne crop-variant generation nadal nie istnieje,
 - [x] dodać service-level site-identity/entity-graph/date-consistency regression oraz publiczne HTML/JSON-LD emission dla article detail,
@@ -1499,11 +1502,20 @@ Na 2026-09-18 po NEWSROOM-N4-002, zweryfikowanym na `main@04a3e961a40207bd65c41b
 - [x] wdrożyć i przetestować `NEWSROOM_PUBLIC_ENABLED` w N3-008 dla obecnie istniejących public detail/redirect + author + IndexNow surfaces; przyszłe N4/N5 discovery surfaces nadal wymagają tego samego gate,
 - [x] dodać N4-001 `NewsroomHomeReadModelServiceTest` dla rollout gate, scalar/cacheable projection i stałego query budgetu niezależnego od liczby kategorii,
 - [x] dodać N4-002 public Hub Blade/browser regression wraz z rzeczywistym publicznym rendererem,
+- [x] dodać N4-003 category page feature/browser regression wraz z rzeczywistym publicznym rendererem,
 - [ ] po pierwszym release wpisać rzeczywiste wyniki i ewentualne różnice od planu.
 
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-18 — v0.23
+
+- NEWSROOM-N4-003 implementation PR #85 zakończył exact-head CI #326 PASS na `8e4f707060fbaa348e9392f0b19beb7b4517beca` oraz Browser Smoke #29 PASS dla `newsroom-category`, `newsroom-home` i `newsroom-article`; merge to `main@84bcb2aeff57a1374def7af411c39db07a8fb38d`,
+- `NewsroomCategoryPageTest` pokrywa rollout gate, eligibility/status filtering, deterministic order, paginację, empty state/noindex, canonical i schema; `e2e-newsroom-category.mjs` wykonuje JS-disabled responsive QA oraz page-2 canonical check,
+- post-merge CI #327 zakończył pełny gate: 1067 passed / 19 684 assertions / 2 skipped, Pint 1065 files PASS, frontend build 9.40 s; `newsroom-postgres` 7 passed / 94 assertions,
+- aktywna pusta kategoria pozostaje 200/noindex; invalid/out-of-range i gate=false failują do 404; topic/feed, `/poradniki` hub, cache/invalidation i N5 discovery pozostają otwarte,
+- następnym wykonywalnym taskiem jest NEWSROOM-N4-004 — `/poradniki` hub.
 
 ### 2026-09-18 — v0.22
 
