@@ -67,7 +67,7 @@ final class NewsroomGuideHubReadModelService
             'url' => NewsroomRouteContract::canonicalPath($type->value, (string) $article->slug),
             'lead' => filled($article->lead) ? (string) $article->lead : null,
             'first_published_at' => $article->first_published_at?->toIso8601String(),
-            'category' => $category instanceof \App\Models\ContentCategory
+            'category' => $category instanceof ContentCategory
                 ? [
                     'id' => (int) $category->getKey(),
                     'name' => (string) $category->name,
