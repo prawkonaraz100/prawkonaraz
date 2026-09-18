@@ -182,6 +182,15 @@ Route::get('/szkolenia-z-instruktorem', fn () => Inertia::render('Public/Marketi
 Route::get('/aktualnosci', [NewsroomPlaceholderController::class, 'news'])
     ->name('public.news');
 Route::get('/aktualnosci/feed.xml', NewsroomFeedController::class)
+    ->withoutMiddleware([
+        EnsureUserIsNotBanned::class,
+        HandleInertiaRequests::class,
+        MarkReturningUser::class,
+        TrackUserIpActivity::class,
+        VerifyCsrfToken::class,
+        StartSession::class,
+        ShareErrorsFromSession::class,
+    ])
     ->name('public.news.feed');
 Route::get('/aktualnosci/kategoria/{categorySlug}', NewsroomCategoryController::class)
     ->where('categorySlug', NewsroomRouteContract::SLUG_PATTERN)
