@@ -1937,24 +1937,36 @@ Re-use existing IndexNow queue/submission pipeline; nie tworzyć drugiego klient
 
 ## NEWSROOM-N5-006 — Extend existing SEO/sitemap audits
 
-Rozszerzyć istniejący `SeoSitemapAuditor` zamiast tworzyć równoległy sitemap validator.
+### Status implementacji
 
-Raportuje/testuje m.in.:
+**DONE — implementation merged + post-merge Quality Gate PASS.**
 
-- duplicate/canonical sitemap loc,
-- article/news shard limits,
-- required news namespace/tags,
-- old article in news sitemap,
-- noindex/draft/redirect source in sitemap,
-- orphan article,
-- broken related relation,
-- draft target,
-- source URL empty,
-- expired breaking,
-- index wskazujący brakujący child,
-- duplicate/stale obsolete shard po publication switch.
+Potwierdzony stan na `main@18300baf3a91ffc5e3c549ab664c471bfd34ffe4`:
 
-Można dodać newsroom-specific `newsroom:audit-links` dla graph/link checks, ale sitemap rules pozostają w istniejącym audytorze.
+- istniejący `SeoSitemapAuditor` został rozszerzony; nie powstał równoległy sitemap validator,
+- auditor sprawdza duplicate index loc, brakujący child file, canonical/current article eligibility, noindex/draft/non-public author/inactive category/redirect-source entries, Google News namespace/required tags/identity/language/title/date/2-day window, article/news topology i shard overlap oraz obsolete unreferenced article/news shard files,
+- istniejący generic URL-count/byte-size guard nadal jest reużywany również dla newsroomowych plików,
+- `NewsroomSemanticLinkService::auditAll()` wykonuje site-wide QA na tym samym resolverze semantic links co publiczne renderowanie,
+- cienka komenda `newsroom:audit-links` raportuje orphan article bez gwarantowanego crawlable inbound, pusty publicznie cytowany source URL, expired breaking, non-public topic/legal/sign targets, niekwalifikowany/broken related target lub canonical URL oraz broken topic featured-article relation,
+- public gate wyłączony => link audit kończy się bez fałszywych błędów dla dark deployment,
+- dodano `NewsroomSeoSitemapAuditTest` i `NewsroomLinkAuditTest`; nie dodano migracji, schema ani drugiego graph/sitemap subsystemu.
+
+### Potwierdzone testy i Quality Gate
+
+- finalny implementation HEAD `64feb88b614b737a69784d43e86e97591aaec3d5`,
+- pre-merge CI #397: 1127 passed / 20 131 assertions / 2 skipped, PostgreSQL 7/94, Pint PASS, frontend build PASS,
+- Browser Smoke #57: PASS dla article/home/category/guides/topic/semantic-links,
+- PR #107 zmergowany do `main@18300baf3a91ffc5e3c549ab664c471bfd34ffe4`,
+- post-merge CI #398: 1127 passed / 20 131 assertions / 2 skipped, PostgreSQL 7/94, Pint PASS, frontend build PASS.
+
+### Poza zakresem N5-006
+
+- child-before-index atomic publication,
+- generator-side obsolete-shard cleanup po przełączeniu indexu,
+- dirty/version freshness coordinator i częsty scheduler lock,
+- produkcyjna static/Nginx/CDN/GSC verification.
+
+Te elementy pozostają NEWSROOM-N5-007.
 
 ---
 
@@ -2535,7 +2547,7 @@ Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-008 na `main@3d7ac8ab8a3ed1c299cb0c
 - `NewsroomSemanticLinkService::audit()` daje per-article inbound sources, explicit reverse-edge count i estimated hub depth; site-wide `newsroom:audit-links` nie istnieje,
 - Browser Smoke #48 potwierdził `newsroom-semantic-links` oraz brak regresji w article/home/category/guides/topic,
 - exact-head CI #361 był pełnym PASS, a post-merge CI #362 na exact `main@3d7ac8ab...` zakończył: 1093 passed / 19 881 assertions / 2 skipped, Pint PASS, frontend build 7.42 s; `newsroom-postgres` 7 passed / 94 assertions,
-- N5-001 wdrożyło standard article sitemap + hub coverage, N5-002 Google News Sitemap, N5-003 Atom feed/discovery, N5-004 analytics hooks, a N5-005 article-specific IndexNow automation; dirty/version refresh, namespace-specific sitemap audit i atomic child-before-index publication pozostają N5,
+- N5-001 wdrożyło standard article sitemap + hub coverage, N5-002 Google News Sitemap, N5-003 Atom feed/discovery, N5-004 analytics hooks, N5-005 article-specific IndexNow automation, a N5-006 istniejący sitemap/link audit hardening; dirty/version refresh i atomic child-before-index publication pozostają N5-007,
 - QUEUE_CONNECTION w env example jest sync; stały queue worker nie jest gwarantowany,
 - panel Filament pozostaje admin-only i ten kontrakt pozostaje wymaganiem v1.
 
@@ -2543,13 +2555,23 @@ Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-008 na `main@3d7ac8ab8a3ed1c299cb0c
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N5-006 — Extend existing SEO/sitemap audits.
+NEWSROOM-N5-007 — Static sitemap publication + freshness + delivery hardening.
 
-N5-005 jest zamknięte implementacyjnie po PR #105, exact-head CI #392 i post-merge CI #393 na `main@1cc9f4bec8c7d7fc105fd3495664434cf4323eea`. Następny krok ma rozszerzyć istniejący `SeoSitemapAuditor` o newsroom/news namespace-specific checks zgodnie z N5-006, bez tworzenia równoległego validatora. Static publication/freshness hardening pozostaje osobnym N5-007.
+N5-006 jest zamknięte implementacyjnie po PR #107, exact-head CI #397, Browser Smoke #57 i post-merge CI #398 na `main@18300baf3a91ffc5e3c549ab664c471bfd34ffe4`. Następny krok ma usunąć istniejący broken-set window w statycznym generatorze, wdrożyć child-before-index atomic publication/cleanup oraz dirty-version refresh coordinator zgodnie z już zapisanym kontraktem N5-007. Produkcyjna topologia/delivery verification pozostaje warunkiem rolloutowym, nie jest deklarowana jako wykonana przez N5-006.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-18 — v0.51
+
+- NEWSROOM-N5-006 zmergowano przez PR #107; finalny implementation head `64feb88b614b737a69784d43e86e97591aaec3d5`, merge `main@18300baf3a91ffc5e3c549ab664c471bfd34ffe4`,
+- rozszerzono istniejący `SeoSitemapAuditor` o newsroom/news canonical, eligibility, namespace/tag/date/window, topology/shard i obsolete-file checks bez drugiego validatora,
+- dodano site-wide `NewsroomSemanticLinkService::auditAll()` oraz cienką komendę `newsroom:audit-links` dla orphan/source/breaking/non-public-target/related/featured-topic QA, reużywające istniejący semantic graph i public gate,
+- nie zmieniono generatora sitemap, migracji, schema ani mechanizmu publikacji statycznych plików; atomic child-before-index publication, cleanup po switchu i dirty/version coordinator pozostają N5-007,
+- pierwszy pre-merge CI #396 nie jest evidence zamknięcia: backend/PostgreSQL/Browser były zielone, ale Pint wykrył jeden unused import; po style-only fix finalny HEAD przeszedł cały gate od początku,
+- CI #397 zakończył 1127 passed / 20 131 assertions / 2 skipped, PostgreSQL 7/94, Pint/build PASS; Browser Smoke #57 PASS 6/6; post-merge CI #398 powtórzył 1127 / 20 131 / 2 skipped, PostgreSQL 7/94 i Pint/build PASS,
+- następnym wykonywalnym taskiem jest NEWSROOM-N5-007 — Static sitemap publication + freshness + delivery hardening.
 
 ### 2026-09-18 — v0.50
 
