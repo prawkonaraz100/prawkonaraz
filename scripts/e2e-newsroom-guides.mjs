@@ -114,6 +114,18 @@ try {
             throw new Error(`Ineligible or empty-state content leaked at ${viewport.name}px.`);
         }
 
+        const footer = page.locator('footer.site-footer');
+        const footerNews = footer.locator('a[href="/aktualnosci"]');
+        const footerGuides = footer.locator('a[href="/poradniki"]');
+
+        if (await footerNews.count() !== 1 || (await footerNews.innerText()).trim() !== 'Aktualności') {
+            throw new Error(`Shared footer Aktualności link contract failed at ${viewport.name}px.`);
+        }
+
+        if (await footerGuides.count() !== 1 || (await footerGuides.innerText()).trim() !== 'Poradniki') {
+            throw new Error(`Shared footer Poradniki link contract failed at ${viewport.name}px.`);
+        }
+
         const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
         if (!canonical?.endsWith(guidesPath)) {
             throw new Error(`Guides canonical contract failed at ${viewport.name}px: ${canonical}`);
