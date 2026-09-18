@@ -1897,25 +1897,41 @@ Site-wide orphan/click-depth crawler/komenda pozostaje osobnym możliwym hardeni
 
 ## NEWSROOM-N5-005 — IndexNow integration review
 
+### Status implementacji
+
+**DONE w kodzie — PR #105 zmergowano na `main@1cc9f4bec8c7d7fc105fd3495664434cf4323eea`.** Finalny implementation head `44c8099ac2ea020bf5d9e31cfe547af8cb2149f7` przeszedł exact-head CI #392; post-merge CI #393 na exact `main` również zakończył pełny PASS.
+
 ### Cel
 
 Re-use existing IndexNow queue/submission pipeline; nie tworzyć drugiego klienta ani traktować lokalnego `event_type` jak pola protokołu.
 
-### DoD
+### Potwierdzony stan implementacji
 
-- payload pozostaje zgodny z istniejącym `IndexNowSubmissionService`: `host` + `key` + opcjonalne `keyLocation` + `urlList`; brak własnego created/updated/deleted verb w HTTP payload,
-- first publish po commit -> canonical `200` + lokalny `EVENT_CREATED`,
-- substantive public update / republish po commit -> canonical `200` + lokalny `EVENT_UPDATED`,
-- archive zachowujący detail `200` nie jest lokalnym delete; enqueue updated tylko jeśli publiczna reprezentacja/robots detail page faktycznie się zmieniła,
-- withdraw najpierw ustanawia `410`, a dopiero after commit enqueue tego samego URL z lokalnym `EVENT_DELETED`,
-- slug change najpierw ustanawia old `301 -> new` i new `200`; after commit enqueue obu URL-i, old jako lokalny `EVENT_UPDATED` (nie deleted), new jako created/updated,
-- restore-to-review pozostawia `410` i nie enqueue'uje; republish zgłasza URL dopiero po przywróceniu `200`,
-- preview/draft/in_review/scheduled-before-time/noindex nie trafiają do kolejki,
-- `NEWSROOM_PUBLIC_ENABLED=false` wyłącza newsroom collector/automation,
-- rollback transakcji nie tworzy submission row,
-- integracja używa istniejącego IndexNow queue/submission pipeline i jego URL safety filters/dedupe/retry,
-- failure does not block article publication/state transaction,
-- 200/202 oznacza tylko przyjęcie zgłoszenia, nie gwarancję crawl/index/ranking.
+- `ContentArticleIndexNowRequested` implementuje `ShouldDispatchAfterCommit`; side effect jest uruchamiany dopiero po skutecznym commit i rollback nie tworzy newsroom submission row,
+- `QueueNewsroomArticleIndexNow` jest pojedynczym listenerem odkrywanym przez Laravel i reużywa istniejący `IndexNowQueueService`, `PublicUrlResolver`, dedupe/debounce/retry oraz URL safety filters; nie ma drugiego klienta ani drugiej kolejki,
+- first publish -> canonical URL z lokalnym `EVENT_CREATED`, republish -> `EVENT_UPDATED`,
+- substantive public update bez zmiany canonical path -> `EVENT_UPDATED`; semantic no-op nie enqueue'uje,
+- archive przy obecnym kontrakcie detail `200`/robots nie enqueue'uje i nie jest traktowane jako delete,
+- withdraw po ustanowieniu withdrawn/410 -> ten sam URL z lokalnym `EVENT_DELETED`,
+- restore-to-review pozostaje bez enqueue; późniejszy publish po fresh review zgłasza URL jako `EVENT_UPDATED`,
+- zmiana sluga wcześniej publikowanego artykułu po commit zgłasza old redirect path i new canonical jako dwa lokalne `EVENT_UPDATED`; public update ze zmianą sluga nie dodaje trzeciego duplikatu canonical enqueue,
+- scheduled-before-time, noindex i `NEWSROOM_PUBLIC_ENABLED=false` są suppressowane; draft/in_review nie mają ścieżki automatycznego enqueue,
+- listener izoluje exception kolejki przez `report()` i nie cofa już zatwierdzonej transakcji publikacji,
+- `event_type` pozostaje lokalną metadaną `indexnow_url_submissions`; HTTP payload `IndexNowSubmissionService` nadal zawiera tylko `host`, `key`, opcjonalne `keyLocation` i `urlList`.
+
+### Testy i Quality Gate
+
+- `NewsroomIndexNowAutomationTest` pokrywa publish, republish/archive, withdraw/restore, substantive update/no-op, slug old+new bez duplikacji, scheduled/noindex/gate suppression, outer rollback i izolację awarii kolejki,
+- `IndexNowQueueAutomationTest` chroni brak `event_type` w HTTP payload,
+- exact-head CI #392: **1116 passed / 20 095 assertions / 2 skipped**, PostgreSQL **7 passed / 94 assertions**, Pint PASS, frontend build PASS,
+- post-merge CI #393 na `main@1cc9f4bec8c7d7fc105fd3495664434cf4323eea`: **1116 passed / 20 095 assertions / 2 skipped**, PostgreSQL **7 passed / 94 assertions**, Pint PASS, frontend build PASS.
+
+### Poza zakresem N5-005
+
+- produkcyjne włączenie/deploy fazy 2 IndexNow i weryfikacja w Bing Webmaster Tools,
+- sitemap namespace/age/tag/shard audit hardening — N5-006,
+- child-before-index atomic publication, obsolete-shard cleanup i dirty/version refresh coordinator — N5-007,
+- 200/202 nadal oznacza tylko przyjęcie zgłoszenia, nie gwarancję crawl/index/ranking.
 
 ---
 
@@ -2519,7 +2535,7 @@ Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-008 na `main@3d7ac8ab8a3ed1c299cb0c
 - `NewsroomSemanticLinkService::audit()` daje per-article inbound sources, explicit reverse-edge count i estimated hub depth; site-wide `newsroom:audit-links` nie istnieje,
 - Browser Smoke #48 potwierdził `newsroom-semantic-links` oraz brak regresji w article/home/category/guides/topic,
 - exact-head CI #361 był pełnym PASS, a post-merge CI #362 na exact `main@3d7ac8ab...` zakończył: 1093 passed / 19 881 assertions / 2 skipped, Pint PASS, frontend build 7.42 s; `newsroom-postgres` 7 passed / 94 assertions,
-- N5-001 wdrożyło standard article sitemap + hub coverage, N5-002 Google News Sitemap, N5-003 Atom feed/discovery, a N5-004 analytics hooks; dirty/version refresh, IndexNow automation, namespace-specific sitemap audit i atomic child-before-index publication pozostają N5,
+- N5-001 wdrożyło standard article sitemap + hub coverage, N5-002 Google News Sitemap, N5-003 Atom feed/discovery, N5-004 analytics hooks, a N5-005 article-specific IndexNow automation; dirty/version refresh, namespace-specific sitemap audit i atomic child-before-index publication pozostają N5,
 - QUEUE_CONNECTION w env example jest sync; stały queue worker nie jest gwarantowany,
 - panel Filament pozostaje admin-only i ten kontrakt pozostaje wymaganiem v1.
 
@@ -2527,14 +2543,23 @@ Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-008 na `main@3d7ac8ab8a3ed1c299cb0c
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N5-005 — IndexNow integration review.
+NEWSROOM-N5-006 — Extend existing SEO/sitemap audits.
 
-N5-004 jest zamknięte implementacyjnie po PR #103, exact-head CI #384, Browser Smoke #55 i post-merge CI #385 na `main@5704b3c3a8acde029001e28567980c5de8e27cdf`. Następny krok ma reużyć istniejący IndexNow queue/submission pipeline zgodnie z NEWSROOM-N5-005, bez drugiego klienta i bez wkładania lokalnego `event_type` do HTTP payload. Namespace-specific sitemap audit oraz static publication/freshness hardening pozostają osobnymi późniejszymi taskami N5.
+N5-005 jest zamknięte implementacyjnie po PR #105, exact-head CI #392 i post-merge CI #393 na `main@1cc9f4bec8c7d7fc105fd3495664434cf4323eea`. Następny krok ma rozszerzyć istniejący `SeoSitemapAuditor` o newsroom/news namespace-specific checks zgodnie z N5-006, bez tworzenia równoległego validatora. Static publication/freshness hardening pozostaje osobnym N5-007.
 
 ---
 
 # 12. Historia zmian
 
+### 2026-09-18 — v0.50
+
+- NEWSROOM-N5-005 zmergowano przez PR #105; finalny implementation head `44c8099ac2ea020bf5d9e31cfe547af8cb2149f7`, merge `main@1cc9f4bec8c7d7fc105fd3495664434cf4323eea`,
+- wdrożono dedicated `ContentArticleIndexNowRequested` z `ShouldDispatchAfterCommit` i pojedynczy auto-discovered listener `QueueNewsroomArticleIndexNow`, reużywające istniejący `IndexNowQueueService`/submission pipeline zamiast drugiego klienta,
+- publish/republish/substantive update/withdraw/slug change mapują się na lokalne `EVENT_CREATED|UPDATED|DELETED` zgodnie z publicznym HTTP lifecycle; archive, restore-to-review, no-op, scheduled-before-time, noindex i gate=false nie generują nieprawidłowych zgłoszeń,
+- slug change zgłasza old 301 path i new canonical po commit, a public update ze zmianą sluga nie dubluje canonical enqueue; outer rollback nie tworzy row, a błąd kolejki nie cofa zatwierdzonej publikacji,
+- `event_type` pozostaje lokalną metadaną kolejki i regression test potwierdza brak tego pola w HTTP payload `IndexNowSubmissionService`,
+- exact-head CI #392 zakończył 1116 passed / 20 095 assertions / 2 skipped, PostgreSQL 7/94, Pint PASS i frontend build PASS; post-merge CI #393 na exact main powtórzył 1116 / 20 095 / 2 skipped, PostgreSQL 7/94, Pint/build PASS,
+- produkcyjne wdrożenie fazy 2 IndexNow/Bing verification nie jest deklarowane jako wykonane; następnym taskiem jest NEWSROOM-N5-006 — Extend existing SEO/sitemap audits.
 ### 2026-09-18 — v0.49
 
 - NEWSROOM-N5-004 zmergowano przez PR #103; finalny implementation head `6235b7dbadd60549a82ceebcb4eda47aaa6596fa`, merge `main@5704b3c3a8acde029001e28567980c5de8e27cdf`,
