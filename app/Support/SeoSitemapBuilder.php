@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Enums\ContentArticleType;
 use App\Models\ContentArticle;
 use App\Models\ContentArticleRedirect;
 use App\Models\ContentAuthor;
@@ -191,7 +192,7 @@ class SeoSitemapBuilder
         $buckets = [];
 
         foreach ($articles as $article) {
-            $type = $article->type instanceof \App\Enums\ContentArticleType
+            $type = $article->type instanceof ContentArticleType
                 ? $article->type->value
                 : (string) $article->type;
 
