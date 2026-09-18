@@ -1157,6 +1157,8 @@ Nie implementujemy osobnych pipeline’ów dla każdego kanału przed uruchomien
 - category_click,
 - source_click.
 
+Powyższe nazwy są konceptualne na poziomie architektury. Finalny kontrakt nazw/parametrów utrzymuje `NEWSROOM-SEO-DISTRIBUTION-AND-OBSERVABILITY.md`. NEWSROOM-N5-004 materializuje prefiksowane eventy `newsroom_*`, w tym wymagany przez backlog `newsroom_module_click`; optional scroll depth pozostaje niewdrożony.
+
 ### 19.2. KPI newsroomu
 
 Nie oceniamy newsroomu wyłącznie liczbą page views.
@@ -1537,8 +1539,9 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N5-001` — standard article sitemap + rollout-gated hub coverage + deterministic fixed-ID-range sharding w istniejącym static sitemap pipeline.
 - [x] `NEWSROOM-N5-002` — rollout-gated Google News Sitemap w tym samym static pipeline: 2-day `first_published_at` eligibility, required news metadata i deterministic >1000 split.
 - [x] `NEWSROOM-N5-003` — rollout-gated Atom 1.0 feed + head discovery, generation cache, stable IDs, public validators/304 i stateless delivery.
+- [x] `NEWSROOM-N5-004` — privacy-safe delegated analytics hooks reużywające istniejący `trackAnalyticsEvent` i GA/consent layer, bez backendowego event store i zmian schema.
 
-N5-001..N5-003 są zmaterializowane i potwierdzone na `main@18cd07233e3c8712cf2c7fc9e0c32018baef65d3`; decyzje o jednym static sitemap pipeline i jednym `NewsroomPublicGate` pozostały bez zmian. Następnym wykonywalnym taskiem jest `NEWSROOM-N5-004` — Analytics hooks. Child-before-index atomic publication, obsolete-shard cleanup, dirty/version refresh coordinator, namespace-specific sitemap audit, article-specific IndexNow i produkcyjna static/Nginx/CDN verification pozostają oddzielnymi późniejszymi zakresami N5/N6.
+N5-001..N5-004 są zmaterializowane i potwierdzone na `main@5704b3c3a8acde029001e28567980c5de8e27cdf`; decyzje o jednym static sitemap pipeline, jednym `NewsroomPublicGate` i braku równoległego analytics backendu pozostały bez zmian. Następnym wykonywalnym taskiem jest `NEWSROOM-N5-005` — IndexNow integration review. Child-before-index atomic publication, obsolete-shard cleanup, dirty/version refresh coordinator, namespace-specific sitemap audit i produkcyjna static/Nginx/CDN verification pozostają oddzielnymi późniejszymi zakresami N5/N6.
 
 ---
 ## 28. Zasady utrzymania dokumentu
@@ -1564,6 +1567,15 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 
 ## 29. Historia zmian
 
+### 2026-09-18 — v0.49
+
+- NEWSROOM-N5-004 zmergowano przez PR #103; finalny implementation head `6235b7dbadd60549a82ceebcb4eda47aaa6596fa`, merge `main@5704b3c3a8acde029001e28567980c5de8e27cdf`,
+- implementacja reużywa istniejący public JS entrypoint, `trackAnalyticsEvent` i istniejący Google Analytics/consent layer; nie dodano drugiego analytics subsystemu, event store, migracji ani modeli,
+- jeden delegated `newsroomAnalytics.ts` obsługuje article/module/category/pagination/Product Bridge/source/related click tracking przez semantyczne `data-*`, bez zmiany SSR-first layoutu i bez wpływu na czytanie treści bez JS,
+- privacy contract ogranicza parametry do stabilnych identyfikatorów/kontekstu i pathname destination; body/title/author/source metadata nie są przenoszone do analytics,
+- `prawkonaraz:analytics-ready` integruje delayed consent bez tworzenia osobnej kolejki; optional scroll depth i popular-content ranking pozostają poza wdrożonym zakresem,
+- exact-head CI #384, Browser Smoke #55 i post-merge CI #385 zakończyły pełny PASS; post-merge: 1106 passed / 20 051 assertions / 2 skipped, PostgreSQL 7/94, Pint/build PASS,
+- NEWSROOM-N5-005 IndexNow integration review jest następnym wykonywalnym taskiem; decyzje architektoniczne newsroomu pozostają bez zmian.
 ### 2026-09-18 — v0.48
 
 - NEWSROOM-N5-003 zmergowano przez PR #101; finalny implementation head `1c89f370e899895eb25ac80bd437b19c1797a9ec`, merge `main@18cd07233e3c8712cf2c7fc9e0c32018baef65d3`,
