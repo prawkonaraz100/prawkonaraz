@@ -66,7 +66,7 @@ test('newsroom article catch all excludes reserved namespace segments and invali
         ->and(newsroomRouteNameForPath('/poradniki/kategoria'))->toBe('public.guides.show');
 });
 
-test('unimplemented feed and topic routes stay 404 while unknown category and detail slugs fail closed', function () {
+test('unimplemented feed and unknown public slugs fail closed', function () {
     $this->get('/aktualnosci/feed.xml')->assertNotFound();
     $this->get('/aktualnosci/kategoria/nie-istnieje')->assertNotFound();
     $this->get('/aktualnosci/temat/pkk')->assertNotFound();
