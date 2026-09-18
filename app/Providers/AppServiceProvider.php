@@ -8,9 +8,13 @@ use App\Events\ContentHomePlacementChanged;
 use App\Listeners\InvalidateNewsroomHomeCacheOnPlacementChange;
 use App\Listeners\InvalidateNewsroomReadCacheOnArticleWorkflowTransition;
 use App\Listeners\InvalidateNewsroomReadCacheOnPublicArticleChange;
+use App\Models\ContentAuthor;
 use App\Models\ContentCategory;
+use App\Models\ContentTopic;
 use App\Models\QuestionPublicExplanation;
+use App\Observers\ContentAuthorObserver;
 use App\Observers\ContentCategoryObserver;
+use App\Observers\ContentTopicObserver;
 use App\Observers\QuestionPublicExplanationObserver;
 use App\Support\SharedAuthorTrafficSignSchemaService;
 use App\Support\TrafficSignSchemaService;
@@ -35,7 +39,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        ContentAuthor::observe(ContentAuthorObserver::class);
         ContentCategory::observe(ContentCategoryObserver::class);
+        ContentTopic::observe(ContentTopicObserver::class);
         QuestionPublicExplanation::observe(QuestionPublicExplanationObserver::class);
 
         Event::listen(

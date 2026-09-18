@@ -17,4 +17,12 @@ return [
 
     // Bounded latest-news window for the public Atom feed.
     'feed_items_limit' => 50,
+
+    // SEO artifact freshness uses the configured cache store. Production uses
+    // Redis, while tests can inherit the isolated default cache store.
+    'seo_artifact_cache_store' => env('NEWSROOM_SEO_ARTIFACT_CACHE_STORE'),
+
+    // Long enough to cover one full sitemap generation/audit pass. The
+    // version marker remains dirty if a refresh fails or changes race it.
+    'seo_artifact_refresh_lock_seconds' => (int) env('NEWSROOM_SEO_ARTIFACT_REFRESH_LOCK_SECONDS', 300),
 ];
