@@ -1,0 +1,73 @@
+name: Production SEO Delivery Smoke
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/production-seo-delivery-smoke.yml'
+      - 'deploy/mikrus/nginx/prawkobit.conf.example'
+      - 'scripts/production-seo-delivery-smoke.sh'
+      - 'tests/Unit/Infrastructure/NginxSeoStaticDeliveryConfigurationTest.php'
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: Public origin/proxy URL to verify
+        required: true
+        default: https://prawkonaraz.pl
+        type: string
+      strict:
+        description: Fail when the live delivery contract is not satisfied
+        required: true
+        default: true
+        type: boolean
+      require_newsroom_feed:
+        description: Require the public Atom feed contract instead of accepting rollout-gated 404
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  production-seo-delivery:
+    runs-on: ubuntu-latest
+    env:
+      BASE_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.base_url || 'https://prawkonaraz.pl' }}
+      STRICT: ${{ github.event_name == 'workflow_dispatch' && inputs.strict && '1' || '0' }}
+      REQUIRE_NEWSROOM_FEED: ${{ github.event_name == 'workflow_dispatch' && inputs.require_newsroom_feed && '1' || '0' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate smoke script syntax
+        run: bash -n scripts/production-seo-delivery-smoke.sh
+
+      - name: Run public static delivery smoke
+        shell: bash
+        run: |
+          mkdir -p output
+          set +e
+          bash scripts/production-seo-delivery-smoke.sh "$BASE_URL" 2>&1 | tee output/production-seo-delivery-smoke.txt
+          smoke_exit=${PIPESTATUS[0]}
+          set -e
+
+          printf '\nSmoke exit code: %s\n' "$smoke_exit"
+
+          if [[ "$smoke_exit" -ne 0 ]]; then
+            if [[ "$STRICT" == "1" ]]; then
+              echo "STRICT mode: production delivery smoke failed." >&2
+              exit "$smoke_exit"
+            fi
+
+            echo "::warning::REPORT-ONLY mode: production delivery smoke found failures. This is evidence to deploy/fix before strict verification."
+          fi
+
+      - name: Upload smoke report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-seo-delivery-smoke
+          path: output/production-seo-delivery-smoke.txt
+          if-no-files-found: error
+          retention-days: 7
