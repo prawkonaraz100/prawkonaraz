@@ -17,8 +17,7 @@ final class NewsroomSemanticLinkService
 
     public function __construct(
         private readonly NewsroomPublicGate $publicGate,
-    ) {
-    }
+    ) {}
 
     /**
      * @return list<array{id:int,title:string,slug:string,url:string}>
@@ -113,8 +112,9 @@ final class NewsroomSemanticLinkService
             ->all();
     }
 
-    /** @param  iterable<int,mixed>  $questionIds
-     *  @return list<array<string,mixed>>
+    /**
+     * @param  iterable<int,mixed>  $questionIds
+     * @return list<array<string,mixed>>
      */
     public function forQuestions(iterable $questionIds, int $limit = self::REVERSE_LIMIT): array
     {
@@ -133,8 +133,9 @@ final class NewsroomSemanticLinkService
         );
     }
 
-    /** @param  iterable<int,mixed>  $legalUnitIds
-     *  @return list<array<string,mixed>>
+    /**
+     * @param  iterable<int,mixed>  $legalUnitIds
+     * @return list<array<string,mixed>>
      */
     public function forLegalUnits(iterable $legalUnitIds, int $limit = self::REVERSE_LIMIT): array
     {
@@ -331,8 +332,9 @@ final class NewsroomSemanticLinkService
         ];
     }
 
-    /** @param  iterable<int,mixed>  $values
-     *  @return list<int>
+    /**
+     * @param  iterable<int,mixed>  $values
+     * @return list<int>
      */
     private function ids(iterable $values): array
     {
