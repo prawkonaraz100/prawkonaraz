@@ -465,8 +465,7 @@ test('sitemap publication writes the root index after every child payload', func
         app(SeoSitemapBuilder::class),
         app(SeoSitemapXmlRenderer::class),
         app(PublicQuestionCatalogService::class),
-    ) extends SeoSitemapGenerator
-    {
+    ) extends SeoSitemapGenerator {
         /**
          * @var list<string>
          */
@@ -500,8 +499,7 @@ test('sitemap payload validation happens before the published set is changed', f
         app(SeoSitemapBuilder::class),
         app(SeoSitemapXmlRenderer::class),
         app(PublicQuestionCatalogService::class),
-    ) extends SeoSitemapGenerator
-    {
+    ) extends SeoSitemapGenerator {
         /**
          * @return array<string, array{contents:string,urls:int}>
          */
