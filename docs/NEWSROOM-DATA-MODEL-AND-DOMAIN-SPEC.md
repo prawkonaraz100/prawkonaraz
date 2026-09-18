@@ -1022,7 +1022,7 @@ Granice obecnej implementacji:
 - analogiczny stale-write guard dla `NewsroomHomeComposer` jest wdrożony po PR #58 przez deterministyczny `ContentHomePlacementEditToken`; update/delete porównują loaded token pod row lockiem, a tuple advisory-lock/overlap contract pozostaje dodatkową warstwą concurrency protection,
 - scheduler command i batch due processing zostały wdrożone downstream w N1-005 i reużywają tego service boundary,
 - publiczny HTTP 410/301/200 pozostaje N3; service ustanawia withdrawal tombstone, ale nie renderuje odpowiedzi HTTP,
-- N4-006 podłącza lekkie cache invalidation listenery after-commit dla istniejących publicznych read models home/category; sitemap/IndexNow/dirty-version refresh pozostają niepodłączone i należą do N5.
+- N4-006 podłącza lekkie cache invalidation listenery after-commit dla istniejących publicznych read models home/category; od N5-005 article-specific IndexNow jest podłączone osobnym after-commit application event/listenerem do istniejącego `IndexNowQueueService`, natomiast sitemap dirty/version refresh nadal pozostaje osobnym zakresem N5.
 
 #### 20.1.1. Edycja już opublikowanego artykułu bez revisions
 
@@ -1123,7 +1123,9 @@ Listenery po commit mogą:
 - odświeżać feed cache,
 - oznaczać statyczne sitemap jako wymagające refreshu.
 
-Nie zakładamy, że `ShouldQueue` oznacza asynchroniczność: aktualny repo contract ma `QUEUE_CONNECTION=sync`. Pełny refresh sitemap nie może wykonywać się w request publikacji.
+**Stan po NEWSROOM-N5-005:** `ContentArticleIndexNowRequested` jest application eventem implementującym `ShouldDispatchAfterCommit`. Auto-discovered `QueueNewsroomArticleIndexNow` po commit ponownie ładuje article, stosuje `NewsroomPublicGate`, noindex/lifecycle eligibility i `PublicUrlResolver`, a następnie używa istniejącego `IndexNowQueueService`. Event nie zastępuje lifecycle audit events i nie wprowadza nowego aggregate; `event_type` pozostaje lokalną metadaną istniejącej tabeli `indexnow_url_submissions`. Błąd kolejki jest raportowany i izolowany od już zatwierdzonej transakcji.
+
+Nie zakładamy, że `ShouldQueue` oznacza asynchroniczność: aktualny repo contract ma `QUEUE_CONNECTION=sync`. N5-005 nie wykonuje HTTP IndexNow w transakcji publikacji; finalny submit nadal wykonuje istniejący queue/drain pipeline. Pełny refresh sitemap nie może wykonywać się w request publikacji.
 
 `ContentArticleSubstantivelyUpdated` jest emitowany wyłącznie, gdy zmieniła się publiczna treść/meaningful metadata i ustawiono `last_substantive_update_at`. Techniczny zapis, audit note, cache touch lub pole niewidoczne publicznie nie emituje tego eventu tylko po to, by odświeżyć SEO freshness.
 
@@ -1295,7 +1297,7 @@ Invalidation:
 - `ContentCategoryObserver` implementuje `ShouldHandleEventsAfterCommit` i po save/delete invaliduje home + category,
 - generation rotation chroni przed stale write-after-invalidation race przy równoległym rebuildzie.
 
-Nie cache’ujemy preview jako publicznej strony. N5-003 materializuje osobny feed generation cache/refresh; sitemap dirty/version coordinator i article-specific IndexNow pozostają osobnym zakresem N5.
+Nie cache’ujemy preview jako publicznej strony. N5-003 materializuje osobny feed generation cache/refresh; N5-005 materializuje article-specific IndexNow przez osobny after-commit event/listener nad istniejącą kolejką. Sitemap dirty/version coordinator pozostaje osobnym zakresem N5.
 
 ---
 
@@ -1811,6 +1813,16 @@ Na 2026-09-18:
 
 ## 45. Historia zmian
 
+### 2026-09-18 — v0.38
+
+- NEWSROOM-N5-005 zmergowano przez PR #105 na `main@1cc9f4bec8c7d7fc105fd3495664434cf4323eea`; finalny implementation head `44c8099ac2ea020bf5d9e31cfe547af8cb2149f7`,
+- nie dodano migracji, tabel ani nowego persisted aggregate; newsroom reużywa istniejące `indexnow_url_submissions`, `IndexNowQueueService`, submission service i scheduler/drain contract,
+- `ContentArticleIndexNowRequested` implementuje `ShouldDispatchAfterCommit`; auto-discovered listener stosuje gate/noindex/lifecycle policy i URL normalization przed enqueue, a exception kolejki nie cofa zatwierdzonego workflow state,
+- first publish/republish/substantive update/withdraw/slug change mają jawne lokalne event-type semantics; archive/restore/no-op/scheduled-before-time/gate=false nie tworzą niepoprawnych queue rows,
+- old/new slug paths są emitowane po commit bez trzeciego duplicate canonical enqueue; outer rollback nie pozostawia ghost submission row,
+- protokół IndexNow nie zmienił się: `event_type` pozostaje lokalnym polem istniejącej kolejki, nie polem HTTP payload,
+- exact-head CI #392 i post-merge CI #393 zakończyły PASS: 1116 passed / 20 095 assertions / 2 skipped, PostgreSQL 7/94, Pint/build PASS,
+- data/schema contract pozostaje bez zmian; kolejnym taskiem jest NEWSROOM-N5-006 — Extend existing SEO/sitemap audits.
 ### 2026-09-18 — v0.37
 
 - NEWSROOM-N5-004 zmergowano przez PR #103 na `main@5704b3c3a8acde029001e28567980c5de8e27cdf`; finalny implementation head `6235b7dbadd60549a82ceebcb4eda47aaa6596fa`,

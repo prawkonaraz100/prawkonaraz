@@ -1605,7 +1605,7 @@ Obecnie:
 - NEWSROOM-N5-002 rozszerza ten sam static pipeline o News Sitemap: gate=true emituje wyłącznie `type=news`, aktywnie dystrybuowane `published` + indexable current-canonical articles z aktywną kategorią i publicznym autorem, kwalifikowane wyłącznie przez `first_published_at >= now()-2 days`,
 - `news:name` reużywa canonical identity z `SiteIdentitySchema::siteName()`, `news:language=pl`, `news:publication_date=first_published_at`, a `news:title` bierze widoczny `ContentArticle.title`; przy <=1000 entries używany jest `/sitemaps/news.xml`, a powyżej limitu deterministic fixed-ID-range shards trafiają bezpośrednio do root `/sitemap.xml`,
 - istniejący `SeoSitemapAuditor` dopuszcza legalny overlap URL pomiędzy standard article sitemap i News Sitemap; pełne newsroom/news namespace, age, required-tag i shard audit rules pozostają otwarte w N5-006,
-- NEWSROOM-N3-008 jest wdrożone, N4-002 konsumuje ten sam gate dla publicznego huba `/aktualnosci`, N4-003 dla category pages, N4-004 dla `/poradniki`, N4-007 dla topic dossier, N4-008 dla topic/related/reverse-link resolvers, N5-001 dla standard article sitemap/hub coverage, N5-002 dla News Sitemap, a N5-003 dla Atom feed/discovery. Przy gate=false category/topic/feed routes failują do 404, top-level `/poradniki` pozostaje noindex placeholderem, N4-008 nie emituje reverse targets, N5-001/N5-002 nie emitują newsroom article/news sitemap discovery, a feed discovery jest suppressowane; N5-004 nie tworzy osobnego rollout gate i emituje eventy tylko na rzeczywiście zrenderowanych publicznych surface'ach z analytics-ready istniejącego GA layer. Przy gate=true opublikowany topic ma self-canonical `index,follow,max-image-preview:large`, draft/future/unknown pozostają 404, a historyczny archived topic zwraca 410 + noindex. Article-specific IndexNow automation pozostaje otwarte w N5.
+- NEWSROOM-N3-008 jest wdrożone, N4-002 konsumuje ten sam gate dla publicznego huba `/aktualnosci`, N4-003 dla category pages, N4-004 dla `/poradniki`, N4-007 dla topic dossier, N4-008 dla topic/related/reverse-link resolvers, N5-001 dla standard article sitemap/hub coverage, N5-002 dla News Sitemap, N5-003 dla Atom feed/discovery, a N5-005 dla article-specific IndexNow automation. Przy gate=false category/topic/feed routes failują do 404, top-level `/poradniki` pozostaje noindex placeholderem, N4-008 nie emituje reverse targets, N5-001/N5-002 nie emitują newsroom article/news sitemap discovery, feed discovery jest suppressowane, a `QueueNewsroomArticleIndexNow` kończy bez enqueue; N5-004 nie tworzy osobnego rollout gate i emituje eventy tylko na rzeczywiście zrenderowanych publicznych surface'ach z analytics-ready istniejącego GA layer. Przy gate=true opublikowany topic ma self-canonical `index,follow,max-image-preview:large`, draft/future/unknown pozostają 404, a historyczny archived topic zwraca 410 + noindex. N5-005 reużywa istniejący queue/submission pipeline i nie zmienia protokołu HTTP IndexNow.
 
 ---
 
@@ -1628,6 +1628,7 @@ Obecnie:
 - [ ] zweryfikować rzeczywiste static/Nginx/CDN headers/304 bez przenoszenia source of truth do SitemapController,
 - [x] wdrożyć Atom feed + auto-discovery + application-level validators w NEWSROOM-N5-003,
 - [x] wdrożyć privacy-safe analytics hooks/events w NEWSROOM-N5-004 przez istniejący `trackAnalyticsEvent` i GA/consent layer,
+- [x] wdrożyć article-specific IndexNow automation w NEWSROOM-N5-005 przez istniejący `IndexNowQueueService`/submission pipeline, after-commit event i public-gate/noindex safety filters; lokalny `event_type` nie wchodzi do HTTP payload,
 - [x] wdrożyć N4-003 category SEO: self-canonical pagination, category title/description fallback, `CollectionPage` + `BreadcrumbList` oraz conditional `ItemList`,
 - [x] wdrożyć N4-004 guide-hub SEO: self-canonical pagination, empty-hub noindex, `CollectionPage` + `BreadcrumbList` oraz conditional `ItemList`,
 - [x] wdrożyć N4-007 topic SEO: self-canonical pagination, `seo_title`/`seo_description` fallback, `CollectionPage` + `BreadcrumbList` + `ItemList`, 404 dla nonpublic i 410/noindex dla archived history,
@@ -1640,6 +1641,15 @@ Obecnie:
 
 ## 70. Historia zmian
 
+### 2026-09-18 — v0.23
+
+- NEWSROOM-N5-005 zmergowano przez PR #105 na `main@1cc9f4bec8c7d7fc105fd3495664434cf4323eea`; finalny implementation head `44c8099ac2ea020bf5d9e31cfe547af8cb2149f7`,
+- `ContentArticleIndexNowRequested` jest `ShouldDispatchAfterCommit`, a auto-discovered `QueueNewsroomArticleIndexNow` reużywa istniejący `IndexNowQueueService`, `PublicUrlResolver`, dedupe/debounce/retry i safety filters; nie powstał drugi client ani queue,
+- first publish -> lokalny `EVENT_CREATED`, republish/substantive update -> `EVENT_UPDATED`, withdraw po 410 -> `EVENT_DELETED`; archive przy niezmienionym detail/robots, restore-to-review, no-op, scheduled-before-time, noindex i gate=false nie tworzą błędnych enqueue,
+- published slug change po commit zgłasza old redirect path i new canonical jako `EVENT_UPDATED`; public update ze zmianą sluga nie dubluje canonical row, rollback nie zostawia ghost submission, a błąd queue nie cofa publikacji,
+- payload `IndexNowSubmissionService` pozostaje protocol-safe (`host`, `key`, opcjonalne `keyLocation`, `urlList`); `event_type` jest tylko lokalną metadaną kolejki,
+- exact-head CI #392 i post-merge CI #393 zakończyły 1116 passed / 20 095 assertions / 2 skipped, Pint/build PASS i PostgreSQL 7/94,
+- produkcyjny rollout fazy 2/Bing verification nadal nie jest potwierdzony; następny task to NEWSROOM-N5-006 namespace-specific sitemap audit hardening.
 ### 2026-09-18 — v0.22
 
 - NEWSROOM-N5-004 zmergowano przez PR #103 na `main@5704b3c3a8acde029001e28567980c5de8e27cdf`; finalny implementation head `6235b7dbadd60549a82ceebcb4eda47aaa6596fa`,

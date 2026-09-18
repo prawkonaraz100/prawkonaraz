@@ -770,6 +770,7 @@ Regression test najpierw odtwarza/chroni przed potwierdzonym obecnym problemem: 
 - IndexNow 200/202 oznacza accepted request; test nie interpretuje tego jako dowodu indeksacji,
 - failure/retry IndexNow nie cofa ani nie blokuje zakończonej transakcji publikacyjnej.
 
+**Stan po NEWSROOM-N5-005:** kontrakt jest wdrożony w `tests/Feature/Public/NewsroomIndexNowAutomationTest.php` oraz rozszerzonym `IndexNowQueueAutomationTest`. Exact-head CI #392 na `44c8099ac2ea020bf5d9e31cfe547af8cb2149f7` zakończył 1116 passed / 20 095 assertions / 2 skipped, Pint PASS, frontend build PASS i PostgreSQL 7/94. Po merge PR #105 post-merge CI #393 na `main@1cc9f4bec8c7d7fc105fd3495664434cf4323eea` powtórzył ten sam backend/PostgreSQL wynik oraz Pint/build PASS. Browser Smoke nie został uruchomiony dla tego backendowego zakresu przez istniejące path filters i nie jest przedstawiany jako dowód N5-005.
 
 ---
 
@@ -1500,8 +1501,8 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - `NewsroomPublicArticlePageTest` został zsynchronizowany z nowym kontraktem guide detail: primary category jest crawlable classification linkiem bez zmiany guide breadcrumb family,
 - workflow `Browser Smoke` ma osobny job `newsroom-semantic-links`; Browser Smoke #48 na finalnym N4-008 head `bd63773bc1febdcc6aa8c2507c6621e908d63b09` zakończył PASS dla semantic-links, article, home, category, guides i topic,
 - exact-head CI #361 zakończył pełny PASS, a post-merge CI #362 na `main@3d7ac8ab8a3ed1c299cb0cdd4cb1ef8ac6b53f78` zakończył: `quality` 1093 passed / 19 881 assertions / 2 skipped, Pint PASS, frontend build 7.42 s; `newsroom-postgres` 7 passed / 94 assertions,
-- publiczny Hub Blade, category pages, guide hub, topic dossier, navigation integration, home/category cache, N4-008 semantic/reverse links, N5-001 standard article sitemap/hub coverage, N5-002 Google News Sitemap, N5-003 Atom feed/discovery oraz N5-004 analytics hooks są zamknięte implementacyjnie; następnym taskiem jest NEWSROOM-N5-005,
-- article-specific IndexNow review/automation, atomic static publication, dirty/version newsroom refresh coordinator i pełne namespace-specific `SeoSitemapAuditor` extension pozostają N5; produkcyjny CDN/Nginx feed smoke nadal nie jest potwierdzony.
+- publiczny Hub Blade, category pages, guide hub, topic dossier, navigation integration, home/category cache, N4-008 semantic/reverse links, N5-001 standard article sitemap/hub coverage, N5-002 Google News Sitemap, N5-003 Atom feed/discovery, N5-004 analytics hooks oraz N5-005 article-specific IndexNow automation są zamknięte implementacyjnie; następnym taskiem jest NEWSROOM-N5-006,
+- atomic static publication, dirty/version newsroom refresh coordinator i pełne namespace-specific `SeoSitemapAuditor` extension pozostają N5; produkcyjny CDN/Nginx feed smoke oraz produkcyjny rollout fazy 2 IndexNow/Bing verification nadal nie są potwierdzone.
 
 ---
 
@@ -1523,6 +1524,7 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - [ ] dodać dirty-marker refresh tests,
 - [x] dodać N5-003 feed/discovery regression: Atom metadata/corpus/limit, stable id + slug change, workflow invalidation, ETag/Last-Modified/304, no Set-Cookie, gate/discovery,
 - [x] dodać N5-004 analytics regression: render/privacy contract, GA readiness signal oraz JS-enabled Browser Smoke dla exactly-once article view, one-click-one-event, module click i disabled/non-link suppression,
+- [x] dodać N5-005 IndexNow lifecycle regression: publish/republish/update/withdraw/restore/slug, scheduled/noindex/gate suppression, outer rollback, queue failure isolation i brak lokalnego `event_type` w HTTP payload,
 - [ ] dodać production-like static robots/sitemap/feed delivery smoke,
 - [ ] rozszerzyć istniejący `SeoSitemapAuditor` o newsroom/news namespace-specific checks; N5-001 potwierdza ogólne entry-count/byte-size guards, a N5-002 tylko legalny article/news URL overlap handling,
 - [ ] stworzyć production smoke checklist w praktyce,
@@ -1541,6 +1543,15 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 
 ## 60. Historia zmian
 
+### 2026-09-18 — v0.33
+
+- NEWSROOM-N5-005 implementation PR #105 zakończył exact-head CI #392 PASS na `44c8099ac2ea020bf5d9e31cfe547af8cb2149f7`; merge to `main@1cc9f4bec8c7d7fc105fd3495664434cf4323eea`,
+- `NewsroomIndexNowAutomationTest` pokrywa after-commit first publish, republish/archive, withdraw/restore, substantive update/no-op, old+new slug paths bez duplikacji, scheduled/noindex/gate suppression, outer rollback oraz failure isolation,
+- `IndexNowQueueAutomationTest` dodatkowo chroni protokół HTTP: lokalny `event_type` nie jest serializowany do payloadu `IndexNowSubmissionService`,
+- implementacja przeszła finalny exact-head gate dopiero w CI #392 po usunięciu podwójnej rejestracji auto-discovered listenera, korekcie fixture czasu i style-only Pint fix; wcześniejsze failing runy nie są traktowane jako evidence wykonania,
+- CI #392 i post-merge CI #393 zakończyły 1116 passed / 20 095 assertions / 2 skipped, PostgreSQL 7/94, Pint PASS i frontend build PASS,
+- Browser Smoke nie został uruchomiony przez path filters dla backendowego zakresu #105; nie zastępujemy tej informacji fałszywym browser evidence,
+- następnym wykonywalnym taskiem jest NEWSROOM-N5-006 — Extend existing SEO/sitemap audits.
 ### 2026-09-18 — v0.32
 
 - NEWSROOM-N5-004 implementation PR #103 zakończył exact-head CI #384 PASS na `6235b7dbadd60549a82ceebcb4eda47aaa6596fa`; Browser Smoke #55 PASS dla article/home/category/guides/topic/semantic-links; merge to `main@5704b3c3a8acde029001e28567980c5de8e27cdf`,

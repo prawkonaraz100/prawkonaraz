@@ -1540,8 +1540,9 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N5-002` — rollout-gated Google News Sitemap w tym samym static pipeline: 2-day `first_published_at` eligibility, required news metadata i deterministic >1000 split.
 - [x] `NEWSROOM-N5-003` — rollout-gated Atom 1.0 feed + head discovery, generation cache, stable IDs, public validators/304 i stateless delivery.
 - [x] `NEWSROOM-N5-004` — privacy-safe delegated analytics hooks reużywające istniejący `trackAnalyticsEvent` i GA/consent layer, bez backendowego event store i zmian schema.
+- [x] `NEWSROOM-N5-005` — article-specific IndexNow lifecycle integration przez dedicated after-commit event/listener nad istniejącym `IndexNowQueueService`/submission pipeline, bez nowego klienta, kolejki ani schema.
 
-N5-001..N5-004 są zmaterializowane i potwierdzone na `main@5704b3c3a8acde029001e28567980c5de8e27cdf`; decyzje o jednym static sitemap pipeline, jednym `NewsroomPublicGate` i braku równoległego analytics backendu pozostały bez zmian. Następnym wykonywalnym taskiem jest `NEWSROOM-N5-005` — IndexNow integration review. Child-before-index atomic publication, obsolete-shard cleanup, dirty/version refresh coordinator, namespace-specific sitemap audit i produkcyjna static/Nginx/CDN verification pozostają oddzielnymi późniejszymi zakresami N5/N6.
+N5-001..N5-005 są zmaterializowane i potwierdzone na `main@1cc9f4bec8c7d7fc105fd3495664434cf4323eea`; decyzje o jednym static sitemap pipeline, jednym `NewsroomPublicGate`, jednym IndexNow queue/submission pipeline i braku równoległych subsystemów pozostały bez zmian. Następnym wykonywalnym taskiem jest `NEWSROOM-N5-006` — Extend existing SEO/sitemap audits. Child-before-index atomic publication, obsolete-shard cleanup, dirty/version refresh coordinator i produkcyjna static/Nginx/CDN verification pozostają oddzielnymi późniejszymi zakresami N5/N6.
 
 ---
 ## 28. Zasady utrzymania dokumentu
@@ -1567,6 +1568,15 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 
 ## 29. Historia zmian
 
+### 2026-09-18 — v0.50
+
+- NEWSROOM-N5-005 zmergowano przez PR #105; finalny implementation head `44c8099ac2ea020bf5d9e31cfe547af8cb2149f7`, merge `main@1cc9f4bec8c7d7fc105fd3495664434cf4323eea`,
+- `ContentArticleIndexNowRequested` materializuje after-commit boundary, a `QueueNewsroomArticleIndexNow` reużywa istniejący IndexNow queue/submission subsystem; brak nowej tabeli, migracji, klienta HTTP i równoległego schedulera,
+- lifecycle mapping zachowuje public HTTP semantics: first publish created, republish/substantive update updated, withdraw deleted dopiero po 410, archive bez zmiany detail/robots bez enqueue, restore-to-review bez enqueue, slug old+new jako updated po commit,
+- public gate/noindex/scheduled-before-time i outer rollback są fail-closed; listener izoluje awarię queue od zatwierdzonej transakcji publikacji,
+- lokalny `event_type` nie stał się polem protokołu IndexNow; istniejący `IndexNowSubmissionService` nadal odpowiada za finalny HTTP payload,
+- exact-head CI #392 i post-merge CI #393 były pełnym PASS: 1116 passed / 20 095 assertions / 2 skipped, PostgreSQL 7/94, Pint/build PASS,
+- N5-006 — Extend existing SEO/sitemap audits jest następnym wykonywalnym taskiem; decyzje architektoniczne pozostają bez zmian.
 ### 2026-09-18 — v0.49
 
 - NEWSROOM-N5-004 zmergowano przez PR #103; finalny implementation head `6235b7dbadd60549a82ceebcb4eda47aaa6596fa`, merge `main@5704b3c3a8acde029001e28567980c5de8e27cdf`,

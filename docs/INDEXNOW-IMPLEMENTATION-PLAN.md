@@ -551,6 +551,38 @@ daty, wyliczyc ich kanoniczne URL-e i dodac je do kolejki bez wysylania HTTP.
 - nie wysylamy cyklicznie calej sitemap bez realnych zmian,
 - nie zapisujemy pelnego klucza w dokumentacji ani raportach publicznych.
 
+### 9.5 Integracja Newsroomu po NEWSROOM-N5-005
+
+Newsroom reuzywa dokladnie ten sam lokalny queue/submission pipeline. Nie powstal drugi klient HTTP, druga tabela ani drugi scheduler.
+
+Potwierdzony flow:
+
+1. use case publikacji/sluga zapisuje stan publiczny i audit w swojej transakcji,
+2. `ContentArticleIndexNowRequested` implementuje `ShouldDispatchAfterCommit`, wiec rollback nie zostawia ghost submission row,
+3. auto-discovered `QueueNewsroomArticleIndexNow` ponownie laduje article i stosuje `NEWSROOM_PUBLIC_ENABLED`, noindex/lifecycle eligibility oraz `PublicUrlResolver`,
+4. listener przekazuje URL do istniejacego `IndexNowQueueService`; exception queue jest raportowany, ale nie cofa zakonczonej publikacji,
+5. istniejacy drain/submission pipeline wysyla finalny HTTP request.
+
+Lokalne lifecycle semantics:
+
+- first publish -> `EVENT_CREATED`,
+- republish / substantive public update -> `EVENT_UPDATED`,
+- archive przy obecnym detail `200` i niezmienionym robots -> brak enqueue,
+- withdraw po ustanowieniu `410` -> `EVENT_DELETED`,
+- restore-to-review -> brak enqueue; pozniejszy publish po fresh review -> `EVENT_UPDATED`,
+- published slug change -> old redirect URL i new canonical jako dwa `EVENT_UPDATED`,
+- scheduled-before-time, noindex i gate=false -> brak enqueue.
+
+`event_type` jest tylko lokalna metadana `indexnow_url_submissions`. `IndexNowSubmissionService` nadal serializuje do protokolu tylko `host`, `key`, opcjonalne `keyLocation` i `urlList`.
+
+Evidence implementacyjne:
+
+- PR #105, finalny implementation head `44c8099ac2ea020bf5d9e31cfe547af8cb2149f7`, merge `main@1cc9f4bec8c7d7fc105fd3495664434cf4323eea`,
+- exact-head CI #392: 1116 passed / 20 095 assertions / 2 skipped, PostgreSQL 7/94, Pint/build PASS,
+- post-merge CI #393: 1116 passed / 20 095 assertions / 2 skipped, PostgreSQL 7/94, Pint/build PASS.
+
+To evidence dotyczy kodowej integracji Newsroomu. Nie potwierdza produkcyjnego wlaczenia fazy 2 ani statusu crawl/index w Bing.
+
 ## 10. Checklist
 
 ### Audyt i plan
@@ -604,6 +636,9 @@ daty, wyliczyc ich kanoniczne URL-e i dodac je do kolejki bez wysylania HTTP.
 - [x] Dodac `seo:indexnow-enqueue-public-explanations`.
 - [x] Dodac scheduler co 10 minut z `withoutOverlapping`.
 - [x] Dodac testy kolejki i automatyzacji.
+- [x] Podlaczyc Newsroom do istniejacego queue/submission pipeline przez after-commit event/listener bez nowego klienta ani schema (NEWSROOM-N5-005).
+- [x] Pokryc Newsroom lifecycle regression: publish/republish/update/withdraw/restore/slug, rollback, gate/noindex/scheduled suppression i failure isolation.
+- [x] Potwierdzic regression testem, ze lokalny `event_type` nie jest polem HTTP payload IndexNow.
 - [ ] Wdrozyc faze 2 na produkcje.
 - [ ] Uruchomic migracje produkcyjna.
 - [ ] Ustawic produkcyjne env `INDEXNOW_AUTOMATION_ENABLED=true`.
