@@ -8,7 +8,6 @@ use App\Models\ContentAuthor;
 use App\Models\ContentCategory;
 use App\Models\ContentTopic;
 use App\Models\LegalUnit;
-use App\Models\TrafficSign;
 use Illuminate\Database\Eloquent\Builder;
 
 final class NewsroomSemanticLinkService
