@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Enums\ContentArticleType;
+use App\Enums\ContentArticleWorkflowStatus;
 use App\Models\ContentArticle;
 use App\Models\ContentArticleRedirect;
 use App\Models\ContentAuthor;
@@ -13,6 +14,7 @@ use App\Models\LicenseCategory;
 use App\Models\QuestionSeoTopic;
 use App\Models\TrafficSign;
 use App\Models\TrafficSignCategory;
+use App\SEO\Schema\SiteIdentitySchema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -24,6 +26,12 @@ class SeoSitemapBuilder
     public const STATIC_SITEMAP_PATH = '/sitemaps/static.xml';
 
     public const ARTICLES_SITEMAP_PATH = '/sitemaps/articles.xml';
+
+    public const NEWS_SITEMAP_PATH = '/sitemaps/news.xml';
+
+    public const NEWS_SITEMAP_MAX_ENTRIES = 1000;
+
+    public const NEWS_SITEMAP_WINDOW_DAYS = 2;
 
     public const LEGACY_QUESTIONS_SITEMAP_PATH = '/sitemaps/questions.xml';
 
@@ -37,15 +45,18 @@ class SeoSitemapBuilder
         protected TrafficSignSupportingPageCatalog $trafficSignSupportingPageCatalog,
         protected LegalContentCatalogService $legalContentCatalogService,
         protected NewsroomPublicGate $newsroomPublicGate,
+        protected SiteIdentitySchema $siteIdentitySchema,
     ) {}
 
     /**
      * @param  array<string, array{urls: list<array{loc:string,lastmod:string|null,images:array<int,string>}>, lastmod:string|null}>|null  $articleShards
+     * @param  array<string, array{urls: list<array{loc:string,publication_name:string,language:string,publication_date:string,title:string}>, lastmod:string|null}>|null  $newsShards
      * @return list<array{loc: string, lastmod: string|null}>
      */
-    public function sitemapIndexItems(?array $articleShards = null): array
+    public function sitemapIndexItems(?array $articleShards = null, ?array $newsShards = null): array
     {
         $articleShards ??= $this->articleSitemapShards();
+        $newsShards ??= $this->newsSitemapShards();
 
         return array_values(array_filter([
             [
@@ -53,6 +64,7 @@ class SeoSitemapBuilder
                 'lastmod' => $this->staticSitemapLastModified(),
             ],
             ...$this->articleSitemapIndexItems($articleShards),
+            ...$this->newsSitemapIndexItems($newsShards),
             [
                 'loc' => route('sitemap.questions.hub'),
                 'lastmod' => $this->publicQuestionCatalogService->latestQuestionLastModified(),
@@ -169,9 +181,7 @@ class SeoSitemapBuilder
             1,
             (int) config('newsroom.article_sitemap_shard_id_span', self::DEFAULT_ARTICLE_SITEMAP_SHARD_ID_SPAN),
         );
-        $reservedPaths = ContentArticleRedirect::query()
-            ->pluck('from_path')
-            ->mapWithKeys(fn (string $path): array => ['/'.ltrim($path, '/') => true]);
+        $reservedPaths = $this->reservedArticlePaths();
 
         $articles = $this->indexableNewsroomArticlesQuery()
             ->select([
@@ -192,17 +202,9 @@ class SeoSitemapBuilder
         $buckets = [];
 
         foreach ($articles as $article) {
-            $type = $article->type instanceof ContentArticleType
-                ? $article->type->value
-                : (string) $article->type;
+            $path = $this->canonicalArticlePath($article);
 
-            try {
-                $path = NewsroomRouteContract::canonicalPath($type, (string) $article->slug);
-            } catch (InvalidArgumentException) {
-                continue;
-            }
-
-            if ($reservedPaths->has($path)) {
+            if ($path === null || $reservedPaths->has($path)) {
                 continue;
             }
 
@@ -247,6 +249,117 @@ class SeoSitemapBuilder
     public function articleSitemapIndexItems(?array $shards = null): array
     {
         $shards ??= $this->articleSitemapShards();
+
+        return collect($shards)
+            ->map(fn (array $shard, string $relativePath): array => [
+                'loc' => url('/'.ltrim($relativePath, '/')),
+                'lastmod' => $shard['lastmod'],
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array<string, array{urls: list<array{loc:string,publication_name:string,language:string,publication_date:string,title:string}>, lastmod:string|null}>
+     */
+    public function newsSitemapShards(): array
+    {
+        if ($this->newsroomPublicGate->disabled()) {
+            return [];
+        }
+
+        $maxEntries = max(
+            1,
+            min(
+                self::NEWS_SITEMAP_MAX_ENTRIES,
+                (int) config('newsroom.news_sitemap_max_entries', self::NEWS_SITEMAP_MAX_ENTRIES),
+            ),
+        );
+        $reservedPaths = $this->reservedArticlePaths();
+        $publicationName = $this->siteIdentitySchema->siteName();
+
+        $articles = ContentArticle::query()
+            ->activelyDistributed()
+            ->indexable()
+            ->where('type', ContentArticleType::News->value)
+            ->where('workflow_status', ContentArticleWorkflowStatus::Published->value)
+            ->where('first_published_at', '>=', now()->subDays(self::NEWS_SITEMAP_WINDOW_DAYS))
+            ->whereHas('category', fn (Builder $query): Builder => $query->active())
+            ->whereHas('author', fn (Builder $query): Builder => $query->published())
+            ->select([
+                'id',
+                'type',
+                'slug',
+                'title',
+                'first_published_at',
+            ])
+            ->orderBy('id')
+            ->get();
+
+        $urls = [];
+
+        foreach ($articles as $article) {
+            $path = $this->canonicalArticlePath($article);
+
+            if ($path === null || $reservedPaths->has($path) || $article->first_published_at === null) {
+                continue;
+            }
+
+            $urls[] = [
+                'loc' => url($path),
+                'publication_name' => $publicationName,
+                'language' => 'pl',
+                'publication_date' => $article->first_published_at->toIso8601String(),
+                'title' => trim((string) $article->title),
+            ];
+        }
+
+        if (count($urls) <= $maxEntries) {
+            return [
+                ltrim(self::NEWS_SITEMAP_PATH, '/') => [
+                    'urls' => $urls,
+                    'lastmod' => $this->newsSitemapLastModified($urls),
+                ],
+            ];
+        }
+
+        $buckets = [];
+
+        foreach ($articles as $article) {
+            $path = $this->canonicalArticlePath($article);
+
+            if ($path === null || $reservedPaths->has($path) || $article->first_published_at === null) {
+                continue;
+            }
+
+            $bucket = intdiv(max(1, (int) $article->getKey()) - 1, $maxEntries);
+            $relativePath = $this->newsRangeShardPath($bucket, $maxEntries);
+            $buckets[$relativePath][] = [
+                'loc' => url($path),
+                'publication_name' => $publicationName,
+                'language' => 'pl',
+                'publication_date' => $article->first_published_at->toIso8601String(),
+                'title' => trim((string) $article->title),
+            ];
+        }
+
+        ksort($buckets, SORT_NATURAL);
+
+        return collect($buckets)
+            ->map(fn (array $bucketUrls): array => [
+                'urls' => array_values($bucketUrls),
+                'lastmod' => $this->newsSitemapLastModified($bucketUrls),
+            ])
+            ->all();
+    }
+
+    /**
+     * @param  array<string, array{urls: list<array{loc:string,publication_name:string,language:string,publication_date:string,title:string}>, lastmod:string|null}>|null  $shards
+     * @return list<array{loc:string,lastmod:string|null}>
+     */
+    public function newsSitemapIndexItems(?array $shards = null): array
+    {
+        $shards ??= $this->newsSitemapShards();
 
         return collect($shards)
             ->map(fn (array $shard, string $relativePath): array => [
@@ -472,6 +585,44 @@ class SeoSitemapBuilder
             })
             ->values()
             ->all();
+    }
+
+    protected function reservedArticlePaths(): Collection
+    {
+        return ContentArticleRedirect::query()
+            ->pluck('from_path')
+            ->mapWithKeys(fn (string $path): array => ['/'.ltrim($path, '/') => true]);
+    }
+
+    protected function canonicalArticlePath(ContentArticle $article): ?string
+    {
+        $type = $article->type instanceof ContentArticleType
+            ? $article->type->value
+            : (string) $article->type;
+
+        try {
+            return NewsroomRouteContract::canonicalPath($type, (string) $article->slug);
+        } catch (InvalidArgumentException) {
+            return null;
+        }
+    }
+
+    /**
+     * @param  list<array{publication_date:string}>  $urls
+     */
+    protected function newsSitemapLastModified(array $urls): ?string
+    {
+        return $this->maxLastModified(
+            collect($urls)->pluck('publication_date')->filter()->all(),
+        );
+    }
+
+    protected function newsRangeShardPath(int $bucket, int $span): string
+    {
+        $start = ($bucket * $span) + 1;
+        $end = ($bucket + 1) * $span;
+
+        return sprintf('sitemaps/news-%06d-%06d.xml', $start, $end);
     }
 
     protected function indexableNewsroomArticlesQuery(): Builder
