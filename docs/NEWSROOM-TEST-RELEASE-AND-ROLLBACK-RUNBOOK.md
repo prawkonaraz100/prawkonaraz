@@ -1049,13 +1049,13 @@ Przy pre-launch `NEWSROOM_PUBLIC_ENABLED=false` test potwierdza:
 - news i guide detail failują do 404 bez ujawnienia treści,
 - historyczny old-path nie wykonuje 301 do dark-deployed canonical,
 - `/aktualnosci` i `/poradniki` zachowują istniejący placeholder 200 + `X-Robots-Tag: noindex, follow`,
-- category/topic/feed route contract pozostaje publicznie 404, ponieważ te powierzchnie nadal należą do N4/N5,
+- category/topic routes failują do 404 przy gate=false, natomiast feed route pozostaje publicznie 404 niezależnie od gate do N5,
 - author page nie pokazuje newsroom publications,
 - newsroom-only author nie jest kwalifikowany przez author sitemap, a newsroomowy `public_state_changed_at` nie wnosi freshness contribution przy wyłączonym gate,
 - obecny `IndexNowUrlCollector` nie przepuszcza namespace `/aktualnosci` ani `/poradniki`,
 - authenticated admin private preview nadal działa.
 
-Przy `NEWSROOM_PUBLIC_ENABLED=true` regression potwierdza obecnie istniejące powierzchnie: public article detail, publiczny Hub Blade `/aktualnosci`, author publication, author sitemap eligibility i historyczny redirect. Category/topic/feed, osobny `/poradniki` hub, reverse links oraz article/news sitemap pozostają przyszłym N4/N5 i nie są fałszywie zaliczane.
+Przy `NEWSROOM_PUBLIC_ENABLED=true` regression potwierdza obecnie istniejące powierzchnie: public article detail, publiczny Hub Blade `/aktualnosci`, category pages, `/poradniki` hub, topic dossier, author publication, author sitemap eligibility i historyczny redirect. Feed, reverse links oraz article/news sitemap pozostają przyszłym N4-008/N5 i nie są fałszywie zaliczane.
 
 Existing public-article PHPUnit baseline i dedykowany Browser Smoke `newsroom-article` jawnie ustawiają gate na `true`, dzięki czemu bezpieczny produkcyjny default `false` nie maskuje regresji publicznego renderer'a.
 
