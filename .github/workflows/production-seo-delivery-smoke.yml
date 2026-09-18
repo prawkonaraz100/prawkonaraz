@@ -1,0 +1,58 @@
+name: Production SEO Delivery Smoke
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/production-seo-delivery-smoke.yml'
+      - 'deploy/mikrus/nginx/prawkobit.conf.example'
+      - 'scripts/seo-static-delivery-smoke.sh'
+      - 'tests/Unit/Infrastructure/NginxStaticSeoDeliveryConfigTest.php'
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: Public origin/proxy URL to verify
+        required: true
+        default: https://prawkonaraz.pl
+        type: string
+      strict:
+        description: Fail when the live delivery contract is not satisfied
+        required: true
+        default: true
+        type: boolean
+      check_newsroom_feed:
+        description: Also require the public Atom feed contract
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  production-seo-delivery:
+    runs-on: ubuntu-latest
+    env:
+      BASE_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.base_url || 'https://prawkonaraz.pl' }}
+      STRICT: ${{ github.event_name == 'workflow_dispatch' && inputs.strict && '1' || '0' }}
+      CHECK_NEWSROOM_FEED: ${{ github.event_name == 'workflow_dispatch' && inputs.check_newsroom_feed && '1' || '0' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate smoke script syntax
+        run: bash -n scripts/seo-static-delivery-smoke.sh
+
+      - name: Run public static delivery smoke
+        run: |
+          mkdir -p output
+          bash scripts/seo-static-delivery-smoke.sh 2>&1 | tee output/production-seo-delivery-smoke.txt
+
+      - name: Upload smoke report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-seo-delivery-smoke
+          path: output/production-seo-delivery-smoke.txt
+          if-no-files-found: error
+          retention-days: 7
