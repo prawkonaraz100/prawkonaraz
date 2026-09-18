@@ -5,7 +5,7 @@
 - **Status:** Canonical architecture + live implementation status
 - **Obszar:** publiczny serwis informacyjny, newsroom, aktualności, poradniki i dystrybucja treści
 - **Repozytorium:** `prawkonaraz100/prawkonaraz`
-- **Bazowy stan kodu:** `main@c68672f6aa7c41defaeec56debb541d5a60d9f4f`
+- **Bazowy stan kodu:** `main@a9fb9ccfed058de88efdb6e0833b67911aeb09aa`
 - **Data utworzenia:** 2026-09-15
 - **Właściciel decyzji produktowej:** PrawkoNaRaz
 - **Cel:** zaprojektować profesjonalny pion medialny bez dublowania istniejącej platformy, bez osobnego CMS/WordPressa i bez rozbijania modularnego monolitu.
@@ -138,6 +138,8 @@ Repo ma już istotny fundament:
 - N4-004: istniejący `NewsroomPlaceholderController::guides()` pozostaje rollout switchem dla `public.guides`; gate=false zachowuje pre-launch placeholder 200 + `X-Robots-Tag: noindex, follow`, a gate=true renderuje SSR `newsroom.guides`,
 - N4-004: `NewsroomGuideHubReadModelService` reużywa `ContentArticlePublicCatalogService::activelyDistributedQuery(NewsroomRouteContract::FAMILY_GUIDES)`, sortuje `first_published_at DESC, id DESC`, paginuje po 20 i emituje public-safe guide data,
 - N4-004: aktywny pusty guide hub renderuje użyteczny 200 + `noindex,follow`; invalid/out-of-range `page` failuje do 404, a `NewsroomGuideHubSchemaService` emituje `CollectionPage`, `BreadcrumbList` i conditional `ItemList`,
+- N4-005: `PublicNavigation::primary` zachowuje pojedyncze kanoniczne wpisy „Aktualności” i „Poradniki” z dotychczasowymi active-state prefixami; `documentNavigationPrefixes` już zawiera `/aktualnosci` i `/poradniki` i nie zostało zmienione,
+- N4-005: `PublicFooter::service_links` dodaje dokładnie po jednym wejściu do `/aktualnosci` i `/poradniki`; wspólne dane konsumują oba aktualne renderery compact footera — Vue `SiteFooter.vue` i Blade `public-footer.blade.php`,
 - route `/autorzy/{authorSlug}`,
 - statyczny produkcyjny pipeline sitemap `SeoSitemapGenerator` + `SeoSitemapBuilder` + `SeoSitemapAuditor`, z codziennym `seo:refresh-sitemaps` jako istniejącym safety netem,
 - dynamiczny `SitemapController`, który współistnieje z generowanymi artefaktami i nie jest samodzielnym source of truth produkcyjnego XML,
@@ -150,7 +152,7 @@ Repo ma już istotny fundament:
 - publiczny klaster znaków drogowych,
 - publiczna baza pytań,
 - relacje z podstawami prawnymi,
-- publiczna nawigacja z pozycją „Aktualności”,
+- publiczna nawigacja z pojedynczymi pozycjami „Aktualności” i „Poradniki”; N4-005 uzupełnia wspólny compact footer o oba huby bez duplikowania primary navigation,
 - route `/aktualnosci` i `/poradniki` z zachowanymi top-level route names,
 - wykonywalny `NewsroomRouteContract`,
 - zarejestrowane route namespaces feed/category/topic/article zgodne z finalnym kontraktem,
@@ -204,7 +206,7 @@ To oznacza, że:
 Nie ma obecnie kompletnego end-to-end odpowiednika:
 
 - publicznego topic lifecycle pod `/aktualnosci/temat/{topicSlug}`; publiczne 200/410, nav i sitemap consequences pozostają N4/N5,
-- publicznych topic/feed rendererów oraz osobnego huba `/poradniki`,
+- publicznych topic/feed rendererów,
 - reverse-link surface z istniejących entity pages do newsroom article,
 - news sitemap,
 - feedu RSS/Atom,
@@ -1519,8 +1521,9 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N4-002` — publiczny Hub Blade `/aktualnosci`.
 - [x] `NEWSROOM-N4-003` — publiczne category pages `/aktualnosci/kategoria/{categorySlug}`.
 - [x] `NEWSROOM-N4-004` — publiczny guide-only hub `/poradniki`.
+- [x] `NEWSROOM-N4-005` — Navigation integration bez duplikowania istniejących primary links.
 
-N4-004 jest zmaterializowane i potwierdzone na `main@2bb22142b1e9bec803f9c3889c11000194f46783`; następnym wykonywalnym taskiem jest `NEWSROOM-N4-005` — Navigation integration. Pozostałe elementy N4–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu pełną checklistę.
+N4-005 jest zmaterializowane i potwierdzone na `main@a9fb9ccfed058de88efdb6e0833b67911aeb09aa`; następnym wykonywalnym taskiem jest `NEWSROOM-N4-006` — Cache. Pozostałe elementy N4–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu pełną checklistę.
 
 ---
 ## 28. Zasady utrzymania dokumentu
@@ -1545,6 +1548,15 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-18 — v0.42
+
+- NEWSROOM-N4-005 zmergowano przez PR #89; finalny implementation head `189219b3586d2df8e4ea73045318fd68f38f0fa1`, merge `main@a9fb9ccfed058de88efdb6e0833b67911aeb09aa`,
+- audyt potwierdził istniejące pojedyncze primary links `Aktualności -> /aktualnosci` i `Poradniki -> /poradniki` z właściwymi prefixami; nie dodano duplikatów i nie zmieniono `documentNavigationPrefixes`,
+- wspólny `PublicFooter::service_links` został uzupełniony o oba huby; Vue `SiteFooter.vue` i Blade `public-footer.blade.php` konsumują ten sam source of truth,
+- dodano `NewsroomNavigationIntegrationTest` dla canonical links, duplicate-free footer i prefixów oraz rozszerzono `newsroom-guides` Browser QA o rzeczywiste linki footera; Browser Smoke #32 PASS dla `newsroom-guides`, `newsroom-category`, `newsroom-home`, `newsroom-article`,
+- exact-head CI #335 PASS; post-merge CI #336 PASS: 1075 passed / 19 745 assertions / 2 skipped, Pint 1069 files PASS, frontend build 7.32 s, `newsroom-postgres` 7 passed / 94 assertions,
+- NEWSROOM-N4-006 Cache jest następnym wykonywalnym taskiem; topic pages N4-007, reverse links N4-008 i N5 discovery pozostają otwarte.
 
 ### 2026-09-18 — v0.41
 

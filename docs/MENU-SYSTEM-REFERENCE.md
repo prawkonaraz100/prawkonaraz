@@ -1,6 +1,6 @@
 # Menu system reference
 
-Status: stan aktualny z lokalnego projektu, zaktualizowany 2026-06-04.
+Status: stan aktualny, zweryfikowany 2026-09-18 względem `main@a9fb9ccfed058de88efdb6e0833b67911aeb09aa` po NEWSROOM-N4-005.
 
 Ten dokument opisuje publiczne menu `prawkonaraz.pl`: skad bierze dane, jak rozni sie w Vue/Inertia i Blade, jakie ma stany zalogowania, jak dziala mobile, wyszukiwarka, menu konta, drawery logowania/rejestracji oraz footer. Ma sluzyc jako punkt odniesienia przed kazda zmiana w nawigacji.
 
@@ -93,7 +93,9 @@ Desktopowe primary menu jest celowo takie samo w Vue i Blade. To jest uklad prze
 
 ### Mobile i footer
 
-Backendowe `navigation.primary` nadal zawiera standardowy zestaw publicznych linkow (`Aktualnosci`, opcjonalnie `Nauka`, `Pytania`, `Znaki drogowe`, `Testy online`, `Przepisy`, `Poradniki`, `Cena`). Ten zestaw pozostaje uzywany w mobile menu i footerze, zeby nie przebudowywac tych powierzchni przy desktopowym ujednoliceniu.
+Backendowe `navigation.primary` nadal zawiera pojedyncze kanoniczne wpisy `Aktualnosci` (`/aktualnosci`) i `Poradniki` (`/poradniki`) z poprawnymi prefixami active-state. N4-005 nie dodalo drugich wpisow do headerow ani nie zmienilo tych prefixow.
+
+Aktualne renderery headera Vue i Blade maja wlasne kuratorowane listy mobile/desktop i nie nalezy zakladac, ze renderuja cale `navigation.primary`. Compact footer nie renderuje `navigation.primary`; oba aktualne renderery footera (`SiteFooter.vue` i `public-footer.blade.php`) konsumują wspolne `PublicFooter::service_links`.
 
 ### Dostep do nauki
 
@@ -226,7 +228,20 @@ Panel ma `max-h-[calc(100svh-72px)]` i `overflow-y-auto`, wiec przy dlugiej lisc
 
 ## 10. Footer
 
-Footer ma wspolne dane z `PublicFooter` i renderery Vue/Blade.
+Footer ma wspolne dane z `PublicFooter` i renderery Vue/Blade. Po NEWSROOM-N4-005 `PublicFooter::service_links` jest wspolnym source of truth dla compact footera w obu rendererach i zawiera dokladnie po jednym wejściu do `/aktualnosci` i `/poradniki`.
+
+Aktualne `service_links`:
+
+| Label | Href |
+| --- | --- |
+| Baza pytan | `/oficjalna-baza-pytan-na-prawo-jazdy` |
+| Testy na prawo jazdy | `/testy-na-prawo-jazdy` |
+| Aktualnosci | `/aktualnosci` |
+| Poradniki | `/poradniki` |
+| Kurs | `/kurs` |
+| Cennik | `/cennik` |
+
+`footer_groups` nadal istnieje w danych `PublicNavigation`, ale aktualny compact `SiteFooter.vue` i `public-footer.blade.php` renderuja `legal_links`, `service_links` i `social_links`, a nie `footer_groups`.
 
 CTA:
 
@@ -266,7 +281,7 @@ Wyjatek bez headera:
 - jesli path pasuje do `documentNavigationPrefixes`, uzywa zwyklego `<a>`,
 - w innym przypadku uzywa Inertia `Link`.
 
-Prefixy dokumentowe obejmuja m.in. `/`, `/admin`, `/aktualnosci`, `/autorzy`, `/cennik`, `/kontakt`, `/oficjalna-baza-pytan-na-prawo-jazdy`, `/pytanie`, `/testy-na-prawo-jazdy`, `/znaki-drogowe`.
+Prefixy dokumentowe obejmuja m.in. `/`, `/admin`, `/aktualnosci`, `/autorzy`, `/cennik`, `/kontakt`, `/oficjalna-baza-pytan-na-prawo-jazdy`, `/poradniki`, `/pytanie`, `/testy-na-prawo-jazdy`, `/znaki-drogowe`. N4-005 potwierdzilo, ze `/aktualnosci` i `/poradniki` byly juz obecne i nie wymagaly zmiany `documentNavigationPrefixes`.
 
 Konsekwencja: publiczne/SEO strony zwykle ida pelnym document navigation. Prywatne widoki aplikacyjne, np. `/nauka`, `/profile`, `/trener-pamieci`, ida przez Inertia, o ile nie sa dodane do prefixow dokumentowych.
 
@@ -385,7 +400,7 @@ Przy dodaniu albo zmianie linku:
 2. Sprawdz route w `routes/web.php` lub `routes/auth.php`.
 3. Ustaw poprawne `match`, zeby active state dzialal na detailach i podstronach.
 4. Jesli to publiczna strona dokumentowa, zaktualizuj `documentNavigationPrefixes`.
-5. Jesli link ma byc w footerze, zaktualizuj `footer_groups`.
+5. Jesli link ma byc w aktualnym compact footerze, zaktualizuj `PublicFooter::service_links`; `footer_groups` zmieniaj tylko wtedy, gdy faktycznie korzysta z nich dany renderer.
 6. Sprawdz Vue desktop, Vue mobile, Blade desktop, Blade mobile.
 7. Jesli zmiana dotyczy auth action, sprawdz guest, zwyklego usera, moderatora i admina.
 8. Jesli zmiana dotyczy wygladu, porownaj `SiteHeader.vue` z `public-header.blade.php`.

@@ -1558,20 +1558,29 @@ N4-004 nie obejmuje global navigation changes N4-005, cache/invalidation N4-006,
 
 ## NEWSROOM-N4-005 — Navigation integration
 
-### Potwierdzony stan
+### Status implementacji
 
-`PublicNavigation` ma już primary links „Aktualności” i „Poradniki” z właściwymi prefixami.
+**DONE w kodzie — PR #89 zmergowano na `main@a9fb9ccfed058de88efdb6e0833b67911aeb09aa`.** Finalny implementation head `189219b3586d2df8e4ea73045318fd68f38f0fa1` przeszedł exact-head CI #335, Browser Smoke #32 i post-merge CI #336.
+
+### Aktualny stan implementacji
+
+- `PublicNavigation::primary` zachowuje dokładnie po jednym wpisie „Aktualności” i „Poradniki”; nie dodano duplikatów i nie zmieniono active-state prefixów,
+- `documentNavigationPrefixes` już zawiera `/aktualnosci` i `/poradniki`; N4-005 nie wymagało zmiany helpera,
+- `PublicFooter::service_links` został uzupełniony o oba huby,
+- Vue `SiteFooter.vue` i Blade `public-footer.blade.php` nadal renderują wspólne dane z `PublicFooter`,
+- `NewsroomNavigationIntegrationTest` chroni canonical links, duplicate-free footer i prefixy,
+- `newsroom-guides` Browser QA sprawdza dokładnie po jednym linku footerowym do obu hubów, a Browser Smoke #32 przeszedł wszystkie relewantne newsroom joby.
 
 ### Zakres
 
-- zachować istniejące linki i active states, bez dublowania,
-- sprawdzić footer/inne renderery i dodać tylko brakujące, uzasadnione wejścia,
-- documentNavigationPrefixes tylko jeśli faktycznie potrzebne.
+- [x] zachować istniejące linki i active states, bez dublowania,
+- [x] sprawdzić footer/inne renderery i dodać tylko brakujące, uzasadnione wejścia,
+- [x] pozostawić `documentNavigationPrefixes` bez zmiany, ponieważ oba namespace’y już istniały.
 
 ### DoD
 
-- zero duplicate nav items,
-- Vue + Blade renderers verified.
+- [x] zero duplicate nav items,
+- [x] Vue + Blade renderers verified.
 
 ---
 
@@ -2323,20 +2332,18 @@ Nie oznaczać tasku DONE przed merge + green verification.
 
 # 10. Aktualny stan
 
-Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-004 na `main@2bb22142b1e9bec803f9c3889c11000194f46783`:
+Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-005 na `main@a9fb9ccfed058de88efdb6e0833b67911aeb09aa`:
 
 - pakiet projektowy newsroomu obejmuje architekturę, model danych, CMS, UI, governance, SEO, backlog i runbook,
-- foundation N0, pełny etap N1-001..N1-006, admin/domain N2-001..N2-012, cały etap NEWSROOM-N3-001..N3-008 oraz NEWSROOM-N4-001..N4-004 są wdrożone,
+- foundation N0, pełny etap N1-001..N1-006, admin/domain N2-001..N2-012, cały etap NEWSROOM-N3-001..N3-008 oraz NEWSROOM-N4-001..N4-005 są wdrożone,
 - publiczne article detail `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}`, fail-closed Product Bridge, old-path 301, author-profile integration i globalny `NEWSROOM_PUBLIC_ENABLED` gate są zmaterializowane,
-- N4-001 dostarcza bounded scalar-array home read model, N4-002 przy gate=true renderuje z niego SSR `newsroom.home`, N4-003 aktywuje `public.news.categories.show`, a N4-004 aktywuje istniejący top-level `public.guides` jako SSR `newsroom.guides`,
-- gate=false pozostawia `/aktualnosci` i `/poradniki` jako pre-launch placeholdery 200 + noindex oraz blokuje category page do 404; gate=true renderuje oba publiczne huby,
-- guide hub kwalifikuje wyłącznie guide-family `activelyDistributed()` corpus, sortuje `first_published_at DESC, id DESC`, paginuje po 20 i reużywa istniejące guide detail URLs,
-- aktywny pusty guide hub renderuje użyteczny 200 + noindex, a invalid/out-of-range page failuje do 404; page 1 nie emituje redundantnego `?page=1`,
-- `/aktualnosci` ma crawlable `Zobacz wszystkie poradniki` do `public.guides`; topic/feed routes nadal pozostają 404,
-- `newsroom-guides`, `newsroom-category`, `newsroom-home` i `newsroom-article` są automatycznymi PR Browser QA; guides harness działa z JS disabled na 360/390/430/768/1024/1280/1440 oraz sprawdza drugą stronę paginacji,
-- istnieją public/robots.txt i RobotsController; newsroom nie zmienia tej warstwy bez osobnego production-delivery audit,
-- newsroom dirty/version refresh coordinator, atomic child-before-index publication, topic/feed public surfaces oraz newsroom/news sitemap output jeszcze nie istnieją,
-- canonical CI zachowuje SQLite `quality` i addytywny `newsroom-postgres`; post-merge CI #332 na exact `main@2bb22142...` był pełnym PASS,
+- N4-001..N4-004 materializują publiczne huby/category/read models, a N4-005 domyka integrację nawigacji bez tworzenia drugiego systemu menu,
+- `PublicNavigation::primary` nadal zawiera pojedyncze canonical links „Aktualności” i „Poradniki” z dotychczasowymi active-state prefixami; `documentNavigationPrefixes` już zawiera oba namespace’y i nie został zmieniony,
+- `PublicFooter::service_links` zawiera teraz dokładnie po jednym wejściu do `/aktualnosci` i `/poradniki`; Vue `SiteFooter.vue` i Blade `public-footer.blade.php` konsumują ten sam footer source of truth,
+- `NewsroomNavigationIntegrationTest` pilnuje canonical primary links, duplicate-free footer links i istniejących document-navigation prefixes,
+- Browser Smoke #32 potwierdził rzeczywisty footer na guide hubie oraz brak regresji w `newsroom-guides`, `newsroom-category`, `newsroom-home` i `newsroom-article`,
+- topic/feed routes nadal pozostają 404, a newsroom dirty/version refresh coordinator i faktyczny cache/invalidation nadal nie istnieją,
+- canonical CI zachowuje SQLite `quality` i addytywny `newsroom-postgres`; post-merge CI #336 na exact `main@a9fb9ccf...` był pełnym PASS,
 - QUEUE_CONNECTION w env example jest sync; stały queue worker nie jest gwarantowany,
 - panel Filament pozostaje admin-only i ten kontrakt pozostaje wymaganiem v1.
 
@@ -2344,13 +2351,22 @@ Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-004 na `main@2bb22142b1e9bec803f9c3
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N4-005 — Navigation integration.
+NEWSROOM-N4-006 — Cache.
 
-N4-004 jest zamknięte implementacyjnie po PR #87, exact-head CI #331, Browser Smoke #31 i post-merge CI #332. Następny krok ma zweryfikować i ewentualnie uzupełnić istniejącą integrację nawigacji bez dublowania już istniejących primary links „Aktualności” i „Poradniki”. Nie obejmuje cache/invalidation N4-006, topic pages N4-007, reverse links N4-008 ani discovery N5.
+N4-005 jest zamknięte implementacyjnie po PR #89, exact-head CI #335, Browser Smoke #32 i post-merge CI #336. Następny krok ma dodać cache/invalidation dla już istniejących publicznych read surfaces zgodnie z istniejącym kontraktem i bez zmiany kolejności/eligibility. Nie obejmuje topic pages N4-007, reverse links N4-008 ani discovery N5.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-18 — v0.42
+
+- NEWSROOM-N4-005 zmergowano przez PR #89; finalny implementation head `189219b3586d2df8e4ea73045318fd68f38f0fa1`, merge `main@a9fb9ccfed058de88efdb6e0833b67911aeb09aa`,
+- zachowano istniejące primary links „Aktualności” i „Poradniki” oraz ich active-state prefixes bez duplikowania i bez zmiany `documentNavigationPrefixes`,
+- `PublicFooter::service_links` uzupełniono o oba huby; Vue i Blade compact footer renderują wspólne dane,
+- dodano `NewsroomNavigationIntegrationTest` oraz footer assertions do `e2e-newsroom-guides.mjs`; Browser Smoke #32 PASS dla wszystkich czterech newsroom jobów,
+- exact-head CI #335 i post-merge CI #336 PASS; post-merge: 1075 passed / 19 745 assertions / 2 skipped, Pint 1069 files PASS, frontend build 7.32 s; PostgreSQL 7 passed / 94 assertions,
+- NEWSROOM-N4-006 Cache jest następnym wykonywalnym taskiem.
 
 ### 2026-09-18 — v0.41
 

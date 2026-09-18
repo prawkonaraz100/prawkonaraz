@@ -1317,8 +1317,11 @@ Na 2026-09-18 po NEWSROOM-N4-004, zweryfikowanym na `main@2bb22142b1e9bec803f9c3
 - dedykowany Browser Smoke #29 `newsroom-category` przeszedł z JavaScript disabled na 360/390/430/768/1024/1280/1440 oraz dodatkowo sprawdził page 2/canonical; równoległe `newsroom-home` i `newsroom-article` również zakończyły PASS,
 - N4-004 renderuje `newsroom.guides` jako evergreen guide-only hub: H1/lead, praktyczny label `Poradnik`, hero/lead card, grid dalszych poradników, useful empty-state i SSR pagination; publication time nie jest głównym sygnałem UI,
 - guide hub reużywa wspólny `layouts.public-content`, istniejące guide detail URLs oraz category label jako klasyfikację bez kierowania guide cards do newsroom category page,
-- `/aktualnosci` ma crawlable `Zobacz wszystkie poradniki` do `public.guides`; nie dodano drugiego systemu nawigacji i global navigation pozostaje zakresem N4-005,
+- `/aktualnosci` ma crawlable `Zobacz wszystkie poradniki` do `public.guides`; N4-005 potwierdziło istniejące pojedyncze primary links „Aktualności” i „Poradniki” i nie dodało drugiego systemu nawigacji,
 - Browser Smoke #31 `newsroom-guides` przeszedł z JS disabled na 360/390/430/768/1024/1280/1440 oraz page-2 canonical check; `newsroom-category`, `newsroom-home` i `newsroom-article` w tym samym runie również zakończyły PASS,
+- N4-005 zachowuje istniejące header primary links i active states bez duplikatów; `documentNavigationPrefixes` dla `/aktualnosci` i `/poradniki` pozostaje bez zmian,
+- compact footer ma wspólny backend source `PublicFooter::service_links`; od N4-005 zarówno Vue `SiteFooter.vue`, jak i Blade `public-footer.blade.php` renderują po jednym crawlable wejściu „Aktualności” i „Poradniki”,
+- Browser Smoke #32 potwierdził oba linki footerowe na guide hubie przy JS disabled i brak regresji w `newsroom-guides`, `newsroom-category`, `newsroom-home` i `newsroom-article`,
 - Hub Blade reużywa `layouts.public-content`, wspólny header/footer i route `public.tests`; przy gate=true emituje self-canonical i `index,follow,max-image-preview:large`,
 - dedykowany Browser Smoke #27 `newsroom-home` przeszedł z JavaScript disabled na 360/390/430/768/1024/1280/1440, sprawdzając realny built CSS, H1/subnavigation/content/CTA, canonical/robots i brak horizontal overflow; równoległy `newsroom-article` także zakończył PASS.
 
@@ -1348,11 +1351,20 @@ Na 2026-09-18 po NEWSROOM-N4-004, zweryfikowanym na `main@2bb22142b1e9bec803f9c3
 - [x] zbudować NEWSROOM-N4-002 Hub Blade layout i dedykowany responsive Browser QA,
 - [x] zbudować NEWSROOM-N4-003 Category pages i dedykowany responsive Browser QA,
 - [x] zbudować NEWSROOM-N4-004 `/poradniki` hub i dedykowany responsive Browser QA,
-- [ ] zweryfikować NEWSROOM-N4-005 Navigation integration bez dublowania istniejących linków; to jest następny wykonywalny UI zakres.
+- [x] zweryfikować NEWSROOM-N4-005 Navigation integration bez dublowania istniejących linków i uzupełnić wspólny compact footer o oba huby.
+- [ ] NEWSROOM-N4-006 Cache jest następnym wykonywalnym taskiem backlogu; następnym nowym publicznym surface UI pozostaje NEWSROOM-N4-007 Topic / dossier pages.
 
 ---
 
 ## 69. Historia zmian
+
+### 2026-09-18 — v0.21
+
+- NEWSROOM-N4-005 zmergowano przez PR #89 na `main@a9fb9ccfed058de88efdb6e0833b67911aeb09aa`; finalny implementation head `189219b3586d2df8e4ea73045318fd68f38f0fa1`,
+- istniejące header primary links „Aktualności” i „Poradniki” oraz active-state prefixes zostały zachowane bez duplikatów; `documentNavigationPrefixes` nie wymagał zmiany,
+- `PublicFooter::service_links` dostał pojedyncze wejścia do `/aktualnosci` i `/poradniki`, współdzielone przez Vue i Blade compact footer,
+- `NewsroomNavigationIntegrationTest` chroni duplicate-free contract; `newsroom-guides` Browser QA sprawdza realny footer, a Browser Smoke #32 zakończył PASS dla wszystkich czterech newsroom jobów,
+- exact-head CI #335 i post-merge CI #336 zakończyły PASS; NEWSROOM-N4-006 Cache jest następnym wykonywalnym taskiem.
 
 ### 2026-09-18 — v0.20
 
