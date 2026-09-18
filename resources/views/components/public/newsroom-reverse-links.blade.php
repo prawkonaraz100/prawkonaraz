@@ -4,7 +4,7 @@
 ])
 
 @if (($articles ?? []) !== [])
-    <section {{ $attributes->merge(['class' => 'border-t border-slate-200 pt-7']) }} aria-labelledby="newsroom-reverse-links-heading">
+    <section data-newsroom-reverse-links {{ $attributes->merge(['class' => 'border-t border-slate-200 pt-7']) }} aria-labelledby="newsroom-reverse-links-heading">
         <p class="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Czytaj także</p>
         <h2 id="newsroom-reverse-links-heading" class="mt-1 text-xl font-semibold text-slate-950">{{ $heading }}</h2>
 
