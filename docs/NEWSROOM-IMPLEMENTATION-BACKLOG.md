@@ -186,7 +186,7 @@ Preferowany:
 - parametry używają kontraktu `[a-z0-9-]+`; newsroom article route rezerwuje segmenty `kategoria` i `temat`,
 - feed/category/topic routes są deklarowane przed article catch-all,
 - route contract nie przesądza o bieżącym publicznym statusie downstream controllerów; stan detail routes opisuje sekcja N3 i rozdział 10,
-- `/aktualnosci` przy gate=false zachowuje pre-launch placeholder UX z `X-Robots-Tag: noindex, follow`, a przy gate=true po N4-002 renderuje SSR `newsroom.home`; `/poradniki` nadal pozostaje placeholderem/noindex do N4-004,
+- `/aktualnosci` przy gate=false zachowuje pre-launch placeholder UX z `X-Robots-Tag: noindex, follow`, a przy gate=true po N4-002 renderuje SSR `newsroom.home`; od N4-003 `public.news.categories.show` przy gate=true renderuje SSR category page, a przy gate=false failuje do 404; `/poradniki` nadal pozostaje placeholderem/noindex do N4-004,
 - shared `Public/MarketingPlaceholder` innych sekcji nie został globalnie zmieniony,
 - `NewsroomRouteContract` implementuje type -> route family, canonical path, reserved slug policy i guard cross-family type transition po pierwszej publikacji.
 
@@ -1483,13 +1483,39 @@ N4-002 nie obejmuje category/topic/feed, osobnego huba `/poradniki`, cache/inval
 
 ## NEWSROOM-N4-003 — Category pages
 
+### Status implementacji
+
+**DONE w kodzie — PR #85 zmergowano na `main@84bcb2aeff57a1374def7af411c39db07a8fb38d`.** Finalny implementation head `8e4f707060fbaa348e9392f0b19beb7b4517beca` przeszedł exact-head CI #326, Browser Smoke #29 i post-merge CI #327.
+
+### Aktualny stan implementacji
+
+- istniejący route `public.news.categories.show` jest podłączony do `NewsroomCategoryController`; przy gate=false category request kończy 404, przy gate=true aktywna kategoria renderuje `newsroom.category`,
+- `NewsroomCategoryReadModelService` reużywa `ContentArticlePublicCatalogService::activelyDistributedQuery(NewsroomRouteContract::FAMILY_NEWSROOM)`, filtruje po `category_id`, sortuje `first_published_at DESC, id DESC` i paginuje po 20,
+- inactive/unknown category, nieprawidłowy `page` oraz out-of-range page failują do 404,
+- aktywna pusta kategoria renderuje użyteczny 200, ale ma meta robots i `X-Robots-Tag: noindex, follow`,
+- page 1 ma canonical bez `?page=1`; kolejne strony mają self-canonical `?page=N` i crawlable prev/next/page links,
+- `NewsroomCategorySchemaService` emituje `CollectionPage`, `BreadcrumbList` oraz `ItemList` tylko dla niepustego corpus,
+- related categories obejmują wyłącznie aktywne kategorie mające `activelyDistributed()` newsroom-family articles,
+- Hub Blade linkuje category blocks przez `Zobacz wszystkie` do istniejącego route category,
+- `NewsroomCategoryPageTest` i `scripts/e2e-newsroom-category.mjs` chronią gate, eligibility, deterministic order, empty state, paginację, canonical/robots/schema i responsive browser surface.
+
 ### Zakres
 
-- category header,
-- activelyDistributed-only chronological list,
-- order by first_published_at desc + deterministic tie-breaker,
-- pagination,
-- SEO.
+- [x] category header,
+- [x] activelyDistributed-only chronological list,
+- [x] order by first_published_at desc + deterministic tie-breaker,
+- [x] pagination,
+- [x] SEO.
+
+### DoD
+
+- [x] category route aktywuje się bez tworzenia drugiego route contract,
+- [x] public listing nie pokazuje guide/draft/archived/needs_review corpus,
+- [x] paginacja jest SSR/crawlable i canonical-safe,
+- [x] empty category nie staje się indeksowalną thin page,
+- [x] dedykowany Browser QA PASS.
+
+N4-003 nie obejmuje `/poradniki` huba, topic/feed, cache/invalidation, reverse links ani N5 discovery.
 
 ---
 
@@ -2270,19 +2296,20 @@ Nie oznaczać tasku DONE przed merge + green verification.
 
 # 10. Aktualny stan
 
-Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-002 na `main@04a3e961a40207bd65c41b684a5bf1cd8d2c5e10`:
+Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-003 na `main@84bcb2aeff57a1374def7af411c39db07a8fb38d`:
 
 - pakiet projektowy newsroomu obejmuje architekturę, model danych, CMS, UI, governance, SEO, backlog i runbook,
-- foundation N0, pełny etap N1-001..N1-006, admin/domain N2-001..N2-012, cały etap NEWSROOM-N3-001..N3-008 oraz NEWSROOM-N4-001..N4-002 są wdrożone,
+- foundation N0, pełny etap N1-001..N1-006, admin/domain N2-001..N2-012, cały etap NEWSROOM-N3-001..N3-008 oraz NEWSROOM-N4-001..N4-003 są wdrożone,
 - publiczne article detail `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}`, fail-closed Product Bridge, old-path 301, author-profile integration i globalny `NEWSROOM_PUBLIC_ENABLED` gate są zmaterializowane,
-- N4-001 dostarcza bounded scalar-array home read model, a N4-002 przy gate=true renderuje z niego SSR `newsroom.home` pod istniejącym route `public.news`,
-- gate=false pozostawia `/aktualnosci` jako pre-launch placeholder 200 + noindex; `/poradniki` pozostaje placeholderem/noindex niezależnie od gate do N4-004,
-- category/topic/feed routes są nadal zarejestrowane, ale zwracają 404; N4-002 nie uruchomiło ich ani nie dodało osobnego category navigation routingu,
-- Hub Blade pomija puste moduły i reużywa wspólny public layout/header/footer oraz istniejący `public.tests` Product Bridge,
-- dedykowany `newsroom-home` Browser QA jest automatycznym PR gate dla relewantnych zmian i przechodzi z JS disabled na 360/390/430/768/1024/1280/1440,
+- N4-001 dostarcza bounded scalar-array home read model, N4-002 przy gate=true renderuje z niego SSR `newsroom.home`, a N4-003 aktywuje istniejący `public.news.categories.show` jako SSR category page,
+- gate=false pozostawia `/aktualnosci` jako pre-launch placeholder 200 + noindex i blokuje category page do 404; `/poradniki` pozostaje placeholderem/noindex do N4-004,
+- category page kwalifikuje wyłącznie aktywną kategorię i newsroom-family `activelyDistributed()` corpus, sortuje `first_published_at DESC, id DESC` i paginuje po 20 rekordów,
+- aktywna pusta kategoria renderuje użyteczny 200 + noindex, a inactive/unknown/invalid/out-of-range request failuje do 404,
+- Hub Blade ma crawlable `Zobacz wszystkie` do category pages; topic/feed routes nadal pozostają 404,
+- `newsroom-category`, `newsroom-home` i `newsroom-article` są automatycznymi PR Browser QA; category harness działa z JS disabled na 360/390/430/768/1024/1280/1440 oraz sprawdza drugą stronę paginacji,
 - istnieją public/robots.txt i RobotsController; newsroom nie zmienia tej warstwy bez osobnego production-delivery audit,
-- newsroom dirty/version refresh coordinator, atomic child-before-index publication, category/topic/feed public surfaces oraz newsroom/news sitemap output jeszcze nie istnieją,
-- canonical CI zachowuje SQLite `quality` i addytywny `newsroom-postgres`; post-merge CI #322 na exact `main@04a3e961...` był pełnym PASS,
+- newsroom dirty/version refresh coordinator, atomic child-before-index publication, topic/feed public surfaces oraz newsroom/news sitemap output jeszcze nie istnieją,
+- canonical CI zachowuje SQLite `quality` i addytywny `newsroom-postgres`; post-merge CI #327 na exact `main@84bcb2ae...` był pełnym PASS,
 - QUEUE_CONNECTION w env example jest sync; stały queue worker nie jest gwarantowany,
 - panel Filament pozostaje admin-only i ten kontrakt pozostaje wymaganiem v1.
 
@@ -2290,13 +2317,22 @@ Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-002 na `main@04a3e961a40207bd65c41b
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N4-003 — Category pages.
+NEWSROOM-N4-004 — `/poradniki` hub.
 
-N4-002 jest zamknięte implementacyjnie po PR #83, exact-head CI #321, Browser Smoke #27 i post-merge CI #322. Następny krok ma zmaterializować istniejący route contract `/aktualnosci/kategoria/{categorySlug}` jako publiczną category page zgodną z aktywną dystrybucją, chronologicznym sortowaniem, deterministycznym tie-breakerem, paginacją i SEO. Nie obejmuje `/poradniki` huba N4-004, cache/invalidation N4-006, reverse links N4-008 ani discovery N5.
+N4-003 jest zamknięte implementacyjnie po PR #85, exact-head CI #326, Browser Smoke #29 i post-merge CI #327. Następny krok ma zmaterializować istniejący top-level route `/poradniki` jako publiczny guide-only hub z evergreen UI variant i reużyciem istniejącego article renderer/catalog boundary. Nie obejmuje cache/invalidation N4-006, topic pages N4-007, reverse links N4-008 ani discovery N5.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-18 — v0.40
+
+- NEWSROOM-N4-003 zmergowano przez PR #85; finalny implementation head `8e4f707060fbaa348e9392f0b19beb7b4517beca`, merge `main@84bcb2aeff57a1374def7af411c39db07a8fb38d`,
+- aktywowano istniejący `public.news.categories.show` jako rollout-gated SSR category page z `activelyDistributed()` newsroom corpus, deterministic order i paginacją po 20,
+- pusta aktywna kategoria ma 200 + noindex, a inactive/unknown/invalid/out-of-range requests failują do 404; page 1 nie emituje redundantnego `?page=1`,
+- dodano category `CollectionPage`/`BreadcrumbList`/conditional `ItemList`, crawlable hub links oraz dedykowany `NewsroomCategoryPageTest` i `e2e-newsroom-category.mjs`,
+- Browser Smoke #29 PASS dla `newsroom-category`, `newsroom-home`, `newsroom-article`; exact-head CI #326 i post-merge CI #327 PASS, post-merge: 1067 passed / 19 684 assertions / 2 skipped, Pint 1065 files PASS, frontend build 9.40 s, PostgreSQL 7 passed / 94 assertions,
+- NEWSROOM-N4-004 `/poradniki` hub jest następnym wykonywalnym taskiem.
 
 ### 2026-09-18 — v0.39
 
