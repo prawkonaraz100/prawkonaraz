@@ -31,6 +31,7 @@ test('mikrus nginx serves canonical static seo artifacts without php fallback', 
     foreach ([$rootSitemap, $childSitemaps] as $location) {
         expect($location)
             ->not->toBe('')
+            ->toContain('types { application/xml xml; }')
             ->toContain('default_type application/xml;')
             ->toContain('Cache-Control "public, max-age=60, s-maxage=60, must-revalidate"')
             ->toContain('etag on;')
