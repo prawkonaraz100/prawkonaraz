@@ -171,11 +171,46 @@ try {
 
             const cdp = await context.newCDPSession(page);
             const metrics = await cdp.send('Page.getLayoutMetrics');
-            const scrollWidth = Math.ceil(metrics.cssContentSize.width);
             const viewportWidth = Math.ceil(metrics.cssLayoutViewport.clientWidth);
+            let measuredWidth;
 
-            if (scrollWidth > viewportWidth) {
-                throw new Error(`Horizontal overflow on ${surface.key} at ${viewport.name}px: ${scrollWidth}px > ${viewportWidth}px.`);
+            if (surface.key === 'article') {
+                measuredWidth = Math.ceil(metrics.cssContentSize.width);
+
+                if (measuredWidth > viewportWidth) {
+                    throw new Error(`Horizontal overflow on article at ${viewport.name}px: ${measuredWidth}px > ${viewportWidth}px.`);
+                }
+            } else {
+                const reverseSection = page.locator('[data-newsroom-reverse-links]');
+
+                if (await reverseSection.count() !== 1) {
+                    throw new Error(`${surface.key} reverse-link section count failed at ${viewport.name}px.`);
+                }
+
+                const geometry = await reverseSection.evaluate((element) => {
+                    const rect = element.getBoundingClientRect();
+
+                    return {
+                        clientWidth: element.clientWidth,
+                        scrollWidth: element.scrollWidth,
+                        left: rect.left,
+                        right: rect.right,
+                    };
+                });
+
+                measuredWidth = Math.ceil(geometry.scrollWidth);
+
+                if (
+                    geometry.scrollWidth > geometry.clientWidth + 1
+                    || geometry.left < -1
+                    || geometry.right > viewportWidth + 1
+                ) {
+                    throw new Error(
+                        `${surface.key} reverse-link overflow at ${viewport.name}px: `
+                        + `scroll=${geometry.scrollWidth}, client=${geometry.clientWidth}, `
+                        + `left=${geometry.left}, right=${geometry.right}, viewport=${viewportWidth}.`,
+                    );
+                }
             }
 
             const screenshot = path.join(outputDir, `${surface.key}-${viewport.name}.png`);
@@ -185,7 +220,7 @@ try {
                 surface: surface.key,
                 viewport: viewport.name,
                 status: 'ok',
-                scroll_width: scrollWidth,
+                measured_width: measuredWidth,
                 screenshot,
             });
 
