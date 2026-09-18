@@ -103,7 +103,7 @@ Na pierwszym etapie nie budujemy:
 
 ## 5. Aktualny stan implementacji
 
-Stan sprawdzony ponownie 2026-09-18 względem `main@5ddfa48c0646fa89cc802d129e6d9ccee9d18957` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-012, NEWSROOM-N3-001..N3-008, NEWSROOM-N4-001..N4-008 oraz NEWSROOM-N5-001. Zakres admin/domain N2, public article layer N3 i public IA/semantic layer N4 są zamknięte. N5-001 rozszerza istniejący statyczny sitemap pipeline o standard article sitemap, rollout-gated hub coverage i deterministic fixed-ID-range sharding; pozostałe N5/N6 pozostają otwarte.
+Stan sprawdzony ponownie 2026-09-18 względem `main@827f3816487d3a404df26c381a103a6cd1a9f413` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-012, NEWSROOM-N3-001..N3-008, NEWSROOM-N4-001..N4-008 oraz NEWSROOM-N5-001..N5-002. Zakres admin/domain N2, public article layer N3 i public IA/semantic layer N4 są zamknięte. N5-001 rozszerza istniejący statyczny sitemap pipeline o standard article sitemap/hub coverage, a N5-002 o rollout-gated Google News Sitemap z 2-dniowym `first_published_at` window i deterministic split; pozostałe N5/N6 pozostają otwarte.
 
 ### 5.1. Elementy już istniejące
 
@@ -150,6 +150,8 @@ Repo ma już istotny fundament:
 - statyczny produkcyjny pipeline sitemap `SeoSitemapGenerator` + `SeoSitemapBuilder` + `SeoSitemapAuditor`, z codziennym `seo:refresh-sitemaps` jako istniejącym safety netem,
 - N5-001: ten sam pipeline generuje rollout-gated standard article sitemap; przy małym corpus `/sitemaps/articles.xml`, a po przekroczeniu zakresu bezpośrednie fixed-ID-range shards wpisane do root `/sitemap.xml`, bez OFFSET i bez nested newsroom sitemap-index,
 - N5-001: `static.xml` obejmuje newsroom home, warunkowo guides, active categories i published topics; article `lastmod` używa domenowych public-state timestamps, a generator/auditor egzekwują 50 000 entries / 50 MB,
+- N5-002: ten sam pipeline generuje rollout-gated Google News Sitemap dla świeżych `type=news`, `published`, indexable current-canonical articles z aktywną kategorią/publicznym autorem; `news:name` reużywa `SiteIdentitySchema::siteName()`, language=`pl`, publication date=`first_published_at`, title=widoczny article title,
+- N5-002: przy <=1000 entries używany jest `/sitemaps/news.xml`, a powyżej limitu fixed-`content_articles.id` range shards są wpisywane bezpośrednio do root `/sitemap.xml`; pełny news namespace/age/tag auditor pozostaje N5-006,
 - dynamiczny `SitemapController`, który współistnieje z generowanymi artefaktami i nie jest samodzielnym source of truth produkcyjnego XML,
 - statyczny `public/robots.txt` oraz istniejący `RobotsController`; produkcyjny kontrakt robots pozostaje zgodny z `SEO-SITEMAP-REPAIR-PLAN.md`,
 - breadcrumbs,
@@ -1532,8 +1534,9 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N4-007` — publiczne rollout-gated Topic / dossier pages na istniejącym `ContentTopic` i route `/aktualnosci/temat/{topicSlug}`.
 - [x] `NEWSROOM-N4-008` — semantic silo / controlled reverse links na istniejących topic/question/legal/sign pivots, bez nowej schema.
 - [x] `NEWSROOM-N5-001` — standard article sitemap + rollout-gated hub coverage + deterministic fixed-ID-range sharding w istniejącym static sitemap pipeline.
+- [x] `NEWSROOM-N5-002` — rollout-gated Google News Sitemap w tym samym static pipeline: 2-day `first_published_at` eligibility, required news metadata i deterministic >1000 split.
 
-N5-001 jest zmaterializowane i potwierdzone na `main@5ddfa48c0646fa89cc802d129e6d9ccee9d18957`; decyzja architektoniczna o jednym statycznym sitemap pipeline pozostała bez zmian. Następnym wykonywalnym taskiem jest `NEWSROOM-N5-002` — News sitemap. Child-before-index atomic publication, obsolete-shard cleanup, dirty/version refresh coordinator, feed, article-specific IndexNow i produkcyjna static/Nginx/CDN verification pozostają oddzielnymi późniejszymi zakresami N5/N6.
+N5-001 i N5-002 są zmaterializowane i potwierdzone na `main@827f3816487d3a404df26c381a103a6cd1a9f413`; decyzja architektoniczna o jednym statycznym sitemap pipeline pozostała bez zmian. Następnym wykonywalnym taskiem jest `NEWSROOM-N5-003` — RSS/Atom feed + discovery. Child-before-index atomic publication, obsolete-shard cleanup, dirty/version refresh coordinator, namespace-specific sitemap audit, article-specific IndexNow i produkcyjna static/Nginx/CDN verification pozostają oddzielnymi późniejszymi zakresami N5/N6.
 
 ---
 ## 28. Zasady utrzymania dokumentu
@@ -1558,6 +1561,15 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-18 — v0.47
+
+- NEWSROOM-N5-002 zmergowano przez PR #99; finalny implementation head `9bc16a7e42ae55c23b1916a4e214b9af846fd3dd`, merge `main@827f3816487d3a404df26c381a103a6cd1a9f413`,
+- decyzja architektoniczna nie zmieniła się: Google News Sitemap rozszerza istniejące `SeoSitemapBuilder` / `SeoSitemapGenerator` / `SeoSitemapXmlRenderer`, bez równoległego engine i bez nested newsroom/news sitemap-index,
+- rollout gate, current-canonical eligibility, canonical publication identity i fixed-ID-range sharding reużywają istniejące N3/N5 fundamenty; 2-dniowe okno jest liczone wyłącznie po `first_published_at`,
+- istniejący auditor został zmieniony tylko tyle, by legalny URL overlap standard article/news sitemap nie był traktowany jako duplikat; pełny namespace/age/tag/shard audit pozostaje N5-006,
+- exact-head CI #371 i post-merge CI #372 zakończyły pełny PASS: 1100 passed / 19 964 assertions / 2 skipped, Pint PASS, frontend build PASS i PostgreSQL 7/94,
+- feed, atomic publication/obsolete-shard cleanup, dirty/version coordinator, article-specific IndexNow i production static/Nginx/CDN/GSC verification pozostają otwarte; następnym taskiem jest NEWSROOM-N5-003.
 
 ### 2026-09-18 — v0.46
 
