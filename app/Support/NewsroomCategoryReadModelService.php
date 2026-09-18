@@ -75,7 +75,7 @@ final class NewsroomCategoryReadModelService
         $relatedCategories = ContentCategory::query()
             ->active()
             ->select(['id', 'name', 'slug', 'position'])
-            ->whereKeyNot($category->getKey())
+            ->where('id', '!=', $category->getKey())
             ->whereHas('articles', function (Builder $query): void {
                 $query
                     ->activelyDistributed()
