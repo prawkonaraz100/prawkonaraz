@@ -41,6 +41,8 @@ class PublicFooter
             'service_links' => [
                 ['label' => 'Baza pytań', 'href' => route('public.questions.hub', absolute: false)],
                 ['label' => 'Testy na prawo jazdy', 'href' => route('public.tests', absolute: false)],
+                ['label' => 'Aktualności', 'href' => route('public.news', absolute: false)],
+                ['label' => 'Poradniki', 'href' => route('public.guides', absolute: false)],
                 ['label' => 'Kurs', 'href' => route('public.course', absolute: false)],
                 ['label' => 'Cennik', 'href' => route('public.pricing', absolute: false)],
             ],
