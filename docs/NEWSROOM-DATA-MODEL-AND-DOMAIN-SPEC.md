@@ -6,11 +6,11 @@
 - Obszar: newsroom / media portal
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Bazowy stan repo przy projektowaniu: main@6a38c95ce76ee05997977d614d795ed8513462f1
-- Ostatnia weryfikacja zgodności z kodem: main@c68672f6aa7c41defaeec56debb541d5a60d9f4f (2026-09-17)
+- Ostatnia weryfikacja zgodności z kodem: main@5f1880e03469fc6e340a86fdb1b4246c7afd116b (2026-09-18)
 - Data: 2026-09-17
 - Zakres: model domenowy, baza danych, invariants, serwisy aplikacyjne, routing domeny i kolejność migracji
 
-Ten dokument opisuje docelowy model danych newsroomu. Schema, modele/factories/scopes oraz serwisy aplikacyjne N1 są już zmaterializowane; zakres admin/domain N2 jest zmaterializowany, a publiczny article stack N3-001..N3-007 obejmuje current-canonical detail, SEO/schema, renderer/Product Bridge, historyczny one-hop 301 oraz integrację istniejącego profilu autora z Newsroom corpus. N3-008, N4 i discovery N5 pozostają dalszym etapem. Stan wdrożenia należy czytać z sekcji 43 i aktualizować po każdej zmianie kodu.
+Ten dokument opisuje docelowy model danych newsroomu. Schema, modele/factories/scopes oraz serwisy aplikacyjne N1 są zmaterializowane; zakres admin/domain N2 i publiczny article stack N3-001..N3-008 są zmaterializowane, a N4-001..N4-006 obejmuje publiczne hub/category read surfaces, nawigację oraz cache/invalidation dla istniejących home/category read models. Topic/dossier N4-007, reverse links N4-008 i discovery N5 pozostają dalszym etapem. Stan wdrożenia należy czytać z sekcji 43 i aktualizować po każdej zmianie kodu.
 
 ---
 
@@ -849,7 +849,7 @@ NEWSROOM-N1-006 jest wdrożone, a NEWSROOM-N4-001 rozszerza ten sam composer na 
 - half-open interval contract pozwala na sąsiadujące okna,
 - PostgreSQL concurrency test potwierdza, że dwa równoległe zapisy tego samego pustego tuple nie mogą równocześnie przejść walidacji.
 
-Filamentowy `NewsroomHomeComposer` i private future preview są już wdrożone przez N2-009. N4-001 dodaje `NewsroomHomeReadModelService` jako rollout-gated, serializowalny scalar-array projection dla lead/secondary/latest/categories/guides/important_now/breaking. Nie wdrożono jeszcze publicznego Hub Blade/controllera konsumującego ten read model — to pozostaje NEWSROOM-N4-002; faktyczny cache/invalidation pozostaje NEWSROOM-N4-006.
+Filamentowy `NewsroomHomeComposer` i private future preview są wdrożone przez N2-009. N4-001 dodaje `NewsroomHomeReadModelService` jako rollout-gated, serializowalny scalar-array projection dla lead/secondary/latest/categories/guides/important_now/breaking; N4-002 materializuje publiczny Hub Blade, a N4-006 podłącza generation-based cache/invalidation dla publicznych home/category read models. Private preview nadal omija publiczny cache.
 
 ---
 
@@ -1022,7 +1022,7 @@ Granice obecnej implementacji:
 - analogiczny stale-write guard dla `NewsroomHomeComposer` jest wdrożony po PR #58 przez deterministyczny `ContentHomePlacementEditToken`; update/delete porównują loaded token pod row lockiem, a tuple advisory-lock/overlap contract pozostaje dodatkową warstwą concurrency protection,
 - scheduler command i batch due processing zostały wdrożone downstream w N1-005 i reużywają tego service boundary,
 - publiczny HTTP 410/301/200 pozostaje N3; service ustanawia withdrawal tombstone, ale nie renderuje odpowiedzi HTTP,
-- cache/sitemap/IndexNow listeners nie są jeszcze podłączone; istnieje jedynie bezpieczny after-commit event hook.
+- N4-006 podłącza lekkie cache invalidation listenery after-commit dla istniejących publicznych read models home/category; sitemap/IndexNow/dirty-version refresh pozostają niepodłączone i należą do N5.
 
 #### 20.1.1. Edycja już opublikowanego artykułu bez revisions
 
@@ -1272,16 +1272,30 @@ Publiczna wyszukiwarka artykułów nie jest wymogiem newsroom v1.
 
 ## 27. Cache model
 
-Cache keys powinny być oparte o publiczne read models, np.:
+### Założenie
 
-- newsroom:home:v1
-- newsroom:category:{slug}:page:{n}
-- newsroom:article:{id}:public
-- newsroom:feed:latest
+Cache keys są oparte o publiczne read models. Preview/admin composition nie jest cache’owane jako publiczna strona. Ciężkie discovery side-effecty nie są częścią tego cache layera.
 
-Cache invalidation przez eventy publikacyjne.
+### Aktualny stan implementacji N4-006
 
-Nie cache’ujemy preview jako publicznej strony.
+Na `main@5f1880e03469fc6e340a86fdb1b4246c7afd116b` istnieje `NewsroomPublicReadCache`:
+
+- home key: `newsroom:home:v1:g:{generation}`,
+- category key: `newsroom:category:{slug}:page:{n}:v1:g:{generation}`,
+- osobne generation keys dla home i category pozwalają rotować namespace bez iterowania po wszystkich starych wpisach,
+- TTL wynosi 60 sekund przez `newsroom.cache_ttl_seconds`; jest safety netem dla zmian zależnych od czasu, nie zastępuje event invalidation,
+- `NewsroomHomeReadModelService` i `NewsroomCategoryReadModelService` korzystają z tego cache,
+- guide hub, article detail, topic/feed i private preview nie są cache’owane przez N4-006.
+
+Invalidation:
+
+- istniejący after-commit `ContentArticleWorkflowTransitioned` invaliduje home + category, gdy transition wchodzi do albo wychodzi z `published`,
+- `ContentArticlePublicReadChanged` jest after-commit sygnałem dla aktywnych public updates oraz featured/breaking exposure changes i invaliduje home + category,
+- `ContentHomePlacementChanged` jest after-commit sygnałem create/update/delete placementu i invaliduje tylko home,
+- `ContentCategoryObserver` implementuje `ShouldHandleEventsAfterCommit` i po save/delete invaliduje home + category,
+- generation rotation chroni przed stale write-after-invalidation race przy równoległym rebuildzie.
+
+Nie cache’ujemy preview jako publicznej strony. Sitemap dirty/version, feed refresh i IndexNow pozostają osobnym zakresem N5.
 
 ---
 
@@ -1742,7 +1756,7 @@ Na 2026-09-18:
 - NEWSROOM-N1-002 jest wdrożone: istnieją modele `ContentArticle`, `ContentCategory`, `ContentTag`, `ContentTopic`, `ContentArticleSource`, `ContentHomePlacement`, ich factories, relations, reverse relations i scopes/predicates,
 - NEWSROOM-N1-003 jest wdrożone: istnieją `ContentArticleSlugService`, `ContentArticleRedirect`, `ContentArticlePathResolver` i PostgreSQL advisory-lock serialization,
 - NEWSROOM-N1-004 jest wdrożone w zakresie publishing/workflow foundation: istnieją `ContentArticlePublishingService`, `ContentArticleWorkflowTransitioned` i feature regression dla workflow/invariants/audit/after-commit rollback boundary,
-- `/aktualnosci` i `/poradniki` pozostają placeholderami 200 z dedykowanym noindex header,
+- `/aktualnosci` i `/poradniki` są rollout-gated publicznymi hubami po N4-002/N4-004; przy wyłączonym gate zachowują pre-launch placeholder/noindex,
 - article detail routes `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}` są publicznie podłączone przez N3-004/N3-006, natomiast category/topic/feed pozostają downstream 404 do odpowiednich N4/N5 implementacji,
 - newsroom schema istnieje: `content_categories`, `content_tags`, `content_articles`, `content_topics`, pivots/relations, redirects i `content_home_placements` są tworzone przez 12 migracji,
 - schema i warstwa modelowa są zweryfikowane na SQLite i PostgreSQL 16; `newsroom-postgres` uruchamia migration contract oraz model/scope contract,
@@ -1760,7 +1774,7 @@ Na 2026-09-18:
 - NEWSROOM-N1-006 jest wdrożone: istnieją `NewsroomHomeCompositionService`, `NewsroomHomePlacementService` i niemutujący `ContentArticlePublishingService::assertScheduledPreviewReady()`; overlap/concurrency jest testowane również na PostgreSQL,
 - NEWSROOM-N4-001 jest wdrożone na `main@e0e06e9af8a6b02a63ef4b3e1eb2d772409ad974`: ten sam `NewsroomHomeCompositionService` ma bounded category query plan, a `NewsroomHomeReadModelService` daje gated/cacheable scalar projection bez uruchamiania publicznego huba,
 - N2-010 jest DONE po PR #60: `ContentArticleResource` ma kontrolowane provenance/regulatory fields, hero/OG upload przez `NewsroomArticleMediaService`, verified managed media metadata, focal X/Y i CSS crop previews; `ContentArticlePublicationChecklist` egzekwuje regulatory/source/effective-date coherence oraz ponowną media reinspekcję,
-- admin/domain CMS N2 jest zmaterializowany: obok `ContentCategoryResource`, `ContentArticleResource`, body/source/relation/workflow/public-update/checklist/preview/HomeComposer/provenance-media slices istnieje `ContentTopicResource` + `ContentTopicPublishingService`; N2-001..N2-012 oraz public article layer N3 są zamknięte, N4-001 read model jest wdrożony, natomiast Hub Blade N4-002, dalsze N4 oraz discovery N5 pozostają otwarte.
+- admin/domain CMS N2 oraz public article layer N3 są zamknięte; N4-001..N4-006 są zmaterializowane, w tym public home/category/guides surfaces, navigation integration i cache/invalidation home/category read models. Topic/dossier N4-007, reverse links N4-008 i discovery N5 pozostają otwarte.
 
 ---
 
@@ -1787,13 +1801,22 @@ Na 2026-09-18:
 - [x] podłączyć publiczne article controllers/renderery i zweryfikować current-canonical HTTP 200/404/410 behavior (NEWSROOM-N3-004),
 - [x] podłączyć historyczny `ContentArticlePathResolver` old-path -> current-canonical 301 flow z one-hop/fail-closed HTTP regression (NEWSROOM-N3-006),
 - [x] NEWSROOM-N4-001: bounded editorial composition + rollout-gated scalar home read model bez publicznego Hub Blade,
-- [ ] NEWSROOM-N4-002: podłączyć publiczny Hub Blade do read modelu i usunąć `MarketingPlaceholder` dla `/aktualnosci`,
+- [x] NEWSROOM-N4-002: publiczny Hub Blade `/aktualnosci`,
+- [x] NEWSROOM-N4-006: cache/invalidation istniejących publicznych home/category read models bez cache’owania preview,
 - [ ] dodać sitemap/public-discovery regression korzystające wyłącznie z current canonical URL,
 
 ---
 
 ## 45. Historia zmian
 
+### 2026-09-18 — v0.33
+
+- NEWSROOM-N4-006 zmergowano przez PR #91; finalny implementation head `093ca709d3155d5fa3f13bae224312fd286077dc`, merge `main@5f1880e03469fc6e340a86fdb1b4246c7afd116b`,
+- `NewsroomPublicReadCache` materializuje generation-based cache dla home i category read models z 60-sekundowym TTL safety net; preview, guide hub, article detail i topic/feed nie są objęte N4-006,
+- invalidation działa after-commit dla publish/archive workflow, aktywnych public/exposure updates, placement changes i category save/delete; placement change rotuje wyłącznie home generation,
+- generation rotation zastępuje masowe enumerowanie kluczy i chroni przed stale write-after-invalidation race; N5 dirty/version/sitemap/IndexNow pozostaje osobnym zakresem,
+- `NewsroomPublicReadCacheTest` pokrywa snapshot reuse, publish, placement, archive, category metadata i outer-transaction rollback/commit boundary; test harness czyści trwały feature-test cache między izolowanymi bazami,
+- exact-head CI #342 i Browser Smoke #36 zakończyły PASS; post-merge CI #343: 1081 passed / 19 770 assertions / 2 skipped, Pint 1077 files PASS, frontend build 9.44 s, PostgreSQL 7 passed / 94 assertions.
 
 ### 2026-09-18 — v0.32
 
