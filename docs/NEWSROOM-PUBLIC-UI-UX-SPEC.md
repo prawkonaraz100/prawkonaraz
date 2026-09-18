@@ -1286,9 +1286,9 @@ Frontend newsroom v1 jest UI-complete, gdy:
 
 ## 67. Stan implementacji
 
-Na 2026-09-18 po NEWSROOM-N4-003, zweryfikowanym na `main@84bcb2aeff57a1374def7af411c39db07a8fb38d`:
+Na 2026-09-18 po NEWSROOM-N4-004, zweryfikowanym na `main@2bb22142b1e9bec803f9c3889c11000194f46783`:
 
-- `/aktualnosci` używa istniejącego `NewsroomPlaceholderController::news()` jako rollout switch: gate=false zachowuje pre-launch `MarketingPlaceholder.vue` 200 + `X-Robots-Tag: noindex, follow`, a gate=true renderuje SSR `newsroom.home`; `/poradniki` nadal pozostaje placeholderem 200 + noindex do N4-004,
+- `/aktualnosci` używa istniejącego `NewsroomPlaceholderController::news()` jako rollout switch: gate=false zachowuje pre-launch `MarketingPlaceholder.vue` 200 + `X-Robots-Tag: noindex, follow`, a gate=true renderuje SSR `newsroom.home`; od N4-004 `/poradniki` używa istniejącego `NewsroomPlaceholderController::guides()` jako analogicznego rollout switcha: gate=false zachowuje placeholder 200 + noindex, gate=true renderuje SSR `newsroom.guides`,
 - category route `/aktualnosci/kategoria/{categorySlug}` jest od N4-003 publicznym SSR surface przy gate=true; topic/feed pozostają downstream i nadal nie są publicznymi rendererami,
 - detail routes `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}` są podłączone do `ContentArticleController`; publicznie widoczny rekord renderuje `newsroom.article`, withdrawn historyczny rekord otrzymuje neutralną 410 surface, a hidden/not-found 404,
 - 404/410 article surfaces używają `noindex,follow` i `X-Robots-Tag: noindex, follow` bez renderowania body/source/product modules,
@@ -1315,6 +1315,10 @@ Na 2026-09-18 po NEWSROOM-N4-003, zweryfikowanym na `main@84bcb2aeff57a1374def7a
 - category page reużywa wspólny `layouts.public-content`, header/footer i istniejące article card metadata; nie tworzy równoległego design systemu,
 - gate=false, inactive/unknown category i invalid/out-of-range page nie pokazują publicznego category UI; aktywna pusta kategoria pokazuje komunikat i powrót do `/aktualnosci` zamiast sztucznych kart,
 - dedykowany Browser Smoke #29 `newsroom-category` przeszedł z JavaScript disabled na 360/390/430/768/1024/1280/1440 oraz dodatkowo sprawdził page 2/canonical; równoległe `newsroom-home` i `newsroom-article` również zakończyły PASS,
+- N4-004 renderuje `newsroom.guides` jako evergreen guide-only hub: H1/lead, praktyczny label `Poradnik`, hero/lead card, grid dalszych poradników, useful empty-state i SSR pagination; publication time nie jest głównym sygnałem UI,
+- guide hub reużywa wspólny `layouts.public-content`, istniejące guide detail URLs oraz category label jako klasyfikację bez kierowania guide cards do newsroom category page,
+- `/aktualnosci` ma crawlable `Zobacz wszystkie poradniki` do `public.guides`; nie dodano drugiego systemu nawigacji i global navigation pozostaje zakresem N4-005,
+- Browser Smoke #31 `newsroom-guides` przeszedł z JS disabled na 360/390/430/768/1024/1280/1440 oraz page-2 canonical check; `newsroom-category`, `newsroom-home` i `newsroom-article` w tym samym runie również zakończyły PASS,
 - Hub Blade reużywa `layouts.public-content`, wspólny header/footer i route `public.tests`; przy gate=true emituje self-canonical i `index,follow,max-image-preview:large`,
 - dedykowany Browser Smoke #27 `newsroom-home` przeszedł z JavaScript disabled na 360/390/430/768/1024/1280/1440, sprawdzając realny built CSS, H1/subnavigation/content/CTA, canonical/robots i brak horizontal overflow; równoległy `newsroom-article` także zakończył PASS.
 
@@ -1329,7 +1333,7 @@ Na 2026-09-18 po NEWSROOM-N4-003, zweryfikowanym na `main@84bcb2aeff57a1374def7a
 - [x] zbudować regulatory context box dla article detail,
 - [x] podłączyć focal-point-aware rendering istniejących hero/image assets; fizyczne crop variants nie są deklarowane jako istniejące,
 - [ ] zbudować topic page,
-- [ ] zbudować pozostałe topic/guide-hub Blade components,
+- [ ] zbudować pozostałe topic Blade components,
 - [x] zbudować publiczny Hub Blade `/aktualnosci` w NEWSROOM-N4-002,
 - [x] zbudować category page w NEWSROOM-N4-003,
 - [x] zbudować article page,
@@ -1343,11 +1347,21 @@ Na 2026-09-18 po NEWSROOM-N4-003, zweryfikowanym na `main@84bcb2aeff57a1374def7a
 - [x] zbudować NEWSROOM-N4-001 editorial composition read model,
 - [x] zbudować NEWSROOM-N4-002 Hub Blade layout i dedykowany responsive Browser QA,
 - [x] zbudować NEWSROOM-N4-003 Category pages i dedykowany responsive Browser QA,
-- [ ] zbudować NEWSROOM-N4-004 `/poradniki` hub; to jest następny wykonywalny UI task.
+- [x] zbudować NEWSROOM-N4-004 `/poradniki` hub i dedykowany responsive Browser QA,
+- [ ] zweryfikować NEWSROOM-N4-005 Navigation integration bez dublowania istniejących linków; to jest następny wykonywalny UI zakres.
 
 ---
 
 ## 69. Historia zmian
+
+### 2026-09-18 — v0.20
+
+- NEWSROOM-N4-004 zmergowano przez PR #87 na `main@2bb22142b1e9bec803f9c3889c11000194f46783`; finalny implementation head `119cbd94d1fb6ff6f9f2025e726242190927266d`,
+- `/poradniki` przy gate=true renderuje SSR `newsroom.guides`, a gate=false zachowuje pre-launch placeholder/noindex; route name i article detail layer pozostały bez zmian,
+- UI ma evergreen variant z labelami poradników, lead card, grid, useful empty state i crawlable pagination; page 1 nie emituje `?page=1`,
+- `/aktualnosci` ma `Zobacz wszystkie poradniki`; N4-005 nadal odpowiada za global navigation audit/integration,
+- Browser Smoke #31 `newsroom-guides` PASS na 360/390/430/768/1024/1280/1440 z JS disabled i page-2 check; exact-head CI #331 i post-merge CI #332 także PASS,
+- NEWSROOM-N4-005 Navigation integration jest następnym UI zakresem.
 
 ### 2026-09-18 — v0.19
 
