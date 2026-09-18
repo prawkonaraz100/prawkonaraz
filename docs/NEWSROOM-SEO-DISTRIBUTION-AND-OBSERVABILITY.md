@@ -1593,8 +1593,8 @@ Obecnie:
 - repo nie gwarantuje async Laravel queue workera (`QUEUE_CONNECTION=sync` w env example), więc newsroom nie może opierać freshness na ShouldQueue,
 - po NEWSROOM-N4-002 `/aktualnosci` jest rollout-gated: przy `NEWSROOM_PUBLIC_ENABLED=false` pozostaje pre-launch placeholderem 200 + `X-Robots-Tag: noindex, follow`, a przy `true` renderuje SSR `newsroom.home` z self-canonical i `index,follow,max-image-preview:large`; od N4-004 `/poradniki` konsumuje ten sam gate: przy `false` pozostaje placeholderem 200 + noindex, a przy `true` renderuje SSR `newsroom.guides`,
 - `/aktualnosci/feed.xml` ma zarejestrowany route contract, ale obecnie zwraca 404; feed ani feed discovery nie są jeszcze wdrożone,
-- category route `/aktualnosci/kategoria/{categorySlug}` jest od N4-003 aktywnym publicznym SSR surface przy gate=true; topic route nadal pozostaje 404 bez publicznego controllera, a article detail routes są aktywne od N3-004.
-- NEWSROOM-N3-008 jest wdrożone, N4-002 konsumuje ten sam gate dla publicznego huba `/aktualnosci`, N4-003 dla category pages, a N4-004 dla `/poradniki`. Przy gate=false category route failuje do 404, a top-level `/poradniki` pozostaje noindex placeholderem; przy gate=true aktywna kategoria oraz niepusty guide hub mogą być indeksowane. Topic/feed, reverse links, newsroom/article/news sitemap i article-specific IndexNow automation pozostają otwarte w dalszym N4/N5.
+- category route `/aktualnosci/kategoria/{categorySlug}` jest od N4-003 aktywnym publicznym SSR surface przy gate=true; od N4-007 topic route `/aktualnosci/temat/{topicSlug}` renderuje publiczne SSR dossier dla opublikowanego topicu, a article detail routes są aktywne od N3-004.
+- NEWSROOM-N3-008 jest wdrożone, N4-002 konsumuje ten sam gate dla publicznego huba `/aktualnosci`, N4-003 dla category pages, N4-004 dla `/poradniki`, a N4-007 dla topic dossier. Przy gate=false category/topic routes failują do 404, a top-level `/poradniki` pozostaje noindex placeholderem; przy gate=true opublikowany topic ma self-canonical `index,follow,max-image-preview:large`, draft/future/unknown pozostają 404, a historyczny archived topic zwraca 410 + noindex. Feed, reverse links, newsroom/article/news sitemap i article-specific IndexNow automation pozostają otwarte w dalszym N4/N5.
 
 ---
 
@@ -1617,7 +1617,7 @@ Obecnie:
 - [ ] wdrożyć analytics hooks/events,
 - [x] wdrożyć N4-003 category SEO: self-canonical pagination, category title/description fallback, `CollectionPage` + `BreadcrumbList` oraz conditional `ItemList`,
 - [x] wdrożyć N4-004 guide-hub SEO: self-canonical pagination, empty-hub noindex, `CollectionPage` + `BreadcrumbList` oraz conditional `ItemList`,
-- [ ] wdrożyć topic SEO dla faktycznie publikowanych dossier,
+- [x] wdrożyć N4-007 topic SEO: self-canonical pagination, `seo_title`/`seo_description` fallback, `CollectionPage` + `BreadcrumbList` + `ItemList`, 404 dla nonpublic i 410/noindex dla archived history,
 - [ ] zweryfikować crop/OG output z focal point,
 - [ ] podłączyć monitoring,
 - [ ] wykonać production Search Console verification,
@@ -1626,6 +1626,16 @@ Obecnie:
 ---
 
 ## 70. Historia zmian
+
+### 2026-09-18 — v0.17
+
+- NEWSROOM-N4-007 zmergowano przez PR #93 na `main@a97373003c5a249a28761df15342f19e656c50c5`; finalny implementation head `812313afc38e30e53c59901d46c2d24188e3f6fa`,
+- topic dossier reużywa canonical `/aktualnosci/temat/{topicSlug}` i istniejący rollout gate; page 1 nie dodaje redundantnego `?page=1`, page N jest self-canonical `?page=N`,
+- publiczny published topic emituje `index,follow,max-image-preview:large`; gate=false/draft/future/unknown failują do 404 + noindex, a wcześniej publiczny archived topic do 410 + noindex,
+- `NewsroomTopicSchemaService` emituje wspólny Organization/WebSite graph, `CollectionPage`, `BreadcrumbList` i `ItemList` dokładnie dla widocznego featured + bieżącej strony listingu; hub nie udaje NewsArticle,
+- title/description używają topic `seo_title`/`seo_description` z fallbackiem do title/description; późniejszy spadek corpus poniżej publish baseline nie zmienia automatycznie HTTP/indexability,
+- task nie wdrożył topic sitemap coverage, reverse links, feed, news sitemap ani nowej IndexNow automatyzacji; te pozostają N4-008/N5,
+- Browser Smoke #39 potwierdził topic canonical i page-2 canonical przy JS disabled; exact-head CI #348 i post-merge CI #349 zakończyły PASS.
 
 ### 2026-09-18 — v0.16
 
