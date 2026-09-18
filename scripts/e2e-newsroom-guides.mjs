@@ -101,13 +101,16 @@ try {
         const bodyText = await page.locator('body').innerText();
         for (const expected of [
             'Praktyczne poradniki',
-            'EVERGREEN',
             'Poradnik E2E 1',
             'Następna',
         ]) {
             if (!bodyText.includes(expected)) {
                 throw new Error(`Missing "${expected}" at ${viewport.name}px.`);
             }
+        }
+
+        if (!/evergreen/i.test(bodyText)) {
+            throw new Error(`Missing evergreen label at ${viewport.name}px.`);
         }
 
         if (bodyText.includes('News poza guide hubem') || bodyText.includes('Nie ma jeszcze opublikowanych poradników')) {

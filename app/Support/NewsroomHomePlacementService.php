@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Enums\ContentArticleType;
+use App\Events\ContentHomePlacementChanged;
 use App\Models\ContentArticle;
 use App\Models\ContentCategory;
 use App\Models\ContentHomePlacement;
@@ -43,6 +44,7 @@ final class NewsroomHomePlacementService
                 ->refresh();
 
             $this->recordAudit('content_home_placement.created', $placement, $actor);
+            ContentHomePlacementChanged::dispatch((int) $placement->getKey(), 'created');
 
             return $placement;
         });
@@ -96,6 +98,7 @@ final class NewsroomHomePlacementService
 
             $updated = $locked->refresh();
             $this->recordAudit('content_home_placement.updated', $updated, $actor);
+            ContentHomePlacementChanged::dispatch((int) $updated->getKey(), 'updated');
 
             return $updated;
         });
@@ -122,7 +125,9 @@ final class NewsroomHomePlacementService
 
             $this->assertFreshEditToken($locked, $loadedToken);
             $this->recordAudit('content_home_placement.deleted', $locked, $actor);
+            $placementId = (int) $locked->getKey();
             $locked->delete();
+            ContentHomePlacementChanged::dispatch($placementId, 'deleted');
         });
     }
 

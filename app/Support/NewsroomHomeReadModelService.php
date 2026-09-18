@@ -12,6 +12,7 @@ final class NewsroomHomeReadModelService
     public function __construct(
         private readonly NewsroomHomeCompositionService $compositionService,
         private readonly NewsroomPublicGate $publicGate,
+        private readonly NewsroomPublicReadCache $cache,
         private readonly MediaUrlResolver $mediaUrlResolver,
     ) {}
 
@@ -45,6 +46,12 @@ final class NewsroomHomeReadModelService
             return null;
         }
 
+        return $this->cache->rememberHome(fn (): array => $this->buildFresh());
+    }
+
+    /** @return array<string,mixed> */
+    private function buildFresh(): array
+    {
         $composition = $this->compositionService->compose();
 
         return [

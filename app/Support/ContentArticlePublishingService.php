@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Enums\ContentArticleType;
 use App\Enums\ContentArticleWorkflowStatus;
+use App\Events\ContentArticlePublicReadChanged;
 use App\Events\ContentArticleWorkflowTransitioned;
 use App\Models\ContentArticle;
 use App\Models\User;
@@ -417,6 +418,8 @@ final class ContentArticlePublishingService
                 ],
             );
 
+            $this->dispatchPublicReadChange($locked, 'content_article.featured_changed');
+
             return $locked->refresh();
         });
     }
@@ -468,6 +471,8 @@ final class ContentArticlePublishingService
                 ],
             );
 
+            $this->dispatchPublicReadChange($locked, 'content_article.breaking_changed');
+
             return $locked->refresh();
         });
     }
@@ -505,6 +510,8 @@ final class ContentArticlePublishingService
                     'trigger' => $this->triggerForActor($actor),
                 ],
             );
+
+            $this->dispatchPublicReadChange($locked, 'content_article.breaking_changed');
 
             return $locked->refresh();
         });
@@ -654,6 +661,8 @@ final class ContentArticlePublishingService
                 ],
             );
 
+            $this->dispatchPublicReadChange($locked, 'content_article.public_updated');
+
             return $locked->refresh();
         });
     }
@@ -790,6 +799,18 @@ final class ContentArticlePublishingService
             $from->value,
             $to->value,
             $trigger,
+        );
+    }
+
+    private function dispatchPublicReadChange(ContentArticle $article, string $action): void
+    {
+        if (! $article->isActivelyDistributed()) {
+            return;
+        }
+
+        ContentArticlePublicReadChanged::dispatch(
+            (int) $article->getKey(),
+            $action,
         );
     }
 

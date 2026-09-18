@@ -4,6 +4,7 @@ namespace Tests;
 
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 abstract class TestCase extends BaseTestCase
@@ -47,6 +48,7 @@ abstract class TestCase extends BaseTestCase
         $this->app['config']->set('study.pjm_module_enabled', true);
         $this->app['db']->purge('sqlite');
         $this->artisan('migrate', ['--force' => true]);
+        Cache::flush();
         $this->withoutMiddleware(ValidateCsrfToken::class);
 
         $this->withoutVite();
