@@ -302,7 +302,7 @@ Pokrywają już service/domain layer:
 
 Finalny N1-003 PostgreSQL gate: 6 testów / 86 asercji PASS. Finalny ogólny gate: 906 passed / 18 565 assertions / 2 skipped; Pint 980 files i frontend build PASS.
 
-N3-004 uruchomiło current-canonical public detail 200/404/410, a NEWSROOM-N3-006 dodało `tests/Feature/NewsroomArticleRedirectTest.php` i publiczny old path -> exactly one 301 do current canonical dla newsroom/guides. Invalid/non-301/stale redirect state failuje do 404, a query params nie są forwardowane. Poniższe HTTP-level old path -> 301 jest stanem wykonanym; sitemap-only-current-canonical pozostaje downstream N5 i nie jest jeszcze uznane za wykonane.
+N3-004 uruchomiło current-canonical public detail 200/404/410, a NEWSROOM-N3-006 dodało `tests/Feature/NewsroomArticleRedirectTest.php` i publiczny old path -> exactly one 301 do current canonical dla newsroom/guides. Invalid/non-301/stale redirect state failuje do 404, a query params nie są forwardowane. N5-001 domknęło sitemap-only-current-canonical dla standard article sitemap: current canonical może wejść do sitemap tylko przy spełnieniu eligibility, a canonical path kolidujący z historycznym `from_path` jest wykluczany.
 
 - initial slug unique,
 - duplicate current slug rejected/resolved zgodnie z service,
@@ -1055,7 +1055,7 @@ Przy pre-launch `NEWSROOM_PUBLIC_ENABLED=false` test potwierdza:
 - obecny `IndexNowUrlCollector` nie przepuszcza namespace `/aktualnosci` ani `/poradniki`,
 - authenticated admin private preview nadal działa.
 
-Przy `NEWSROOM_PUBLIC_ENABLED=true` regression potwierdza obecnie istniejące powierzchnie: public article detail, publiczny Hub Blade `/aktualnosci`, category pages, `/poradniki` hub, topic dossier, author publication, author sitemap eligibility, historyczny redirect oraz N4-008 semantic/reverse-link modules. Feed oraz article/news sitemap pozostają przyszłym N5 i nie są fałszywie zaliczane.
+Przy `NEWSROOM_PUBLIC_ENABLED=true` regression potwierdza obecnie istniejące powierzchnie: public article detail, publiczny Hub Blade `/aktualnosci`, category pages, `/poradniki` hub, topic dossier, author publication, author sitemap eligibility, historyczny redirect, N4-008 semantic/reverse-link modules oraz N5-001 standard article sitemap/hub coverage. Feed i news sitemap pozostają dalszym N5 i nie są fałszywie zaliczane.
 
 Existing public-article PHPUnit baseline i dedykowany Browser Smoke `newsroom-article` jawnie ustawiają gate na `true`, dzięki czemu bezpieczny produkcyjny default `false` nie maskuje regresji publicznego renderer'a.
 
@@ -1495,8 +1495,8 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - `NewsroomPublicArticlePageTest` został zsynchronizowany z nowym kontraktem guide detail: primary category jest crawlable classification linkiem bez zmiany guide breadcrumb family,
 - workflow `Browser Smoke` ma osobny job `newsroom-semantic-links`; Browser Smoke #48 na finalnym N4-008 head `bd63773bc1febdcc6aa8c2507c6621e908d63b09` zakończył PASS dla semantic-links, article, home, category, guides i topic,
 - exact-head CI #361 zakończył pełny PASS, a post-merge CI #362 na `main@3d7ac8ab8a3ed1c299cb0cdd4cb1ef8ac6b53f78` zakończył: `quality` 1093 passed / 19 881 assertions / 2 skipped, Pint PASS, frontend build 7.42 s; `newsroom-postgres` 7 passed / 94 assertions,
-- publiczny Hub Blade, category pages, guide hub, topic dossier, navigation integration, home/category cache oraz N4-008 semantic/reverse links są zamknięte implementacyjnie; następnym taskiem jest NEWSROOM-N5-001,
-- atomic static publication, dirty/version newsroom refresh coordinator, newsroom/news sitemap output i `SeoSitemapAuditor` extension pozostają N5.
+- publiczny Hub Blade, category pages, guide hub, topic dossier, navigation integration, home/category cache, N4-008 semantic/reverse links oraz N5-001 standard article sitemap/hub coverage są zamknięte implementacyjnie; następnym taskiem jest NEWSROOM-N5-002,
+- atomic static publication, dirty/version newsroom refresh coordinator, news sitemap output, feed i namespace-specific `SeoSitemapAuditor` extension pozostają N5.
 
 ---
 
@@ -1512,9 +1512,12 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - [x] dodać old-slug 301 HTTP integration w N3-006; `NewsroomArticleRedirectTest` pokrywa newsroom/guides one-hop redirect, current canonical 200 oraz invalid redirect fail-closed 404,
 - [x] dodać N3-007 `ContentAuthorProfileTest` dla author-profile lifecycle, shared schema identity, public-state sitemap freshness i unpublish guard,
 - [x] dodać N2 stale-write/Apply-public-update oraz HomeComposer stale-write regression; ContentArticle i placement same-second conflicts są blokowane,
-- [ ] dodać news namespace + sitemap sharding + atomic publish + dirty-marker refresh/feed-discovery tests,
+- [x] dodać N5-001 standard article sitemap regression w istniejącym `SeoSitemapGenerationTest`: single shard, boundary crossing, stable fixed-ID-range assignment, no duplicate URL across shards, public-gate suppression, eligibility/current-canonical oraz URL-count/byte-size guards,
+- [ ] dodać news namespace + news-sitemap boundary tests,
+- [ ] dodać child-before-index atomic publication + obsolete-shard cleanup tests,
+- [ ] dodać dirty-marker refresh/feed-discovery tests,
 - [ ] dodać production-like static robots/sitemap delivery smoke,
-- [ ] rozszerzyć istniejący SeoSitemapAuditor,
+- [ ] rozszerzyć istniejący `SeoSitemapAuditor` o newsroom/news namespace-specific checks; N5-001 potwierdza już ogólne entry-count/byte-size guards,
 - [ ] stworzyć production smoke checklist w praktyce,
 - [x] wdrożyć i przetestować `NEWSROOM_PUBLIC_ENABLED` w N3-008 dla obecnie istniejących public detail/redirect + author + IndexNow surfaces; przyszłe N4/N5 discovery surfaces nadal wymagają tego samego gate,
 - [x] dodać N4-001 `NewsroomHomeReadModelServiceTest` dla rollout gate, scalar/cacheable projection i stałego query budgetu niezależnego od liczby kategorii,
@@ -1530,6 +1533,15 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-18 — v0.29
+
+- NEWSROOM-N5-001 implementation PR #97 zakończył exact-head CI #367 PASS na `b4ff321011c3d58438876c9d69f324e342ec9021`; merge to `main@5ddfa48c0646fa89cc802d129e6d9ccee9d18957`,
+- `tests/Feature/Public/SeoSitemapGenerationTest.php` pokrywa rollout-gated standard article sitemap, public/indexable eligibility, current-canonical/redirect-source exclusion, meaningful `lastmod`, single shard, boundary crossing, stabilny fixed-ID-range assignment, brak duplikatów oraz URL-count/byte-size guards,
+- istniejący `SeoSitemapAuditor` sprawdza również ogólne protocol limits wygenerowanych plików; news namespace-specific checks pozostają downstream,
+- post-merge CI #368 zakończył pełny gate: 1098 passed / 19 926 assertions / 2 skipped, Pint PASS, frontend build 9.61 s; `newsroom-postgres` 7 passed / 94 assertions,
+- nie ma jeszcze dowodu produkcyjnego static/Nginx/CDN/GSC ani child-before-index/obsolete-shard cleanup; news sitemap, atomic publication, dirty refresh i feed tests pozostają otwarte,
+- następnym wykonywalnym taskiem jest NEWSROOM-N5-002 — News sitemap.
 
 ### 2026-09-18 — v0.28
 
