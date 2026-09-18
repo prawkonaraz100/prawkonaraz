@@ -186,7 +186,7 @@ Preferowany:
 - parametry używają kontraktu `[a-z0-9-]+`; newsroom article route rezerwuje segmenty `kategoria` i `temat`,
 - feed/category/topic routes są deklarowane przed article catch-all,
 - route contract nie przesądza o bieżącym publicznym statusie downstream controllerów; stan detail routes opisuje sekcja N3 i rozdział 10,
-- `/aktualnosci` i `/poradniki` nadal zachowują pre-launch placeholder UX, ale przez dedykowany `NewsroomPlaceholderController` dodają `X-Robots-Tag: noindex, follow`,
+- `/aktualnosci` przy gate=false zachowuje pre-launch placeholder UX z `X-Robots-Tag: noindex, follow`, a przy gate=true po N4-002 renderuje SSR `newsroom.home`; `/poradniki` nadal pozostaje placeholderem/noindex do N4-004,
 - shared `Public/MarketingPlaceholder` innych sekcji nie został globalnie zmieniony,
 - `NewsroomRouteContract` implementuje type -> route family, canonical path, reserved slug policy i guard cross-family type transition po pierwszej publikacji.
 
@@ -205,7 +205,7 @@ Po pierwszej publikacji zwykła edycja nie może przenieść rekordu pomiędzy t
 - pre-launch `/aktualnosci` i `/poradniki` placeholdery nie są pozostawione jako indeksowalne thin pages: przy public gate=false mają jawne `noindex` bez zmiany shared MarketingPlaceholder dla niepowiązanych routes,
 - dokumenty aktualizowane.
 
-Aktualny N0-002 realizuje pre-launch noindex bez feature flaga; `NEWSROOM_PUBLIC_ENABLED` pozostaje osobnym zadaniem N3-008 i ma później przejąć sterowanie rolloutem bez zmiany route contract.
+N0-002 ustanowiło bazowy pre-launch noindex bez zmiany route contract. NEWSROOM-N3-008 później zmaterializowało `NEWSROOM_PUBLIC_ENABLED`, a NEWSROOM-N4-002 konsumuje ten sam gate dla top-level `/aktualnosci`; route contract i route names pozostają bez zmian.
 
 ---
 
@@ -1426,7 +1426,7 @@ Wdrożyć publiczną warstwę bez natychmiastowego przełączania istniejących 
 - `NewsroomHomeReadModelService` materializuje publiczny scalar-array projection dla lead/secondary/latest/categories/guides/important_now/breaking, z canonical path, category/author i hero metadata; wynik jest serializowalny i gotowy do późniejszego cache,
 - publiczny read model respektuje istniejący `NewsroomPublicGate`: przy `NEWSROOM_PUBLIC_ENABLED=false` zwraca `null`; admin preview nadal korzysta bezpośrednio z domenowego composera i pozostaje dostępny,
 - `tests/Feature/NewsroomHomeReadModelServiceTest.php` chroni rollout gate, scalar/cacheable projection oraz stały query budget przy wzroście liczby aktywnych kategorii,
-- N4-001 nie wdraża jeszcze cache store/invalidation z N4-006 ani publicznego Blade/controllera; `/aktualnosci` pozostaje dotychczasowym placeholderem do NEWSROOM-N4-002.
+- N4-001 samo nie wdrażało cache store/invalidation z N4-006 ani publicznego Blade/controllera; ten ostatni zakres został następnie zmaterializowany przez NEWSROOM-N4-002, natomiast faktyczny cache/invalidation nadal pozostaje N4-006.
 
 ### Zakres
 
@@ -1450,15 +1450,34 @@ Wdrożyć publiczną warstwę bez natychmiastowego przełączania istniejących 
 
 ## NEWSROOM-N4-002 — Hub Blade layout
 
+### Status implementacji
+
+**DONE w kodzie — PR #83 zmergowano na `main@04a3e961a40207bd65c41b684a5bf1cd8d2c5e10`.** Finalny implementation head `1036b67aa44b56fffb0bc1e9083d3a0d1d3963d0` przeszedł exact-head CI #321 i Browser Smoke #27; post-merge CI #322 na exact `main` zakończył się pełnym PASS.
+
+### Aktualny stan implementacji
+
+- istniejący route `public.news` nadal używa `NewsroomPlaceholderController::news()`; nie dodano drugiego route ani równoległego controllera,
+- przy `NEWSROOM_PUBLIC_ENABLED=false` `NewsroomHomeReadModelService::build()` zwraca `null`, a controller zachowuje dotychczasowy `Public/MarketingPlaceholder` 200 + `X-Robots-Tag: noindex, follow`,
+- przy `NEWSROOM_PUBLIC_ENABLED=true` controller renderuje SSR `resources/views/newsroom/home.blade.php` z istniejącego N4-001 read modelu i ustawia self-canonical oraz `index,follow,max-image-preview:large`,
+- Hub Blade renderuje tylko niepuste moduły: newsroom subnavigation, important-now, breaking, lead/secondary, latest, category blocks, guides i Product Bridge; brak danych nie tworzy sztucznych kart ani pustych placeholderów,
+- category links w samym hubie nie otwierają jeszcze downstream category pages: subnavigation kotwiczy do sekcji na `/aktualnosci`; publiczne category/topic/feed routes pozostają 404 do kolejnych tasków,
+- Product Bridge reużywa istniejący route `public.tests`; wspólny `layouts.public-content`, header i footer pozostają bez zmian,
+- `tests/Feature/NewsroomHomePageTest.php` pokrywa gate=false, gate=true i empty-section behavior; istniejące `NewsroomPublicGateTest` i `Public/NewsroomRouteContractTest` zostały zsynchronizowane z nowym enabled-state huba,
+- dedykowany `scripts/e2e-newsroom-home.mjs` działa z JavaScript disabled, realnym built CSS i viewportami 360/390/430/768/1024/1280/1440; workflow `Browser Smoke` ma automatyczny job `newsroom-home` dla relewantnych PR-ów.
+
 ### Zakres
 
-- UI spec implementation,
-- responsive,
-- empty section behavior.
+- [x] UI spec implementation dla publicznego `/aktualnosci`,
+- [x] responsive,
+- [x] empty section behavior.
 
 ### DoD
 
-- no MarketingPlaceholder.
+- [x] przy gate=true brak `MarketingPlaceholder` na `/aktualnosci`,
+- [x] przy gate=false zachowany bezpieczny pre-launch placeholder/noindex,
+- [x] dedicated hub Browser QA PASS.
+
+N4-002 nie obejmuje category/topic/feed, osobnego huba `/poradniki`, cache/invalidation ani sitemap/discovery.
 
 ---
 
@@ -2251,21 +2270,19 @@ Nie oznaczać tasku DONE przed merge + green verification.
 
 # 10. Aktualny stan
 
-Na 2026-09-17:
+Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-002 na `main@04a3e961a40207bd65c41b684a5bf1cd8d2c5e10`:
 
 - pakiet projektowy newsroomu obejmuje architekturę, model danych, CMS, UI, governance, SEO, backlog i runbook,
-- foundation N0, pełny etap N1-001..N1-006, admin/domain N2-001..N2-012 oraz NEWSROOM-N3-001..N3-005 są wdrożone,
-- PR #71 wdrożył publiczny article detail dla `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}` z Blade rendererem, SEO/schema integration, public sources/provenance/regulatory context, hero/focal-point handling, correction i author box,
-- PR #73 rozszerzył istniejący renderer o fail-closed Product Bridge: jawnie powiązane publiczne questions/legal/signs oraz contextual CTA; body target bez article-owned pivotu albo public eligibility jest pomijany,
-- traffic sign bridge dodatkowo dopuszcza tylko pivot `direct` lub `example`; luźny `related` nie jest renderowany,
-- `/aktualnosci` i `/poradniki` nadal renderują pre-launch placeholder z `X-Robots-Tag: noindex, follow`; category/topic/feed routes pozostają downstream i nie są uruchomione jako publiczne huby,
-- current-canonical article detail działa przez route-family public catalog; withdrawn historyczny detail ma 410, hidden/not-found 404, archived historyczny detail pozostaje 200 zgodnie z policy,
-- historyczne old-path -> current canonical 301 są wdrożone przez NEWSROOM-N3-006; author profile integration N3-007 i `NEWSROOM_PUBLIC_ENABLED` N3-008 pozostają otwarte,
-- fundamenty ContentAuthor/legal/traffic signs/public SEO istnieją,
-- istnieją config/content.php organization, SchemaIds/SchemaRenderer oraz współdzielony SiteIdentitySchema; homepage i article graph korzystają z kanonicznego Organization/WebSite identity,
+- foundation N0, pełny etap N1-001..N1-006, admin/domain N2-001..N2-012, cały etap NEWSROOM-N3-001..N3-008 oraz NEWSROOM-N4-001..N4-002 są wdrożone,
+- publiczne article detail `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}`, fail-closed Product Bridge, old-path 301, author-profile integration i globalny `NEWSROOM_PUBLIC_ENABLED` gate są zmaterializowane,
+- N4-001 dostarcza bounded scalar-array home read model, a N4-002 przy gate=true renderuje z niego SSR `newsroom.home` pod istniejącym route `public.news`,
+- gate=false pozostawia `/aktualnosci` jako pre-launch placeholder 200 + noindex; `/poradniki` pozostaje placeholderem/noindex niezależnie od gate do N4-004,
+- category/topic/feed routes są nadal zarejestrowane, ale zwracają 404; N4-002 nie uruchomiło ich ani nie dodało osobnego category navigation routingu,
+- Hub Blade pomija puste moduły i reużywa wspólny public layout/header/footer oraz istniejący `public.tests` Product Bridge,
+- dedykowany `newsroom-home` Browser QA jest automatycznym PR gate dla relewantnych zmian i przechodzi z JS disabled na 360/390/430/768/1024/1280/1440,
 - istnieją public/robots.txt i RobotsController; newsroom nie zmienia tej warstwy bez osobnego production-delivery audit,
-- newsroom dirty/version refresh coordinator, atomic child-before-index publication i newsroom/news sitemap output jeszcze nie istnieją,
-- canonical CI zachowuje szybki SQLite job `quality` i addytywny `newsroom-postgres`; finalny post-merge CI #276 na `main@fcc8074f89db141d522c5000742afc2e07a68565` był pełnym PASS,
+- newsroom dirty/version refresh coordinator, atomic child-before-index publication, category/topic/feed public surfaces oraz newsroom/news sitemap output jeszcze nie istnieją,
+- canonical CI zachowuje SQLite `quality` i addytywny `newsroom-postgres`; post-merge CI #322 na exact `main@04a3e961...` był pełnym PASS,
 - QUEUE_CONNECTION w env example jest sync; stały queue worker nie jest gwarantowany,
 - panel Filament pozostaje admin-only i ten kontrakt pozostaje wymaganiem v1.
 
@@ -2273,13 +2290,21 @@ Na 2026-09-17:
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N3-007 — Author profile integration.
+NEWSROOM-N4-003 — Category pages.
 
-N3-006 jest zamknięte implementacyjnie na `main@33d9946219595a4be75d789b19cc8d10efc2ecc0` po PR #75, exact-head CI #279, Browser Smoke #21 i post-merge CI #280. Następny krok ma rozszerzyć istniejący publiczny profil `ContentAuthor` o newsroom publications bez tworzenia drugiego profilu autora ani traffic-sign-specific schema source of truth. Nie obejmuje rollout gate N3-008, reverse links N4-008 ani discovery N5.
+N4-002 jest zamknięte implementacyjnie po PR #83, exact-head CI #321, Browser Smoke #27 i post-merge CI #322. Następny krok ma zmaterializować istniejący route contract `/aktualnosci/kategoria/{categorySlug}` jako publiczną category page zgodną z aktywną dystrybucją, chronologicznym sortowaniem, deterministycznym tie-breakerem, paginacją i SEO. Nie obejmuje `/poradniki` huba N4-004, cache/invalidation N4-006, reverse links N4-008 ani discovery N5.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-18 — v0.39
+
+- NEWSROOM-N4-002 zmergowano przez PR #83; finalny implementation head `1036b67aa44b56fffb0bc1e9083d3a0d1d3963d0`, merge `main@04a3e961a40207bd65c41b684a5bf1cd8d2c5e10`,
+- `public.news` przy gate=true renderuje SSR `newsroom.home` z N4-001 read modelu, a gate=false zachowuje MarketingPlaceholder 200 + noindex; nie uruchomiono category/topic/feed ani `/poradniki` hub,
+- dodano `NewsroomHomePageTest` i dedykowany Playwright `e2e:newsroom-home`; Browser Smoke #27 zakończył PASS dla `newsroom-home` i `newsroom-article`,
+- exact-head CI #321 i post-merge CI #322 zakończyły się PASS; post-merge: 1062 passed / 19 638 assertions / 2 skipped, Pint 1061 files PASS, frontend build 7.59 s, PostgreSQL 7 passed / 94 assertions,
+- następnym wykonywalnym taskiem jest NEWSROOM-N4-003 — Category pages.
 
 ### 2026-09-18 — v0.38
 
