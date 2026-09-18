@@ -833,21 +833,23 @@ NewsroomHomeCompositionService:
 
 Breaking strip jest niezależnym alertem i może wskazywać ten sam artykuł co lead, ponieważ nie jest kolejną kartą contentową.
 
-### 16.5. Aktualny stan implementacji N1-006
+### 16.5. Aktualny stan implementacji N1-006 + N4-001
 
-NEWSROOM-N1-006 jest wdrożone na `main`:
+NEWSROOM-N1-006 jest wdrożone, a NEWSROOM-N4-001 rozszerza ten sam composer na `main@e0e06e9af8a6b02a63ef4b3e1eb2d772409ad974` bez zmiany persisted placement modelu:
 
 - `NewsroomHomeCompositionService` materializuje kolejność lead -> secondary -> latest -> category blocks -> guides -> important now i prowadzi globalny zbiór użytych article IDs,
 - manual placements są rozwiązywane przed fallbackiem, ale placement poza oknem czasowym nie dyskwalifikuje samego artykułu z legalnego fallbacku,
 - bieżący render używa `activelyDistributed()`; future preview może uwzględnić initial `scheduled` dopiero od `scheduled_for`, po `ContentArticlePublishingService::assertScheduledPreviewReady()` i bez mutowania workflow,
 - fallback jest deterministyczny i nie pobiera całego corpusu do filtrowania w PHP,
+- N4-001 usuwa category-count-dependent query growth: aktywne category placements są pobierane jednym batchem, a editorial i chronological candidate windows są rankowane per `category_id` przez `ROW_NUMBER() OVER (PARTITION BY category_id ...)`,
+- kandydaci kategorii są następnie hydratowani jednym bounded zbiorem `ContentArticle` z eager-loaded `category` i `author`; query budget nie rośnie wraz z liczbą aktywnych kategorii,
 - category lead respektuje category context, guides lead wymaga typu `guide`, a krótkie moduły są dozwolone przy braku unikalnych kandydatów,
 - breaking strip jest rozwiązywany niezależnie i może powtórzyć lead,
 - `NewsroomHomePlacementService` wykonuje create/update w transakcji, waliduje kontrolowane surface/slot/context/date ranges i sprawdza overlap po acquisition PostgreSQL advisory locka oraz row locka,
 - half-open interval contract pozwala na sąsiadujące okna,
 - PostgreSQL concurrency test potwierdza, że dwa równoległe zapisy tego samego pustego tuple nie mogą równocześnie przejść walidacji.
 
-Nie wdrożono jeszcze Filament UI placements ani publicznego kontrolera konsumującego composer; odpowiednio pozostają N2/N3.
+Filamentowy `NewsroomHomeComposer` i private future preview są już wdrożone przez N2-009. N4-001 dodaje `NewsroomHomeReadModelService` jako rollout-gated, serializowalny scalar-array projection dla lead/secondary/latest/categories/guides/important_now/breaking. Nie wdrożono jeszcze publicznego Hub Blade/controllera konsumującego ten read model — to pozostaje NEWSROOM-N4-002; faktyczny cache/invalidation pozostaje NEWSROOM-N4-006.
 
 ---
 
@@ -1727,7 +1729,7 @@ Model danych jest gotowy, gdy:
 
 
 - NEWSROOM-N3-007 jest wdrożone na `main@c68672f6aa7c41defaeec56debb541d5a60d9f4f`: istniejący author profile agreguje indexable Newsroom corpus z osobnymi lifecycle sections, współdzieli stabilny Person schema builder, author sitemap używa newsroomowego `public_state_changed_at`, a model blokuje odpublikowanie autora z zależnym indexable article,
-Na 2026-09-17:
+Na 2026-09-18:
 
 - ContentAuthor istnieje,
 - legal trust layer istnieje,
@@ -1741,7 +1743,7 @@ Na 2026-09-17:
 - NEWSROOM-N1-003 jest wdrożone: istnieją `ContentArticleSlugService`, `ContentArticleRedirect`, `ContentArticlePathResolver` i PostgreSQL advisory-lock serialization,
 - NEWSROOM-N1-004 jest wdrożone w zakresie publishing/workflow foundation: istnieją `ContentArticlePublishingService`, `ContentArticleWorkflowTransitioned` i feature regression dla workflow/invariants/audit/after-commit rollback boundary,
 - `/aktualnosci` i `/poradniki` pozostają placeholderami 200 z dedykowanym noindex header,
-- przyszłe detail/category/topic/feed routes są zarejestrowane, lecz zwracają 404 do czasu publicznej implementacji,
+- article detail routes `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}` są publicznie podłączone przez N3-004/N3-006, natomiast category/topic/feed pozostają downstream 404 do odpowiednich N4/N5 implementacji,
 - newsroom schema istnieje: `content_categories`, `content_tags`, `content_articles`, `content_topics`, pivots/relations, redirects i `content_home_placements` są tworzone przez 12 migracji,
 - schema i warstwa modelowa są zweryfikowane na SQLite i PostgreSQL 16; `newsroom-postgres` uruchamia migration contract oraz model/scope contract,
 - `ContentCategory` Eloquent model istnieje; N2-001 dodało jego Filament `ContentCategoryResource` oraz modelowe slug/delete/deactivation guards; dedykowany DB seeder kategorii nadal nie istnieje,
@@ -1753,18 +1755,19 @@ Na 2026-09-17:
 - N2-007 jest DONE po PR #52: `ContentArticlePublicationChecklist` przejęło istniejące review/publication/fresh-review assertions i jest wspólnym source of truth dla backendowych blockerów oraz adminowej listy readiness; warningi pozostają addytywne i nie osłabiają publish invariants,
 - N2-008 jest DONE po PR #56: istnieje prywatny administrator-only preview zapisanej wersji `ContentArticle`; nie zmienia domenowego public-visibility contract, nie otwiera publicznych controllerów N3 i nie dodaje nowego persisted preview/revision modelu,
 - `ContentArticle`, `ContentTag`, `ContentTopic`, `ContentArticleSource` i `ContentHomePlacement` Eloquent models/factories istnieją; factory workflow states pokrywają dokumentowany baseline,
-- service-level route-family lookup guard istnieje w `ContentArticlePathResolver`; nadal nie jest podłączony do publicznych controllerów N3,
+- route-family/history guard w `ContentArticlePathResolver` jest podłączony do publicznego article flow przez N3-004/N3-006; current canonical ma pierwszeństwo, a kwalifikowany historical path wykonuje one-hop 301,
 - NEWSROOM-N1-005 scheduler istnieje jako `newsroom:publish-due`, jest zarejestrowany co minutę w production i deleguje due-time revalidation/publish do `ContentArticlePublishingService`,
 - NEWSROOM-N1-006 jest wdrożone: istnieją `NewsroomHomeCompositionService`, `NewsroomHomePlacementService` i niemutujący `ContentArticlePublishingService::assertScheduledPreviewReady()`; overlap/concurrency jest testowane również na PostgreSQL,
+- NEWSROOM-N4-001 jest wdrożone na `main@e0e06e9af8a6b02a63ef4b3e1eb2d772409ad974`: ten sam `NewsroomHomeCompositionService` ma bounded category query plan, a `NewsroomHomeReadModelService` daje gated/cacheable scalar projection bez uruchamiania publicznego huba,
 - N2-010 jest DONE po PR #60: `ContentArticleResource` ma kontrolowane provenance/regulatory fields, hero/OG upload przez `NewsroomArticleMediaService`, verified managed media metadata, focal X/Y i CSS crop previews; `ContentArticlePublicationChecklist` egzekwuje regulatory/source/effective-date coherence oraz ponowną media reinspekcję,
-- admin/domain CMS N2 jest zmaterializowany: obok `ContentCategoryResource`, `ContentArticleResource`, body/source/relation/workflow/public-update/checklist/preview/HomeComposer/provenance-media slices istnieje po PR #62 `ContentTopicResource` + `ContentTopicPublishingService`; N2-001..N2-012 są zamknięte implementacyjnie, natomiast publiczne N3/N4 i discovery N5 nadal nie są zmaterializowane.
+- admin/domain CMS N2 jest zmaterializowany: obok `ContentCategoryResource`, `ContentArticleResource`, body/source/relation/workflow/public-update/checklist/preview/HomeComposer/provenance-media slices istnieje `ContentTopicResource` + `ContentTopicPublishingService`; N2-001..N2-012 oraz public article layer N3 są zamknięte, N4-001 read model jest wdrożony, natomiast Hub Blade N4-002, dalsze N4 oraz discovery N5 pozostają otwarte.
 
 ---
 
 ## 44. Pozostałe zadania
 
 - [x] wdrożyć NEWSROOM-N2-011 `ContentTopicResource` + topic publication/identity guards bez zmiany istniejącej schema,
-- [ ] wdrożyć N3 publiczny renderer bloków zgodny z `NewsroomBodyContract`,
+- [x] wdrożyć N3 publiczny renderer bloków zgodny z `NewsroomBodyContract` (NEWSROOM-N3-004/N3-005),
 - [x] podłączyć `NewsroomMediaStorage` do N2 hero/OG uploadu i `ContentArticle` persistence przez `NewsroomArticleMediaService` / `NewsroomArticleProvenanceMediaAdapter`,
 - [x] wdrożyć focal-point X/Y oraz CSS crop previews i OG-alt UX bez deklarowania fizycznych variants,
 - [ ] wdrożyć crop/variant generation dopiero wraz z fizycznymi artefaktami i ich testami,
@@ -1783,12 +1786,21 @@ Na 2026-09-17:
 - [x] NEWSROOM-N3-003: wdrożyć `ContentArticleSchemaService` z jednym stabilnym publicznym entity graph nad canonical/date contract N3-002,
 - [x] podłączyć publiczne article controllers/renderery i zweryfikować current-canonical HTTP 200/404/410 behavior (NEWSROOM-N3-004),
 - [x] podłączyć historyczny `ContentArticlePathResolver` old-path -> current-canonical 301 flow z one-hop/fail-closed HTTP regression (NEWSROOM-N3-006),
+- [x] NEWSROOM-N4-001: bounded editorial composition + rollout-gated scalar home read model bez publicznego Hub Blade,
+- [ ] NEWSROOM-N4-002: podłączyć publiczny Hub Blade do read modelu i usunąć `MarketingPlaceholder` dla `/aktualnosci`,
 - [ ] dodać sitemap/public-discovery regression korzystające wyłącznie z current canonical URL,
 
 ---
 
 ## 45. Historia zmian
 
+
+### 2026-09-18 — v0.32
+
+- NEWSROOM-N4-001 zmergowano przez PR #81 bez zmian schema/migracji ani persisted placement contract; finalny implementation head `813aba108b6b68f0526df3a9c8c86d82df5ca0f6`, merge `main@e0e06e9af8a6b02a63ef4b3e1eb2d772409ad974`,
+- `NewsroomHomeCompositionService` nadal jest jedynym resolverem placements/fallback/dedupe; per-category candidate loading używa bounded SQL window rankingu i batch hydration zamiast query-per-category,
+- `NewsroomHomeReadModelService` daje `NewsroomPublicGate`-aware scalar projection dla przyszłego public huba; N4-001 nie uruchamia Hub Blade ani cache invalidation,
+- `NewsroomHomeReadModelServiceTest` potwierdza gated/serializable projection i stały query budget; exact-head CI #314 oraz post-merge CI #315 były PASS, w tym PostgreSQL 7/94.
 
 ### 2026-09-17 — v0.31
 
