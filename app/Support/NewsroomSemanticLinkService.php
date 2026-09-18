@@ -7,6 +7,7 @@ use App\Models\ContentArticle;
 use App\Models\ContentAuthor;
 use App\Models\ContentCategory;
 use App\Models\ContentTopic;
+use App\Models\LegalUnit;
 use Illuminate\Database\Eloquent\Builder;
 
 final class NewsroomSemanticLinkService
@@ -268,6 +269,160 @@ final class NewsroomSemanticLinkService
             'explicit_reverse_edge_count' => $explicitReverseEdges,
             'estimated_hub_depth' => $estimatedHubDepth,
         ];
+    }
+
+    /**
+     * Site-wide QA built on the same semantic-link resolver used by public rendering.
+     *
+     * @return list<string>
+     */
+    public function auditAll(): array
+    {
+        if ($this->publicGate->disabled()) {
+            return [];
+        }
+
+        $errors = [];
+        $articles = ContentArticle::query()
+            ->activelyDistributed()
+            ->indexable()
+            ->whereIn('type', [
+                ...NewsroomRouteContract::NEWSROOM_TYPES,
+                ...NewsroomRouteContract::GUIDE_TYPES,
+            ])
+            ->with([
+                'category',
+                'author',
+                'topics',
+                'sources',
+                'legalUnits',
+                'trafficSigns',
+            ])
+            ->orderBy('id')
+            ->get();
+
+        foreach ($articles as $article) {
+            $type = $article->type instanceof ContentArticleType
+                ? $article->type->value
+                : (string) $article->type;
+            $path = NewsroomRouteContract::canonicalPath($type, (string) $article->slug);
+            $family = NewsroomRouteContract::familyForType($type);
+            $audit = $this->audit($article);
+
+            $hasGuaranteedInbound = $family === NewsroomRouteContract::FAMILY_GUIDES
+                ? $audit['hub'] !== null
+                : $audit['category'] !== null || $audit['topics'] !== [];
+
+            if (! $hasGuaranteedInbound) {
+                $errors[] = 'Orphan newsroom article without guaranteed crawlable inbound: '.$path;
+            }
+
+            foreach ($article->sources as $source) {
+                if ($source->is_publicly_cited && blank($source->url)) {
+                    $errors[] = sprintf(
+                        'Publicly cited source URL is empty for %s: source_id=%d.',
+                        $path,
+                        (int) $source->getKey(),
+                    );
+                }
+            }
+
+            if (
+                $article->is_breaking
+                && (
+                    $article->breaking_expires_at === null
+                    || $article->breaking_expires_at->lte(now())
+                )
+            ) {
+                $errors[] = 'Expired breaking state on newsroom article: '.$path;
+            }
+
+            foreach ($article->topics as $topic) {
+                if (! $topic->isPubliclyVisible()) {
+                    $errors[] = sprintf(
+                        'Draft/non-public topic target linked from %s: topic_id=%d.',
+                        $path,
+                        (int) $topic->getKey(),
+                    );
+                }
+            }
+
+            foreach ($article->legalUnits as $legalUnit) {
+                if ($legalUnit->status !== LegalUnit::STATUS_VERIFIED) {
+                    $errors[] = sprintf(
+                        'Draft/non-public legal target linked from %s: legal_unit_id=%d.',
+                        $path,
+                        (int) $legalUnit->getKey(),
+                    );
+                }
+            }
+
+            foreach ($article->trafficSigns as $trafficSign) {
+                if (! $trafficSign->isPubliclyVisible()) {
+                    $errors[] = sprintf(
+                        'Draft/non-public traffic-sign target linked from %s: traffic_sign_id=%d.',
+                        $path,
+                        (int) $trafficSign->getKey(),
+                    );
+                }
+            }
+
+            foreach ($this->relatedArticles($article) as $related) {
+                $target = ContentArticle::query()->find((int) ($related['id'] ?? 0));
+
+                if (! $target instanceof ContentArticle) {
+                    $errors[] = 'Broken related article target from '.$path.'.';
+
+                    continue;
+                }
+
+                if (! $target->isActivelyDistributed() || ! $target->isIndexable()) {
+                    $errors[] = sprintf(
+                        'Draft/non-public related article target from %s: article_id=%d.',
+                        $path,
+                        (int) $target->getKey(),
+                    );
+
+                    continue;
+                }
+
+                $targetType = $target->type instanceof ContentArticleType
+                    ? $target->type->value
+                    : (string) $target->type;
+                $expectedUrl = NewsroomRouteContract::canonicalPath(
+                    $targetType,
+                    (string) $target->slug,
+                );
+
+                if (($related['url'] ?? null) !== $expectedUrl) {
+                    $errors[] = sprintf(
+                        'Broken related article canonical URL from %s: article_id=%d.',
+                        $path,
+                        (int) $target->getKey(),
+                    );
+                }
+            }
+        }
+
+        ContentTopic::query()
+            ->published()
+            ->whereNotNull('featured_article_id')
+            ->with('featuredArticle')
+            ->orderBy('id')
+            ->get()
+            ->each(function (ContentTopic $topic) use (&$errors): void {
+                if (! $topic->hasEligibleFeaturedArticle()) {
+                    $errors[] = sprintf(
+                        'Broken topic featured-article relation: topic_id=%d article_id=%d.',
+                        (int) $topic->getKey(),
+                        (int) $topic->featured_article_id,
+                    );
+                }
+            });
+
+        sort($errors, SORT_STRING);
+
+        return array_values(array_unique($errors));
     }
 
     /**
