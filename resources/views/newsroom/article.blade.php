@@ -35,13 +35,9 @@
             <div class="mx-auto max-w-[900px]">
                 @if ($article->category)
                     <p class="content-kicker">
-                        @if (($article->type?->value ?? (string) $article->type) !== 'guide')
-                            <a href="{{ route('public.news.categories.show', $article->category->slug) }}" class="hover:underline">
-                                {{ $article->category->name }}
-                            </a>
-                        @else
+                        <a href="{{ route('public.news.categories.show', $article->category->slug) }}" class="hover:underline">
                             {{ $article->category->name }}
-                        @endif
+                        </a>
                     </p>
                 @endif
 
@@ -70,6 +66,20 @@
                         <span>{{ $provenanceLabel }}</span>
                     @endif
                 </div>
+
+                @if (($topicLinks ?? []) !== [])
+                    <nav class="mt-4 flex flex-wrap items-center gap-2 text-sm" aria-label="Tematy materiału">
+                        <span class="font-semibold text-slate-600">Tematy:</span>
+                        @foreach ($topicLinks as $topicLink)
+                            <a
+                                href="{{ $topicLink['url'] }}"
+                                class="inline-flex min-h-9 items-center border border-slate-300 bg-white px-3 font-semibold text-slate-800 hover:border-slate-500 hover:underline"
+                            >
+                                {{ $topicLink['title'] }}
+                            </a>
+                        @endforeach
+                    </nav>
+                @endif
 
                 @if ($heroImageUrl)
                     <figure class="mt-8 overflow-hidden rounded-md bg-slate-100">
@@ -265,6 +275,29 @@
                     <section class="mt-10 border-l-4 border-slate-400 bg-slate-50 px-5 py-5" aria-labelledby="newsroom-correction-heading">
                         <h2 id="newsroom-correction-heading" class="text-lg font-semibold text-slate-950">Korekta</h2>
                         <p class="mt-2 whitespace-pre-line text-sm leading-6 text-slate-700">{{ $article->correction_note }}</p>
+                    </section>
+                @endif
+
+                @if (($relatedArticles ?? []) !== [])
+                    <section class="mt-12 border-t border-slate-200 pt-7" aria-labelledby="newsroom-related-articles-heading">
+                        <p class="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Czytaj dalej</p>
+                        <h2 id="newsroom-related-articles-heading" class="mt-1 text-xl font-semibold text-slate-950">Powiązane materiały</h2>
+                        <div class="mt-5 grid gap-4 md:grid-cols-2">
+                            @foreach ($relatedArticles as $relatedArticle)
+                                <a href="{{ $relatedArticle['url'] }}" class="block border border-slate-200 bg-white px-5 py-5 hover:border-slate-400 hover:bg-slate-50">
+                                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">
+                                        @if ($relatedArticle['category'])
+                                            <span>{{ $relatedArticle['category'] }}</span>
+                                        @endif
+                                        <span>{{ $relatedArticle['type'] === 'guide' ? 'Poradnik' : 'Aktualność' }}</span>
+                                    </div>
+                                    <h3 class="mt-2 text-lg font-semibold leading-7 text-slate-950">{{ $relatedArticle['title'] }}</h3>
+                                    @if ($relatedArticle['lead'])
+                                        <p class="mt-2 text-sm leading-6 text-slate-600">{{ $relatedArticle['lead'] }}</p>
+                                    @endif
+                                </a>
+                            @endforeach
+                        </div>
                     </section>
                 @endif
 
