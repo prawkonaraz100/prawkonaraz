@@ -2338,7 +2338,7 @@ Docs-only:
 - [x] article sitemap przez istniejący static generator + deterministic sharding readiness + rollout-gated hub coverage (NEWSROOM-N5-001)
 - [x] News Sitemap full required metadata + `first_published_at` eligibility + 1000-entry deterministic split (NEWSROOM-N5-002)
 - [ ] dirty/version scheduled refresh bez queue-worker assumption
-- [ ] child-before-index atomic static publication
+- [x] child-before-index atomic static publication — potwierdzone w NEWSROOM-N5-007 PR #109; dirty/version refresh i production delivery smoke pozostają osobnymi otwartymi gate'ami
 - [x] istniejący `SeoSitemapAuditor` rozszerzony o newsroom/news namespace/tag/date/window/eligibility/topology/shard/obsolete-file checks w NEWSROOM-N5-006; generic protocol-limit guards nadal są reużywane
 - [ ] rzeczywisty static/Nginx/CDN delivery smoke (Content-Type/cache/Set-Cookie/validators)
 - [x] Atom feed + discovery + generation cache/validator contract (NEWSROOM-N5-003)
