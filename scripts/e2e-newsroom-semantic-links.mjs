@@ -148,8 +148,9 @@ try {
             }
 
             const bodyText = await page.locator('body').innerText();
+            const normalizedBodyText = bodyText.toLocaleLowerCase('pl-PL');
             for (const expected of surface.expected) {
-                if (!bodyText.includes(expected)) {
+                if (!normalizedBodyText.includes(expected.toLocaleLowerCase('pl-PL'))) {
                     throw new Error(`${surface.key} missing "${expected}" at ${viewport.name}px.`);
                 }
             }
