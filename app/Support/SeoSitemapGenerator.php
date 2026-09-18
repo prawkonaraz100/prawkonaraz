@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\File;
 
 class SeoSitemapGenerator
 {
+    public const MAX_URLS_PER_FILE = 50000;
+
+    public const MAX_UNCOMPRESSED_BYTES = 52428800;
+
     public function __construct(
         protected SeoSitemapBuilder $builder,
         protected SeoSitemapXmlRenderer $renderer,
@@ -19,6 +23,8 @@ class SeoSitemapGenerator
     public function generate(bool $dryRun = false): array
     {
         $files = $this->buildFiles();
+
+        $this->assertProtocolLimits($files);
 
         if (! $dryRun) {
             $this->prepareSitemapDirectory();
@@ -42,7 +48,8 @@ class SeoSitemapGenerator
      */
     protected function buildFiles(): array
     {
-        $sitemapIndexItems = $this->builder->sitemapIndexItems();
+        $articleShards = $this->builder->articleSitemapShards();
+        $sitemapIndexItems = $this->builder->sitemapIndexItems($articleShards);
         $staticUrls = $this->builder->staticUrls();
         $questionHubUrls = $this->publicQuestionCatalogService->hubSitemapUrls();
         $questionCategoryUrls = $this->publicQuestionCatalogService->categorySitemapUrls();
@@ -115,6 +122,13 @@ class SeoSitemapGenerator
             ],
         ];
 
+        foreach ($articleShards as $relativePath => $shard) {
+            $files[$relativePath] = [
+                'contents' => $this->renderer->urlset($shard['urls']),
+                'urls' => count($shard['urls']),
+            ];
+        }
+
         foreach ($this->publicQuestionCatalogService->visibleCategories() as $category) {
             $urls = $this->publicQuestionCatalogService->sitemapUrlsForCanonicalCategory($category);
 
@@ -132,6 +146,43 @@ class SeoSitemapGenerator
         }
 
         return $files;
+    }
+
+    /**
+     * @param  array<string, array{contents:string,urls:int}>  $files
+     */
+    protected function assertProtocolLimits(array $files): void
+    {
+        $maxUrls = max(
+            1,
+            (int) config('seo.sitemap_max_urls_per_file', self::MAX_URLS_PER_FILE),
+        );
+        $maxBytes = max(
+            1,
+            (int) config('seo.sitemap_max_uncompressed_bytes', self::MAX_UNCOMPRESSED_BYTES),
+        );
+
+        foreach ($files as $relativePath => $meta) {
+            if ($meta['urls'] > $maxUrls) {
+                throw new \RuntimeException(sprintf(
+                    'Generated sitemap exceeds URL limit: %s urls=%d limit=%d',
+                    $relativePath,
+                    $meta['urls'],
+                    $maxUrls,
+                ));
+            }
+
+            $bytes = strlen($meta['contents']);
+
+            if ($bytes > $maxBytes) {
+                throw new \RuntimeException(sprintf(
+                    'Generated sitemap exceeds uncompressed byte limit: %s bytes=%d limit=%d',
+                    $relativePath,
+                    $bytes,
+                    $maxBytes,
+                ));
+            }
+        }
     }
 
     protected function prepareSitemapDirectory(): void
