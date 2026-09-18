@@ -174,9 +174,12 @@ Docelowy zestaw publiczny:
 /sitemaps/traffic-sign-supporting-pages.xml
 /sitemaps/authors.xml
 /sitemaps/articles.xml
+/sitemaps/news.xml
 ```
 
 Dla newsroomu `/sitemaps/articles.xml` jest nazwą pojedynczego pliku przy małym corpus. Po przekroczeniu skonfigurowanego zakresu N5-001 generuje stabilne shard files `/sitemaps/articles-{id-range}.xml` i wpisuje je bezpośrednio do głównego `/sitemap.xml`; nie powstaje zagnieżdżony newsroom sitemap-index.
+
+Dla Google News `/sitemaps/news.xml` jest nazwą pojedynczego pliku do 1000 kwalifikowanych wpisów. Po przekroczeniu limitu N5-002 generuje stabilne fixed-`content_articles.id` range shards `/sitemaps/news-{id-range}.xml` i również wpisuje je bezpośrednio do głównego `/sitemap.xml`; nie powstaje osobny nested news sitemap-index.
 
 `/sitemap.xml` ma byc sitemap index, czyli lista child sitemap.
 
@@ -787,6 +790,21 @@ Potwierdzony stan repo po PR #97, merge `main@5ddfa48c0646fa89cc802d129e6d9ccee9
 - exact-head CI #367 oraz post-merge CI #368 zakończyły PASS; post-merge: 1098 passed / 19 926 assertions / 2 skipped, Pint PASS, frontend build PASS, PostgreSQL 7/94.
 
 Ten wpis potwierdza **stan kodu i CI**, nie stan produkcyjnego delivery. Nadal nie ma w tym tasku potwierdzenia publicznych Nginx/CDN headers/304, GSC/Bing processing, child-before-index atomic set publication ani obsolete-shard cleanup. Te elementy pozostają osobnymi zadaniami i nie wolno traktować ich jako wykonanych na podstawie N5-001.
+
+## 9.4. Google News Sitemap N5-002 — status kodu 2026-09-18
+
+Potwierdzony stan repo po PR #99, merge `main@827f3816487d3a404df26c381a103a6cd1a9f413`:
+
+- Google News constraints zostały ponownie sprawdzone przy implementacji: 2-dniowe okno po pierwotnym `first_published_at`, maks. 1000 `news:news` entries per plik oraz wymagane `news:name`, `news:language`, `news:publication_date`, `news:title`,
+- istniejący `SeoSitemapBuilder`, `SeoSitemapGenerator` i `SeoSitemapXmlRenderer` generują statyczną News Sitemap; nie ma drugiego generatora,
+- corpus wymaga `NEWSROOM_PUBLIC_ENABLED=true`, `type=news`, aktywnej dystrybucji, workflow `published`, indexable current canonical, aktywnej kategorii i publicznego autora,
+- świeżość jest liczona wyłącznie przez `first_published_at >= now()-2 days`; późniejsza aktualizacja lub ponowne ustawienie `published_at` nie przywraca starego artykułu do News Sitemap,
+- `news:name` pochodzi z istniejącego `SiteIdentitySchema::siteName()`, language to `pl`, publication date to pierwotny `first_published_at`, a title to widoczny `ContentArticle.title`,
+- do 1000 entries używany jest `/sitemaps/news.xml`; powyżej limitu powstają deterministic fixed-ID-range shards wskazywane bezpośrednio przez root sitemap index,
+- istniejący auditor dopuszcza legalny overlap URL pomiędzy standard article sitemap i News Sitemap; pełne newsroom/news namespace/required-tag/age/shard checks pozostają osobnym N5-006,
+- exact-head CI #371 oraz post-merge CI #372 zakończyły PASS; post-merge: 1100 passed / 19 964 assertions / 2 skipped, Pint PASS, frontend build 10.28 s, PostgreSQL 7/94.
+
+Ten wpis potwierdza **stan kodu i CI**, nie produkcyjne delivery. Nadal nie ma dowodu publicznych Nginx/CDN headers/validators, Google News/GSC processing, child-before-index atomic set publication, obsolete-shard cleanup ani kilku-minutowego dirty/version refresh SLA. Nie wolno traktować ich jako wykonanych na podstawie N5-002.
 
 ## 9.2. Automatyczne odswiezanie sitemap
 
