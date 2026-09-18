@@ -1591,10 +1591,10 @@ Obecnie:
 - newsroom Article schema graph istnieje przez `ContentArticleSchemaService` po NEWSROOM-N3-003 i jest emitowany przez publiczny article HTTP renderer od N3-004; news sitemap i feed nadal nie istnieją,
 - newsroom dirty/version refresh coordinator i atomowy child-before-index switch nie istnieją,
 - repo nie gwarantuje async Laravel queue workera (`QUEUE_CONNECTION=sync` w env example), więc newsroom nie może opierać freshness na ShouldQueue,
-- `/aktualnosci` i `/poradniki` są pre-launch placeholderami 200 z `X-Robots-Tag: noindex, follow`,
+- po NEWSROOM-N4-002 `/aktualnosci` jest rollout-gated: przy `NEWSROOM_PUBLIC_ENABLED=false` pozostaje pre-launch placeholderem 200 + `X-Robots-Tag: noindex, follow`, a przy `true` renderuje SSR `newsroom.home` z self-canonical i `index,follow,max-image-preview:large`; `/poradniki` nadal jest pre-launch placeholderem 200 + noindex,
 - `/aktualnosci/feed.xml` ma zarejestrowany route contract, ale obecnie zwraca 404; feed ani feed discovery nie są jeszcze wdrożone,
 - category/topic route namespaces są zarejestrowane i nadal pozostają 404 bez publicznych controllerów; article detail routes są aktywne od N3-004.
-- NEWSROOM-N3-008 jest wdrożone: `NEWSROOM_PUBLIC_ENABLED=false` blokuje current detail/guide i historyczne redirecty, zachowuje top-level placeholdery oraz filtruje newsroom namespace z obecnego IndexNow collectora; przyszłe N4/N5 discovery surfaces pozostają otwarte.
+- NEWSROOM-N3-008 jest wdrożone, a N4-002 konsumuje ten sam gate dla publicznego huba `/aktualnosci`; przy `false` hub nie staje się indeksowalną thin page, przy `true` może być indeksowany. Category/topic/feed, reverse links, newsroom/article/news sitemap i article-specific IndexNow automation pozostają otwarte w dalszym N4/N5.
 
 ---
 
@@ -1624,6 +1624,13 @@ Obecnie:
 ---
 
 ## 70. Historia zmian
+
+### 2026-09-18 — v0.14
+
+- NEWSROOM-N4-002 zmergowano przez PR #83 na `main@04a3e961a40207bd65c41b684a5bf1cd8d2c5e10`; publiczny `/aktualnosci` konsumuje istniejący `NewsroomPublicGate`,
+- gate=false nadal zwraca pre-launch placeholder 200 + `X-Robots-Tag: noindex, follow`; gate=true renderuje SSR Hub Blade z self-canonical i robots `index,follow,max-image-preview:large`,
+- task nie uruchomił feedu, category/topic pages, newsroom sitemap, news sitemap ani nowej IndexNow automatyzacji; te powierzchnie nie są oznaczone jako wykonane,
+- Browser Smoke #27 potwierdził canonical/robots publicznego huba na macierzy 360/390/430/768/1024/1280/1440 z JS disabled; exact-head CI #321 i post-merge CI #322 zakończyły się PASS.
 
 ### 2026-09-18 — v0.13
 
