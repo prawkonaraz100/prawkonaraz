@@ -63,6 +63,33 @@ class SeoSitemapXmlRenderer
     }
 
     /**
+     * @param  list<array{loc:string,publication_name:string,language:string,publication_date:string,title:string}>  $urls
+     */
+    public function newsUrlset(array $urls): string
+    {
+        $xml = ['<?xml version="1.0" encoding="UTF-8"?>'];
+        $xml[] = '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">';
+
+        foreach ($urls as $item) {
+            $xml[] = '    <url>';
+            $xml[] = '        <loc>'.$this->escape($item['loc']).'</loc>';
+            $xml[] = '        <news:news>';
+            $xml[] = '            <news:publication>';
+            $xml[] = '                <news:name>'.$this->escape($item['publication_name']).'</news:name>';
+            $xml[] = '                <news:language>'.$this->escape($item['language']).'</news:language>';
+            $xml[] = '            </news:publication>';
+            $xml[] = '            <news:publication_date>'.$this->escape($item['publication_date']).'</news:publication_date>';
+            $xml[] = '            <news:title>'.$this->escape($item['title']).'</news:title>';
+            $xml[] = '        </news:news>';
+            $xml[] = '    </url>';
+        }
+
+        $xml[] = '</urlset>';
+
+        return implode("\n", $xml)."\n";
+    }
+
+    /**
      * @param  list<array{loc: string, lastmod?: string|null, videos: list<array{thumbnail_loc: string, title: string, description: string, content_loc: string, duration?: int|null, publication_date?: string|null, family_friendly?: string|null}>}>  $urls
      */
     public function videoUrlset(array $urls): string
