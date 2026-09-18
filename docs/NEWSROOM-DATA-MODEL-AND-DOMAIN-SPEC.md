@@ -6,11 +6,11 @@
 - Obszar: newsroom / media portal
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Bazowy stan repo przy projektowaniu: main@6a38c95ce76ee05997977d614d795ed8513462f1
-- Ostatnia weryfikacja zgodności z kodem: main@a97373003c5a249a28761df15342f19e656c50c5 (2026-09-18)
+- Ostatnia weryfikacja zgodności z kodem: main@3d7ac8ab8a3ed1c299cb0cdd4cb1ef8ac6b53f78 (2026-09-18)
 - Data: 2026-09-17
 - Zakres: model domenowy, baza danych, invariants, serwisy aplikacyjne, routing domeny i kolejność migracji
 
-Ten dokument opisuje docelowy model danych newsroomu. Schema, modele/factories/scopes oraz serwisy aplikacyjne N1 są zmaterializowane; zakres admin/domain N2 i publiczny article stack N3-001..N3-008 są zmaterializowane, a N4-001..N4-007 obejmuje publiczne hub/category/guides/topic surfaces, nawigację oraz cache/invalidation dla istniejących home/category read models. Reverse links N4-008 i discovery N5 pozostają dalszym etapem. Stan wdrożenia należy czytać z sekcji 43 i aktualizować po każdej zmianie kodu.
+Ten dokument opisuje docelowy model danych newsroomu. Schema, modele/factories/scopes oraz serwisy aplikacyjne N1 są zmaterializowane; zakres admin/domain N2 i publiczny article stack N3-001..N3-008 są zmaterializowane, a N4-001..N4-008 obejmuje publiczne hub/category/guides/topic surfaces, nawigację, cache/invalidation home/category oraz semantic/reverse-link integration. N4-008 reużywa istniejące pivoty i nie zmienia schema; discovery N5 pozostaje dalszym etapem. Stan wdrożenia należy czytać z sekcji 43 i aktualizować po każdej zmianie kodu.
 
 ---
 
@@ -536,7 +536,7 @@ PR #62 materializuje istniejący model topicu i adminowy workflow bez zmian sche
 - eligible corpus liczy istniejącą relację `articles()` przez `activelyDistributed()->indexable()`; pivot nadal nie ma `sort_order`,
 - `ContentTopicResource` zapisuje article membership i featured membership bez tworzenia równoległego modelu lub nowej tabeli oraz pokazuje health/promotability w backoffice,
 - publish/archive/republish zapisują istniejący `AuditLog` z `User` actorem i allowlisted metadata status/corpus/featured,
-- późniejszy spadek corpus poniżej 3 nie mutuje automatycznie statusu ani HTTP/indexability; od N4-007 route `/aktualnosci/temat/{topicSlug}` renderuje rollout-gated publiczne dossier dla `published`, a wcześniej publiczny `archived` topic zwraca 410 + noindex. Sitemap coverage i reverse-link/nav discovery pozostają downstream N5/N4-008.
+- późniejszy spadek corpus poniżej 3 nie mutuje automatycznie statusu ani HTTP/indexability; od N4-007 route `/aktualnosci/temat/{topicSlug}` renderuje rollout-gated publiczne dossier dla `published`, a wcześniej publiczny `archived` topic zwraca 410 + noindex. Jawne article→topic links i controlled reverse-link discovery są zmaterializowane przez N4-008; sitemap coverage pozostaje N5.
 
 ---
 
@@ -1774,7 +1774,7 @@ Na 2026-09-18:
 - NEWSROOM-N1-006 jest wdrożone: istnieją `NewsroomHomeCompositionService`, `NewsroomHomePlacementService` i niemutujący `ContentArticlePublishingService::assertScheduledPreviewReady()`; overlap/concurrency jest testowane również na PostgreSQL,
 - NEWSROOM-N4-001 jest wdrożone na `main@e0e06e9af8a6b02a63ef4b3e1eb2d772409ad974`: ten sam `NewsroomHomeCompositionService` ma bounded category query plan, a `NewsroomHomeReadModelService` daje gated/cacheable scalar projection bez uruchamiania publicznego huba,
 - N2-010 jest DONE po PR #60: `ContentArticleResource` ma kontrolowane provenance/regulatory fields, hero/OG upload przez `NewsroomArticleMediaService`, verified managed media metadata, focal X/Y i CSS crop previews; `ContentArticlePublicationChecklist` egzekwuje regulatory/source/effective-date coherence oraz ponowną media reinspekcję,
-- admin/domain CMS N2 oraz public article layer N3 są zamknięte; N4-001..N4-007 są zmaterializowane, w tym public home/category/guides/topic surfaces, navigation integration i cache/invalidation home/category read models. Reverse links N4-008 i discovery N5 pozostają otwarte.
+- admin/domain CMS N2 oraz public article layer N3 są zamknięte; N4-001..N4-008 są zmaterializowane, w tym public home/category/guides/topic surfaces, navigation integration, cache/invalidation home/category oraz semantic/reverse-link integration. N4-008 używa istniejących `content_article_*` pivotów bez nowej migracji i bez mutacji istniejącego question graphu. Discovery N5 pozostaje otwarte.
 
 ---
 
@@ -1804,11 +1804,22 @@ Na 2026-09-18:
 - [x] NEWSROOM-N4-002: publiczny Hub Blade `/aktualnosci`,
 - [x] NEWSROOM-N4-006: cache/invalidation istniejących publicznych home/category read models bez cache’owania preview,
 - [x] NEWSROOM-N4-007: publiczny rollout-gated topic/dossier route z featured article, mixed-family eligible corpus, SSR pagination i CollectionPage schema,
+- [x] NEWSROOM-N4-008: semantic/reverse-link integration na istniejących topic/question/legal/sign pivots, z bounded resolverami, wspólnym public gate i bez zmian schema/question graphu,
 - [ ] dodać sitemap/public-discovery regression korzystające wyłącznie z current canonical URL,
 
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-18 — v0.35
+
+- NEWSROOM-N4-008 zmergowano przez PR #95; finalny implementation head `bd63773bc1febdcc6aa8c2507c6621e908d63b09`, merge `main@3d7ac8ab8a3ed1c299cb0cdd4cb1ef8ac6b53f78`,
+- nie dodano migracji ani nowego relation graphu: `NewsroomSemanticLinkService` czyta istniejące `content_article_topic`, `content_article_question`, `content_article_legal_unit` i `content_article_traffic_sign`,
+- reverse/related targets przechodzą `activelyDistributed()+indexable()`, aktywną kategorię i publicznego autora; reverse list ma limit 3, related articles limit 4, a TrafficSign dopuszcza tylko `direct|example`,
+- istniejący zakaz mutowania `question_relations`, `question_seo_topics` i rankingów pozostaje zachowany i ma regression coverage,
+- per-article audit udostępnia crawlable inbound sources, explicit reverse-edge count i estimated hub depth; osobny site-wide orphan auditor nie został dodany,
+- exact-head CI #361 i Browser Smoke #48 zakończyły PASS; post-merge CI #362 zakończył 1093 passed / 19 881 assertions / 2 skipped, Pint PASS, frontend build 7.42 s i PostgreSQL 7/94,
+- następny etap to N5; schema N4 pozostaje zamknięta bez dodatkowych zmian.
 
 ### 2026-09-18 — v0.34
 
