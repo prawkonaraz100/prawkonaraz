@@ -28,15 +28,10 @@ header_value() {
     local headers_file="$1"
     local header_name="$2"
 
-    awk -v name="$header_name" '
-        BEGIN { IGNORECASE = 1 }
-        $0 ~ "^" name ":" {
-            sub(/^[^:]+:[[:space:]]*/, "")
-            sub(/\r$/, "")
-            value = $0
-        }
-        END { print value }
-    ' "$headers_file"
+    grep -Ei "^$header_name:" "$headers_file" \
+        | tail -n 1 \
+        | sed -E 's/^[^:]+:[[:space:]]*//; s/\r$//' \
+        || true
 }
 
 has_header() {
