@@ -30,12 +30,23 @@
         </section>
     @endif
 
-    <section class="content-band newsroom-article">
+    <section
+        class="content-band newsroom-article"
+        data-newsroom-analytics-article
+        data-article-id="{{ $article->id }}"
+        data-article-type="{{ $article->type->value }}"
+        data-category-slug="{{ $article->category?->slug }}"
+    >
         <div class="content-shell content-hero-section">
             <div class="mx-auto max-w-[900px]">
                 @if ($article->category)
                     <p class="content-kicker">
-                        <a href="{{ route('public.news.categories.show', $article->category->slug) }}" class="hover:underline">
+                        <a
+                            href="{{ route('public.news.categories.show', $article->category->slug) }}"
+                            class="hover:underline"
+                            data-newsroom-analytics-event="newsroom_category_click"
+                            data-newsroom-analytics-module="category_{{ $article->category->slug }}"
+                        >
                             {{ $article->category->name }}
                         </a>
                     </p>
@@ -191,7 +202,15 @@
                                     <footer class="mt-3 text-sm font-semibold leading-6 text-slate-600">
                                         {{ $block['data']['attribution'] }}
                                         @if ($block['data']['source_url'])
-                                            · <a href="{{ $block['data']['source_url'] }}" target="_blank" rel="noopener noreferrer" class="text-blue-700 underline">źródło</a>
+                                            · <a
+                                                href="{{ $block['data']['source_url'] }}"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="text-blue-700 underline"
+                                                data-newsroom-analytics-event="newsroom_source_click"
+                                                data-newsroom-analytics-module="sources"
+                                                data-newsroom-analytics-position="body-{{ $loop->iteration }}"
+                                            >źródło</a>
                                         @endif
                                     </footer>
                                 </blockquote>
@@ -235,7 +254,13 @@
                             @case('related_article')
                                 <aside class="border border-slate-200 bg-slate-50 px-5 py-5">
                                     <p class="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Czytaj także</p>
-                                    <a href="{{ $block['related_article']['url'] }}" class="mt-2 block text-lg font-semibold leading-7 text-slate-950 hover:underline">
+                                    <a
+                                        href="{{ $block['related_article']['url'] }}"
+                                        class="mt-2 block text-lg font-semibold leading-7 text-slate-950 hover:underline"
+                                        data-newsroom-analytics-event="newsroom_related_article_click"
+                                        data-newsroom-analytics-module="related_articles"
+                                        data-newsroom-analytics-position="body-{{ $loop->iteration }}"
+                                    >
                                         {{ $block['related_article']['title'] }}
                                     </a>
                                     @if ($block['related_article']['lead'])
@@ -263,7 +288,15 @@
                                         · {{ $source['published_at'] }}
                                     @endif
                                     @if ($source['url'])
-                                        · <a href="{{ $source['url'] }}" target="_blank" rel="noopener noreferrer" class="text-blue-700 underline">otwórz źródło</a>
+                                        · <a
+                                            href="{{ $source['url'] }}"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="text-blue-700 underline"
+                                            data-newsroom-analytics-event="newsroom_source_click"
+                                            data-newsroom-analytics-module="sources"
+                                            data-newsroom-analytics-position="{{ $loop->iteration }}"
+                                        >otwórz źródło</a>
                                     @endif
                                 </li>
                             @endforeach
@@ -284,7 +317,13 @@
                         <h2 id="newsroom-related-articles-heading" class="mt-1 text-xl font-semibold text-slate-950">Powiązane materiały</h2>
                         <div class="mt-5 grid gap-4 md:grid-cols-2">
                             @foreach ($relatedArticles as $relatedArticle)
-                                <a href="{{ $relatedArticle['url'] }}" class="block border border-slate-200 bg-white px-5 py-5 hover:border-slate-400 hover:bg-slate-50">
+                                <a
+                                    href="{{ $relatedArticle['url'] }}"
+                                    class="block border border-slate-200 bg-white px-5 py-5 hover:border-slate-400 hover:bg-slate-50"
+                                    data-newsroom-analytics-event="newsroom_related_article_click"
+                                    data-newsroom-analytics-module="related_articles"
+                                    data-newsroom-analytics-position="{{ $loop->iteration }}"
+                                >
                                     <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">
                                         @if ($relatedArticle['category'])
                                             <span>{{ $relatedArticle['category'] }}</span>
