@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ContentArticleType;
 use App\Models\ContentArticle;
 use App\Models\ContentArticleRedirect;
 use App\Models\ContentAuthor;
@@ -679,6 +680,16 @@ test('Google News sitemap uses required metadata and first publication eligibili
         'published_at' => now()->subHour(),
     ]);
 
+    ContentArticle::factory()->published()->create([
+        'type' => ContentArticleType::Explainer->value,
+        'category_id' => $category->id,
+        'author_id' => $author->id,
+        'title' => 'Świeży explainer poza News Sitemap',
+        'slug' => 'swiezy-explainer-poza-news-sitemap',
+        'first_published_at' => now()->subHour(),
+        'published_at' => now()->subHour(),
+    ]);
+
     ContentArticle::factory()->needsReview()->create([
         'category_id' => $category->id,
         'author_id' => $author->id,
@@ -759,6 +770,7 @@ test('Google News sitemap uses required metadata and first publication eligibili
         ->not->toContain('SEO title nie może wejść')
         ->not->toContain($old->slug)
         ->not->toContain('swiezy-poradnik-poza-news-sitemap')
+        ->not->toContain('swiezy-explainer-poza-news-sitemap')
         ->not->toContain('needs-review-poza-news-sitemap')
         ->not->toContain('noindex-poza-news-sitemap')
         ->not->toContain('nieaktywna-kategoria-poza-news-sitemap')
