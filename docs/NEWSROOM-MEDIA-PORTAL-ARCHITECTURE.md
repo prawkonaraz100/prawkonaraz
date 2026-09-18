@@ -103,7 +103,7 @@ Na pierwszym etapie nie budujemy:
 
 ## 5. Aktualny stan implementacji
 
-Stan sprawdzony ponownie 2026-09-18 względem `main@23b952b77e39cd25fb39edc252faf05849946bd7` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-012 oraz NEWSROOM-N3-001..N3-008. Zakres admin/domain N2 jest zamknięty. Public read boundary N3-001, article SEO metadata N3-002, article schema graph N3-003, publiczny article controller/Blade/body renderer N3-004, Product Bridge N3-005, publiczny historical redirect resolver N3-006, integracja profilu autora N3-007 oraz public rollout config gate N3-008 są wdrożone. N4/N5 pozostają otwarte.
+Stan sprawdzony ponownie 2026-09-18 względem `main@e0e06e9af8a6b02a63ef4b3e1eb2d772409ad974` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-012, NEWSROOM-N3-001..N3-008 oraz NEWSROOM-N4-001. Zakres admin/domain N2 i public article layer N3 są zamknięte. N4-001 materializuje bounded/cacheable read-model kompozycji huba; publiczny Hub Blade z N4-002 oraz pozostałe N4/N5 pozostają otwarte.
 
 ### 5.1. Elementy już istniejące
 
@@ -129,6 +129,9 @@ Repo ma już istotny fundament:
 - N3-008: `config/newsroom.php` + `NewsroomPublicGate` centralizują `NEWSROOM_PUBLIC_ENABLED` z bezpiecznym defaultem `false`; `.env.example` również utrwala `false`,
 - N3-008: przy gate=false publiczne article/guide detail oraz historyczne old-path redirecty failują do 404 przed lookupem/redirect resolverem; top-level `/aktualnosci` i `/poradniki` pozostają pre-launch placeholderami 200 + `X-Robots-Tag: noindex, follow`,
 - N3-008: gate=false usuwa Newsroom z author profile oraz newsroom-only author sitemap eligibility/freshness i filtruje namespace `/aktualnosci` + `/poradniki` z istniejącego `IndexNowUrlCollector`; admin/private preview pozostają dostępne,
+- N4-001: istniejący `NewsroomHomeCompositionService` pozostaje jedynym resolverem fixed placements/fallback/dedupe; category composition korzysta z batched placements, per-category SQL window rankingu i wspólnego eager-loadu zamiast query-per-category,
+- N4-001: `NewsroomHomeReadModelService` wystawia rollout-gated scalar-array projection lead/secondary/latest/categories/guides/important_now/breaking z canonical path, category/author i hero metadata; wynik jest serializowalny i gotowy do późniejszego cache,
+- N4-001 nie wdraża publicznego huba ani cache invalidation: `/aktualnosci` nadal jest pre-launch placeholderem do N4-002, a faktyczny cache pozostaje N4-006,
 - route `/autorzy/{authorSlug}`,
 - statyczny produkcyjny pipeline sitemap `SeoSitemapGenerator` + `SeoSitemapBuilder` + `SeoSitemapAuditor`, z codziennym `seo:refresh-sitemaps` jako istniejącym safety netem,
 - dynamiczny `SitemapController`, który współistnieje z generowanymi artefaktami i nie jest samodzielnym source of truth produkcyjnego XML,
@@ -158,7 +161,7 @@ Repo ma już istotny fundament:
 
 ### 5.2. Elementy nadal pre-launch / odroczone
 
-`/aktualnosci` i `/poradniki` nadal renderują `Public/MarketingPlaceholder.vue` przez dedykowany `NewsroomPlaceholderController`, który ustawia `X-Robots-Tag: noindex, follow`.
+`/aktualnosci` i `/poradniki` nadal renderują `Public/MarketingPlaceholder.vue` przez dedykowany `NewsroomPlaceholderController`, który ustawia `X-Robots-Tag: noindex, follow`. N4-001 przygotowało dane dla przyszłego huba, ale nie zmieniło tej publicznej powierzchni; zamiana placeholdera na Hub Blade należy wyłącznie do N4-002.
 
 Następujące namespaces pozostają downstream i nie zostały uruchomione przez N3-005:
 
@@ -1505,8 +1508,9 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N3-006` — old-path -> canonical 301.
 - [x] `NEWSROOM-N3-007` — author-profile integration.
 - [x] `NEWSROOM-N3-008` — public rollout config gate.
+- [x] `NEWSROOM-N4-001` — `/aktualnosci` editorial composition read model.
 
-N3-008 rollout gate jest zmaterializowane i potwierdzone na `main@23b952b77e39cd25fb39edc252faf05849946bd7`; następnym wykonywalnym taskiem jest `NEWSROOM-N4-001` — `/aktualnosci` editorial composition read model. Pozostałe elementy N4–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu pełną checklistę.
+N4-001 jest zmaterializowane i potwierdzone na `main@e0e06e9af8a6b02a63ef4b3e1eb2d772409ad974`; następnym wykonywalnym taskiem jest `NEWSROOM-N4-002` — Hub Blade layout. Pozostałe elementy N4–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu pełną checklistę.
 
 ---
 ## 28. Zasady utrzymania dokumentu
@@ -1531,6 +1535,14 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-18 — v0.38
+
+- NEWSROOM-N4-001 zmergowano przez PR #81; finalny implementation head `813aba108b6b68f0526df3a9c8c86d82df5ca0f6`, merge `main@e0e06e9af8a6b02a63ef4b3e1eb2d772409ad974`,
+- nie zmieniono decyzji DEC-NR-006 ani nie utworzono drugiego composera: `NewsroomHomeCompositionService` nadal rozstrzyga fixed placements, fallback, global dedupe i breaking exception,
+- category composition ma stały query budget dzięki batchowi placements, SQL window rankingowi per category i jednemu eager-loadowi relacji dla wybranych kandydatów; `NewsroomHomeReadModelService` daje rollout-gated scalar-array projection dla przyszłego huba,
+- publiczny `/aktualnosci` nadal jest placeholderem 200 + noindex; N4-002 pozostaje odpowiedzialne za Hub Blade, a N4-006 za faktyczny cache/invalidation,
+- exact-head CI #314 i post-merge CI #315 były PASS; post-merge: 1059 tests passed / 19 611 assertions / 2 skipped, Pint 1060 files PASS, frontend build 9.93 s, PostgreSQL 7 tests / 94 assertions.
 
 ### 2026-09-18 — v0.37
 

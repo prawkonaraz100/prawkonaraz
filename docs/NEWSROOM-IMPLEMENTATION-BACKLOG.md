@@ -1413,23 +1413,38 @@ Wdrożyć publiczną warstwę bez natychmiastowego przełączania istniejących 
 
 ## NEWSROOM-N4-001 — /aktualnosci editorial composition read model
 
+### Status implementacji
+
+**DONE w kodzie — PR #81 zmergowano na `main@e0e06e9af8a6b02a63ef4b3e1eb2d772409ad974`.** Finalny implementation head `813aba108b6b68f0526df3a9c8c86d82df5ca0f6` przeszedł exact-head CI #314, a post-merge CI #315 na exact `main` zakończył się pełnym PASS. Publiczny renderer huba nie należy do tego tasku i pozostaje NEWSROOM-N4-002.
+
+### Aktualny stan implementacji
+
+- istniejący `NewsroomHomeCompositionService` pozostaje jedynym composerem; N4-001 nie tworzy równoległej logiki kompozycji,
+- zachowano kolejność lead -> secondary -> latest -> category blocks -> guides -> important now oraz globalny zbiór użytych article IDs; breaking pozostaje jedynym świadomym wyjątkiem i może powtórzyć lead,
+- manual placements nadal wygrywają wyłącznie dla kwalifikowanego `activelyDistributed()` targetu, a deterministyczny fallback zachowuje istniejące kryteria,
+- category composition nie wykonuje już query-per-category: aktywne category placements są pobierane batchem, a kandydaci editorial/chronological są ograniczani per category przez ranking `ROW_NUMBER() OVER (PARTITION BY category_id ...)`; relacje `category` i `author` są eager-loaded jednym batchem dla wybranego zbioru,
+- `NewsroomHomeReadModelService` materializuje publiczny scalar-array projection dla lead/secondary/latest/categories/guides/important_now/breaking, z canonical path, category/author i hero metadata; wynik jest serializowalny i gotowy do późniejszego cache,
+- publiczny read model respektuje istniejący `NewsroomPublicGate`: przy `NEWSROOM_PUBLIC_ENABLED=false` zwraca `null`; admin preview nadal korzysta bezpośrednio z domenowego composera i pozostaje dostępny,
+- `tests/Feature/NewsroomHomeReadModelServiceTest.php` chroni rollout gate, scalar/cacheable projection oraz stały query budget przy wzroście liczby aktywnych kategorii,
+- N4-001 nie wdraża jeszcze cache store/invalidation z N4-006 ani publicznego Blade/controllera; `/aktualnosci` pozostaje dotychczasowym placeholderem do NEWSROOM-N4-002.
+
 ### Zakres
 
-- fixed placements,
-- lead,
-- secondary,
-- latest,
-- category blocks,
-- guides,
-- breaking,
-- fallback,
-- global card deduplication.
+- [x] fixed placements,
+- [x] lead,
+- [x] secondary,
+- [x] latest,
+- [x] category blocks,
+- [x] guides,
+- [x] breaking,
+- [x] fallback,
+- [x] global card deduplication.
 
 ### Performance
 
-- bounded queries,
-- eager loads,
-- cacheable read model.
+- [x] bounded queries niezależne od liczby aktywnych kategorii,
+- [x] eager loads dla category/author,
+- [x] cacheable scalar-array read model; faktyczny cache/invalidation pozostaje N4-006.
 
 ---
 
@@ -2265,6 +2280,14 @@ N3-006 jest zamknięte implementacyjnie na `main@33d9946219595a4be75d789b19cc8d1
 ---
 
 # 12. Historia zmian
+
+### 2026-09-18 — v0.38
+
+- NEWSROOM-N4-001 zmergowano przez PR #81; finalny implementation head `813aba108b6b68f0526df3a9c8c86d82df5ca0f6`, merge `main@e0e06e9af8a6b02a63ef4b3e1eb2d772409ad974`,
+- `NewsroomHomeCompositionService` zachowuje istniejący fixed-placement/fallback/dedupe contract, ale category composition ma teraz stały query budget dzięki batchowi placements, per-category window rankingowi i wspólnemu eager-loadowi,
+- dodano rollout-gated `NewsroomHomeReadModelService` zwracający serializowalne scalar arrays gotowe dla późniejszego Blade/cache; nie dodano publicznego huba ani cache invalidation,
+- exact-head CI #314 oraz post-merge CI #315 zakończyły się PASS; post-merge `quality`: 1059 passed / 19 611 assertions / 2 skipped, Pint 1060 files PASS, frontend build 9.93 s; `newsroom-postgres`: 7 passed / 94 assertions,
+- następnym wykonywalnym taskiem jest NEWSROOM-N4-002 — Hub Blade layout.
 
 ### 2026-09-18 — v0.37
 

@@ -1457,27 +1457,30 @@ Runbook jest spełniony, gdy:
 
 ## 58. Stan implementacji
 
-Na 2026-09-18 po NEWSROOM-N3-008, zweryfikowanym na `main@23b952b77e39cd25fb39edc252faf05849946bd7`:
+Na 2026-09-18 po NEWSROOM-N4-001, zweryfikowanym na `main@e0e06e9af8a6b02a63ef4b3e1eb2d772409ad974`:
 
 - istnieją globalne backend tests, ops backup/restore/health commands i kanoniczny CI z `quality` na SQLite oraz addytywnym `newsroom-postgres` na PostgreSQL 16,
-- istnieją newsroom-specific unit/security i feature regression dla body contract/editor, media storage/article media, enum/schema/model, slug/history, publishing workflow, home composition/placements, article preview, topic/CMS oraz N3-001 catalog, N3-002 SEO, N3-003 schema service, N3-005 Product Bridge, N3-006 redirect, N3-007 author profile i N3-008 public gate,
+- istnieją newsroom-specific unit/security i feature regression dla body contract/editor, media storage/article media, enum/schema/model, slug/history, publishing workflow, home composition/placements, article preview, topic/CMS oraz N3-001 catalog, N3-002 SEO, N3-003 schema service, N3-005 Product Bridge, N3-006 redirect, N3-007 author profile, N3-008 public gate i N4-001 home read model,
 - N3-004 dostarcza `NewsroomArticleBodyRenderer`, `NewsroomArticlePresentationService`, publiczny `ContentArticleController`, Blade `newsroom.article`/`article-unavailable` i feature tests publicznego article response,
 - N3-005 dodaje `NewsroomArticleProductBridgeService`, `newsroom.product-bridge-block` i `NewsroomProductBridgeTest`; publiczny article renderer obsługuje teraz questions/legal/signs/contextual CTA bez losowych relacji i bez draft targetów,
 - current-canonical public detail ma automatyczne 200/404/410 coverage; 410/404 nie renderują treści i są noindex, a `NewsroomArticleRedirectTest` pokrywa old-slug one-hop 301/fail-closed behavior N3-006,
 - `ContentAuthorProfileTest` pokrywa N3-007 lifecycle profilu autora, wspólną Person/Organization identity, author-sitemap freshness z `public_state_changed_at` oraz blokadę odpublikowania autora z zależnym indexable article i odblokowanie po noindex,
+- `NewsroomHomeCompositionServiceTest` nadal chroni fixed placements, manual-over-fallback, future preview, global card dedupe, category context, short modules i breaking exception; N4-001 rozszerza ten sam composer zamiast tworzyć drugi resolver,
+- nowy `tests/Feature/NewsroomHomeReadModelServiceTest.php` potwierdza `NewsroomPublicGate` dla publicznego read modelu, scalar/JSON-serializable projection z canonical/category/author/hero metadata oraz stały query budget przy wzroście liczby aktywnych kategorii z 1 do 8,
 - Product Bridge wymaga body target + article-owned pivot + istniejący public eligibility; question group ma limit 5, legal wymaga verified act/unit + published legal page/topic, a signs wymagają published sign/author/category i pivot `direct` albo `example`; luźny `related` jest fail-closed,
 - publiczny response emituje SEO metadata i JSON-LD z istniejących N3-002/N3-003 services, route-family breadcrumbs, hero/provenance/regulatory context, public sources, correction, author box, public-safe related article oraz Product Bridge,
 - dedicated `.github/workflows/browser-smoke.yml` job `newsroom-article` istnieje; Browser Smoke #23 na finalnym N3-008 head `c8484aa1529eb41805a76ceb7be1f55db63aec14` zakończył się PASS po jawnym ustawieniu `NEWSROOM_PUBLIC_ENABLED=true`,
 - harness działa z JS disabled, sprawdza realny built CSS, H1/breadcrumb/body/source/canonical/JSON-LD/Product Bridge/CTA oraz horizontal overflow i zapisuje artifact,
-- finalny exact-head CI #308 dla PR #79 zakończył się PASS na `c8484aa1529eb41805a76ceb7be1f55db63aec14`; post-merge CI #309 na `main@23b952b77e39cd25fb39edc252faf05849946bd7` potwierdził `quality` PASS i `newsroom-postgres` PASS,
-- hub/category/topic/feed browser surfaces i reverse links N4-008 pozostają otwarte; N3-006 redirect, N3-007 author profile i N3-008 rollout gate są zamknięte implementacyjnie,
+- N4-001 nie uruchamiało osobnego Browser Smoke, ponieważ nie zmienia publicznego renderera; istniejący Browser Smoke #23 pozostaje dowodem dla article detail/gate, nie dla nieistniejącego jeszcze Hub Blade,
+- finalny exact-head CI #314 dla PR #81 zakończył się PASS na `813aba108b6b68f0526df3a9c8c86d82df5ca0f6`; post-merge CI #315 na `main@e0e06e9af8a6b02a63ef4b3e1eb2d772409ad974` zakończył się pełnym PASS: `quality` 1059 passed / 19 611 assertions / 2 skipped, Pint 1060 files PASS, frontend build 9.93 s; `newsroom-postgres` 7 passed / 94 assertions,
+- publiczny Hub Blade, category/topic/feed browser surfaces i reverse links N4-008 pozostają otwarte; N4-001 read model jest zamknięty implementacyjnie, a następnym taskiem jest N4-002,
 - atomic static publication, dirty/version newsroom refresh coordinator, newsroom/news sitemap output i `SeoSitemapAuditor` extension pozostają N5.
 
 ---
 
 ## 59. Pozostałe zadania
 
-- [ ] dodać dalsze test files w trakcie N3-008..N5,
+- [ ] dodać dalsze test files w trakcie N4-002..N5; N4-001 dodało rzeczywisty `NewsroomHomeReadModelServiceTest`,
 - [x] dodać dedykowany browser E2E dla publicznego article detail N3-004,
 - [x] dodać N2 media/topic/focal-point integration i N3-004 renderer/browser regression; pełne crop-variant generation nadal nie istnieje,
 - [x] dodać service-level site-identity/entity-graph/date-consistency regression oraz publiczne HTML/JSON-LD emission dla article detail,
@@ -1491,11 +1494,20 @@ Na 2026-09-18 po NEWSROOM-N3-008, zweryfikowanym na `main@23b952b77e39cd25fb39ed
 - [ ] rozszerzyć istniejący SeoSitemapAuditor,
 - [ ] stworzyć production smoke checklist w praktyce,
 - [x] wdrożyć i przetestować `NEWSROOM_PUBLIC_ENABLED` w N3-008 dla obecnie istniejących public detail/redirect + author + IndexNow surfaces; przyszłe N4/N5 discovery surfaces nadal wymagają tego samego gate,
+- [x] dodać N4-001 `NewsroomHomeReadModelServiceTest` dla rollout gate, scalar/cacheable projection i stałego query budgetu niezależnego od liczby kategorii,
+- [ ] dodać N4-002 public Hub Blade/browser regression dopiero wraz z rzeczywistym publicznym rendererem,
 - [ ] po pierwszym release wpisać rzeczywiste wyniki i ewentualne różnice od planu.
 
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-18 — v0.21
+
+- NEWSROOM-N4-001 implementation PR #81 zakończył exact-head CI #314 PASS na `813aba108b6b68f0526df3a9c8c86d82df5ca0f6`, a post-merge CI #315 przeszedł pełny gate na `main@e0e06e9af8a6b02a63ef4b3e1eb2d772409ad974`,
+- dodano `tests/Feature/NewsroomHomeReadModelServiceTest.php` dla rollout-gated scalar projection oraz regresji stałego query budgetu; istniejący `NewsroomHomeCompositionServiceTest` nadal pokrywa placement/fallback/dedupe/breaking/future-preview semantics,
+- post-merge `quality`: 1059 passed / 19 611 assertions / 2 skipped, Pint 1060 files PASS, frontend build 9.93 s; `newsroom-postgres`: 7 passed / 94 assertions,
+- N4-001 nie miało osobnego Browser Smoke, ponieważ publiczny `/aktualnosci` nadal jest placeholderem; N4-002 odpowiada za Hub Blade i jego browser regression.
 
 ### 2026-09-18 — v0.20
 
