@@ -281,6 +281,12 @@
 
     <section class="content-band">
         <div class="content-shell pb-10">
+            <x-public.newsroom-reverse-links
+                class="mb-10"
+                :articles="$newsroomReverseArticles ?? []"
+                heading="Materiały powiązane z tym znakiem"
+            />
+
             <a href="{{ route('traffic-signs.categories.show', $sign->category->slug) }}" class="inline-flex min-h-12 items-center gap-3 rounded-md border border-slate-200 bg-white px-5 text-sm font-bold text-slate-950 transition hover:border-slate-300 hover:bg-slate-50">
                 <svg aria-hidden="true" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="m15 18-6-6 6-6" />
