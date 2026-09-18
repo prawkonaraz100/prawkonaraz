@@ -213,7 +213,7 @@ class SeoSitemapGenerator
     protected function isNewsSitemapPath(string $relativePath): bool
     {
         return $relativePath === ltrim(SeoSitemapBuilder::NEWS_SITEMAP_PATH, '/')
-            || preg_match('#^sitemaps/news-\d{6}-\d{6}\.xml$#', $relativePath) === 1;
+            || preg_match('#^sitemaps/news-\d+-\d+\.xml$#', $relativePath) === 1;
     }
 
     protected function prepareSitemapDirectory(): void
