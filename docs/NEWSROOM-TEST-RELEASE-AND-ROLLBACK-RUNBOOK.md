@@ -1482,14 +1482,17 @@ Na 2026-09-18 po NEWSROOM-N4-004, zweryfikowanym na `main@2bb22142b1e9bec803f9c3
 - N4-004 dodaje `NewsroomGuidesHubTest` dla gate, guide-only eligibility, deterministic order, empty-state/noindex, pagination, canonical i schema; `NewsroomPublicGateTest` i `NewsroomHomePageTest` zostały rozszerzone o publiczny guide hub i crawlable wejście z `/aktualnosci`,
 - workflow `Browser Smoke` ma osobny automatyczny job `newsroom-guides`; Browser Smoke #31 na finalnym N4-004 head `119cbd94d1fb6ff6f9f2025e726242190927266d` zakończył PASS dla `newsroom-guides`, `newsroom-category`, `newsroom-home` i `newsroom-article`; guides harness działa z JS disabled na 360/390/430/768/1024/1280/1440 i sprawdza page 2/canonical,
 - exact-head CI #331 zakończył PASS, a post-merge CI #332 na `main@2bb22142b1e9bec803f9c3889c11000194f46783` zakończył pełny gate: `quality` 1072 passed / 19 731 assertions / 2 skipped, Pint 1068 files PASS, frontend build 10.14 s; `newsroom-postgres` 7 passed / 94 assertions,
-- publiczny Hub Blade, category pages i guide hub są zamknięte implementacyjnie; topic/feed surfaces i reverse links N4-008 pozostają otwarte, a następnym taskiem jest N4-005 Navigation integration,
+- N4-005 dodaje `Public/NewsroomNavigationIntegrationTest.php` dla canonical primary links, duplicate-free `PublicFooter::service_links`, wspólnego Vue/Blade footer source i istniejących document-navigation prefixes,
+- `e2e-newsroom-guides.mjs` od N4-005 sprawdza dokładnie po jednym footer linku `Aktualności` i `Poradniki`; Browser Smoke #32 na finalnym N4-005 head `189219b3586d2df8e4ea73045318fd68f38f0fa1` zakończył PASS dla `newsroom-guides`, `newsroom-category`, `newsroom-home` i `newsroom-article`,
+- exact-head CI #335 zakończył PASS, a post-merge CI #336 na `main@a9fb9ccfed058de88efdb6e0833b67911aeb09aa` zakończył pełny gate: `quality` 1075 passed / 19 745 assertions / 2 skipped, Pint 1069 files PASS, frontend build 7.32 s; `newsroom-postgres` 7 passed / 94 assertions,
+- publiczny Hub Blade, category pages, guide hub i navigation integration są zamknięte implementacyjnie; topic/feed surfaces i reverse links N4-008 pozostają otwarte, a następnym taskiem jest N4-006 Cache,
 - atomic static publication, dirty/version newsroom refresh coordinator, newsroom/news sitemap output i `SeoSitemapAuditor` extension pozostają N5.
 
 ---
 
 ## 59. Pozostałe zadania
 
-- [ ] dodać dalsze test files w trakcie N4-005..N5; N4-001 dodało `NewsroomHomeReadModelServiceTest`, N4-002 `NewsroomHomePageTest` i `e2e-newsroom-home.mjs`, N4-003 `NewsroomCategoryPageTest` i `e2e-newsroom-category.mjs`, a N4-004 `NewsroomGuidesHubTest` i `e2e-newsroom-guides.mjs`,
+- [ ] dodać dalsze test files w trakcie N4-006..N5; N4-001 dodało `NewsroomHomeReadModelServiceTest`, N4-002 `NewsroomHomePageTest` i `e2e-newsroom-home.mjs`, N4-003 `NewsroomCategoryPageTest` i `e2e-newsroom-category.mjs`, N4-004 `NewsroomGuidesHubTest` i `e2e-newsroom-guides.mjs`, a N4-005 `Public/NewsroomNavigationIntegrationTest.php` oraz footer assertions w guides browser QA,
 - [x] dodać dedykowany browser E2E dla publicznego article detail N3-004,
 - [x] dodać N2 media/topic/focal-point integration i N3-004 renderer/browser regression; pełne crop-variant generation nadal nie istnieje,
 - [x] dodać service-level site-identity/entity-graph/date-consistency regression oraz publiczne HTML/JSON-LD emission dla article detail,
@@ -1507,11 +1510,20 @@ Na 2026-09-18 po NEWSROOM-N4-004, zweryfikowanym na `main@2bb22142b1e9bec803f9c3
 - [x] dodać N4-002 public Hub Blade/browser regression wraz z rzeczywistym publicznym rendererem,
 - [x] dodać N4-003 category page feature/browser regression wraz z rzeczywistym publicznym rendererem,
 - [x] dodać N4-004 guide-hub feature/browser regression wraz z rzeczywistym publicznym rendererem,
+- [x] dodać N4-005 navigation/footer regression dla canonical primary links, duplicate-free footer oraz Vue/Blade shared source,
 - [ ] po pierwszym release wpisać rzeczywiste wyniki i ewentualne różnice od planu.
 
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-18 — v0.25
+
+- NEWSROOM-N4-005 implementation PR #89 zakończył exact-head CI #335 PASS na `189219b3586d2df8e4ea73045318fd68f38f0fa1` oraz Browser Smoke #32 PASS dla `newsroom-guides`, `newsroom-category`, `newsroom-home` i `newsroom-article`; merge to `main@a9fb9ccfed058de88efdb6e0833b67911aeb09aa`,
+- `NewsroomNavigationIntegrationTest` pokrywa canonical primary links, duplicate-free shared footer i istniejące document-navigation prefixes; `e2e-newsroom-guides.mjs` sprawdza realny Blade footer na pełnej macierzy viewportów,
+- post-merge CI #336 zakończył pełny gate: 1075 passed / 19 745 assertions / 2 skipped, Pint 1069 files PASS, frontend build 7.32 s; `newsroom-postgres` 7 passed / 94 assertions,
+- primary links oraz `documentNavigationPrefixes` nie zostały zmienione; funkcjonalną zmianą N4-005 są tylko pojedyncze wejścia `Aktualności` i `Poradniki` w `PublicFooter::service_links`, współdzielone przez Vue i Blade,
+- następnym wykonywalnym taskiem jest NEWSROOM-N4-006 — Cache.
 
 ### 2026-09-18 — v0.24
 
