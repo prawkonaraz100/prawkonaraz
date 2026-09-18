@@ -10,7 +10,7 @@
 - Data: 2026-09-17
 - Zakres: model domenowy, baza danych, invariants, serwisy aplikacyjne, routing domeny i kolejność migracji
 
-Ten dokument opisuje docelowy model danych newsroomu. Schema, modele/factories/scopes oraz serwisy aplikacyjne N1 są zmaterializowane; zakres admin/domain N2 i publiczny article stack N3-001..N3-008 są zmaterializowane, a N4-001..N4-008 obejmuje publiczne hub/category/guides/topic surfaces, nawigację, cache/invalidation home/category oraz semantic/reverse-link integration. N4-008 reużywa istniejące pivoty i nie zmienia schema; discovery N5 pozostaje dalszym etapem. Stan wdrożenia należy czytać z sekcji 43 i aktualizować po każdej zmianie kodu.
+Ten dokument opisuje docelowy model danych newsroomu. Schema, modele/factories/scopes oraz serwisy aplikacyjne N1 są zmaterializowane; zakres admin/domain N2 i publiczny article stack N3-001..N3-008 są zmaterializowane, a N4-001..N4-008 obejmuje publiczne hub/category/guides/topic surfaces, nawigację, cache/invalidation home/category oraz semantic/reverse-link integration. N5-001..N5-006 materializują discovery/distribution/audit ponad istniejącym modelem bez nowych newsroomowych tabel lub migracji w N5-006; publication/freshness hardening pozostaje N5-007. Stan wdrożenia należy czytać z sekcji 43 i aktualizować po każdej zmianie kodu.
 
 ---
 
@@ -1022,7 +1022,7 @@ Granice obecnej implementacji:
 - analogiczny stale-write guard dla `NewsroomHomeComposer` jest wdrożony po PR #58 przez deterministyczny `ContentHomePlacementEditToken`; update/delete porównują loaded token pod row lockiem, a tuple advisory-lock/overlap contract pozostaje dodatkową warstwą concurrency protection,
 - scheduler command i batch due processing zostały wdrożone downstream w N1-005 i reużywają tego service boundary,
 - publiczny HTTP 410/301/200 pozostaje N3; service ustanawia withdrawal tombstone, ale nie renderuje odpowiedzi HTTP,
-- N4-006 podłącza lekkie cache invalidation listenery after-commit dla istniejących publicznych read models home/category; od N5-005 article-specific IndexNow jest podłączone osobnym after-commit application event/listenerem do istniejącego `IndexNowQueueService`, natomiast sitemap dirty/version refresh nadal pozostaje osobnym zakresem N5.
+- N4-006 podłącza lekkie cache invalidation listenery after-commit dla istniejących publicznych read models home/category; od N5-005 article-specific IndexNow jest podłączone osobnym after-commit application event/listenerem do istniejącego `IndexNowQueueService`, N5-006 dodało wyłącznie audit/QA bez nowego persistence contract, natomiast sitemap dirty/version refresh pozostaje NEWSROOM-N5-007.
 
 #### 20.1.1. Edycja już opublikowanego artykułu bez revisions
 
@@ -1297,7 +1297,7 @@ Invalidation:
 - `ContentCategoryObserver` implementuje `ShouldHandleEventsAfterCommit` i po save/delete invaliduje home + category,
 - generation rotation chroni przed stale write-after-invalidation race przy równoległym rebuildzie.
 
-Nie cache’ujemy preview jako publicznej strony. N5-003 materializuje osobny feed generation cache/refresh; N5-005 materializuje article-specific IndexNow przez osobny after-commit event/listener nad istniejącą kolejką. Sitemap dirty/version coordinator pozostaje osobnym zakresem N5.
+Nie cache’ujemy preview jako publicznej strony. N5-003 materializuje osobny feed generation cache/refresh; N5-005 materializuje article-specific IndexNow przez osobny after-commit event/listener nad istniejącą kolejką. N5-006 nie dodaje persistence/freshness side effectów; sitemap dirty/version coordinator pozostaje osobnym zakresem NEWSROOM-N5-007.
 
 ---
 
@@ -1812,6 +1812,15 @@ Na 2026-09-18:
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-18 — v0.39
+
+- NEWSROOM-N5-006 zmergowano przez PR #107; finalny implementation head `64feb88b614b737a69784d43e86e97591aaec3d5`, merge `main@18300baf3a91ffc5e3c549ab664c471bfd34ffe4`,
+- nie dodano migracji, tabel, kolumn ani nowego persisted aggregate; `SeoSitemapAuditor`, `NewsroomSemanticLinkService` i CLI QA działają nad istniejącymi modelami/relacjami,
+- `auditAll()` reużywa istniejące article/category/author/topic/source/legal/sign relations i public eligibility; nie zmienia ownershipu tych domen ani question graphu,
+- N5-006 nie wprowadza sitemap dirty marker/version state ani publication metadata; te elementy pozostają NEWSROOM-N5-007,
+- exact-head CI #397 i post-merge CI #398 zakończyły PASS: 1127 passed / 20 131 assertions / 2 skipped, PostgreSQL 7/94, Pint/build PASS; Browser Smoke #57 PASS 6/6 przed merge,
+- data/schema contract pozostaje bez zmian; kolejnym taskiem jest NEWSROOM-N5-007 — Static sitemap publication + freshness + delivery hardening.
 
 ### 2026-09-18 — v0.38
 

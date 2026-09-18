@@ -151,7 +151,7 @@ Repo ma już istotny fundament:
 - N5-001: ten sam pipeline generuje rollout-gated standard article sitemap; przy małym corpus `/sitemaps/articles.xml`, a po przekroczeniu zakresu bezpośrednie fixed-ID-range shards wpisane do root `/sitemap.xml`, bez OFFSET i bez nested newsroom sitemap-index,
 - N5-001: `static.xml` obejmuje newsroom home, warunkowo guides, active categories i published topics; article `lastmod` używa domenowych public-state timestamps, a generator/auditor egzekwują 50 000 entries / 50 MB,
 - N5-002: ten sam pipeline generuje rollout-gated Google News Sitemap dla świeżych `type=news`, `published`, indexable current-canonical articles z aktywną kategorią/publicznym autorem; `news:name` reużywa `SiteIdentitySchema::siteName()`, language=`pl`, publication date=`first_published_at`, title=widoczny article title,
-- N5-002: przy <=1000 entries używany jest `/sitemaps/news.xml`, a powyżej limitu fixed-`content_articles.id` range shards są wpisywane bezpośrednio do root `/sitemap.xml`; pełny news namespace/age/tag auditor pozostaje N5-006,
+- N5-002: przy <=1000 entries używany jest `/sitemaps/news.xml`, a powyżej limitu fixed-`content_articles.id` range shards są wpisywane bezpośrednio do root `/sitemap.xml`; N5-006 domknęło news namespace/age/tag/eligibility/topology audit w istniejącym `SeoSitemapAuditor`,
 - N5-003: `/aktualnosci/feed.xml` zwraca przy gate=true jeden Atom 1.0 feed z latest `type=news`, stabilnym `urn:prawkonaraz:content-article:{id}`, canonical links, `published`/`updated`, summary/autorem, generation cache, ETag/Last-Modified/304 i bez session cookie; public layout emituje Atom discovery,
 - dynamiczny `SitemapController`, który współistnieje z generowanymi artefaktami i nie jest samodzielnym source of truth produkcyjnego XML,
 - statyczny `public/robots.txt` oraz istniejący `RobotsController`; produkcyjny kontrakt robots pozostaje zgodny z `SEO-SITEMAP-REPAIR-PLAN.md`,
@@ -1541,8 +1541,9 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N5-003` — rollout-gated Atom 1.0 feed + head discovery, generation cache, stable IDs, public validators/304 i stateless delivery.
 - [x] `NEWSROOM-N5-004` — privacy-safe delegated analytics hooks reużywające istniejący `trackAnalyticsEvent` i GA/consent layer, bez backendowego event store i zmian schema.
 - [x] `NEWSROOM-N5-005` — article-specific IndexNow lifecycle integration przez dedicated after-commit event/listener nad istniejącym `IndexNowQueueService`/submission pipeline, bez nowego klienta, kolejki ani schema.
+- [x] `NEWSROOM-N5-006` — istniejący `SeoSitemapAuditor` rozszerzony o newsroom/news audit hardening oraz site-wide `newsroom:audit-links` nad istniejącym semantic graph, bez drugiego validatora, graph subsystemu, migracji ani schema.
 
-N5-001..N5-005 są zmaterializowane i potwierdzone na `main@1cc9f4bec8c7d7fc105fd3495664434cf4323eea`; decyzje o jednym static sitemap pipeline, jednym `NewsroomPublicGate`, jednym IndexNow queue/submission pipeline i braku równoległych subsystemów pozostały bez zmian. Następnym wykonywalnym taskiem jest `NEWSROOM-N5-006` — Extend existing SEO/sitemap audits. Child-before-index atomic publication, obsolete-shard cleanup, dirty/version refresh coordinator i produkcyjna static/Nginx/CDN verification pozostają oddzielnymi późniejszymi zakresami N5/N6.
+N5-001..N5-006 są zmaterializowane i potwierdzone na `main@18300baf3a91ffc5e3c549ab664c471bfd34ffe4`; decyzje o jednym static sitemap pipeline, jednym `NewsroomPublicGate`, jednym semantic-link graph i jednym IndexNow queue/submission pipeline pozostały bez zmian. Następnym wykonywalnym taskiem jest `NEWSROOM-N5-007` — Static sitemap publication + freshness + delivery hardening. Child-before-index atomic publication, post-switch obsolete-shard cleanup, dirty/version refresh coordinator i produkcyjna static/Nginx/CDN verification nie są deklarowane jako wykonane przez N5-006.
 
 ---
 ## 28. Zasady utrzymania dokumentu
@@ -1567,6 +1568,15 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-18 — v0.51
+
+- NEWSROOM-N5-006 zmergowano przez PR #107; finalny implementation head `64feb88b614b737a69784d43e86e97591aaec3d5`, merge `main@18300baf3a91ffc5e3c549ab664c471bfd34ffe4`,
+- architektura nie zmieniła się: Newsroom nadal rozszerza istniejące `SeoSitemapAuditor` i `NewsroomSemanticLinkService`; nie powstał równoległy sitemap validator, graph subsystem, tabela ani migracja,
+- `newsroom:audit-links` jest cienkim wejściem CLI do site-wide QA i reużywa istniejący public gate/semantic resolver; sitemap-specific rules pozostają w istniejącym auditorze,
+- N5-006 jest wyłącznie warstwą audytu/QA: generator, child-before-index publication, post-switch cleanup i dirty/version freshness coordinator pozostają NEWSROOM-N5-007,
+- CI #397 zakończył 1127 passed / 20 131 assertions / 2 skipped, PostgreSQL 7/94, Pint/build PASS; Browser Smoke #57 PASS 6/6; post-merge CI #398 powtórzył 1127 / 20 131 / 2 skipped, PostgreSQL 7/94 i Pint/build PASS,
+- następnym wykonywalnym taskiem jest NEWSROOM-N5-007; decyzje architektoniczne dotyczące static sitemap source of truth pozostają bez zmian.
 
 ### 2026-09-18 — v0.50
 
