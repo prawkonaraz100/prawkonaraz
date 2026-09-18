@@ -160,5 +160,7 @@ test('enabled newsroom public gate exposes only already implemented eligible pub
         ->assertSee('Publiczny topic po cutover')
         ->assertSee('Publiczny artykuł po cutover');
 
-    $this->get(route('public.news.feed'))->assertNotFound();
+    $this->get(route('public.news.feed'))
+        ->assertOk()
+        ->assertHeader('Content-Type', 'application/atom+xml; charset=UTF-8');
 });
