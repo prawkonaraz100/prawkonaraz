@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\NewsroomGuideHubReadModelService;
+use App\Support\NewsroomGuideHubSchemaService;
 use App\Support\NewsroomHomeReadModelService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -33,14 +35,88 @@ class NewsroomPlaceholderController extends Controller
         ]);
     }
 
-    public function guides(Request $request): Response
+    public function guides(
+        Request $request,
+        NewsroomGuideHubReadModelService $readModelService,
+        NewsroomGuideHubSchemaService $schemaService,
+    ): Response {
+        $page = $this->page($request);
+        $readModel = $readModelService->build($page);
+
+        if ($readModel === null) {
+            if ($page > 1) {
+                abort(404);
+            }
+
+            return $this->placeholder(
+                $request,
+                'Poradniki',
+                'Nauka',
+                'W poradnikach zbierzemy praktyczne materiały pomagające przejść od teorii do pewnego wyniku na egzaminie.',
+            );
+        }
+
+        $guides = $readModel['guides'];
+        $baseCanonical = route('public.guides');
+        $canonical = $page > 1 ? $baseCanonical.'?page='.$page : $baseCanonical;
+        $description = 'Praktyczne poradniki o prawie jazdy, egzaminach, formalnościach i przygotowaniu do nauki oraz egzaminu.';
+        $hasGuides = $guides->total() > 0;
+        $robots = $hasGuides
+            ? 'index,follow,max-image-preview:large'
+            : 'noindex,follow';
+        $title = $page > 1
+            ? 'Poradniki o prawie jazdy — strona '.$page.' | prawkonaraz.pl'
+            : 'Poradniki o prawie jazdy i egzaminach | prawkonaraz.pl';
+        $breadcrumbs = [
+            [
+                'label' => 'Strona główna',
+                'url' => route('home'),
+            ],
+            [
+                'label' => 'Poradniki',
+                'url' => $baseCanonical,
+            ],
+        ];
+
+        $response = response()->view('newsroom.guides', [
+            'guides' => $guides,
+            'meta' => [
+                'title' => $title,
+                'description' => $description,
+                'canonical' => $canonical,
+                'robots' => $robots,
+            ],
+            'breadcrumbs' => $breadcrumbs,
+            'structuredData' => $schemaService->build(
+                $guides,
+                $breadcrumbs,
+                $canonical,
+                $description,
+            ),
+        ]);
+
+        if (! $hasGuides) {
+            $response->headers->set('X-Robots-Tag', 'noindex, follow');
+        }
+
+        return $response;
+    }
+
+    private function page(Request $request): int
     {
-        return $this->placeholder(
-            $request,
-            'Poradniki',
-            'Nauka',
-            'W poradnikach zbierzemy praktyczne materiały pomagające przejść od teorii do pewnego wyniku na egzaminie.',
-        );
+        $rawPage = $request->query('page', '1');
+
+        if (is_array($rawPage)) {
+            abort(404);
+        }
+
+        $rawPage = trim((string) $rawPage);
+
+        if ($rawPage === '' || preg_match('/\\A[1-9][0-9]*\\z/', $rawPage) !== 1) {
+            abort(404);
+        }
+
+        return (int) $rawPage;
     }
 
     private function placeholder(
