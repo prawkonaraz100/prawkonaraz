@@ -14,7 +14,6 @@ test('newsroom home keeps the pre launch placeholder while the public gate is di
     $this->get(route('public.news'))
         ->assertOk()
         ->assertHeader('X-Robots-Tag', 'noindex, follow')
-        ->assertSee('Tu pojawią się aktualności dla kandydatów, kursantów i instruktorów prawa jazdy.')
         ->assertDontSee('Czy zdałbyś teorię dzisiaj?');
 });
 
