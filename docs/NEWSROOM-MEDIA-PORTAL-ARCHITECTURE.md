@@ -5,7 +5,7 @@
 - **Status:** Canonical architecture + live implementation status
 - **Obszar:** publiczny serwis informacyjny, newsroom, aktualności, poradniki i dystrybucja treści
 - **Repozytorium:** `prawkonaraz100/prawkonaraz`
-- **Bazowy stan kodu:** `main@5f1880e03469fc6e340a86fdb1b4246c7afd116b`
+- **Bazowy stan kodu:** `main@a97373003c5a249a28761df15342f19e656c50c5`
 - **Data utworzenia:** 2026-09-15
 - **Właściciel decyzji produktowej:** PrawkoNaRaz
 - **Cel:** zaprojektować profesjonalny pion medialny bez dublowania istniejącej platformy, bez osobnego CMS/WordPressa i bez rozbijania modularnego monolitu.
@@ -1526,8 +1526,9 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N4-004` — publiczny guide-only hub `/poradniki`.
 - [x] `NEWSROOM-N4-005` — Navigation integration bez duplikowania istniejących primary links.
 - [x] `NEWSROOM-N4-006` — generation-based cache/invalidation dla publicznych home/category read models.
+- [x] `NEWSROOM-N4-007` — publiczne rollout-gated Topic / dossier pages na istniejącym `ContentTopic` i route `/aktualnosci/temat/{topicSlug}`.
 
-N4-006 jest zmaterializowane i potwierdzone na `main@5f1880e03469fc6e340a86fdb1b4246c7afd116b`; następnym wykonywalnym taskiem jest `NEWSROOM-N4-007` — Topic / dossier pages. Pozostałe elementy N4–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu pełną checklistę.
+N4-007 jest zmaterializowane i potwierdzone na `main@a97373003c5a249a28761df15342f19e656c50c5`; następnym wykonywalnym taskiem jest `NEWSROOM-N4-008` — Semantic silo / reverse-link integration. Pozostałe elementy N4–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu pełną checklistę.
 
 ---
 ## 28. Zasady utrzymania dokumentu
@@ -1552,6 +1553,16 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-18 — v0.44
+
+- NEWSROOM-N4-007 zmergowano przez PR #93; finalny implementation head `812313afc38e30e53c59901d46c2d24188e3f6fa`, merge `main@a97373003c5a249a28761df15342f19e656c50c5`,
+- nie zmieniono decyzji o topicu jako ręcznie publikowanym dossier odrębnym od taga ani istniejącego `ContentTopic`/pivot schema; N4-007 uruchamia tylko publiczną warstwę read/HTTP/SSR,
+- publiczny topic używa jawnego `ContentTopic` status contract: published -> 200 przy gate=true, draft/future/unknown/gate=false -> 404, wcześniej publiczny archived -> 410; późniejszy spadek corpus poniżej baseline nie wykonuje automatycznego status/HTTP flipu,
+- read model pokazuje opcjonalny eligible featured article i chronologiczny `activelyDistributed()+indexable()` corpus news/explainer/analysis/report/guide bez ręcznego rankingu; featured nie jest duplikowany w liście,
+- SSR Blade i `NewsroomTopicSchemaService` realizują istniejący route/canonical/CollectionPage contract; nie dodano automatycznych tag pages, topic cache, reverse links ani N5 sitemap/feed/IndexNow,
+- Browser Smoke #39 PASS dla `newsroom-topic`, `newsroom-guides`, `newsroom-category`, `newsroom-home`, `newsroom-article`; exact-head CI #348 PASS, post-merge CI #349 PASS: 1087 passed / 19 827 assertions / 2 skipped, Pint 1081 files PASS, frontend build 9.48 s, PostgreSQL 7/94,
+- NEWSROOM-N4-008 Semantic silo / reverse-link integration jest następnym wykonywalnym taskiem.
 
 ### 2026-09-18 — v0.43
 
