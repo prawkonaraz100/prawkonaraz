@@ -3,7 +3,9 @@
 namespace App\Support;
 
 use App\Enums\ContentArticleType;
+use App\Events\ContentArticleIndexNowRequested;
 use App\Models\ContentArticle;
+use App\Models\IndexNowUrlSubmission;
 use App\Models\ContentArticleRedirect;
 use App\Models\User;
 use DomainException;
@@ -154,6 +156,21 @@ final class ContentArticleSlugService
                     'redirect_created' => $locked->first_published_at !== null,
                 ],
             );
+
+            if ($locked->first_published_at !== null) {
+                ContentArticleIndexNowRequested::dispatch(
+                    (int) $locked->getKey(),
+                    $oldPath,
+                    IndexNowUrlSubmission::EVENT_UPDATED,
+                    'content_article.slug_changed',
+                );
+                ContentArticleIndexNowRequested::dispatch(
+                    (int) $locked->getKey(),
+                    $newPath,
+                    IndexNowUrlSubmission::EVENT_UPDATED,
+                    'content_article.slug_changed',
+                );
+            }
 
             return $locked->refresh();
         });
