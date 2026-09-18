@@ -49,7 +49,8 @@ class SeoSitemapGenerator
     protected function buildFiles(): array
     {
         $articleShards = $this->builder->articleSitemapShards();
-        $sitemapIndexItems = $this->builder->sitemapIndexItems($articleShards);
+        $newsShards = $this->builder->newsSitemapShards();
+        $sitemapIndexItems = $this->builder->sitemapIndexItems($articleShards, $newsShards);
         $staticUrls = $this->builder->staticUrls();
         $questionHubUrls = $this->publicQuestionCatalogService->hubSitemapUrls();
         $questionCategoryUrls = $this->publicQuestionCatalogService->categorySitemapUrls();
@@ -129,6 +130,13 @@ class SeoSitemapGenerator
             ];
         }
 
+        foreach ($newsShards as $relativePath => $shard) {
+            $files[$relativePath] = [
+                'contents' => $this->renderer->newsUrlset($shard['urls']),
+                'urls' => count($shard['urls']),
+            ];
+        }
+
         foreach ($this->publicQuestionCatalogService->visibleCategories() as $category) {
             $urls = $this->publicQuestionCatalogService->sitemapUrlsForCanonicalCategory($category);
 
@@ -162,7 +170,24 @@ class SeoSitemapGenerator
             (int) config('seo.sitemap_max_uncompressed_bytes', self::MAX_UNCOMPRESSED_BYTES),
         );
 
+        $newsMaxEntries = max(
+            1,
+            min(
+                SeoSitemapBuilder::NEWS_SITEMAP_MAX_ENTRIES,
+                (int) config('newsroom.news_sitemap_max_entries', SeoSitemapBuilder::NEWS_SITEMAP_MAX_ENTRIES),
+            ),
+        );
+
         foreach ($files as $relativePath => $meta) {
+            if ($this->isNewsSitemapPath($relativePath) && $meta['urls'] > $newsMaxEntries) {
+                throw new \RuntimeException(sprintf(
+                    'Generated News sitemap exceeds entry limit: %s urls=%d limit=%d',
+                    $relativePath,
+                    $meta['urls'],
+                    $newsMaxEntries,
+                ));
+            }
+
             if ($meta['urls'] > $maxUrls) {
                 throw new \RuntimeException(sprintf(
                     'Generated sitemap exceeds URL limit: %s urls=%d limit=%d',
@@ -183,6 +208,12 @@ class SeoSitemapGenerator
                 ));
             }
         }
+    }
+
+    protected function isNewsSitemapPath(string $relativePath): bool
+    {
+        return $relativePath === ltrim(SeoSitemapBuilder::NEWS_SITEMAP_PATH, '/')
+            || preg_match('#^sitemaps/news-\d{6}-\d{6}\.xml$#', $relativePath) === 1;
     }
 
     protected function prepareSitemapDirectory(): void
