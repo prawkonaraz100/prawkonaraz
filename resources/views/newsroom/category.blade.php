@@ -98,6 +98,7 @@
                             data-article-type="{{ $article['type'] }}"
                             data-category-slug="{{ $category['slug'] }}"
                             data-newsroom-analytics-module="category_{{ $category['slug'] }}"
+                            data-newsroom-analytics-position="{{ $loop->iteration }}"
                         >
                             <div class="min-w-0">
                                 <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
