@@ -1,7 +1,7 @@
 # Deployment Runbook: prawkonaraz.pl na Mikrusie
 
 Status: kanoniczna procedura manualnego deployu  
-Ostatnia aktualizacja: 2026-06-04  
+Ostatnia aktualizacja: 2026-09-19  
 Produkcja: `https://prawkonaraz.pl`  
 Serwer: `henryk153.mikrus.xyz`, SSH port `10153`  
 Katalog aplikacji na VPS: `/var/www/prawkobit/current`
@@ -83,6 +83,7 @@ docker exec serwistestyprawojazdy-app-1 php artisan test --filter=PublicQuestion
 
 # zmiany sitemap/SEO
 docker exec serwistestyprawojazdy-app-1 php artisan test tests/Feature/Public/SeoSitemapGenerationTest.php
+docker exec serwistestyprawojazdy-app-1 php artisan test tests/Unit/Infrastructure/NginxSeoStaticDeliveryConfigurationTest.php
 ```
 
 Pelny `php artisan test` uruchamiaj wtedy, gdy zmiana jest przekrojowa, dotyka
@@ -385,6 +386,15 @@ dedykowanego zdalnego skryptu, bo daje to:
 
 ## 10. Kontrole po deployu
 
+Jesli release zmienia `deploy/mikrus/nginx/prawkobit.conf.example`, sam deploy aplikacji **nie aktualizuje automatycznie** aktywnej konfiguracji Nginx. Najpierw porownaj i zastosuj zmianę do produkcyjnego vhosta, a następnie:
+
+```bash
+nginx -t
+systemctl reload nginx
+```
+
+Nie traktuj repo-level testu konfiguracji jako dowodu, że aktywny origin używa nowego configu.
+
 Na serwerze:
 
 ```bash
@@ -401,6 +411,20 @@ Invoke-WebRequest -Uri https://prawkonaraz.pl/login -UseBasicParsing
 Invoke-WebRequest -Uri https://prawkonaraz.pl/api/v1/health -UseBasicParsing
 ```
 
+Dla release'u dotykającego robots/sitemap/Nginx uruchom również executable production SEO smoke:
+
+```bash
+bash scripts/production-seo-delivery-smoke.sh https://prawkonaraz.pl
+```
+
+Skrypt sprawdza `/robots.txt`, `/sitemap.xml`, `/sitemaps/static.xml` i `/aktualnosci/feed.xml`: status, Content-Type, public Cache-Control dla statycznych crawler assets, brak `Set-Cookie`, ETag/Last-Modified oraz conditional `304`. Domyślnie feed może zwrócić `404`, gdy newsroom public gate jest wyłączony. Po świadomym włączeniu publicznego feedu uruchom:
+
+```bash
+REQUIRE_NEWSROOM_FEED=1 bash scripts/production-seo-delivery-smoke.sh https://prawkonaraz.pl
+```
+
+Zachowaj wynik tego realnego runu jako evidence. Sam fakt, że skrypt istnieje w repo lub że jego test konfiguracji jest PASS, nie oznacza production smoke PASS.
+
 Minimalny sukces:
 
 - publiczne URL-e zwracaja `200` albo oczekiwane `301`,
@@ -410,6 +434,7 @@ Minimalny sukces:
   `200` i wlasnym canonicalem,
 - `ops:health-report` ma status `OK` albo znany, wyjasniony `degraded`,
 - `ops:smoke-test` zwraca `Smoke test status: OK`,
+- dla zmian SEO/static delivery `production-seo-delivery-smoke.sh` kończy się `Production SEO delivery smoke passed.` na rzeczywistym publicznym URL,
 - aplikacja nie zostala w maintenance mode.
 
 Po deployu frontendowym, jesli uzytkownik widzi stary CSS/JS:

@@ -787,7 +787,7 @@ Newsroom sitemap rozszerza istniejący statyczny pipeline:
 
 Nie przenosimy produkcyjnego source of truth do runtime `SitemapController`.
 
-**Potwierdzony stan po PR #109 i #112:** PR #109 usunął wcześniejszy broken-set window: `SeoSitemapGenerator` waliduje kompletny generated set przed publication, zapisuje child XML przed głównym `sitemap.xml`, przełącza root index na końcu i dopiero potem usuwa obsolete zarządzane article/news sitemap files. PR #112 wdrożył dirty/version freshness coordinator, shared cache lock oraz every-minute scheduler z `onOneServer()` + `withoutOverlapping()` przy zachowaniu daily safety net. Aktualne deployment docs potwierdzają single-node topology z lokalnym `public/`; production static HTTP/Nginx/Cloudflare/GSC delivery verification nadal pozostaje otwarte.
+**Potwierdzony stan po PR #109, #112 i #115:** PR #109 usunął wcześniejszy broken-set window: `SeoSitemapGenerator` waliduje kompletny generated set przed publication, zapisuje child XML przed głównym `sitemap.xml`, przełącza root index na końcu i dopiero potem usuwa obsolete zarządzane article/news sitemap files. PR #112 wdrożył dirty/version freshness coordinator, shared cache lock oraz every-minute scheduler z `onOneServer()` + `withoutOverlapping()` przy zachowaniu daily safety net. PR #115 dodał repo-level production delivery hardening: dedykowane Nginx blocks dla robots/root/child sitemaps, jawny Content-Type/public cache/validators i `scripts/production-seo-delivery-smoke.sh`. Aktualne deployment docs potwierdzają single-node topology z lokalnym `public/`; faktyczny run smoke przeciw produkcji, Cloudflare/origin evidence i GSC verification nadal pozostają otwarte.
 
 ### 30.2. Refresh po zmianie publicznego corpus — bez założenia o queue workerze
 
@@ -1608,7 +1608,7 @@ Obecnie:
 - wspólny public-content layout emituje `og:site_name` z kanonicznego identity,
 - istnieje również runtime `SitemapController`, ale statyczne pliki są nadrzędnym produkcyjnym modelem; samo dodanie headerów do kontrolera nie rozwiązuje static delivery,
 - newsroom Article schema graph istnieje przez `ContentArticleSchemaService` po NEWSROOM-N3-003 i jest emitowany przez publiczny article HTTP renderer od N3-004; od NEWSROOM-N5-002 istnieje statyczna rollout-gated News Sitemap, od NEWSROOM-N5-003 publiczny rollout-gated Atom 1.0 feed z auto-discovery i application-level validators, a od NEWSROOM-N5-004 privacy-safe public analytics hooks reużywające istniejący GA/consent layer,
-- NEWSROOM-N5-007 PR #109 wdrożył atomowy child-before-index switch i post-switch cleanup zarządzanych article/news sitemap files, a PR #112 wdrożył cache-backed dirty/version refresh coordinator, shared lock oraz every-minute scheduler z `onOneServer()` + `withoutOverlapping()` przy zachowaniu daily safety net,
+- NEWSROOM-N5-007 PR #109 wdrożył atomowy child-before-index switch i post-switch cleanup zarządzanych article/news sitemap files, PR #112 cache-backed dirty/version refresh coordinator, shared lock oraz every-minute scheduler z `onOneServer()` + `withoutOverlapping()` przy zachowaniu daily safety net, a PR #115 repo-level Nginx/static-delivery contract oraz production smoke script,
 - repo nie gwarantuje async Laravel queue workera (`QUEUE_CONNECTION=sync` w env example), więc newsroom nie może opierać freshness na ShouldQueue,
 - po NEWSROOM-N4-002 `/aktualnosci` jest rollout-gated: przy `NEWSROOM_PUBLIC_ENABLED=false` pozostaje pre-launch placeholderem 200 + `X-Robots-Tag: noindex, follow`, a przy `true` renderuje SSR `newsroom.home` z self-canonical i `index,follow,max-image-preview:large`; od N4-004 `/poradniki` konsumuje ten sam gate: przy `false` pozostaje placeholderem 200 + noindex, a przy `true` renderuje SSR `newsroom.guides`,
 - `/aktualnosci/feed.xml` przy gate=true zwraca Atom 1.0 `application/atom+xml` z ETag/Last-Modified/public Cache-Control i conditional 304, a przy gate=false zwraca 404; crawlable public newsroom/guide surfaces emitują Atom discovery w head,
@@ -1621,7 +1621,7 @@ Obecnie:
 - NEWSROOM-N5-002 rozszerza ten sam static pipeline o News Sitemap: gate=true emituje wyłącznie `type=news`, aktywnie dystrybuowane `published` + indexable current-canonical articles z aktywną kategorią i publicznym autorem, kwalifikowane wyłącznie przez `first_published_at >= now()-2 days`,
 - `news:name` reużywa canonical identity z `SiteIdentitySchema::siteName()`, `news:language=pl`, `news:publication_date=first_published_at`, a `news:title` bierze widoczny `ContentArticle.title`; przy <=1000 entries używany jest `/sitemaps/news.xml`, a powyżej limitu deterministic fixed-ID-range shards trafiają bezpośrednio do root `/sitemap.xml`,
 - NEWSROOM-N5-006 rozszerza istniejący `SeoSitemapAuditor` bez równoległego validatora: poza legalnym article/news overlap sprawdza duplicate index loc, missing child, current-canonical/indexability/category/author/redirect-source eligibility, Google News namespace/required tags/name/language/title/publication-date/2-day window, single-vs-sharded topology, invalid/overlapping shard ranges oraz obsolete unreferenced article/news files,
-- NEWSROOM-N5-007 jest częściowo zmaterializowane po PR #109 i #112: publication hardening, dirty/version coordinator, shared lock, every-minute scheduler oraz aktualny single-node topology gate są potwierdzone; unrelated XML nadal nie są objęte cleanupem. Production static HTTP/Nginx/Cloudflare/GSC delivery verification i production-like delivery smoke pozostają otwarte,
+- NEWSROOM-N5-007 jest częściowo zmaterializowane po PR #109, #112 i #115: publication hardening, dirty/version coordinator, shared lock, every-minute scheduler, aktualny single-node topology gate oraz repo-level static delivery hardening są potwierdzone; unrelated XML nadal nie są objęte cleanupem. Realne uruchomienie `production-seo-delivery-smoke.sh` przeciw produkcji, Cloudflare/origin HTTP evidence i GSC verification pozostają otwarte,
 - NEWSROOM-N3-008 jest wdrożone, N4-002 konsumuje ten sam gate dla publicznego huba `/aktualnosci`, N4-003 dla category pages, N4-004 dla `/poradniki`, N4-007 dla topic dossier, N4-008 dla topic/related/reverse-link resolvers, N5-001 dla standard article sitemap/hub coverage, N5-002 dla News Sitemap, N5-003 dla Atom feed/discovery, a N5-005 dla article-specific IndexNow automation. Przy gate=false category/topic/feed routes failują do 404, top-level `/poradniki` pozostaje noindex placeholderem, N4-008 nie emituje reverse targets, N5-001/N5-002 nie emitują newsroom article/news sitemap discovery, feed discovery jest suppressowane, a `QueueNewsroomArticleIndexNow` kończy bez enqueue; N5-004 nie tworzy osobnego rollout gate i emituje eventy tylko na rzeczywiście zrenderowanych publicznych surface'ach z analytics-ready istniejącego GA layer. Przy gate=true opublikowany topic ma self-canonical `index,follow,max-image-preview:large`, draft/future/unknown pozostają 404, a historyczny archived topic zwraca 410 + noindex. N5-005 reużywa istniejący queue/submission pipeline i nie zmienia protokołu HTTP IndexNow.
 
 ---
@@ -1642,7 +1642,7 @@ Obecnie:
 - [x] wdrożyć child-before-index atomic publication i cleanup obsolete zarządzanych article/news shards po switchu — potwierdzone w NEWSROOM-N5-007 PR #109; unrelated XML pozostają nietknięte,
 - [x] wdrożyć dirty/version refresh coordinator + frequent scheduler lock; zachować daily cron jako safety net i nie wymagać queue workera — potwierdzone w NEWSROOM-N5-007 PR #112,
 - [x] rozszerzyć istniejący `SeoSitemapAuditor` w NEWSROOM-N5-006 o newsroom/news namespace/tag/date/window/eligibility/topology/shard/obsolete-file checks, zachowując ogólne entry-count/byte-size guards i bez drugiego validatora,
-- [ ] zweryfikować rzeczywiste static/Nginx/CDN headers/304 bez przenoszenia source of truth do SitemapController,
+- [ ] zweryfikować rzeczywiste static/Nginx/CDN headers/304 bez przenoszenia source of truth do SitemapController — Nginx contract i smoke tooling istnieją po PR #115, ale realny production run nadal nie ma evidence,
 - [x] wdrożyć Atom feed + auto-discovery + application-level validators w NEWSROOM-N5-003,
 - [x] wdrożyć privacy-safe analytics hooks/events w NEWSROOM-N5-004 przez istniejący `trackAnalyticsEvent` i GA/consent layer,
 - [x] wdrożyć article-specific IndexNow automation w NEWSROOM-N5-005 przez istniejący `IndexNowQueueService`/submission pipeline, after-commit event i public-gate/noindex safety filters; lokalny `event_type` nie wchodzi do HTTP payload,
@@ -1657,6 +1657,16 @@ Obecnie:
 ---
 
 ## 70. Historia zmian
+
+### 2026-09-18 — v0.27
+
+- trzeci podkrok NEWSROOM-N5-007 zmergowano przez PR #115; finalny implementation head `30fa65d63eacdcb31b2a1c8c815f4034e29b5166`, merge `main@9a9c98d3534492e30ba215fd9785b7dd425a1f75`,
+- statyczny source of truth nie zmienił się: Nginx obsługuje istniejące pliki z `public/`, a runtime `SitemapController` nie przejął produkcyjnego modelu,
+- `deploy/mikrus/nginx/prawkobit.conf.example` ma dedykowane crawler-safe blocks dla robots/root/child sitemaps z właściwym Content-Type, public cache, ETag, `if_modified_since exact` i nosniff,
+- `scripts/production-seo-delivery-smoke.sh` sprawdza produkcyjny HTTP contract dla robots/sitemap/static sitemap oraz rollout-gated Atom feedu, w tym brak Set-Cookie i conditional 304,
+- `NginxSeoStaticDeliveryConfigurationTest` chroni repo-level Nginx contract,
+- exact-head CI #416 i post-merge CI #417 zakończyły pełny PASS: 1137 passed / 20 207 assertions / 2 skipped, PostgreSQL 7/94, Pint 1102 files PASS i frontend build PASS,
+- NEWSROOM-N5-007 pozostaje IN PROGRESS: brak jeszcze evidence z faktycznego uruchomienia smoke przeciw produkcji, Cloudflare/origin verification i GSC; scheduler-definition/lock-contention regression także pozostaje otwarty.
 
 ### 2026-09-18 — v0.26
 

@@ -1542,9 +1542,9 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N5-004` — privacy-safe delegated analytics hooks reużywające istniejący `trackAnalyticsEvent` i GA/consent layer, bez backendowego event store i zmian schema.
 - [x] `NEWSROOM-N5-005` — article-specific IndexNow lifecycle integration przez dedicated after-commit event/listener nad istniejącym `IndexNowQueueService`/submission pipeline, bez nowego klienta, kolejki ani schema.
 - [x] `NEWSROOM-N5-006` — istniejący `SeoSitemapAuditor` rozszerzony o newsroom/news audit hardening oraz site-wide `newsroom:audit-links` nad istniejącym semantic graph, bez drugiego validatora, graph subsystemu, migracji ani schema.
-- [ ] `NEWSROOM-N5-007` — **IN PROGRESS**: PR #109 domknął pre-validation, child-before-index atomic publication i post-switch cleanup zarządzanych article/news sitemap files; PR #112 domknął cache-backed dirty/version coordinator, shared lock, every-minute scheduler i aktualny single-node topology gate. Production static HTTP/Nginx/Cloudflare/GSC delivery verification nadal pozostaje otwarte.
+- [ ] `NEWSROOM-N5-007` — **IN PROGRESS**: PR #109 domknął pre-validation, child-before-index atomic publication i post-switch cleanup zarządzanych article/news sitemap files; PR #112 cache-backed dirty/version coordinator, shared lock, every-minute scheduler i aktualny single-node topology gate; PR #115 repo-level Nginx/static-delivery contract oraz production smoke tooling. Realny production HTTP/Cloudflare/GSC evidence nadal pozostaje otwarty.
 
-N5-001..N5-006 oraz dwa repo-level podkroki N5-007 są zmaterializowane i potwierdzone na `main@79b6de0276ba8cdce500c366a4f98098e528dcd8`; decyzje o jednym static sitemap pipeline, jednym `NewsroomPublicGate`, jednym semantic-link graph i jednym IndexNow queue/submission pipeline pozostały bez zmian. PR #109 materializuje pre-validation + child-before-index atomic publication + post-switch cleanup, a PR #112 cache-backed dirty/version coordinator, shared lock, every-minute scheduler i version-safe marker clearing bez queue workera. Aktualne deployment docs potwierdzają 1x Mikrus 4.1 z lokalnym `public/`, więc topology gate jest spełniony dla obecnego single-node contractu. Następnym wykonywalnym podkrokiem N5-007 jest production static/Nginx/Cloudflare/GSC delivery verification; N5-007 nadal nie jest DONE.
+N5-001..N5-006 oraz trzy repo-level podkroki N5-007 są zmaterializowane i potwierdzone na `main@9a9c98d3534492e30ba215fd9785b7dd425a1f75`; decyzje o jednym static sitemap pipeline, jednym `NewsroomPublicGate`, jednym semantic-link graph i jednym IndexNow queue/submission pipeline pozostały bez zmian. PR #109 materializuje pre-validation + child-before-index atomic publication + post-switch cleanup, PR #112 cache-backed dirty/version coordinator, shared lock, every-minute scheduler i version-safe marker clearing bez queue workera, a PR #115 crawler-safe Nginx delivery contract + production smoke script. Aktualne deployment docs potwierdzają 1x Mikrus 4.1 z lokalnym `public/`, więc topology gate jest spełniony dla obecnego single-node contractu. Następnym wykonywalnym podkrokiem N5-007 jest faktyczne production smoke execution i zapis HTTP/Cloudflare evidence, a następnie GSC verification; N5-007 nadal nie jest DONE.
 
 ---
 ## 28. Zasady utrzymania dokumentu
@@ -1569,6 +1569,15 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-18 — v0.54
+
+- trzeci podkrok NEWSROOM-N5-007 zmergowano przez PR #115; finalny implementation head `30fa65d63eacdcb31b2a1c8c815f4034e29b5166`, merge `main@9a9c98d3534492e30ba215fd9785b7dd425a1f75`,
+- decyzja architektoniczna nie zmieniła się: statyczne pliki w `public/` pozostają source of truth, a Nginx jest warstwą delivery; runtime generator nie zastępuje static pipeline,
+- PR #115 dodaje dedykowane Nginx blocks dla `/robots.txt`, `/sitemap.xml` i `/sitemaps/*` oraz `scripts/production-seo-delivery-smoke.sh` do weryfikacji rzeczywistego HTTP contractu,
+- repo-level regression `NginxSeoStaticDeliveryConfigurationTest` chroni Content-Type/cache/validator/nosniff contract,
+- exact-head CI #416 i post-merge CI #417 były pełnym PASS: 1137 passed / 20 207 assertions / 2 skipped, PostgreSQL 7/94, Pint 1102 files PASS i frontend build PASS,
+- NEWSROOM-N5-007 pozostaje IN PROGRESS: realny smoke run przeciw produkcji, Cloudflare/origin evidence i GSC verification nadal nie są potwierdzone; scheduler-definition/lock-contention regression pozostaje oddzielnym open evidence.
 
 ### 2026-09-18 — v0.53
 

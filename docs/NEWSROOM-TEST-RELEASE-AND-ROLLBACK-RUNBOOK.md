@@ -1505,7 +1505,7 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - pierwszy podkrok NEWSROOM-N5-007 jest potwierdzony po PR #109: complete-set XML pre-validation, child-before-index atomic publication oraz post-switch cleanup zarządzanych article/news sitemap files; exact-head CI #403 i post-merge CI #404 zakończyły pełny PASS,
 - drugi podkrok NEWSROOM-N5-007 jest potwierdzony po PR #112: cache-backed version/clean-version coordinator, shared lock, clean-state skip, failure/race retention, after-commit dirty events/observers oraz every-minute scheduler z `onOneServer()` + `withoutOverlapping()`; exact-head CI #409 i post-merge CI #410 zakończyły pełny PASS,
 - aktualne canonical deployment docs potwierdzają single-node Mikrus 4.1 z lokalnym `public/`, lokalnym Redisem i jednym cronem `schedule:run`, więc topology gate jest spełniony dla obecnego contractu,
-- NEWSROOM-N5-007 pozostaje IN PROGRESS: produkcyjny CDN/Nginx/static-delivery smoke i HTTP header/cache/validator evidence nadal nie są potwierdzone; dedykowany scheduler-definition/lock-contention regression również pozostaje otwartym test evidence. Produkcyjny rollout fazy 2 IndexNow/Bing verification pozostaje osobnym otwartym evidence.
+- NEWSROOM-N5-007 pozostaje IN PROGRESS: PR #115 dodał crawler-safe Nginx contract, `production-seo-delivery-smoke.sh` i repo-level Nginx regression, ale faktyczne uruchomienie smoke przeciw produkcji oraz HTTP/Cloudflare evidence nadal nie są potwierdzone; dedykowany scheduler-definition/lock-contention regression również pozostaje otwartym test evidence. Produkcyjny rollout fazy 2 IndexNow/Bing verification pozostaje osobnym otwartym evidence.
 
 ---
 
@@ -1529,9 +1529,10 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - [x] dodać N5-004 analytics regression: render/privacy contract, GA readiness signal oraz JS-enabled Browser Smoke dla exactly-once article view, one-click-one-event, module click i disabled/non-link suppression,
 - [x] dodać N5-005 IndexNow lifecycle regression: publish/republish/update/withdraw/restore/slug, scheduled/noindex/gate suppression, outer rollback, queue failure isolation i brak lokalnego `event_type` w HTTP payload,
 - [ ] dodać dedykowany regression scheduler definition / lock contention dla N5-007; PR #112 potwierdza implementację `onOneServer()` + `withoutOverlapping()` + cache lock, ale nie ma osobnego testu tego contractu,
-- [ ] dodać production-like static robots/sitemap/feed delivery smoke,
+- [x] dodać production-like static robots/sitemap/feed delivery smoke — PR #115 dodaje `scripts/production-seo-delivery-smoke.sh` z Content-Type/cache/no-Set-Cookie/validator/304 checks oraz rollout-gated feed contract,
 - [x] dodać N5-006 `NewsroomSeoSitemapAuditTest` i rozszerzyć istniejący `SeoSitemapAuditor` o duplicate/missing-child, News namespace/tags/date/window, current-canonical/indexability/redirect-source, topology/shard/obsolete-file checks przy zachowaniu generic entry-count/byte-size guards,
-- [ ] stworzyć production smoke checklist w praktyce,
+- [x] stworzyć production smoke checklist w praktyce — executable checklist istnieje jako `scripts/production-seo-delivery-smoke.sh`,
+- [ ] uruchomić ten smoke przeciw rzeczywistej produkcji po wdrożeniu aktualnego Nginx configu i zachować evidence dla robots/root/static sitemap/feed oraz conditional 304,
 - [x] wdrożyć i przetestować `NEWSROOM_PUBLIC_ENABLED` w N3-008 dla obecnie istniejących public detail/redirect + author + IndexNow surfaces; przyszłe N4/N5 discovery surfaces nadal wymagają tego samego gate,
 - [x] dodać N4-001 `NewsroomHomeReadModelServiceTest` dla rollout gate, scalar/cacheable projection i stałego query budgetu niezależnego od liczby kategorii,
 - [x] dodać N4-002 public Hub Blade/browser regression wraz z rzeczywistym publicznym rendererem,
@@ -1546,6 +1547,15 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-18 — v0.37
+
+- trzeci podkrok NEWSROOM-N5-007 zmergowano przez PR #115; finalny implementation head `30fa65d63eacdcb31b2a1c8c815f4034e29b5166`, merge `main@9a9c98d3534492e30ba215fd9785b7dd425a1f75`,
+- dodano `NginxSeoStaticDeliveryConfigurationTest` chroniący repo-level production config dla robots/root/child sitemap: Content-Type, public cache, ETag, `if_modified_since exact`, nosniff i static-first `try_files`,
+- dodano `scripts/production-seo-delivery-smoke.sh`, który sprawdza HTTP 200, Content-Type, public Cache-Control, brak Set-Cookie, ETag/Last-Modified i conditional 304; dla `/aktualnosci/feed.xml` 404 jest akceptowane tylko przy niewymaganym public feedzie,
+- exact-head CI #416: 1137 passed / 20 207 assertions / 2 skipped, PostgreSQL 7/94, Pint 1102 files PASS, frontend build 6.82 s; post-merge CI #417 powtórzył 1137 / 20 207 / 2 skipped, PostgreSQL 7/94, Pint PASS i build 10.16 s,
+- production smoke harness istnieje, ale nie zapisujemy go jako production PASS: brak jeszcze dowodu rzeczywistego uruchomienia przeciw `https://prawkonaraz.pl` po wdrożeniu aktualnego Nginx configu,
+- NEWSROOM-N5-007 pozostaje IN PROGRESS; dodatkowo dedykowany scheduler-definition/lock-contention regression nadal jest otwarty.
 
 ### 2026-09-18 — v0.36
 
