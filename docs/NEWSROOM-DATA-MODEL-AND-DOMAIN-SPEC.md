@@ -849,7 +849,7 @@ NEWSROOM-N1-006 jest wdrożone, a NEWSROOM-N4-001 rozszerza ten sam composer na 
 - half-open interval contract pozwala na sąsiadujące okna,
 - PostgreSQL concurrency test potwierdza, że dwa równoległe zapisy tego samego pustego tuple nie mogą równocześnie przejść walidacji.
 
-Filamentowy `NewsroomHomeComposer` i private future preview są już wdrożone przez N2-009. N4-001 dodaje `NewsroomHomeReadModelService` jako rollout-gated, serializowalny scalar-array projection dla lead/secondary/latest/categories/guides/important_now/breaking. Nie wdrożono jeszcze publicznego Hub Blade/controllera konsumującego ten read model — to pozostaje NEWSROOM-N4-002; faktyczny cache/invalidation pozostaje NEWSROOM-N4-006.
+Filamentowy `NewsroomHomeComposer` i private future preview są wdrożone przez N2-009. N4-001 dodaje `NewsroomHomeReadModelService` jako rollout-gated, serializowalny scalar-array projection dla lead/secondary/latest/categories/guides/important_now/breaking; N4-002 materializuje publiczny Hub Blade, a N4-006 podłącza generation-based cache/invalidation dla publicznych home/category read models. Private preview nadal omija publiczny cache.
 
 ---
 
