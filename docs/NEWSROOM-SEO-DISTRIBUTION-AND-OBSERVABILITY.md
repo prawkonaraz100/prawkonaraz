@@ -1591,10 +1591,10 @@ Obecnie:
 - newsroom Article schema graph istnieje przez `ContentArticleSchemaService` po NEWSROOM-N3-003 i jest emitowany przez publiczny article HTTP renderer od N3-004; news sitemap i feed nadal nie istnieją,
 - newsroom dirty/version refresh coordinator i atomowy child-before-index switch nie istnieją,
 - repo nie gwarantuje async Laravel queue workera (`QUEUE_CONNECTION=sync` w env example), więc newsroom nie może opierać freshness na ShouldQueue,
-- po NEWSROOM-N4-002 `/aktualnosci` jest rollout-gated: przy `NEWSROOM_PUBLIC_ENABLED=false` pozostaje pre-launch placeholderem 200 + `X-Robots-Tag: noindex, follow`, a przy `true` renderuje SSR `newsroom.home` z self-canonical i `index,follow,max-image-preview:large`; `/poradniki` nadal jest pre-launch placeholderem 200 + noindex,
+- po NEWSROOM-N4-002 `/aktualnosci` jest rollout-gated: przy `NEWSROOM_PUBLIC_ENABLED=false` pozostaje pre-launch placeholderem 200 + `X-Robots-Tag: noindex, follow`, a przy `true` renderuje SSR `newsroom.home` z self-canonical i `index,follow,max-image-preview:large`; od N4-004 `/poradniki` konsumuje ten sam gate: przy `false` pozostaje placeholderem 200 + noindex, a przy `true` renderuje SSR `newsroom.guides`,
 - `/aktualnosci/feed.xml` ma zarejestrowany route contract, ale obecnie zwraca 404; feed ani feed discovery nie są jeszcze wdrożone,
 - category route `/aktualnosci/kategoria/{categorySlug}` jest od N4-003 aktywnym publicznym SSR surface przy gate=true; topic route nadal pozostaje 404 bez publicznego controllera, a article detail routes są aktywne od N3-004.
-- NEWSROOM-N3-008 jest wdrożone, N4-002 konsumuje ten sam gate dla publicznego huba `/aktualnosci`, a N4-003 dla category pages. Przy gate=false category route failuje do 404; przy gate=true aktywna kategoria może być indeksowana. Topic/feed, reverse links, newsroom/article/news sitemap i article-specific IndexNow automation pozostają otwarte w dalszym N4/N5.
+- NEWSROOM-N3-008 jest wdrożone, N4-002 konsumuje ten sam gate dla publicznego huba `/aktualnosci`, N4-003 dla category pages, a N4-004 dla `/poradniki`. Przy gate=false category route failuje do 404, a top-level `/poradniki` pozostaje noindex placeholderem; przy gate=true aktywna kategoria oraz niepusty guide hub mogą być indeksowane. Topic/feed, reverse links, newsroom/article/news sitemap i article-specific IndexNow automation pozostają otwarte w dalszym N4/N5.
 
 ---
 
@@ -1616,6 +1616,7 @@ Obecnie:
 - [ ] wdrożyć feed + auto-discovery + własne validators,
 - [ ] wdrożyć analytics hooks/events,
 - [x] wdrożyć N4-003 category SEO: self-canonical pagination, category title/description fallback, `CollectionPage` + `BreadcrumbList` oraz conditional `ItemList`,
+- [x] wdrożyć N4-004 guide-hub SEO: self-canonical pagination, empty-hub noindex, `CollectionPage` + `BreadcrumbList` oraz conditional `ItemList`,
 - [ ] wdrożyć topic SEO dla faktycznie publikowanych dossier,
 - [ ] zweryfikować crop/OG output z focal point,
 - [ ] podłączyć monitoring,
@@ -1625,6 +1626,15 @@ Obecnie:
 ---
 
 ## 70. Historia zmian
+
+### 2026-09-18 — v0.16
+
+- NEWSROOM-N4-004 zmergowano przez PR #87 na `main@2bb22142b1e9bec803f9c3889c11000194f46783`; `/poradniki` konsumuje istniejący `NewsroomPublicGate`,
+- gate=false zachowuje top-level placeholder 200 + `X-Robots-Tag: noindex, follow`; gate=true niepusty guide hub ma `index,follow,max-image-preview:large`,
+- page 1 ma self-canonical bez redundantnego `?page=1`, kolejne strony canonical `?page=N`; invalid/out-of-range page failuje do 404,
+- pusty aktywny guide hub ma 200 + meta/header `noindex,follow`; graph używa `CollectionPage` + `BreadcrumbList` i `ItemList` tylko dla niepustego corpus,
+- task nie wdrożył topic/feed, article/news sitemap, reverse links ani nowej IndexNow automatyzacji,
+- Browser Smoke #31 potwierdził guide-hub robots/canonical oraz page-2 canonical z JS disabled; exact-head CI #331 i post-merge CI #332 zakończyły się PASS.
 
 ### 2026-09-18 — v0.15
 
