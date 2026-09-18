@@ -468,7 +468,7 @@ Assertions:
 - twitter card,
 - RSS/Atom discovery link.
 
-N3-004 podłącza istniejący `ContentArticleSeoService` do publicznego `newsroom.article`; RSS/Atom discovery nadal pozostaje N5.
+N3-004 podłącza istniejący `ContentArticleSeoService` do publicznego `newsroom.article`; od NEWSROOM-N5-003 wspólny public-content layout emituje Atom discovery dla crawlable newsroom/guide surfaces przy włączonym gate.
 
 ---
 
@@ -739,6 +739,8 @@ Regression test najpierw odtwarza/chroni przed potwierdzonym obecnym problemem: 
 ---
 
 ## 25. Feed tests
+
+**Stan implementacji:** N5-003 jest pokryte przez `tests/Feature/Public/NewsroomFeedTest.php`, `NewsroomPublicGateTest` i `NewsroomRouteContractTest`; exact-head CI #380 oraz post-merge CI #381 są PASS. Poniższy kontrakt pozostaje regresyjnym wymaganiem, a production delivery smoke jest osobnym gate'em.
 
 - XML valid,
 - content type,
@@ -1049,13 +1051,13 @@ Przy pre-launch `NEWSROOM_PUBLIC_ENABLED=false` test potwierdza:
 - news i guide detail failują do 404 bez ujawnienia treści,
 - historyczny old-path nie wykonuje 301 do dark-deployed canonical,
 - `/aktualnosci` i `/poradniki` zachowują istniejący placeholder 200 + `X-Robots-Tag: noindex, follow`,
-- category/topic routes failują do 404 przy gate=false, natomiast feed route pozostaje publicznie 404 niezależnie od gate do N5,
+- category/topic routes failują do 404 przy gate=false; N5-003 feed również zwraca wtedy 404 i discovery jest suppressowane, natomiast przy gate=true feed zwraca publiczny Atom 1.0 response,
 - author page nie pokazuje newsroom publications,
 - newsroom-only author nie jest kwalifikowany przez author sitemap, a newsroomowy `public_state_changed_at` nie wnosi freshness contribution przy wyłączonym gate,
 - obecny `IndexNowUrlCollector` nie przepuszcza namespace `/aktualnosci` ani `/poradniki`,
 - authenticated admin private preview nadal działa.
 
-Przy `NEWSROOM_PUBLIC_ENABLED=true` regression potwierdza obecnie istniejące powierzchnie: public article detail, publiczny Hub Blade `/aktualnosci`, category pages, `/poradniki` hub, topic dossier, author publication, author sitemap eligibility, historyczny redirect, N4-008 semantic/reverse-link modules, N5-001 standard article sitemap/hub coverage oraz N5-002 Google News Sitemap. Feed pozostaje dalszym N5 i nie jest fałszywie zaliczany.
+Przy `NEWSROOM_PUBLIC_ENABLED=true` regression potwierdza obecnie istniejące powierzchnie: public article detail, publiczny Hub Blade `/aktualnosci`, category pages, `/poradniki` hub, topic dossier, author publication, author sitemap eligibility, historyczny redirect, N4-008 semantic/reverse-link modules, N5-001 standard article sitemap/hub coverage, N5-002 Google News Sitemap oraz N5-003 Atom feed/discovery. Gate=false feed 404 i brak discovery są również pokryte.
 
 Existing public-article PHPUnit baseline i dedykowany Browser Smoke `newsroom-article` jawnie ustawiają gate na `true`, dzięki czemu bezpieczny produkcyjny default `false` nie maskuje regresji publicznego renderer'a.
 
@@ -1352,7 +1354,7 @@ Jeśli draft stał się publiczny:
 - [ ] production sample News Sitemap ma wymagane metadata/eligibility zgodne z wdrożonym N5-002
 - [ ] fresh dirty-marker/scheduled refresh dla News Sitemap
 - [ ] child-before-index atomic publication
-- [ ] feed + head discovery
+- [ ] production sample Atom feed + head discovery na publicznym środowisku
 - [ ] sitemap static delivery headers/304 na faktycznej warstwie
 - [ ] brak regresji istniejących question/sign/legal/author sitemap
 
@@ -1496,8 +1498,8 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - `NewsroomPublicArticlePageTest` został zsynchronizowany z nowym kontraktem guide detail: primary category jest crawlable classification linkiem bez zmiany guide breadcrumb family,
 - workflow `Browser Smoke` ma osobny job `newsroom-semantic-links`; Browser Smoke #48 na finalnym N4-008 head `bd63773bc1febdcc6aa8c2507c6621e908d63b09` zakończył PASS dla semantic-links, article, home, category, guides i topic,
 - exact-head CI #361 zakończył pełny PASS, a post-merge CI #362 na `main@3d7ac8ab8a3ed1c299cb0cdd4cb1ef8ac6b53f78` zakończył: `quality` 1093 passed / 19 881 assertions / 2 skipped, Pint PASS, frontend build 7.42 s; `newsroom-postgres` 7 passed / 94 assertions,
-- publiczny Hub Blade, category pages, guide hub, topic dossier, navigation integration, home/category cache, N4-008 semantic/reverse links, N5-001 standard article sitemap/hub coverage oraz N5-002 Google News Sitemap są zamknięte implementacyjnie; następnym taskiem jest NEWSROOM-N5-003,
-- atomic static publication, dirty/version newsroom refresh coordinator, feed i pełne namespace-specific `SeoSitemapAuditor` extension pozostają N5.
+- publiczny Hub Blade, category pages, guide hub, topic dossier, navigation integration, home/category cache, N4-008 semantic/reverse links, N5-001 standard article sitemap/hub coverage, N5-002 Google News Sitemap oraz N5-003 Atom feed/discovery są zamknięte implementacyjnie; następnym taskiem jest NEWSROOM-N5-004,
+- atomic static publication, dirty/version newsroom refresh coordinator i pełne namespace-specific `SeoSitemapAuditor` extension pozostają N5; produkcyjny CDN/Nginx feed smoke nadal nie jest potwierdzony.
 
 ---
 
@@ -1516,8 +1518,9 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - [x] dodać N5-001 standard article sitemap regression w istniejącym `SeoSitemapGenerationTest`: single shard, boundary crossing, stable fixed-ID-range assignment, no duplicate URL across shards, public-gate suppression, eligibility/current-canonical oraz URL-count/byte-size guards,
 - [x] dodać N5-002 News Sitemap regression w istniejącym `SeoSitemapGenerationTest`: required namespace/tags, visible title/canonical identity, `first_published_at` 2-day eligibility, old-updated exclusion, public-gate suppression, non-news/status/noindex/category/author/redirect-source exclusions i realny 1000→1001 boundary,
 - [ ] dodać child-before-index atomic publication + obsolete-shard cleanup tests,
-- [ ] dodać dirty-marker refresh/feed-discovery tests,
-- [ ] dodać production-like static robots/sitemap delivery smoke,
+- [ ] dodać dirty-marker refresh tests,
+- [x] dodać N5-003 feed/discovery regression: Atom metadata/corpus/limit, stable id + slug change, workflow invalidation, ETag/Last-Modified/304, no Set-Cookie, gate/discovery,
+- [ ] dodać production-like static robots/sitemap/feed delivery smoke,
 - [ ] rozszerzyć istniejący `SeoSitemapAuditor` o newsroom/news namespace-specific checks; N5-001 potwierdza ogólne entry-count/byte-size guards, a N5-002 tylko legalny article/news URL overlap handling,
 - [ ] stworzyć production smoke checklist w praktyce,
 - [x] wdrożyć i przetestować `NEWSROOM_PUBLIC_ENABLED` w N3-008 dla obecnie istniejących public detail/redirect + author + IndexNow surfaces; przyszłe N4/N5 discovery surfaces nadal wymagają tego samego gate,
@@ -1534,6 +1537,15 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-18 — v0.31
+
+- NEWSROOM-N5-003 implementation PR #101 zakończył exact-head CI #380 PASS na `1c89f370e899895eb25ac80bd437b19c1797a9ec`; Browser Smoke #54 PASS dla article/home/category/guides/topic/semantic-links; merge to `main@18cd07233e3c8712cf2c7fc9e0c32018baef65d3`,
+- `NewsroomFeedTest` pokrywa Atom content/metadata, bounded latest corpus, non-news/non-active exclusion, stable URN przy slug change, archive invalidation, ETag/Last-Modified, osobne conditional 304 i brak `Set-Cookie`,
+- public gate regression potwierdza feed 404 + discovery suppression przy false oraz Atom 200 przy true; route regression nie oczekuje już historycznego 404 dla wdrożonego feedu,
+- post-merge CI #381: 1104 passed / 20 024 assertions / 2 skipped, Pint PASS, frontend build 6.21 s; `newsroom-postgres` 7 passed / 94 assertions,
+- produkcyjny static/CDN/Nginx smoke i Search Console evidence pozostają niewykonane; nie są zastępowane przez application-level tests,
+- następnym wykonywalnym taskiem jest NEWSROOM-N5-004 — Analytics hooks.
 
 ### 2026-09-18 — v0.30
 

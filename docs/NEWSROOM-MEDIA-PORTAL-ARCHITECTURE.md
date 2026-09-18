@@ -103,7 +103,7 @@ Na pierwszym etapie nie budujemy:
 
 ## 5. Aktualny stan implementacji
 
-Stan sprawdzony ponownie 2026-09-18 względem `main@827f3816487d3a404df26c381a103a6cd1a9f413` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-012, NEWSROOM-N3-001..N3-008, NEWSROOM-N4-001..N4-008 oraz NEWSROOM-N5-001..N5-002. Zakres admin/domain N2, public article layer N3 i public IA/semantic layer N4 są zamknięte. N5-001 rozszerza istniejący statyczny sitemap pipeline o standard article sitemap/hub coverage, a N5-002 o rollout-gated Google News Sitemap z 2-dniowym `first_published_at` window i deterministic split; pozostałe N5/N6 pozostają otwarte.
+Stan sprawdzony ponownie 2026-09-18 względem `main@18cd07233e3c8712cf2c7fc9e0c32018baef65d3` po wdrożeniu N0, N1-001..N1-006, N2-001..N2-012, NEWSROOM-N3-001..N3-008, NEWSROOM-N4-001..N4-008 oraz NEWSROOM-N5-001..N5-003. Zakres admin/domain N2, public article layer N3 i public IA/semantic layer N4 są zamknięte. N5-001/N5-002 rozszerzają istniejący static sitemap pipeline, a N5-003 materializuje rollout-gated Atom feed + discovery, generation cache i HTTP validators; pozostałe N5/N6 pozostają otwarte.
 
 ### 5.1. Elementy już istniejące
 
@@ -152,6 +152,7 @@ Repo ma już istotny fundament:
 - N5-001: `static.xml` obejmuje newsroom home, warunkowo guides, active categories i published topics; article `lastmod` używa domenowych public-state timestamps, a generator/auditor egzekwują 50 000 entries / 50 MB,
 - N5-002: ten sam pipeline generuje rollout-gated Google News Sitemap dla świeżych `type=news`, `published`, indexable current-canonical articles z aktywną kategorią/publicznym autorem; `news:name` reużywa `SiteIdentitySchema::siteName()`, language=`pl`, publication date=`first_published_at`, title=widoczny article title,
 - N5-002: przy <=1000 entries używany jest `/sitemaps/news.xml`, a powyżej limitu fixed-`content_articles.id` range shards są wpisywane bezpośrednio do root `/sitemap.xml`; pełny news namespace/age/tag auditor pozostaje N5-006,
+- N5-003: `/aktualnosci/feed.xml` zwraca przy gate=true jeden Atom 1.0 feed z latest `type=news`, stabilnym `urn:prawkonaraz:content-article:{id}`, canonical links, `published`/`updated`, summary/autorem, generation cache, ETag/Last-Modified/304 i bez session cookie; public layout emituje Atom discovery,
 - dynamiczny `SitemapController`, który współistnieje z generowanymi artefaktami i nie jest samodzielnym source of truth produkcyjnego XML,
 - statyczny `public/robots.txt` oraz istniejący `RobotsController`; produkcyjny kontrakt robots pozostaje zgodny z `SEO-SITEMAP-REPAIR-PLAN.md`,
 - breadcrumbs,
@@ -196,7 +197,7 @@ To oznacza, że:
 
 - adresy, IA i matching/order contract istnieją,
 - model domenowy artykułów/kategorii/tagów/topiców i relacji oraz backendowy publishing/scheduling foundation istnieją,
-- publiczny hub `/aktualnosci` istnieje po N4-002 przy włączonym gate, publiczne category pages istnieją po N4-003, guide-only hub `/poradniki` po N4-004, a topic/dossier `/aktualnosci/temat/{topicSlug}` po N4-007; feed nadal nie istnieje,
+- publiczny hub `/aktualnosci` istnieje po N4-002 przy włączonym gate, publiczne category pages istnieją po N4-003, guide-only hub `/poradniki` po N4-004, topic/dossier `/aktualnosci/temat/{topicSlug}` po N4-007, a Atom feed `/aktualnosci/feed.xml` po N5-003,
 - `ContentArticlePublicCatalogService` jest konsumowany przez publiczny detail controller i rozróżnia `visible/gone/not_found`,
 - `ContentArticleSeoService` i `ContentArticleSchemaService` są podłączone do publicznego article response,
 - `NewsroomArticleBodyRenderer` renderuje publicznie `rich_text`, `image`, `quote`, `table`, `context`, public-safe `related_article` oraz przygotowane przez Product Bridge `legal_reference`, `question_group`, `traffic_sign_group` i `product_cta`,
@@ -1535,8 +1536,9 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N4-008` — semantic silo / controlled reverse links na istniejących topic/question/legal/sign pivots, bez nowej schema.
 - [x] `NEWSROOM-N5-001` — standard article sitemap + rollout-gated hub coverage + deterministic fixed-ID-range sharding w istniejącym static sitemap pipeline.
 - [x] `NEWSROOM-N5-002` — rollout-gated Google News Sitemap w tym samym static pipeline: 2-day `first_published_at` eligibility, required news metadata i deterministic >1000 split.
+- [x] `NEWSROOM-N5-003` — rollout-gated Atom 1.0 feed + head discovery, generation cache, stable IDs, public validators/304 i stateless delivery.
 
-N5-001 i N5-002 są zmaterializowane i potwierdzone na `main@827f3816487d3a404df26c381a103a6cd1a9f413`; decyzja architektoniczna o jednym statycznym sitemap pipeline pozostała bez zmian. Następnym wykonywalnym taskiem jest `NEWSROOM-N5-003` — RSS/Atom feed + discovery. Child-before-index atomic publication, obsolete-shard cleanup, dirty/version refresh coordinator, namespace-specific sitemap audit, article-specific IndexNow i produkcyjna static/Nginx/CDN verification pozostają oddzielnymi późniejszymi zakresami N5/N6.
+N5-001..N5-003 są zmaterializowane i potwierdzone na `main@18cd07233e3c8712cf2c7fc9e0c32018baef65d3`; decyzje o jednym static sitemap pipeline i jednym `NewsroomPublicGate` pozostały bez zmian. Następnym wykonywalnym taskiem jest `NEWSROOM-N5-004` — Analytics hooks. Child-before-index atomic publication, obsolete-shard cleanup, dirty/version refresh coordinator, namespace-specific sitemap audit, article-specific IndexNow i produkcyjna static/Nginx/CDN verification pozostają oddzielnymi późniejszymi zakresami N5/N6.
 
 ---
 ## 28. Zasady utrzymania dokumentu
@@ -1561,6 +1563,15 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-18 — v0.48
+
+- NEWSROOM-N5-003 zmergowano przez PR #101; finalny implementation head `1c89f370e899895eb25ac80bd437b19c1797a9ec`, merge `main@18cd07233e3c8712cf2c7fc9e0c32018baef65d3`,
+- publiczny route `/aktualnosci/feed.xml` materializuje jeden Atom 1.0 feed i reużywa istniejący public catalog, route contract, canonical identity, rollout gate oraz generation-based cache zamiast tworzyć równoległy subsystem,
+- feed ma stable content-article URN, absolute canonical item links, original publish/substantive-update semantics, summary/public author, default limit 50 i after-commit invalidation przez istniejące `invalidateAll()`,
+- head discovery zostało dodane do wspólnego public-content layoutu; feed jest bezstanowy, nie wysyła session cookie i obsługuje ETag/Last-Modified oraz conditional 304,
+- exact-head CI #380 i Browser Smoke #54 zakończyły PASS; post-merge CI #381 na exact main: 1104 passed / 20 024 assertions / 2 skipped, Pint PASS, frontend build 6.21 s i PostgreSQL 7/94,
+- NEWSROOM-N5-004 Analytics hooks jest następnym wykonywalnym taskiem; N5-003 nie zmienia static sitemap architecture ani persistence schema.
 
 ### 2026-09-18 — v0.47
 
