@@ -1384,7 +1384,7 @@ Rozszerzyć istniejący publiczny profil `ContentAuthor` o Newsroom bez tworzeni
 - `IndexNowUrlCollector` defensywnie odrzuca namespace `/aktualnosci` i `/poradniki` przy wyłączonym gate; faktyczna article-specific automatyzacja IndexNow nadal należy do N5-005,
 - admin/data i authenticated private preview pozostają dostępne przy `false`,
 - istniejące publiczne testy i dedykowane Browser Smoke jawnie ustawiają gate na `true`; `NewsroomPublicGateTest` pokrywa disabled/enabled state dla news + guide detail, old-path redirect, top-level placeholderów, category/topic gate behavior, feed 404, author discovery, author sitemap contribution, IndexNow collector i private preview,
-- public hub/category/guides/topic oraz N4-008 semantic/reverse links konsumują dziś ten sam gate; feed oraz article/news sitemap nadal nie istnieją i N5 musi nadal używać tego samego `NewsroomPublicGate` zamiast tworzyć własne przełączniki.
+- public hub/category/guides/topic, N4-008 semantic/reverse links, N5-001 article/hub sitemap oraz N5-002 News Sitemap konsumują dziś ten sam gate; feed nadal nie istnieje i N5-003 musi użyć tego samego `NewsroomPublicGate` zamiast tworzyć własny przełącznik.
 
 
 ### Cel
@@ -2215,9 +2215,10 @@ Docs-only:
 - [x] visible/schema dates consistency dla article detail
 - [x] self-canonical + route-family exclusivity dla current article detail
 - [x] article sitemap przez istniejący static generator + deterministic sharding readiness + rollout-gated hub coverage (NEWSROOM-N5-001)
-- [ ] news sitemap full required metadata + dirty/version scheduled refresh bez queue-worker assumption
+- [x] News Sitemap full required metadata + `first_published_at` eligibility + 1000-entry deterministic split (NEWSROOM-N5-002)
+- [ ] dirty/version scheduled refresh bez queue-worker assumption
 - [ ] child-before-index atomic static publication
-- [ ] istniejący SeoSitemapAuditor rozszerzony o newsroom/news namespace-specific checks; N5-001 dodało już ogólne protocol-limit guards bez drugiego auditora
+- [ ] istniejący SeoSitemapAuditor rozszerzony o newsroom/news namespace-specific checks; N5-001 dodało ogólne protocol-limit guards, a N5-002 tylko legalny article/news overlap handling bez pełnego namespace/age/tag audit
 - [ ] rzeczywisty static/Nginx/CDN delivery smoke (Content-Type/cache/Set-Cookie/validators)
 - [ ] feed + discovery + własny cache/validator contract
 - [ ] author ProfilePage / publisher / WebSite
@@ -2446,7 +2447,7 @@ Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-008 na `main@3d7ac8ab8a3ed1c299cb0c
 - `NewsroomSemanticLinkService::audit()` daje per-article inbound sources, explicit reverse-edge count i estimated hub depth; site-wide `newsroom:audit-links` nie istnieje,
 - Browser Smoke #48 potwierdził `newsroom-semantic-links` oraz brak regresji w article/home/category/guides/topic,
 - exact-head CI #361 był pełnym PASS, a post-merge CI #362 na exact `main@3d7ac8ab...` zakończył: 1093 passed / 19 881 assertions / 2 skipped, Pint PASS, frontend build 7.42 s; `newsroom-postgres` 7 passed / 94 assertions,
-- feed route nadal pozostaje 404; N5-001 wdrożyło standard article sitemap + hub coverage, natomiast dirty/version refresh, news sitemap, feed/discovery, IndexNow automation, namespace-specific sitemap audit i atomic child-before-index publication pozostają N5,
+- feed route nadal pozostaje 404; N5-001 wdrożyło standard article sitemap + hub coverage, a N5-002 Google News Sitemap; dirty/version refresh, feed/discovery, IndexNow automation, namespace-specific sitemap audit i atomic child-before-index publication pozostają N5,
 - QUEUE_CONNECTION w env example jest sync; stały queue worker nie jest gwarantowany,
 - panel Filament pozostaje admin-only i ten kontrakt pozostaje wymaganiem v1.
 
