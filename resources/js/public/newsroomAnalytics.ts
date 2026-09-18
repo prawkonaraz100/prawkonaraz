@@ -5,7 +5,6 @@ const ARTICLE_CONTEXT_SELECTOR = '[data-newsroom-analytics-article]';
 const EXPLICIT_EVENT_SELECTOR = 'a[data-newsroom-analytics-event]';
 const MODULE_CARD_SELECTOR = '[data-newsroom-analytics-module][data-article-id][data-article-url]';
 const PAGINATION_SELECTOR = '[data-analytics-module="pagination"] a[href]';
-const SCROLL_DEPTHS = [25, 50, 75, 100] as const;
 
 type AnalyticsContext = {
     article_id?: number;
@@ -120,44 +119,6 @@ const setupArticleView = (): void => {
     window.addEventListener(ANALYTICS_READY_EVENT, send);
 };
 
-const setupArticleScrollDepth = (): void => {
-    const context = pageArticleContext();
-
-    if (!context.article_id || !context.article_type) {
-        return;
-    }
-
-    const sent = new Set<number>();
-
-    const sync = () => {
-        if (!analyticsReady()) {
-            return;
-        }
-
-        const scrollable = document.documentElement.scrollHeight - window.innerHeight;
-        const progress = scrollable <= 0
-            ? 100
-            : Math.min(100, Math.max(0, (window.scrollY / scrollable) * 100));
-
-        SCROLL_DEPTHS.forEach((depth) => {
-            if (progress < depth || sent.has(depth)) {
-                return;
-            }
-
-            if (track('newsroom_article_scroll_depth', {
-                ...context,
-                position: depth,
-            })) {
-                sent.add(depth);
-            }
-        });
-    };
-
-    sync();
-    window.addEventListener('scroll', sync, { passive: true });
-    window.addEventListener(ANALYTICS_READY_EVENT, sync);
-};
-
 const setupClickTracking = (): void => {
     document.addEventListener('click', (event) => {
         const target = event.target;
@@ -215,9 +176,12 @@ const setupClickTracking = (): void => {
             return;
         }
 
+        const position = cleanValue(card.dataset.newsroomAnalyticsPosition);
+
         track('newsroom_module_click', {
             ...contextFromElement(card),
             module,
+            ...(position ? { position } : {}),
             destination_path: clickedPath,
         });
     });
@@ -232,6 +196,5 @@ export const setupNewsroomAnalytics = (): void => {
     }
 
     setupArticleView();
-    setupArticleScrollDepth();
     setupClickTracking();
 };
