@@ -316,8 +316,15 @@
     @if ($hasGuides)
         <section id="poradniki" class="border-t border-slate-200 bg-slate-50" aria-labelledby="newsroom-guides-heading" data-analytics-module="guides">
             <div class="content-shell py-9 md:py-12">
-                <p class="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Materiały praktyczne</p>
-                <h2 id="newsroom-guides-heading" class="mt-1 text-2xl font-semibold tracking-tight text-slate-950">Poradniki</h2>
+                <div class="flex flex-wrap items-end justify-between gap-4">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Materiały praktyczne</p>
+                        <h2 id="newsroom-guides-heading" class="mt-1 text-2xl font-semibold tracking-tight text-slate-950">Poradniki</h2>
+                    </div>
+                    <a href="{{ route('public.guides') }}" class="inline-flex min-h-11 items-center text-sm font-semibold text-slate-800 hover:underline">
+                        Zobacz wszystkie poradniki
+                    </a>
+                </div>
 
                 <div class="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                     @if (! empty($home['guides']['lead']))

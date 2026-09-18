@@ -134,5 +134,16 @@ test('enabled newsroom public gate exposes only already implemented eligible pub
         ->assertViewIs('newsroom.category')
         ->assertSee('Publiczny artykuł po cutover');
 
+    $guide = ContentArticle::factory()->published()->guide()->create([
+        'title' => 'Publiczny poradnik po cutover',
+        'slug' => 'publiczny-poradnik-po-cutover',
+    ]);
+
+    $this->get(route('public.guides'))
+        ->assertOk()
+        ->assertHeaderMissing('X-Robots-Tag')
+        ->assertViewIs('newsroom.guides')
+        ->assertSee('Publiczny poradnik po cutover');
+
     $this->get(route('public.news.feed'))->assertNotFound();
 });

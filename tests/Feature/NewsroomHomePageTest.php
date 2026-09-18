@@ -49,6 +49,14 @@ test('newsroom home renders the public blade from the gated read model when enab
         ]);
     }
 
+    ContentArticle::factory()->published()->guide()->create([
+        'category_id' => $category->id,
+        'title' => 'Praktyczny poradnik z huba',
+        'slug' => 'praktyczny-poradnik-z-huba',
+        'first_published_at' => now()->subDay(),
+        'published_at' => now()->subDay(),
+    ]);
+
     $response = $this->get(route('public.news'));
 
     $response
@@ -63,6 +71,8 @@ test('newsroom home renders the public blade from the gated read model when enab
         ->assertSee('Egzaminy')
         ->assertSee('Zobacz wszystkie')
         ->assertSee(route('public.news.categories.show', ['categorySlug' => $category->slug]), false)
+        ->assertSee('Zobacz wszystkie poradniki')
+        ->assertSee(route('public.guides'), false)
         ->assertSee('Czy zdałbyś teorię dzisiaj?')
         ->assertSee('Rozpocznij bezpłatny test')
         ->assertSee(route('public.tests'), false)
