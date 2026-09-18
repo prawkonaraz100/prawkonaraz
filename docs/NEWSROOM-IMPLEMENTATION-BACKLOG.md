@@ -1765,7 +1765,7 @@ Site-wide orphan/click-depth crawler/komenda pozostaje osobnym możliwym hardeni
 - `news:name` korzysta z istniejącego canonical publication identity przez `SiteIdentitySchema::siteName()`; nie dodano równoległego configu,
 - `news:language=pl`, `news:publication_date=first_published_at` w ISO/W3C, a `news:title` używa widocznego `ContentArticle.title`, nie SEO title ani brandingu,
 - przy maks. 1000 kwalifikowanych wpisów generator używa `/sitemaps/news.xml`; powyżej limitu generuje stabilne fixed-`content_articles.id` range shards i wpisuje je bezpośrednio do istniejącego root sitemap index,
-- istniejący `SeoSitemapAuditor` dopuszcza legalny overlap URL-i pomiędzy standard article sitemap i News Sitemap; pełne namespace/tag/age/shard audit rules pozostają osobnym NEWSROOM-N5-006,
+- istniejący `SeoSitemapAuditor` dopuszcza legalny overlap URL-i pomiędzy standard article sitemap i News Sitemap; cross-stage status: NEWSROOM-N5-006 później domknęło namespace/tag/age/eligibility/topology/shard/obsolete-file audit rules bez drugiego validatora,
 - N5-002 nie wdraża feedu, dirty/version refresh coordinatora, child-before-index atomic publication/obsolete-shard cleanup, article-specific IndexNow ani produkcyjnej weryfikacji Nginx/CDN/GSC.
 
 ### Zakres
@@ -2318,7 +2318,7 @@ Docs-only:
 - [x] News Sitemap full required metadata + `first_published_at` eligibility + 1000-entry deterministic split (NEWSROOM-N5-002)
 - [ ] dirty/version scheduled refresh bez queue-worker assumption
 - [ ] child-before-index atomic static publication
-- [ ] istniejący SeoSitemapAuditor rozszerzony o newsroom/news namespace-specific checks; N5-001 dodało ogólne protocol-limit guards, a N5-002 tylko legalny article/news overlap handling bez pełnego namespace/age/tag audit
+- [x] istniejący `SeoSitemapAuditor` rozszerzony o newsroom/news namespace/tag/date/window/eligibility/topology/shard/obsolete-file checks w NEWSROOM-N5-006; generic protocol-limit guards nadal są reużywane
 - [ ] rzeczywisty static/Nginx/CDN delivery smoke (Content-Type/cache/Set-Cookie/validators)
 - [x] Atom feed + discovery + generation cache/validator contract (NEWSROOM-N5-003)
 - [ ] author ProfilePage / publisher / WebSite
