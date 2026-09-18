@@ -11,6 +11,8 @@ use DateTimeInterface;
 use DomainException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 final class NewsroomHomeCompositionService
@@ -101,15 +103,26 @@ final class NewsroomHomeCompositionService
             ->orderBy('id')
             ->get();
 
+        $categoryPlacements = $includeManualPlacements
+            ? $this->categoryPlacementCandidates($at)
+            : collect();
+
+        $categoryCandidatePools = $this->categoryCandidatePools($at, $categories);
+
         foreach ($categories as $category) {
+            $categoryId = (int) $category->getKey();
+            $categorySlug = (string) $category->slug;
+
             $categoryLead = $this->resolveEditorialSlot(
                 ContentHomePlacement::SLOT_CATEGORY_LEAD,
-                (string) $category->slug,
+                $categorySlug,
                 1,
                 $at,
                 $used,
                 $category,
                 includeManualPlacements: $includeManualPlacements,
+                placementCandidates: $categoryPlacements->get($categorySlug, []),
+                fallbackCandidates: $categoryCandidatePools['editorial']->get($categoryId, []),
             )[0] ?? null;
 
             $items = $this->resolveChronological(
@@ -117,6 +130,7 @@ final class NewsroomHomeCompositionService
                 $at,
                 $used,
                 $category,
+                fallbackCandidates: $categoryCandidatePools['chronological']->get($categoryId, []),
             );
 
             if ($categoryLead === null && $items === []) {
@@ -185,6 +199,8 @@ final class NewsroomHomeCompositionService
         ?ContentCategory $category = null,
         ?ContentArticleType $type = null,
         bool $includeManualPlacements = true,
+        ?iterable $placementCandidates = null,
+        ?iterable $fallbackCandidates = null,
     ): array {
         if ($limit === 0) {
             return [];
@@ -193,7 +209,7 @@ final class NewsroomHomeCompositionService
         $resolved = [];
 
         if ($includeManualPlacements) {
-            $placements = ContentHomePlacement::query()
+            $placements = $placementCandidates ?? ContentHomePlacement::query()
                 ->activeAt($at)
                 ->where('surface_key', ContentHomePlacement::SURFACE_NEWSROOM_HOME)
                 ->where('slot_key', $slotKey)
@@ -224,19 +240,24 @@ final class NewsroomHomeCompositionService
             }
         }
 
-        $query = $this->candidateQuery($at);
+        if ($fallbackCandidates === null) {
+            $query = $this->candidateQuery($at);
 
-        $this->applyContextFilters($query, $category, $type);
+            $this->applyContextFilters($query, $category, $type);
 
-        $query
-            ->orderByDesc('is_featured')
-            ->orderByDesc('editorial_priority')
-            ->orderByRaw('COALESCE(first_published_at, scheduled_for) DESC')
-            ->orderByDesc('id');
+            $query
+                ->orderByDesc('is_featured')
+                ->orderByDesc('editorial_priority')
+                ->orderByRaw('COALESCE(first_published_at, scheduled_for) DESC')
+                ->orderByDesc('id');
 
-        foreach ($query->limit(self::CANDIDATE_WINDOW)->get() as $article) {
+            $fallbackCandidates = $query->limit(self::CANDIDATE_WINDOW)->get();
+        }
+
+        foreach ($fallbackCandidates as $article) {
             if (
                 isset($used[(int) $article->getKey()])
+                || ! $this->matchesSlotContext($article, $slotKey, $category, $type)
                 || ! $this->isArticleEligibleAt($article, $at)
             ) {
                 continue;
@@ -262,23 +283,30 @@ final class NewsroomHomeCompositionService
         array &$used,
         ?ContentCategory $category = null,
         ?ContentArticleType $type = null,
+        ?iterable $fallbackCandidates = null,
     ): array {
         if ($limit === 0) {
             return [];
         }
 
-        $query = $this->candidateQuery($at);
-        $this->applyContextFilters($query, $category, $type);
+        if ($fallbackCandidates === null) {
+            $query = $this->candidateQuery($at);
+            $this->applyContextFilters($query, $category, $type);
 
-        $query
-            ->orderByRaw('COALESCE(first_published_at, scheduled_for) DESC')
-            ->orderByDesc('id');
+            $query
+                ->orderByRaw('COALESCE(first_published_at, scheduled_for) DESC')
+                ->orderByDesc('id');
+
+            $fallbackCandidates = $query->limit(self::CANDIDATE_WINDOW)->get();
+        }
 
         $resolved = [];
 
-        foreach ($query->limit(self::CANDIDATE_WINDOW)->get() as $article) {
+        foreach ($fallbackCandidates as $article) {
             if (
                 isset($used[(int) $article->getKey()])
+                || ($category !== null && (int) $article->category_id !== (int) $category->getKey())
+                || ($type !== null && $article->type !== $type)
                 || ! $this->isArticleEligibleAt($article, $at)
             ) {
                 continue;
@@ -314,13 +342,12 @@ final class NewsroomHomeCompositionService
         return null;
     }
 
-    private function candidateQuery(Carbon $at): Builder
+    private function candidateQuery(Carbon $at, bool $withRelations = true): Builder
     {
         $now = now();
         $includeScheduledPreview = $at->gt($now);
 
-        return ContentArticle::query()
-            ->with(['category', 'author'])
+        $query = ContentArticle::query()
             ->where(function (Builder $query) use ($at, $includeScheduledPreview): void {
                 $query->where(function (Builder $published) use ($at): void {
                     $published
@@ -338,6 +365,126 @@ final class NewsroomHomeCompositionService
                     });
                 }
             });
+
+        if ($withRelations) {
+            $query->with(['category', 'author']);
+        }
+
+        return $query;
+    }
+
+    /**
+     * @return Collection<string, Collection<int, ContentHomePlacement>>
+     */
+    private function categoryPlacementCandidates(Carbon $at): Collection
+    {
+        return ContentHomePlacement::query()
+            ->activeAt($at)
+            ->where('surface_key', ContentHomePlacement::SURFACE_NEWSROOM_HOME)
+            ->where('slot_key', ContentHomePlacement::SLOT_CATEGORY_LEAD)
+            ->whereNotNull('context_key')
+            ->with(['article.category', 'article.author'])
+            ->orderBy('context_key')
+            ->orderBy('position')
+            ->orderBy('id')
+            ->get()
+            ->groupBy(fn (ContentHomePlacement $placement): string => (string) $placement->context_key);
+    }
+
+    /**
+     * @param  Collection<int, ContentCategory>  $categories
+     * @return array{
+     *     editorial: Collection<int, list<ContentArticle>>,
+     *     chronological: Collection<int, list<ContentArticle>>
+     * }
+     */
+    private function categoryCandidatePools(Carbon $at, Collection $categories): array
+    {
+        $categoryIds = $categories
+            ->map(fn (ContentCategory $category): int => (int) $category->getKey())
+            ->values()
+            ->all();
+
+        if ($categoryIds === []) {
+            return [
+                'editorial' => collect(),
+                'chronological' => collect(),
+            ];
+        }
+
+        $editorialRows = $this->rankedCategoryCandidateRows($at, $categoryIds, editorial: true);
+        $chronologicalRows = $this->rankedCategoryCandidateRows($at, $categoryIds, editorial: false);
+
+        $articleIds = collect($editorialRows)
+            ->concat($chronologicalRows)
+            ->pluck('id')
+            ->map(fn (mixed $id): int => (int) $id)
+            ->unique()
+            ->values()
+            ->all();
+
+        if ($articleIds === []) {
+            return [
+                'editorial' => collect(),
+                'chronological' => collect(),
+            ];
+        }
+
+        $articles = ContentArticle::query()
+            ->with(['category', 'author'])
+            ->whereIn('id', $articleIds)
+            ->get()
+            ->keyBy(fn (ContentArticle $article): int => (int) $article->getKey());
+
+        return [
+            'editorial' => $this->hydrateRankedCategoryRows($editorialRows, $articles),
+            'chronological' => $this->hydrateRankedCategoryRows($chronologicalRows, $articles),
+        ];
+    }
+
+    /**
+     * @param  list<int>  $categoryIds
+     * @return list<object{id:int,category_id:int,candidate_rank:int}>
+     */
+    private function rankedCategoryCandidateRows(
+        Carbon $at,
+        array $categoryIds,
+        bool $editorial,
+    ): array {
+        $order = $editorial
+            ? 'is_featured DESC, editorial_priority DESC, COALESCE(first_published_at, scheduled_for) DESC, id DESC'
+            : 'COALESCE(first_published_at, scheduled_for) DESC, id DESC';
+
+        $ranked = $this->candidateQuery($at, withRelations: false)
+            ->whereIn('category_id', $categoryIds)
+            ->select(['id', 'category_id'])
+            ->selectRaw(
+                "ROW_NUMBER() OVER (PARTITION BY category_id ORDER BY {$order}) AS candidate_rank",
+            );
+
+        return DB::query()
+            ->fromSub($ranked->toBase(), 'ranked_newsroom_candidates')
+            ->where('candidate_rank', '<=', self::CANDIDATE_WINDOW)
+            ->orderBy('category_id')
+            ->orderBy('candidate_rank')
+            ->get(['id', 'category_id', 'candidate_rank'])
+            ->all();
+    }
+
+    /**
+     * @param  list<object{id:int,category_id:int,candidate_rank:int}>  $rows
+     * @param  Collection<int, ContentArticle>  $articles
+     * @return Collection<int, list<ContentArticle>>
+     */
+    private function hydrateRankedCategoryRows(array $rows, Collection $articles): Collection
+    {
+        return collect($rows)
+            ->groupBy(fn (object $row): int => (int) $row->category_id)
+            ->map(fn (Collection $categoryRows): array => $categoryRows
+                ->map(fn (object $row): ?ContentArticle => $articles->get((int) $row->id))
+                ->filter(fn (?ContentArticle $article): bool => $article instanceof ContentArticle)
+                ->values()
+                ->all());
     }
 
     private function applyContextFilters(
