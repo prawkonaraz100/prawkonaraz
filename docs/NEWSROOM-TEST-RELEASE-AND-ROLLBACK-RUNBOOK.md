@@ -1055,7 +1055,7 @@ Przy pre-launch `NEWSROOM_PUBLIC_ENABLED=false` test potwierdza:
 - obecny `IndexNowUrlCollector` nie przepuszcza namespace `/aktualnosci` ani `/poradniki`,
 - authenticated admin private preview nadal działa.
 
-Przy `NEWSROOM_PUBLIC_ENABLED=true` regression potwierdza obecnie istniejące powierzchnie: public article detail, publiczny Hub Blade `/aktualnosci`, category pages, `/poradniki` hub, topic dossier, author publication, author sitemap eligibility, historyczny redirect, N4-008 semantic/reverse-link modules oraz N5-001 standard article sitemap/hub coverage. Feed i news sitemap pozostają dalszym N5 i nie są fałszywie zaliczane.
+Przy `NEWSROOM_PUBLIC_ENABLED=true` regression potwierdza obecnie istniejące powierzchnie: public article detail, publiczny Hub Blade `/aktualnosci`, category pages, `/poradniki` hub, topic dossier, author publication, author sitemap eligibility, historyczny redirect, N4-008 semantic/reverse-link modules, N5-001 standard article sitemap/hub coverage oraz N5-002 Google News Sitemap. Feed pozostaje dalszym N5 i nie jest fałszywie zaliczany.
 
 Existing public-article PHPUnit baseline i dedykowany Browser Smoke `newsroom-article` jawnie ustawiają gate na `true`, dzięki czemu bezpieczny produkcyjny default `false` nie maskuje regresji publicznego renderer'a.
 
@@ -1495,8 +1495,8 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - `NewsroomPublicArticlePageTest` został zsynchronizowany z nowym kontraktem guide detail: primary category jest crawlable classification linkiem bez zmiany guide breadcrumb family,
 - workflow `Browser Smoke` ma osobny job `newsroom-semantic-links`; Browser Smoke #48 na finalnym N4-008 head `bd63773bc1febdcc6aa8c2507c6621e908d63b09` zakończył PASS dla semantic-links, article, home, category, guides i topic,
 - exact-head CI #361 zakończył pełny PASS, a post-merge CI #362 na `main@3d7ac8ab8a3ed1c299cb0cdd4cb1ef8ac6b53f78` zakończył: `quality` 1093 passed / 19 881 assertions / 2 skipped, Pint PASS, frontend build 7.42 s; `newsroom-postgres` 7 passed / 94 assertions,
-- publiczny Hub Blade, category pages, guide hub, topic dossier, navigation integration, home/category cache, N4-008 semantic/reverse links oraz N5-001 standard article sitemap/hub coverage są zamknięte implementacyjnie; następnym taskiem jest NEWSROOM-N5-002,
-- atomic static publication, dirty/version newsroom refresh coordinator, news sitemap output, feed i namespace-specific `SeoSitemapAuditor` extension pozostają N5.
+- publiczny Hub Blade, category pages, guide hub, topic dossier, navigation integration, home/category cache, N4-008 semantic/reverse links, N5-001 standard article sitemap/hub coverage oraz N5-002 Google News Sitemap są zamknięte implementacyjnie; następnym taskiem jest NEWSROOM-N5-003,
+- atomic static publication, dirty/version newsroom refresh coordinator, feed i pełne namespace-specific `SeoSitemapAuditor` extension pozostają N5.
 
 ---
 
@@ -1513,11 +1513,11 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - [x] dodać N3-007 `ContentAuthorProfileTest` dla author-profile lifecycle, shared schema identity, public-state sitemap freshness i unpublish guard,
 - [x] dodać N2 stale-write/Apply-public-update oraz HomeComposer stale-write regression; ContentArticle i placement same-second conflicts są blokowane,
 - [x] dodać N5-001 standard article sitemap regression w istniejącym `SeoSitemapGenerationTest`: single shard, boundary crossing, stable fixed-ID-range assignment, no duplicate URL across shards, public-gate suppression, eligibility/current-canonical oraz URL-count/byte-size guards,
-- [ ] dodać news namespace + news-sitemap boundary tests,
+- [x] dodać N5-002 News Sitemap regression w istniejącym `SeoSitemapGenerationTest`: required namespace/tags, visible title/canonical identity, `first_published_at` 2-day eligibility, old-updated exclusion, public-gate suppression, non-news/status/noindex/category/author/redirect-source exclusions i realny 1000→1001 boundary,
 - [ ] dodać child-before-index atomic publication + obsolete-shard cleanup tests,
 - [ ] dodać dirty-marker refresh/feed-discovery tests,
 - [ ] dodać production-like static robots/sitemap delivery smoke,
-- [ ] rozszerzyć istniejący `SeoSitemapAuditor` o newsroom/news namespace-specific checks; N5-001 potwierdza już ogólne entry-count/byte-size guards,
+- [ ] rozszerzyć istniejący `SeoSitemapAuditor` o newsroom/news namespace-specific checks; N5-001 potwierdza ogólne entry-count/byte-size guards, a N5-002 tylko legalny article/news URL overlap handling,
 - [ ] stworzyć production smoke checklist w praktyce,
 - [x] wdrożyć i przetestować `NEWSROOM_PUBLIC_ENABLED` w N3-008 dla obecnie istniejących public detail/redirect + author + IndexNow surfaces; przyszłe N4/N5 discovery surfaces nadal wymagają tego samego gate,
 - [x] dodać N4-001 `NewsroomHomeReadModelServiceTest` dla rollout gate, scalar/cacheable projection i stałego query budgetu niezależnego od liczby kategorii,
@@ -1533,6 +1533,15 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-18 — v0.30
+
+- NEWSROOM-N5-002 implementation PR #99 zakończył exact-head CI #371 PASS na `9bc16a7e42ae55c23b1916a4e214b9af846fd3dd`; merge to `main@827f3816487d3a404df26c381a103a6cd1a9f413`,
+- `tests/Feature/Public/SeoSitemapGenerationTest.php` pokrywa News Sitemap namespace/required metadata, canonical publication name, visible title, 2-day `first_published_at` eligibility, old-updated exclusion, public gate, non-news/status/noindex/category/author/redirect-source exclusion oraz realny 1000→1001 split,
+- existing auditor dopuszcza legalny overlap URL standard article/news sitemap; pełne namespace/age/tag/shard checks pozostają N5-006 i nie są fałszywie zaliczane,
+- post-merge CI #372 zakończył pełny gate: 1100 passed / 19 964 assertions / 2 skipped, Pint PASS, frontend build 10.28 s; `newsroom-postgres` 7 passed / 94 assertions,
+- nie ma jeszcze dowodu produkcyjnego static/Nginx/CDN/GSC ani child-before-index/obsolete-shard cleanup/dirty refresh; feed tests pozostają otwarte,
+- następnym wykonywalnym taskiem jest NEWSROOM-N5-003 — RSS/Atom feed + discovery.
 
 ### 2026-09-18 — v0.29
 
