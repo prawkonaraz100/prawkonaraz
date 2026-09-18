@@ -25,13 +25,10 @@ class SeoSitemapGenerator
         $files = $this->buildFiles();
 
         $this->assertProtocolLimits($files);
+        $this->assertValidXmlPayloads($files);
 
         if (! $dryRun) {
-            $this->prepareSitemapDirectory();
-
-            foreach ($files as $relativePath => $meta) {
-                $this->writeAtomically(public_path($relativePath), $meta['contents']);
-            }
+            $this->publishFiles($files);
         }
 
         return collect($files)
@@ -216,17 +213,80 @@ class SeoSitemapGenerator
             || preg_match('#^sitemaps/news-\d+-\d+\.xml$#', $relativePath) === 1;
     }
 
-    protected function prepareSitemapDirectory(): void
+    /**
+     * @param  array<string, array{contents:string,urls:int}>  $files
+     */
+    protected function assertValidXmlPayloads(array $files): void
+    {
+        foreach ($files as $relativePath => $meta) {
+            if (@simplexml_load_string($meta['contents']) === false) {
+                throw new \RuntimeException('Generated sitemap XML is invalid: '.$relativePath);
+            }
+        }
+    }
+
+    /**
+     * @param  array<string, array{contents:string,urls:int}>  $files
+     */
+    protected function publishFiles(array $files): void
+    {
+        $index = $files['sitemap.xml'] ?? null;
+
+        if (! is_array($index)) {
+            throw new \RuntimeException('Generated sitemap set is missing sitemap.xml.');
+        }
+
+        $this->ensureSitemapDirectory();
+
+        foreach ($files as $relativePath => $meta) {
+            if ($relativePath === 'sitemap.xml') {
+                continue;
+            }
+
+            $this->writeAtomically(public_path($relativePath), $meta['contents']);
+        }
+
+        $this->writeAtomically(public_path('sitemap.xml'), $index['contents']);
+
+        $this->removeObsoleteNewsroomSitemapFiles(array_keys($files));
+    }
+
+    protected function ensureSitemapDirectory(): void
     {
         $directory = public_path('sitemaps');
 
         if (! File::isDirectory($directory)) {
             File::makeDirectory($directory, 0755, true);
         }
+    }
 
-        foreach (File::glob($directory.DIRECTORY_SEPARATOR.'*.xml') ?: [] as $file) {
-            File::delete($file);
+    /**
+     * @param  list<string>  $publishedPaths
+     */
+    protected function removeObsoleteNewsroomSitemapFiles(array $publishedPaths): void
+    {
+        $published = array_fill_keys($publishedPaths, true);
+        $directory = public_path('sitemaps');
+
+        foreach (['articles*.xml', 'news*.xml'] as $pattern) {
+            foreach (File::glob($directory.DIRECTORY_SEPARATOR.$pattern) ?: [] as $file) {
+                $relativePath = 'sitemaps/'.basename($file);
+
+                if (
+                    $this->isManagedNewsroomSitemapPath($relativePath)
+                    && ! isset($published[$relativePath])
+                ) {
+                    File::delete($file);
+                }
+            }
         }
+    }
+
+    protected function isManagedNewsroomSitemapPath(string $relativePath): bool
+    {
+        return $relativePath === ltrim(SeoSitemapBuilder::ARTICLES_SITEMAP_PATH, '/')
+            || $relativePath === ltrim(SeoSitemapBuilder::NEWS_SITEMAP_PATH, '/')
+            || preg_match('#^sitemaps/(?:articles|news)-\\d+-\\d+\\.xml$#', $relativePath) === 1;
     }
 
     protected function writeAtomically(string $path, string $contents): void
@@ -239,7 +299,9 @@ class SeoSitemapGenerator
 
         $temporaryPath = $path.'.tmp.'.bin2hex(random_bytes(4));
 
-        File::put($temporaryPath, $contents, true);
+        if (File::put($temporaryPath, $contents, true) === false) {
+            throw new \RuntimeException('Unable to stage sitemap XML: '.$path);
+        }
 
         if (@simplexml_load_string($contents) === false) {
             File::delete($temporaryPath);
@@ -247,6 +309,10 @@ class SeoSitemapGenerator
             throw new \RuntimeException('Generated sitemap XML is invalid: '.$path);
         }
 
-        File::move($temporaryPath, $path);
+        if (! File::move($temporaryPath, $path)) {
+            File::delete($temporaryPath);
+
+            throw new \RuntimeException('Unable to atomically publish sitemap XML: '.$path);
+        }
     }
 }
