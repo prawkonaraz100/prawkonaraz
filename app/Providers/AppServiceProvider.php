@@ -8,7 +8,6 @@ use App\Events\ContentHomePlacementChanged;
 use App\Listeners\InvalidateNewsroomHomeCacheOnPlacementChange;
 use App\Listeners\InvalidateNewsroomReadCacheOnArticleWorkflowTransition;
 use App\Listeners\InvalidateNewsroomReadCacheOnPublicArticleChange;
-use App\Listeners\MarkNewsroomSeoArtifactsDirty;
 use App\Models\ContentAuthor;
 use App\Models\ContentCategory;
 use App\Models\ContentTopic;
@@ -56,18 +55,6 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(
             ContentHomePlacementChanged::class,
             InvalidateNewsroomHomeCacheOnPlacementChange::class,
-        );
-        Event::listen(
-            ContentArticleWorkflowTransitioned::class,
-            MarkNewsroomSeoArtifactsDirty::class,
-        );
-        Event::listen(
-            ContentArticlePublicReadChanged::class,
-            MarkNewsroomSeoArtifactsDirty::class,
-        );
-        Event::listen(
-            ContentHomePlacementChanged::class,
-            MarkNewsroomSeoArtifactsDirty::class,
         );
 
         RateLimiter::for('contact', function (Request $request): Limit {
