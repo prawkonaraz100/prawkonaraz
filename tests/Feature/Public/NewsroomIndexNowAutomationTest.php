@@ -111,13 +111,14 @@ test('first publish queues canonical newsroom url as created after commit', func
 });
 
 test('archive does not queue delete while republish queues updated', function () {
+    Carbon::setTestNow('2026-09-18 12:00:00');
+
     $article = ContentArticle::factory()->published()->create([
         'slug' => 'archiwum-indexnow',
     ]);
     ContentArticleSource::factory()->for($article, 'article')->create();
 
     $service = app(ContentArticlePublishingService::class);
-    Carbon::setTestNow('2026-09-18 12:00:00');
     $archived = $service->archive($article);
 
     expect($archived->workflow_status)->toBe(ContentArticleWorkflowStatus::Archived)
@@ -138,13 +139,14 @@ test('archive does not queue delete while republish queues updated', function ()
 });
 
 test('withdraw queues deleted only after 410 state and restore to review stays silent until republish', function () {
+    Carbon::setTestNow('2026-09-18 13:00:00');
+
     $article = ContentArticle::factory()->published()->create([
         'slug' => 'wycofany-indexnow',
     ]);
     ContentArticleSource::factory()->for($article, 'article')->create();
 
     $service = app(ContentArticlePublishingService::class);
-    Carbon::setTestNow('2026-09-18 13:00:00');
     $withdrawn = $service->withdraw($article, 'Test wycofania.');
 
     $deleted = IndexNowUrlSubmission::query()->sole();
