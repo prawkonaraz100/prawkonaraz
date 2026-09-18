@@ -157,19 +157,20 @@ test('category metadata change invalidates cached home and category projections'
         'position' => 10,
     ]);
 
-    ContentArticle::factory()->published()->create([
+    ContentArticle::factory()->published()->featured()->create([
         'category_id' => $category->id,
+        'editorial_priority' => 100,
     ]);
 
     $home = app(NewsroomHomeReadModelService::class);
     $categoryRead = app(NewsroomCategoryReadModelService::class);
 
-    expect($home->build()['categories'][0]['category']['name'])->toBe('Stara nazwa')
+    expect($home->build()['lead']['category']['name'])->toBe('Stara nazwa')
         ->and($categoryRead->build($category->slug)['category']['name'])->toBe('Stara nazwa');
 
     $category->update(['name' => 'Nowa nazwa']);
 
-    expect($home->build()['categories'][0]['category']['name'])->toBe('Nowa nazwa')
+    expect($home->build()['lead']['category']['name'])->toBe('Nowa nazwa')
         ->and($categoryRead->build($category->slug)['category']['name'])->toBe('Nowa nazwa');
 });
 
