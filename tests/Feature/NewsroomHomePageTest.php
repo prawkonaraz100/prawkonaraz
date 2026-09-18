@@ -61,6 +61,8 @@ test('newsroom home renders the public blade from the gated read model when enab
         ->assertSee($lead->title)
         ->assertSee('Najnowsze')
         ->assertSee('Egzaminy')
+        ->assertSee('Zobacz wszystkie')
+        ->assertSee(route('public.news.categories.show', ['categorySlug' => $category->slug]), false)
         ->assertSee('Czy zdałbyś teorię dzisiaj?')
         ->assertSee('Rozpocznij bezpłatny test')
         ->assertSee(route('public.tests'), false)
