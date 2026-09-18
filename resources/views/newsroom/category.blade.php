@@ -28,6 +28,10 @@
     $lastPage = $articles->lastPage();
     $pageStart = max(1, $currentPage - 2);
     $pageEnd = min($lastPage, $currentPage + 2);
+    $categoryBaseUrl = route('public.news.categories.show', ['categorySlug' => $category['slug']]);
+    $pageUrl = static fn (int $page): string => $page <= 1
+        ? $categoryBaseUrl
+        : $categoryBaseUrl.'?page='.$page;
 @endphp
 
 @section('content')
@@ -138,8 +142,8 @@
                 @if ($lastPage > 1)
                     <nav class="mt-8 border-t border-slate-200 pt-6" aria-label="Paginacja kategorii" data-analytics-module="pagination">
                         <div class="flex flex-wrap items-center gap-2">
-                            @if ($articles->previousPageUrl())
-                                <a href="{{ $articles->previousPageUrl() }}" rel="prev" class="inline-flex min-h-11 items-center justify-center border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-900 hover:border-slate-500 hover:underline">
+                            @if ($currentPage > 1)
+                                <a href="{{ $pageUrl($currentPage - 1) }}" rel="prev" class="inline-flex min-h-11 items-center justify-center border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-900 hover:border-slate-500 hover:underline">
                                     Poprzednia
                                 </a>
                             @endif
@@ -150,14 +154,14 @@
                                         {{ $page }}
                                     </span>
                                 @else
-                                    <a href="{{ $articles->url($page) }}" class="inline-flex min-h-11 min-w-11 items-center justify-center border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-900 hover:border-slate-500 hover:underline">
+                                    <a href="{{ $pageUrl($page) }}" class="inline-flex min-h-11 min-w-11 items-center justify-center border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-900 hover:border-slate-500 hover:underline">
                                         {{ $page }}
                                     </a>
                                 @endif
                             @endfor
 
-                            @if ($articles->nextPageUrl())
-                                <a href="{{ $articles->nextPageUrl() }}" rel="next" class="inline-flex min-h-11 items-center justify-center border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-900 hover:border-slate-500 hover:underline">
+                            @if ($currentPage < $lastPage)
+                                <a href="{{ $pageUrl($currentPage + 1) }}" rel="next" class="inline-flex min-h-11 items-center justify-center border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-900 hover:border-slate-500 hover:underline">
                                     Następna
                                 </a>
                             @endif
