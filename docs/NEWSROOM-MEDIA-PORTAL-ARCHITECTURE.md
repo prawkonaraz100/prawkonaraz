@@ -5,7 +5,7 @@
 - **Status:** Canonical architecture + live implementation status
 - **Obszar:** publiczny serwis informacyjny, newsroom, aktualności, poradniki i dystrybucja treści
 - **Repozytorium:** `prawkonaraz100/prawkonaraz`
-- **Bazowy stan kodu:** `main@a97373003c5a249a28761df15342f19e656c50c5`
+- **Bazowy stan kodu:** `main@3d7ac8ab8a3ed1c299cb0cdd4cb1ef8ac6b53f78`
 - **Data utworzenia:** 2026-09-15
 - **Właściciel decyzji produktowej:** PrawkoNaRaz
 - **Cel:** zaprojektować profesjonalny pion medialny bez dublowania istniejącej platformy, bez osobnego CMS/WordPressa i bez rozbijania modularnego monolitu.
@@ -201,7 +201,7 @@ To oznacza, że:
 - legal reference wymaga verified `LegalUnit`, verified `LegalAct` i opublikowanej strony przepisu w opublikowanym topicu; internal notes/official excerpt nie są emitowane,
 - traffic sign group dopuszcza tylko article pivot `relation_type` `direct` lub `example`, a następnie wymaga published znaku, autora i kategorii; luźny `related` jest fail-closed,
 - contextual CTA reużywa istniejące trasy testu, publicznej bazy pytań i nauki,
-- reverse links nie są częścią N3-005 i pozostają N4-008,
+- reverse links nie są częścią N3-005; zostały później zmaterializowane w N4-008 na tych samych article-owned pivots,
 - `ContentArticlePathResolver` pozostaje canonical/history path foundation; NEWSROOM-N3-006 podłącza go do publicznego HTTP po current-canonical `not_found` i zwraca one-hop 301 wyłącznie dla zapisanego 301 wskazującego bieżący canonical; stale/malformed/self-loop redirect failuje zamknięcie do 404, a query string nie jest przenoszony do celu,
 - `NEWSROOM_PUBLIC_ENABLED` nie został wdrożony przez N3-005 i pozostaje NEWSROOM-N3-008,
 - zakres admin/domain CMS N2 pozostaje zmaterializowany, w tym `ContentCategoryResource`, `ContentArticleResource`, Builder/sources/relations/workflow/public-update/checklist/preview/HomeComposer/provenance-media i `ContentTopicResource`.
@@ -210,9 +210,8 @@ To oznacza, że:
 
 Nie ma obecnie kompletnego end-to-end odpowiednika:
 
-- jawnego reverse-link/discovery wejścia do publicznych topic/dossier z istniejących entity/content surfaces — pozostaje N4-008,
+- site-wide orphan/click-depth audit command ponad per-article audit data — może wejść do N5/N6,
 - publicznego feed rendererera `/aktualnosci/feed.xml` — pozostaje N5,
-- reverse-link surface z istniejących entity pages do newsroom article,
 - news sitemap,
 - feedu RSS/Atom,
 - rankingów najnowsze / najczęściej czytane,
@@ -917,7 +916,7 @@ Przykłady:
 
 CTA powinno wynikać z kontekstu, nie być globalnym banerem „kup teraz”.
 
-**Aktualny stan:** NEWSROOM-N3-005 jest wdrożone. `NewsroomArticleProductBridgeService` rozwiązuje wyłącznie jawnie powiązane, publicznie kwalifikowane targety; question group ma limit 5, legal reference wymaga verified legal data i opublikowanej publicznej strony, a traffic sign wymaga relacji `direct` lub `example` oraz published sign/author/category. CTA reużywa istniejące trasy testu, bazy pytań i nauki. Reverse links pozostają N4-008.
+**Aktualny stan:** NEWSROOM-N3-005 jest wdrożone. `NewsroomArticleProductBridgeService` rozwiązuje wyłącznie jawnie powiązane, publicznie kwalifikowane targety; question group ma limit 5, legal reference wymaga verified legal data i opublikowanej publicznej strony, a traffic sign wymaga relacji `direct` lub `example` oraz published sign/author/category. CTA reużywa istniejące trasy testu, bazy pytań i nauki. N4-008 później dodało kontrolowane reverse links oraz article→topic/related discovery bez dublowania Product Bridge i bez nowego relation graphu.
 
 ---
 
@@ -1529,8 +1528,9 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N4-005` — Navigation integration bez duplikowania istniejących primary links.
 - [x] `NEWSROOM-N4-006` — generation-based cache/invalidation dla publicznych home/category read models.
 - [x] `NEWSROOM-N4-007` — publiczne rollout-gated Topic / dossier pages na istniejącym `ContentTopic` i route `/aktualnosci/temat/{topicSlug}`.
+- [x] `NEWSROOM-N4-008` — semantic silo / controlled reverse links na istniejących topic/question/legal/sign pivots, bez nowej schema.
 
-N4-007 jest zmaterializowane i potwierdzone na `main@a97373003c5a249a28761df15342f19e656c50c5`; następnym wykonywalnym taskiem jest `NEWSROOM-N4-008` — Semantic silo / reverse-link integration. Pozostałe elementy N4–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu pełną checklistę.
+N4-008 jest zmaterializowane i potwierdzone na `main@3d7ac8ab8a3ed1c299cb0cdd4cb1ef8ac6b53f78`; następnym wykonywalnym taskiem jest `NEWSROOM-N5-001` — rozszerzenie istniejącego static sitemap generatora o article/hub coverage i deterministic sharding. Pozostałe elementy N5–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu pełną checklistę.
 
 ---
 ## 28. Zasady utrzymania dokumentu
@@ -1555,6 +1555,16 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-18 — v0.45
+
+- NEWSROOM-N4-008 zmergowano przez PR #95; finalny implementation head `bd63773bc1febdcc6aa8c2507c6621e908d63b09`, merge `main@3d7ac8ab8a3ed1c299cb0cdd4cb1ef8ac6b53f78`,
+- decyzja architektoniczna nie zmieniła się: semantic graph korzysta z jawnych relacji i nie tworzy sitewide reciprocal-link farm; implementacja reużywa istniejące `content_article_*` pivots,
+- article/guide detail ma primary-category, explicit topic links i deterministic related articles; reverse links są bounded na publicznych question/legal/sign surfaces, a TrafficSign pozostaje fail-closed dla `direct|example`,
+- istniejący N3-005 Product Bridge nadal odpowiada za article→question/legal/sign, więc N4-008 nie tworzy drugiego forward-link mechanizmu ani nie dotyka `question_relations` / `question_seo_topics`,
+- per-article audit materializuje inbound sources, explicit reverse-edge count i estimated hub depth; site-wide orphan/click-depth command nie został wdrożony,
+- exact-head CI #361 i Browser Smoke #48 zakończyły PASS; post-merge CI #362 zakończył 1093 passed / 19 881 assertions / 2 skipped, Pint PASS, frontend build 7.42 s i PostgreSQL 7/94,
+- następnym wykonywalnym taskiem jest NEWSROOM-N5-001.
 
 ### 2026-09-18 — v0.44
 

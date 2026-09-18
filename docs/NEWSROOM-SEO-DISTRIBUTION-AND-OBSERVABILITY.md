@@ -250,7 +250,7 @@ Nie publikować:
 
 Repo ma równolegle statyczny `public/robots.txt` i route `RobotsController`. Zgodnie z `SEO-SITEMAP-REPAIR-PLAN.md` produkcyjnie preferowany jest statyczny plik oraz jawna weryfikacja Nginx/Cloudflare.
 
-Globalny `NEWSROOM_PUBLIC_ENABLED=false` jest wdrożony przez N3-008 jako pre-launch/dark-deploy gate. `config/newsroom.php` ma bezpieczny default `false`, a `NewsroomPublicGate` centralizuje decyzję. Przy `false` publiczne article/guide detail oraz historyczne old-path redirecty failują do 404 przed lookupem/redirect resolverem; `/aktualnosci` i `/poradniki` pozostają linkowanymi pre-launch placeholder pages z `X-Robots-Tag: noindex, follow`. Profil autora nie emituje newsroom publications, a `SeoSitemapBuilder` nie uwzględnia newsroom-only author eligibility ani newsroomowego freshness contribution. Istniejący `IndexNowUrlCollector` dodatkowo odrzuca namespace `/aktualnosci` i `/poradniki` przy wyłączonym gate. Feed, article/news sitemap oraz reverse-link surfaces nadal nie istnieją i muszą konsumować ten sam gate dopiero przy wdrożeniu w N4/N5.
+Globalny `NEWSROOM_PUBLIC_ENABLED=false` jest wdrożony przez N3-008 jako pre-launch/dark-deploy gate. `config/newsroom.php` ma bezpieczny default `false`, a `NewsroomPublicGate` centralizuje decyzję. Przy `false` publiczne article/guide detail oraz historyczne old-path redirecty failują do 404 przed lookupem/redirect resolverem; `/aktualnosci` i `/poradniki` pozostają linkowanymi pre-launch placeholder pages z `X-Robots-Tag: noindex, follow`. Profil autora nie emituje newsroom publications, a `SeoSitemapBuilder` nie uwzględnia newsroom-only author eligibility ani newsroomowego freshness contribution. Istniejący `IndexNowUrlCollector` dodatkowo odrzuca namespace `/aktualnosci` i `/poradniki` przy wyłączonym gate. Od N4-008 również semantic/reverse-link resolver failuje do pustego wyniku przy wyłączonym gate. Feed oraz article/news sitemap nadal nie istnieją i muszą konsumować ten sam gate przy wdrożeniu w N5.
 
 Ta flaga jest przede wszystkim **pre-launch/dark-deploy gate**. Po pierwszym publicznym rollout nie używamy długotrwale `false` jako technicznego rollbacku dla już indeksowanych article URLs, jeśli skutkiem byłyby masowe 404. Dla krótkiej awarii technicznej preferujemy kontrolowane 503/Retry-After lub rollback kodu zachowujący publiczne routes; dla pojedynczej błędnej treści używamy `withdrawn`.
 
@@ -1594,7 +1594,10 @@ Obecnie:
 - po NEWSROOM-N4-002 `/aktualnosci` jest rollout-gated: przy `NEWSROOM_PUBLIC_ENABLED=false` pozostaje pre-launch placeholderem 200 + `X-Robots-Tag: noindex, follow`, a przy `true` renderuje SSR `newsroom.home` z self-canonical i `index,follow,max-image-preview:large`; od N4-004 `/poradniki` konsumuje ten sam gate: przy `false` pozostaje placeholderem 200 + noindex, a przy `true` renderuje SSR `newsroom.guides`,
 - `/aktualnosci/feed.xml` ma zarejestrowany route contract, ale obecnie zwraca 404; feed ani feed discovery nie są jeszcze wdrożone,
 - category route `/aktualnosci/kategoria/{categorySlug}` jest od N4-003 aktywnym publicznym SSR surface przy gate=true; od N4-007 topic route `/aktualnosci/temat/{topicSlug}` renderuje publiczne SSR dossier dla opublikowanego topicu, a article detail routes są aktywne od N3-004.
-- NEWSROOM-N3-008 jest wdrożone, N4-002 konsumuje ten sam gate dla publicznego huba `/aktualnosci`, N4-003 dla category pages, N4-004 dla `/poradniki`, a N4-007 dla topic dossier. Przy gate=false category/topic routes failują do 404, a top-level `/poradniki` pozostaje noindex placeholderem; przy gate=true opublikowany topic ma self-canonical `index,follow,max-image-preview:large`, draft/future/unknown pozostają 404, a historyczny archived topic zwraca 410 + noindex. Feed, reverse links, newsroom/article/news sitemap i article-specific IndexNow automation pozostają otwarte w dalszym N4/N5.
+- NEWSROOM-N4-008 materializuje istniejący semantic graph bez nowej schema: article/guide detail linkuje primary category, jawne published topics i deterministic related articles (max 4), a question/legal/sign surfaces renderują bounded reverse links (max 3) z istniejących newsroom pivots,
+- reverse/related eligibility wymaga `activelyDistributed()+indexable()`, aktywnej kategorii i publicznego autora; TrafficSign dopuszcza tylko `direct|example`, a question graph (`question_relations`, `question_seo_topics`, rankingi) pozostaje nietknięty,
+- `NewsroomSemanticLinkService::audit()` udostępnia per-article `has_crawlable_inbound`, inbound sources, explicit reverse-edge count i `estimated_hub_depth`; rekomendowana site-wide komenda `newsroom:audit-links` z sekcji 45 nadal nie istnieje i może wejść w N5/N6,
+- NEWSROOM-N3-008 jest wdrożone, N4-002 konsumuje ten sam gate dla publicznego huba `/aktualnosci`, N4-003 dla category pages, N4-004 dla `/poradniki`, N4-007 dla topic dossier, a N4-008 dla topic/related/reverse-link resolvers. Przy gate=false category/topic routes failują do 404, top-level `/poradniki` pozostaje noindex placeholderem, a N4-008 nie emituje reverse targets; przy gate=true opublikowany topic ma self-canonical `index,follow,max-image-preview:large`, draft/future/unknown pozostają 404, a historyczny archived topic zwraca 410 + noindex. Feed, newsroom/article/news sitemap i article-specific IndexNow automation pozostają otwarte w N5.
 
 ---
 
@@ -1606,7 +1609,9 @@ Obecnie:
 - [x] wdrożyć ContentArticleSeoService,
 - [x] wdrożyć ContentArticleSchemaService i publiczne osadzenie graphu w article HTML w N3-004,
 - [x] zintegrować ProfilePage/Article author identity i author sitemap z Newsroom corpus w N3-007,
-- [x] wdrożyć NEWSROOM-N3-008 public rollout gate dla istniejących detail/redirect, author profile/author sitemap contribution i obecnego IndexNow collectora; przyszłe feed/article sitemap/reverse links nadal muszą respektować ten sam gate,
+- [x] wdrożyć NEWSROOM-N3-008 public rollout gate dla detail/redirect, author profile/author sitemap contribution i obecnego IndexNow collectora; N4-008 semantic/reverse links respektują ten sam gate, a przyszłe feed/article/news sitemap nadal muszą go konsumować,
+- [x] wdrożyć N4-008 semantic silo / controlled reverse links na istniejących explicit pivots, z bounded deterministic resolverami i per-article inbound/click-depth audit data,
+- [ ] dodać site-wide orphan/click-depth audit command lub crawler ponad per-article audit data, jeśli N5/N6 potwierdzi potrzebę operacyjną,
 - [ ] rozszerzyć istniejący statyczny generator o article sitemap z deterministic sharding readiness,
 - [ ] wdrożyć statyczny news sitemap z pełnymi wymaganymi news tags,
 - [ ] wdrożyć child-before-index atomic publication i cleanup obsolete shards po switchu,
@@ -1626,6 +1631,16 @@ Obecnie:
 ---
 
 ## 70. Historia zmian
+
+### 2026-09-18 — v0.18
+
+- NEWSROOM-N4-008 zmergowano przez PR #95; finalny implementation head `bd63773bc1febdcc6aa8c2507c6621e908d63b09`, merge `main@3d7ac8ab8a3ed1c299cb0cdd4cb1ef8ac6b53f78`,
+- semantic graph reużywa istniejące public hubs, category/topic/author surfaces i newsroom-owned pivots; nie powstał automatyczny tag graph ani sitewide reciprocal-link farm,
+- related articles są deterministyczne i bounded do 4, reverse links do 3; wszystkie targets muszą być `activelyDistributed()+indexable()` z aktywną kategorią i publicznym autorem,
+- TrafficSign reverse resolver dopuszcza wyłącznie `direct|example`; article-question integration nie modyfikuje istniejącego question relation graphu,
+- `audit()` daje per-article inbound/click-depth evidence, ale site-wide `newsroom:audit-links` nadal jest tylko rekomendowanym możliwym hardeningiem N5/N6,
+- exact-head CI #361 i Browser Smoke #48 zakończyły PASS; post-merge CI #362 zakończył 1093 passed / 19 881 assertions / 2 skipped, Pint PASS, frontend build 7.42 s i PostgreSQL 7/94,
+- następnym wykonywalnym taskiem jest NEWSROOM-N5-001; feed, news sitemap, analytics i IndexNow pozostają osobnymi taskami N5.
 
 ### 2026-09-18 — v0.17
 
