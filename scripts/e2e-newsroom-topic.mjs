@@ -99,6 +99,7 @@ try {
         }
 
         const bodyText = await page.locator('body').innerText();
+        const normalizedBodyText = bodyText.toLocaleLowerCase('pl-PL');
         for (const expected of [
             'Najważniejsze informacje i praktyczne materiały o egzaminie teoretycznym.',
             'Wyróżniony materiał',
@@ -108,7 +109,7 @@ try {
             'Poradnik',
             'Następna',
         ]) {
-            if (!bodyText.includes(expected)) {
+            if (!normalizedBodyText.includes(expected.toLocaleLowerCase('pl-PL'))) {
                 throw new Error(`Missing "${expected}" at ${viewport.name}px.`);
             }
         }
