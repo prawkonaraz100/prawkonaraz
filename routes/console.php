@@ -2405,6 +2405,12 @@ Schedule::command('ops:prune-study-history')
     ->environments(['production'])
     ->withoutOverlapping();
 
+Schedule::command('newsroom:refresh-seo-artifacts-if-dirty')
+    ->everyMinute()
+    ->environments(['production'])
+    ->onOneServer()
+    ->withoutOverlapping();
+
 Schedule::command('seo:refresh-sitemaps')
     ->dailyAt((string) env('SEO_SITEMAP_REFRESH_AT', '03:30'))
     ->environments(['production'])
