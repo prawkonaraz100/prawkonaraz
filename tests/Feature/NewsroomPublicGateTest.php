@@ -2,6 +2,7 @@
 
 use App\Models\ContentArticle;
 use App\Models\ContentAuthor;
+use App\Models\ContentTopic;
 use App\Models\User;
 use App\Support\ContentArticleSlugService;
 use App\Support\IndexNowUrlCollector;
@@ -144,6 +145,20 @@ test('enabled newsroom public gate exposes only already implemented eligible pub
         ->assertHeaderMissing('X-Robots-Tag')
         ->assertViewIs('newsroom.guides')
         ->assertSee('Publiczny poradnik po cutover');
+
+    $topic = ContentTopic::factory()->published()->create([
+        'title' => 'Publiczny topic po cutover',
+        'slug' => 'publiczny-topic-po-cutover',
+        'description' => 'Redakcyjny opis publicznego topicu.',
+    ]);
+    $topic->articles()->attach($article->id);
+
+    $this->get(route('public.news.topics.show', ['topicSlug' => $topic->slug]))
+        ->assertOk()
+        ->assertHeaderMissing('X-Robots-Tag')
+        ->assertViewIs('newsroom.topic')
+        ->assertSee('Publiczny topic po cutover')
+        ->assertSee('Publiczny artykuł po cutover');
 
     $this->get(route('public.news.feed'))->assertNotFound();
 });
