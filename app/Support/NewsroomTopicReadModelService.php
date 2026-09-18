@@ -91,7 +91,7 @@ final class NewsroomTopicReadModelService
         $articlesQuery = $this->eligibleArticlesQuery($topic);
 
         if ($topic->featured_article_id !== null) {
-            $articlesQuery->whereKeyNot($topic->featured_article_id);
+            $articlesQuery->where('content_articles.id', '!=', $topic->featured_article_id);
         }
 
         $articles = $articlesQuery->paginate(self::PER_PAGE, ['*'], 'page', $page);
