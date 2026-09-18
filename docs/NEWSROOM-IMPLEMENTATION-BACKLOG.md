@@ -1586,19 +1586,40 @@ N4-004 nie obejmuje global navigation changes N4-005, cache/invalidation N4-006,
 
 ## NEWSROOM-N4-006 — Cache
 
+### Status implementacji
+
+**DONE w kodzie — PR #91 zmergowano na `main@5f1880e03469fc6e340a86fdb1b4246c7afd116b`.** Finalny implementation head `093ca709d3155d5fa3f13bae224312fd286077dc` przeszedł exact-head CI #342, Browser Smoke #36 i post-merge CI #343.
+
+### Aktualny stan implementacji
+
+- `NewsroomHomeReadModelService` i `NewsroomCategoryReadModelService` korzystają z jednego `NewsroomPublicReadCache`,
+- home/category keys są generation-based, więc invalidation rotuje namespace zamiast enumerować stare klucze,
+- `newsroom.cache_ttl_seconds=60` jest safety netem dla time-window changes; event invalidation pozostaje głównym mechanizmem,
+- istniejący after-commit `ContentArticleWorkflowTransitioned` invaliduje home+category przy wejściu/wyjściu z `published`,
+- `ContentArticlePublicReadChanged` invaliduje home+category po aktywnym public update oraz featured/breaking exposure changes,
+- `ContentHomePlacementChanged` invaliduje tylko home po create/update/delete placementu,
+- `ContentCategoryObserver` działa after-commit i invaliduje home+category po save/delete kategorii,
+- admin/private preview, guide hub, article detail, topic/feed nie są cache’owane przez ten task,
+- N5 dirty/version/sitemap/IndexNow/feed-refresh coordinator pozostaje osobnym zakresem.
+
 ### Zakres
 
-- home,
-- category,
-- topic,
-- feed later,
-- invalidation events.
+- [x] home,
+- [x] category,
+- [ ] topic — pozostaje do N4-007, gdy publiczny topic surface będzie istniał,
+- [ ] feed later — pozostaje N5,
+- [x] invalidation events.
 
 ### Test
 
-- publish shows article after invalidation,
-- placement change invalidates home,
-- archive removes article from cached sections.
+- [x] publish shows article after invalidation,
+- [x] placement change invalidates home,
+- [x] archive removes article from cached sections,
+- [x] category metadata invalidates home/category projections,
+- [x] cache reuse jest obserwowalny przed invalidation,
+- [x] invalidation event nie wykonuje side effectu przed outer transaction commit.
+
+N4-006 nie obejmuje topic/feed, guide-hub/article cache ani N5 discovery side effects.
 
 ---
 
@@ -2332,18 +2353,19 @@ Nie oznaczać tasku DONE przed merge + green verification.
 
 # 10. Aktualny stan
 
-Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-005 na `main@a9fb9ccfed058de88efdb6e0833b67911aeb09aa`:
+Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-006 na `main@5f1880e03469fc6e340a86fdb1b4246c7afd116b`:
 
 - pakiet projektowy newsroomu obejmuje architekturę, model danych, CMS, UI, governance, SEO, backlog i runbook,
-- foundation N0, pełny etap N1-001..N1-006, admin/domain N2-001..N2-012, cały etap NEWSROOM-N3-001..N3-008 oraz NEWSROOM-N4-001..N4-005 są wdrożone,
-- publiczne article detail `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}`, fail-closed Product Bridge, old-path 301, author-profile integration i globalny `NEWSROOM_PUBLIC_ENABLED` gate są zmaterializowane,
-- N4-001..N4-004 materializują publiczne huby/category/read models, a N4-005 domyka integrację nawigacji bez tworzenia drugiego systemu menu,
-- `PublicNavigation::primary` nadal zawiera pojedyncze canonical links „Aktualności” i „Poradniki” z dotychczasowymi active-state prefixami; `documentNavigationPrefixes` już zawiera oba namespace’y i nie został zmieniony,
-- `PublicFooter::service_links` zawiera teraz dokładnie po jednym wejściu do `/aktualnosci` i `/poradniki`; Vue `SiteFooter.vue` i Blade `public-footer.blade.php` konsumują ten sam footer source of truth,
-- `NewsroomNavigationIntegrationTest` pilnuje canonical primary links, duplicate-free footer links i istniejących document-navigation prefixes,
-- Browser Smoke #32 potwierdził rzeczywisty footer na guide hubie oraz brak regresji w `newsroom-guides`, `newsroom-category`, `newsroom-home` i `newsroom-article`,
-- topic/feed routes nadal pozostają 404, a newsroom dirty/version refresh coordinator i faktyczny cache/invalidation nadal nie istnieją,
-- canonical CI zachowuje SQLite `quality` i addytywny `newsroom-postgres`; post-merge CI #336 na exact `main@a9fb9ccf...` był pełnym PASS,
+- foundation N0, pełny etap N1-001..N1-006, admin/domain N2-001..N2-012, cały etap NEWSROOM-N3-001..N3-008 oraz NEWSROOM-N4-001..N4-006 są wdrożone,
+- publiczne article detail `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}`, fail-closed Product Bridge, old-path 301, author-profile integration, public hub/category/guides surfaces, navigation integration i globalny `NEWSROOM_PUBLIC_ENABLED` gate są zmaterializowane,
+- `NewsroomPublicReadCache` cache’uje istniejące publiczne home/category read models przez generation-based keys i 60-sekundowy TTL safety net,
+- publish/archive workflow oraz aktywne public/exposure updates invalidują home+category after-commit; placement changes invalidują tylko home; category save/delete invaliduje home+category after-commit,
+- preview, guide hub, article detail, topic/feed i N5 dirty/version/sitemap/IndexNow nie są częścią N4-006,
+- `NewsroomPublicReadCacheTest` chroni reuse, publish, placement, archive, category metadata i outer-transaction rollback/commit boundary,
+- feature-test harness czyści trwały file cache między testami, zgodnie z izolowanym per-test SQLite database contract,
+- Browser Smoke #36 potwierdził brak regresji w `newsroom-guides`, `newsroom-category`, `newsroom-home` i `newsroom-article`,
+- topic/feed routes nadal pozostają 404, a newsroom dirty/version refresh coordinator nadal nie istnieje,
+- canonical CI zachowuje SQLite `quality` i addytywny `newsroom-postgres`; post-merge CI #343 na exact `main@5f1880e0...` był pełnym PASS,
 - QUEUE_CONNECTION w env example jest sync; stały queue worker nie jest gwarantowany,
 - panel Filament pozostaje admin-only i ten kontrakt pozostaje wymaganiem v1.
 
@@ -2351,13 +2373,23 @@ Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-005 na `main@a9fb9ccfed058de88efdb6
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N4-006 — Cache.
+NEWSROOM-N4-007 — Topic / dossier pages.
 
-N4-005 jest zamknięte implementacyjnie po PR #89, exact-head CI #335, Browser Smoke #32 i post-merge CI #336. Następny krok ma dodać cache/invalidation dla już istniejących publicznych read surfaces zgodnie z istniejącym kontraktem i bez zmiany kolejności/eligibility. Nie obejmuje topic pages N4-007, reverse links N4-008 ani discovery N5.
+N4-006 jest zamknięte implementacyjnie po PR #91, exact-head CI #342, Browser Smoke #36 i post-merge CI #343. Następny krok ma zmaterializować istniejący topic route jako publiczną, rollout-gated dossier surface dla opublikowanych topiców i activelyDistributed/indexable corpus, bez automatycznych tag pages. Nie obejmuje reverse links N4-008 ani discovery N5.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-18 — v0.43
+
+- NEWSROOM-N4-006 zmergowano przez PR #91; finalny implementation head `093ca709d3155d5fa3f13bae224312fd286077dc`, merge `main@5f1880e03469fc6e340a86fdb1b4246c7afd116b`,
+- `NewsroomPublicReadCache` materializuje generation-based cache dla home/category public read models z 60-sekundowym TTL safety net,
+- after-commit invalidation obejmuje publish/archive workflow, aktywne public/exposure updates, placement create/update/delete i category save/delete; placement invaliduje tylko home,
+- preview, guide hub, article detail, topic/feed i N5 dirty/version/sitemap/IndexNow pozostają poza zakresem N4-006,
+- `NewsroomPublicReadCacheTest` oraz izolacja trwałego feature-test cache potwierdzają reuse/invalidation i transaction boundary,
+- exact-head CI #342 oraz Browser Smoke #36 PASS; post-merge CI #343 PASS: 1081 passed / 19 770 assertions / 2 skipped, Pint 1077 files PASS, frontend build 9.44 s, PostgreSQL 7 passed / 94 assertions,
+- NEWSROOM-N4-007 Topic / dossier pages jest następnym wykonywalnym taskiem.
 
 ### 2026-09-18 — v0.42
 
