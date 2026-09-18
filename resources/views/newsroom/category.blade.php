@@ -91,7 +91,14 @@
             @else
                 <div class="divide-y divide-slate-200">
                     @foreach ($articles as $article)
-                        <article class="grid gap-4 py-6 sm:grid-cols-[minmax(0,1fr)_180px] sm:items-start md:gap-7" data-article-id="{{ $article['id'] }}">
+                        <article
+                            class="grid gap-4 py-6 sm:grid-cols-[minmax(0,1fr)_180px] sm:items-start md:gap-7"
+                            data-article-id="{{ $article['id'] }}"
+                            data-article-url="{{ $article['url'] }}"
+                            data-article-type="{{ $article['type'] }}"
+                            data-category-slug="{{ $category['slug'] }}"
+                            data-newsroom-analytics-module="category_{{ $category['slug'] }}"
+                        >
                             <div class="min-w-0">
                                 <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
                                     @if ($label = $typeLabel($article['type']))
