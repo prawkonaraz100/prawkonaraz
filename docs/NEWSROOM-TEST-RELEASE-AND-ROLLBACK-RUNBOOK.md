@@ -1503,7 +1503,9 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - exact-head CI #361 zakończył pełny PASS, a post-merge CI #362 na `main@3d7ac8ab8a3ed1c299cb0cdd4cb1ef8ac6b53f78` zakończył: `quality` 1093 passed / 19 881 assertions / 2 skipped, Pint PASS, frontend build 7.42 s; `newsroom-postgres` 7 passed / 94 assertions,
 - publiczny Hub Blade, category pages, guide hub, topic dossier, navigation integration, home/category cache, N4-008 semantic/reverse links, N5-001 standard article sitemap/hub coverage, N5-002 Google News Sitemap, N5-003 Atom feed/discovery, N5-004 analytics hooks, N5-005 article-specific IndexNow automation oraz N5-006 sitemap/link audit hardening są zamknięte implementacyjnie,
 - pierwszy podkrok NEWSROOM-N5-007 jest potwierdzony po PR #109: complete-set XML pre-validation, child-before-index atomic publication oraz post-switch cleanup zarządzanych article/news sitemap files; exact-head CI #403 i post-merge CI #404 zakończyły pełny PASS,
-- NEWSROOM-N5-007 pozostaje IN PROGRESS: dirty/version newsroom refresh coordinator, frequent scheduler/shared lock, topology gate i produkcyjny CDN/Nginx/static-delivery smoke nadal nie są potwierdzone; produkcyjny rollout fazy 2 IndexNow/Bing verification również pozostaje osobnym otwartym evidence.
+- drugi podkrok NEWSROOM-N5-007 jest potwierdzony po PR #112: cache-backed version/clean-version coordinator, shared lock, clean-state skip, failure/race retention, after-commit dirty events/observers oraz every-minute scheduler z `onOneServer()` + `withoutOverlapping()`; exact-head CI #409 i post-merge CI #410 zakończyły pełny PASS,
+- aktualne canonical deployment docs potwierdzają single-node Mikrus 4.1 z lokalnym `public/`, lokalnym Redisem i jednym cronem `schedule:run`, więc topology gate jest spełniony dla obecnego contractu,
+- NEWSROOM-N5-007 pozostaje IN PROGRESS: produkcyjny CDN/Nginx/static-delivery smoke i HTTP header/cache/validator evidence nadal nie są potwierdzone; dedykowany scheduler-definition/lock-contention regression również pozostaje otwartym test evidence. Produkcyjny rollout fazy 2 IndexNow/Bing verification pozostaje osobnym otwartym evidence.
 
 ---
 
@@ -1522,10 +1524,11 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - [x] dodać N5-001 standard article sitemap regression w istniejącym `SeoSitemapGenerationTest`: single shard, boundary crossing, stable fixed-ID-range assignment, no duplicate URL across shards, public-gate suppression, eligibility/current-canonical oraz URL-count/byte-size guards,
 - [x] dodać N5-002 News Sitemap regression w istniejącym `SeoSitemapGenerationTest`: required namespace/tags, visible title/canonical identity, `first_published_at` 2-day eligibility, old-updated exclusion, public-gate suppression, non-news/status/noindex/category/author/redirect-source exclusions i realny 1000→1001 boundary,
 - [x] dodać child-before-index atomic publication + obsolete-shard cleanup tests — `SeoSitemapGenerationTest` potwierdza root-index-last, fail-before-switch dla invalid XML i cleanup zarządzanych article/news files przy zachowaniu unrelated XML,
-- [ ] dodać dirty-marker refresh tests,
+- [x] dodać dirty-marker refresh tests — `NewsroomSeoArtifactRefreshCoordinatorTest` pokrywa version/clean-version, after-commit lifecycle dirty events, clean-state skip, success, audit failure i version race,
 - [x] dodać N5-003 feed/discovery regression: Atom metadata/corpus/limit, stable id + slug change, workflow invalidation, ETag/Last-Modified/304, no Set-Cookie, gate/discovery,
 - [x] dodać N5-004 analytics regression: render/privacy contract, GA readiness signal oraz JS-enabled Browser Smoke dla exactly-once article view, one-click-one-event, module click i disabled/non-link suppression,
 - [x] dodać N5-005 IndexNow lifecycle regression: publish/republish/update/withdraw/restore/slug, scheduled/noindex/gate suppression, outer rollback, queue failure isolation i brak lokalnego `event_type` w HTTP payload,
+- [ ] dodać dedykowany regression scheduler definition / lock contention dla N5-007; PR #112 potwierdza implementację `onOneServer()` + `withoutOverlapping()` + cache lock, ale nie ma osobnego testu tego contractu,
 - [ ] dodać production-like static robots/sitemap/feed delivery smoke,
 - [x] dodać N5-006 `NewsroomSeoSitemapAuditTest` i rozszerzyć istniejący `SeoSitemapAuditor` o duplicate/missing-child, News namespace/tags/date/window, current-canonical/indexability/redirect-source, topology/shard/obsolete-file checks przy zachowaniu generic entry-count/byte-size guards,
 - [ ] stworzyć production smoke checklist w praktyce,
@@ -1543,6 +1546,17 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-18 — v0.36
+
+- drugi podkrok NEWSROOM-N5-007 zmergowano przez PR #112; finalny implementation head `6f1c3b99d11796f74987c7fe640302b2d76578b7`, merge `main@79b6de0276ba8cdce500c366a4f98098e528dcd8`,
+- `NewsroomSeoArtifactRefreshCoordinatorTest` potwierdza version/clean-version coalescing, after-commit lifecycle dirty signals, clean-state skip, successful clean, audit failure retention oraz nowszą version pojawiającą się podczas generation,
+- kod implementuje shared cache lock oraz production schedule co minutę z `onOneServer()` + `withoutOverlapping()`; dedykowany test lock contention / schedule definition nie został dodany i pozostaje jawnym open evidence,
+- daily `seo:refresh-sitemaps` nadal istnieje jako niezależny recovery path; testy działają przy `QUEUE_CONNECTION=sync` i implementacja nie zakłada queue workera,
+- canonical deployment docs potwierdzają obecny single-node Mikrus 4.1 z lokalnym `public/`, Redisem i jednym scheduler cronem; topology gate jest spełniony dla tego contractu, ale multi-node wymaga ponownej weryfikacji i shared artifact distribution,
+- exact-head CI #409 zakończył 1136 passed / 20 182 assertions / 2 skipped, PostgreSQL 7/94, Pint 1101 files PASS i frontend build 10.03 s; post-merge CI #410 na exact `main@79b6de0276ba8cdce500c366a4f98098e528dcd8` powtórzył 1136 / 20 182 / 2 skipped, PostgreSQL 7/94, Pint PASS i build 7.54 s,
+- Browser Smoke nie został uruchomiony dla backend/scheduler/test-only zakresu #112; nie zapisujemy nieistniejącego browser evidence,
+- production-like static robots/sitemap/feed delivery smoke i rzeczywiste HTTP headers/cache/validators nadal pozostają otwarte, więc NEWSROOM-N5-007 nie jest DONE.
 
 ### 2026-09-18 — v0.35
 
