@@ -5,7 +5,7 @@
 - **Status:** Canonical architecture + live implementation status
 - **Obszar:** publiczny serwis informacyjny, newsroom, aktualności, poradniki i dystrybucja treści
 - **Repozytorium:** `prawkonaraz100/prawkonaraz`
-- **Bazowy stan kodu:** `main@a9fb9ccfed058de88efdb6e0833b67911aeb09aa`
+- **Bazowy stan kodu:** `main@5f1880e03469fc6e340a86fdb1b4246c7afd116b`
 - **Data utworzenia:** 2026-09-15
 - **Właściciel decyzji produktowej:** PrawkoNaRaz
 - **Cel:** zaprojektować profesjonalny pion medialny bez dublowania istniejącej platformy, bez osobnego CMS/WordPressa i bez rozbijania modularnego monolitu.
@@ -140,6 +140,9 @@ Repo ma już istotny fundament:
 - N4-004: aktywny pusty guide hub renderuje użyteczny 200 + `noindex,follow`; invalid/out-of-range `page` failuje do 404, a `NewsroomGuideHubSchemaService` emituje `CollectionPage`, `BreadcrumbList` i conditional `ItemList`,
 - N4-005: `PublicNavigation::primary` zachowuje pojedyncze kanoniczne wpisy „Aktualności” i „Poradniki” z dotychczasowymi active-state prefixami; `documentNavigationPrefixes` już zawiera `/aktualnosci` i `/poradniki` i nie zostało zmienione,
 - N4-005: `PublicFooter::service_links` dodaje dokładnie po jednym wejściu do `/aktualnosci` i `/poradniki`; wspólne dane konsumują oba aktualne renderery compact footera — Vue `SiteFooter.vue` i Blade `public-footer.blade.php`,
+- N4-006: `NewsroomPublicReadCache` cache’uje istniejące publiczne home/category read models przez generation-based keys; TTL 60 s jest safety netem, a generation rotation daje store-agnostic invalidation bez enumeracji kluczy,
+- N4-006: after-commit invalidation reużywa `ContentArticleWorkflowTransitioned` dla wejścia/wyjścia z `published`, dodaje `ContentArticlePublicReadChanged` dla aktywnych public/exposure updates, `ContentHomePlacementChanged` dla home placementów oraz after-commit `ContentCategoryObserver` dla metadata kategorii,
+- N4-006: placement invaliduje tylko home; article workflow/public update/category invaliduje home + category. Preview, guide hub, article detail, topic/feed i N5 dirty/version/sitemap/IndexNow nie są objęte tym cache layerem,
 - route `/autorzy/{authorSlug}`,
 - statyczny produkcyjny pipeline sitemap `SeoSitemapGenerator` + `SeoSitemapBuilder` + `SeoSitemapAuditor`, z codziennym `seo:refresh-sitemaps` jako istniejącym safety netem,
 - dynamiczny `SitemapController`, który współistnieje z generowanymi artefaktami i nie jest samodzielnym source of truth produkcyjnego XML,
@@ -1522,8 +1525,9 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N4-003` — publiczne category pages `/aktualnosci/kategoria/{categorySlug}`.
 - [x] `NEWSROOM-N4-004` — publiczny guide-only hub `/poradniki`.
 - [x] `NEWSROOM-N4-005` — Navigation integration bez duplikowania istniejących primary links.
+- [x] `NEWSROOM-N4-006` — generation-based cache/invalidation dla publicznych home/category read models.
 
-N4-005 jest zmaterializowane i potwierdzone na `main@a9fb9ccfed058de88efdb6e0833b67911aeb09aa`; następnym wykonywalnym taskiem jest `NEWSROOM-N4-006` — Cache. Pozostałe elementy N4–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu pełną checklistę.
+N4-006 jest zmaterializowane i potwierdzone na `main@5f1880e03469fc6e340a86fdb1b4246c7afd116b`; następnym wykonywalnym taskiem jest `NEWSROOM-N4-007` — Topic / dossier pages. Pozostałe elementy N4–N6 są celowo utrzymywane w wykonawczym backlogu zamiast dublować tu pełną checklistę.
 
 ---
 ## 28. Zasady utrzymania dokumentu
@@ -1548,6 +1552,16 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-18 — v0.43
+
+- NEWSROOM-N4-006 zmergowano przez PR #91; finalny implementation head `093ca709d3155d5fa3f13bae224312fd286077dc`, merge `main@5f1880e03469fc6e340a86fdb1b4246c7afd116b`,
+- `NewsroomPublicReadCache` cache’uje tylko istniejące publiczne home/category read models przez generation-based keys i 60-sekundowy TTL safety net; preview/guide/article/topic/feed pozostają poza zakresem,
+- after-commit invalidation obejmuje publish/archive workflow, aktywne public/exposure updates, home placement changes i category save/delete; placement rotuje tylko home generation,
+- cache layer nie przejmuje odpowiedzialności N5: dirty/version refresh, sitemap, feed discovery i IndexNow pozostają osobnym zakresem,
+- `NewsroomPublicReadCacheTest` chroni cache reuse/invalidation i outer-transaction boundary; feature-test harness czyści trwały cache między izolowanymi bazami,
+- exact-head CI #342 oraz Browser Smoke #36 PASS; post-merge CI #343 PASS: 1081 passed / 19 770 assertions / 2 skipped, Pint 1077 files PASS, frontend build 9.44 s, PostgreSQL 7 passed / 94 assertions,
+- NEWSROOM-N4-007 Topic / dossier pages jest następnym wykonywalnym taskiem; reverse links N4-008 i N5 discovery pozostają otwarte.
 
 ### 2026-09-18 — v0.42
 
