@@ -196,7 +196,6 @@ $categories = [
     ['name' => 'Egzaminy', 'slug' => 'egzaminy', 'position' => 10],
     ['name' => 'Przepisy', 'slug' => 'przepisy', 'position' => 20],
     ['name' => 'WORD', 'slug' => 'word', 'position' => 30],
-    ['name' => 'Poradniki', 'slug' => 'poradniki', 'position' => 40],
 ];
 
 $models = [];
@@ -230,7 +229,7 @@ for ($i = 1; $i <= 40; $i++) {
 
 for ($i = 1; $i <= 10; $i++) {
     \App\Models\ContentArticle::factory()->published()->guide()->create([
-        'category_id' => $models['poradniki']->id,
+        'category_id' => $models['egzaminy']->id,
         'title' => 'Poradnik praktyczny E2E '.$i,
         'slug' => 'poradnik-praktyczny-e2e-'.$i,
         'lead' => 'Praktyczny materiał evergreen '.$i.'.',
