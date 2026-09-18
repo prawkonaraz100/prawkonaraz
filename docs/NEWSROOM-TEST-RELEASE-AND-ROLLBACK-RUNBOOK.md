@@ -1459,7 +1459,7 @@ Runbook jest spełniony, gdy:
 
 ## 58. Stan implementacji
 
-Na 2026-09-18 po NEWSROOM-N4-004, zweryfikowanym na `main@2bb22142b1e9bec803f9c3889c11000194f46783`:
+Na 2026-09-18 po NEWSROOM-N4-006, zweryfikowanym na `main@5f1880e03469fc6e340a86fdb1b4246c7afd116b`:
 
 - istnieją globalne backend tests, ops backup/restore/health commands i kanoniczny CI z `quality` na SQLite oraz addytywnym `newsroom-postgres` na PostgreSQL 16,
 - istnieją newsroom-specific unit/security i feature regression dla body contract/editor, media storage/article media, enum/schema/model, slug/history, publishing workflow, home composition/placements, article preview, topic/CMS oraz N3-001 catalog, N3-002 SEO, N3-003 schema service, N3-005 Product Bridge, N3-006 redirect, N3-007 author profile, N3-008 public gate, N4-001 home read model, N4-002 public home renderer, N4-003 category pages i N4-004 guides hub,
@@ -1485,14 +1485,17 @@ Na 2026-09-18 po NEWSROOM-N4-004, zweryfikowanym na `main@2bb22142b1e9bec803f9c3
 - N4-005 dodaje `Public/NewsroomNavigationIntegrationTest.php` dla canonical primary links, duplicate-free `PublicFooter::service_links`, wspólnego Vue/Blade footer source i istniejących document-navigation prefixes,
 - `e2e-newsroom-guides.mjs` od N4-005 sprawdza dokładnie po jednym footer linku `Aktualności` i `Poradniki`; Browser Smoke #32 na finalnym N4-005 head `189219b3586d2df8e4ea73045318fd68f38f0fa1` zakończył PASS dla `newsroom-guides`, `newsroom-category`, `newsroom-home` i `newsroom-article`,
 - exact-head CI #335 zakończył PASS, a post-merge CI #336 na `main@a9fb9ccfed058de88efdb6e0833b67911aeb09aa` zakończył pełny gate: `quality` 1075 passed / 19 745 assertions / 2 skipped, Pint 1069 files PASS, frontend build 7.32 s; `newsroom-postgres` 7 passed / 94 assertions,
-- publiczny Hub Blade, category pages, guide hub i navigation integration są zamknięte implementacyjnie; topic/feed surfaces i reverse links N4-008 pozostają otwarte, a następnym taskiem jest N4-006 Cache,
+- N4-006 dodaje `NewsroomPublicReadCacheTest` dla obserwowalnego snapshot reuse i invalidation po publish, placement change, archive, category metadata oraz outer-transaction rollback/commit boundary,
+- feature-test base czyści trwały `CACHE_STORE=file` pomiędzy testami z osobnymi SQLite databases, więc cache nie może przenosić snapshotu między izolowanymi test cases,
+- exact-head CI #342 zakończył PASS na `093ca709d3155d5fa3f13bae224312fd286077dc`, Browser Smoke #36 zakończył PASS dla `newsroom-guides`, `newsroom-category`, `newsroom-home` i `newsroom-article`, a post-merge CI #343 na `main@5f1880e03469fc6e340a86fdb1b4246c7afd116b` zakończył pełny gate: `quality` 1081 passed / 19 770 assertions / 2 skipped, Pint 1077 files PASS, frontend build 9.44 s; `newsroom-postgres` 7 passed / 94 assertions,
+- publiczny Hub Blade, category pages, guide hub, navigation integration i home/category cache są zamknięte implementacyjnie; topic/feed surfaces i reverse links N4-008 pozostają otwarte, a następnym taskiem jest N4-007 Topic / dossier pages,
 - atomic static publication, dirty/version newsroom refresh coordinator, newsroom/news sitemap output i `SeoSitemapAuditor` extension pozostają N5.
 
 ---
 
 ## 59. Pozostałe zadania
 
-- [ ] dodać dalsze test files w trakcie N4-006..N5; N4-001 dodało `NewsroomHomeReadModelServiceTest`, N4-002 `NewsroomHomePageTest` i `e2e-newsroom-home.mjs`, N4-003 `NewsroomCategoryPageTest` i `e2e-newsroom-category.mjs`, N4-004 `NewsroomGuidesHubTest` i `e2e-newsroom-guides.mjs`, a N4-005 `Public/NewsroomNavigationIntegrationTest.php` oraz footer assertions w guides browser QA,
+- [ ] dodać dalsze test files w trakcie N4-007..N5; N4-001 dodało `NewsroomHomeReadModelServiceTest`, N4-002 `NewsroomHomePageTest` i `e2e-newsroom-home.mjs`, N4-003 `NewsroomCategoryPageTest` i `e2e-newsroom-category.mjs`, N4-004 `NewsroomGuidesHubTest` i `e2e-newsroom-guides.mjs`, N4-005 `Public/NewsroomNavigationIntegrationTest.php`, a N4-006 `NewsroomPublicReadCacheTest`,
 - [x] dodać dedykowany browser E2E dla publicznego article detail N3-004,
 - [x] dodać N2 media/topic/focal-point integration i N3-004 renderer/browser regression; pełne crop-variant generation nadal nie istnieje,
 - [x] dodać service-level site-identity/entity-graph/date-consistency regression oraz publiczne HTML/JSON-LD emission dla article detail,
@@ -1511,11 +1514,20 @@ Na 2026-09-18 po NEWSROOM-N4-004, zweryfikowanym na `main@2bb22142b1e9bec803f9c3
 - [x] dodać N4-003 category page feature/browser regression wraz z rzeczywistym publicznym rendererem,
 - [x] dodać N4-004 guide-hub feature/browser regression wraz z rzeczywistym publicznym rendererem,
 - [x] dodać N4-005 navigation/footer regression dla canonical primary links, duplicate-free footer oraz Vue/Blade shared source,
+- [x] dodać N4-006 cache regression dla snapshot reuse, event invalidation i after-commit transaction boundary,
 - [ ] po pierwszym release wpisać rzeczywiste wyniki i ewentualne różnice od planu.
 
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-18 — v0.26
+
+- NEWSROOM-N4-006 implementation PR #91 zakończył exact-head CI #342 PASS na `093ca709d3155d5fa3f13bae224312fd286077dc` oraz Browser Smoke #36 PASS dla `newsroom-guides`, `newsroom-category`, `newsroom-home` i `newsroom-article`; merge to `main@5f1880e03469fc6e340a86fdb1b4246c7afd116b`,
+- `NewsroomPublicReadCacheTest` potwierdza rzeczywisty cache reuse oraz invalidation po publish, placement change, archive, category metadata i outer-transaction commit; test base czyści trwały file cache między izolowanymi feature tests,
+- post-merge CI #343 zakończył pełny gate: 1081 passed / 19 770 assertions / 2 skipped, Pint 1077 files PASS, frontend build 9.44 s; `newsroom-postgres` 7 passed / 94 assertions,
+- Browser Smoke #36 potwierdził brak regresji publicznych article/home/category/guides surfaces; case-insensitive evergreen assertion jest test-only hardening i nie zmienia renderer contract,
+- N4-006 nie obejmuje guide/article/topic/feed cache ani N5 dirty/version/sitemap/IndexNow; następnym wykonywalnym taskiem jest NEWSROOM-N4-007 — Topic / dossier pages.
 
 ### 2026-09-18 — v0.25
 
