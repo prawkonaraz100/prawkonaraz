@@ -561,7 +561,7 @@ Zamknięte przejścia obejmują draft ↔ review, review mark, initial schedule,
 Istotne granice pozostają otwarte:
 - `applyPublicUpdate` dla już publicznego artykułu jest wdrożone w N2,
 - scheduler command/registration został wdrożony w N1-005,
-- cache/sitemap/IndexNow listeners nie są jeszcze podłączone; PR #30 ustanawia wyłącznie bezpieczny after-commit hook.
+- PR #30 ustanowił bezpieczny after-commit hook; N4-006 później podłączyło lightweight cache invalidation listeners dla istniejących home/category read models. Sitemap/IndexNow/dirty-version side effects nadal pozostają osobnym zakresem N5.
 
 ### Zakres
 
@@ -1426,7 +1426,7 @@ Wdrożyć publiczną warstwę bez natychmiastowego przełączania istniejących 
 - `NewsroomHomeReadModelService` materializuje publiczny scalar-array projection dla lead/secondary/latest/categories/guides/important_now/breaking, z canonical path, category/author i hero metadata; wynik jest serializowalny i gotowy do późniejszego cache,
 - publiczny read model respektuje istniejący `NewsroomPublicGate`: przy `NEWSROOM_PUBLIC_ENABLED=false` zwraca `null`; admin preview nadal korzysta bezpośrednio z domenowego composera i pozostaje dostępny,
 - `tests/Feature/NewsroomHomeReadModelServiceTest.php` chroni rollout gate, scalar/cacheable projection oraz stały query budget przy wzroście liczby aktywnych kategorii,
-- N4-001 samo nie wdrażało cache store/invalidation z N4-006 ani publicznego Blade/controllera; ten ostatni zakres został następnie zmaterializowany przez NEWSROOM-N4-002, natomiast faktyczny cache/invalidation nadal pozostaje N4-006.
+- N4-001 samo nie wdrażało cache store/invalidation ani publicznego Blade/controllera; publiczny renderer został zmaterializowany przez NEWSROOM-N4-002, a faktyczny home/category cache/invalidation przez NEWSROOM-N4-006.
 
 ### Zakres
 
