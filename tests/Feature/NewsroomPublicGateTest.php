@@ -128,5 +128,11 @@ test('enabled newsroom public gate exposes only already implemented eligible pub
         ->assertHeaderMissing('X-Robots-Tag')
         ->assertViewIs('newsroom.home');
 
+    $this->get(route('public.news.categories.show', ['categorySlug' => $article->category->slug]))
+        ->assertOk()
+        ->assertHeaderMissing('X-Robots-Tag')
+        ->assertViewIs('newsroom.category')
+        ->assertSee('Publiczny artykuł po zmianie');
+
     $this->get(route('public.news.feed'))->assertNotFound();
 });
