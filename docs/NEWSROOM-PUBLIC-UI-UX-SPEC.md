@@ -1286,10 +1286,10 @@ Frontend newsroom v1 jest UI-complete, gdy:
 
 ## 67. Stan implementacji
 
-Na 2026-09-18 po NEWSROOM-N4-002, zweryfikowanym na `main@04a3e961a40207bd65c41b684a5bf1cd8d2c5e10`:
+Na 2026-09-18 po NEWSROOM-N4-003, zweryfikowanym na `main@84bcb2aeff57a1374def7af411c39db07a8fb38d`:
 
 - `/aktualnosci` używa istniejącego `NewsroomPlaceholderController::news()` jako rollout switch: gate=false zachowuje pre-launch `MarketingPlaceholder.vue` 200 + `X-Robots-Tag: noindex, follow`, a gate=true renderuje SSR `newsroom.home`; `/poradniki` nadal pozostaje placeholderem 200 + noindex do N4-004,
-- category/topic/feed routes pozostają downstream i nie zostały uruchomione przez N3-005,
+- category route `/aktualnosci/kategoria/{categorySlug}` jest od N4-003 publicznym SSR surface przy gate=true; topic/feed pozostają downstream i nadal nie są publicznymi rendererami,
 - detail routes `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}` są podłączone do `ContentArticleController`; publicznie widoczny rekord renderuje `newsroom.article`, withdrawn historyczny rekord otrzymuje neutralną 410 surface, a hidden/not-found 404,
 - 404/410 article surfaces używają `noindex,follow` i `X-Robots-Tag: noindex, follow` bez renderowania body/source/product modules,
 - publiczny article renderer reużywa istniejący `public-content` layout, header/footer oraz gotowe N3-001 catalog, N3-002 SEO metadata i N3-003 schema graph; canonical/OG/article dates i JSON-LD są obecne w initial HTML,
@@ -1310,7 +1310,11 @@ Na 2026-09-18 po NEWSROOM-N4-002, zweryfikowanym na `main@04a3e961a40207bd65c41b
 - N4-001 rozszerza istniejący `NewsroomHomeCompositionService` bez tworzenia drugiego systemu kompozycji: fixed placements, fallback, globalna deduplikacja i breaking exception pozostają tym samym kontraktem, a category blocks korzystają z batched placements i bounded per-category ranking zamiast query-per-category,
 - `NewsroomHomeReadModelService` dostarcza rollout-gated scalar-array projection bezpośrednio do publicznego huba: lead/secondary/latest/categories/guides/important_now/breaking z canonical path, category/author i hero metadata; przy `NEWSROOM_PUBLIC_ENABLED=false` nadal zwraca `null`,
 - N4-002 podłącza read model do `resources/views/newsroom/home.blade.php`: renderuje responsywnie newsroom subnavigation, important-now, breaking, lead/secondary, latest, category blocks, guides i Product Bridge; puste sekcje są pomijane zamiast wypełniane sztucznymi kartami,
-- subnavigation kategorii w tym tasku prowadzi do kotwic sekcji na hubie, a nie do jeszcze niewdrożonych category routes; category/topic/feed pozostają dalszym N4/N5, a faktyczny cache N4-006,
+- subnavigation kategorii na hubie nadal prowadzi do kotwic sekcji, ale od N4-003 każdy category block ma crawlable `Zobacz wszystkie` do `public.news.categories.show`; topic/feed pozostają dalszym N4/N5, a faktyczny cache N4-006,
+- `newsroom.category` renderuje category header, chronologiczny listing kart, useful empty state, related categories oraz SSR paginację; wszystkie publiczne linki są czytelne bez JavaScript,
+- category page reużywa wspólny `layouts.public-content`, header/footer i istniejące article card metadata; nie tworzy równoległego design systemu,
+- gate=false, inactive/unknown category i invalid/out-of-range page nie pokazują publicznego category UI; aktywna pusta kategoria pokazuje komunikat i powrót do `/aktualnosci` zamiast sztucznych kart,
+- dedykowany Browser Smoke #29 `newsroom-category` przeszedł z JavaScript disabled na 360/390/430/768/1024/1280/1440 oraz dodatkowo sprawdził page 2/canonical; równoległe `newsroom-home` i `newsroom-article` również zakończyły PASS,
 - Hub Blade reużywa `layouts.public-content`, wspólny header/footer i route `public.tests`; przy gate=true emituje self-canonical i `index,follow,max-image-preview:large`,
 - dedykowany Browser Smoke #27 `newsroom-home` przeszedł z JavaScript disabled na 360/390/430/768/1024/1280/1440, sprawdzając realny built CSS, H1/subnavigation/content/CTA, canonical/robots i brak horizontal overflow; równoległy `newsroom-article` także zakończył PASS.
 
@@ -1325,9 +1329,9 @@ Na 2026-09-18 po NEWSROOM-N4-002, zweryfikowanym na `main@04a3e961a40207bd65c41b
 - [x] zbudować regulatory context box dla article detail,
 - [x] podłączyć focal-point-aware rendering istniejących hero/image assets; fizyczne crop variants nie są deklarowane jako istniejące,
 - [ ] zbudować topic page,
-- [ ] zbudować pozostałe category/topic/guide-hub Blade components,
+- [ ] zbudować pozostałe topic/guide-hub Blade components,
 - [x] zbudować publiczny Hub Blade `/aktualnosci` w NEWSROOM-N4-002,
-- [ ] zbudować category page,
+- [x] zbudować category page w NEWSROOM-N4-003,
 - [x] zbudować article page,
 - [x] dodać responsive Browser QA dla article detail na wymaganej macierzy N3-004,
 - [ ] domknąć pełny accessibility QA newsroomu,
@@ -1338,11 +1342,21 @@ Na 2026-09-18 po NEWSROOM-N4-002, zweryfikowanym na `main@04a3e961a40207bd65c41b
 - [x] zbudować NEWSROOM-N3-008 public rollout config gate; `NEWSROOM_PUBLIC_ENABLED=false` jest bezpiecznym defaultem,
 - [x] zbudować NEWSROOM-N4-001 editorial composition read model,
 - [x] zbudować NEWSROOM-N4-002 Hub Blade layout i dedykowany responsive Browser QA,
-- [ ] zbudować NEWSROOM-N4-003 Category pages; to jest następny wykonywalny task.
+- [x] zbudować NEWSROOM-N4-003 Category pages i dedykowany responsive Browser QA,
+- [ ] zbudować NEWSROOM-N4-004 `/poradniki` hub; to jest następny wykonywalny UI task.
 
 ---
 
 ## 69. Historia zmian
+
+### 2026-09-18 — v0.19
+
+- NEWSROOM-N4-003 zmergowano przez PR #85 na `main@84bcb2aeff57a1374def7af411c39db07a8fb38d`; finalny implementation head `8e4f707060fbaa348e9392f0b19beb7b4517beca`,
+- category route renderuje SSR `newsroom.category` tylko przy gate=true i aktywnej kategorii; gate=false/inactive/unknown/invalid/out-of-range failują do 404,
+- UI materializuje category header, chronologiczny listing, empty-state, related-category chips oraz crawlable paginację; hub category blocks mają `Zobacz wszystkie`,
+- aktywna pusta kategoria zachowuje czytelny 200/noindex zamiast thin-page cards; page 1 nie linkuje do redundantnego `?page=1`,
+- Browser Smoke #29 `newsroom-category` PASS na 360/390/430/768/1024/1280/1440 z JS disabled i page-2 check; exact-head CI #326 oraz post-merge CI #327 także PASS,
+- NEWSROOM-N4-004 `/poradniki` hub jest następnym UI taskiem.
 
 ### 2026-09-18 — v0.18
 
