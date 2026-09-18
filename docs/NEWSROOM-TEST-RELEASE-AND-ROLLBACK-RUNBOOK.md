@@ -1500,8 +1500,8 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - `NewsroomPublicArticlePageTest` został zsynchronizowany z nowym kontraktem guide detail: primary category jest crawlable classification linkiem bez zmiany guide breadcrumb family,
 - workflow `Browser Smoke` ma osobny job `newsroom-semantic-links`; Browser Smoke #48 na finalnym N4-008 head `bd63773bc1febdcc6aa8c2507c6621e908d63b09` zakończył PASS dla semantic-links, article, home, category, guides i topic,
 - exact-head CI #361 zakończył pełny PASS, a post-merge CI #362 na `main@3d7ac8ab8a3ed1c299cb0cdd4cb1ef8ac6b53f78` zakończył: `quality` 1093 passed / 19 881 assertions / 2 skipped, Pint PASS, frontend build 7.42 s; `newsroom-postgres` 7 passed / 94 assertions,
-- publiczny Hub Blade, category pages, guide hub, topic dossier, navigation integration, home/category cache, N4-008 semantic/reverse links, N5-001 standard article sitemap/hub coverage, N5-002 Google News Sitemap oraz N5-003 Atom feed/discovery są zamknięte implementacyjnie; następnym taskiem jest NEWSROOM-N5-004,
-- atomic static publication, dirty/version newsroom refresh coordinator i pełne namespace-specific `SeoSitemapAuditor` extension pozostają N5; produkcyjny CDN/Nginx feed smoke nadal nie jest potwierdzony.
+- publiczny Hub Blade, category pages, guide hub, topic dossier, navigation integration, home/category cache, N4-008 semantic/reverse links, N5-001 standard article sitemap/hub coverage, N5-002 Google News Sitemap, N5-003 Atom feed/discovery oraz N5-004 analytics hooks są zamknięte implementacyjnie; następnym taskiem jest NEWSROOM-N5-005,
+- article-specific IndexNow review/automation, atomic static publication, dirty/version newsroom refresh coordinator i pełne namespace-specific `SeoSitemapAuditor` extension pozostają N5; produkcyjny CDN/Nginx feed smoke nadal nie jest potwierdzony.
 
 ---
 
