@@ -1182,20 +1182,26 @@ Monitorować orphan articles i nadmiernie odizolowane klastry.
 
 ## 45. Orphan detection
 
-Rekomendowana komenda QA:
+### Aktualny stan po NEWSROOM-N5-006
 
-newsroom:audit-links
+Istnieje cienka komenda QA:
 
-Raportuje:
+`newsroom:audit-links`
 
-- published article bez crawlable inbound linku,
-- ważny article z nadmiernym click depth,
-- broken related/reverse links,
-- draft/noindex/redirect-source targets,
-- duplicate URL w kilku related modules,
-- redirect chains.
+Komenda deleguje do `NewsroomSemanticLinkService::auditAll()`, czyli reużywa ten sam semantic-link resolver i public gate co rendering. Dla aktywnie dystrybuowanych, indeksowalnych artykułów raportuje potwierdzone w kodzie przypadki:
 
-Może wejść w N5/N6.
+- brak gwarantowanego crawlable inbound z hub/category/topic,
+- pusty URL źródła oznaczonego jako publicznie cytowane,
+- wygasły stan breaking,
+- powiązany non-public topic, legal unit lub traffic sign,
+- broken/non-public related article target albo related URL niezgodny z canonical route contract,
+- published topic z niekwalifikowanym featured article.
+
+Przy wyłączonym `NEWSROOM_PUBLIC_ENABLED` site-wide link audit nie generuje fałszywych problemów dark deployment.
+
+### Nadal poza tym audytorem
+
+Pierwotne rekomendacje dotyczące progu nadmiernego click depth, duplicate URL pomiędzy modułami i redirect-chain crawling nie są deklarowane jako wdrożone przez N5-006. Redirect-source/noindex sitemap eligibility jest sprawdzane w rozszerzonym `SeoSitemapAuditor`, a nie dublowane w `newsroom:audit-links`.
 
 ---
 
@@ -1599,12 +1605,12 @@ Obecnie:
 - category route `/aktualnosci/kategoria/{categorySlug}` jest od N4-003 aktywnym publicznym SSR surface przy gate=true; od N4-007 topic route `/aktualnosci/temat/{topicSlug}` renderuje publiczne SSR dossier dla opublikowanego topicu, a article detail routes są aktywne od N3-004.
 - NEWSROOM-N4-008 materializuje istniejący semantic graph bez nowej schema: article/guide detail linkuje primary category, jawne published topics i deterministic related articles (max 4), a question/legal/sign surfaces renderują bounded reverse links (max 3) z istniejących newsroom pivots,
 - reverse/related eligibility wymaga `activelyDistributed()+indexable()`, aktywnej kategorii i publicznego autora; TrafficSign dopuszcza tylko `direct|example`, a question graph (`question_relations`, `question_seo_topics`, rankingi) pozostaje nietknięty,
-- `NewsroomSemanticLinkService::audit()` udostępnia per-article `has_crawlable_inbound`, inbound sources, explicit reverse-edge count i `estimated_hub_depth`; rekomendowana site-wide komenda `newsroom:audit-links` z sekcji 45 nadal nie istnieje i może wejść w N5/N6,
+- `NewsroomSemanticLinkService::audit()` udostępnia per-article `has_crawlable_inbound`, inbound sources, explicit reverse-edge count i `estimated_hub_depth`; NEWSROOM-N5-006 dodało `auditAll()` i cienką komendę `newsroom:audit-links` dla site-wide orphan/source/breaking/non-public-target/related/featured-topic QA bez drugiego graph subsystemu,
 - NEWSROOM-N5-001 rozszerza istniejące `SeoSitemapBuilder` / `SeoSitemapGenerator` / `SeoSitemapAuditor`: standard article sitemap obejmuje indexable newsroom/guide detail URLs, root sitemap index wskazuje article file/shards bez nested index, a `static.xml` dostaje rollout-gated coverage dla newsroom home, guides, active categories i published topics,
 - article shard assignment jest stabilny po stałych zakresach `content_articles.id` (domyślny span 10 000), a generator/auditor egzekwują 50 000 wpisów i 50 MB nieskompresowanego XML; N5-001 nie implementuje jeszcze child-before-index set switch ani cleanup obsolete shards,
 - NEWSROOM-N5-002 rozszerza ten sam static pipeline o News Sitemap: gate=true emituje wyłącznie `type=news`, aktywnie dystrybuowane `published` + indexable current-canonical articles z aktywną kategorią i publicznym autorem, kwalifikowane wyłącznie przez `first_published_at >= now()-2 days`,
 - `news:name` reużywa canonical identity z `SiteIdentitySchema::siteName()`, `news:language=pl`, `news:publication_date=first_published_at`, a `news:title` bierze widoczny `ContentArticle.title`; przy <=1000 entries używany jest `/sitemaps/news.xml`, a powyżej limitu deterministic fixed-ID-range shards trafiają bezpośrednio do root `/sitemap.xml`,
-- istniejący `SeoSitemapAuditor` dopuszcza legalny overlap URL pomiędzy standard article sitemap i News Sitemap; pełne newsroom/news namespace, age, required-tag i shard audit rules pozostają otwarte w N5-006,
+- NEWSROOM-N5-006 rozszerza istniejący `SeoSitemapAuditor` bez równoległego validatora: poza legalnym article/news overlap sprawdza duplicate index loc, missing child, current-canonical/indexability/category/author/redirect-source eligibility, Google News namespace/required tags/name/language/title/publication-date/2-day window, single-vs-sharded topology, invalid/overlapping shard ranges oraz obsolete unreferenced article/news files,
 - NEWSROOM-N3-008 jest wdrożone, N4-002 konsumuje ten sam gate dla publicznego huba `/aktualnosci`, N4-003 dla category pages, N4-004 dla `/poradniki`, N4-007 dla topic dossier, N4-008 dla topic/related/reverse-link resolvers, N5-001 dla standard article sitemap/hub coverage, N5-002 dla News Sitemap, N5-003 dla Atom feed/discovery, a N5-005 dla article-specific IndexNow automation. Przy gate=false category/topic/feed routes failują do 404, top-level `/poradniki` pozostaje noindex placeholderem, N4-008 nie emituje reverse targets, N5-001/N5-002 nie emitują newsroom article/news sitemap discovery, feed discovery jest suppressowane, a `QueueNewsroomArticleIndexNow` kończy bez enqueue; N5-004 nie tworzy osobnego rollout gate i emituje eventy tylko na rzeczywiście zrenderowanych publicznych surface'ach z analytics-ready istniejącego GA layer. Przy gate=true opublikowany topic ma self-canonical `index,follow,max-image-preview:large`, draft/future/unknown pozostają 404, a historyczny archived topic zwraca 410 + noindex. N5-005 reużywa istniejący queue/submission pipeline i nie zmienia protokołu HTTP IndexNow.
 
 ---
@@ -1619,12 +1625,12 @@ Obecnie:
 - [x] zintegrować ProfilePage/Article author identity i author sitemap z Newsroom corpus w N3-007,
 - [x] wdrożyć NEWSROOM-N3-008 public rollout gate dla detail/redirect, author profile/author sitemap contribution i obecnego IndexNow collectora; N4-008 semantic/reverse links, N5-001/N5-002 sitemap coverage i N5-003 feed/discovery respektują ten sam gate,
 - [x] wdrożyć N4-008 semantic silo / controlled reverse links na istniejących explicit pivots, z bounded deterministic resolverami i per-article inbound/click-depth audit data,
-- [ ] dodać site-wide orphan/click-depth audit command lub crawler ponad per-article audit data, jeśli N5/N6 potwierdzi potrzebę operacyjną,
+- [x] dodać site-wide `newsroom:audit-links` w NEWSROOM-N5-006 ponad istniejącym per-article audit data; komenda obejmuje potwierdzony orphan/source/breaking/non-public-target/related/featured-topic QA, natomiast threshold excessive click-depth, duplicate-module URL i redirect-chain crawler pozostają niewdrożone,
 - [x] rozszerzyć istniejący statyczny generator o article sitemap z deterministic sharding readiness i rollout-gated hub coverage w NEWSROOM-N5-001,
 - [x] wdrożyć statyczny News Sitemap z wymaganymi news tags, 2-dniowym `first_published_at` window i 1000-entry deterministic split w NEWSROOM-N5-002,
 - [ ] wdrożyć child-before-index atomic publication i cleanup obsolete shards po switchu,
 - [ ] wdrożyć dirty/version refresh coordinator + frequent scheduler lock; zachować daily cron jako safety net i nie wymagać queue workera,
-- [ ] rozszerzyć istniejący sitemap auditor o newsroom/news namespace-specific checks; N5-001 dodało ogólne entry-count/byte-size guards, a N5-002 tylko legalny article/news overlap handling bez pełnego namespace/age/tag audit,
+- [x] rozszerzyć istniejący `SeoSitemapAuditor` w NEWSROOM-N5-006 o newsroom/news namespace/tag/date/window/eligibility/topology/shard/obsolete-file checks, zachowując ogólne entry-count/byte-size guards i bez drugiego validatora,
 - [ ] zweryfikować rzeczywiste static/Nginx/CDN headers/304 bez przenoszenia source of truth do SitemapController,
 - [x] wdrożyć Atom feed + auto-discovery + application-level validators w NEWSROOM-N5-003,
 - [x] wdrożyć privacy-safe analytics hooks/events w NEWSROOM-N5-004 przez istniejący `trackAnalyticsEvent` i GA/consent layer,
@@ -1640,6 +1646,15 @@ Obecnie:
 ---
 
 ## 70. Historia zmian
+
+### 2026-09-18 — v0.24
+
+- NEWSROOM-N5-006 zmergowano przez PR #107; finalny implementation head `64feb88b614b737a69784d43e86e97591aaec3d5`, merge `main@18300baf3a91ffc5e3c549ab664c471bfd34ffe4`,
+- istniejący `SeoSitemapAuditor` obsługuje teraz newsroom/news canonical eligibility, required News namespace/tags/identity/date/window, duplicate/missing-child oraz single/sharded topology, overlap i obsolete unreferenced file checks; nie powstał drugi validator,
+- `NewsroomSemanticLinkService::auditAll()` i `newsroom:audit-links` materializują site-wide QA na tym samym graph/public-gate contract co public rendering; zakres jest celowo węższy niż pełny crawler rekomendowany pierwotnie,
+- N5-006 nie zmienia generatora ani sposobu publikacji statycznych plików; potwierdzony broken-set window, child-before-index switch, post-switch cleanup i dirty/version refresh coordinator pozostają NEWSROOM-N5-007,
+- finalny pre-merge CI #397: 1127 passed / 20 131 assertions / 2 skipped, PostgreSQL 7/94, Pint/build PASS; Browser Smoke #57 PASS 6/6; post-merge CI #398 powtórzył 1127 / 20 131 / 2 skipped, PostgreSQL 7/94 i Pint/build PASS,
+- kolejnym wykonywalnym taskiem jest NEWSROOM-N5-007; produkcyjna static/Nginx/CDN/GSC verification nadal nie jest przedstawiana jako wykonana.
 
 ### 2026-09-18 — v0.23
 
