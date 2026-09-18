@@ -1990,6 +1990,27 @@ Nie zmieniamy produkcyjnego modelu na runtime generation.
 
 Nie implementować tego jako zwykłego `ShouldQueue`, dopóki produkcja ma `QUEUE_CONNECTION=sync` i brak monitorowanego workera.
 
+### Potwierdzony stan implementacji po PR #109
+
+NEWSROOM-N5-007 pozostaje **IN PROGRESS**.
+
+Zakończony jest wyłącznie pierwszy podkrok publication hardening:
+- `SeoSitemapGenerator::generate()` buduje cały replacement set i waliduje protocol limits oraz XML przed modyfikacją opublikowanych plików,
+- child XML są zapisywane atomowo przed głównym `sitemap.xml`,
+- root `sitemap.xml` jest przełączany dopiero po zapisaniu child files,
+- obsolete zarządzane `articles*.xml` / `news*.xml` są usuwane dopiero po przełączeniu root indexu,
+- niezwiązane XML w `public/sitemaps` nie są usuwane przez ten cleanup,
+- regression tests potwierdzają kolejność publication, fail-before-switch dla invalid XML oraz post-switch cleanup.
+
+Implementation PR #109 miał finalny head `dbcd5cdb2f0e6663c998f930c034624f8fe36bf4` i został zmergowany do `main@1744a93fd8f0bddfe7fc5bff90b146fdea24b016`. Exact-head CI #403 oraz post-merge CI #404 zakończyły pełny PASS: 1130 passed / 20 144 assertions / 2 skipped, PostgreSQL 7/94, Pint 1093 files PASS i frontend build PASS.
+
+Nadal niewykonane w N5-007:
+- after-commit dirty/version signal,
+- frequent refresh coordinator i shared Redis/distributed lock / single-execution scheduler semantics,
+- version-safe marker clearing,
+- topology gate dla single-node vs multi-node,
+- production HTTP/static/Nginx/Cloudflare/GSC verification.
+
 ### Robots compatibility
 
 - nie usuwać `RobotsController` w tym tasku,
@@ -2317,7 +2338,7 @@ Docs-only:
 - [x] article sitemap przez istniejący static generator + deterministic sharding readiness + rollout-gated hub coverage (NEWSROOM-N5-001)
 - [x] News Sitemap full required metadata + `first_published_at` eligibility + 1000-entry deterministic split (NEWSROOM-N5-002)
 - [ ] dirty/version scheduled refresh bez queue-worker assumption
-- [ ] child-before-index atomic static publication
+- [x] child-before-index atomic static publication — potwierdzone w NEWSROOM-N5-007 PR #109; dirty/version refresh i production delivery smoke pozostają osobnymi otwartymi gate'ami
 - [x] istniejący `SeoSitemapAuditor` rozszerzony o newsroom/news namespace/tag/date/window/eligibility/topology/shard/obsolete-file checks w NEWSROOM-N5-006; generic protocol-limit guards nadal są reużywane
 - [ ] rzeczywisty static/Nginx/CDN delivery smoke (Content-Type/cache/Set-Cookie/validators)
 - [x] Atom feed + discovery + generation cache/validator contract (NEWSROOM-N5-003)
@@ -2555,13 +2576,24 @@ Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-008 na `main@3d7ac8ab8a3ed1c299cb0c
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N5-007 — Static sitemap publication + freshness + delivery hardening.
+NEWSROOM-N5-007 — Static sitemap publication + freshness + delivery hardening — **kontynuacja**.
 
-N5-006 jest zamknięte implementacyjnie po PR #107, exact-head CI #397, Browser Smoke #57 i post-merge CI #398 na `main@18300baf3a91ffc5e3c549ab664c471bfd34ffe4`. Następny krok ma usunąć istniejący broken-set window w statycznym generatorze, wdrożyć child-before-index atomic publication/cleanup oraz dirty-version refresh coordinator zgodnie z już zapisanym kontraktem N5-007. Produkcyjna topologia/delivery verification pozostaje warunkiem rolloutowym, nie jest deklarowana jako wykonana przez N5-006.
+Pierwszy podkrok N5-007, czyli pre-validation + child-before-index atomic publication + post-switch cleanup zarządzanych article/news sitemap files, jest potwierdzony po PR #109 i post-merge CI #404 na `main@1744a93fd8f0bddfe7fc5bff90b146fdea24b016`.
+
+Następnym wykonywalnym podkrokiem pozostaje dirty/version freshness coordinator z częstym schedulerem i shared lockiem zgodnie z zapisanym kontraktem N5-007. Przed rolloutem częstego refreshu nadal obowiązuje topology gate; production static/Nginx/Cloudflare/GSC delivery verification nie jest jeszcze wykonana.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-18 — v0.52
+
+- pierwszy podkrok NEWSROOM-N5-007 zmergowano przez PR #109; finalny implementation head `dbcd5cdb2f0e6663c998f930c034624f8fe36bf4`, merge `main@1744a93fd8f0bddfe7fc5bff90b146fdea24b016`,
+- `SeoSitemapGenerator` waliduje kompletny generated set przed publication, zapisuje child XML przed root `sitemap.xml` i usuwa obsolete zarządzane article/news files dopiero po switchu root indexu; unrelated XML nie są objęte cleanupem,
+- `SeoSitemapGenerationTest` chroni root-index-last ordering, brak modyfikacji starego setu przy invalid XML oraz post-switch obsolete-newsroom cleanup,
+- CI #401 i #402 nie są finalnym evidence, ponieważ backend/PostgreSQL przechodziły, ale Pint wykrywał konflikt stylu w nowym test helperze; po minimalnej korekcie testowej cały gate uruchomiono od nowa na finalnym SHA,
+- exact-head CI #403: 1130 passed / 20 144 assertions / 2 skipped, PostgreSQL 7/94, Pint 1093 files PASS, frontend build 9.94 s; post-merge CI #404 na exact main powtórzył 1130 / 20 144 / 2 skipped, PostgreSQL 7/94, Pint PASS i build 9.69 s,
+- NEWSROOM-N5-007 pozostaje IN PROGRESS: dirty/version signal, refresh coordinator + distributed lock, version-safe marker clearing, topology gate i production static delivery verification nadal są otwarte.
 
 ### 2026-09-18 — v0.51
 

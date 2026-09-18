@@ -1607,10 +1607,11 @@ Obecnie:
 - reverse/related eligibility wymaga `activelyDistributed()+indexable()`, aktywnej kategorii i publicznego autora; TrafficSign dopuszcza tylko `direct|example`, a question graph (`question_relations`, `question_seo_topics`, rankingi) pozostaje nietknięty,
 - `NewsroomSemanticLinkService::audit()` udostępnia per-article `has_crawlable_inbound`, inbound sources, explicit reverse-edge count i `estimated_hub_depth`; NEWSROOM-N5-006 dodało `auditAll()` i cienką komendę `newsroom:audit-links` dla site-wide orphan/source/breaking/non-public-target/related/featured-topic QA bez drugiego graph subsystemu,
 - NEWSROOM-N5-001 rozszerza istniejące `SeoSitemapBuilder` / `SeoSitemapGenerator` / `SeoSitemapAuditor`: standard article sitemap obejmuje indexable newsroom/guide detail URLs, root sitemap index wskazuje article file/shards bez nested index, a `static.xml` dostaje rollout-gated coverage dla newsroom home, guides, active categories i published topics,
-- article shard assignment jest stabilny po stałych zakresach `content_articles.id` (domyślny span 10 000), a generator/auditor egzekwują 50 000 wpisów i 50 MB nieskompresowanego XML; N5-001 nie implementuje jeszcze child-before-index set switch ani cleanup obsolete shards,
+- article shard assignment jest stabilny po stałych zakresach `content_articles.id` (domyślny span 10 000), a generator/auditor egzekwują 50 000 wpisów i 50 MB nieskompresowanego XML; pierwszy podkrok N5-007 później domknął child-before-index publication i post-switch cleanup zarządzanych article/news shards,
 - NEWSROOM-N5-002 rozszerza ten sam static pipeline o News Sitemap: gate=true emituje wyłącznie `type=news`, aktywnie dystrybuowane `published` + indexable current-canonical articles z aktywną kategorią i publicznym autorem, kwalifikowane wyłącznie przez `first_published_at >= now()-2 days`,
 - `news:name` reużywa canonical identity z `SiteIdentitySchema::siteName()`, `news:language=pl`, `news:publication_date=first_published_at`, a `news:title` bierze widoczny `ContentArticle.title`; przy <=1000 entries używany jest `/sitemaps/news.xml`, a powyżej limitu deterministic fixed-ID-range shards trafiają bezpośrednio do root `/sitemap.xml`,
 - NEWSROOM-N5-006 rozszerza istniejący `SeoSitemapAuditor` bez równoległego validatora: poza legalnym article/news overlap sprawdza duplicate index loc, missing child, current-canonical/indexability/category/author/redirect-source eligibility, Google News namespace/required tags/name/language/title/publication-date/2-day window, single-vs-sharded topology, invalid/overlapping shard ranges oraz obsolete unreferenced article/news files,
+- NEWSROOM-N5-007 jest częściowo zmaterializowane po PR #109: `SeoSitemapGenerator` waliduje kompletny generated set przed publication, atomowo zapisuje wszystkie child XML przed root `sitemap.xml`, przełącza root index na końcu i dopiero potem usuwa obsolete zarządzane `articles*.xml` / `news*.xml`; unrelated XML nie są objęte cleanupem. Dirty/version coordinator, frequent scheduler lock, topology gate i production static delivery verification pozostają otwarte,
 - NEWSROOM-N3-008 jest wdrożone, N4-002 konsumuje ten sam gate dla publicznego huba `/aktualnosci`, N4-003 dla category pages, N4-004 dla `/poradniki`, N4-007 dla topic dossier, N4-008 dla topic/related/reverse-link resolvers, N5-001 dla standard article sitemap/hub coverage, N5-002 dla News Sitemap, N5-003 dla Atom feed/discovery, a N5-005 dla article-specific IndexNow automation. Przy gate=false category/topic/feed routes failują do 404, top-level `/poradniki` pozostaje noindex placeholderem, N4-008 nie emituje reverse targets, N5-001/N5-002 nie emitują newsroom article/news sitemap discovery, feed discovery jest suppressowane, a `QueueNewsroomArticleIndexNow` kończy bez enqueue; N5-004 nie tworzy osobnego rollout gate i emituje eventy tylko na rzeczywiście zrenderowanych publicznych surface'ach z analytics-ready istniejącego GA layer. Przy gate=true opublikowany topic ma self-canonical `index,follow,max-image-preview:large`, draft/future/unknown pozostają 404, a historyczny archived topic zwraca 410 + noindex. N5-005 reużywa istniejący queue/submission pipeline i nie zmienia protokołu HTTP IndexNow.
 
 ---
@@ -1628,7 +1629,7 @@ Obecnie:
 - [x] dodać site-wide `newsroom:audit-links` w NEWSROOM-N5-006 ponad istniejącym per-article audit data; komenda obejmuje potwierdzony orphan/source/breaking/non-public-target/related/featured-topic QA, natomiast threshold excessive click-depth, duplicate-module URL i redirect-chain crawler pozostają niewdrożone,
 - [x] rozszerzyć istniejący statyczny generator o article sitemap z deterministic sharding readiness i rollout-gated hub coverage w NEWSROOM-N5-001,
 - [x] wdrożyć statyczny News Sitemap z wymaganymi news tags, 2-dniowym `first_published_at` window i 1000-entry deterministic split w NEWSROOM-N5-002,
-- [ ] wdrożyć child-before-index atomic publication i cleanup obsolete shards po switchu,
+- [x] wdrożyć child-before-index atomic publication i cleanup obsolete zarządzanych article/news shards po switchu — potwierdzone w NEWSROOM-N5-007 PR #109; unrelated XML pozostają nietknięte,
 - [ ] wdrożyć dirty/version refresh coordinator + frequent scheduler lock; zachować daily cron jako safety net i nie wymagać queue workera,
 - [x] rozszerzyć istniejący `SeoSitemapAuditor` w NEWSROOM-N5-006 o newsroom/news namespace/tag/date/window/eligibility/topology/shard/obsolete-file checks, zachowując ogólne entry-count/byte-size guards i bez drugiego validatora,
 - [ ] zweryfikować rzeczywiste static/Nginx/CDN headers/304 bez przenoszenia source of truth do SitemapController,
@@ -1646,6 +1647,15 @@ Obecnie:
 ---
 
 ## 70. Historia zmian
+
+### 2026-09-18 — v0.25
+
+- pierwszy podkrok NEWSROOM-N5-007 zmergowano przez PR #109; finalny implementation head `dbcd5cdb2f0e6663c998f930c034624f8fe36bf4`, merge `main@1744a93fd8f0bddfe7fc5bff90b146fdea24b016`,
+- static sitemap source of truth nie zmienił się: `SeoSitemapGenerator` nadal publikuje pliki do `public/`, ale teraz waliduje cały set przed switch, zapisuje child files przed root indexem i usuwa obsolete zarządzane article/news files dopiero po przełączeniu `sitemap.xml`,
+- cleanup jest celowo ograniczony do kanonicznych article/news paths oraz fixed-ID-range article/news shards; unrelated `public/sitemaps/*.xml` nie są usuwane,
+- `SeoSitemapGenerationTest` potwierdza root-index-last ordering, fail-before-switch dla invalid XML oraz post-switch cleanup przy zachowaniu unrelated XML,
+- exact-head CI #403 i post-merge CI #404 zakończyły pełny PASS: 1130 passed / 20 144 assertions / 2 skipped, PostgreSQL 7/94, Pint 1093 files PASS i frontend build PASS,
+- NEWSROOM-N5-007 pozostaje IN PROGRESS: dirty/version signal, frequent scheduler + distributed lock, topology gate oraz production static/Nginx/Cloudflare/GSC verification nadal nie są wykonane.
 
 ### 2026-09-18 — v0.24
 

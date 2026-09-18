@@ -1356,7 +1356,7 @@ Jeśli draft stał się publiczny:
 - [ ] articles sitemap/shard z istniejącego static generatora
 - [ ] production sample News Sitemap ma wymagane metadata/eligibility zgodne z wdrożonym N5-002
 - [ ] fresh dirty-marker/scheduled refresh dla News Sitemap
-- [ ] child-before-index atomic publication
+- [x] child-before-index atomic publication — repository-level regression potwierdzone w PR #109; production static delivery nadal wymaga osobnego smoke
 - [ ] production sample Atom feed + head discovery na publicznym środowisku
 - [ ] sitemap static delivery headers/304 na faktycznej warstwie
 - [ ] brak regresji istniejących question/sign/legal/author sitemap
@@ -1501,8 +1501,9 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - `NewsroomPublicArticlePageTest` został zsynchronizowany z nowym kontraktem guide detail: primary category jest crawlable classification linkiem bez zmiany guide breadcrumb family,
 - workflow `Browser Smoke` ma osobny job `newsroom-semantic-links`; Browser Smoke #48 na finalnym N4-008 head `bd63773bc1febdcc6aa8c2507c6621e908d63b09` zakończył PASS dla semantic-links, article, home, category, guides i topic,
 - exact-head CI #361 zakończył pełny PASS, a post-merge CI #362 na `main@3d7ac8ab8a3ed1c299cb0cdd4cb1ef8ac6b53f78` zakończył: `quality` 1093 passed / 19 881 assertions / 2 skipped, Pint PASS, frontend build 7.42 s; `newsroom-postgres` 7 passed / 94 assertions,
-- publiczny Hub Blade, category pages, guide hub, topic dossier, navigation integration, home/category cache, N4-008 semantic/reverse links, N5-001 standard article sitemap/hub coverage, N5-002 Google News Sitemap, N5-003 Atom feed/discovery, N5-004 analytics hooks, N5-005 article-specific IndexNow automation oraz N5-006 sitemap/link audit hardening są zamknięte implementacyjnie; następnym taskiem jest NEWSROOM-N5-007,
-- atomic child-before-index publication, post-switch cleanup i dirty/version newsroom refresh coordinator pozostają N5-007; produkcyjny CDN/Nginx feed/static-delivery smoke oraz produkcyjny rollout fazy 2 IndexNow/Bing verification nadal nie są potwierdzone.
+- publiczny Hub Blade, category pages, guide hub, topic dossier, navigation integration, home/category cache, N4-008 semantic/reverse links, N5-001 standard article sitemap/hub coverage, N5-002 Google News Sitemap, N5-003 Atom feed/discovery, N5-004 analytics hooks, N5-005 article-specific IndexNow automation oraz N5-006 sitemap/link audit hardening są zamknięte implementacyjnie,
+- pierwszy podkrok NEWSROOM-N5-007 jest potwierdzony po PR #109: complete-set XML pre-validation, child-before-index atomic publication oraz post-switch cleanup zarządzanych article/news sitemap files; exact-head CI #403 i post-merge CI #404 zakończyły pełny PASS,
+- NEWSROOM-N5-007 pozostaje IN PROGRESS: dirty/version newsroom refresh coordinator, frequent scheduler/shared lock, topology gate i produkcyjny CDN/Nginx/static-delivery smoke nadal nie są potwierdzone; produkcyjny rollout fazy 2 IndexNow/Bing verification również pozostaje osobnym otwartym evidence.
 
 ---
 
@@ -1520,7 +1521,7 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - [x] dodać N2 stale-write/Apply-public-update oraz HomeComposer stale-write regression; ContentArticle i placement same-second conflicts są blokowane,
 - [x] dodać N5-001 standard article sitemap regression w istniejącym `SeoSitemapGenerationTest`: single shard, boundary crossing, stable fixed-ID-range assignment, no duplicate URL across shards, public-gate suppression, eligibility/current-canonical oraz URL-count/byte-size guards,
 - [x] dodać N5-002 News Sitemap regression w istniejącym `SeoSitemapGenerationTest`: required namespace/tags, visible title/canonical identity, `first_published_at` 2-day eligibility, old-updated exclusion, public-gate suppression, non-news/status/noindex/category/author/redirect-source exclusions i realny 1000→1001 boundary,
-- [ ] dodać child-before-index atomic publication + obsolete-shard cleanup tests,
+- [x] dodać child-before-index atomic publication + obsolete-shard cleanup tests — `SeoSitemapGenerationTest` potwierdza root-index-last, fail-before-switch dla invalid XML i cleanup zarządzanych article/news files przy zachowaniu unrelated XML,
 - [ ] dodać dirty-marker refresh tests,
 - [x] dodać N5-003 feed/discovery regression: Atom metadata/corpus/limit, stable id + slug change, workflow invalidation, ETag/Last-Modified/304, no Set-Cookie, gate/discovery,
 - [x] dodać N5-004 analytics regression: render/privacy contract, GA readiness signal oraz JS-enabled Browser Smoke dla exactly-once article view, one-click-one-event, module click i disabled/non-link suppression,
@@ -1542,6 +1543,15 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-18 — v0.35
+
+- pierwszy podkrok NEWSROOM-N5-007 zmergowano przez PR #109; finalny implementation head `dbcd5cdb2f0e6663c998f930c034624f8fe36bf4`, merge `main@1744a93fd8f0bddfe7fc5bff90b146fdea24b016`,
+- `SeoSitemapGenerationTest` dodaje regression dla root `sitemap.xml` publikowanego po child payloads, invalid XML odrzuconego przed zmianą istniejącego setu oraz obsolete zarządzanych article/news files usuwanych po switchu bez kasowania unrelated XML,
+- CI #401 i #402 nie są finalnym evidence ze względu na Pint failure w test helperze; finalny exact-head CI #403 przeszedł 1130 passed / 20 144 assertions / 2 skipped, PostgreSQL 7/94, Pint 1093 files PASS i frontend build 9.94 s,
+- post-merge CI #404 na exact `main@1744a93fd8f0bddfe7fc5bff90b146fdea24b016` powtórzył 1130 / 20 144 / 2 skipped, PostgreSQL 7/94, Pint PASS i frontend build 9.69 s,
+- Browser Smoke nie został uruchomiony dla tego backend/test-only zakresu; nie zapisujemy nieistniejącego browser evidence,
+- dirty-marker refresh tests, scheduler/shared-lock regression oraz production-like static robots/sitemap/feed delivery smoke pozostają otwarte, więc NEWSROOM-N5-007 nie jest DONE.
 
 ### 2026-09-18 — v0.34
 
