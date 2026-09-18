@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Enums\ContentArticleType;
 use App\Models\ContentArticle;
+use App\Models\ContentAuthor;
 use App\Models\ContentCategory;
 use App\Models\ContentTopic;
 use Illuminate\Database\Eloquent\Builder;
@@ -171,16 +172,25 @@ final class NewsroomSemanticLinkService
     /**
      * @return array{
      *     has_crawlable_inbound:bool,
+     *     hub:?array{label:string,url:string},
      *     category:?array{label:string,url:string},
      *     topics:list<array{id:int,title:string,slug:string,url:string}>,
+     *     author:?array{label:string,url:string},
+     *     inbound_sources:list<array{kind:string,label:string,url:string}>,
      *     explicit_reverse_edge_count:int,
      *     estimated_hub_depth:?int
      * }
      */
     public function audit(ContentArticle $article): array
     {
-        $topics = $this->topics($article);
+        $gateEnabled = $this->publicGate->enabled();
+        $isIndexable = $gateEnabled && $article->isIndexable();
+        $isActive = $isIndexable && $article->isActivelyDistributed();
+        $topics = $isIndexable ? $this->topics($article) : [];
         $category = null;
+        $author = null;
+        $hub = null;
+        $inboundSources = [];
 
         if ($article->category instanceof ContentCategory && $article->category->is_active) {
             $category = [
@@ -189,17 +199,71 @@ final class NewsroomSemanticLinkService
             ];
         }
 
+        if ($article->author instanceof ContentAuthor && $article->author->isPubliclyVisible()) {
+            $author = [
+                'label' => (string) $article->author->name,
+                'url' => route('content-authors.show', ['authorSlug' => $article->author->slug], false),
+            ];
+        }
+
+        if ($isActive) {
+            $type = $article->type instanceof ContentArticleType
+                ? $article->type->value
+                : (string) $article->type;
+            $family = NewsroomRouteContract::familyForType($type);
+            $hub = $family === NewsroomRouteContract::FAMILY_GUIDES
+                ? ['label' => 'Poradniki', 'url' => route('public.guides', absolute: false)]
+                : ['label' => 'Aktualności', 'url' => route('public.news', absolute: false)];
+
+            $inboundSources[] = [
+                'kind' => 'hub',
+                ...$hub,
+            ];
+
+            if ($family === NewsroomRouteContract::FAMILY_NEWSROOM && $category !== null) {
+                $inboundSources[] = [
+                    'kind' => 'category',
+                    ...$category,
+                ];
+            }
+
+            foreach ($topics as $topic) {
+                $inboundSources[] = [
+                    'kind' => 'topic',
+                    'label' => $topic['title'],
+                    'url' => $topic['url'],
+                ];
+            }
+        }
+
+        if ($isIndexable && $author !== null) {
+            $inboundSources[] = [
+                'kind' => 'author',
+                ...$author,
+            ];
+        }
+
         $explicitReverseEdges = $article->questions()->count()
             + $article->legalUnits()->count()
             + $article->trafficSigns()->count();
 
+        $estimatedHubDepth = match (true) {
+            ! $isIndexable => null,
+            $isActive && $hub !== null && $hub['url'] === route('public.guides', absolute: false) => 1,
+            $isActive && $category !== null => 2,
+            $author !== null => 3,
+            default => null,
+        };
+
         return [
-            'has_crawlable_inbound' => $article->isActivelyDistributed()
-                && ($category !== null || $topics !== [] || $explicitReverseEdges > 0),
+            'has_crawlable_inbound' => $inboundSources !== [],
+            'hub' => $hub,
             'category' => $category,
             'topics' => $topics,
+            'author' => $author,
+            'inbound_sources' => $inboundSources,
             'explicit_reverse_edge_count' => $explicitReverseEdges,
-            'estimated_hub_depth' => $article->isActivelyDistributed() ? 2 : null,
+            'estimated_hub_depth' => $estimatedHubDepth,
         ];
     }
 
