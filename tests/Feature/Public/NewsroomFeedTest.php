@@ -110,13 +110,17 @@ test('public Atom feed exposes latest actively distributed news with stable meta
         ->and($lastModified)->not->toBeNull()
         ->and($response->headers->get('Cache-Control'))->toContain('public');
 
-    $this->withHeaders([
-        'If-None-Match' => $etag,
-        'If-Modified-Since' => $lastModified,
-    ])->get(route('public.news.feed'))
+    $this->withHeader('If-None-Match', $etag)
+        ->get(route('public.news.feed'))
         ->assertStatus(304)
         ->assertHeader('ETag', $etag)
-        ->assertHeader('Last-Modified', $lastModified);
+        ->assertHeaderMissing('Set-Cookie');
+
+    $this->withHeader('If-Modified-Since', $lastModified)
+        ->get(route('public.news.feed'))
+        ->assertStatus(304)
+        ->assertHeader('ETag', $etag)
+        ->assertHeaderMissing('Set-Cookie');
 });
 
 test('Atom item id stays stable while canonical link follows slug change', function () {
