@@ -38,6 +38,8 @@ class SeoSitemapAuditor
             return $errors;
         }
 
+        $this->validateFileLimits($sitemapPath, 'sitemap.xml', $index, $errors);
+
         foreach ($index->children() as $sitemap) {
             $loc = trim((string) $sitemap->loc);
             $this->validateLoc($loc, 'sitemap index', $errors);
@@ -63,6 +65,8 @@ class SeoSitemapAuditor
             if ($child === null) {
                 continue;
             }
+
+            $this->validateFileLimits($childPath, $relativePath, $child, $errors);
 
             foreach ($child->children() as $entry) {
                 if ($entry->getName() === 'sitemap') {
@@ -128,6 +132,46 @@ class SeoSitemapAuditor
             if (str_contains($loc, $forbidden)) {
                 $errors[] = 'Forbidden loc pattern "'.$forbidden.'" in '.$source.': '.$loc;
             }
+        }
+    }
+
+    /**
+     * @param  list<string>  $errors
+     */
+    protected function validateFileLimits(
+        string $path,
+        string $source,
+        \SimpleXMLElement $xml,
+        array &$errors,
+    ): void {
+        $maxUrls = max(
+            1,
+            (int) config('seo.sitemap_max_urls_per_file', SeoSitemapGenerator::MAX_URLS_PER_FILE),
+        );
+        $maxBytes = max(
+            1,
+            (int) config('seo.sitemap_max_uncompressed_bytes', SeoSitemapGenerator::MAX_UNCOMPRESSED_BYTES),
+        );
+        $entries = count($xml->children());
+
+        if ($entries > $maxUrls) {
+            $errors[] = sprintf(
+                'Sitemap entry limit exceeded in %s: entries=%d limit=%d.',
+                $source,
+                $entries,
+                $maxUrls,
+            );
+        }
+
+        $bytes = File::size($path);
+
+        if ($bytes > $maxBytes) {
+            $errors[] = sprintf(
+                'Sitemap byte limit exceeded in %s: bytes=%d limit=%d.',
+                $source,
+                $bytes,
+                $maxBytes,
+            );
         }
     }
 
