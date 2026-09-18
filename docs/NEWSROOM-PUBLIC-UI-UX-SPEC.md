@@ -1171,13 +1171,16 @@ Warunki przed uruchomieniem:
 
 ## 63. Analytics hooks
 
-Komponenty mogą mieć data attributes:
+NEWSROOM-N5-004 jest wdrożone bez zmiany wizualnego layoutu. Publiczne SSR surface’y wystawiają semantyczne hooki:
 
-- data-analytics-module
-- data-analytics-position
-- data-article-id
+- istniejące `data-analytics-module` pozostaje markerem sekcji/paginacji,
+- tracking cards/links używa `data-newsroom-analytics-module`, `data-newsroom-analytics-position`, `data-newsroom-analytics-event`,
+- stabilny kontekst kart używa `data-article-id`, `data-article-url`, `data-article-type`, `data-category-slug`,
+- article detail wystawia `data-newsroom-analytics-article` jako page context.
 
-Nie wkładamy logiki analitycznej do każdego Blade partiala ręcznie; public-content JS może delegować click tracking.
+Logika nie jest duplikowana w Blade partialach: jeden `resources/js/public/newsroomAnalytics.ts`, inicjalizowany przez `public-content.ts`, deleguje click tracking i reużywa istniejący `trackAnalyticsEvent`/GA consent layer. Brak JS nie blokuje czytania, routingu ani linków.
+
+Do analytics nie przenosimy body, tytułu, autora ani source metadata. `destination_path` jest pathname. Optional scroll depth nie został wdrożony.
 
 ---
 
@@ -1383,6 +1386,14 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 ---
 
 ## 69. Historia zmian
+
+### 2026-09-18 — v0.25
+
+- NEWSROOM-N5-004 zmergowano przez PR #103 na `main@5704b3c3a8acde029001e28567980c5de8e27cdf`; publiczny design/layout nie zmienił się,
+- article/home/category/guides/Product Bridge dostały wyłącznie niewizualne semantyczne `data-*` dla delegated analytics; czytanie i nawigacja nadal są SSR/link-first i nie zależą od JavaScript,
+- jeden `newsroomAnalytics.ts` obsługuje article/module/category/pagination/Product Bridge/source/related clicks przez istniejący GA/consent layer; nie ma ręcznej logiki w każdym partialu ani content/PII w params,
+- Browser Smoke #55 potwierdził dotychczasowy responsive rendering oraz dodatkowy JS-enabled analytics pass w `newsroom-article`; CI #384 i post-merge CI #385 były pełnym PASS,
+- następnym taskiem wykonawczym jest NEWSROOM-N5-005 IndexNow integration review; nie wymaga on z góry zmian publicznego UI.
 
 ### 2026-09-18 — v0.24
 

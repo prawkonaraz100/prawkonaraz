@@ -1038,6 +1038,8 @@ External Google Fonts są w harnessie deterministycznie stubowane, ale realny zb
 
 Browser Smoke #20 na finalnym N3-005 head `7d795b895865cda49ba94a4fec50533d7b0f7a97` zakończył się PASS. Artifact `newsroom-article-browser-qa` ma ID `10508254861`, rozmiar 1 124 509 bytes i SHA256 `753b717cb5f0319e2e7799552b181fd972b41cd3b3a66bba7dd9a82d7ce96a2a`.
 
+Po NEWSROOM-N5-004 ten sam `newsroom-article` harness zachowuje dotychczasowy JS-disabled responsive pass, a następnie wykonuje osobny JS-enabled analytics pass z lokalnym `gtag` stubem. Regression potwierdza delayed `prawkonaraz:analytics-ready` -> dokładnie jeden `newsroom_article_view`, dokładnie jeden event na kliknięcie Product Bridge/source/related link, generic `newsroom_module_click` ze stabilnym kontekstem oraz brak eventu dla non-link i `aria-disabled`. Browser Smoke #55 zakończył PASS dla `newsroom-article`, `newsroom-home`, `newsroom-category`, `newsroom-guides`, `newsroom-topic` i `newsroom-semantic-links`.
+
 Po NEWSROOM-N4-002 workflow ma również osobny automatyczny job `newsroom-home` oraz komendę `npm run e2e:newsroom-home`. Harness buduje assets, seeduje deterministyczny hub corpus, renderuje `/aktualnosci` przez Laravel kernel i uruchamia Chromium z JavaScript disabled. Sprawdza H1, newsroom subnavigation, lead/latest/category/guides/Product Bridge, self-canonical, robots `index,follow,max-image-preview:large`, realny built CSS oraz brak horizontal overflow na 360/390/430/768/1024/1280/1440. Browser Smoke #27 na finalnym N4-002 head `1036b67aa44b56fffb0bc1e9083d3a0d1d3963d0` zakończył PASS dla obu relewantnych jobów `newsroom-home` i `newsroom-article`; genericzny `browser-smoke` pozostał prawidłowo skipped na evencie pull_request, ponieważ jest manual-only.
 
 ---
@@ -1498,8 +1500,8 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - `NewsroomPublicArticlePageTest` został zsynchronizowany z nowym kontraktem guide detail: primary category jest crawlable classification linkiem bez zmiany guide breadcrumb family,
 - workflow `Browser Smoke` ma osobny job `newsroom-semantic-links`; Browser Smoke #48 na finalnym N4-008 head `bd63773bc1febdcc6aa8c2507c6621e908d63b09` zakończył PASS dla semantic-links, article, home, category, guides i topic,
 - exact-head CI #361 zakończył pełny PASS, a post-merge CI #362 na `main@3d7ac8ab8a3ed1c299cb0cdd4cb1ef8ac6b53f78` zakończył: `quality` 1093 passed / 19 881 assertions / 2 skipped, Pint PASS, frontend build 7.42 s; `newsroom-postgres` 7 passed / 94 assertions,
-- publiczny Hub Blade, category pages, guide hub, topic dossier, navigation integration, home/category cache, N4-008 semantic/reverse links, N5-001 standard article sitemap/hub coverage, N5-002 Google News Sitemap oraz N5-003 Atom feed/discovery są zamknięte implementacyjnie; następnym taskiem jest NEWSROOM-N5-004,
-- atomic static publication, dirty/version newsroom refresh coordinator i pełne namespace-specific `SeoSitemapAuditor` extension pozostają N5; produkcyjny CDN/Nginx feed smoke nadal nie jest potwierdzony.
+- publiczny Hub Blade, category pages, guide hub, topic dossier, navigation integration, home/category cache, N4-008 semantic/reverse links, N5-001 standard article sitemap/hub coverage, N5-002 Google News Sitemap, N5-003 Atom feed/discovery oraz N5-004 analytics hooks są zamknięte implementacyjnie; następnym taskiem jest NEWSROOM-N5-005,
+- article-specific IndexNow review/automation, atomic static publication, dirty/version newsroom refresh coordinator i pełne namespace-specific `SeoSitemapAuditor` extension pozostają N5; produkcyjny CDN/Nginx feed smoke nadal nie jest potwierdzony.
 
 ---
 
@@ -1520,6 +1522,7 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - [ ] dodać child-before-index atomic publication + obsolete-shard cleanup tests,
 - [ ] dodać dirty-marker refresh tests,
 - [x] dodać N5-003 feed/discovery regression: Atom metadata/corpus/limit, stable id + slug change, workflow invalidation, ETag/Last-Modified/304, no Set-Cookie, gate/discovery,
+- [x] dodać N5-004 analytics regression: render/privacy contract, GA readiness signal oraz JS-enabled Browser Smoke dla exactly-once article view, one-click-one-event, module click i disabled/non-link suppression,
 - [ ] dodać production-like static robots/sitemap/feed delivery smoke,
 - [ ] rozszerzyć istniejący `SeoSitemapAuditor` o newsroom/news namespace-specific checks; N5-001 potwierdza ogólne entry-count/byte-size guards, a N5-002 tylko legalny article/news URL overlap handling,
 - [ ] stworzyć production smoke checklist w praktyce,
@@ -1538,6 +1541,14 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 
 ## 60. Historia zmian
 
+### 2026-09-18 — v0.32
+
+- NEWSROOM-N5-004 implementation PR #103 zakończył exact-head CI #384 PASS na `6235b7dbadd60549a82ceebcb4eda47aaa6596fa`; Browser Smoke #55 PASS dla article/home/category/guides/topic/semantic-links; merge to `main@5704b3c3a8acde029001e28567980c5de8e27cdf`,
+- `NewsroomAnalyticsHooksTest` chroni render i privacy-safe event hooks, `GoogleAnalyticsTagTest` readiness signal, a `NewsroomHomePageTest` stabilne module names i brak content fields,
+- `newsroom-article` Browser QA ma teraz dodatkowy JS-enabled analytics pass: delayed readiness -> exactly one article view, click -> one event, generic module click oraz brak eventu dla non-link/`aria-disabled`,
+- exact-head CI #384: 1106 passed / 20 051 assertions / 2 skipped, Pint PASS, frontend build 9.72 s, PostgreSQL 7/94; post-merge CI #385 powtórzył 1106 / 20 051 / 2 skipped, Pint PASS, frontend build 7.30 s i PostgreSQL 7/94,
+- Browser Smoke #55 pozostaje PR-level release evidence; push CI nie uruchamia tego workflow, więc post-merge dowodem JS analytics jest zweryfikowany exact-head Browser Smoke #55 plus post-merge backend/build CI #385,
+- następnym wykonywalnym taskiem jest NEWSROOM-N5-005 — IndexNow integration review.
 ### 2026-09-18 — v0.31
 
 - NEWSROOM-N5-003 implementation PR #101 zakończył exact-head CI #380 PASS na `1c89f370e899895eb25ac80bd437b19c1797a9ec`; Browser Smoke #54 PASS dla article/home/category/guides/topic/semantic-links; merge to `main@18cd07233e3c8712cf2c7fc9e0c32018baef65d3`,

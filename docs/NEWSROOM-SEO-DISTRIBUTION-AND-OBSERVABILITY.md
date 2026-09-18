@@ -912,6 +912,7 @@ Po rollout:
 Minimalne eventy:
 
 - newsroom_article_view
+- newsroom_module_click
 - newsroom_related_article_click
 - newsroom_related_question_click
 - newsroom_related_legal_click
@@ -937,6 +938,8 @@ Standard:
 - timestamp po stronie systemu analytics
 
 Nie wysyłać treści body ani danych osobowych w event names/params.
+
+**Stan po NEWSROOM-N5-004:** wdrożony klient używa `article_id`, `article_type`, `category_slug`, `module`, `position` i `destination_path`. `destination_path` jest redukowany do pathname. `auth_state` i jawny application timestamp nie zostały dodane w N5-004; czas pozostaje odpowiedzialnością systemu analytics.
 
 ---
 
@@ -1588,7 +1591,7 @@ Obecnie:
 - HomePageController korzysta z kanonicznego Organization/WebSite graph; legacy „Orły na Drodze” nie jest już emitowane przez homepage,
 - wspólny public-content layout emituje `og:site_name` z kanonicznego identity,
 - istnieje również runtime `SitemapController`, ale statyczne pliki są nadrzędnym produkcyjnym modelem; samo dodanie headerów do kontrolera nie rozwiązuje static delivery,
-- newsroom Article schema graph istnieje przez `ContentArticleSchemaService` po NEWSROOM-N3-003 i jest emitowany przez publiczny article HTTP renderer od N3-004; od NEWSROOM-N5-002 istnieje statyczna rollout-gated News Sitemap, a od NEWSROOM-N5-003 publiczny rollout-gated Atom 1.0 feed z auto-discovery i application-level validators,
+- newsroom Article schema graph istnieje przez `ContentArticleSchemaService` po NEWSROOM-N3-003 i jest emitowany przez publiczny article HTTP renderer od N3-004; od NEWSROOM-N5-002 istnieje statyczna rollout-gated News Sitemap, od NEWSROOM-N5-003 publiczny rollout-gated Atom 1.0 feed z auto-discovery i application-level validators, a od NEWSROOM-N5-004 privacy-safe public analytics hooks reużywające istniejący GA/consent layer,
 - newsroom dirty/version refresh coordinator i atomowy child-before-index switch nie istnieją,
 - repo nie gwarantuje async Laravel queue workera (`QUEUE_CONNECTION=sync` w env example), więc newsroom nie może opierać freshness na ShouldQueue,
 - po NEWSROOM-N4-002 `/aktualnosci` jest rollout-gated: przy `NEWSROOM_PUBLIC_ENABLED=false` pozostaje pre-launch placeholderem 200 + `X-Robots-Tag: noindex, follow`, a przy `true` renderuje SSR `newsroom.home` z self-canonical i `index,follow,max-image-preview:large`; od N4-004 `/poradniki` konsumuje ten sam gate: przy `false` pozostaje placeholderem 200 + noindex, a przy `true` renderuje SSR `newsroom.guides`,
@@ -1602,7 +1605,7 @@ Obecnie:
 - NEWSROOM-N5-002 rozszerza ten sam static pipeline o News Sitemap: gate=true emituje wyłącznie `type=news`, aktywnie dystrybuowane `published` + indexable current-canonical articles z aktywną kategorią i publicznym autorem, kwalifikowane wyłącznie przez `first_published_at >= now()-2 days`,
 - `news:name` reużywa canonical identity z `SiteIdentitySchema::siteName()`, `news:language=pl`, `news:publication_date=first_published_at`, a `news:title` bierze widoczny `ContentArticle.title`; przy <=1000 entries używany jest `/sitemaps/news.xml`, a powyżej limitu deterministic fixed-ID-range shards trafiają bezpośrednio do root `/sitemap.xml`,
 - istniejący `SeoSitemapAuditor` dopuszcza legalny overlap URL pomiędzy standard article sitemap i News Sitemap; pełne newsroom/news namespace, age, required-tag i shard audit rules pozostają otwarte w N5-006,
-- NEWSROOM-N3-008 jest wdrożone, N4-002 konsumuje ten sam gate dla publicznego huba `/aktualnosci`, N4-003 dla category pages, N4-004 dla `/poradniki`, N4-007 dla topic dossier, N4-008 dla topic/related/reverse-link resolvers, N5-001 dla standard article sitemap/hub coverage, N5-002 dla News Sitemap, a N5-003 dla Atom feed/discovery. Przy gate=false category/topic/feed routes failują do 404, top-level `/poradniki` pozostaje noindex placeholderem, N4-008 nie emituje reverse targets, N5-001/N5-002 nie emitują newsroom article/news sitemap discovery, a feed discovery jest suppressowane; przy gate=true opublikowany topic ma self-canonical `index,follow,max-image-preview:large`, draft/future/unknown pozostają 404, a historyczny archived topic zwraca 410 + noindex. Article-specific IndexNow automation pozostaje otwarte w N5.
+- NEWSROOM-N3-008 jest wdrożone, N4-002 konsumuje ten sam gate dla publicznego huba `/aktualnosci`, N4-003 dla category pages, N4-004 dla `/poradniki`, N4-007 dla topic dossier, N4-008 dla topic/related/reverse-link resolvers, N5-001 dla standard article sitemap/hub coverage, N5-002 dla News Sitemap, a N5-003 dla Atom feed/discovery. Przy gate=false category/topic/feed routes failują do 404, top-level `/poradniki` pozostaje noindex placeholderem, N4-008 nie emituje reverse targets, N5-001/N5-002 nie emitują newsroom article/news sitemap discovery, a feed discovery jest suppressowane; N5-004 nie tworzy osobnego rollout gate i emituje eventy tylko na rzeczywiście zrenderowanych publicznych surface'ach z analytics-ready istniejącego GA layer. Przy gate=true opublikowany topic ma self-canonical `index,follow,max-image-preview:large`, draft/future/unknown pozostają 404, a historyczny archived topic zwraca 410 + noindex. Article-specific IndexNow automation pozostaje otwarte w N5.
 
 ---
 
@@ -1610,11 +1613,11 @@ Obecnie:
 
 - [x] ujednolicić Organization/WebSite/site name na istniejącym config/schema infrastructure,
 - [x] dodać `og:site_name` do wspólnego public layout contract,
-- [ ] dodać feed discovery do wspólnego public layout contract,
+- [x] dodać feed discovery do wspólnego public layout contract w NEWSROOM-N5-003,
 - [x] wdrożyć ContentArticleSeoService,
 - [x] wdrożyć ContentArticleSchemaService i publiczne osadzenie graphu w article HTML w N3-004,
 - [x] zintegrować ProfilePage/Article author identity i author sitemap z Newsroom corpus w N3-007,
-- [x] wdrożyć NEWSROOM-N3-008 public rollout gate dla detail/redirect, author profile/author sitemap contribution i obecnego IndexNow collectora; N4-008 semantic/reverse links respektują ten sam gate, a przyszłe feed/article/news sitemap nadal muszą go konsumować,
+- [x] wdrożyć NEWSROOM-N3-008 public rollout gate dla detail/redirect, author profile/author sitemap contribution i obecnego IndexNow collectora; N4-008 semantic/reverse links, N5-001/N5-002 sitemap coverage i N5-003 feed/discovery respektują ten sam gate,
 - [x] wdrożyć N4-008 semantic silo / controlled reverse links na istniejących explicit pivots, z bounded deterministic resolverami i per-article inbound/click-depth audit data,
 - [ ] dodać site-wide orphan/click-depth audit command lub crawler ponad per-article audit data, jeśli N5/N6 potwierdzi potrzebę operacyjną,
 - [x] rozszerzyć istniejący statyczny generator o article sitemap z deterministic sharding readiness i rollout-gated hub coverage w NEWSROOM-N5-001,
@@ -1624,7 +1627,7 @@ Obecnie:
 - [ ] rozszerzyć istniejący sitemap auditor o newsroom/news namespace-specific checks; N5-001 dodało ogólne entry-count/byte-size guards, a N5-002 tylko legalny article/news overlap handling bez pełnego namespace/age/tag audit,
 - [ ] zweryfikować rzeczywiste static/Nginx/CDN headers/304 bez przenoszenia source of truth do SitemapController,
 - [x] wdrożyć Atom feed + auto-discovery + application-level validators w NEWSROOM-N5-003,
-- [ ] wdrożyć analytics hooks/events,
+- [x] wdrożyć privacy-safe analytics hooks/events w NEWSROOM-N5-004 przez istniejący `trackAnalyticsEvent` i GA/consent layer,
 - [x] wdrożyć N4-003 category SEO: self-canonical pagination, category title/description fallback, `CollectionPage` + `BreadcrumbList` oraz conditional `ItemList`,
 - [x] wdrożyć N4-004 guide-hub SEO: self-canonical pagination, empty-hub noindex, `CollectionPage` + `BreadcrumbList` oraz conditional `ItemList`,
 - [x] wdrożyć N4-007 topic SEO: self-canonical pagination, `seo_title`/`seo_description` fallback, `CollectionPage` + `BreadcrumbList` + `ItemList`, 404 dla nonpublic i 410/noindex dla archived history,
@@ -1637,6 +1640,15 @@ Obecnie:
 
 ## 70. Historia zmian
 
+### 2026-09-18 — v0.22
+
+- NEWSROOM-N5-004 zmergowano przez PR #103 na `main@5704b3c3a8acde029001e28567980c5de8e27cdf`; finalny implementation head `6235b7dbadd60549a82ceebcb4eda47aaa6596fa`,
+- wdrożono jeden delegated `newsroomAnalytics.ts` nad istniejącym `trackAnalyticsEvent` i Google Analytics/consent layer; nie powstał drugi klient, event store ani backend telemetryczny,
+- event model obejmuje article view, generic module click, category/pagination, Product Bridge, sources i related article/question/legal/sign clicks; stabilne parametry to `article_id`, `article_type`, `category_slug`, `module`, `position`, `destination_path`,
+- privacy contract zabrania body/title/author/source-title/publisher/PII; `destination_path` jest redukowany do pathname; optional scroll depth nadal nie jest wdrożony,
+- `prawkonaraz:analytics-ready` obsługuje delayed consent; Browser Smoke #55 potwierdza exactly-once article view, one-click-one-event, module click i suppression non-link/`aria-disabled`,
+- exact-head CI #384 i post-merge CI #385 zakończyły 1106 passed / 20 051 assertions / 2 skipped, Pint/build PASS i PostgreSQL 7/94; Browser Smoke #55 był PASS dla wszystkich sześciu newsroom jobs,
+- następnym taskiem jest NEWSROOM-N5-005 IndexNow integration review; namespace-specific sitemap audit i static publication/freshness hardening pozostają otwarte.
 ### 2026-09-18 — v0.21
 
 - NEWSROOM-N5-003 zmergowano przez PR #101 na `main@18cd07233e3c8712cf2c7fc9e0c32018baef65d3`; finalny implementation head `1c89f370e899895eb25ac80bd437b19c1797a9ec`,

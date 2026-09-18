@@ -1811,6 +1811,15 @@ Na 2026-09-18:
 
 ## 45. Historia zmian
 
+### 2026-09-18 — v0.37
+
+- NEWSROOM-N5-004 zmergowano przez PR #103 na `main@5704b3c3a8acde029001e28567980c5de8e27cdf`; finalny implementation head `6235b7dbadd60549a82ceebcb4eda47aaa6596fa`,
+- analytics nie dodaje tabel, migracji, modeli, kolejki eventów ani persisted aggregate; implementacja jest publicznym client-side adapterem nad istniejącym `trackAnalyticsEvent` i Google Analytics/consent layer,
+- stabilny kontekst telemetryczny pochodzi z już istniejących publicznych scalar IDs/slugs i renderowanych `data-*`; nie wprowadzono nowego domain invariant ani relacji,
+- `prawkonaraz:analytics-ready` jest browser readiness signal, nie zdarzeniem domenowym i nie jest zapisywany w bazie,
+- exact-head CI #384, Browser Smoke #55 i post-merge CI #385 zakończyły PASS; post-merge: 1106 passed / 20 051 assertions / 2 skipped, PostgreSQL 7/94, Pint/build PASS,
+- data/schema contract pozostaje bez zmian; kolejnym taskiem jest NEWSROOM-N5-005 IndexNow integration review.
+
 ### 2026-09-18 — v0.36
 
 - NEWSROOM-N5-003 zmergowano przez PR #101 na `main@18cd07233e3c8712cf2c7fc9e0c32018baef65d3`; finalny implementation head `1c89f370e899895eb25ac80bd437b19c1797a9ec`,

@@ -1857,15 +1857,41 @@ Site-wide orphan/click-depth crawler/komenda pozostaje osobnym możliwym hardeni
 
 ## NEWSROOM-N5-004 — Analytics hooks
 
-- article view,
-- module click,
-- product bridge,
-- sources,
-- related links.
+### Status implementacji
 
-### Privacy
+**DONE w kodzie — PR #103 zmergowano na `main@5704b3c3a8acde029001e28567980c5de8e27cdf`.** Finalny implementation head `6235b7dbadd60549a82ceebcb4eda47aaa6596fa` przeszedł exact-head CI #384 i Browser Smoke #55; post-merge CI #385 na exact `main` również zakończył pełny PASS.
 
-- no body or PII in event params.
+### Aktualny stan implementacji
+
+- analytics reużywa istniejący `trackAnalyticsEvent` i istniejący Google Analytics / consent layer; nie powstał drugi klient GA, backend telemetryczny ani nowa tabela,
+- `resources/js/public/newsroomAnalytics.ts` jest jednym delegowanym handlerem dla SSR newsroomu, inicjalizowanym przez `public-content.ts`,
+- istnieją eventy `newsroom_article_view`, `newsroom_module_click`, `newsroom_product_cta_click`, `newsroom_source_click`, `newsroom_related_article_click`, `newsroom_related_question_click`, `newsroom_related_legal_click`, `newsroom_related_sign_click`, `newsroom_category_click` i `newsroom_pagination_click`,
+- article/module context używa wyłącznie stabilnych pól: `article_id`, `article_type`, `category_slug`, `module`, `position`, `destination_path`,
+- `destination_path` jest redukowany do pathname; tytuł, autor, body, lead, source title/publisher i inne treści/PII nie są wysyłane jako parametry,
+- istniejący GA component emituje `prawkonaraz:analytics-ready` po konfiguracji consent-ready gtag; article view czeka na gotowość i jest emitowany jednokrotnie dla instancji strony,
+- home/category/guides/article/Product Bridge używają semantycznych `data-*`; podstawowy publiczny UI/routing/read model nie został zmieniony,
+- optional scroll-depth z SEO spec nie został wdrożony w N5-004.
+
+### Testy
+
+- `NewsroomAnalyticsHooksTest` chroni publiczny render, event names i zakaz body/title/author w atrybutach telemetrycznych,
+- `GoogleAnalyticsTagTest` chroni readiness signal istniejącego GA layer,
+- `NewsroomHomePageTest` chroni stabilne module names i privacy-safe hooki na hubie,
+- Browser Smoke #55 rozszerza `newsroom-article` o JS-enabled gtag stub: delayed readiness -> dokładnie jeden article view, click -> jeden event, generic module click oraz brak eventu dla non-link / `aria-disabled` target; wszystkie sześć newsroom jobs jest PASS.
+
+### Dowód Quality Gate
+
+- exact-head CI #384: **1106 passed / 20 051 assertions / 2 skipped**, PostgreSQL **7 passed / 94 assertions**, Pint PASS, frontend build PASS,
+- Browser Smoke #55: PASS dla article, home, category, guides, topic i semantic-links,
+- post-merge CI #385 na `main@5704b3c3a8acde029001e28567980c5de8e27cdf`: **1106 passed / 20 051 assertions / 2 skipped**, PostgreSQL **7 passed / 94 assertions**, Pint PASS, frontend build PASS.
+
+### Poza zakresem N5-004
+
+- własny backend/event store telemetryczny,
+- ranking popularności i bot/dedupe policy,
+- optional scroll depth,
+- article-specific IndexNow,
+- namespace-specific sitemap audit oraz static publication/freshness hardening.
 
 ---
 
@@ -2493,7 +2519,7 @@ Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-008 na `main@3d7ac8ab8a3ed1c299cb0c
 - `NewsroomSemanticLinkService::audit()` daje per-article inbound sources, explicit reverse-edge count i estimated hub depth; site-wide `newsroom:audit-links` nie istnieje,
 - Browser Smoke #48 potwierdził `newsroom-semantic-links` oraz brak regresji w article/home/category/guides/topic,
 - exact-head CI #361 był pełnym PASS, a post-merge CI #362 na exact `main@3d7ac8ab...` zakończył: 1093 passed / 19 881 assertions / 2 skipped, Pint PASS, frontend build 7.42 s; `newsroom-postgres` 7 passed / 94 assertions,
-- feed route nadal pozostaje 404; N5-001 wdrożyło standard article sitemap + hub coverage, a N5-002 Google News Sitemap; dirty/version refresh, feed/discovery, IndexNow automation, namespace-specific sitemap audit i atomic child-before-index publication pozostają N5,
+- N5-001 wdrożyło standard article sitemap + hub coverage, N5-002 Google News Sitemap, N5-003 Atom feed/discovery, a N5-004 analytics hooks; dirty/version refresh, IndexNow automation, namespace-specific sitemap audit i atomic child-before-index publication pozostają N5,
 - QUEUE_CONNECTION w env example jest sync; stały queue worker nie jest gwarantowany,
 - panel Filament pozostaje admin-only i ten kontrakt pozostaje wymaganiem v1.
 
@@ -2501,14 +2527,23 @@ Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-008 na `main@3d7ac8ab8a3ed1c299cb0c
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N5-004 — Analytics hooks.
+NEWSROOM-N5-005 — IndexNow integration review.
 
-N5-003 jest zamknięte implementacyjnie po PR #101, exact-head CI #380, Browser Smoke #54 i post-merge CI #381 na `main@18cd07233e3c8712cf2c7fc9e0c32018baef65d3`. Następny krok wdraża istniejący kontrakt NEWSROOM-N5-004 dla article view, module click, Product Bridge, sources i related links bez body/PII w event params. Atomic publication, dirty/version refresh, IndexNow oraz namespace-specific sitemap audit pozostają własnymi późniejszymi taskami N5.
+N5-004 jest zamknięte implementacyjnie po PR #103, exact-head CI #384, Browser Smoke #55 i post-merge CI #385 na `main@5704b3c3a8acde029001e28567980c5de8e27cdf`. Następny krok ma reużyć istniejący IndexNow queue/submission pipeline zgodnie z NEWSROOM-N5-005, bez drugiego klienta i bez wkładania lokalnego `event_type` do HTTP payload. Namespace-specific sitemap audit oraz static publication/freshness hardening pozostają osobnymi późniejszymi taskami N5.
 
 ---
 
 # 12. Historia zmian
 
+### 2026-09-18 — v0.49
+
+- NEWSROOM-N5-004 zmergowano przez PR #103; finalny implementation head `6235b7dbadd60549a82ceebcb4eda47aaa6596fa`, merge `main@5704b3c3a8acde029001e28567980c5de8e27cdf`,
+- telemetryka reużywa istniejący `trackAnalyticsEvent` i GA/consent layer; nie dodano backendowego event store, migracji, nowych tabel ani drugiego klienta analytics,
+- wdrożono delegated SSR tracking dla article view, module/category/pagination clicks, Product Bridge, sources i related article/question/legal/sign links z parametrami ograniczonymi do `article_id`, `article_type`, `category_slug`, `module`, `position`, `destination_path`,
+- `prawkonaraz:analytics-ready` rozwiązuje delayed-consent readiness; Browser Smoke #55 potwierdza dokładnie jeden article view po readiness, one click -> one event, generic module click oraz suppression non-link/`aria-disabled`,
+- `NewsroomAnalyticsHooksTest`, `GoogleAnalyticsTagTest` i `NewsroomHomePageTest` chronią render/privacy contract; optional scroll depth i popular-content ranking pozostają poza N5-004,
+- exact-head CI #384 zakończył 1106 passed / 20 051 assertions / 2 skipped, PostgreSQL 7/94, Pint PASS i frontend build PASS; Browser Smoke #55 był PASS; post-merge CI #385 na exact main powtórzył 1106 / 20 051 / 2 skipped, PostgreSQL 7/94, Pint i build PASS,
+- następnym taskiem jest NEWSROOM-N5-005 — IndexNow integration review; N5-006/N5-007 pozostają osobnymi zakresami.
 ### 2026-09-18 — v0.48
 
 - NEWSROOM-N5-003 zmergowano przez PR #101; finalny implementation head `1c89f370e899895eb25ac80bd437b19c1797a9ec`, merge `main@18cd07233e3c8712cf2c7fc9e0c32018baef65d3`,
