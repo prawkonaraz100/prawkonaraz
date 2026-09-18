@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ContentArticleType;
 use App\Models\ContentArticle;
 use App\Models\ContentArticleRedirect;
 use App\Models\ContentAuthor;
@@ -10,6 +11,7 @@ use App\Models\Question;
 use App\Models\QuestionMedia;
 use App\Models\QuestionPublicExplanation;
 use App\Support\QuestionVideoSeoDescriptionService;
+use App\Support\SeoSitemapBuilder;
 use App\Support\SeoSitemapGenerator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
@@ -21,6 +23,7 @@ beforeEach(function (): void {
     config()->set('media.public_base_url', 'https://prawkonaraz.pl/storage');
     config()->set('newsroom.public_enabled', false);
     config()->set('newsroom.article_sitemap_shard_id_span', 10000);
+    config()->set('newsroom.news_sitemap_max_entries', SeoSitemapBuilder::NEWS_SITEMAP_MAX_ENTRIES);
     config()->set('seo.sitemap_max_urls_per_file', SeoSitemapGenerator::MAX_URLS_PER_FILE);
     config()->set('seo.sitemap_max_uncompressed_bytes', SeoSitemapGenerator::MAX_UNCOMPRESSED_BYTES);
     URL::forceRootUrl('https://prawkonaraz.pl');
@@ -607,14 +610,224 @@ test('newsroom sitemap coverage stays disabled behind the public gate', function
         ->assertSuccessful();
 
     expect(File::exists(public_path('sitemaps/articles.xml')))->toBeFalse();
+    expect(File::glob(public_path('sitemaps/news*.xml')) ?: [])->toBeEmpty();
 
     $static = File::get(public_path('sitemaps/static.xml'));
     $index = File::get(public_path('sitemap.xml'));
 
-    expect($index)->not->toContain('/sitemaps/articles');
+    expect($index)
+        ->not->toContain('/sitemaps/articles')
+        ->not->toContain('/sitemaps/news');
     expect($static)
         ->not->toContain('<loc>https://prawkonaraz.pl/aktualnosci</loc>')
         ->not->toContain('<loc>https://prawkonaraz.pl/poradniki</loc>');
+});
+
+test('Google News sitemap uses required metadata and first publication eligibility', function () {
+    Carbon::setTestNow('2026-09-18 12:00:00');
+    config()->set('newsroom.public_enabled', true);
+    config()->set('content.organization.name', 'PrawkoNaRaz');
+
+    $category = ContentCategory::factory()->create([
+        'name' => 'Aktualności',
+        'slug' => 'aktualnosci-news-sitemap',
+    ]);
+    $author = ContentAuthor::factory()->published()->create([
+        'name' => 'Redakcja News Sitemap',
+        'slug' => 'redakcja-news-sitemap',
+    ]);
+
+    $freshPublishedAt = now()->subHours(6);
+    $fresh = ContentArticle::factory()->published()->create([
+        'category_id' => $category->id,
+        'author_id' => $author->id,
+        'title' => 'Nowe przepisy & egzamin',
+        'seo_title' => 'SEO title nie może wejść do news:title - PrawkoNaRaz',
+        'slug' => 'nowe-przepisy-egzamin-news-sitemap',
+        'first_published_at' => $freshPublishedAt,
+        'published_at' => $freshPublishedAt,
+        'last_substantive_update_at' => now()->subMinute(),
+        'public_state_changed_at' => now()->subMinute(),
+    ]);
+
+    $boundaryPublishedAt = now()->subDays(SeoSitemapBuilder::NEWS_SITEMAP_WINDOW_DAYS);
+    $boundary = ContentArticle::factory()->published()->create([
+        'category_id' => $category->id,
+        'author_id' => $author->id,
+        'title' => 'Materiał dokładnie na granicy dwóch dni',
+        'slug' => 'material-granica-dwoch-dni',
+        'first_published_at' => $boundaryPublishedAt,
+        'published_at' => $boundaryPublishedAt,
+    ]);
+
+    $old = ContentArticle::factory()->published()->create([
+        'category_id' => $category->id,
+        'author_id' => $author->id,
+        'title' => 'Stary news z nową aktualizacją',
+        'slug' => 'stary-news-z-nowa-aktualizacja',
+        'first_published_at' => now()->subDays(2)->subSecond(),
+        'published_at' => now()->subMinute(),
+        'last_substantive_update_at' => now(),
+        'public_state_changed_at' => now(),
+    ]);
+
+    ContentArticle::factory()->published()->guide()->create([
+        'category_id' => $category->id,
+        'author_id' => $author->id,
+        'title' => 'Świeży poradnik poza News Sitemap',
+        'slug' => 'swiezy-poradnik-poza-news-sitemap',
+        'first_published_at' => now()->subHour(),
+        'published_at' => now()->subHour(),
+    ]);
+
+    ContentArticle::factory()->published()->create([
+        'type' => ContentArticleType::Explainer->value,
+        'category_id' => $category->id,
+        'author_id' => $author->id,
+        'title' => 'Świeży explainer poza News Sitemap',
+        'slug' => 'swiezy-explainer-poza-news-sitemap',
+        'first_published_at' => now()->subHour(),
+        'published_at' => now()->subHour(),
+    ]);
+
+    ContentArticle::factory()->needsReview()->create([
+        'category_id' => $category->id,
+        'author_id' => $author->id,
+        'title' => 'Needs review poza News Sitemap',
+        'slug' => 'needs-review-poza-news-sitemap',
+        'first_published_at' => now()->subHour(),
+        'published_at' => now()->subHour(),
+    ]);
+
+    ContentArticle::factory()->published()->noindex()->create([
+        'category_id' => $category->id,
+        'author_id' => $author->id,
+        'title' => 'Noindex poza News Sitemap',
+        'slug' => 'noindex-poza-news-sitemap',
+        'first_published_at' => now()->subHour(),
+        'published_at' => now()->subHour(),
+    ]);
+
+    $inactiveCategory = ContentCategory::factory()->inactive()->create([
+        'name' => 'Nieaktywna News',
+        'slug' => 'nieaktywna-news',
+    ]);
+    ContentArticle::factory()->published()->create([
+        'category_id' => $inactiveCategory->id,
+        'author_id' => $author->id,
+        'title' => 'Nieaktywna kategoria poza News Sitemap',
+        'slug' => 'nieaktywna-kategoria-poza-news-sitemap',
+        'first_published_at' => now()->subHour(),
+        'published_at' => now()->subHour(),
+    ]);
+
+    $privateAuthor = ContentAuthor::factory()->create([
+        'name' => 'Niepubliczny autor News',
+        'slug' => 'niepubliczny-autor-news',
+    ]);
+    ContentArticle::factory()->published()->create([
+        'category_id' => $category->id,
+        'author_id' => $privateAuthor->id,
+        'title' => 'Niepubliczny autor poza News Sitemap',
+        'slug' => 'niepubliczny-autor-poza-news-sitemap',
+        'first_published_at' => now()->subHour(),
+        'published_at' => now()->subHour(),
+    ]);
+
+    $redirectSource = ContentArticle::factory()->published()->create([
+        'category_id' => $category->id,
+        'author_id' => $author->id,
+        'title' => 'Redirect source poza News Sitemap',
+        'slug' => 'redirect-source-poza-news-sitemap',
+        'first_published_at' => now()->subHour(),
+        'published_at' => now()->subHour(),
+    ]);
+    ContentArticleRedirect::query()->create([
+        'article_id' => $redirectSource->id,
+        'from_path' => '/aktualnosci/redirect-source-poza-news-sitemap',
+        'to_path' => '/aktualnosci/nowe-przepisy-egzamin-news-sitemap',
+        'http_status' => 301,
+    ]);
+
+    $this->artisan('seo:generate-sitemaps')
+        ->assertSuccessful();
+
+    expect(File::exists(public_path('sitemaps/news.xml')))->toBeTrue();
+
+    $news = File::get(public_path('sitemaps/news.xml'));
+    $index = File::get(public_path('sitemap.xml'));
+
+    expect($index)->toContain('https://prawkonaraz.pl/sitemaps/news.xml');
+
+    expect($news)
+        ->toContain('xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"')
+        ->toContain('<loc>https://prawkonaraz.pl/aktualnosci/'.$fresh->slug.'</loc>')
+        ->toContain('<news:name>PrawkoNaRaz</news:name>')
+        ->toContain('<news:language>pl</news:language>')
+        ->toContain('<news:publication_date>'.$freshPublishedAt->toIso8601String().'</news:publication_date>')
+        ->toContain('<news:title>Nowe przepisy &amp; egzamin</news:title>')
+        ->toContain('<loc>https://prawkonaraz.pl/aktualnosci/'.$boundary->slug.'</loc>')
+        ->not->toContain('SEO title nie może wejść')
+        ->not->toContain($old->slug)
+        ->not->toContain('swiezy-poradnik-poza-news-sitemap')
+        ->not->toContain('swiezy-explainer-poza-news-sitemap')
+        ->not->toContain('needs-review-poza-news-sitemap')
+        ->not->toContain('noindex-poza-news-sitemap')
+        ->not->toContain('nieaktywna-kategoria-poza-news-sitemap')
+        ->not->toContain('niepubliczny-autor-poza-news-sitemap')
+        ->not->toContain('redirect-source-poza-news-sitemap');
+
+    expect(substr_count($news, '<news:news>'))->toBe(2);
+
+    $this->artisan('seo:audit-sitemaps')
+        ->assertSuccessful();
+});
+
+test('Google News sitemap splits above the verified 1000 entry limit', function () {
+    Carbon::setTestNow('2026-09-18 12:00:00');
+    config()->set('newsroom.public_enabled', true);
+
+    expect(SeoSitemapBuilder::NEWS_SITEMAP_MAX_ENTRIES)->toBe(1000);
+    expect(config('newsroom.news_sitemap_max_entries'))->toBe(1000);
+
+    $category = ContentCategory::factory()->create();
+    $author = ContentAuthor::factory()->published()->create();
+
+    ContentArticle::factory()
+        ->count(SeoSitemapBuilder::NEWS_SITEMAP_MAX_ENTRIES + 1)
+        ->published()
+        ->create([
+            'category_id' => $category->id,
+            'author_id' => $author->id,
+        ]);
+
+    $this->artisan('seo:generate-sitemaps')
+        ->assertSuccessful();
+
+    expect(File::exists(public_path('sitemaps/news.xml')))->toBeFalse();
+
+    $files = collect(File::glob(public_path('sitemaps/news-*.xml')) ?: [])->sort()->values();
+
+    expect($files->count())->toBeGreaterThan(1);
+
+    $totalEntries = 0;
+    $index = File::get(public_path('sitemap.xml'));
+
+    foreach ($files as $file) {
+        $xml = File::get($file);
+        $entries = substr_count($xml, '<news:news>');
+
+        expect($entries)->toBeGreaterThan(0);
+        expect($entries)->toBeLessThanOrEqual(SeoSitemapBuilder::NEWS_SITEMAP_MAX_ENTRIES);
+        expect($index)->toContain('https://prawkonaraz.pl/sitemaps/'.basename($file));
+
+        $totalEntries += $entries;
+    }
+
+    expect($totalEntries)->toBe(SeoSitemapBuilder::NEWS_SITEMAP_MAX_ENTRIES + 1);
+
+    $this->artisan('seo:audit-sitemaps')
+        ->assertSuccessful();
 });
 
 test('newsroom article shards cross deterministic id ranges and keep stable assignment', function () {

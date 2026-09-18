@@ -10,4 +10,8 @@ return [
     // Stable ID-range sharding avoids offset churn when individual articles
     // leave the indexable corpus. Protocol limits are enforced separately.
     'article_sitemap_shard_id_span' => 10000,
+
+    // Google News currently allows at most 1,000 news:news entries per file.
+    // Keep this configurable downward for deterministic boundary regression.
+    'news_sitemap_max_entries' => 1000,
 ];
