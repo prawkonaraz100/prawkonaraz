@@ -260,6 +260,36 @@ async function verifyAnalyticsHooks(browserInstance) {
     await clickWithoutNavigation('[data-newsroom-analytics-event="newsroom_source_click"]');
     await clickWithoutNavigation('[data-newsroom-analytics-event="newsroom_related_article_click"]');
 
+    await page.evaluate(() => {
+        const moduleCard = document.createElement('article');
+        moduleCard.dataset.newsroomAnalyticsModule = 'latest';
+        moduleCard.dataset.newsroomAnalyticsPosition = '2';
+        moduleCard.dataset.articleId = '987654';
+        moduleCard.dataset.articleType = 'news';
+        moduleCard.dataset.categorySlug = 'egzaminy';
+        moduleCard.dataset.articleUrl = '/aktualnosci/e2e-module-target';
+
+        const moduleLink = document.createElement('a');
+        moduleLink.href = '/aktualnosci/e2e-module-target';
+        moduleLink.textContent = 'Synthetic module target';
+        moduleLink.addEventListener('click', (event) => event.preventDefault(), { once: true });
+        moduleCard.appendChild(moduleLink);
+        document.body.appendChild(moduleCard);
+        moduleLink.click();
+
+        const nonLink = document.createElement('button');
+        nonLink.dataset.newsroomAnalyticsEvent = 'newsroom_product_cta_click';
+        nonLink.click();
+
+        const disabledLink = document.createElement('a');
+        disabledLink.href = '/testy-na-prawo-jazdy';
+        disabledLink.dataset.newsroomAnalyticsEvent = 'newsroom_product_cta_click';
+        disabledLink.setAttribute('aria-disabled', 'true');
+        disabledLink.addEventListener('click', (event) => event.preventDefault(), { once: true });
+        document.body.appendChild(disabledLink);
+        disabledLink.click();
+    });
+
     const events = await page.evaluate(() => (
         (window.__newsroomAnalyticsEvents ?? [])
             .filter((entry) => entry[0] === 'event')
@@ -274,6 +304,7 @@ async function verifyAnalyticsHooks(browserInstance) {
         'newsroom_product_cta_click',
         'newsroom_source_click',
         'newsroom_related_article_click',
+        'newsroom_module_click',
     ];
 
     for (const eventName of expectedSingleEvents) {
@@ -316,6 +347,16 @@ async function verifyAnalyticsHooks(browserInstance) {
     if (relatedClick?.parameters?.module !== 'related_articles'
         || !relatedClick?.parameters?.destination_path?.endsWith('/e2e-powiazany-material-analityczny')) {
         throw new Error('Related article analytics parameters are invalid.');
+    }
+
+    const moduleClick = events.find((event) => event.name === 'newsroom_module_click');
+    if (moduleClick?.parameters?.article_id !== 987654
+        || moduleClick?.parameters?.article_type !== 'news'
+        || moduleClick?.parameters?.category_slug !== 'egzaminy'
+        || moduleClick?.parameters?.module !== 'latest'
+        || moduleClick?.parameters?.position !== '2'
+        || moduleClick?.parameters?.destination_path !== '/aktualnosci/e2e-module-target') {
+        throw new Error('Module click analytics parameters are invalid.');
     }
 
     await context.close();
