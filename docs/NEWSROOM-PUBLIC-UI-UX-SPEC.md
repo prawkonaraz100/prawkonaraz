@@ -1300,7 +1300,7 @@ Frontend newsroom v1 jest UI-complete, gdy:
 
 ## 67. Stan implementacji
 
-Na 2026-09-18 po NEWSROOM-N4-007, zweryfikowanym na `main@a97373003c5a249a28761df15342f19e656c50c5`:
+Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0cdd4cb1ef8ac6b53f78`:
 
 - `/aktualnosci` używa istniejącego `NewsroomPlaceholderController::news()` jako rollout switch: gate=false zachowuje pre-launch `MarketingPlaceholder.vue` 200 + `X-Robots-Tag: noindex, follow`, a gate=true renderuje SSR `newsroom.home`; od N4-004 `/poradniki` używa istniejącego `NewsroomPlaceholderController::guides()` jako analogicznego rollout switcha: gate=false zachowuje placeholder 200 + noindex, gate=true renderuje SSR `newsroom.guides`,
 - category route `/aktualnosci/kategoria/{categorySlug}` jest od N4-003 publicznym SSR surface przy gate=true; topic route `/aktualnosci/temat/{topicSlug}` jest publicznym SSR dossier od N4-007; feed nadal pozostaje downstream N5,
@@ -1318,13 +1318,13 @@ Na 2026-09-18 po NEWSROOM-N4-007, zweryfikowanym na `main@a97373003c5a249a28761d
 - hero i image blocks zachowują dimensions/alt/caption/credit oraz focal-point-aware `object-position`; N3-005 nie deklaruje nieistniejących fizycznych crop variants,
 - related article block nadal rozwiązuje tylko publicznie widoczny target z aktywną kategorią i opublikowanym autorem; nie renderuje draft targetu,
 - publiczny artykuł nie wymaga JavaScript do odczytania; Browser Smoke #23 na finalnym N3-008 implementation head `c8484aa1529eb41805a76ceb7be1f55db63aec14` przeszedł dedykowany `newsroom-article` QA, zachowując public renderer po wprowadzeniu gate,
-- N3-005 nie implementuje reverse links; semantic silo/reverse-link integration pozostaje NEWSROOM-N4-008,
+- N3-005 nie implementował reverse links; NEWSROOM-N4-008 później dodało controlled reverse links i article→topic/related discovery bez dublowania Product Bridge,
 - historyczne old-slug -> current canonical 301 są wdrożone przez NEWSROOM-N3-006 bez dodatkowego UI surface; `NEWSROOM_PUBLIC_ENABLED` jest wdrożone przez NEWSROOM-N3-008; przy `false` publiczne article/guide detail i historyczne redirecty failują do 404 przed lookupem, podczas gdy top-level placeholdery pozostają 200 + noindex,
 - NEWSROOM-N3-007 rozszerza istniejący `/autorzy/{slug}`: `published` trafia do aktualnych publikacji, `needs_review+indexable` do osobnej sekcji „W trakcie weryfikacji”, `archived+indexable` do osobnego „Archiwum”, a noindex/scheduled/withdrawn/inactive-category nie są listowane,
 - N4-001 rozszerza istniejący `NewsroomHomeCompositionService` bez tworzenia drugiego systemu kompozycji: fixed placements, fallback, globalna deduplikacja i breaking exception pozostają tym samym kontraktem, a category blocks korzystają z batched placements i bounded per-category ranking zamiast query-per-category,
 - `NewsroomHomeReadModelService` dostarcza rollout-gated scalar-array projection bezpośrednio do publicznego huba: lead/secondary/latest/categories/guides/important_now/breaking z canonical path, category/author i hero metadata; przy `NEWSROOM_PUBLIC_ENABLED=false` nadal zwraca `null`,
 - N4-002 podłącza read model do `resources/views/newsroom/home.blade.php`: renderuje responsywnie newsroom subnavigation, important-now, breaking, lead/secondary, latest, category blocks, guides i Product Bridge; puste sekcje są pomijane zamiast wypełniane sztucznymi kartami,
-- subnavigation kategorii na hubie nadal prowadzi do kotwic sekcji, ale od N4-003 każdy category block ma crawlable `Zobacz wszystkie` do `public.news.categories.show`; publiczny topic route istnieje od N4-007, natomiast jawne topic discovery/reverse links pozostają N4-008, a feed N5,
+- subnavigation kategorii na hubie nadal prowadzi do kotwic sekcji, ale od N4-003 każdy category block ma crawlable `Zobacz wszystkie` do `public.news.categories.show`; publiczny topic route istnieje od N4-007, a od N4-008 article detail ma jawne topic links i controlled reverse links z question/legal/sign surfaces; feed pozostaje N5,
 - `newsroom.category` renderuje category header, chronologiczny listing kart, useful empty state, related categories oraz SSR paginację; wszystkie publiczne linki są czytelne bez JavaScript,
 - category page reużywa wspólny `layouts.public-content`, header/footer i istniejące article card metadata; nie tworzy równoległego design systemu,
 - gate=false, inactive/unknown category i invalid/out-of-range page nie pokazują publicznego category UI; aktywna pusta kategoria pokazuje komunikat i powrót do `/aktualnosci` zamiast sztucznych kart,
@@ -1339,6 +1339,11 @@ Na 2026-09-18 po NEWSROOM-N4-007, zweryfikowanym na `main@a97373003c5a249a28761d
 - N4-007 renderuje `newsroom.topic` z H1/opisem, opcjonalnym featured leadem, mixed-family listą materiałów i SSR pagination; featured nie jest duplikowany w chronologicznym listingu,
 - topic surface reużywa wspólny `layouts.public-content`, header/footer i istniejące canonical article/guide URLs; nie wymaga JavaScript do czytania,
 - Browser Smoke #39 `newsroom-topic` przeszedł z JS disabled na 360/390/430/768/1024/1280/1440 oraz page-2 canonical check; równoległe `newsroom-guides`, `newsroom-category`, `newsroom-home` i `newsroom-article` również zakończyły PASS,
+- N4-008 rozszerza ten sam `newsroom.article`: primary category jest zwykłym crawlable linkiem także na guide detail, jawne published topics są linkowane w sekcji „Tematy”, a „Powiązane materiały” renderują deterministyczny related set do maks. 4,
+- wspólny komponent `newsroom-reverse-links` renderuje do maks. 3 canonical newsroom/guide links na publicznym pytaniu, opublikowanej stronie prawnej i detalu znaku; pusty resolver nie emituje pustego modułu,
+- reverse-link UI konsumuje ten sam `NEWSROOM_PUBLIC_ENABLED` gate i tylko `activelyDistributed()+indexable()` targets; TrafficSign nie pokazuje pivotu `related`, a wyłącznie `direct|example`,
+- N4-008 nie zmienia guide-hub cards: category label na `/poradniki` pozostaje klasyfikacją bez linkowania kart do newsroom category page; nowy primary-category link dotyczy detail article/guide,
+- Browser Smoke #48 dodał `newsroom-semantic-links` i potwierdził article/home/category/guides/topic bez regresji; exact-head CI #361 i post-merge CI #362 zakończyły PASS,
 - Hub Blade reużywa `layouts.public-content`, wspólny header/footer i route `public.tests`; przy gate=true emituje self-canonical i `index,follow,max-image-preview:large`,
 - dedykowany Browser Smoke #27 `newsroom-home` przeszedł z JavaScript disabled na 360/390/430/768/1024/1280/1440, sprawdzając realny built CSS, H1/subnavigation/content/CTA, canonical/robots i brak horizontal overflow; równoległy `newsroom-article` także zakończył PASS.
 
@@ -1353,7 +1358,8 @@ Na 2026-09-18 po NEWSROOM-N4-007, zweryfikowanym na `main@a97373003c5a249a28761d
 - [x] zbudować regulatory context box dla article detail,
 - [x] podłączyć focal-point-aware rendering istniejących hero/image assets; fizyczne crop variants nie są deklarowane jako istniejące,
 - [x] zbudować topic page w NEWSROOM-N4-007,
-- [x] zbudować wymagane N4-007 topic Blade components dla H1/opisu/featured/listingu/paginacji; reverse-link modules pozostają N4-008,
+- [x] zbudować wymagane N4-007 topic Blade components dla H1/opisu/featured/listingu/paginacji,
+- [x] zbudować NEWSROOM-N4-008 semantic/reverse-link UI: category/topic/related links na article detail oraz bounded reverse module na question/legal/sign surfaces,
 - [x] zbudować publiczny Hub Blade `/aktualnosci` w NEWSROOM-N4-002,
 - [x] zbudować category page w NEWSROOM-N4-003,
 - [x] zbudować article page,
@@ -1371,11 +1377,22 @@ Na 2026-09-18 po NEWSROOM-N4-007, zweryfikowanym na `main@a97373003c5a249a28761d
 - [x] zweryfikować NEWSROOM-N4-005 Navigation integration bez dublowania istniejących linków i uzupełnić wspólny compact footer o oba huby.
 - [x] NEWSROOM-N4-006 Cache jest wdrożone dla home/category read models.
 - [x] NEWSROOM-N4-007 Topic / dossier pages jest wdrożone i ma dedykowany responsive Browser QA.
-- [ ] NEWSROOM-N4-008 Semantic silo / reverse-link integration pozostaje następnym wykonywalnym zakresem publicznego linkowania.
+- [x] NEWSROOM-N4-008 Semantic silo / reverse-link integration jest wdrożone i ma dedykowany responsive Browser QA.
+- [ ] kolejne publiczne zmiany wynikają z N5 discovery/delivery; szczegółową kolejność utrzymuje backlog.
 
 ---
 
 ## 69. Historia zmian
+
+### 2026-09-18 — v0.23
+
+- NEWSROOM-N4-008 zmergowano przez PR #95; finalny implementation head `bd63773bc1febdcc6aa8c2507c6621e908d63b09`, merge `main@3d7ac8ab8a3ed1c299cb0cdd4cb1ef8ac6b53f78`,
+- article/guide detail renderuje crawlable primary-category link, explicit published topic links oraz deterministic „Powiązane materiały” do maks. 4,
+- publiczne question/legal/sign pages reużywają wspólny `newsroom-reverse-links` i pokazują maks. 3 canonical eligible newsroom/guide targets; przy braku relacji moduł nie jest renderowany,
+- TrafficSign pozostaje fail-closed dla `direct|example`; guide hub cards nie zostały zmienione i nadal traktują category jako label klasyfikacyjny,
+- N4-008 reużywa istniejący public layout/design language i nie wymaga JavaScript do czytania linków,
+- Browser Smoke #48 potwierdził `newsroom-semantic-links` oraz article/home/category/guides/topic; exact-head CI #361 i post-merge CI #362 zakończyły PASS,
+- następnym etapem wykonawczym jest N5 zgodnie z backlogiem.
 
 ### 2026-09-18 — v0.22
 
