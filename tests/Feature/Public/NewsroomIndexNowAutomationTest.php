@@ -257,6 +257,20 @@ test('public update with slug change relies on slug events without duplicate can
         ]);
 });
 
+test('scheduled article does not queue before its publication time', function () {
+    $article = newsroomIndexNowReviewedArticle([
+        'slug' => 'scheduled-indexnow',
+    ]);
+
+    $scheduled = app(ContentArticlePublishingService::class)->schedule(
+        $article,
+        now()->addHour(),
+    );
+
+    expect($scheduled->workflow_status)->toBe(ContentArticleWorkflowStatus::Scheduled)
+        ->and(IndexNowUrlSubmission::query()->count())->toBe(0);
+});
+
 test('noindex and disabled newsroom gate suppress automatic queue rows', function () {
     $noindex = newsroomIndexNowReviewedArticle([
         'slug' => 'noindex-indexnow',
