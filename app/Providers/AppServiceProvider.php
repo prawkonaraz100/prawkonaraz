@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use App\Events\ContentArticleIndexNowRequested;
 use App\Events\ContentArticlePublicReadChanged;
 use App\Events\ContentArticleWorkflowTransitioned;
 use App\Events\ContentHomePlacementChanged;
 use App\Listeners\InvalidateNewsroomHomeCacheOnPlacementChange;
 use App\Listeners\InvalidateNewsroomReadCacheOnArticleWorkflowTransition;
+use App\Listeners\QueueNewsroomArticleIndexNow;
 use App\Listeners\InvalidateNewsroomReadCacheOnPublicArticleChange;
 use App\Models\ContentCategory;
 use App\Models\QuestionPublicExplanation;
@@ -45,6 +47,10 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(
             ContentArticlePublicReadChanged::class,
             InvalidateNewsroomReadCacheOnPublicArticleChange::class,
+        );
+        Event::listen(
+            ContentArticleIndexNowRequested::class,
+            QueueNewsroomArticleIndexNow::class,
         );
         Event::listen(
             ContentHomePlacementChanged::class,
