@@ -1285,7 +1285,7 @@ Na `main@5f1880e03469fc6e340a86fdb1b4246c7afd116b` istnieje `NewsroomPublicReadC
 - osobne generation keys dla home i category pozwalają rotować namespace bez iterowania po wszystkich starych wpisach,
 - TTL wynosi 60 sekund przez `newsroom.cache_ttl_seconds`; jest safety netem dla zmian zależnych od czasu, nie zastępuje event invalidation,
 - `NewsroomHomeReadModelService` i `NewsroomCategoryReadModelService` korzystają z tego cache,
-- guide hub, article detail, topic/feed i private preview nie są cache’owane przez N4-006.
+- guide hub, article detail, topic i private preview nie są cache’owane przez N4-006; od N5-003 ten sam `NewsroomPublicReadCache` ma osobną generation-based przestrzeń feedu z after-commit invalidation przez `invalidateAll()`.
 
 Invalidation:
 
@@ -1295,7 +1295,7 @@ Invalidation:
 - `ContentCategoryObserver` implementuje `ShouldHandleEventsAfterCommit` i po save/delete invaliduje home + category,
 - generation rotation chroni przed stale write-after-invalidation race przy równoległym rebuildzie.
 
-Nie cache’ujemy preview jako publicznej strony. Sitemap dirty/version, feed refresh i IndexNow pozostają osobnym zakresem N5.
+Nie cache’ujemy preview jako publicznej strony. N5-003 materializuje osobny feed generation cache/refresh; sitemap dirty/version coordinator i article-specific IndexNow pozostają osobnym zakresem N5.
 
 ---
 
@@ -1377,9 +1377,9 @@ Kod zawiera:
 - `public.news.feed`, `public.news.categories.show`, `public.news.topics.show`, `public.news.show` i `public.guides.show`,
 - routing namespace/catch-all w kolejności zgodnej z tym dokumentem,
 - `/aktualnosci` i `/poradniki` są rollout-gated: przy gate=false zachowują pre-launch placeholder 200 + `X-Robots-Tag: noindex, follow`, a przy gate=true renderują publiczne SSR huby,
-- `public.news.categories.show`, `public.news.topics.show`, `public.news.show` i `public.guides.show` mają publiczne controllery/renderery przy gate=true; `/aktualnosci/feed.xml` pozostaje jawne 404 do N5.
+- `public.news.categories.show`, `public.news.topics.show`, `public.news.show` i `public.guides.show` mają publiczne controllery/renderery przy gate=true; od N5-003 `public.news.feed` jest podłączony do `NewsroomFeedController`, zwraca Atom 200 przy gate=true i 404 przy gate=false.
 
-`ContentArticle` i `ContentTopic` mają już publiczne route/read boundaries dla article/category/topic/guides. Feed controller nadal nie istnieje; record-level article family guard jest wdrożony przez N3, a topic N4-007 reużywa istniejący `ContentTopic` publish/archival contract bez nowego route modelu.
+`ContentArticle` i `ContentTopic` mają publiczne route/read boundaries dla article/category/topic/guides, a N5-003 dodaje read-only feed service/controller bez nowego persistence modelu. Record-level article family guard pozostaje wdrożony przez N3, a topic N4-007 reużywa istniejący `ContentTopic` publish/archival contract.
 
 ---
 
@@ -1757,7 +1757,7 @@ Na 2026-09-18:
 - NEWSROOM-N1-003 jest wdrożone: istnieją `ContentArticleSlugService`, `ContentArticleRedirect`, `ContentArticlePathResolver` i PostgreSQL advisory-lock serialization,
 - NEWSROOM-N1-004 jest wdrożone w zakresie publishing/workflow foundation: istnieją `ContentArticlePublishingService`, `ContentArticleWorkflowTransitioned` i feature regression dla workflow/invariants/audit/after-commit rollback boundary,
 - `/aktualnosci` i `/poradniki` są rollout-gated publicznymi hubami po N4-002/N4-004; przy wyłączonym gate zachowują pre-launch placeholder/noindex,
-- article detail routes `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}` są publicznie podłączone przez N3-004/N3-006; category pages są aktywne od N4-003, topic dossier od N4-007, a feed pozostaje downstream 404 do N5,
+- article detail routes `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}` są publicznie podłączone przez N3-004/N3-006; category pages są aktywne od N4-003, topic dossier od N4-007, a od N5-003 `/aktualnosci/feed.xml` jest rollout-gated Atom feedem,
 - newsroom schema istnieje: `content_categories`, `content_tags`, `content_articles`, `content_topics`, pivots/relations, redirects i `content_home_placements` są tworzone przez 12 migracji,
 - schema i warstwa modelowa są zweryfikowane na SQLite i PostgreSQL 16; `newsroom-postgres` uruchamia migration contract oraz model/scope contract,
 - `ContentCategory` Eloquent model istnieje; N2-001 dodało jego Filament `ContentCategoryResource` oraz modelowe slug/delete/deactivation guards; dedykowany DB seeder kategorii nadal nie istnieje,
@@ -1810,6 +1810,15 @@ Na 2026-09-18:
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-18 — v0.36
+
+- NEWSROOM-N5-003 zmergowano przez PR #101 na `main@18cd07233e3c8712cf2c7fc9e0c32018baef65d3`; finalny implementation head `1c89f370e899895eb25ac80bd437b19c1797a9ec`,
+- N5-003 nie dodaje tabel, migracji ani nowego persisted aggregate: `NewsroomFeedService` czyta istniejący `ContentArticlePublicCatalogService`/Eloquent corpus i renderuje read-only Atom output,
+- `NewsroomPublicReadCache` dostał osobną generation key/przestrzeń dla feedu; istniejące after-commit `invalidateAll()` obejmuje teraz home, categories i feed,
+- `public.news.feed` jest podłączony do `NewsroomFeedController`; gate=false -> 404, gate=true -> stateless Atom response z stable content-article URN, original publish/substantive-update semantics i conditional HTTP validators,
+- exact-head CI #380, Browser Smoke #54 i post-merge CI #381 zakończyły PASS; post-merge: 1104 passed / 20 024 assertions / 2 skipped, PostgreSQL 7/94, Pint/build PASS,
+- data/schema contract pozostaje bez zmian; kolejnym taskiem jest NEWSROOM-N5-004 Analytics hooks.
 
 ### 2026-09-18 — v0.35
 
