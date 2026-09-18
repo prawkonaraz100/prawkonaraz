@@ -6,6 +6,7 @@ import { setupCsrfSessionLifecycle } from './lib/csrfSession';
 import { registerPwaServiceWorker } from './lib/pwa';
 import { setupPublicAuthDrawerLoader } from './public/authDrawerLoader';
 import { setupQuestionLessonAudio } from './public/questionLessonAudio';
+import { setupNewsroomAnalytics } from './public/newsroomAnalytics';
 import '../images/home/hero-composite-v3.webp';
 import '../images/home/hero-mobile.png';
 import '../images/home/contact/advisor-monday.jpg';
@@ -306,6 +307,7 @@ if (document.readyState === 'loading') {
         setupHomeHeaderMenus();
         setupPublicAuthDrawerLoader();
         setupQuestionLessonAudio();
+        setupNewsroomAnalytics();
         setupHomeOpsReveals();
         setupHomeOpsVideos();
         setupHomeContactDialog();
@@ -321,6 +323,7 @@ if (document.readyState === 'loading') {
     setupHomeHeaderMenus();
     setupPublicAuthDrawerLoader();
     setupQuestionLessonAudio();
+    setupNewsroomAnalytics();
     setupHomeOpsReveals();
     setupHomeOpsVideos();
     setupHomeContactDialog();
