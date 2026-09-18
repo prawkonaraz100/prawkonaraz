@@ -20,6 +20,7 @@ test('google analytics tag renders on public blade pages when configured', funct
         ->assertSee('G-TEST12345', false)
         ->assertSee('prawkonaraz.analyticsConsent.v1', false)
         ->assertSee('google-analytics-consent', false)
+        ->assertSee('prawkonaraz:analytics-ready', false)
         ->assertSeeText('Akceptuję')
         ->assertSeeText('Nie teraz');
 });

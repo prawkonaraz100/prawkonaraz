@@ -31,6 +31,7 @@ const report = {
     status: 'running',
     render_status: null,
     viewports: [],
+    analytics: null,
 };
 
 let browser;
@@ -183,6 +184,9 @@ try {
         await context.close();
     }
 
+    console.log('[newsroom-e2e] analytics');
+    report.analytics = await verifyAnalyticsHooks(browser);
+
     report.status = 'ok';
     console.log('[newsroom-e2e] PASS');
 } catch (error) {
@@ -198,15 +202,188 @@ try {
     await closeStaticServer(staticServer);
 }
 
+async function verifyAnalyticsHooks(browserInstance) {
+    const context = await browserInstance.newContext({
+        viewport: { width: 1280, height: 900 },
+        serviceWorkers: 'block',
+        javaScriptEnabled: true,
+    });
+    const page = await context.newPage();
+    page.setDefaultTimeout(10_000);
+    page.setDefaultNavigationTimeout(15_000);
+
+    const response = await page.goto(`${baseUrl}${articlePath}`, {
+        waitUntil: 'domcontentloaded',
+        timeout: 15_000,
+    });
+
+    if (!response || response.status() !== 200) {
+        throw new Error(`Analytics snapshot returned ${response?.status() ?? 'no response'}.`);
+    }
+
+    await page.waitForFunction(() => {
+        return Boolean(document.querySelector('[data-newsroom-analytics-article]'))
+            && Boolean(document.querySelector('[data-newsroom-analytics-event="newsroom_product_cta_click"]'))
+            && Boolean(document.querySelector('[data-newsroom-analytics-event="newsroom_source_click"]'))
+            && Boolean(document.querySelector('[data-newsroom-analytics-event="newsroom_related_article_click"]'));
+    });
+
+    await page.evaluate(() => {
+        window.__newsroomAnalyticsEvents = [];
+        window.__prawkonarazGoogleAnalyticsConfigured = 'G-E2E';
+        window.gtag = (...args) => {
+            window.__newsroomAnalyticsEvents.push(args);
+        };
+        window.dispatchEvent(new CustomEvent('prawkonaraz:analytics-ready'));
+    });
+
+    await page.waitForFunction(() => {
+        return window.__newsroomAnalyticsEvents?.filter(
+            (entry) => entry[0] === 'event' && entry[1] === 'newsroom_article_view',
+        ).length === 1;
+    });
+
+    const clickWithoutNavigation = async (selector) => {
+        await page.evaluate((targetSelector) => {
+            const link = document.querySelector(targetSelector);
+
+            if (!(link instanceof HTMLAnchorElement)) {
+                throw new Error(`Analytics link not found: ${targetSelector}`);
+            }
+
+            link.addEventListener('click', (event) => event.preventDefault(), { once: true });
+            link.click();
+        }, selector);
+    };
+
+    await clickWithoutNavigation('[data-newsroom-analytics-event="newsroom_product_cta_click"]');
+    await clickWithoutNavigation('[data-newsroom-analytics-event="newsroom_source_click"]');
+    await clickWithoutNavigation('[data-newsroom-analytics-event="newsroom_related_article_click"]');
+
+    await page.evaluate(() => {
+        const moduleCard = document.createElement('article');
+        moduleCard.dataset.newsroomAnalyticsModule = 'latest';
+        moduleCard.dataset.newsroomAnalyticsPosition = '2';
+        moduleCard.dataset.articleId = '987654';
+        moduleCard.dataset.articleType = 'news';
+        moduleCard.dataset.categorySlug = 'egzaminy';
+        moduleCard.dataset.articleUrl = '/aktualnosci/e2e-module-target';
+
+        const moduleLink = document.createElement('a');
+        moduleLink.href = '/aktualnosci/e2e-module-target';
+        moduleLink.textContent = 'Synthetic module target';
+        moduleLink.addEventListener('click', (event) => event.preventDefault(), { once: true });
+        moduleCard.appendChild(moduleLink);
+        document.body.appendChild(moduleCard);
+        moduleLink.click();
+
+        const nonLink = document.createElement('button');
+        nonLink.dataset.newsroomAnalyticsEvent = 'newsroom_product_cta_click';
+        nonLink.click();
+
+        const disabledLink = document.createElement('a');
+        disabledLink.href = '/testy-na-prawo-jazdy';
+        disabledLink.dataset.newsroomAnalyticsEvent = 'newsroom_product_cta_click';
+        disabledLink.setAttribute('aria-disabled', 'true');
+        disabledLink.addEventListener('click', (event) => event.preventDefault(), { once: true });
+        document.body.appendChild(disabledLink);
+        disabledLink.click();
+    });
+
+    const events = await page.evaluate(() => (
+        (window.__newsroomAnalyticsEvents ?? [])
+            .filter((entry) => entry[0] === 'event')
+            .map((entry) => ({
+                name: entry[1],
+                parameters: entry[2] ?? {},
+            }))
+    ));
+
+    const expectedSingleEvents = [
+        'newsroom_article_view',
+        'newsroom_product_cta_click',
+        'newsroom_source_click',
+        'newsroom_related_article_click',
+        'newsroom_module_click',
+    ];
+
+    for (const eventName of expectedSingleEvents) {
+        const matches = events.filter((event) => event.name === eventName);
+
+        if (matches.length !== 1) {
+            throw new Error(`${eventName} expected exactly once, got ${matches.length}.`);
+        }
+    }
+
+    for (const event of events) {
+        for (const forbidden of ['title', 'author', 'body', 'lead', 'source_title', 'source_publisher']) {
+            if (Object.prototype.hasOwnProperty.call(event.parameters, forbidden)) {
+                throw new Error(`Forbidden analytics parameter "${forbidden}" in ${event.name}.`);
+            }
+        }
+    }
+
+    const articleView = events.find((event) => event.name === 'newsroom_article_view');
+
+    if (!Number.isInteger(articleView?.parameters?.article_id)
+        || articleView?.parameters?.article_type !== 'news'
+        || typeof articleView?.parameters?.category_slug !== 'string') {
+        throw new Error('Article view is missing stable article context.');
+    }
+
+    const productClick = events.find((event) => event.name === 'newsroom_product_cta_click');
+    if (productClick?.parameters?.module !== 'product_bridge'
+        || productClick?.parameters?.destination_path !== '/testy-na-prawo-jazdy') {
+        throw new Error('Product CTA analytics parameters are invalid.');
+    }
+
+    const sourceClick = events.find((event) => event.name === 'newsroom_source_click');
+    if (sourceClick?.parameters?.module !== 'sources'
+        || sourceClick?.parameters?.destination_path !== '/e2e-source') {
+        throw new Error('Source analytics parameters are invalid.');
+    }
+
+    const relatedClick = events.find((event) => event.name === 'newsroom_related_article_click');
+    if (relatedClick?.parameters?.module !== 'related_articles'
+        || !relatedClick?.parameters?.destination_path?.endsWith('/e2e-powiazany-material-analityczny')) {
+        throw new Error('Related article analytics parameters are invalid.');
+    }
+
+    const moduleClick = events.find((event) => event.name === 'newsroom_module_click');
+    if (moduleClick?.parameters?.article_id !== 987654
+        || moduleClick?.parameters?.article_type !== 'news'
+        || moduleClick?.parameters?.category_slug !== 'egzaminy'
+        || moduleClick?.parameters?.module !== 'latest'
+        || moduleClick?.parameters?.position !== '2'
+        || moduleClick?.parameters?.destination_path !== '/aktualnosci/e2e-module-target') {
+        throw new Error('Module click analytics parameters are invalid.');
+    }
+
+    await context.close();
+
+    return {
+        status: 'ok',
+        event_names: events.map((event) => event.name),
+        article_id: articleView.parameters.article_id,
+    };
+}
 async function seedArticle() {
     const php = String.raw`
 $existing = \App\Models\ContentArticle::query()->where('slug', '${slug}')->first();
 if ($existing) { $existing->delete(); }
+$related = \App\Models\ContentArticle::factory()->published()->create([
+    'title' => 'E2E powiązany materiał analityczny',
+    'slug' => 'e2e-powiazany-material-analityczny',
+]);
 $article = \App\Models\ContentArticle::factory()->published()->create([
     'title' => '${title}',
     'slug' => '${slug}',
     'lead' => 'Lead E2E sprawdzający publiczny widok artykułu newsroomu na pełnej macierzy szerokości.',
     'body_blocks' => \App\Support\NewsroomBodyContract::normalize([
+        [
+            'type' => \App\Support\NewsroomBodyContract::BLOCK_RELATED_ARTICLE,
+            'data' => ['article_id' => $related->id],
+        ],
         [
             'type' => \App\Support\NewsroomBodyContract::BLOCK_PRODUCT_CTA,
             'data' => ['kind' => 'test'],

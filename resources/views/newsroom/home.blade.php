@@ -115,7 +115,14 @@
                 <div class="newsroom-home-lead-grid grid gap-8 lg:gap-10">
                     @if (! empty($home['lead']))
                         @php($lead = $home['lead'])
-                        <article data-article-id="{{ $lead['id'] }}">
+                        <article
+                            data-article-id="{{ $lead['id'] }}"
+                            data-article-url="{{ $lead['url'] }}"
+                            data-article-type="{{ $lead['type'] }}"
+                            data-category-slug="{{ $lead['category']['slug'] ?? '' }}"
+                            data-newsroom-analytics-module="lead"
+                            data-newsroom-analytics-position="1"
+                        >
                             @if (! empty($lead['hero']))
                                 <a href="{{ $lead['url'] }}" class="block overflow-hidden bg-slate-100">
                                     <img
@@ -161,7 +168,15 @@
                     @if (! empty($home['secondary']))
                         <div class="divide-y divide-slate-200 border-y border-slate-200 lg:border-t-0" aria-label="Pozostałe najważniejsze materiały">
                             @foreach ($home['secondary'] as $article)
-                                <article class="py-5 first:pt-0 lg:first:pt-5" data-article-id="{{ $article['id'] }}">
+                                <article
+                                    class="py-5 first:pt-0 lg:first:pt-5"
+                                    data-article-id="{{ $article['id'] }}"
+                                    data-article-url="{{ $article['url'] }}"
+                                    data-article-type="{{ $article['type'] }}"
+                                    data-category-slug="{{ $article['category']['slug'] ?? '' }}"
+                                    data-newsroom-analytics-module="secondary"
+                                    data-newsroom-analytics-position="{{ $loop->iteration }}"
+                                >
                                     <div class="flex gap-4">
                                         <div class="min-w-0 flex-1">
                                             <div class="flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-[0.1em]">
@@ -213,7 +228,15 @@
 
                 <div class="mt-5 divide-y divide-slate-200 border-y border-slate-200">
                     @foreach ($home['latest'] as $article)
-                        <article class="grid gap-2 py-4 sm:grid-cols-[130px_minmax(0,1fr)_auto] sm:items-center sm:gap-5" data-article-id="{{ $article['id'] }}">
+                        <article
+                            class="grid gap-2 py-4 sm:grid-cols-[130px_minmax(0,1fr)_auto] sm:items-center sm:gap-5"
+                            data-article-id="{{ $article['id'] }}"
+                            data-article-url="{{ $article['url'] }}"
+                            data-article-type="{{ $article['type'] }}"
+                            data-category-slug="{{ $article['category']['slug'] ?? '' }}"
+                            data-newsroom-analytics-module="latest"
+                            data-newsroom-analytics-position="{{ $loop->iteration }}"
+                        >
                             <div class="text-xs text-slate-500">
                                 @if ($published = $formatPublishedAt($article['first_published_at']))
                                     <time datetime="{{ $article['first_published_at'] }}">{{ $published }}</time>
@@ -247,7 +270,7 @@
     @endif
 
     @foreach ($home['categories'] as $block)
-        <section id="kategoria-{{ $block['category']['slug'] }}" class="content-band border-t border-slate-200" aria-labelledby="category-heading-{{ $block['category']['id'] }}" data-analytics-module="category">
+        <section id="kategoria-{{ $block['category']['slug'] }}" class="content-band border-t border-slate-200" aria-labelledby="category-heading-{{ $block['category']['id'] }}" data-analytics-module="category_{{ $block['category']['slug'] }}">
             <div class="content-shell py-9 md:py-12">
                 <div class="flex flex-wrap items-end justify-between gap-4">
                     <div class="max-w-3xl">
@@ -256,7 +279,12 @@
                             <p class="mt-2 text-sm leading-6 text-slate-600">{{ $block['category']['description'] }}</p>
                         @endif
                     </div>
-                    <a href="{{ route('public.news.categories.show', ['categorySlug' => $block['category']['slug']]) }}" class="inline-flex min-h-11 items-center text-sm font-semibold text-slate-800 hover:underline">
+                    <a
+                        href="{{ route('public.news.categories.show', ['categorySlug' => $block['category']['slug']]) }}"
+                        class="inline-flex min-h-11 items-center text-sm font-semibold text-slate-800 hover:underline"
+                        data-newsroom-analytics-event="newsroom_category_click"
+                        data-newsroom-analytics-module="category_{{ $block['category']['slug'] }}"
+                    >
                         Zobacz wszystkie
                     </a>
                 </div>
@@ -264,7 +292,15 @@
                 <div class="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                     @if (! empty($block['lead']))
                         @php($article = $block['lead'])
-                        <article class="md:col-span-2" data-article-id="{{ $article['id'] }}">
+                        <article
+                            class="md:col-span-2"
+                            data-article-id="{{ $article['id'] }}"
+                            data-article-url="{{ $article['url'] }}"
+                            data-article-type="{{ $article['type'] }}"
+                            data-category-slug="{{ $block['category']['slug'] }}"
+                            data-newsroom-analytics-module="category_{{ $block['category']['slug'] }}"
+                            data-newsroom-analytics-position="lead"
+                        >
                             @if (! empty($article['hero']))
                                 <a href="{{ $article['url'] }}" class="block overflow-hidden bg-slate-100">
                                     <img
@@ -287,7 +323,15 @@
                     @endif
 
                     @foreach ($block['items'] as $article)
-                        <article class="border-t border-slate-200 pt-4 md:border-t-0 md:pt-0" data-article-id="{{ $article['id'] }}">
+                        <article
+                            class="border-t border-slate-200 pt-4 md:border-t-0 md:pt-0"
+                            data-article-id="{{ $article['id'] }}"
+                            data-article-url="{{ $article['url'] }}"
+                            data-article-type="{{ $article['type'] }}"
+                            data-category-slug="{{ $block['category']['slug'] }}"
+                            data-newsroom-analytics-module="category_{{ $block['category']['slug'] }}"
+                            data-newsroom-analytics-position="item-{{ $loop->iteration }}"
+                        >
                             @if (! empty($article['hero']))
                                 <a href="{{ $article['url'] }}" class="mb-3 block overflow-hidden bg-slate-100">
                                     <img
@@ -321,7 +365,12 @@
                         <p class="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Materiały praktyczne</p>
                         <h2 id="newsroom-guides-heading" class="mt-1 text-2xl font-semibold tracking-tight text-slate-950">Poradniki</h2>
                     </div>
-                    <a href="{{ route('public.guides') }}" class="inline-flex min-h-11 items-center text-sm font-semibold text-slate-800 hover:underline">
+                    <a
+                        href="{{ route('public.guides') }}"
+                        class="inline-flex min-h-11 items-center text-sm font-semibold text-slate-800 hover:underline"
+                        data-newsroom-analytics-event="newsroom_module_click"
+                        data-newsroom-analytics-module="guides"
+                    >
                         Zobacz wszystkie poradniki
                     </a>
                 </div>
@@ -329,7 +378,15 @@
                 <div class="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                     @if (! empty($home['guides']['lead']))
                         @php($article = $home['guides']['lead'])
-                        <article class="border-l-4 border-[#efc54f] bg-white px-5 py-5 md:col-span-2" data-article-id="{{ $article['id'] }}">
+                        <article
+                            class="border-l-4 border-[#efc54f] bg-white px-5 py-5 md:col-span-2"
+                            data-article-id="{{ $article['id'] }}"
+                            data-article-url="{{ $article['url'] }}"
+                            data-article-type="{{ $article['type'] }}"
+                            data-category-slug="{{ $article['category']['slug'] ?? '' }}"
+                            data-newsroom-analytics-module="guides"
+                            data-newsroom-analytics-position="lead"
+                        >
                             <p class="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Poradnik</p>
                             <h3 class="newsroom-home-card-title mt-2 text-xl font-semibold leading-7 text-slate-950">
                                 <a href="{{ $article['url'] }}" class="hover:underline">{{ $article['title'] }}</a>
@@ -341,7 +398,15 @@
                     @endif
 
                     @foreach ($home['guides']['items'] as $article)
-                        <article class="bg-white px-5 py-5" data-article-id="{{ $article['id'] }}">
+                        <article
+                            class="bg-white px-5 py-5"
+                            data-article-id="{{ $article['id'] }}"
+                            data-article-url="{{ $article['url'] }}"
+                            data-article-type="{{ $article['type'] }}"
+                            data-category-slug="{{ $article['category']['slug'] ?? '' }}"
+                            data-newsroom-analytics-module="guides"
+                            data-newsroom-analytics-position="item-{{ $loop->iteration }}"
+                        >
                             <p class="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Poradnik</p>
                             <h3 class="newsroom-home-card-title mt-2 text-base font-semibold leading-6 text-slate-950">
                                 <a href="{{ $article['url'] }}" class="hover:underline">{{ $article['title'] }}</a>
@@ -361,7 +426,12 @@
                     <h2 id="newsroom-product-bridge-heading" class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Czy zdałbyś teorię dzisiaj?</h2>
                     <p class="mt-2 text-sm leading-6 text-slate-600">Rozwiąż bezpłatny test 20 pytań z oficjalnej bazy — bez logowania.</p>
                 </div>
-                <a href="{{ route('public.tests') }}" class="inline-flex min-h-11 items-center justify-center bg-slate-950 px-5 py-3 text-sm font-semibold text-white hover:bg-slate-800">
+                <a
+                    href="{{ route('public.tests') }}"
+                    class="inline-flex min-h-11 items-center justify-center bg-slate-950 px-5 py-3 text-sm font-semibold text-white hover:bg-slate-800"
+                    data-newsroom-analytics-event="newsroom_product_cta_click"
+                    data-newsroom-analytics-module="product_bridge"
+                >
                     Rozpocznij bezpłatny test
                 </a>
             </div>

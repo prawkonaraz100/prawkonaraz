@@ -239,6 +239,7 @@
                 }
 
                 window.gtag('config', config.measurementId, tagConfig);
+                window.dispatchEvent(new CustomEvent('prawkonaraz:analytics-ready'));
             };
 
             const grantAnalyticsConsent = () => {

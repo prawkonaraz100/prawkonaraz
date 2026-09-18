@@ -62,7 +62,15 @@
                 </div>
 
                 @if ($leadGuide)
-                    <article class="grid gap-6 border-b border-slate-200 py-7 md:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)] md:items-center" data-article-id="{{ $leadGuide['id'] }}">
+                    <article
+                        class="grid gap-6 border-b border-slate-200 py-7 md:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)] md:items-center"
+                        data-article-id="{{ $leadGuide['id'] }}"
+                        data-article-url="{{ $leadGuide['url'] }}"
+                        data-article-type="{{ $leadGuide['type'] }}"
+                        data-category-slug="{{ $leadGuide['category']['slug'] ?? '' }}"
+                        data-newsroom-analytics-module="guides"
+                        data-newsroom-analytics-position="lead"
+                    >
                         <div class="min-w-0">
                             <div class="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-[0.1em]">
                                 <span class="text-slate-500">Poradnik</span>
@@ -105,7 +113,14 @@
                 @if ($remainingGuides->isNotEmpty())
                     <div class="grid gap-x-7 gap-y-8 py-8 sm:grid-cols-2 lg:grid-cols-3">
                         @foreach ($remainingGuides as $guide)
-                            <article data-article-id="{{ $guide['id'] }}">
+                            <article
+                                data-article-id="{{ $guide['id'] }}"
+                                data-article-url="{{ $guide['url'] }}"
+                                data-article-type="{{ $guide['type'] }}"
+                                data-category-slug="{{ $guide['category']['slug'] ?? '' }}"
+                                data-newsroom-analytics-module="guides"
+                                data-newsroom-analytics-position="{{ $loop->iteration }}"
+                            >
                                 @if (! empty($guide['hero']))
                                     <a href="{{ $guide['url'] }}" class="mb-4 block overflow-hidden bg-slate-100">
                                         <img

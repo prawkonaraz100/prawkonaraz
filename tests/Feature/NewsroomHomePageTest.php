@@ -76,6 +76,13 @@ test('newsroom home renders the public blade from the gated read model when enab
         ->assertSee('Czy zdałbyś teorię dzisiaj?')
         ->assertSee('Rozpocznij bezpłatny test')
         ->assertSee(route('public.tests'), false)
+        ->assertSee('data-newsroom-analytics-module="lead"', false)
+        ->assertSee('data-newsroom-analytics-module="latest"', false)
+        ->assertSee('data-newsroom-analytics-module="category_egzaminy"', false)
+        ->assertSee('data-newsroom-analytics-module="guides"', false)
+        ->assertSee('data-newsroom-analytics-event="newsroom_product_cta_click"', false)
+        ->assertDontSee('data-newsroom-analytics-title=', false)
+        ->assertDontSee('data-newsroom-analytics-body=', false)
         ->assertDontSee('Tu pojawią się aktualności dla kandydatów, kursantów i instruktorów prawa jazdy.')
         ->assertDontSee('MarketingPlaceholder');
 });

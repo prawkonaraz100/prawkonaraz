@@ -8,7 +8,13 @@
         </div>
         <div class="mt-5 grid gap-3 sm:grid-cols-2">
             @foreach ($block['questions'] as $question)
-                <a href="{{ $question['url'] }}" class="group flex min-w-0 gap-4 border border-slate-200 bg-white p-4 hover:border-slate-400">
+                <a
+                    href="{{ $question['url'] }}"
+                    class="group flex min-w-0 gap-4 border border-slate-200 bg-white p-4 hover:border-slate-400"
+                    data-newsroom-analytics-event="newsroom_related_question_click"
+                    data-newsroom-analytics-module="related_questions"
+                    data-newsroom-analytics-position="{{ $loop->iteration }}"
+                >
                     @if ($question['thumbnail_url'])
                         <img src="{{ $question['thumbnail_url'] }}" alt="{{ $question['thumbnail_alt'] ?: '' }}" width="112" height="84" class="h-[84px] w-28 shrink-0 object-cover" loading="lazy" decoding="async">
                     @endif
@@ -27,7 +33,12 @@
 @if ($block['type'] === 'legal_reference' && ! empty($block['legal_reference']))
     <aside class="border-l-4 border-[#efc54f] bg-[#fffdf3] px-5 py-5 sm:px-6" aria-label="Podstawa prawna">
         <p class="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Podstawa prawna</p>
-        <a href="{{ $block['legal_reference']['url'] }}" class="mt-2 block text-lg font-semibold leading-7 text-slate-950 hover:underline">
+        <a
+            href="{{ $block['legal_reference']['url'] }}"
+            class="mt-2 block text-lg font-semibold leading-7 text-slate-950 hover:underline"
+            data-newsroom-analytics-event="newsroom_related_legal_click"
+            data-newsroom-analytics-module="product_bridge"
+        >
             {{ $block['legal_reference']['reference'] }}
         </a>
         @if ($block['legal_reference']['title'] && $block['legal_reference']['title'] !== $block['legal_reference']['reference'])
@@ -45,7 +56,13 @@
         <h2 id="newsroom-sign-group-{{ $loop->index ?? 0 }}" class="mt-1 text-xl font-semibold text-slate-950">Powiązane znaki</h2>
         <div class="mt-5 grid gap-3 sm:grid-cols-2">
             @foreach ($block['traffic_signs'] as $sign)
-                <a href="{{ $sign['url'] }}" class="group flex min-w-0 items-center gap-4 border border-slate-200 bg-white p-4 hover:border-slate-400">
+                <a
+                    href="{{ $sign['url'] }}"
+                    class="group flex min-w-0 items-center gap-4 border border-slate-200 bg-white p-4 hover:border-slate-400"
+                    data-newsroom-analytics-event="newsroom_related_sign_click"
+                    data-newsroom-analytics-module="product_bridge"
+                    data-newsroom-analytics-position="{{ $loop->iteration }}"
+                >
                     @if ($sign['image_url'])
                         <img src="{{ $sign['image_url'] }}" alt="{{ $sign['image_alt'] }}" width="80" height="80" class="h-20 w-20 shrink-0 object-contain" loading="lazy" decoding="async">
                     @endif
@@ -65,7 +82,12 @@
             <p class="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">PrawkoNaRaz</p>
             <p class="mt-1 text-sm leading-6 text-slate-700">{{ $block['product_cta']['description'] }}</p>
         </div>
-        <a href="{{ $block['product_cta']['url'] }}" class="mt-4 inline-flex min-h-11 shrink-0 items-center justify-center bg-[#efc54f] px-5 py-2.5 text-sm font-bold text-slate-950 hover:brightness-95 sm:mt-0">
+        <a
+            href="{{ $block['product_cta']['url'] }}"
+            class="mt-4 inline-flex min-h-11 shrink-0 items-center justify-center bg-[#efc54f] px-5 py-2.5 text-sm font-bold text-slate-950 hover:brightness-95 sm:mt-0"
+            data-newsroom-analytics-event="newsroom_product_cta_click"
+            data-newsroom-analytics-module="product_bridge"
+        >
             {{ $block['product_cta']['label'] }}
         </a>
     </aside>
