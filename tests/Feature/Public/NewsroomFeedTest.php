@@ -2,6 +2,7 @@
 
 use App\Enums\ContentArticleType;
 use App\Models\ContentArticle;
+use App\Models\ContentAuthor;
 use App\Support\ContentArticlePublishingService;
 use App\Support\ContentArticleSlugService;
 use App\Support\NewsroomPublicReadCache;
@@ -17,9 +18,15 @@ test('public Atom feed exposes latest actively distributed news with stable meta
     config()->set('newsroom.feed_items_limit', 2);
     config()->set('content.organization.name', 'PrawkoNaRaz');
 
+    $author = ContentAuthor::factory()->published()->create([
+        'name' => 'Redakcja Feed',
+        'slug' => 'redakcja-feed',
+    ]);
+
     $newestPublishedAt = now()->subMinutes(20);
     $newestUpdatedAt = now()->subMinutes(5);
     $newest = ContentArticle::factory()->published()->create([
+        'author_id' => $author->id,
         'title' => 'Nowy wpis & ważna zmiana',
         'slug' => 'nowy-wpis-feed',
         'lead' => 'Krótki opis & podsumowanie.',
@@ -30,6 +37,7 @@ test('public Atom feed exposes latest actively distributed news with stable meta
 
     $secondPublishedAt = now()->subHour();
     $second = ContentArticle::factory()->published()->create([
+        'author_id' => $author->id,
         'title' => 'Drugi wpis',
         'slug' => 'drugi-wpis-feed',
         'first_published_at' => $secondPublishedAt,
@@ -69,7 +77,8 @@ test('public Atom feed exposes latest actively distributed news with stable meta
     $response = $this->get(route('public.news.feed'))
         ->assertOk()
         ->assertHeader('Content-Type', 'application/atom+xml; charset=UTF-8')
-        ->assertHeader('X-Content-Type-Options', 'nosniff');
+        ->assertHeader('X-Content-Type-Options', 'nosniff')
+        ->assertHeaderMissing('Set-Cookie');
 
     $xml = $response->getContent();
 
@@ -82,6 +91,7 @@ test('public Atom feed exposes latest actively distributed news with stable meta
         ->toContain('<published>'.$newestPublishedAt->toAtomString().'</published>')
         ->toContain('<updated>'.$newestUpdatedAt->toAtomString().'</updated>')
         ->toContain('<summary type="text">Krótki opis &amp; podsumowanie.</summary>')
+        ->toContain('<name>Redakcja Feed</name>')
         ->toContain('<id>urn:prawkonaraz:content-article:'.$second->id.'</id>')
         ->toContain('<published>'.$secondPublishedAt->toAtomString().'</published>')
         ->not->toContain($oldest->slug)
