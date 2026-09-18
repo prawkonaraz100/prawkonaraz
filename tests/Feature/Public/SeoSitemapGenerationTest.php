@@ -455,7 +455,6 @@ test('seo refresh command generates files and runs the audit', function () {
     expect(File::exists(public_path('sitemaps/questions-b.xml')))->toBeTrue();
 });
 
-
 test('newsroom article sitemap includes only indexable canonical public articles and indexable hubs', function () {
     Carbon::setTestNow('2026-09-18 12:00:00');
     config()->set('newsroom.public_enabled', true);
