@@ -121,6 +121,7 @@
                             data-article-type="{{ $lead['type'] }}"
                             data-category-slug="{{ $lead['category']['slug'] ?? '' }}"
                             data-newsroom-analytics-module="lead"
+                            data-newsroom-analytics-position="1"
                         >
                             @if (! empty($lead['hero']))
                                 <a href="{{ $lead['url'] }}" class="block overflow-hidden bg-slate-100">
@@ -174,6 +175,7 @@
                                     data-article-type="{{ $article['type'] }}"
                                     data-category-slug="{{ $article['category']['slug'] ?? '' }}"
                                     data-newsroom-analytics-module="secondary"
+                                    data-newsroom-analytics-position="{{ $loop->iteration }}"
                                 >
                                     <div class="flex gap-4">
                                         <div class="min-w-0 flex-1">
@@ -233,6 +235,7 @@
                             data-article-type="{{ $article['type'] }}"
                             data-category-slug="{{ $article['category']['slug'] ?? '' }}"
                             data-newsroom-analytics-module="latest"
+                            data-newsroom-analytics-position="{{ $loop->iteration }}"
                         >
                             <div class="text-xs text-slate-500">
                                 @if ($published = $formatPublishedAt($article['first_published_at']))
@@ -296,6 +299,7 @@
                             data-article-type="{{ $article['type'] }}"
                             data-category-slug="{{ $block['category']['slug'] }}"
                             data-newsroom-analytics-module="category_{{ $block['category']['slug'] }}"
+                            data-newsroom-analytics-position="lead"
                         >
                             @if (! empty($article['hero']))
                                 <a href="{{ $article['url'] }}" class="block overflow-hidden bg-slate-100">
@@ -326,6 +330,7 @@
                             data-article-type="{{ $article['type'] }}"
                             data-category-slug="{{ $block['category']['slug'] }}"
                             data-newsroom-analytics-module="category_{{ $block['category']['slug'] }}"
+                            data-newsroom-analytics-position="item-{{ $loop->iteration }}"
                         >
                             @if (! empty($article['hero']))
                                 <a href="{{ $article['url'] }}" class="mb-3 block overflow-hidden bg-slate-100">
@@ -380,6 +385,7 @@
                             data-article-type="{{ $article['type'] }}"
                             data-category-slug="{{ $article['category']['slug'] ?? '' }}"
                             data-newsroom-analytics-module="guides"
+                            data-newsroom-analytics-position="lead"
                         >
                             <p class="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Poradnik</p>
                             <h3 class="newsroom-home-card-title mt-2 text-xl font-semibold leading-7 text-slate-950">
@@ -399,6 +405,7 @@
                             data-article-type="{{ $article['type'] }}"
                             data-category-slug="{{ $article['category']['slug'] ?? '' }}"
                             data-newsroom-analytics-module="guides"
+                            data-newsroom-analytics-position="item-{{ $loop->iteration }}"
                         >
                             <p class="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Poradnik</p>
                             <h3 class="newsroom-home-card-title mt-2 text-base font-semibold leading-6 text-slate-950">
