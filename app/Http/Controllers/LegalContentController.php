@@ -7,10 +7,15 @@ use App\Support\LegalContentCatalogService;
 use App\Support\LegalContentSchemaService;
 use App\Support\LegalContentSeoService;
 use App\Support\MediaUrlResolver;
+use App\Support\NewsroomSemanticLinkService;
 use Illuminate\View\View;
 
 class LegalContentController extends Controller
 {
+    public function __construct(
+        private readonly NewsroomSemanticLinkService $newsroomSemanticLinks,
+    ) {}
+
     public function index(
         LegalContentCatalogService $catalog,
         LegalContentSeoService $seo,
@@ -62,6 +67,9 @@ class LegalContentController extends Controller
             'questionReferences' => $questionReferences,
             'questionCards' => $questionCards,
             'questionAssignmentLegalUnits' => $questionAssignmentLegalUnits,
+            'newsroomReverseArticles' => $this->newsroomSemanticLinks->forLegalUnits(
+                $page->legalUnits()->pluck('legal_units.id'),
+            ),
             'meta' => $seo->page($page),
             'breadcrumbs' => $breadcrumbItems,
             'structuredData' => $schema->page($page, $breadcrumbItems, $questionReferences),
