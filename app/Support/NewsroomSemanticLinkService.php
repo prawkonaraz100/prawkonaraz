@@ -250,7 +250,7 @@ final class NewsroomSemanticLinkService
             + $article->trafficSigns()->count();
 
         $estimatedHubDepth = match (true) {
-            ! $isIndexable => null,
+            $isIndexable === false => null,
             $isActive && $hub !== null && $hub['url'] === route('public.guides', absolute: false) => 1,
             $isActive && $category !== null => 2,
             $author !== null => 3,
