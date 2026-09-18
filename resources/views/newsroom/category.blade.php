@@ -69,7 +69,7 @@
                 </div>
                 @if ($articles->total() > 0)
                     <p class="text-sm text-slate-500">
-                        {{ $articles->total() }} {{ trans_choice('materiał|materiały|materiałów', $articles->total()) }}
+                        Liczba materiałów: {{ $articles->total() }}
                     </p>
                 @endif
             </div>
