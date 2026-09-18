@@ -1303,7 +1303,7 @@ Frontend newsroom v1 jest UI-complete, gdy:
 Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0cdd4cb1ef8ac6b53f78`:
 
 - `/aktualnosci` używa istniejącego `NewsroomPlaceholderController::news()` jako rollout switch: gate=false zachowuje pre-launch `MarketingPlaceholder.vue` 200 + `X-Robots-Tag: noindex, follow`, a gate=true renderuje SSR `newsroom.home`; od N4-004 `/poradniki` używa istniejącego `NewsroomPlaceholderController::guides()` jako analogicznego rollout switcha: gate=false zachowuje placeholder 200 + noindex, gate=true renderuje SSR `newsroom.guides`,
-- category route `/aktualnosci/kategoria/{categorySlug}` jest od N4-003 publicznym SSR surface przy gate=true; topic route `/aktualnosci/temat/{topicSlug}` jest publicznym SSR dossier od N4-007; feed nadal pozostaje downstream N5,
+- category route `/aktualnosci/kategoria/{categorySlug}` jest od N4-003 publicznym SSR surface przy gate=true; topic route `/aktualnosci/temat/{topicSlug}` jest publicznym SSR dossier od N4-007; od N5-003 `/aktualnosci/feed.xml` jest publicznym Atom feedem przy gate=true i 404 przy gate=false,
 - detail routes `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}` są podłączone do `ContentArticleController`; publicznie widoczny rekord renderuje `newsroom.article`, withdrawn historyczny rekord otrzymuje neutralną 410 surface, a hidden/not-found 404,
 - 404/410 article surfaces używają `noindex,follow` i `X-Robots-Tag: noindex, follow` bez renderowania body/source/product modules,
 - publiczny article renderer reużywa istniejący `public-content` layout, header/footer oraz gotowe N3-001 catalog, N3-002 SEO metadata i N3-003 schema graph; canonical/OG/article dates i JSON-LD są obecne w initial HTML,
@@ -1324,7 +1324,7 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - N4-001 rozszerza istniejący `NewsroomHomeCompositionService` bez tworzenia drugiego systemu kompozycji: fixed placements, fallback, globalna deduplikacja i breaking exception pozostają tym samym kontraktem, a category blocks korzystają z batched placements i bounded per-category ranking zamiast query-per-category,
 - `NewsroomHomeReadModelService` dostarcza rollout-gated scalar-array projection bezpośrednio do publicznego huba: lead/secondary/latest/categories/guides/important_now/breaking z canonical path, category/author i hero metadata; przy `NEWSROOM_PUBLIC_ENABLED=false` nadal zwraca `null`,
 - N4-002 podłącza read model do `resources/views/newsroom/home.blade.php`: renderuje responsywnie newsroom subnavigation, important-now, breaking, lead/secondary, latest, category blocks, guides i Product Bridge; puste sekcje są pomijane zamiast wypełniane sztucznymi kartami,
-- subnavigation kategorii na hubie nadal prowadzi do kotwic sekcji, ale od N4-003 każdy category block ma crawlable `Zobacz wszystkie` do `public.news.categories.show`; publiczny topic route istnieje od N4-007, a od N4-008 article detail ma jawne topic links i controlled reverse links z question/legal/sign surfaces; feed pozostaje N5,
+- subnavigation kategorii na hubie nadal prowadzi do kotwic sekcji, ale od N4-003 każdy category block ma crawlable `Zobacz wszystkie` do `public.news.categories.show`; publiczny topic route istnieje od N4-007, od N4-008 article detail ma jawne topic links i controlled reverse links z question/legal/sign surfaces, a N5-003 dodaje Atom auto-discovery w shared public-content head dla crawlable newsroom/guide surfaces,
 - `newsroom.category` renderuje category header, chronologiczny listing kart, useful empty state, related categories oraz SSR paginację; wszystkie publiczne linki są czytelne bez JavaScript,
 - category page reużywa wspólny `layouts.public-content`, header/footer i istniejące article card metadata; nie tworzy równoległego design systemu,
 - gate=false, inactive/unknown category i invalid/out-of-range page nie pokazują publicznego category UI; aktywna pusta kategoria pokazuje komunikat i powrót do `/aktualnosci` zamiast sztucznych kart,
@@ -1383,6 +1383,14 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 ---
 
 ## 69. Historia zmian
+
+### 2026-09-18 — v0.24
+
+- NEWSROOM-N5-003 zmergowano przez PR #101 na `main@18cd07233e3c8712cf2c7fc9e0c32018baef65d3`; public UI nie dostało nowego wizualnego komponentu ani design systemu,
+- shared `layouts.public-content` emituje niewizualny head discovery link `rel="alternate" type="application/atom+xml"` dla crawlable newsroom/guide surfaces przy gate=true,
+- gate=false zachowuje pre-launch placeholder behavior top-level hubów, blokuje feed do 404 i suppressuje discovery; gate=true udostępnia Atom feed bez zmiany istniejących page layouts,
+- exact-head CI #380 i Browser Smoke #54 oraz post-merge CI #381 zakończyły PASS; nie ma deklaracji produkcyjnego CDN/Nginx feed smoke,
+- następnym taskiem wykonawczym jest NEWSROOM-N5-004 Analytics hooks; nie wymaga on z góry zmian publicznego UI.
 
 ### 2026-09-18 — v0.23
 
