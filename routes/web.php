@@ -48,6 +48,7 @@ use App\Http\Controllers\MethodologyPageController;
 use App\Http\Controllers\ModeratorAccountsController;
 use App\Http\Controllers\NewsroomCategoryController;
 use App\Http\Controllers\NewsroomPlaceholderController;
+use App\Http\Controllers\NewsroomTopicController;
 use App\Http\Controllers\PartnersPageController;
 use App\Http\Controllers\PjmSessionPageController;
 use App\Http\Controllers\PostAuthRedirectController;
@@ -184,7 +185,7 @@ Route::get('/aktualnosci/feed.xml', fn () => abort(404))
 Route::get('/aktualnosci/kategoria/{categorySlug}', NewsroomCategoryController::class)
     ->where('categorySlug', NewsroomRouteContract::SLUG_PATTERN)
     ->name('public.news.categories.show');
-Route::get('/aktualnosci/temat/{topicSlug}', fn () => abort(404))
+Route::get('/aktualnosci/temat/{topicSlug}', NewsroomTopicController::class)
     ->where('topicSlug', NewsroomRouteContract::SLUG_PATTERN)
     ->name('public.news.topics.show');
 Route::get('/aktualnosci/{articleSlug}', [ContentArticleController::class, 'news'])
