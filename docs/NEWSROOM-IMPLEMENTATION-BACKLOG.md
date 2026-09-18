@@ -2189,10 +2189,10 @@ Docs-only:
 - [x] stable entity graph + site identity dla article detail
 - [x] visible/schema dates consistency dla article detail
 - [x] self-canonical + route-family exclusivity dla current article detail
-- [ ] article sitemap przez istniejący static generator + deterministic sharding readiness
+- [x] article sitemap przez istniejący static generator + deterministic sharding readiness + rollout-gated hub coverage (NEWSROOM-N5-001)
 - [ ] news sitemap full required metadata + dirty/version scheduled refresh bez queue-worker assumption
 - [ ] child-before-index atomic static publication
-- [ ] istniejący SeoSitemapAuditor rozszerzony bez drugiego auditora
+- [ ] istniejący SeoSitemapAuditor rozszerzony o newsroom/news namespace-specific checks; N5-001 dodało już ogólne protocol-limit guards bez drugiego auditora
 - [ ] rzeczywisty static/Nginx/CDN delivery smoke (Content-Type/cache/Set-Cookie/validators)
 - [ ] feed + discovery + własny cache/validator contract
 - [ ] author ProfilePage / publisher / WebSite
@@ -2421,7 +2421,7 @@ Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-008 na `main@3d7ac8ab8a3ed1c299cb0c
 - `NewsroomSemanticLinkService::audit()` daje per-article inbound sources, explicit reverse-edge count i estimated hub depth; site-wide `newsroom:audit-links` nie istnieje,
 - Browser Smoke #48 potwierdził `newsroom-semantic-links` oraz brak regresji w article/home/category/guides/topic,
 - exact-head CI #361 był pełnym PASS, a post-merge CI #362 na exact `main@3d7ac8ab...` zakończył: 1093 passed / 19 881 assertions / 2 skipped, Pint PASS, frontend build 7.42 s; `newsroom-postgres` 7 passed / 94 assertions,
-- feed route nadal pozostaje 404, a dirty/version refresh, article/news sitemap, feed/discovery, IndexNow automation i sitemap-auditor extension pozostają N5,
+- feed route nadal pozostaje 404; N5-001 wdrożyło standard article sitemap + hub coverage, natomiast dirty/version refresh, news sitemap, feed/discovery, IndexNow automation, namespace-specific sitemap audit i atomic child-before-index publication pozostają N5,
 - QUEUE_CONNECTION w env example jest sync; stały queue worker nie jest gwarantowany,
 - panel Filament pozostaje admin-only i ten kontrakt pozostaje wymaganiem v1.
 
@@ -2429,9 +2429,9 @@ Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-008 na `main@3d7ac8ab8a3ed1c299cb0c
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N5-001 — Extend static generator: articles + hub sitemap coverage + deterministic sharding.
+NEWSROOM-N5-002 — News sitemap.
 
-N4-008 jest zamknięte implementacyjnie po PR #95, exact-head CI #361, Browser Smoke #48 i post-merge CI #362. Następny krok rozszerza istniejący `SeoSitemapGenerator` / `SeoSitemapBuilder` o newsroom article/hub coverage bez tworzenia drugiego generatora. Feed, news sitemap, analytics i IndexNow mają własne kolejne taski N5.
+N5-001 jest zamknięte implementacyjnie po PR #97, exact-head CI #367 i post-merge CI #368 na `main@5ddfa48c0646fa89cc802d129e6d9ccee9d18957`. Następny krok wdraża osobną statyczną news sitemap zgodnie z istniejącym kontraktem N5-002. Feed, atomic publication, dirty/version refresh, analytics i IndexNow pozostają własnymi kolejnymi taskami N5.
 
 ---
 
