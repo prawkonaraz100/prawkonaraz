@@ -787,7 +787,7 @@ Newsroom sitemap rozszerza istniejący statyczny pipeline:
 
 Nie przenosimy produkcyjnego source of truth do runtime `SitemapController`.
 
-**Potwierdzony gap bieżącego kodu:** aktualny `SeoSitemapGenerator::prepareSitemapDirectory()` usuwa wszystkie `public/sitemaps/*.xml` przed pętlą zapisu, a `generate()` zapisuje `sitemap.xml` przed child files. Dzisiejszy pipeline ma więc przejściowe okno brakujących child XML podczas refreshu. N5-007 musi najpierw usunąć ten istniejący broken-set window, zanim zwiększymy częstotliwość refreshu dla newsroomu. Nie opisujemy atomic publication jako funkcji już zaimplementowanej.
+**Potwierdzony stan po pierwszym podkroku N5-007:** PR #109 usunął wcześniejszy broken-set window. `SeoSitemapGenerator` waliduje kompletny generated set przed publication, zapisuje child XML przed głównym `sitemap.xml`, przełącza root index na końcu i dopiero potem usuwa obsolete zarządzane article/news sitemap files. Dirty/version freshness coordinator, frequent scheduler/shared lock, topology gate i production static delivery verification nadal pozostają otwarte.
 
 ### 30.2. Refresh po zmianie publicznego corpus — bez założenia o queue workerze
 
@@ -1598,7 +1598,7 @@ Obecnie:
 - wspólny public-content layout emituje `og:site_name` z kanonicznego identity,
 - istnieje również runtime `SitemapController`, ale statyczne pliki są nadrzędnym produkcyjnym modelem; samo dodanie headerów do kontrolera nie rozwiązuje static delivery,
 - newsroom Article schema graph istnieje przez `ContentArticleSchemaService` po NEWSROOM-N3-003 i jest emitowany przez publiczny article HTTP renderer od N3-004; od NEWSROOM-N5-002 istnieje statyczna rollout-gated News Sitemap, od NEWSROOM-N5-003 publiczny rollout-gated Atom 1.0 feed z auto-discovery i application-level validators, a od NEWSROOM-N5-004 privacy-safe public analytics hooks reużywające istniejący GA/consent layer,
-- newsroom dirty/version refresh coordinator i atomowy child-before-index switch nie istnieją,
+- newsroom dirty/version refresh coordinator nadal nie istnieje; atomowy child-before-index switch i post-switch cleanup zarządzanych article/news sitemap files są wdrożone po NEWSROOM-N5-007 PR #109,
 - repo nie gwarantuje async Laravel queue workera (`QUEUE_CONNECTION=sync` w env example), więc newsroom nie może opierać freshness na ShouldQueue,
 - po NEWSROOM-N4-002 `/aktualnosci` jest rollout-gated: przy `NEWSROOM_PUBLIC_ENABLED=false` pozostaje pre-launch placeholderem 200 + `X-Robots-Tag: noindex, follow`, a przy `true` renderuje SSR `newsroom.home` z self-canonical i `index,follow,max-image-preview:large`; od N4-004 `/poradniki` konsumuje ten sam gate: przy `false` pozostaje placeholderem 200 + noindex, a przy `true` renderuje SSR `newsroom.guides`,
 - `/aktualnosci/feed.xml` przy gate=true zwraca Atom 1.0 `application/atom+xml` z ETag/Last-Modified/public Cache-Control i conditional 304, a przy gate=false zwraca 404; crawlable public newsroom/guide surfaces emitują Atom discovery w head,
