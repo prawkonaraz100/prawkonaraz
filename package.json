@@ -6,6 +6,7 @@
         "build": "vue-tsc && vite build",
         "dev": "vite",
         "e2e:newsroom-article": "node scripts/e2e-newsroom-article.mjs",
+        "e2e:newsroom-category": "node scripts/e2e-newsroom-category.mjs",
         "e2e:newsroom-home": "node scripts/e2e-newsroom-home.mjs",
         "e2e:public-auth-drawers": "node scripts/e2e-public-auth-drawers.mjs",
         "e2e:smoke": "node scripts/e2e-smoke.mjs",

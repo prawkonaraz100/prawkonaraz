@@ -249,11 +249,16 @@
     @foreach ($home['categories'] as $block)
         <section id="kategoria-{{ $block['category']['slug'] }}" class="content-band border-t border-slate-200" aria-labelledby="category-heading-{{ $block['category']['id'] }}" data-analytics-module="category">
             <div class="content-shell py-9 md:py-12">
-                <div class="max-w-3xl">
-                    <h2 id="category-heading-{{ $block['category']['id'] }}" class="text-2xl font-semibold tracking-tight text-slate-950">{{ $block['category']['name'] }}</h2>
-                    @if ($block['category']['description'])
-                        <p class="mt-2 text-sm leading-6 text-slate-600">{{ $block['category']['description'] }}</p>
-                    @endif
+                <div class="flex flex-wrap items-end justify-between gap-4">
+                    <div class="max-w-3xl">
+                        <h2 id="category-heading-{{ $block['category']['id'] }}" class="text-2xl font-semibold tracking-tight text-slate-950">{{ $block['category']['name'] }}</h2>
+                        @if ($block['category']['description'])
+                            <p class="mt-2 text-sm leading-6 text-slate-600">{{ $block['category']['description'] }}</p>
+                        @endif
+                    </div>
+                    <a href="{{ route('public.news.categories.show', ['categorySlug' => $block['category']['slug']]) }}" class="inline-flex min-h-11 items-center text-sm font-semibold text-slate-800 hover:underline">
+                        Zobacz wszystkie
+                    </a>
                 </div>
 
                 <div class="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
