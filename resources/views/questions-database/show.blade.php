@@ -1008,6 +1008,12 @@
                 :preview="$relatedQuestionPreview"
             />
 
+            <x-public.newsroom-reverse-links
+                class="mt-8"
+                :articles="$newsroomReverseArticles ?? []"
+                heading="Materiały powiązane z tym pytaniem"
+            />
+
             <nav
                 class="mt-5 grid gap-4 pb-7 sm:grid-cols-[220px_minmax(0,1fr)_280px] sm:items-center"
                 aria-label="Nawigacja po pytaniach"

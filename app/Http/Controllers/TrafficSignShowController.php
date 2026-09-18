@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\TrafficSign;
 use App\Support\MediaUrlResolver;
+use App\Support\NewsroomSemanticLinkService;
 use App\Support\TrafficSignBreadcrumbs;
 use App\Support\TrafficSignRedirectPolicy;
 use App\Support\TrafficSignRelatedContentService;
@@ -17,6 +18,10 @@ use Illuminate\View\View;
 
 class TrafficSignShowController extends Controller
 {
+    public function __construct(
+        private readonly NewsroomSemanticLinkService $newsroomSemanticLinks,
+    ) {}
+
     public function __invoke(
         string $signSlug,
         TrafficSignSeoService $trafficSignSeoService,
@@ -58,6 +63,7 @@ class TrafficSignShowController extends Controller
             'signImageUrl' => $this->transparentSignCutoutUrl($sign, $mediaUrlResolver)
                 ?: $mediaUrlResolver->resolveIfPublicAssetExists($sign->image_path),
             'relatedSignCards' => $this->relatedSignCards($relatedSigns, $mediaUrlResolver),
+            'newsroomReverseArticles' => $this->newsroomSemanticLinks->forTrafficSign((int) $sign->getKey()),
             'supportingPages' => $this->supportingPageCards(
                 $supportingPages,
                 $this->supportingSignImages($supportingPages, $mediaUrlResolver),

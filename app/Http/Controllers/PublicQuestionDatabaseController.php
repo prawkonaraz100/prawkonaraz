@@ -6,6 +6,7 @@ use App\Filament\Resources\Questions\QuestionResource;
 use App\Models\ContentAuthor;
 use App\Models\LicenseCategory;
 use App\Support\LegalContentCatalogService;
+use App\Support\NewsroomSemanticLinkService;
 use App\Support\PublicQuestionAnswerStatsService;
 use App\Support\PublicQuestionBreadcrumbs;
 use App\Support\PublicQuestionCatalogService;
@@ -24,6 +25,10 @@ use Illuminate\View\View;
 
 class PublicQuestionDatabaseController extends Controller
 {
+    public function __construct(
+        private readonly NewsroomSemanticLinkService $newsroomSemanticLinks,
+    ) {}
+
     public function index(
         Request $request,
         PublicQuestionCatalogService $publicQuestionCatalogService,
@@ -369,6 +374,7 @@ class PublicQuestionDatabaseController extends Controller
             'canEditLegalReferences' => $canEditPublicExplanation,
             'legalReferenceUpdateUrl' => route('api.v1.admin.questions.legal-reference.update', $mainQuestion),
             'legalUnitSearchUrl' => route('api.v1.admin.legal-units.search'),
+            'newsroomReverseArticles' => $this->newsroomSemanticLinks->forQuestions($questions->pluck('id')),
             'legalReferenceEditorOptions' => $canEditPublicExplanation
                 ? $legalContentCatalogService->questionLegalReferenceEditorOptions($legalReferences->first()?->legalUnit)
                 : [],

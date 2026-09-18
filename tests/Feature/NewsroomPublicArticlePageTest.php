@@ -152,7 +152,7 @@ test('public newsroom article renders canonical content seo schema and safe pres
         ->assertDontSee('CTA produktu');
 });
 
-test('public guide uses guide route family and does not inject category into breadcrumbs', function () {
+test('public guide uses guide route family and exposes its primary category link', function () {
     $guide = ContentArticle::factory()->published()->guide()->create([
         'title' => 'Jak przygotować się do egzaminu',
         'slug' => 'jak-przygotowac-sie-do-egzaminu',
@@ -165,7 +165,7 @@ test('public guide uses guide route family and does not inject category into bre
         ->assertOk()
         ->assertSee('Jak przygotować się do egzaminu')
         ->assertSee('href="'.route('public.guides').'"', false)
-        ->assertDontSee('href="'.route('public.news.categories.show', $guide->category->slug).'"', false)
+        ->assertSee('href="'.route('public.news.categories.show', $guide->category->slug).'"', false)
         ->assertSee('"@type":"Article"', false)
         ->assertDontSee('"@type":"NewsArticle"', false);
 });

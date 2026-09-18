@@ -284,6 +284,15 @@
         </div>
     </section>
 
+    <section class="content-band">
+        <div class="content-shell pb-10">
+            <x-public.newsroom-reverse-links
+                :articles="$newsroomReverseArticles ?? []"
+                heading="Materiały powiązane z tym przepisem"
+            />
+        </div>
+    </section>
+
     @if ($canManageQuestionReferences)
         <div
             class="fixed inset-0 z-[80] hidden items-center justify-center bg-slate-950/55 p-4"
