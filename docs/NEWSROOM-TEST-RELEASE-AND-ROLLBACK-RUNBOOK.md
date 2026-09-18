@@ -1055,7 +1055,7 @@ Przy pre-launch `NEWSROOM_PUBLIC_ENABLED=false` test potwierdza:
 - obecny `IndexNowUrlCollector` nie przepuszcza namespace `/aktualnosci` ani `/poradniki`,
 - authenticated admin private preview nadal działa.
 
-Przy `NEWSROOM_PUBLIC_ENABLED=true` regression potwierdza obecnie istniejące powierzchnie: public article detail, publiczny Hub Blade `/aktualnosci`, category pages, `/poradniki` hub, topic dossier, author publication, author sitemap eligibility, historyczny redirect oraz N4-008 semantic/reverse-link modules. Feed oraz article/news sitemap pozostają przyszłym N5 i nie są fałszywie zaliczane.
+Przy `NEWSROOM_PUBLIC_ENABLED=true` regression potwierdza obecnie istniejące powierzchnie: public article detail, publiczny Hub Blade `/aktualnosci`, category pages, `/poradniki` hub, topic dossier, author publication, author sitemap eligibility, historyczny redirect, N4-008 semantic/reverse-link modules oraz N5-001 standard article sitemap/hub coverage. Feed i news sitemap pozostają dalszym N5 i nie są fałszywie zaliczane.
 
 Existing public-article PHPUnit baseline i dedykowany Browser Smoke `newsroom-article` jawnie ustawiają gate na `true`, dzięki czemu bezpieczny produkcyjny default `false` nie maskuje regresji publicznego renderer'a.
 
