@@ -289,11 +289,22 @@ test('traffic sign page renders reverse links only from explicit sign pivots', f
         'sort_order' => 0,
     ]);
 
+    $loose = ContentArticle::factory()->published()->create([
+        'title' => 'Luźno powiązany znak nie trafia do reverse links',
+        'slug' => 'luzno-powiazany-znak-reverse',
+        'editorial_priority' => 999,
+    ]);
+    $loose->trafficSigns()->attach($sign->id, [
+        'relation_type' => 'related',
+        'sort_order' => 0,
+    ]);
+
     $this->get(route('traffic-signs.show', $sign->slug))
         ->assertOk()
         ->assertSee('Materiały powiązane z tym znakiem')
         ->assertSee('Jak czytać ten znak')
-        ->assertSee('/poradniki/'.$linked->slug, false);
+        ->assertSee('/poradniki/'.$linked->slug, false)
+        ->assertDontSee('Luźno powiązany znak nie trafia do reverse links');
 });
 
 test('semantic links disappear from non-newsroom surfaces when public gate is disabled', function () {
