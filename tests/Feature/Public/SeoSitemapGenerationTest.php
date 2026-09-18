@@ -19,6 +19,45 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\URL;
 
+final class RecordingSeoSitemapGenerator extends SeoSitemapGenerator
+{
+    /**
+     * @var list<string>
+     */
+    public array $writes = [];
+
+    protected function writeAtomically(string $path, string $contents): void
+    {
+        $relativePath = str_replace(
+            '\\\\',
+            '/',
+            str_replace(public_path().DIRECTORY_SEPARATOR, '', $path),
+        );
+
+        $this->writes[] = $relativePath;
+    }
+}
+
+final class InvalidXmlSeoSitemapGenerator extends SeoSitemapGenerator
+{
+    /**
+     * @return array<string, array{contents:string,urls:int}>
+     */
+    protected function buildFiles(): array
+    {
+        return [
+            'sitemap.xml' => [
+                'contents' => '<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></sitemapindex>',
+                'urls' => 0,
+            ],
+            'sitemaps/static.xml' => [
+                'contents' => '<urlset>',
+                'urls' => 1,
+            ],
+        ];
+    }
+}
+
 beforeEach(function (): void {
     config()->set('app.url', 'https://prawkonaraz.pl');
     config()->set('filesystems.disks.public.url', 'https://prawkonaraz.pl/storage');
@@ -461,28 +500,11 @@ test('seo refresh command generates files and runs the audit', function () {
 });
 
 test('sitemap publication writes the root index after every child payload', function () {
-    $generator = new class(
+    $generator = new RecordingSeoSitemapGenerator(
         app(SeoSitemapBuilder::class),
         app(SeoSitemapXmlRenderer::class),
-        app(PublicQuestionCatalogService::class),
-    ) extends SeoSitemapGenerator
-    {
-        /**
-         * @var list<string>
-         */
-        public array $writes = [];
-
-        protected function writeAtomically(string $path, string $contents): void
-        {
-            $relativePath = str_replace(
-                '\\',
-                '/',
-                str_replace(public_path().DIRECTORY_SEPARATOR, '', $path),
-            );
-
-            $this->writes[] = $relativePath;
-        }
-    };
+        app(PublicQuestionCatalogService::class)
+    );
 
     $generator->generate();
 
@@ -496,29 +518,11 @@ test('sitemap payload validation happens before the published set is changed', f
     File::put(public_path('sitemap.xml'), 'previous-root-index');
     File::put(public_path('sitemaps/static.xml'), 'previous-static-child');
 
-    $generator = new class(
+    $generator = new InvalidXmlSeoSitemapGenerator(
         app(SeoSitemapBuilder::class),
         app(SeoSitemapXmlRenderer::class),
-        app(PublicQuestionCatalogService::class),
-    ) extends SeoSitemapGenerator
-    {
-        /**
-         * @return array<string, array{contents:string,urls:int}>
-         */
-        protected function buildFiles(): array
-        {
-            return [
-                'sitemap.xml' => [
-                    'contents' => '<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></sitemapindex>',
-                    'urls' => 0,
-                ],
-                'sitemaps/static.xml' => [
-                    'contents' => '<urlset>',
-                    'urls' => 1,
-                ],
-            ];
-        }
-    };
+        app(PublicQuestionCatalogService::class)
+    );
 
     $exception = null;
 
