@@ -1036,7 +1036,7 @@ Computed blocking/warning items.
 - spadek corpus poniżej baseline po publikacji daje warning/wyłączenie z promocji, ale nie automatyczny HTTP flip,
 - explicit topic archive usuwa go z sitemap/nav i zwraca 410 dla wcześniej publicznego URL.
 
-**Stan tego cross-stage punktu DoD:** domenowe `archived` i blokada dalszej promocji są wdrożone w N2-011, ale publiczny route/410 należy do N4-007, a sitemap coverage/exclusion do N5-001. Te publiczne elementy pozostają otwarte i nie są dowodem zamknięcia N2/G2.
+**Stan tego cross-stage punktu DoD:** domenowe `archived` i blokada dalszej promocji są wdrożone w N2-011, a publiczny route/410 został domknięty przez N4-007. Sitemap coverage/exclusion nadal należy do N5-001. N4-007 nie zmienia faktu, że N2/G2 było zamknięte wcześniej na poziomie domeny/CMS.
 
 ---
 
@@ -1211,7 +1211,7 @@ Dodatkowo:
 - publiczny controller podłącza metadata z N3-002 i graph z N3-003 do istniejącego `public-content` layoutu,
 - publiczne sources obejmują wyłącznie `is_publicly_cited=true`; private evidence i `image_license_note` nie są emitowane,
 - hero zachowuje alt, caption, credit, dimensions, focal `object-position` i preload/fetch priority contract,
-- top-level `/aktualnosci` i `/poradniki` pozostają pre-launch placeholderami; category/topic/feed pozostają downstream N4/N5,
+- top-level `/aktualnosci` i `/poradniki` są dziś rollout-gated publicznymi hubami (placeholder/noindex tylko przy gate=false); category pages są publiczne od N4-003, topic dossier od N4-007, a feed pozostaje downstream N5,
 - historyczny old-path -> 301 pozostaje NEWSROOM-N3-006; `NEWSROOM_PUBLIC_ENABLED` pozostaje NEWSROOM-N3-008.
 
 ### Zakres
@@ -1379,12 +1379,12 @@ Rozszerzyć istniejący publiczny profil `ContentAuthor` o Newsroom bez tworzeni
 - `config/newsroom.php` czyta `NEWSROOM_PUBLIC_ENABLED` z bezpiecznym defaultem `false`; `.env.example` również utrwala `NEWSROOM_PUBLIC_ENABLED=false`,
 - `NewsroomPublicGate` jest jednym prostym source of truth dla publicznego dark-deploy gate; nie dodano równoległego feature-flag frameworka,
 - przy `false` `ContentArticleController` failuje zamknięcie do publicznego 404 przed lookupem artykułu i przed historycznym redirect resolverem, więc zarówno current detail, jak i old-path 301 nie ujawniają dark-deployed content,
-- top-level `/aktualnosci` i `/poradniki` zachowują istniejący pre-launch placeholder 200 z `X-Robots-Tag: noindex, follow`; category/topic/feed nadal pozostają niezaimplementowanymi publicznie 404 zgodnie z N4/N5,
+- przy `false` top-level `/aktualnosci` i `/poradniki` zachowują pre-launch placeholder 200 z `X-Robots-Tag: noindex, follow`, a article/category/topic routes failują do 404 przed ujawnieniem publicznego corpus; przy `true` home/category/guides/topic surfaces są aktywne po N4-002/N4-003/N4-004/N4-007, natomiast feed pozostaje 404 do N5,
 - przy `false` profil autora nie pobiera publikacji Newsroomu, a `SeoSitemapBuilder` nie kwalifikuje newsroom-only authora ani nie dodaje newsroomowego `public_state_changed_at` do freshness author sitemap,
 - `IndexNowUrlCollector` defensywnie odrzuca namespace `/aktualnosci` i `/poradniki` przy wyłączonym gate; faktyczna article-specific automatyzacja IndexNow nadal należy do N5-005,
 - admin/data i authenticated private preview pozostają dostępne przy `false`,
-- istniejące public-article testy i dedykowany Browser Smoke jawnie ustawiają gate na `true`; `NewsroomPublicGateTest` pokrywa disabled/enabled state dla news + guide detail, old-path redirect, placeholderów, category/topic/feed 404, author discovery, author sitemap contribution, IndexNow collector i private preview,
-- reverse links, public hub/category/topic, feed oraz article/news sitemap nadal nie istnieją; przyszłe N4/N5 implementacje muszą konsumować ten sam gate zamiast tworzyć własne przełączniki.
+- istniejące publiczne testy i dedykowane Browser Smoke jawnie ustawiają gate na `true`; `NewsroomPublicGateTest` pokrywa disabled/enabled state dla news + guide detail, old-path redirect, top-level placeholderów, category/topic gate behavior, feed 404, author discovery, author sitemap contribution, IndexNow collector i private preview,
+- public hub/category/guides/topic konsumują dziś ten sam gate; reverse links, feed oraz article/news sitemap nadal nie istnieją i N4-008/N5 muszą nadal używać tego samego `NewsroomPublicGate` zamiast tworzyć własne przełączniki.
 
 
 ### Cel
@@ -1460,7 +1460,7 @@ Wdrożyć publiczną warstwę bez natychmiastowego przełączania istniejących 
 - przy `NEWSROOM_PUBLIC_ENABLED=false` `NewsroomHomeReadModelService::build()` zwraca `null`, a controller zachowuje dotychczasowy `Public/MarketingPlaceholder` 200 + `X-Robots-Tag: noindex, follow`,
 - przy `NEWSROOM_PUBLIC_ENABLED=true` controller renderuje SSR `resources/views/newsroom/home.blade.php` z istniejącego N4-001 read modelu i ustawia self-canonical oraz `index,follow,max-image-preview:large`,
 - Hub Blade renderuje tylko niepuste moduły: newsroom subnavigation, important-now, breaking, lead/secondary, latest, category blocks, guides i Product Bridge; brak danych nie tworzy sztucznych kart ani pustych placeholderów,
-- category links w samym hubie nie otwierają jeszcze downstream category pages: subnavigation kotwiczy do sekcji na `/aktualnosci`; publiczne category/topic/feed routes pozostają 404 do kolejnych tasków,
+- subnavigation kategorii nadal kotwiczy do sekcji na `/aktualnosci`, ale category blocks mają crawlable wejścia do publicznych category pages od N4-003; publiczny topic route istnieje od N4-007, jego jawne discovery/reverse links pozostają N4-008, a feed pozostaje 404 do N5,
 - Product Bridge reużywa istniejący route `public.tests`; wspólny `layouts.public-content`, header i footer pozostają bez zmian,
 - `tests/Feature/NewsroomHomePageTest.php` pokrywa gate=false, gate=true i empty-section behavior; istniejące `NewsroomPublicGateTest` i `Public/NewsroomRouteContractTest` zostały zsynchronizowane z nowym enabled-state huba,
 - dedykowany `scripts/e2e-newsroom-home.mjs` działa z JavaScript disabled, realnym built CSS i viewportami 360/390/430/768/1024/1280/1440; workflow `Browser Smoke` ma automatyczny job `newsroom-home` dla relewantnych PR-ów.
