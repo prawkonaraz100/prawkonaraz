@@ -1751,24 +1751,49 @@ Site-wide orphan/click-depth crawler/komenda pozostaje osobnym możliwym hardeni
 
 ## NEWSROOM-N5-002 — News sitemap
 
-- current Google constraints reverified at implementation,
-- recent news eligibility po `first_published_at`, nie po updated/published refresh,
-- tylko type=news + published + indexable,
-- news:name = canonical publication name,
-- news:language = pl,
-- news:publication_date = original first_published_at,
-- news:title = visible title bez author/brand/date,
-- split powyżej aktualnego limitu entry,
-- sitemap index integration,
-- statyczny output generowany przez istniejący generator,
-- `news:name` po launch porównane z nazwą publikacji widoczną w Google News.
+### Status implementacji
+
+**DONE w kodzie — PR #99 zmergowano na `main@827f3816487d3a404df26c381a103a6cd1a9f413`.** Finalny implementation head `9bc16a7e42ae55c23b1916a4e214b9af846fd3dd` przeszedł exact-head CI #371; post-merge CI #372 na exact `main` również zakończył pełny PASS.
+
+### Aktualny stan implementacji
+
+- aktualne wymagania Google News Sitemap zostały ponownie zweryfikowane przy implementacji: 2-dniowe okno po pierwotnej publikacji, maks. 1000 `news:news` entries na plik oraz wymagane `news:name`, `news:language`, `news:publication_date`, `news:title`,
+- istniejące `SeoSitemapBuilder`, `SeoSitemapGenerator` i `SeoSitemapXmlRenderer` zostały rozszerzone; nie powstał drugi sitemap engine,
+- przy `NEWSROOM_PUBLIC_ENABLED=false` News Sitemap nie jest generowana ani wpisywana do root `/sitemap.xml`,
+- eligibility wymaga `type=news`, aktywnej dystrybucji, statusu `published`, indexable, aktywnej kategorii, publicznego autora i current-canonical path niekolidującego z historycznym redirect source,
+- okno świeżości jest liczone wyłącznie po `first_published_at >= now()-2 days`; nowszy `published_at`, `last_substantive_update_at` lub `public_state_changed_at` nie przywraca starego artykułu do News Sitemap,
+- `news:name` korzysta z istniejącego canonical publication identity przez `SiteIdentitySchema::siteName()`; nie dodano równoległego configu,
+- `news:language=pl`, `news:publication_date=first_published_at` w ISO/W3C, a `news:title` używa widocznego `ContentArticle.title`, nie SEO title ani brandingu,
+- przy maks. 1000 kwalifikowanych wpisów generator używa `/sitemaps/news.xml`; powyżej limitu generuje stabilne fixed-`content_articles.id` range shards i wpisuje je bezpośrednio do istniejącego root sitemap index,
+- istniejący `SeoSitemapAuditor` dopuszcza legalny overlap URL-i pomiędzy standard article sitemap i News Sitemap; pełne namespace/tag/age/shard audit rules pozostają osobnym NEWSROOM-N5-006,
+- N5-002 nie wdraża feedu, dirty/version refresh coordinatora, child-before-index atomic publication/obsolete-shard cleanup, article-specific IndexNow ani produkcyjnej weryfikacji Nginx/CDN/GSC.
+
+### Zakres
+
+- [x] current Google constraints reverified at implementation,
+- [x] recent news eligibility po `first_published_at`, nie po updated/published refresh,
+- [x] tylko type=news + published + indexable,
+- [x] news:name = canonical publication name,
+- [x] news:language = pl,
+- [x] news:publication_date = original first_published_at,
+- [x] news:title = visible title bez author/brand/date,
+- [x] split powyżej aktualnego limitu entry,
+- [x] sitemap index integration,
+- [x] statyczny output generowany przez istniejący generator,
+- [ ] `news:name` po launch porównane z nazwą publikacji widoczną w Google News.
 
 ### Testy
 
-- old updated article nie wraca do news sitemap,
-- required namespace/tags,
-- publication date timezone/format,
-- 1000-entry boundary zgodnie z aktualną specyfikacją.
+- [x] old updated article nie wraca do news sitemap,
+- [x] required namespace/tags,
+- [x] publication date timezone/format,
+- [x] 1000-entry boundary zgodnie z aktualną specyfikacją,
+- [x] public-gate suppression, non-news/status/noindex/category/author/redirect-source exclusions.
+
+### Dowód Quality Gate
+
+- exact-head CI #371: 1100 passed / 19 964 assertions / 2 skipped, `newsroom-postgres` 7 passed / 94 assertions, Pint PASS, frontend build PASS,
+- post-merge CI #372 na `main@827f3816487d3a404df26c381a103a6cd1a9f413`: 1100 passed / 19 964 assertions / 2 skipped, `newsroom-postgres` 7 passed / 94 assertions, Pint PASS, frontend build PASS.
 
 ---
 
@@ -2429,13 +2454,22 @@ Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-008 na `main@3d7ac8ab8a3ed1c299cb0c
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N5-002 — News sitemap.
+NEWSROOM-N5-003 — RSS/Atom feed + discovery.
 
-N5-001 jest zamknięte implementacyjnie po PR #97, exact-head CI #367 i post-merge CI #368 na `main@5ddfa48c0646fa89cc802d129e6d9ccee9d18957`. Następny krok wdraża osobną statyczną news sitemap zgodnie z istniejącym kontraktem N5-002. Feed, atomic publication, dirty/version refresh, analytics i IndexNow pozostają własnymi kolejnymi taskami N5.
+N5-002 jest zamknięte implementacyjnie po PR #99, exact-head CI #371 i post-merge CI #372 na `main@827f3816487d3a404df26c381a103a6cd1a9f413`. Następny krok wdraża istniejący route contract feedu, stabilne GUID/Atom IDs i discovery links zgodnie z NEWSROOM-N5-003. Atomic publication, dirty/version refresh, analytics, IndexNow oraz namespace-specific sitemap audit pozostają własnymi późniejszymi taskami N5.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-18 — v0.47
+
+- NEWSROOM-N5-002 zmergowano przez PR #99; finalny implementation head `9bc16a7e42ae55c23b1916a4e214b9af846fd3dd`, merge `main@827f3816487d3a404df26c381a103a6cd1a9f413`,
+- News Sitemap reużywa istniejący static sitemap pipeline i rollout gate; corpus to wyłącznie świeże `type=news`, `published`, indexable current-canonical articles z aktywną kategorią i publicznym autorem,
+- eligibility czasowa jest liczona po `first_published_at`; aktualizacja starego artykułu nie przywraca go do 2-dniowego Google News window,
+- wymagane news metadata używa istniejącego canonical publication identity, języka `pl`, pierwotnej daty publikacji i widocznego title; limit 1000 entries/file jest chroniony przez deterministic fixed-ID-range split,
+- exact-head CI #371 i post-merge CI #372 zakończyły pełny PASS: 1100 passed / 19 964 assertions / 2 skipped, Pint PASS, frontend build PASS i PostgreSQL 7/94,
+- N5-002 nie wdraża feedu, namespace-specific newsroom/news audytora, child-before-index atomic publication/obsolete-shard cleanup, dirty/version coordinatora, article-specific IndexNow ani production static/Nginx/CDN/GSC verification; następnym taskiem jest NEWSROOM-N5-003.
 
 ### 2026-09-18 — v0.46
 
