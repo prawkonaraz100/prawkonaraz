@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Enums\ContentArticleType;
+use App\SEO\Schema\SiteIdentitySchema;
 use Illuminate\Support\Carbon;
 
 final class NewsroomFeedService
@@ -13,7 +14,7 @@ final class NewsroomFeedService
         private readonly ContentArticlePublicCatalogService $catalog,
         private readonly NewsroomPublicReadCache $cache,
         private readonly NewsroomPublicGate $publicGate,
-        private readonly \App\SEO\Schema\SiteIdentitySchema $siteIdentity,
+        private readonly SiteIdentitySchema $siteIdentity,
     ) {}
 
     /**
@@ -30,7 +31,8 @@ final class NewsroomFeedService
      *         link:string,
      *         published:string,
      *         updated:string,
-     *         summary:string
+     *         summary:string,
+     *         author:string|null
      *     }>
      * }|null
      */
@@ -57,7 +59,8 @@ final class NewsroomFeedService
      *         link:string,
      *         published:string,
      *         updated:string,
-     *         summary:string
+     *         summary:string,
+     *         author:string|null
      *     }>
      * }  $feed
      */
@@ -82,6 +85,13 @@ final class NewsroomFeedService
             $xml[] = '        <published>'.$this->escape($item['published']).'</published>';
             $xml[] = '        <updated>'.$this->escape($item['updated']).'</updated>';
             $xml[] = '        <summary type="text">'.$this->escape($item['summary']).'</summary>';
+
+            if ($item['author'] !== null) {
+                $xml[] = '        <author>';
+                $xml[] = '            <name>'.$this->escape($item['author']).'</name>';
+                $xml[] = '        </author>';
+            }
+
             $xml[] = '    </entry>';
         }
 
@@ -104,7 +114,8 @@ final class NewsroomFeedService
      *         link:string,
      *         published:string,
      *         updated:string,
-     *         summary:string
+     *         summary:string,
+     *         author:string|null
      *     }>
      * }
      */
@@ -135,6 +146,9 @@ final class NewsroomFeedService
                     'published' => $publishedAt->toAtomString(),
                     'updated' => $updatedAt->toAtomString(),
                     'summary' => trim(strip_tags((string) $article->lead)),
+                    'author' => $article->author?->is_published === true
+                        ? trim((string) $article->author->name)
+                        : null,
                 ];
             })
             ->values()
