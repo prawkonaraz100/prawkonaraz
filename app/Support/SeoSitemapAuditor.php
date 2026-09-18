@@ -80,7 +80,7 @@ class SeoSitemapAuditor
                 $this->validateLoc($url, $relativePath, $errors);
                 $isVideoSitemap = $relativePath === 'sitemaps/videos.xml';
                 $isNewsSitemap = $relativePath === ltrim(SeoSitemapBuilder::NEWS_SITEMAP_PATH, '/')
-                    || preg_match('#^sitemaps/news-\d{6}-\d{6}\.xml$#', $relativePath) === 1;
+                    || preg_match('#^sitemaps/news-\d+-\d+\.xml$#', $relativePath) === 1;
                 $isSupplementalSitemap = $isVideoSitemap || $isNewsSitemap;
 
                 if (! $isSupplementalSitemap && isset($allLocs[$url])) {
