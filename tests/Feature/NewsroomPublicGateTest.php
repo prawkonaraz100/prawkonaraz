@@ -47,7 +47,8 @@ test('disabled newsroom public gate prevents dark deployed public discovery whil
 
     $this->get(route('public.news'))
         ->assertOk()
-        ->assertHeader('X-Robots-Tag', 'noindex, follow');
+        ->assertHeaderMissing('X-Robots-Tag')
+        ->assertViewIs('newsroom.home');
 
     $this->get(route('public.guides'))
         ->assertOk()
