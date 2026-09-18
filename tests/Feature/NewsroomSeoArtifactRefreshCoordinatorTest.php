@@ -1,5 +1,8 @@
 <?php
 
+use App\Events\ContentArticlePublicReadChanged;
+use App\Events\ContentArticleWorkflowTransitioned;
+use App\Events\ContentHomePlacementChanged;
 use App\Support\NewsroomSeoArtifactRefreshCoordinator;
 use App\Support\SeoSitemapAuditor;
 use App\Support\SeoSitemapGenerator;
@@ -28,6 +31,23 @@ it('tracks dirty versions and clears only an unchanged version', function () {
         ->and($coordinator->markDirty())->toBe(3)
         ->and($coordinator->markCleanIfUnchanged(2))->toBeFalse()
         ->and($coordinator->cleanVersion())->toBe(1)
+        ->and($coordinator->isDirty())->toBeTrue();
+});
+
+it('marks SEO artifacts dirty from public newsroom lifecycle events', function () {
+    $coordinator = app(NewsroomSeoArtifactRefreshCoordinator::class);
+
+    ContentArticleWorkflowTransitioned::dispatch(
+        10,
+        'content_article.published',
+        'review',
+        'published',
+        'user',
+    );
+    ContentArticlePublicReadChanged::dispatch(10, 'content_article.public_updated');
+    ContentHomePlacementChanged::dispatch(20, 'content_home_placement.updated');
+
+    expect($coordinator->currentVersion())->toBe(3)
         ->and($coordinator->isDirty())->toBeTrue();
 });
 
