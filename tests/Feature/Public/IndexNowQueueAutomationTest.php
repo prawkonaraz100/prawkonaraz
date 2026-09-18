@@ -149,7 +149,10 @@ test('indexnow queue drain submits a small due batch and marks rows as sent', fu
 
     Http::assertSent(function (Request $request): bool {
         return $request->url() === 'https://api.indexnow.test/indexnow'
-            && $request['urlList'] === ['https://prawkonaraz.pl/pytanie/8216/czy-mozesz-cofac'];
+            && $request['host'] === 'prawkonaraz.pl'
+            && $request['key'] === 'indexnow-test-queue'
+            && $request['urlList'] === ['https://prawkonaraz.pl/pytanie/8216/czy-mozesz-cofac']
+            && ! isset($request['event_type']);
     });
 
     $submission->refresh();
