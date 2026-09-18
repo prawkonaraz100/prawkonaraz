@@ -173,7 +173,10 @@ Docelowy zestaw publiczny:
 /sitemaps/traffic-sign-categories.xml
 /sitemaps/traffic-sign-supporting-pages.xml
 /sitemaps/authors.xml
+/sitemaps/articles.xml
 ```
+
+Dla newsroomu `/sitemaps/articles.xml` jest nazwą pojedynczego pliku przy małym corpus. Po przekroczeniu skonfigurowanego zakresu N5-001 generuje stabilne shard files `/sitemaps/articles-{id-range}.xml` i wpisuje je bezpośrednio do głównego `/sitemap.xml`; nie powstaje zagnieżdżony newsroom sitemap-index.
 
 `/sitemap.xml` ma byc sitemap index, czyli lista child sitemap.
 
@@ -768,6 +771,22 @@ Uwagi przed deployem:
 - po deployu trzeba uruchomic `php artisan seo:generate-sitemaps` na serwerze w katalogu widzianym przez nginx,
 - potem koniecznie `php artisan seo:audit-sitemaps`,
 - jesli publiczny `robots.txt` nadal pokazuje Cloudflare Managed Content bez `Sitemap:`, trzeba skorygowac ustawienie Cloudflare albo wyczyscic cache dla `/robots.txt`.
+
+## 9.3. Rozszerzenie Newsroom N5-001 — status kodu 2026-09-18
+
+Potwierdzony stan repo po PR #97, merge `main@5ddfa48c0646fa89cc802d129e6d9ccee9d18957`:
+
+- istniejące `SeoSitemapBuilder`, `SeoSitemapGenerator` i `SeoSitemapAuditor` zostały rozszerzone zamiast tworzenia drugiego generatora,
+- standard article sitemap obejmuje indexable newsroom/guide current-canonical URLs przy aktywnej kategorii i publicznym autorze; noindex/draft/withdrawn oraz canonical path kolidujący z historycznym redirect source są wykluczane,
+- `NEWSROOM_PUBLIC_ENABLED=false` wyłącza article shards i newsroom hub coverage,
+- `static.xml` obejmuje rollout-gated `/aktualnosci`, warunkowo `/poradniki`, aktywne category hubs i published topic hubs,
+- article `lastmod` używa `max(first_published_at, last_substantive_update_at, public_state_changed_at)`, a nie czasu generowania XML,
+- pojedynczy corpus używa `/sitemaps/articles.xml`; większy corpus używa stabilnych fixed-`content_articles.id` range shards bez OFFSET shardingu,
+- root `/sitemap.xml` wskazuje article file/shards bezpośrednio; nie dodano nested newsroom sitemap-index,
+- generator i auditor mają twarde guardy `50 000` entries i `50 MB` nieskompresowanego XML,
+- exact-head CI #367 oraz post-merge CI #368 zakończyły PASS; post-merge: 1098 passed / 19 926 assertions / 2 skipped, Pint PASS, frontend build PASS, PostgreSQL 7/94.
+
+Ten wpis potwierdza **stan kodu i CI**, nie stan produkcyjnego delivery. Nadal nie ma w tym tasku potwierdzenia publicznych Nginx/CDN headers/304, GSC/Bing processing, child-before-index atomic set publication ani obsolete-shard cleanup. Te elementy pozostają osobnymi zadaniami i nie wolno traktować ich jako wykonanych na podstawie N5-001.
 
 ## 9.2. Automatyczne odswiezanie sitemap
 
