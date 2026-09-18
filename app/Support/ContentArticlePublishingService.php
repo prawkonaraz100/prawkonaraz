@@ -661,9 +661,7 @@ final class ContentArticlePublishingService
                 ],
             );
 
-            if ($substantiveChange) {
-                $this->dispatchPublicReadChange($locked, 'content_article.public_updated');
-            }
+            $this->dispatchPublicReadChange($locked, 'content_article.public_updated');
 
             return $locked->refresh();
         });
