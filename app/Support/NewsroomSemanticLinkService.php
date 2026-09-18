@@ -163,7 +163,9 @@ final class NewsroomSemanticLinkService
         return $this->reverseArticles(
             fn (Builder $query): Builder => $query->whereHas(
                 'trafficSigns',
-                fn (Builder $relation): Builder => $relation->whereKey($trafficSignId),
+                fn (Builder $relation): Builder => $relation
+                    ->whereKey($trafficSignId)
+                    ->whereIn('content_article_traffic_sign.relation_type', ['direct', 'example']),
             ),
             $limit,
         );
