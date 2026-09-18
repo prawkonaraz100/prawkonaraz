@@ -6,11 +6,11 @@
 - Obszar: newsroom / media portal
 - Dokument nadrzędny: [NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md](./NEWSROOM-MEDIA-PORTAL-ARCHITECTURE.md)
 - Bazowy stan repo przy projektowaniu: main@6a38c95ce76ee05997977d614d795ed8513462f1
-- Ostatnia weryfikacja zgodności z kodem: main@5f1880e03469fc6e340a86fdb1b4246c7afd116b (2026-09-18)
+- Ostatnia weryfikacja zgodności z kodem: main@a97373003c5a249a28761df15342f19e656c50c5 (2026-09-18)
 - Data: 2026-09-17
 - Zakres: model domenowy, baza danych, invariants, serwisy aplikacyjne, routing domeny i kolejność migracji
 
-Ten dokument opisuje docelowy model danych newsroomu. Schema, modele/factories/scopes oraz serwisy aplikacyjne N1 są zmaterializowane; zakres admin/domain N2 i publiczny article stack N3-001..N3-008 są zmaterializowane, a N4-001..N4-006 obejmuje publiczne hub/category read surfaces, nawigację oraz cache/invalidation dla istniejących home/category read models. Topic/dossier N4-007, reverse links N4-008 i discovery N5 pozostają dalszym etapem. Stan wdrożenia należy czytać z sekcji 43 i aktualizować po każdej zmianie kodu.
+Ten dokument opisuje docelowy model danych newsroomu. Schema, modele/factories/scopes oraz serwisy aplikacyjne N1 są zmaterializowane; zakres admin/domain N2 i publiczny article stack N3-001..N3-008 są zmaterializowane, a N4-001..N4-007 obejmuje publiczne hub/category/guides/topic surfaces, nawigację oraz cache/invalidation dla istniejących home/category read models. Reverse links N4-008 i discovery N5 pozostają dalszym etapem. Stan wdrożenia należy czytać z sekcji 43 i aktualizować po każdej zmianie kodu.
 
 ---
 
@@ -536,7 +536,7 @@ PR #62 materializuje istniejący model topicu i adminowy workflow bez zmian sche
 - eligible corpus liczy istniejącą relację `articles()` przez `activelyDistributed()->indexable()`; pivot nadal nie ma `sort_order`,
 - `ContentTopicResource` zapisuje article membership i featured membership bez tworzenia równoległego modelu lub nowej tabeli oraz pokazuje health/promotability w backoffice,
 - publish/archive/republish zapisują istniejący `AuditLog` z `User` actorem i allowlisted metadata status/corpus/featured,
-- późniejszy spadek corpus poniżej 3 nie mutuje automatycznie statusu; publiczne HTTP topicu nie jest jeszcze podłączone. Route `/aktualnosci/temat/{topicSlug}` pozostaje 404 do N4, a 410 archived topicu i sitemap/nav exclusion pozostają downstream.
+- późniejszy spadek corpus poniżej 3 nie mutuje automatycznie statusu ani HTTP/indexability; od N4-007 route `/aktualnosci/temat/{topicSlug}` renderuje rollout-gated publiczne dossier dla `published`, a wcześniej publiczny `archived` topic zwraca 410 + noindex. Sitemap coverage i reverse-link/nav discovery pozostają downstream N5/N4-008.
 
 ---
 
@@ -1376,10 +1376,10 @@ Kod zawiera:
 - zachowane hub route names `public.news` i `public.guides`,
 - `public.news.feed`, `public.news.categories.show`, `public.news.topics.show`, `public.news.show` i `public.guides.show`,
 - routing namespace/catch-all w kolejności zgodnej z tym dokumentem,
-- `/aktualnosci` i `/poradniki` jako nadal działające placeholdery 200 z `X-Robots-Tag: noindex, follow`,
-- przyszłe feed/category/topic/detail routes jako jawne 404 do czasu wdrożenia odpowiadających controllerów.
+- `/aktualnosci` i `/poradniki` są rollout-gated: przy gate=false zachowują pre-launch placeholder 200 + `X-Robots-Tag: noindex, follow`, a przy gate=true renderują publiczne SSR huby,
+- `public.news.categories.show`, `public.news.topics.show`, `public.news.show` i `public.guides.show` mają publiczne controllery/renderery przy gate=true; `/aktualnosci/feed.xml` pozostaje jawne 404 do N5.
 
-`ContentArticle` istnieje już jako model N1-002, ale publiczne article/category/topic/feed controllery nadal nie istnieją. Z tego powodu record-level family lookup guard pozostaje obowiązkiem downstream N3 i nie jest opisany jako wdrożony.
+`ContentArticle` i `ContentTopic` mają już publiczne route/read boundaries dla article/category/topic/guides. Feed controller nadal nie istnieje; record-level article family guard jest wdrożony przez N3, a topic N4-007 reużywa istniejący `ContentTopic` publish/archival contract bez nowego route modelu.
 
 ---
 
@@ -1757,7 +1757,7 @@ Na 2026-09-18:
 - NEWSROOM-N1-003 jest wdrożone: istnieją `ContentArticleSlugService`, `ContentArticleRedirect`, `ContentArticlePathResolver` i PostgreSQL advisory-lock serialization,
 - NEWSROOM-N1-004 jest wdrożone w zakresie publishing/workflow foundation: istnieją `ContentArticlePublishingService`, `ContentArticleWorkflowTransitioned` i feature regression dla workflow/invariants/audit/after-commit rollback boundary,
 - `/aktualnosci` i `/poradniki` są rollout-gated publicznymi hubami po N4-002/N4-004; przy wyłączonym gate zachowują pre-launch placeholder/noindex,
-- article detail routes `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}` są publicznie podłączone przez N3-004/N3-006, natomiast category/topic/feed pozostają downstream 404 do odpowiednich N4/N5 implementacji,
+- article detail routes `/aktualnosci/{articleSlug}` i `/poradniki/{articleSlug}` są publicznie podłączone przez N3-004/N3-006; category pages są aktywne od N4-003, topic dossier od N4-007, a feed pozostaje downstream 404 do N5,
 - newsroom schema istnieje: `content_categories`, `content_tags`, `content_articles`, `content_topics`, pivots/relations, redirects i `content_home_placements` są tworzone przez 12 migracji,
 - schema i warstwa modelowa są zweryfikowane na SQLite i PostgreSQL 16; `newsroom-postgres` uruchamia migration contract oraz model/scope contract,
 - `ContentCategory` Eloquent model istnieje; N2-001 dodało jego Filament `ContentCategoryResource` oraz modelowe slug/delete/deactivation guards; dedykowany DB seeder kategorii nadal nie istnieje,
@@ -1774,7 +1774,7 @@ Na 2026-09-18:
 - NEWSROOM-N1-006 jest wdrożone: istnieją `NewsroomHomeCompositionService`, `NewsroomHomePlacementService` i niemutujący `ContentArticlePublishingService::assertScheduledPreviewReady()`; overlap/concurrency jest testowane również na PostgreSQL,
 - NEWSROOM-N4-001 jest wdrożone na `main@e0e06e9af8a6b02a63ef4b3e1eb2d772409ad974`: ten sam `NewsroomHomeCompositionService` ma bounded category query plan, a `NewsroomHomeReadModelService` daje gated/cacheable scalar projection bez uruchamiania publicznego huba,
 - N2-010 jest DONE po PR #60: `ContentArticleResource` ma kontrolowane provenance/regulatory fields, hero/OG upload przez `NewsroomArticleMediaService`, verified managed media metadata, focal X/Y i CSS crop previews; `ContentArticlePublicationChecklist` egzekwuje regulatory/source/effective-date coherence oraz ponowną media reinspekcję,
-- admin/domain CMS N2 oraz public article layer N3 są zamknięte; N4-001..N4-006 są zmaterializowane, w tym public home/category/guides surfaces, navigation integration i cache/invalidation home/category read models. Topic/dossier N4-007, reverse links N4-008 i discovery N5 pozostają otwarte.
+- admin/domain CMS N2 oraz public article layer N3 są zamknięte; N4-001..N4-007 są zmaterializowane, w tym public home/category/guides/topic surfaces, navigation integration i cache/invalidation home/category read models. Reverse links N4-008 i discovery N5 pozostają otwarte.
 
 ---
 
@@ -1803,11 +1803,23 @@ Na 2026-09-18:
 - [x] NEWSROOM-N4-001: bounded editorial composition + rollout-gated scalar home read model bez publicznego Hub Blade,
 - [x] NEWSROOM-N4-002: publiczny Hub Blade `/aktualnosci`,
 - [x] NEWSROOM-N4-006: cache/invalidation istniejących publicznych home/category read models bez cache’owania preview,
+- [x] NEWSROOM-N4-007: publiczny rollout-gated topic/dossier route z featured article, mixed-family eligible corpus, SSR pagination i CollectionPage schema,
 - [ ] dodać sitemap/public-discovery regression korzystające wyłącznie z current canonical URL,
 
 ---
 
 ## 45. Historia zmian
+
+### 2026-09-18 — v0.34
+
+- NEWSROOM-N4-007 zmergowano przez PR #93; finalny implementation head `812313afc38e30e53c59901d46c2d24188e3f6fa`, merge `main@a97373003c5a249a28761df15342f19e656c50c5`,
+- istniejący route `/aktualnosci/temat/{topicSlug}` został podłączony do `NewsroomTopicController`; gate=false/draft/future/unknown -> 404 + noindex, wcześniej publiczny archived topic -> 410 + noindex,
+- `NewsroomTopicReadModelService` reużywa istniejący `ContentTopic` i jawny pivot; corpus to `activelyDistributed()+indexable()` news/explainer/analysis/report/guide, featured jest opcjonalnym pojedynczym leadem i nie duplikuje listy, a pozostałe materiały są sortowane `first_published_at DESC, id DESC`,
+- późniejszy spadek corpus poniżej baseline 3 nie wykonuje automatycznego HTTP/indexability flipu; baseline pozostaje gate'em publish/republish zgodnie z wcześniejszą decyzją domenową,
+- `NewsroomTopicSchemaService` emituje `CollectionPage` + `BreadcrumbList` + `ItemList`; page 2+ ma self-canonical `?page=N`, a public renderer jest SSR/Blade bez JS dependency,
+- `NewsroomTopicPageTest`, route/public-gate regressions i dedykowany `newsroom-topic` Browser Smoke chronią HTTP, eligibility, featured dedupe, mixed route families, pagination/canonical i responsive no-overflow,
+- exact-head CI #348 oraz Browser Smoke #39 zakończyły PASS; post-merge CI #349: 1087 passed / 19 827 assertions / 2 skipped, Pint 1081 files PASS, frontend build 9.48 s, PostgreSQL 7 passed / 94 assertions,
+- N4-008 reverse-link integration i N5 discovery pozostają otwarte.
 
 ### 2026-09-18 — v0.33
 
