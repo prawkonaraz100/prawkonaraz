@@ -18,7 +18,8 @@ final class NewsroomSemanticLinkService
 
     public function __construct(
         private readonly NewsroomPublicGate $publicGate,
-    ) {}
+    ) {
+    }
 
     /**
      * @return list<array{id:int,title:string,slug:string,url:string}>
@@ -250,7 +251,7 @@ final class NewsroomSemanticLinkService
             + $article->trafficSigns()->count();
 
         $estimatedHubDepth = match (true) {
-            ! $isIndexable => null,
+            !$isIndexable => null,
             $isActive && $hub !== null && $hub['url'] === route('public.guides', absolute: false) => 1,
             $isActive && $category !== null => 2,
             $author !== null => 3,
