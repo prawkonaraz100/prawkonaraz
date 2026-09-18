@@ -9,6 +9,7 @@
         "e2e:newsroom-category": "node scripts/e2e-newsroom-category.mjs",
         "e2e:newsroom-guides": "node scripts/e2e-newsroom-guides.mjs",
         "e2e:newsroom-home": "node scripts/e2e-newsroom-home.mjs",
+        "e2e:newsroom-semantic-links": "node scripts/e2e-newsroom-semantic-links.mjs",
         "e2e:newsroom-topic": "node scripts/e2e-newsroom-topic.mjs",
         "e2e:public-auth-drawers": "node scripts/e2e-public-auth-drawers.mjs",
         "e2e:smoke": "node scripts/e2e-smoke.mjs",
