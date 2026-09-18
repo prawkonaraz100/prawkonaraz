@@ -250,7 +250,7 @@ Nie publikować:
 
 Repo ma równolegle statyczny `public/robots.txt` i route `RobotsController`. Zgodnie z `SEO-SITEMAP-REPAIR-PLAN.md` produkcyjnie preferowany jest statyczny plik oraz jawna weryfikacja Nginx/Cloudflare.
 
-Globalny `NEWSROOM_PUBLIC_ENABLED=false` jest wdrożony przez N3-008 jako pre-launch/dark-deploy gate. `config/newsroom.php` ma bezpieczny default `false`, a `NewsroomPublicGate` centralizuje decyzję. Przy `false` publiczne article/guide detail oraz historyczne old-path redirecty failują do 404 przed lookupem/redirect resolverem; `/aktualnosci` i `/poradniki` pozostają linkowanymi pre-launch placeholder pages z `X-Robots-Tag: noindex, follow`. Profil autora nie emituje newsroom publications, a `SeoSitemapBuilder` nie uwzględnia newsroom-only author eligibility ani newsroomowego freshness contribution. Istniejący `IndexNowUrlCollector` dodatkowo odrzuca namespace `/aktualnosci` i `/poradniki` przy wyłączonym gate. Od N4-008 semantic/reverse-link resolver failuje do pustego wyniku, a N5-001/N5-002 nie emitują article/news sitemap coverage przy wyłączonym gate. Feed nadal nie istnieje i N5-003 musi konsumować ten sam gate przy wdrożeniu.
+Globalny `NEWSROOM_PUBLIC_ENABLED=false` jest wdrożony przez N3-008 jako pre-launch/dark-deploy gate. `config/newsroom.php` ma bezpieczny default `false`, a `NewsroomPublicGate` centralizuje decyzję. Przy `false` publiczne article/guide detail oraz historyczne old-path redirecty failują do 404 przed lookupem/redirect resolverem; `/aktualnosci` i `/poradniki` pozostają linkowanymi pre-launch placeholder pages z `X-Robots-Tag: noindex, follow`. Profil autora nie emituje newsroom publications, a `SeoSitemapBuilder` nie uwzględnia newsroom-only author eligibility ani newsroomowego freshness contribution. Istniejący `IndexNowUrlCollector` dodatkowo odrzuca namespace `/aktualnosci` i `/poradniki` przy wyłączonym gate. Od N4-008 semantic/reverse-link resolver failuje do pustego wyniku, N5-001/N5-002 nie emitują article/news sitemap coverage, a N5-003 zwraca feed 404 i suppressuje Atom head discovery. Przy `true` N5-003 używa tego samego gate dla feedu i discovery; nie istnieje osobny przełącznik.
 
 Ta flaga jest przede wszystkim **pre-launch/dark-deploy gate**. Po pierwszym publicznym rollout nie używamy długotrwale `false` jako technicznego rollbacku dla już indeksowanych article URLs, jeśli skutkiem byłyby masowe 404. Dla krótkiej awarii technicznej preferujemy kontrolowane 503/Retry-After lub rollback kodu zachowujący publiczne routes; dla pojedynczej błędnej treści używamy `withdrawn`.
 
@@ -1347,8 +1347,8 @@ Przed pierwszym production launch:
 - [ ] publication/publisher/contact transparency widoczna
 - [ ] articles sitemap/shard
 - [ ] production sample News Sitemap potwierdzony HTTP: required tags i `first_published_at` eligibility zgodne z wdrożonym N5-002
-- [ ] feed + head auto-discovery
-- [ ] sitemap/feed HTTP validator + 304 sample
+- [ ] production sample Atom feed + head auto-discovery potwierdzony na publicznym środowisku
+- [ ] produkcyjny sitemap/feed HTTP validator + 304 sample na faktycznej warstwie delivery
 - [ ] Search Console main sitemap index submit
 - [ ] URL Inspection sample
 - [ ] max-image-preview:large
@@ -1588,11 +1588,11 @@ Obecnie:
 - HomePageController korzysta z kanonicznego Organization/WebSite graph; legacy „Orły na Drodze” nie jest już emitowane przez homepage,
 - wspólny public-content layout emituje `og:site_name` z kanonicznego identity,
 - istnieje również runtime `SitemapController`, ale statyczne pliki są nadrzędnym produkcyjnym modelem; samo dodanie headerów do kontrolera nie rozwiązuje static delivery,
-- newsroom Article schema graph istnieje przez `ContentArticleSchemaService` po NEWSROOM-N3-003 i jest emitowany przez publiczny article HTTP renderer od N3-004; od NEWSROOM-N5-002 istnieje statyczna rollout-gated News Sitemap, natomiast feed nadal nie istnieje,
+- newsroom Article schema graph istnieje przez `ContentArticleSchemaService` po NEWSROOM-N3-003 i jest emitowany przez publiczny article HTTP renderer od N3-004; od NEWSROOM-N5-002 istnieje statyczna rollout-gated News Sitemap, a od NEWSROOM-N5-003 publiczny rollout-gated Atom 1.0 feed z auto-discovery i application-level validators,
 - newsroom dirty/version refresh coordinator i atomowy child-before-index switch nie istnieją,
 - repo nie gwarantuje async Laravel queue workera (`QUEUE_CONNECTION=sync` w env example), więc newsroom nie może opierać freshness na ShouldQueue,
 - po NEWSROOM-N4-002 `/aktualnosci` jest rollout-gated: przy `NEWSROOM_PUBLIC_ENABLED=false` pozostaje pre-launch placeholderem 200 + `X-Robots-Tag: noindex, follow`, a przy `true` renderuje SSR `newsroom.home` z self-canonical i `index,follow,max-image-preview:large`; od N4-004 `/poradniki` konsumuje ten sam gate: przy `false` pozostaje placeholderem 200 + noindex, a przy `true` renderuje SSR `newsroom.guides`,
-- `/aktualnosci/feed.xml` ma zarejestrowany route contract, ale obecnie zwraca 404; feed ani feed discovery nie są jeszcze wdrożone,
+- `/aktualnosci/feed.xml` przy gate=true zwraca Atom 1.0 `application/atom+xml` z ETag/Last-Modified/public Cache-Control i conditional 304, a przy gate=false zwraca 404; crawlable public newsroom/guide surfaces emitują Atom discovery w head,
 - category route `/aktualnosci/kategoria/{categorySlug}` jest od N4-003 aktywnym publicznym SSR surface przy gate=true; od N4-007 topic route `/aktualnosci/temat/{topicSlug}` renderuje publiczne SSR dossier dla opublikowanego topicu, a article detail routes są aktywne od N3-004.
 - NEWSROOM-N4-008 materializuje istniejący semantic graph bez nowej schema: article/guide detail linkuje primary category, jawne published topics i deterministic related articles (max 4), a question/legal/sign surfaces renderują bounded reverse links (max 3) z istniejących newsroom pivots,
 - reverse/related eligibility wymaga `activelyDistributed()+indexable()`, aktywnej kategorii i publicznego autora; TrafficSign dopuszcza tylko `direct|example`, a question graph (`question_relations`, `question_seo_topics`, rankingi) pozostaje nietknięty,
@@ -1602,7 +1602,7 @@ Obecnie:
 - NEWSROOM-N5-002 rozszerza ten sam static pipeline o News Sitemap: gate=true emituje wyłącznie `type=news`, aktywnie dystrybuowane `published` + indexable current-canonical articles z aktywną kategorią i publicznym autorem, kwalifikowane wyłącznie przez `first_published_at >= now()-2 days`,
 - `news:name` reużywa canonical identity z `SiteIdentitySchema::siteName()`, `news:language=pl`, `news:publication_date=first_published_at`, a `news:title` bierze widoczny `ContentArticle.title`; przy <=1000 entries używany jest `/sitemaps/news.xml`, a powyżej limitu deterministic fixed-ID-range shards trafiają bezpośrednio do root `/sitemap.xml`,
 - istniejący `SeoSitemapAuditor` dopuszcza legalny overlap URL pomiędzy standard article sitemap i News Sitemap; pełne newsroom/news namespace, age, required-tag i shard audit rules pozostają otwarte w N5-006,
-- NEWSROOM-N3-008 jest wdrożone, N4-002 konsumuje ten sam gate dla publicznego huba `/aktualnosci`, N4-003 dla category pages, N4-004 dla `/poradniki`, N4-007 dla topic dossier, N4-008 dla topic/related/reverse-link resolvers, N5-001 dla standard article sitemap/hub coverage, a N5-002 dla News Sitemap. Przy gate=false category/topic routes failują do 404, top-level `/poradniki` pozostaje noindex placeholderem, N4-008 nie emituje reverse targets, a N5-001/N5-002 nie emitują newsroom article/news sitemap discovery; przy gate=true opublikowany topic ma self-canonical `index,follow,max-image-preview:large`, draft/future/unknown pozostają 404, a historyczny archived topic zwraca 410 + noindex. Feed i article-specific IndexNow automation pozostają otwarte w N5.
+- NEWSROOM-N3-008 jest wdrożone, N4-002 konsumuje ten sam gate dla publicznego huba `/aktualnosci`, N4-003 dla category pages, N4-004 dla `/poradniki`, N4-007 dla topic dossier, N4-008 dla topic/related/reverse-link resolvers, N5-001 dla standard article sitemap/hub coverage, N5-002 dla News Sitemap, a N5-003 dla Atom feed/discovery. Przy gate=false category/topic/feed routes failują do 404, top-level `/poradniki` pozostaje noindex placeholderem, N4-008 nie emituje reverse targets, N5-001/N5-002 nie emitują newsroom article/news sitemap discovery, a feed discovery jest suppressowane; przy gate=true opublikowany topic ma self-canonical `index,follow,max-image-preview:large`, draft/future/unknown pozostają 404, a historyczny archived topic zwraca 410 + noindex. Article-specific IndexNow automation pozostaje otwarte w N5.
 
 ---
 
@@ -1623,7 +1623,7 @@ Obecnie:
 - [ ] wdrożyć dirty/version refresh coordinator + frequent scheduler lock; zachować daily cron jako safety net i nie wymagać queue workera,
 - [ ] rozszerzyć istniejący sitemap auditor o newsroom/news namespace-specific checks; N5-001 dodało ogólne entry-count/byte-size guards, a N5-002 tylko legalny article/news overlap handling bez pełnego namespace/age/tag audit,
 - [ ] zweryfikować rzeczywiste static/Nginx/CDN headers/304 bez przenoszenia source of truth do SitemapController,
-- [ ] wdrożyć feed + auto-discovery + własne validators,
+- [x] wdrożyć Atom feed + auto-discovery + application-level validators w NEWSROOM-N5-003,
 - [ ] wdrożyć analytics hooks/events,
 - [x] wdrożyć N4-003 category SEO: self-canonical pagination, category title/description fallback, `CollectionPage` + `BreadcrumbList` oraz conditional `ItemList`,
 - [x] wdrożyć N4-004 guide-hub SEO: self-canonical pagination, empty-hub noindex, `CollectionPage` + `BreadcrumbList` oraz conditional `ItemList`,
@@ -1636,6 +1636,16 @@ Obecnie:
 ---
 
 ## 70. Historia zmian
+
+### 2026-09-18 — v0.21
+
+- NEWSROOM-N5-003 zmergowano przez PR #101 na `main@18cd07233e3c8712cf2c7fc9e0c32018baef65d3`; finalny implementation head `1c89f370e899895eb25ac80bd437b19c1797a9ec`,
+- `/aktualnosci/feed.xml` ma jeden Atom 1.0 output dla latest aktywnie dystrybuowanych newsów: stable URN po article id, absolute canonical links, original publish i substantive-update timestamps, summary i public author,
+- feed/discovery respektują istniejący `NewsroomPublicGate`; gate=false -> feed 404 + brak discovery, gate=true -> Atom discovery na crawlable newsroom/guide surfaces,
+- application response ma public Cache-Control, ETag, Last-Modified, conditional 304, no-sniff i brak session cookie; production CDN/Nginx behavior nadal wymaga osobnego smoke i nie jest deklarowane jako potwierdzone,
+- generation cache reużywa `NewsroomPublicReadCache` i istniejące after-commit invalidation; N5-003 nie wdraża dirty/version sitemap coordinatora,
+- exact-head CI #380 + Browser Smoke #54 oraz post-merge CI #381 były pełnym PASS; post-merge: 1104 passed / 20 024 assertions / 2 skipped, Pint PASS, build 6.21 s, PostgreSQL 7/94,
+- następnym taskiem jest NEWSROOM-N5-004 Analytics hooks; article-specific IndexNow, sitemap audit hardening i static publication/freshness pozostają otwarte.
 
 ### 2026-09-18 — v0.20
 
