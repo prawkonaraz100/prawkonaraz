@@ -10,12 +10,53 @@ use App\Models\LicenseCategory;
 use App\Models\Question;
 use App\Models\QuestionMedia;
 use App\Models\QuestionPublicExplanation;
+use App\Support\PublicQuestionCatalogService;
 use App\Support\QuestionVideoSeoDescriptionService;
 use App\Support\SeoSitemapBuilder;
 use App\Support\SeoSitemapGenerator;
+use App\Support\SeoSitemapXmlRenderer;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\URL;
+
+final class RecordingSeoSitemapGenerator extends SeoSitemapGenerator
+{
+    /**
+     * @var list<string>
+     */
+    public array $writes = [];
+
+    protected function writeAtomically(string $path, string $contents): void
+    {
+        $relativePath = str_replace(
+            '\\\\',
+            '/',
+            str_replace(public_path().DIRECTORY_SEPARATOR, '', $path),
+        );
+
+        $this->writes[] = $relativePath;
+    }
+}
+
+final class InvalidXmlSeoSitemapGenerator extends SeoSitemapGenerator
+{
+    /**
+     * @return array<string, array{contents:string,urls:int}>
+     */
+    protected function buildFiles(): array
+    {
+        return [
+            'sitemap.xml' => [
+                'contents' => '<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></sitemapindex>',
+                'urls' => 0,
+            ],
+            'sitemaps/static.xml' => [
+                'contents' => '<urlset>',
+                'urls' => 1,
+            ],
+        ];
+    }
+}
 
 beforeEach(function (): void {
     config()->set('app.url', 'https://prawkonaraz.pl');
@@ -456,6 +497,67 @@ test('seo refresh command generates files and runs the audit', function () {
 
     expect(File::exists(public_path('sitemap.xml')))->toBeTrue();
     expect(File::exists(public_path('sitemaps/questions-b.xml')))->toBeTrue();
+});
+
+test('sitemap publication writes the root index after every child payload', function () {
+    $generator = new RecordingSeoSitemapGenerator(
+        app(SeoSitemapBuilder::class),
+        app(SeoSitemapXmlRenderer::class),
+        app(PublicQuestionCatalogService::class)
+    );
+
+    $generator->generate();
+
+    expect($generator->writes)->not->toBeEmpty();
+    expect($generator->writes[array_key_last($generator->writes)])->toBe('sitemap.xml');
+    expect(array_slice($generator->writes, 0, -1))->not->toContain('sitemap.xml');
+});
+
+test('sitemap payload validation happens before the published set is changed', function () {
+    File::ensureDirectoryExists(public_path('sitemaps'));
+    File::put(public_path('sitemap.xml'), 'previous-root-index');
+    File::put(public_path('sitemaps/static.xml'), 'previous-static-child');
+
+    $generator = new InvalidXmlSeoSitemapGenerator(
+        app(SeoSitemapBuilder::class),
+        app(SeoSitemapXmlRenderer::class),
+        app(PublicQuestionCatalogService::class)
+    );
+
+    $exception = null;
+
+    try {
+        $generator->generate();
+    } catch (RuntimeException $caught) {
+        $exception = $caught;
+    }
+
+    expect($exception)->toBeInstanceOf(RuntimeException::class);
+    expect($exception?->getMessage())->toContain('Generated sitemap XML is invalid: sitemaps/static.xml');
+    expect(File::get(public_path('sitemap.xml')))->toBe('previous-root-index');
+    expect(File::get(public_path('sitemaps/static.xml')))->toBe('previous-static-child');
+});
+
+test('sitemap publication removes only obsolete newsroom sitemap files after the switch', function () {
+    File::ensureDirectoryExists(public_path('sitemaps'));
+    File::put(public_path('sitemaps/articles-000001-000002.xml'), '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>');
+    File::put(public_path('sitemaps/news.xml'), '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>');
+    File::put(public_path('sitemaps/unrelated.xml'), '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>');
+
+    config()->set('newsroom.public_enabled', false);
+
+    $this->artisan('seo:generate-sitemaps')
+        ->assertSuccessful();
+
+    expect(File::exists(public_path('sitemaps/articles-000001-000002.xml')))->toBeFalse();
+    expect(File::exists(public_path('sitemaps/news.xml')))->toBeFalse();
+    expect(File::exists(public_path('sitemaps/unrelated.xml')))->toBeTrue();
+
+    $index = File::get(public_path('sitemap.xml'));
+
+    expect($index)
+        ->not->toContain('/sitemaps/articles')
+        ->not->toContain('/sitemaps/news');
 });
 
 test('newsroom article sitemap includes only indexable canonical public articles and indexable hubs', function () {
