@@ -69,6 +69,7 @@
                         data-article-type="{{ $leadGuide['type'] }}"
                         data-category-slug="{{ $leadGuide['category']['slug'] ?? '' }}"
                         data-newsroom-analytics-module="guides"
+                        data-newsroom-analytics-position="lead"
                     >
                         <div class="min-w-0">
                             <div class="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-[0.1em]">
@@ -118,6 +119,7 @@
                                 data-article-type="{{ $guide['type'] }}"
                                 data-category-slug="{{ $guide['category']['slug'] ?? '' }}"
                                 data-newsroom-analytics-module="guides"
+                                data-newsroom-analytics-position="{{ $loop->iteration }}"
                             >
                                 @if (! empty($guide['hero']))
                                     <a href="{{ $guide['url'] }}" class="mb-4 block overflow-hidden bg-slate-100">
