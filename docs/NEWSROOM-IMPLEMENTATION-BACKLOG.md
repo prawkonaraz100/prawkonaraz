@@ -2237,6 +2237,13 @@ Workflow działa:
 - sprawdza rollout-gated Atom feed i discovery,
 - przy podaniu próbek sprawdza article/category/topic canonical, graph identity oraz article visible-date vs `datePublished`/`dateModified`.
 
+PR #129 rozszerzył ten sam validator o canonical-host migration evidence dla produkcyjnego originu bez zmiany aplikacji/Nginx/rollout:
+
+- `http://prawkonaraz.pl/`, `https://www.prawkonaraz.pl/`, `http://www.prawkonaraz.pl/` i historyczny `https://prawkoapp.pl/` muszą najpierw redirectować zamiast serwować własne 200,
+- każdy wariant musi zakończyć się `https://prawkonaraz.pl/` z HTTP 200,
+- redirect chain jest zapisywany w raporcie; wielohop jest warningiem, nie automatycznym production failure,
+- custom/non-production `BASE_URL` jawnie pomija project-specific host checks.
+
 PR #127 domknął osobny repo-level deployment-drift guard bez zmiany architektury rollout:
 
 - `deploy/mikrus/deploy.sh` obsługuje opt-in `SEO_RELEASE=1`,
@@ -2255,6 +2262,8 @@ PR #127 domknął osobny repo-level deployment-drift guard bez zmiany architektu
 - post-merge CI #473 na tym exact `main`: PASS — 1139 passed / 20 219 assertions / 2 skipped, `newsroom-postgres` PASS, frontend build PASS.
 - deployment-guard PR #127 finalny HEAD `e84758d911ffc4f6ff10a04f88a2b8c48beb22c6`: CI #477 PASS — 1140 passed / 20 229 assertions / 2 skipped, `newsroom-postgres` PASS, Pint 1102 files PASS, frontend build PASS,
 - merge PR #127: `main@b26317bd979dd0c372b7a9341a8358f2599a9550`; post-merge CI #478 również pełny PASS.
+- canonical-host validator PR #129 finalny HEAD `379f673e681c504322dbcabe370de110ce03dcc5`: Enterprise SEO Production Validation #3 workflow success w REPORT-ONLY mode oraz exact-head CI #481 PASS — 1140 passed / 20 229 assertions / 2 skipped, `newsroom-postgres` PASS, Pint 1102 files PASS, frontend build PASS,
+- merge PR #129: `main@8ea54ba1a8b1ca5349a468353e519fa7262a16d4`; post-merge CI #482 również pełny PASS — 1140 passed / 20 229 assertions / 2 skipped, `newsroom-postgres` PASS, Pint 1102 files PASS, frontend build PASS.
 
 ### Potwierdzony live-production baseline
 
@@ -2273,6 +2282,9 @@ Search Console evidence z 2026-09-19:
 - URL Inspection dla homepage: `Duplicate, Google chose different canonical than user`, robots allowed, indexing allowed, last crawl 2026-08-27,
 - URL Inspection dla `/aktualnosci`: `URL is unknown to Google`,
 - brak jeszcze Search Analytics rows dla `/aktualnosci` w settled window kończącym się 2026-09-16.
+- dodatkowy URL Inspection 2026-09-19: `http://prawkonaraz.pl/` = `Page with redirect`; `https://www.prawkonaraz.pl/` i `http://www.prawkonaraz.pl/` = `URL is unknown to Google`; homepage nadal wskazuje `https://prawkoapp.pl/` jako referring URL,
+- Enterprise SEO Production Validation #3 potwierdził live HTTP migration: `http://prawkonaraz.pl/`, `https://www.prawkonaraz.pl/` i `https://prawkoapp.pl/` kończą na canonical homepage w jednym redirect hop; `http://www.prawkonaraz.pl/` kończy poprawnie, ale ma dwa redirect hops (warning),
+- ten wynik zawęża diagnozę: aktualny Google-selected canonical mismatch homepage nie jest potwierdzony jako aktywna awaria host-migration; przyczyna pozostaje nierozstrzygnięta do ponownego crawl/deploy i dalszego GSC evidence.
 
 ### Boundary / następny krok
 
@@ -2759,6 +2771,14 @@ Następnym wykonywalnym podkrokiem pozostaje **zastosowanie aktualnego Nginx con
 ---
 
 # 12. Historia zmian
+
+### 2026-09-19 — v0.61
+
+- PR #129 rozszerzył istniejący N6-003 validator o produkcyjne canonical-host migration checks dla `http`/`www` i historycznego `prawkoapp.pl`; custom `BASE_URL` pozostaje poza tym project-specific guardem,
+- Enterprise SEO Production Validation #3 potwierdził redirect-to-canonical PASS dla wszystkich czterech wariantów; `http://www.prawkonaraz.pl/` ma 2-hop chain i jest warningiem, pozostałe sprawdzone warianty mają 1 hop,
+- GSC URL Inspection 2026-09-19: apex HTTP jest `Page with redirect`, oba `www` są unknown to Google, a canonical HTTPS homepage nadal ma `Duplicate, Google chose different canonical than user` i referring URL z `https://prawkoapp.pl/`; host migration nie jest więc potwierdzoną aktywną przyczyną mismatchu,
+- finalny HEAD `379f673e681c504322dbcabe370de110ce03dcc5` przeszedł CI #481; PR #129 zmergowano jako `main@8ea54ba1a8b1ca5349a468353e519fa7262a16d4`, a post-merge CI #482 zakończył pełny PASS: 1140 passed / 20 229 assertions / 2 skipped, PostgreSQL PASS, Pint 1102 files PASS i frontend build PASS,
+- N6-003 nadal pozostaje IN PROGRESS: robots cache, live stable `@id`, `/aktualnosci` indexing contract, aktualny deploy/runtime, zielony STRICT run i representative live samples pozostają otwarte.
 
 ### 2026-09-19 — v0.60
 
