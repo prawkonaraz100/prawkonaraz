@@ -35,7 +35,7 @@
         </button>
 
         <figure class="auth-dialog__visual" aria-hidden="true">
-            <img src="{{ $authScene }}" alt="" class="auth-dialog__visual-image">
+            <img src="{{ $authScene }}" alt="" width="1000" height="750" class="auth-dialog__visual-image">
         </figure>
 
         <div class="auth-dialog__panel">
