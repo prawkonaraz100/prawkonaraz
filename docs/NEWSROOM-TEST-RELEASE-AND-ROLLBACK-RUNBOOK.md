@@ -1505,7 +1505,7 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - pierwszy podkrok NEWSROOM-N5-007 jest potwierdzony po PR #109: complete-set XML pre-validation, child-before-index atomic publication oraz post-switch cleanup zarządzanych article/news sitemap files; exact-head CI #403 i post-merge CI #404 zakończyły pełny PASS,
 - drugi podkrok NEWSROOM-N5-007 jest potwierdzony po PR #112: cache-backed version/clean-version coordinator, shared lock, clean-state skip, failure/race retention, after-commit dirty events/observers oraz every-minute scheduler z `onOneServer()` + `withoutOverlapping()`; exact-head CI #409 i post-merge CI #410 zakończyły pełny PASS,
 - aktualne canonical deployment docs potwierdzają single-node Mikrus 4.1 z lokalnym `public/`, lokalnym Redisem i jednym cronem `schedule:run`, więc topology gate jest spełniony dla obecnego contractu,
-- NEWSROOM-N5-007 pozostaje IN PROGRESS: PR #115 dodał crawler-safe Nginx contract, `production-seo-delivery-smoke.sh` i repo-level Nginx regression; PR #117 dodał GitHub Actions smoke harness. Report-only public run wykazał `Cache-Control: max-age=14400` dla `/robots.txt` zamiast oczekiwanego `public, max-age=3600`, więc faktyczny STRICT production PASS oraz HTTP/Cloudflare evidence nadal nie są potwierdzone; dedykowany scheduler-definition/lock-contention regression również pozostaje otwartym test evidence. Produkcyjny rollout fazy 2 IndexNow/Bing verification pozostaje osobnym otwartym evidence.
+- NEWSROOM-N5-007 pozostaje IN PROGRESS: PR #115 dodał crawler-safe Nginx contract, `production-seo-delivery-smoke.sh` i repo-level Nginx regression; PR #117 dodał GitHub Actions smoke harness; PR #119 potwierdził dedykowany scheduler-definition/shared-lock regression. Report-only public run wykazał `Cache-Control: max-age=14400` dla `/robots.txt` zamiast oczekiwanego `public, max-age=3600`, więc faktyczny STRICT production PASS oraz HTTP/Cloudflare/GSC evidence nadal nie są potwierdzone. Produkcyjny rollout fazy 2 IndexNow/Bing verification pozostaje osobnym otwartym evidence.
 
 ---
 
@@ -1528,7 +1528,7 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - [x] dodać N5-003 feed/discovery regression: Atom metadata/corpus/limit, stable id + slug change, workflow invalidation, ETag/Last-Modified/304, no Set-Cookie, gate/discovery,
 - [x] dodać N5-004 analytics regression: render/privacy contract, GA readiness signal oraz JS-enabled Browser Smoke dla exactly-once article view, one-click-one-event, module click i disabled/non-link suppression,
 - [x] dodać N5-005 IndexNow lifecycle regression: publish/republish/update/withdraw/restore/slug, scheduled/noindex/gate suppression, outer rollback, queue failure isolation i brak lokalnego `event_type` w HTTP payload,
-- [ ] dodać dedykowany regression scheduler definition / lock contention dla N5-007; PR #112 potwierdza implementację `onOneServer()` + `withoutOverlapping()` + cache lock, ale nie ma osobnego testu tego contractu,
+- [x] dodać dedykowany regression scheduler definition / lock contention dla N5-007 — PR #119 rozszerza istniejący `NewsroomSeoArtifactRefreshCoordinatorTest` o runtime schedule contract (`everyMinute`, production-only, `onOneServer()`, `withoutOverlapping()`) oraz shared-lock contention z brakiem generator/auditor work i zachowaniem dirty state,
 - [x] dodać production-like static robots/sitemap/feed delivery smoke — PR #115 dodaje `scripts/production-seo-delivery-smoke.sh` z Content-Type/cache/no-Set-Cookie/validator/304 checks oraz rollout-gated feed contract,
 - [x] dodać N5-006 `NewsroomSeoSitemapAuditTest` i rozszerzyć istniejący `SeoSitemapAuditor` o duplicate/missing-child, News namespace/tags/date/window, current-canonical/indexability/redirect-source, topology/shard/obsolete-file checks przy zachowaniu generic entry-count/byte-size guards,
 - [x] stworzyć production smoke checklist w praktyce — executable checklist istnieje jako `scripts/production-seo-delivery-smoke.sh`,
@@ -1547,6 +1547,13 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-19 — v0.39
+
+- PR #119 dodał wyłącznie dedykowane scheduler-definition/shared-lock contention test evidence do istniejącego `NewsroomSeoArtifactRefreshCoordinatorTest`; kod produkcyjny nie został zmieniony,
+- runtime assertion chroni `everyMinute`, production-only, `onOneServer()` i `withoutOverlapping()`, a lock test faktycznie zajmuje coordinator lock i potwierdza successful skip bez generatora/audytora oraz zachowanie dirty state,
+- exact-head CI #424: 1139 passed / 20 219 assertions / 2 skipped, PostgreSQL 7/94, Pint 1102 files PASS, frontend 9.86 s; post-merge CI #425 powtórzył 1139 / 20 219 / 2 skipped, PostgreSQL 7/94, Pint 1102 files PASS i frontend 9.04 s,
+- następny twardy release gate pozostaje produkcyjny: zastosować aktualny Nginx config i uzyskać zielony STRICT workflow run, potem zachować Cloudflare/origin/GSC evidence.
 
 ### 2026-09-19 — v0.38
 

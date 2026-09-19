@@ -1542,9 +1542,9 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N5-004` — privacy-safe delegated analytics hooks reużywające istniejący `trackAnalyticsEvent` i GA/consent layer, bez backendowego event store i zmian schema.
 - [x] `NEWSROOM-N5-005` — article-specific IndexNow lifecycle integration przez dedicated after-commit event/listener nad istniejącym `IndexNowQueueService`/submission pipeline, bez nowego klienta, kolejki ani schema.
 - [x] `NEWSROOM-N5-006` — istniejący `SeoSitemapAuditor` rozszerzony o newsroom/news audit hardening oraz site-wide `newsroom:audit-links` nad istniejącym semantic graph, bez drugiego validatora, graph subsystemu, migracji ani schema.
-- [ ] `NEWSROOM-N5-007` — **IN PROGRESS**: PR #109 domknął pre-validation, child-before-index atomic publication i post-switch cleanup zarządzanych article/news sitemap files; PR #112 cache-backed dirty/version coordinator, shared lock, every-minute scheduler i aktualny single-node topology gate; PR #115 repo-level Nginx/static-delivery contract oraz production smoke tooling; PR #117 dedykowany GitHub Actions smoke harness z REPORT-ONLY PR mode i STRICT manual mode. Report-only produkcja wykazała Cache-Control mismatch, więc realny production HTTP/Cloudflare/GSC PASS nadal pozostaje otwarty.
+- [ ] `NEWSROOM-N5-007` — **IN PROGRESS**: PR #109 domknął pre-validation, child-before-index atomic publication i post-switch cleanup zarządzanych article/news sitemap files; PR #112 cache-backed dirty/version coordinator, shared lock, every-minute scheduler i aktualny single-node topology gate; PR #115 repo-level Nginx/static-delivery contract oraz production smoke tooling; PR #117 dedykowany GitHub Actions smoke harness z REPORT-ONLY PR mode i STRICT manual mode; PR #119 dedykowany runtime scheduler/shared-lock regression. Report-only produkcja wykazała Cache-Control mismatch, więc realny production HTTP/Cloudflare/GSC PASS nadal pozostaje otwarty.
 
-N5-001..N5-006 oraz cztery repo-level podkroki N5-007 są zmaterializowane i potwierdzone na `main@38102d1c3867d13666308ee657d6579fcb5f1d7a`; decyzje o jednym static sitemap pipeline, jednym `NewsroomPublicGate`, jednym semantic-link graph i jednym IndexNow queue/submission pipeline pozostały bez zmian. PR #109 materializuje pre-validation + child-before-index atomic publication + post-switch cleanup, PR #112 cache-backed dirty/version coordinator, shared lock, every-minute scheduler i version-safe marker clearing bez queue workera, PR #115 crawler-safe Nginx delivery contract + production smoke script, a PR #117 GitHub Actions smoke harness. Aktualne deployment docs potwierdzają 1x Mikrus 4.1 z lokalnym `public/`, więc topology gate jest spełniony dla obecnego single-node contractu. Report-only run #117 wykazał, że aktywny publiczny delivery nadal nie spełnia cache contractu dla `/robots.txt`; następnym wykonywalnym podkrokiem jest zastosowanie configu i zielony STRICT smoke, a następnie GSC verification. N5-007 nadal nie jest DONE.
+N5-001..N5-006 oraz pięć repo-level podkroków N5-007 są zmaterializowane i potwierdzone na `main@abb42032370a185a4cf7d7ee9a474ccbca6d86a4`; decyzje o jednym static sitemap pipeline, jednym `NewsroomPublicGate`, jednym semantic-link graph i jednym IndexNow queue/submission pipeline pozostały bez zmian. PR #109 materializuje pre-validation + child-before-index atomic publication + post-switch cleanup, PR #112 cache-backed dirty/version coordinator, shared lock, every-minute scheduler i version-safe marker clearing bez queue workera, PR #115 crawler-safe Nginx delivery contract + production smoke script, PR #117 GitHub Actions smoke harness, a PR #119 runtime scheduler/shared-lock regression w istniejącym teście. Aktualne deployment docs potwierdzają 1x Mikrus 4.1 z lokalnym `public/`, więc topology gate jest spełniony dla obecnego single-node contractu. Report-only run #117 wykazał, że aktywny publiczny delivery nadal nie spełnia cache contractu dla `/robots.txt`; następnym wykonywalnym podkrokiem jest zastosowanie configu i zielony STRICT smoke, a następnie GSC verification. N5-007 nadal nie jest DONE.
 
 ---
 ## 28. Zasady utrzymania dokumentu
@@ -1569,6 +1569,13 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-19 — v0.56
+
+- PR #119 dodał dedykowany scheduler-definition/shared-lock regression w istniejącym `NewsroomSeoArtifactRefreshCoordinatorTest`, bez zmian kodu produkcyjnego ani source-of-truth architecture,
+- test runtime potwierdza every-minute production schedule z `onOneServer()` + `withoutOverlapping()`, a contention test potwierdza skip generatora/audytora i zachowanie dirty state przy zajętym shared locku,
+- exact-head CI #424 oraz post-merge CI #425 zakończyły pełny PASS: 1139 passed / 20 219 assertions / 2 skipped, PostgreSQL 7/94, Pint 1102 files PASS i frontend build PASS,
+- N5-007 pozostaje IN PROGRESS wyłącznie do produkcyjnego deployu aktualnego Nginx, zielonego STRICT smoke oraz Cloudflare/origin/GSC evidence.
 
 ### 2026-09-19 — v0.55
 
