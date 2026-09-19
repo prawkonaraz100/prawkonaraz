@@ -15,6 +15,7 @@ use App\Support\ContentArticlePublishingService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Http;
 
 afterEach(function (): void {
     Carbon::setTestNow();
@@ -578,6 +579,49 @@ test('breaking publication invariant rejects non news and expired breaking state
 
     expect(fn () => newsroomPublishingService()->markReviewed($expired))
         ->toThrow(DomainException::class, 'future expiration');
+});
+
+test('source urls remain declarative metadata and never trigger server side fetches', function () {
+    Http::preventStrayRequests();
+
+    $actor = User::factory()->admin()->create();
+    $article = ContentArticle::factory()->inReview()->create();
+
+    ContentArticleSource::factory()
+        ->for($article, 'article')
+        ->create([
+            'source_type' => ContentArticleSourceType::Official->value,
+            'title' => 'Źródło bez dereferencji',
+            'url' => 'http://127.0.0.1:9/internal-probe',
+            'is_primary' => true,
+            'is_official' => true,
+            'is_publicly_cited' => true,
+        ]);
+
+    $reviewed = newsroomPublishingService()->markReviewed($article, $actor);
+    $published = newsroomPublishingService()->publish($reviewed, $actor);
+    $loadedToken = app(ContentArticleEditToken::class)->make($published->fresh());
+
+    $updated = newsroomPublishingService()->applyPublicUpdate(
+        $published,
+        newsroomPublicUpdatePayload($published, [
+            'sources' => [[
+                'source_type' => ContentArticleSourceType::Official->value,
+                'title' => 'Link-local source URL pozostaje tylko metadanymi',
+                'url' => 'http://169.254.169.254/latest/meta-data/',
+                'is_primary' => true,
+                'is_official' => true,
+                'is_publicly_cited' => true,
+            ]],
+        ]),
+        $loadedToken,
+        $actor,
+    );
+
+    Http::assertNothingSent();
+
+    expect($updated->fresh()->sources()->sole()->url)
+        ->toBe('http://169.254.169.254/latest/meta-data/');
 });
 
 test('source policy allows private interview evidence without a url but rejects unsafe source urls', function () {
