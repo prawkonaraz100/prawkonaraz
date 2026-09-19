@@ -171,7 +171,11 @@ try {
     report.steps.push('create-draft-body-source-relations-hero');
 
     console.log('[newsroom-golden] private preview');
-    await gotoWithRetry(page, `${baseUrl}${article.edit_path}`);
+    await gotoWithReadyLocator(
+        page,
+        `${baseUrl}${article.edit_path}`,
+        'button:has-text("Wyślij do review")',
+    );
     const previewPage = await context.newPage();
     const previewResponse = await gotoWithRetry(previewPage, `${baseUrl}${article.preview_path}`);
 
