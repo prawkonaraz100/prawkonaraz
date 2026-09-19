@@ -11,6 +11,7 @@ use App\Support\ContentArticlePublicationChecklist;
 use App\Support\NewsroomArticleMediaService;
 use App\Support\NewsroomArticleProvenanceMediaAdapter;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 use Livewire\Livewire;
@@ -289,4 +290,31 @@ test('public ordinary save can update private image license note without mutatin
 
     expect($article->origin_type)->toBe(ContentArticleOriginType::Original)
         ->and($article->image_license_note)->toBe('Nowa prywatna notatka licencyjna.');
+});
+
+test('publicly cited source urls are rendered as links without server side fetching', function () {
+    config()->set('newsroom.public_enabled', true);
+    Http::fake();
+
+    $article = ContentArticle::factory()->published()->create([
+        'title' => 'Źródło bez server-side fetch',
+        'slug' => 'zrodlo-bez-server-side-fetch',
+    ]);
+
+    $sourceUrl = 'http://169.254.169.254/latest/meta-data/iam/security-credentials';
+
+    ContentArticleSource::factory()
+        ->for($article, 'article')
+        ->create([
+            'source_type' => ContentArticleSourceType::Official->value,
+            'title' => 'Źródło zewnętrzne',
+            'url' => $sourceUrl,
+            'is_publicly_cited' => true,
+        ]);
+
+    $this->get(route('public.news.show', ['articleSlug' => $article->slug]))
+        ->assertOk()
+        ->assertSee($sourceUrl, false);
+
+    Http::assertNothingSent();
 });
