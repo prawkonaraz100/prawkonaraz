@@ -277,28 +277,28 @@ try {
 async function seedPrerequisites() {
     const fixturePath = path.join(outputDir, 'fixture.json');
     const php = String.raw`
-$admin = \\App\\Models\\User::factory()->admin()->create([
+$admin = \App\Models\User::factory()->admin()->create([
     'name' => 'Newsroom Golden Admin',
     'email' => 'newsroom-golden@example.test',
     'password' => 'password',
 ]);
-$category = \\App\\Models\\ContentCategory::factory()->create([
+$category = \App\Models\ContentCategory::factory()->create([
     'name' => 'Egzaminy E2E',
     'slug' => 'egzaminy-e2e',
     'is_active' => true,
 ]);
-$author = \\App\\Models\\ContentAuthor::factory()->published()->create([
+$author = \App\Models\ContentAuthor::factory()->published()->create([
     'name' => 'E2E Redaktor',
     'slug' => 'e2e-redaktor',
 ]);
-$topic = \\App\\Models\\ContentTopic::factory()->published()->create([
+$topic = \App\Models\ContentTopic::factory()->published()->create([
     'title' => 'E2E Golden Topic',
     'slug' => 'e2e-golden-topic',
 ]);
-$licenseCategory = \\App\\Models\\LicenseCategory::factory()->categoryB()->create([
+$licenseCategory = \App\Models\LicenseCategory::factory()->categoryB()->create([
     'sort_order' => 1,
 ]);
-$question = \\App\\Models\\Question::factory()->for($licenseCategory, 'licenseCategory')->create([
+$question = \App\Models\Question::factory()->for($licenseCategory, 'licenseCategory')->create([
     'external_id' => 'N6-GOLDEN-001',
     'prompt' => 'Czy ten testowy kierowca powinien zastosować się do zasad bezpieczeństwa?',
     'requires_primary_media' => false,
@@ -315,7 +315,7 @@ file_put_contents(
         'question_external_id' => $question->external_id,
         'question_prompt' => strip_tags((string) $question->prompt),
         'create_path' => parse_url(
-            \\App\\Filament\\Resources\\ContentArticles\\ContentArticleResource::getUrl('create', panel: 'admin'),
+            \App\Filament\Resources\ContentArticles\ContentArticleResource::getUrl('create', panel: 'admin'),
             PHP_URL_PATH,
         ),
     ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
@@ -329,7 +329,7 @@ file_put_contents(
 async function readCreatedArticle() {
     const articlePath = path.join(outputDir, 'article.json');
     const php = String.raw`
-$article = \\App\\Models\\ContentArticle::query()
+$article = \App\Models\ContentArticle::query()
     ->where('slug', 'e2e-n6-golden-path')
     ->withCount(['sources', 'questions', 'topics'])
     ->firstOrFail();
@@ -349,7 +349,7 @@ file_put_contents(
         'hero_focal_x' => (float) $article->hero_focal_x,
         'hero_focal_y' => (float) $article->hero_focal_y,
         'edit_path' => parse_url(
-            \\App\\Filament\\Resources\\ContentArticles\\ContentArticleResource::getUrl(
+            \App\Filament\Resources\ContentArticles\ContentArticleResource::getUrl(
                 'edit',
                 ['record' => $article],
                 panel: 'admin',
@@ -357,7 +357,7 @@ file_put_contents(
             PHP_URL_PATH,
         ),
         'preview_path' => parse_url(route('admin.newsroom.articles.preview', $article), PHP_URL_PATH),
-        'public_path' => \\App\\Support\\NewsroomRouteContract::canonicalPath(
+        'public_path' => \App\Support\NewsroomRouteContract::canonicalPath(
             $article->type?->value ?? (string) $article->type,
             (string) $article->slug,
         ),
