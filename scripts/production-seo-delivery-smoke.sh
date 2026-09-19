@@ -3,7 +3,18 @@ set -euo pipefail
 
 BASE_URL="${1:-https://prawkonaraz.pl}"
 REQUIRE_NEWSROOM_FEED="${REQUIRE_NEWSROOM_FEED:-0}"
+EXPECT_NEWSROOM_PUBLIC="${EXPECT_NEWSROOM_PUBLIC:-auto}"
 TMP_DIR="$(mktemp -d)"
+
+if [[ "$EXPECT_NEWSROOM_PUBLIC" != "auto" && "$EXPECT_NEWSROOM_PUBLIC" != "0" && "$EXPECT_NEWSROOM_PUBLIC" != "1" ]]; then
+    echo "EXPECT_NEWSROOM_PUBLIC must be auto, 0 or 1." >&2
+    exit 1
+fi
+
+if [[ "$EXPECT_NEWSROOM_PUBLIC" == "0" && "$REQUIRE_NEWSROOM_FEED" == "1" ]]; then
+    echo "EXPECT_NEWSROOM_PUBLIC=0 conflicts with REQUIRE_NEWSROOM_FEED=1." >&2
+    exit 1
+fi
 
 cleanup() {
     rm -rf "$TMP_DIR"
@@ -149,13 +160,23 @@ check_feed() {
 
     status="$(awk 'toupper($1) ~ /^HTTP\// {code=$2} END {print code}' "$headers")"
 
-    if [[ "$status" == "404" && "$REQUIRE_NEWSROOM_FEED" != "1" ]]; then
-        echo "PASS /aktualnosci/feed.xml (404 accepted while newsroom public gate is disabled)"
+    if [[ "$status" == "404" ]]; then
+        if [[ "$REQUIRE_NEWSROOM_FEED" == "1" || "$EXPECT_NEWSROOM_PUBLIC" == "1" ]]; then
+            echo "Expected newsroom public gate enabled, but feed returned HTTP 404." >&2
+            return 1
+        fi
+
+        echo "PASS /aktualnosci/feed.xml (404 confirms newsroom public gate is disabled)"
         return 0
     fi
 
     if [[ "$status" != "200" ]]; then
         echo "Expected HTTP 200 for feed; got $status." >&2
+        return 1
+    fi
+
+    if [[ "$EXPECT_NEWSROOM_PUBLIC" == "0" ]]; then
+        echo "Expected newsroom public gate disabled, but feed returned HTTP 200." >&2
         return 1
     fi
 
