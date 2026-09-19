@@ -55,6 +55,7 @@ try {
         page_one: await collectSnapshotPerformance({ cwd, baseUrl, snapshotPath: pageOneSnapshot, renderMetricsPath: pageOneMetricsPath }),
         page_two: await collectSnapshotPerformance({ cwd, baseUrl, snapshotPath: pageTwoSnapshot, renderMetricsPath: pageTwoMetricsPath }),
     };
+    console.log('[newsroom-category-e2e] performance', JSON.stringify(report.performance));
 
     staticServer = await startStaticServer();
     browser = await chromium.launch({ headless: true });
