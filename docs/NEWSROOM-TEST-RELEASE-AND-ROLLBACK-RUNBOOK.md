@@ -121,6 +121,16 @@ Stan po PR #127 — repo-level SEO release guard:
 - merge `main@b26317bd979dd0c372b7a9341a8358f2599a9550`: post-merge CI #478 pełny PASS,
 - świeży report-only Production SEO Delivery Smoke przy PR #127 ponownie potwierdził live `/robots.txt` `max-age=14400` i underlying exit `1`; to nadal nie jest production PASS.
 
+Stan po PR #129 — canonical-host migration validation:
+
+- istniejący N6-003 Node validator sprawdza na production originie `http://prawkonaraz.pl/`, oba warianty `www` i historyczny `https://prawkoapp.pl/`,
+- każdy wariant musi redirectować przed podaniem treści i zakończyć się na `https://prawkonaraz.pl/` z HTTP 200,
+- report-only Enterprise SEO Production Validation #3 potwierdził PASS dla wszystkich wariantów; `http://www.prawkonaraz.pl/` ma 2-hop chain jako warning, pozostałe sprawdzone warianty 1 hop,
+- GSC URL Inspection: apex HTTP = `Page with redirect`, oba `www` = unknown to Google; canonical HTTPS homepage nadal ma `Duplicate, Google chose different canonical than user` i `https://prawkoapp.pl/` w referring URLs,
+- nie zapisujemy host migration jako przyczyny Google-selected canonical mismatchu; wynik ją obecnie zawęża, ale nie rozstrzyga źródła mismatchu,
+- finalny HEAD PR #129 `379f673e681c504322dbcabe370de110ce03dcc5`: exact-head CI #481 PASS — 1140 passed / 20 229 assertions / 2 skipped, PostgreSQL PASS, Pint 1102 files PASS, frontend build PASS,
+- merge `main@8ea54ba1a8b1ca5349a468353e519fa7262a16d4`: post-merge CI #482 pełny PASS.
+
 Stan po NEWSROOM-N6-002 — scheduled publication release smoke:
 
 - istnieje osobny workflow `Newsroom Scheduled Publication Smoke` uruchamiany dla zmian w scheduler/publishing/SEO-refresh contract oraz ręcznie przez `workflow_dispatch`,
@@ -1606,12 +1616,21 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - [x] dodać N6-002 production-mode scheduled-publication release smoke i potwierdzić real-clock pre-due/post-due publication, dirty/version oraz feed/sitemap refresh bez daily cron,
 - [x] dodać N6-003 report-only/STRICT enterprise SEO production-validation harness reużywający existing static-delivery smoke,
 - [x] dodać repo-level `SEO_RELEASE=1` deploy guard, który wymusza sitemap refresh/audit + `nginx -t` + publiczny production SEO delivery smoke bez samoczynnego włączania newsroomu lub aplikowania vhosta,
+- [x] dodać canonical-host migration validation dla `http`/`www`/legacy `prawkoapp.pl` i zapisać GSC evidence bez uznawania redirect PASS za rozwiązanie Google-selected canonical mismatchu,
 - [ ] uzyskać zielony manualny STRICT N6-003 run po aktualnym deploy/runtime i zachować live article/category/topic + GSC evidence,
 - [ ] po pierwszym release wpisać rzeczywiste wyniki i ewentualne różnice od planu.
 
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-19 — v0.44
+
+- PR #129 rozszerzył istniejący enterprise SEO validator o production-only canonical-host migration checks dla apex HTTP, obu `www` i historycznego `prawkoapp.pl`; custom `BASE_URL` jawnie pomija ten project-specific guard,
+- Enterprise SEO Production Validation #3 potwierdził, że wszystkie warianty kończą się na `https://prawkonaraz.pl/`; `http://www` ma 2-hop warning, pozostałe sprawdzone warianty 1 hop,
+- GSC 2026-09-19 potwierdza apex HTTP jako `Page with redirect`, oba `www` jako unknown i nadal nierozstrzygnięty `Duplicate, Google chose different canonical than user` dla canonical HTTPS homepage; `prawkoapp.pl` pozostaje referring URL,
+- finalny HEAD `379f673e681c504322dbcabe370de110ce03dcc5` przeszedł CI #481; merge `main@8ea54ba1a8b1ca5349a468353e519fa7262a16d4` ma post-merge CI #482 PASS — 1140 passed / 20 229 assertions / 2 skipped, PostgreSQL PASS, Pint 1102 files PASS i frontend build PASS,
+- N6-003 nadal jest IN PROGRESS; trzy live failures i wymaganie actual deploy + STRICT + representative live samples pozostają otwarte.
 
 ### 2026-09-19 — v0.43
 
