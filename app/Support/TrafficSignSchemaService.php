@@ -372,6 +372,29 @@ class TrafficSignSchemaService
     }
 
     /**
+     * @param  list<array{label: string, url: string}>  $breadcrumbs
+     * @return list<array<string, mixed>>
+     */
+    public function editorialPrinciplesPage(array $breadcrumbs): array
+    {
+        return [
+            $this->trafficSignBreadcrumbs->toSchema($breadcrumbs),
+            $this->organization(),
+            [
+                '@context' => 'https://schema.org',
+                '@type' => 'WebPage',
+                'name' => 'Zasady redakcyjne PrawkoNaRaz',
+                'url' => route('about.editorial-principles'),
+                'description' => 'Publiczne zasady autorstwa, źródeł, weryfikacji, korekt, niezależności i oznaczania materiałów sponsorowanych w PrawkoNaRaz.',
+                'about' => [
+                    '@type' => 'Organization',
+                    'name' => (string) config('content.organization.name', config('app.name', 'prawkonaraz.pl')),
+                ],
+            ],
+        ];
+    }
+
+    /**
      * @param  array<string, mixed>  $page
      * @param  list<array{label: string, url: string}>  $breadcrumbs
      * @return list<array<string, mixed>>
