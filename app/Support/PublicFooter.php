@@ -36,6 +36,7 @@ class PublicFooter
                 ['label' => 'Regulamin', 'href' => route('legal.terms', absolute: false)],
                 ['label' => 'Polityka prywatności', 'href' => route('legal.privacy', absolute: false)],
                 ['label' => 'Metodologia', 'href' => route('about.methodology', absolute: false)],
+                ['label' => 'Zasady redakcyjne', 'href' => route('about.editorial-principles', absolute: false)],
                 ['label' => 'Kontakt', 'href' => route('about.contact', absolute: false)],
             ],
             'service_links' => [
