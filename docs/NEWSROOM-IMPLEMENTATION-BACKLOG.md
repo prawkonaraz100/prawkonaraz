@@ -2473,6 +2473,26 @@ Po ustabilizowaniu domenowego publisher/site identity:
 
 ## NEWSROOM-N6-009 — Publisher transparency production gate
 
+### Status implementacji
+
+**DONE — publiczny publisher-transparency contract jest wdrożony i potwierdzony na `main`.**
+
+PR #140 został zmergowany jako `main@6defc5fe82fef6c6724d67659486d58736231386`. Finalny implementation HEAD `ed7ce64c997d5fc74163bddd6772b5883f78dab9` przeszedł wymagane exact-head gates, a post-merge CI #511 na dokładnym merge SHA zakończył się pełnym PASS:
+
+- `quality`: 1142 passed / 20 246 assertions / 2 skipped,
+- Pint: 1103 files PASS,
+- frontend build PASS,
+- `newsroom-postgres`: PASS.
+
+Faktycznie wdrożony zakres obejmuje:
+
+- publiczną stronę `/zasady-redakcyjne` z kanonicznym SEO, breadcrumbs i WebPage schema,
+- linkowanie do zasad z publicznego artykułu, footera oraz strony `O nas`,
+- `NewsArticle.publishingPrinciples` wskazujące realną publiczną stronę,
+- publiczne opisanie autorstwa, źródeł, weryfikacji, korekt, konfliktów interesów i kontraktu dotyczącego ewentualnych materiałów sponsorowanych.
+
+N6-009 **nie** dodało migracji, nowych pól artykułu ani zmian RBAC/workflow dla sponsoringu. Zachowana pozostaje decyzja architektoniczna, że materiały sponsorowane są poza newsroom v1.
+
 ### Zakres
 
 Audit publicznych powierzchni przed regularnym rolloutem:
@@ -2877,6 +2897,14 @@ Następnym wykonywalnym podkrokiem pozostaje **zastosowanie aktualnego Nginx con
 ---
 
 # 12. Historia zmian
+
+### 2026-09-20 — v0.63
+
+- NEWSROOM-N6-009 wdrożono przez PR #140 jako publisher-transparency production gate bez migracji, nowych pól artykułu ani zmian RBAC/workflow sponsoringu; materiały sponsorowane pozostają poza newsroom v1,
+- dodano publiczne `/zasady-redakcyjne`, linki z artykułu/footer/O nas, canonical SEO + breadcrumbs + WebPage schema oraz `NewsArticle.publishingPrinciples` prowadzące do realnej publicznej strony,
+- finalny implementation HEAD `ed7ce64c997d5fc74163bddd6772b5883f78dab9` przeszedł wymagane exact-head gates, w tym Browser Smoke #105 z golden path i Enterprise SEO validation,
+- PR #140 zmergowano jako `main@6defc5fe82fef6c6724d67659486d58736231386`; post-merge CI #511 zakończył pełny PASS: 1142 passed / 20 246 assertions / 2 skipped, PostgreSQL PASS, Pint 1103 files PASS i frontend build PASS,
+- publiczna polityka opisuje autorstwo, źródła, weryfikację, korekty, konflikty interesów i ewentualny przyszły sponsorship disclosure, bez deklarowania nieistniejącego mechanizmu sponsoringu.
 
 ### 2026-09-19 — v0.62
 

@@ -486,6 +486,17 @@ Jeśli cały materiał jest nieprawdziwy lub nie powinien być publiczny:
 - dokumentujemy przyczynę,
 - nie zostawiamy fałszywego tekstu tylko „dla SEO”.
 
+### 16.4. Publiczna powierzchnia zasad redakcyjnych
+
+Potwierdzony stan po NEWSROOM-N6-009:
+
+- publiczne `/zasady-redakcyjne` opisuje autorstwo, źródła, weryfikację, korekty oraz konflikt interesów,
+- publiczny artykuł, footer i strona `O nas` prowadzą do tej powierzchni,
+- `NewsArticle.publishingPrinciples` wskazuje ten realny publiczny URL,
+- strona ma canonical SEO, breadcrumbs i WebPage schema.
+
+Ta powierzchnia dokumentuje istniejącą politykę; nie tworzy osobnego workflow ani nowych pól domenowych.
+
 ---
 
 ## 17. Update policy
@@ -893,6 +904,8 @@ Nie czekamy na pełny cykl redakcyjny, jeśli błędna informacja jest publiczna
 ## 35. Materiały sponsorowane
 
 Poza v1, ale policy należy ustalić od początku.
+
+Potwierdzony stan po NEWSROOM-N6-009: publiczne `/zasady-redakcyjne` komunikuje ten kontrakt czytelnikowi, ale implementacja nie dodała migracji, pól artykułu, RBAC ani workflow dla treści sponsorowanych. Wprowadzenie faktycznego formatu sponsorowanego wymaga osobnej decyzji i osobnego zakresu implementacyjnego.
 
 Jeśli pojawią się:
 
