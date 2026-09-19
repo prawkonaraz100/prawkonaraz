@@ -137,6 +137,8 @@ test('public newsroom article renders canonical content seo schema and safe pres
         ->assertDontSee('<script>alert(1)</script>', false)
         ->assertSee('Powiązany publiczny materiał')
         ->assertSee('Korekta z 17.09.2026')
+        ->assertSee('href="'.route('about.editorial-principles').'"', false)
+        ->assertSee('zasadach redakcyjnych')
         ->assertSee('object-position: 25.00% 75.00%', false)
         ->assertSee('object-position: 40.00% 60.00%', false);
 
@@ -144,6 +146,7 @@ test('public newsroom article renders canonical content seo schema and safe pres
         ->assertSee('<link rel="canonical" href="'.route('public.news.show', ['articleSlug' => $article->slug]).'">', false)
         ->assertSee('property="og:type" content="article"', false)
         ->assertSee('"@type":"NewsArticle"', false)
+        ->assertSee('"publishingPrinciples":"'.route('about.editorial-principles').'"', false)
         ->assertSee('href="'.route('content-authors.show', $article->author->slug).'"', false)
         ->assertSee('href="'.route('public.news.categories.show', $article->category->slug).'"', false)
         ->assertDontSee('Moduł publiczny N3')
@@ -264,4 +267,22 @@ test('related article blocks fail closed for non public author or inactive categ
         ->assertOk()
         ->assertDontSee('Materiał z ukrytym autorem')
         ->assertDontSee('Materiał z nieaktywną kategorią');
+});
+
+
+test('editorial principles page exposes publisher correction source and sponsorship policy', function () {
+    $response = $this->get(route('about.editorial-principles'));
+
+    $response
+        ->assertOk()
+        ->assertSee('Zasady redakcyjne PrawkoNaRaz')
+        ->assertSee('Autorstwo i odpowiedzialność')
+        ->assertSee('Źródła i weryfikacja')
+        ->assertSee('Korekty i aktualizacje')
+        ->assertSee('Materiały sponsorowane i konflikty interesów')
+        ->assertSee('materiały sponsorowane nie są częścią newsroomu v1')
+        ->assertSee('href="'.route('about.organization').'"', false)
+        ->assertSee('href="'.route('about.contact').'"', false)
+        ->assertSee('<link rel="canonical" href="'.route('about.editorial-principles').'">', false)
+        ->assertSee('"@type":"WebPage"', false);
 });
