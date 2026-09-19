@@ -6,6 +6,7 @@ on:
       - '.github/workflows/newsroom-enterprise-seo-production-validation.yml'
       - 'scripts/newsroom-enterprise-seo-production-validation.mjs'
       - 'scripts/production-seo-delivery-smoke.sh'
+      - 'deploy/mikrus/deploy.sh'
       - 'package.json'
       - 'app/Http/Controllers/HomePageController.php'
       - 'app/Http/Controllers/NewsroomPlaceholderController.php'
@@ -60,6 +61,7 @@ jobs:
       BASE_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.base_url || 'https://prawkonaraz.pl' }}
       STRICT: ${{ github.event_name == 'workflow_dispatch' && inputs.strict && '1' || '0' }}
       REQUIRE_NEWSROOM_PUBLIC: ${{ github.event_name == 'workflow_dispatch' && inputs.require_newsroom_public && '1' || '0' }}
+      EXPECT_NEWSROOM_PUBLIC: ${{ github.event_name == 'workflow_dispatch' && inputs.require_newsroom_public && '1' || '0' }}
       REQUIRE_NEWSROOM_FEED: ${{ github.event_name == 'workflow_dispatch' && inputs.require_newsroom_public && '1' || '0' }}
       ARTICLE_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.article_url || '' }}
       CATEGORY_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.category_url || '' }}
