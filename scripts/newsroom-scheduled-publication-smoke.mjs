@@ -22,7 +22,6 @@ if (!Number.isInteger(dueDelaySeconds) || dueDelaySeconds < 20 || dueDelaySecond
     throw new Error('N6_SCHEDULED_SMOKE_DELAY_SECONDS must be an integer between 20 and 120.');
 }
 
-process.env.APP_URL = baseUrl;
 process.env.NEWSROOM_PUBLIC_ENABLED = 'true';
 process.env.N6_SCHEDULED_SMOKE_SLUG = slug;
 process.env.N6_SCHEDULED_SMOKE_TITLE = title;
@@ -31,7 +30,8 @@ process.env.N6_SCHEDULED_SMOKE_DELAY_SECONDS = String(dueDelaySeconds);
 const report = {
     started_at: new Date().toISOString(),
     status: 'running',
-    base_url: baseUrl,
+    origin_url: baseUrl,
+    canonical_app_url: process.env.APP_URL ?? null,
     slug,
     due_delay_seconds: dueDelaySeconds,
     steps: [],
@@ -308,7 +308,6 @@ function startLaravelServer() {
         cwd: publicDir,
         env: {
             ...process.env,
-            APP_URL: baseUrl,
             NEWSROOM_PUBLIC_ENABLED: 'true',
             PHP_CLI_SERVER_WORKERS: '4',
         },
