@@ -2141,11 +2141,48 @@ N6-001 nie zalicza produkcyjnych gate'ów N5-007 ani scheduled-publication produ
 
 ## NEWSROOM-N6-002 — Scheduled publication production smoke
 
-- create scheduled sample,
-- verify not visible before,
-- verify visible after scheduler,
-- verify dirty/version coordinator + scheduled sitemap/feed refresh,
-- verify news sitemap artifact becomes fresh without waiting for next daily cron.
+### Status implementacji
+
+**DONE — executable production-mode release smoke + exact-head/post-merge CI potwierdzone.**
+
+Zakres został zrealizowany przez PR #123 bez zmiany produkcyjnej logiki publikacji ani architektury newsroomu. Zmienione pliki to wyłącznie:
+
+- `.github/workflows/newsroom-scheduled-publication-smoke.yml`,
+- `package.json`,
+- `scripts/newsroom-scheduled-publication-smoke.mjs`.
+
+### Potwierdzony scenariusz
+
+Smoke działa na realnym zegarze, bez `Carbon::setTestNow` i bez bezpośredniego wymuszania publikacji w bazie:
+
+- tworzy scheduled sample przez istniejący `ContentArticlePublishingService`,
+- przed terminem potwierdza brak artykułu w public article route, hubie, Atom feedzie, `articles.xml` i `news.xml`,
+- przed terminem uruchamia istniejące `newsroom:publish-due` i potwierdza `published=0 failed=0`,
+- po realnym due uruchamia to samo `newsroom:publish-due` i potwierdza `published=1 failed=0 skipped=0`,
+- potwierdza audit trigger `scheduler` oraz przejście workflow do `published`,
+- potwierdza dirty/version advance po publikacji,
+- uruchamia istniejące `newsroom:refresh-seo-artifacts-if-dirty`,
+- potwierdza publiczną widoczność artykułu, obecność w feedzie, `articles.xml` i Google News `news.xml`,
+- potwierdza zmianę hashy sitemap oraz clean version po refreshu bez oczekiwania na daily cron.
+
+HTTP smoke działa przeciw stabilnemu Docker app+Nginx originowi z `APP_ENV=production`, kanonicznym `APP_URL=https://prawkonaraz.pl` i współdzielonym SQLite/storage pomiędzy hostowymi komendami a aplikacją.
+
+### Evidence
+
+- finalny implementation/test HEAD PR #123: `2426f19215326a1c3386e8185222030b634ed795`,
+- Newsroom Scheduled Publication Smoke #10: PASS,
+- Browser Smoke #94: PASS, w tym `newsroom-golden-path` oraz wszystkie pozostałe newsroom Browser Smoke,
+- exact-head CI #467: PASS — `quality` + `newsroom-postgres`,
+- merge PR #123: `main@afaa44dca0012144ab842c9195856eebec4553d3`,
+- post-merge CI #468 na tym exact `main`: PASS — `quality` + `newsroom-postgres`.
+
+Smoke evidence potwierdza m.in. baseline SEO artifact refresh do version 3, `published=0` przed terminem, `published=1` po realnym due, a następnie refresh do version 4 z `articles.xml` i `news.xml` zawierającymi nowy artykuł.
+
+### Boundary
+
+To jest powtarzalny **production-mode release smoke w izolowanym GitHub Actions environment**. Nie jest to dowód mutacji ani publikacji próbnej na live production database i nie należy go tak opisywać.
+
+NEWSROOM-N5-007 pozostaje IN PROGRESS z osobnymi live-production Nginx/STRICT HTTP/Cloudflare/GSC gate'ami. Następnym logicznym taskiem N6 jest **NEWSROOM-N6-003 — Enterprise SEO production validation**.
 
 ---
 
@@ -2648,6 +2685,15 @@ Następnym wykonywalnym podkrokiem pozostaje **zastosowanie aktualnego Nginx con
 ---
 
 # 12. Historia zmian
+
+### 2026-09-19 — v0.58
+
+- NEWSROOM-N6-002 zakończono przez PR #123 jako dedykowany production-mode scheduled-publication release smoke bez zmiany produkcyjnej logiki publikacji ani architektury; diff obejmuje wyłącznie nowy workflow, package script i `scripts/newsroom-scheduled-publication-smoke.mjs`,
+- finalny implementation/test HEAD `2426f19215326a1c3386e8185222030b634ed795` przeszedł Newsroom Scheduled Publication Smoke #10, Browser Smoke #94 i CI #467,
+- smoke potwierdził `published=0` przed realnym terminem, `published=1 failed=0 skipped=0` po due, audit trigger `scheduler`, dirty/version advance oraz refresh sitemap/feed bez oczekiwania na daily cron; `articles.xml` i `news.xml` zostały odświeżone z wersji 3 do 4 i zawierały nowy artykuł,
+- PR #123 zmergowano jako `main@afaa44dca0012144ab842c9195856eebec4553d3`; post-merge CI #468 zakończył pełny PASS,
+- evidence dotyczy izolowanego GitHub Actions environment z `APP_ENV=production` i stabilnym Docker app+Nginx originem; nie jest to live-production database mutation evidence,
+- NEWSROOM-N5-007 pozostaje bez zmian; kolejnym N6 taskiem jest NEWSROOM-N6-003 Enterprise SEO production validation.
 
 ### 2026-09-19 — v0.57
 
