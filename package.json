@@ -16,7 +16,8 @@
         "stress:session": "node scripts/session-stress.mjs",
         "test:unit": "vitest run",
         "e2e:newsroom-golden-path": "node scripts/e2e-newsroom-golden-path.mjs",
-        "smoke:newsroom-scheduled-publication": "node scripts/newsroom-scheduled-publication-smoke.mjs"
+        "smoke:newsroom-scheduled-publication": "node scripts/newsroom-scheduled-publication-smoke.mjs",
+        "validate:newsroom-enterprise-seo-production": "node scripts/newsroom-enterprise-seo-production-validation.mjs"
     },
     "devDependencies": {
         "@inertiajs/vue3": "^2.0.0",
