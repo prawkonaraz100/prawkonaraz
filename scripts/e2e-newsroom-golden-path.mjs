@@ -458,16 +458,27 @@ async function waitForLivewireIdle(page) {
 }
 
 function startLaravelServer() {
+    const publicDir = path.join(cwd, 'public');
+    const router = path.join(
+        cwd,
+        'vendor',
+        'laravel',
+        'framework',
+        'src',
+        'Illuminate',
+        'Foundation',
+        'resources',
+        'server.php',
+    );
     const child = spawn(
         'php',
-        ['artisan', 'serve', '--host=127.0.0.1', `--port=${port}`],
+        ['-S', `127.0.0.1:${port}`, router],
         {
-            cwd,
+            cwd: publicDir,
             env: {
                 ...process.env,
                 APP_URL: baseUrl,
                 NEWSROOM_PUBLIC_ENABLED: 'true',
-                PHP_CLI_SERVER_WORKERS: '4',
             },
             stdio: ['ignore', 'pipe', 'pipe'],
         },
