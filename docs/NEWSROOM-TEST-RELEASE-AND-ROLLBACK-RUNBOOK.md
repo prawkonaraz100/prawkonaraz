@@ -87,6 +87,21 @@ Dla:
 
 Dla krytycznego redakcyjnego golden path.
 
+Stan po NEWSROOM-N6-002 — scheduled publication release smoke:
+
+- istnieje osobny workflow `Newsroom Scheduled Publication Smoke` uruchamiany dla zmian w scheduler/publishing/SEO-refresh contract oraz ręcznie przez `workflow_dispatch`,
+- smoke używa realnego czasu; nie stosuje time travel ani bezpośredniego wymuszenia `published` w bazie,
+- przed due wymaga 404 dla artykułu i braku wpisu w hub/feed/`articles.xml`/`news.xml`,
+- przed due istniejące `newsroom:publish-due` musi zakończyć się `published=0 failed=0`,
+- po due ta sama komenda musi opublikować dokładnie jeden fixture z audit trigger `scheduler`,
+- po publikacji smoke wymaga dirty/version advance, następnie wykonuje istniejące `newsroom:refresh-seo-artifacts-if-dirty`,
+- po refreshu artykuł ma być publiczny i obecny w feed/`articles.xml`/`news.xml`, a sitemap hashes i clean version mają się zmienić,
+- HTTP path działa na stabilnym Docker app+Nginx originie z `APP_ENV=production`, canonical `APP_URL=https://prawkonaraz.pl` i wspólnym SQLite/storage,
+- finalny HEAD PR #123 `2426f19215326a1c3386e8185222030b634ed795`: Scheduled Publication Smoke #10 PASS, Browser Smoke #94 PASS, CI #467 PASS,
+- merge `main@afaa44dca0012144ab842c9195856eebec4553d3`: post-merge CI #468 PASS.
+
+Boundary: ten smoke jest izolowanym production-mode release evidence w GitHub Actions. Nie stanowi live-production database mutation evidence ani nie zamyka osobnych N5-007 live Nginx/STRICT HTTP/Cloudflare/GSC gate'ów.
+
 Stan po NEWSROOM-N6-001:
 
 - istnieje dedykowany `scripts/e2e-newsroom-golden-path.mjs` uruchamiany jako osobny job `newsroom-golden-path` w istniejącym Browser Smoke workflow,
@@ -1554,11 +1569,21 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - [x] dodać N4-007 topic feature/browser regression dla HTTP lifecycle, eligible corpus, featured dedupe, pagination/canonical i responsive SSR,
 - [x] dodać N4-008 semantic-link feature/browser regression dla category/topic/related/reverse modules, gate i responsive no-overflow,
 - [x] dodać N6-001 dedykowany editorial/public Browser Smoke golden path i potwierdzić exact-head oraz post-merge CI,
+- [x] dodać N6-002 production-mode scheduled-publication release smoke i potwierdzić real-clock pre-due/post-due publication, dirty/version oraz feed/sitemap refresh bez daily cron,
 - [ ] po pierwszym release wpisać rzeczywiste wyniki i ewentualne różnice od planu.
 
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-19 — v0.41
+
+- NEWSROOM-N6-002 zrealizowano przez PR #123 jako production-mode real-clock scheduled-publication release smoke bez zmiany produkcyjnej logiki publikacji ani architektury,
+- smoke potwierdza hidden-before-due, `published=0` przed terminem, `published=1 failed=0 skipped=0` po realnym due, audit trigger `scheduler`, dirty/version advance oraz natychmiastowy refresh feed/`articles.xml`/`news.xml` bez daily cron,
+- finalny implementation/test HEAD `2426f19215326a1c3386e8185222030b634ed795`: Newsroom Scheduled Publication Smoke #10 PASS, Browser Smoke #94 PASS, CI #467 PASS,
+- merge PR #123 utworzył `main@afaa44dca0012144ab842c9195856eebec4553d3`; post-merge CI #468 również PASS,
+- evidence pochodzi z izolowanego GitHub Actions environment z `APP_ENV=production` i stabilnym Docker app+Nginx originem; nie jest to live-production database mutation evidence,
+- następny N6 task: NEWSROOM-N6-003 Enterprise SEO production validation; NEWSROOM-N5-007 live-production Nginx/STRICT HTTP/Cloudflare/GSC gate'y pozostają otwarte.
 
 ### 2026-09-19 — v0.40
 
