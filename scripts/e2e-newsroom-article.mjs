@@ -49,6 +49,7 @@ try {
     console.log('[newsroom-e2e] render through Laravel kernel');
     report.render_status = await renderArticleSnapshot();
     report.performance = await collectSnapshotPerformance({ cwd, baseUrl, snapshotPath, renderMetricsPath });
+    console.log('[newsroom-e2e] performance', JSON.stringify(report.performance));
     console.log('[newsroom-e2e] start static browser server');
     staticServer = await startStaticServer();
     browser = await chromium.launch({ headless: true });
