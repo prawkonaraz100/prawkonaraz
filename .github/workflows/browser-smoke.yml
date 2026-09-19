@@ -37,6 +37,8 @@ on:
       - 'resources/views/components/site/home-header.blade.php'
       - 'resources/views/components/site/public-header.blade.php'
       - 'resources/views/components/site/public-footer.blade.php'
+      - 'resources/views/components/site/login-drawer.blade.php'
+      - 'resources/views/components/site/register-drawer.blade.php'
       - 'resources/js/public-content.ts'
       - 'resources/js/public/newsroomAnalytics.ts'
       - 'resources/js/utils/analytics.ts'
@@ -52,6 +54,7 @@ on:
       - 'scripts/e2e-newsroom-topic.mjs'
       - 'scripts/e2e-newsroom-semantic-links.mjs'
       - 'scripts/e2e-newsroom-golden-path.mjs'
+      - 'scripts/newsroom-performance-metrics.mjs'
       - 'package.json'
 
 jobs:
