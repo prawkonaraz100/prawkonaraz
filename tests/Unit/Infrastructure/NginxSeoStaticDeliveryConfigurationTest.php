@@ -51,4 +51,3 @@ test('mikrus deploy can enforce seo release refresh audit and public delivery sm
         ->toContain('bash scripts/production-seo-delivery-smoke.sh "$SEO_BASE_URL"')
         ->toContain('SEO_RELEASE_OK');
 });
-
