@@ -3,6 +3,7 @@ import path from 'node:path';
 import process from 'node:process';
 
 const baseUrl = new URL(process.env.BASE_URL ?? 'https://prawkonaraz.pl');
+const origin = baseUrl.origin;
 const requireNewsroomPublic = process.env.REQUIRE_NEWSROOM_PUBLIC === '1';
 const sampleUrls = {
     article: normalizedOptionalUrl(process.env.ARTICLE_URL),
@@ -11,7 +12,6 @@ const sampleUrls = {
 };
 const outputDir = path.join(process.cwd(), 'output', 'newsroom-enterprise-seo-production-validation');
 const reportPath = path.join(outputDir, 'report.json');
-const origin = baseUrl.origin;
 const websiteId = `${origin}/#website`;
 const organizationId = `${origin}/#organization`;
 
