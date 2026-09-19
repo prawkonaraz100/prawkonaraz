@@ -4,12 +4,15 @@ import path from 'node:path';
 import process from 'node:process';
 import { spawn } from 'node:child_process';
 import { chromium } from 'playwright';
+import { collectSnapshotPerformance } from './newsroom-performance-metrics.mjs';
 
 const cwd = process.cwd();
 const outputDir = path.join(cwd, 'output', 'playwright', 'newsroom-category');
 const pageOneSnapshot = path.join(outputDir, 'category-page-1.html');
 const pageTwoSnapshot = path.join(outputDir, 'category-page-2.html');
 const reportPath = path.join(outputDir, 'report.json');
+const pageOneMetricsPath = path.join(outputDir, 'category-page-1-metrics.json');
+const pageTwoMetricsPath = path.join(outputDir, 'category-page-2-metrics.json');
 const categoryPath = '/aktualnosci/kategoria/przepisy';
 const port = Number(process.env.E2E_NEWSROOM_CATEGORY_PORT ?? '8129');
 const baseUrl = `http://127.0.0.1:${port}`;
@@ -30,6 +33,7 @@ const report = {
     status: 'running',
     viewports: [],
     pagination: null,
+    performance: null,
 };
 
 let browser;
@@ -45,8 +49,12 @@ try {
     await seedCategory();
 
     console.log('[newsroom-category-e2e] render SSR snapshots');
-    await renderSnapshot(categoryPath, pageOneSnapshot);
-    await renderSnapshot(`${categoryPath}?page=2`, pageTwoSnapshot);
+    await renderSnapshot(categoryPath, pageOneSnapshot, pageOneMetricsPath);
+    await renderSnapshot(`${categoryPath}?page=2`, pageTwoSnapshot, pageTwoMetricsPath);
+    report.performance = {
+        page_one: await collectSnapshotPerformance({ cwd, baseUrl, snapshotPath: pageOneSnapshot, renderMetricsPath: pageOneMetricsPath }),
+        page_two: await collectSnapshotPerformance({ cwd, baseUrl, snapshotPath: pageTwoSnapshot, renderMetricsPath: pageTwoMetricsPath }),
+    };
 
     staticServer = await startStaticServer();
     browser = await chromium.launch({ headless: true });
@@ -245,14 +253,28 @@ for ($i = 1; $i <= 25; $i++) {
     await runCommand('php', ['artisan', 'tinker', '--execute', php]);
 }
 
-async function renderSnapshot(requestPath, outputPath) {
+async function renderSnapshot(requestPath, outputPath, metricsPath) {
     const relativeOutput = path.relative(cwd, outputPath).replaceAll('\\', '/');
+    const relativeMetrics = path.relative(cwd, metricsPath).replaceAll('\\', '/');
     const php = String.raw`
+$connection = \Illuminate\Support\Facades\DB::connection();
+$connection->flushQueryLog();
+$connection->enableQueryLog();
+$startedAt = hrtime(true);
 $request = \Illuminate\Http\Request::create('${baseUrl}${requestPath}', 'GET');
 $response = app(\Illuminate\Contracts\Http\Kernel::class)->handle($request);
+$durationMs = (hrtime(true) - $startedAt) / 1000000;
+$queryCount = count($connection->getQueryLog());
+$connection->disableQueryLog();
 $status = $response->getStatusCode();
 if ($status !== 200) { throw new \RuntimeException('Category render returned HTTP '.$status); }
-file_put_contents(base_path('${relativeOutput}'), $response->getContent());
+$content = (string) $response->getContent();
+file_put_contents(base_path('${relativeOutput}'), $content);
+file_put_contents(base_path('${relativeMetrics}'), json_encode([
+    'kernel_render_ms' => round($durationMs, 2),
+    'query_count' => $queryCount,
+    'html_bytes' => strlen($content),
+], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 app(\Illuminate\Contracts\Http\Kernel::class)->terminate($request, $response);
 `;
 
