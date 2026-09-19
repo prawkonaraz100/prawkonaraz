@@ -1,0 +1,124 @@
+name: Newsroom Scheduled Publication Smoke
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/newsroom-scheduled-publication-smoke.yml'
+      - 'scripts/newsroom-scheduled-publication-smoke.mjs'
+      - 'package.json'
+      - 'app/Console/Commands/PublishDueNewsroomArticlesCommand.php'
+      - 'app/Console/Commands/RefreshNewsroomSeoArtifactsIfDirtyCommand.php'
+      - 'app/Support/ContentArticlePublishingService.php'
+      - 'app/Support/NewsroomSeoArtifactRefreshCoordinator.php'
+      - 'app/Support/NewsroomFeedService.php'
+      - 'app/Support/SeoSitemapBuilder.php'
+      - 'app/Support/SeoSitemapGenerator.php'
+      - 'routes/console.php'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scheduled-publication:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      APP_ENV: production
+      APP_DEBUG: 'false'
+      APP_URL: https://prawkonaraz.pl
+      NEWSROOM_PUBLIC_ENABLED: 'true'
+      DB_CONNECTION: sqlite
+      DB_DATABASE: database/database.sqlite
+      DB_URL: ''
+      CACHE_STORE: file
+      SESSION_DRIVER: file
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: log
+      MEDIA_LOCAL_ROOT: ${{ github.workspace }}/storage/app/public-media
+      MEDIA_NEWSROOM_DISK: media_local
+      MEDIA_LOCAL_HOST_ROOT: ${{ github.workspace }}/storage/app/public-media
+      MEDIA_LOCAL_URL: http://127.0.0.1:8081
+      AUDIO_GENERATOR_HOST_ROOT: ${{ github.workspace }}/storage/app/audio-generator-stub
+      N6_SCHEDULED_SMOKE_PORT: '8000'
+      N6_SCHEDULED_SMOKE_DELAY_SECONDS: '45'
+      N6_SCHEDULED_SMOKE_EXTERNAL_SERVER: 'true'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          extensions: mbstring, sqlite3, pdo_sqlite, fileinfo
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Prepare isolated production-mode application
+        run: |
+          cp .env.example .env
+          mkdir -p database storage/app/public storage/app/public-media output/newsroom-scheduled-publication-smoke
+          touch database/database.sqlite
+          php artisan key:generate --force
+          php artisan migrate --force
+          php artisan storage:link
+          php artisan cache:clear
+
+      - name: Build frontend assets
+        run: npm run build
+
+      - name: Start stable Docker production-mode server
+        run: |
+          mkdir -p storage/app/public-media storage/app/audio-generator-stub
+          chmod -R a+rwX database storage bootstrap/cache
+          export APP_KEY_VALUE="$(grep '^APP_KEY=' .env | cut -d= -f2-)"
+          cat > /tmp/newsroom-scheduled.compose.yml <<'EOF'
+          services:
+            app:
+              environment:
+                APP_KEY: ${APP_KEY_VALUE}
+                APP_ENV: production
+                APP_DEBUG: "false"
+                APP_URL: https://prawkonaraz.pl
+                NEWSROOM_PUBLIC_ENABLED: "true"
+                DB_CONNECTION: sqlite
+                DB_DATABASE: /var/www/html/database/database.sqlite
+                DB_URL: ""
+                SESSION_DRIVER: file
+                CACHE_STORE: file
+                QUEUE_CONNECTION: sync
+                MAIL_MAILER: log
+                MEDIA_NEWSROOM_DISK: media_local
+          EOF
+          docker compose -f docker-compose.yml -f /tmp/newsroom-scheduled.compose.yml up -d --build app web media
+          docker compose -f docker-compose.yml -f /tmp/newsroom-scheduled.compose.yml ps
+          curl --fail --retry 30 --retry-all-errors --retry-delay 1 -H 'Host: prawkonaraz.pl' http://127.0.0.1:8000/aktualnosci >/dev/null
+
+      - name: Run N6-002 scheduled publication smoke
+        run: npm run smoke:newsroom-scheduled-publication
+
+      - name: Stop stable Docker production-mode server
+        if: always()
+        run: docker compose -f docker-compose.yml -f /tmp/newsroom-scheduled.compose.yml down --remove-orphans || true
+
+      - name: Upload N6-002 smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newsroom-scheduled-publication-smoke
+          path: output/newsroom-scheduled-publication-smoke
+          if-no-files-found: error
+          retention-days: 7
