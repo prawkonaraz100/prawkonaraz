@@ -1,0 +1,139 @@
+name: Newsroom Enterprise SEO Production Validation
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/newsroom-enterprise-seo-production-validation.yml'
+      - 'scripts/newsroom-enterprise-seo-production-validation.mjs'
+      - 'scripts/production-seo-delivery-smoke.sh'
+      - 'package.json'
+      - 'app/Http/Controllers/HomePageController.php'
+      - 'app/Http/Controllers/NewsroomPlaceholderController.php'
+      - 'app/Http/Controllers/NewsroomCategoryController.php'
+      - 'app/Http/Controllers/NewsroomTopicController.php'
+      - 'app/Http/Controllers/ContentArticleController.php'
+      - 'app/Support/*SchemaService.php'
+      - 'app/Support/*SeoService.php'
+      - 'app/Support/SeoSitemap*.php'
+      - 'resources/views/newsroom/**'
+      - 'routes/web.php'
+      - 'public/robots.txt'
+      - 'deploy/mikrus/nginx/prawkobit.conf.example'
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: Canonical live production origin
+        required: true
+        default: https://prawkonaraz.pl
+        type: string
+      strict:
+        description: Fail the workflow when live production does not satisfy the validation contract
+        required: true
+        default: true
+        type: boolean
+      require_newsroom_public:
+        description: Require public newsroom hub/feed/article sitemap/news sitemap instead of accepting rollout-gated state
+        required: true
+        default: true
+        type: boolean
+      article_url:
+        description: Optional representative public newsroom article URL
+        required: false
+        type: string
+      category_url:
+        description: Optional representative public newsroom category URL
+        required: false
+        type: string
+      topic_url:
+        description: Optional representative public newsroom topic URL
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  enterprise-seo-production:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BASE_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.base_url || 'https://prawkonaraz.pl' }}
+      STRICT: ${{ github.event_name == 'workflow_dispatch' && inputs.strict && '1' || '0' }}
+      REQUIRE_NEWSROOM_PUBLIC: ${{ github.event_name == 'workflow_dispatch' && inputs.require_newsroom_public && '1' || '0' }}
+      REQUIRE_NEWSROOM_FEED: ${{ github.event_name == 'workflow_dispatch' && inputs.require_newsroom_public && '1' || '0' }}
+      ARTICLE_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.article_url || '' }}
+      CATEGORY_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.category_url || '' }}
+      TOPIC_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.topic_url || '' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate production validators syntax
+        run: |
+          bash -n scripts/production-seo-delivery-smoke.sh
+          node --check scripts/newsroom-enterprise-seo-production-validation.mjs
+
+      - name: Run existing static delivery production smoke
+        shell: bash
+        run: |
+          mkdir -p output/newsroom-enterprise-seo-production-validation
+          set +e
+          bash scripts/production-seo-delivery-smoke.sh "$BASE_URL" 2>&1             | tee output/newsroom-enterprise-seo-production-validation/static-delivery.txt
+          smoke_exit=${PIPESTATUS[0]}
+          set -e
+          printf '%s\n' "$smoke_exit" > output/newsroom-enterprise-seo-production-validation/static-delivery-exit.txt
+
+          if [[ "$smoke_exit" -ne 0 ]]; then
+            echo "::warning::Existing production static-delivery smoke found a live contract failure."
+          fi
+
+      - name: Run N6-003 enterprise SEO production validator
+        shell: bash
+        run: |
+          set +e
+          npm run validate:newsroom-enterprise-seo-production 2>&1             | tee output/newsroom-enterprise-seo-production-validation/console.txt
+          seo_exit=${PIPESTATUS[0]}
+          set -e
+          printf '%s\n' "$seo_exit" > output/newsroom-enterprise-seo-production-validation/enterprise-seo-exit.txt
+
+          if [[ "$seo_exit" -ne 0 ]]; then
+            echo "::warning::N6-003 enterprise SEO validator found live production gaps."
+          fi
+
+      - name: Enforce STRICT production gate when requested
+        shell: bash
+        run: |
+          static_exit="$(cat output/newsroom-enterprise-seo-production-validation/static-delivery-exit.txt)"
+          seo_exit="$(cat output/newsroom-enterprise-seo-production-validation/enterprise-seo-exit.txt)"
+
+          {
+            echo "base_url=$BASE_URL"
+            echo "strict=$STRICT"
+            echo "require_newsroom_public=$REQUIRE_NEWSROOM_PUBLIC"
+            echo "static_delivery_exit=$static_exit"
+            echo "enterprise_seo_exit=$seo_exit"
+          } | tee output/newsroom-enterprise-seo-production-validation/workflow-summary.txt
+
+          if [[ "$static_exit" -ne 0 || "$seo_exit" -ne 0 ]]; then
+            if [[ "$STRICT" == "1" ]]; then
+              echo "STRICT mode: enterprise SEO production validation failed." >&2
+              exit 1
+            fi
+
+            echo "::warning::REPORT-ONLY mode: live production has unresolved N6-003 validation gaps."
+          fi
+
+      - name: Upload N6-003 production validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newsroom-enterprise-seo-production-validation
+          path: output/newsroom-enterprise-seo-production-validation
+          if-no-files-found: error
+          retention-days: 7
