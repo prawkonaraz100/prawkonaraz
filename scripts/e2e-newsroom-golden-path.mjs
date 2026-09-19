@@ -141,7 +141,10 @@ try {
         'data.editorial_note': 'N6-001 browser golden path.',
     });
 
-    await callPageComponent(page, 'create');
+    const createSubmit = page.locator('form button[type="submit"]').first();
+    await createSubmit.waitFor();
+    await createSubmit.click();
+    await page.waitForLoadState('networkidle').catch(() => {});
     await waitForLivewireIdle(page);
 
     const article = await readCreatedArticle();
@@ -386,21 +389,6 @@ async function setPageComponentState(page, state) {
             await component.$set(property, propertyValue, false);
         }, { property: key, propertyValue: value });
     }
-}
-
-async function callPageComponent(page, method, ...args) {
-    await page.evaluate(async ({ targetMethod, targetArgs }) => {
-        const form = document.querySelector('form');
-        const root = form?.closest('[wire\\:id]') ?? document.querySelector('[wire\\:id]');
-        const id = root?.getAttribute('wire:id');
-
-        if (!id || !window.Livewire) {
-            throw new Error('Unable to resolve the page Livewire component.');
-        }
-
-        const component = window.Livewire.find(id);
-        await component.$call(targetMethod, ...targetArgs);
-    }, { targetMethod: method, targetArgs: args });
 }
 
 async function runHeaderAction(page, label, successText) {
