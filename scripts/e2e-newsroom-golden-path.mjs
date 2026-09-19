@@ -404,7 +404,7 @@ async function runHeaderAction(page, label, successText) {
     await action.waitFor();
     await action.click();
 
-    const dialog = page.getByRole('dialog').last();
+    const dialog = page.locator('[role="dialog"]:visible').last();
     await dialog.waitFor();
 
     const sameLabelButton = dialog.getByRole('button', { name: label, exact: true });
