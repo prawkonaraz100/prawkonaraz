@@ -1074,7 +1074,7 @@ Production after rollout:
 - preview admin-only auth + private/no-store,
 - XSS,
 - upload validation,
-- no SSRF source fetch,
+- no SSRF source fetch — [x] repo-level regression potwierdzony przez PR #137; loopback/link-local source URL przechodzi review/publish/public-update przy `Http::preventStrayRequests()` i `Http::assertNothingSent()`; exact-head CI #502 oraz post-merge CI #503 PASS,
 - CSRF admin writes,
 - rate limiting public dynamic endpoints if any,
 - no draft leaks through API/search/sitemap/feed.
@@ -1626,6 +1626,13 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-19 — v0.48
+
+- NEWSROOM-N6-005 rozpoczęto od brakującego twardego regression dla kontraktu `source URL no server-side fetch`,
+- PR #137 zmienił wyłącznie `NewsroomPublishingServiceTest`: blokuje outbound Laravel HTTP i potwierdza, że loopback/link-local source URLs pozostają metadanymi przez review -> publish -> Apply public update,
+- finalny HEAD `68660f5caa08e5aed82f3bb62cd48fef345d1171` przeszedł CI #502; merge `main@f73153ccbb9522201a98e0754d71de269ea7c6f7` ma post-merge CI #503 pełny PASS — 1141 passed / 20 231 assertions / 2 skipped, PostgreSQL 7/94, Pint 1102 files PASS i frontend build PASS,
+- nie zmieniono produkcyjnej logiki, architektury ani polityki URL; N6-005 pozostaje IN PROGRESS dla pozostałych security/rollout gates.
 
 ### 2026-09-19 — v0.47
 
