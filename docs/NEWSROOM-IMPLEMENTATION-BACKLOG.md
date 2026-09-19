@@ -2094,13 +2094,48 @@ Nie zmieniamy ustawień repo w ramach docs PR; to osobny operational action.
 
 ## NEWSROOM-N6-001 — E2E golden path
 
+### Status implementacji
+
+**DONE — implementation + exact-head Browser Smoke + post-merge CI potwierdzone na `main`.**
+
+Zakres został zrealizowany przez PR #121 bez zmiany produkcyjnej implementacji ani architektury newsroomu. Zmienione pliki to wyłącznie:
+
+- `.github/workflows/browser-smoke.yml`,
+- `package.json`,
+- `scripts/e2e-newsroom-golden-path.mjs`.
+
+### Potwierdzony golden path
+
 Admin:
 
-draft -> sources -> relations -> preview -> publish.
+- login admina,
+- utworzenie draftu przez rzeczywisty komponent Filament,
+- ordered `body_blocks`,
+- public source,
+- topic + question relation,
+- zapis hero przez newsroom media service wraz z focal point,
+- prywatny preview z `private, no-store` i `noindex`,
+- `draft -> in_review -> reviewed -> published` przez rzeczywiste akcje workflow.
 
 Public:
 
-hub -> article -> related question -> product.
+- `/aktualnosci` hub -> opublikowany artykuł,
+- artykuł -> powiązane publiczne pytanie,
+- artykuł -> product CTA.
+
+Test używa rzeczywistego stanu Filament Builder/Repeater/FileUpload, rzeczywistego confirmation modal oraz odświeżenia edit UI pomiędzy transitionami. Toast nie jest twardym kontraktem testu; o powodzeniu transition decyduje potwierdzony stan domenowy.
+
+### Evidence
+
+- finalny implementation/test HEAD PR #121: `76d0fa7d428b11f2db9d901eac698c7a169722ff`,
+- Browser Smoke #84: PASS, w tym `newsroom-golden-path` oraz wszystkie pozostałe newsroom Browser Smoke,
+- exact-head CI #454: PASS — 1139 passed / 20 219 assertions / 2 skipped, PostgreSQL PASS, Pint 1102 files PASS, frontend build PASS,
+- merge PR #121: `main@b0b29d9b4a3337f4e527334f6ead8b1be85303ad`,
+- post-merge CI #455 na tym exact `main`: PASS — 1139 passed / 20 219 assertions / 2 skipped, PostgreSQL PASS, Pint 1102 files PASS, frontend build PASS.
+
+### Boundary
+
+N6-001 nie zalicza produkcyjnych gate'ów N5-007 ani scheduled-publication production smoke. Następnym logicznym taskiem N6 pozostaje **NEWSROOM-N6-002 — Scheduled publication production smoke**.
 
 ---
 
@@ -2613,6 +2648,14 @@ Następnym wykonywalnym podkrokiem pozostaje **zastosowanie aktualnego Nginx con
 ---
 
 # 12. Historia zmian
+
+### 2026-09-19 — v0.57
+
+- NEWSROOM-N6-001 zakończono przez PR #121 jako dedykowany Browser Smoke golden path bez zmiany produkcyjnego kodu ani architektury; diff obejmuje wyłącznie workflow, package script i `scripts/e2e-newsroom-golden-path.mjs`,
+- finalny implementation/test HEAD `76d0fa7d428b11f2db9d901eac698c7a169722ff` przeszedł Browser Smoke #84 oraz CI #454; golden path potwierdził admin create/preview/workflow publish oraz public hub -> article -> related question -> product,
+- exact-head CI #454: 1139 passed / 20 219 assertions / 2 skipped, PostgreSQL PASS, Pint 1102 files PASS, frontend build 9.47 s; merge PR #121 utworzył `main@b0b29d9b4a3337f4e527334f6ead8b1be85303ad`,
+- post-merge CI #455 na tym exact `main` również zakończył pełny PASS: 1139 passed / 20 219 assertions / 2 skipped, PostgreSQL PASS, Pint 1102 files PASS, frontend build 10.17 s,
+- NEWSROOM-N5-007 produkcyjne gate'y pozostają bez zmian; kolejnym taskiem N6 jest NEWSROOM-N6-002 scheduled-publication production smoke.
 
 ### 2026-09-19 — v0.56
 
