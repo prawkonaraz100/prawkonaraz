@@ -137,7 +137,7 @@ try {
                 note: 'Relacja golden path.',
             },
         ],
-        'data.hero_image_path': fixture.hero_image_path,
+        'data.hero_image_path': [fixture.hero_image_path],
         'data.hero_image_alt': 'Testowy obraz hero golden path N6-001',
         'data.hero_focal_x': 0.35,
         'data.hero_focal_y': 0.65,
