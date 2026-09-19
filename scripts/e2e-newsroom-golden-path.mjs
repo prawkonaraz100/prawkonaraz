@@ -391,7 +391,7 @@ async function setPageComponentState(page, state) {
             }
 
             const component = window.Livewire.find(id);
-            await component.$set(property, propertyValue);
+            component.$set(property, propertyValue, false);
         }, { property: key, propertyValue: value });
     }
 }
