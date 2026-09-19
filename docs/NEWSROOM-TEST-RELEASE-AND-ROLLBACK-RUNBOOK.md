@@ -87,6 +87,30 @@ Dla:
 
 Dla krytycznego redakcyjnego golden path.
 
+Stan po NEWSROOM-N6-003 — enterprise SEO production validation:
+
+- istnieje osobny workflow `Newsroom Enterprise SEO Production Validation`,
+- PR runs są REPORT-ONLY przeciw live production; manualny `workflow_dispatch` domyślnie STRICT,
+- workflow reużywa istniejący `scripts/production-seo-delivery-smoke.sh`, więc robots/sitemap/static cache/Set-Cookie/validator/304 contract nie jest dublowany,
+- nowy Node validator sprawdza homepage canonical + WebSite/Organization identity, Organization logo, newsroom hub indexing contract, sitemap index/children, feed/discovery oraz opcjonalne representative article/category/topic samples,
+- finalny HEAD PR #125 `8a64f81c15fb6c52e2a90db26c5c65c9ad999801`: Enterprise SEO Production Validation #2 workflow success w REPORT-ONLY mode, Scheduled Publication Smoke #12 PASS, Browser Smoke #96 PASS, CI #472 PASS,
+- merge `main@0344427cdf42804a037c688df54da6216f243ca6`: post-merge CI #473 PASS — 1139 passed / 20 219 assertions / 2 skipped, PostgreSQL PASS, frontend build PASS.
+
+Live baseline z report-only evidence nadal ma failures i dlatego nie jest release PASS:
+
+- robots cache nadal `max-age=14400`,
+- live homepage nie ma jeszcze stable WebSite/Organization `@id` zgodnych z aktualnym `main`,
+- live `/aktualnosci` nie spełnia ani publicznego newsroom contractu, ani repo placeholder `noindex` contractu,
+- brak article/news sitemap coverage i feed pozostaje 404.
+
+GSC 2026-09-19:
+
+- homepage URL Inspection: `Duplicate, Google chose different canonical than user`,
+- `/aktualnosci`: `URL is unknown to Google`,
+- główny sitemap index jest submitted i ostatnio pobrany 2026-09-19 bez reported warnings/errors.
+
+N6-003 pozostaje IN PROGRESS do aktualnego production deploy/runtime, zielonego STRICT workflow i reprezentatywnych article/category/topic samples.
+
 Stan po NEWSROOM-N6-002 — scheduled publication release smoke:
 
 - istnieje osobny workflow `Newsroom Scheduled Publication Smoke` uruchamiany dla zmian w scheduler/publishing/SEO-refresh contract oraz ręcznie przez `workflow_dispatch`,
@@ -1570,11 +1594,22 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - [x] dodać N4-008 semantic-link feature/browser regression dla category/topic/related/reverse modules, gate i responsive no-overflow,
 - [x] dodać N6-001 dedykowany editorial/public Browser Smoke golden path i potwierdzić exact-head oraz post-merge CI,
 - [x] dodać N6-002 production-mode scheduled-publication release smoke i potwierdzić real-clock pre-due/post-due publication, dirty/version oraz feed/sitemap refresh bez daily cron,
+- [x] dodać N6-003 report-only/STRICT enterprise SEO production-validation harness reużywający existing static-delivery smoke,
+- [ ] uzyskać zielony manualny STRICT N6-003 run po aktualnym deploy/runtime i zachować live article/category/topic + GSC evidence,
 - [ ] po pierwszym release wpisać rzeczywiste wyniki i ewentualne różnice od planu.
 
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-19 — v0.42
+
+- NEWSROOM-N6-003 otrzymał dedykowany enterprise SEO production-validation harness w PR #125; nie zmieniono produkcyjnej logiki aplikacji ani architektury,
+- report-only PR mode zbiera live evidence, manualny `workflow_dispatch` domyślnie egzekwuje STRICT; workflow reużywa existing production static-delivery smoke i dodaje homepage/site-identity/logo/newsroom/sitemap/feed/sample checks,
+- finalny HEAD `8a64f81c15fb6c52e2a90db26c5c65c9ad999801`: Enterprise SEO Production Validation #2 workflow success w REPORT-ONLY mode, Scheduled Publication Smoke #12 PASS, Browser Smoke #96 PASS, CI #472 PASS,
+- merge PR #125 utworzył `main@0344427cdf42804a037c688df54da6216f243ca6`; post-merge CI #473 PASS — 1139 passed / 20 219 assertions / 2 skipped, PostgreSQL PASS, frontend build PASS,
+- live report-only evidence nadal wykazuje robots cache mismatch, nieaktualny homepage graph identity, niespójny `/aktualnosci` indexing contract, brak article/news sitemap coverage i feed 404; GSC homepage ma Google-selected canonical mismatch, a `/aktualnosci` jest unknown,
+- N6-003 pozostaje IN PROGRESS; nie zapisujemy report-only workflow success jako production PASS.
 
 ### 2026-09-19 — v0.41
 
