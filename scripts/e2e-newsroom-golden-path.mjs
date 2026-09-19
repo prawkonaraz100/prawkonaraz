@@ -64,10 +64,15 @@ try {
     await page.goto(`${baseUrl}/admin/login`, { waitUntil: 'domcontentloaded' });
     await page.locator('input[type="email"]').fill(adminEmail);
     await page.locator('input[type="password"]').fill(adminPassword);
-    await Promise.all([
-        page.waitForURL((url) => !url.pathname.endsWith('/admin/login'), { timeout: 20_000 }),
-        page.locator('button[type="submit"]').click(),
-    ]);
+    const loginResponsePromise = page.waitForResponse((response) => (
+        response.request().method() === 'POST'
+        && new URL(response.url()).pathname.includes('/livewire-')
+        && new URL(response.url()).pathname.endsWith('/update')
+    ));
+    await page.locator('button[type="submit"]').click({ noWaitAfter: true });
+    const loginResponse = await loginResponsePromise;
+    assert(loginResponse.status() === 200, `Admin login Livewire update returned HTTP ${loginResponse.status()}.`);
+    await page.waitForTimeout(300);
     report.steps.push('login-admin');
 
     console.log('[newsroom-golden] create draft through Filament page component');
@@ -438,6 +443,7 @@ function startLaravelServer() {
                 ...process.env,
                 APP_URL: baseUrl,
                 NEWSROOM_PUBLIC_ENABLED: 'true',
+                PHP_CLI_SERVER_WORKERS: '4',
             },
             stdio: ['ignore', 'pipe', 'pipe'],
         },
