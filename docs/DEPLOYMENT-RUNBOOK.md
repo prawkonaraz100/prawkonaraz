@@ -425,6 +425,13 @@ REQUIRE_NEWSROOM_FEED=1 bash scripts/production-seo-delivery-smoke.sh https://pr
 
 Zachowaj wynik tego realnego runu jako evidence. Sam fakt, że skrypt istnieje w repo lub że jego test konfiguracji jest PASS, nie oznacza production smoke PASS.
 
+Od PR #117 ten sam smoke ma dedykowany workflow GitHub Actions `.github/workflows/production-seo-delivery-smoke.yml`:
+- run na `pull_request` jest **REPORT-ONLY** przeciw aktualnej produkcji; może zakończyć job zielono mimo niezgodności, ale zapisuje raport i warning,
+- `workflow_dispatch` jest domyślnie **STRICT** i jest właściwym sposobem zapisania post-deploy production evidence po zastosowaniu aktualnego Nginx configu,
+- opcja `require_newsroom_feed` wymusza publiczny kontrakt Atom feedu dopiero po świadomym włączeniu newsroom public gate.
+
+Pierwszy report-only run workflow z PR #117 nie był production PASS: publiczny `/robots.txt` zwrócił `Cache-Control: max-age=14400`, podczas gdy kontrakt repo oczekuje `public, max-age=3600`; smoke zakończył się kodem `1`. Taki zielony REPORT-ONLY job jest wyłącznie evidence rozbieżności. Production PASS wolno zapisać dopiero po udanym STRICT `workflow_dispatch`.
+
 Minimalny sukces:
 
 - publiczne URL-e zwracaja `200` albo oczekiwane `301`,
