@@ -99,6 +99,17 @@ class TrafficSignBreadcrumbs
     /**
      * @return list<array{label: string, url: string}>
      */
+    public function editorialPrinciples(): array
+    {
+        return [
+            ['label' => 'Strona główna', 'url' => route('home')],
+            ['label' => 'Zasady redakcyjne', 'url' => route('about.editorial-principles')],
+        ];
+    }
+
+    /**
+     * @return list<array{label: string, url: string}>
+     */
     public function supportingPage(string $title, string $slug): array
     {
         return [
