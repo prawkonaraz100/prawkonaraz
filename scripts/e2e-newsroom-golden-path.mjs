@@ -46,6 +46,7 @@ try {
 
     console.log('[newsroom-golden] seed prerequisites');
     const fixture = await seedPrerequisites();
+    report.steps.push('store-hero-through-media-service');
 
     console.log('[newsroom-golden] start Laravel server');
     serverProcess = startLaravelServer();
@@ -82,15 +83,6 @@ try {
         `Create page redirected unexpectedly to ${page.url()}.`,
     );
     await page.locator('form[wire\\:submit]').first().waitFor();
-
-    const uploadInput = page.locator('input[type="file"]').first();
-    if (await uploadInput.count() !== 1) {
-        throw new Error('Hero FileUpload input was not found on the create page.');
-    }
-
-    await uploadInput.setInputFiles(heroPath);
-    await waitForComponentStatePresent(page, 'data.hero_image_path', 30_000);
-    await waitForLivewireIdle(page);
 
     await setPageComponentState(page, {
         'data.type': 'news',
@@ -145,6 +137,7 @@ try {
                 note: 'Relacja golden path.',
             },
         ],
+        'data.hero_image_path': fixture.hero_image_path,
         'data.hero_image_alt': 'Testowy obraz hero golden path N6-001',
         'data.hero_focal_x': 0.35,
         'data.hero_focal_y': 0.65,
@@ -315,6 +308,10 @@ $question = \App\Models\Question::factory()->for($licenseCategory, 'licenseCateg
     'requires_primary_media' => false,
     'delivery_issue' => null,
 ]);
+$heroFile = base_path('output/playwright/newsroom-golden-path/hero.png');
+$hero = app(\App\Support\NewsroomArticleMediaService::class)->store(
+    new \Illuminate\Http\UploadedFile($heroFile, 'hero.png', 'image/png', null, true),
+);
 file_put_contents(
     base_path('output/playwright/newsroom-golden-path/fixture.json'),
     json_encode([
@@ -325,6 +322,9 @@ file_put_contents(
         'question_id' => $question->id,
         'question_external_id' => $question->external_id,
         'question_prompt' => strip_tags((string) $question->prompt),
+        'hero_image_path' => $hero['path'],
+        'hero_image_width' => $hero['width'],
+        'hero_image_height' => $hero['height'],
         'create_path' => parse_url(
             \App\Filament\Resources\ContentArticles\ContentArticleResource::getUrl('create', panel: 'admin'),
             PHP_URL_PATH,
@@ -397,31 +397,6 @@ async function setPageComponentState(page, state) {
             component.$set(property, propertyValue, false);
         }, { property: key, propertyValue: value });
     }
-}
-
-async function waitForComponentStatePresent(page, property, timeout = 15_000) {
-    await page.waitForFunction(
-        ({ stateProperty }) => {
-            const form = document.querySelector('form[wire\\:submit]');
-            const root = form?.closest('[wire\\:id]') ?? document.querySelector('[wire\\:id]');
-            const id = root?.getAttribute('wire:id');
-
-            if (!id || !window.Livewire) {
-                return false;
-            }
-
-            const component = window.Livewire.find(id);
-            const value = component.$get(stateProperty);
-
-            if (Array.isArray(value)) {
-                return value.length > 0;
-            }
-
-            return value !== null && value !== undefined && value !== '';
-        },
-        { stateProperty: property },
-        { timeout },
-    );
 }
 
 async function runHeaderAction(page, label, successText) {
