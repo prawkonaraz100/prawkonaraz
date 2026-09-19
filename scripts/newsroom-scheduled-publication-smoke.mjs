@@ -182,18 +182,18 @@ $slug = (string) env('N6_SCHEDULED_SMOKE_SLUG');
 $title = (string) env('N6_SCHEDULED_SMOKE_TITLE');
 $delay = max(20, (int) env('N6_SCHEDULED_SMOKE_DELAY_SECONDS', 45));
 
-$category = \\App\\Models\\ContentCategory::factory()->create([
+$category = \App\Models\\ContentCategory::factory()->create([
     'name' => 'N6 Scheduled Smoke',
     'slug' => 'n6-scheduled-smoke',
     'is_active' => true,
 ]);
 
-$author = \\App\\Models\\ContentAuthor::factory()->published()->create([
+$author = \App\Models\\ContentAuthor::factory()->published()->create([
     'name' => 'N6 Smoke Author',
     'slug' => 'n6-smoke-author',
 ]);
 
-\\App\\Models\\ContentArticle::factory()->published()->create([
+\App\Models\\ContentArticle::factory()->published()->create([
     'category_id' => $category->id,
     'author_id' => $author->id,
     'title' => 'N6 baseline published news',
@@ -203,7 +203,7 @@ $author = \\App\\Models\\ContentAuthor::factory()->published()->create([
     'public_state_changed_at' => now()->subMinutes(10),
 ]);
 
-$article = \\App\\Models\\ContentArticle::factory()->inReview()->create([
+$article = \App\Models\\ContentArticle::factory()->inReview()->create([
     'category_id' => $category->id,
     'author_id' => $author->id,
     'title' => $title,
@@ -211,7 +211,7 @@ $article = \\App\\Models\\ContentArticle::factory()->inReview()->create([
     'lead' => 'Scheduled publication release smoke using the real scheduler clock.',
 ]);
 
-\\App\\Models\\ContentArticleSource::factory()
+\App\Models\\ContentArticleSource::factory()
     ->for($article, 'article')
     ->create([
         'publisher' => 'N6 smoke source',
@@ -220,7 +220,7 @@ $article = \\App\\Models\\ContentArticle::factory()->inReview()->create([
         'is_publicly_cited' => true,
     ]);
 
-$service = app(\\App\\Support\\ContentArticlePublishingService::class);
+$service = app(\App\Support\\ContentArticlePublishingService::class);
 $reviewed = $service->markReviewed($article);
 $scheduled = $service->schedule($reviewed, now()->addSeconds($delay));
 
@@ -231,7 +231,7 @@ file_put_contents(
         'slug' => $scheduled->slug,
         'title' => $scheduled->title,
         'scheduled_for' => $scheduled->scheduled_for?->toAtomString(),
-        'public_path' => \\App\\Support\\NewsroomRouteContract::canonicalPath(
+        'public_path' => \App\Support\\NewsroomRouteContract::canonicalPath(
             $scheduled->type?->value ?? (string) $scheduled->type,
             (string) $scheduled->slug,
         ),
@@ -244,7 +244,7 @@ file_put_contents(
 
 async function readCoordinatorState() {
     const php = String.raw`
-$coordinator = app(\\App\\Support\\NewsroomSeoArtifactRefreshCoordinator::class);
+$coordinator = app(\App\Support\\NewsroomSeoArtifactRefreshCoordinator::class);
 file_put_contents(
     base_path('output/newsroom-scheduled-publication-smoke/coordinator.json'),
     json_encode([
@@ -262,13 +262,13 @@ file_put_contents(
 
 async function readArticleState() {
     const php = String.raw`
-$article = \\App\\Models\\ContentArticle::query()
+$article = \App\Models\\ContentArticle::query()
     ->where('slug', (string) env('N6_SCHEDULED_SMOKE_SLUG'))
     ->firstOrFail();
 
-$audit = \\App\\Models\\AuditLog::query()
+$audit = \App\Models\\AuditLog::query()
     ->where('action', 'content_article.published')
-    ->where('entity_type', \\App\\Models\\ContentArticle::class)
+    ->where('entity_type', \App\Models\\ContentArticle::class)
     ->where('entity_id', (string) $article->id)
     ->latest('id')
     ->first();
