@@ -1505,7 +1505,7 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - pierwszy podkrok NEWSROOM-N5-007 jest potwierdzony po PR #109: complete-set XML pre-validation, child-before-index atomic publication oraz post-switch cleanup zarządzanych article/news sitemap files; exact-head CI #403 i post-merge CI #404 zakończyły pełny PASS,
 - drugi podkrok NEWSROOM-N5-007 jest potwierdzony po PR #112: cache-backed version/clean-version coordinator, shared lock, clean-state skip, failure/race retention, after-commit dirty events/observers oraz every-minute scheduler z `onOneServer()` + `withoutOverlapping()`; exact-head CI #409 i post-merge CI #410 zakończyły pełny PASS,
 - aktualne canonical deployment docs potwierdzają single-node Mikrus 4.1 z lokalnym `public/`, lokalnym Redisem i jednym cronem `schedule:run`, więc topology gate jest spełniony dla obecnego contractu,
-- NEWSROOM-N5-007 pozostaje IN PROGRESS: PR #115 dodał crawler-safe Nginx contract, `production-seo-delivery-smoke.sh` i repo-level Nginx regression, ale faktyczne uruchomienie smoke przeciw produkcji oraz HTTP/Cloudflare evidence nadal nie są potwierdzone; dedykowany scheduler-definition/lock-contention regression również pozostaje otwartym test evidence. Produkcyjny rollout fazy 2 IndexNow/Bing verification pozostaje osobnym otwartym evidence.
+- NEWSROOM-N5-007 pozostaje IN PROGRESS: PR #115 dodał crawler-safe Nginx contract, `production-seo-delivery-smoke.sh` i repo-level Nginx regression; PR #117 dodał GitHub Actions smoke harness. Report-only public run wykazał `Cache-Control: max-age=14400` dla `/robots.txt` zamiast oczekiwanego `public, max-age=3600`, więc faktyczny STRICT production PASS oraz HTTP/Cloudflare evidence nadal nie są potwierdzone; dedykowany scheduler-definition/lock-contention regression również pozostaje otwartym test evidence. Produkcyjny rollout fazy 2 IndexNow/Bing verification pozostaje osobnym otwartym evidence.
 
 ---
 
@@ -1532,7 +1532,7 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - [x] dodać production-like static robots/sitemap/feed delivery smoke — PR #115 dodaje `scripts/production-seo-delivery-smoke.sh` z Content-Type/cache/no-Set-Cookie/validator/304 checks oraz rollout-gated feed contract,
 - [x] dodać N5-006 `NewsroomSeoSitemapAuditTest` i rozszerzyć istniejący `SeoSitemapAuditor` o duplicate/missing-child, News namespace/tags/date/window, current-canonical/indexability/redirect-source, topology/shard/obsolete-file checks przy zachowaniu generic entry-count/byte-size guards,
 - [x] stworzyć production smoke checklist w praktyce — executable checklist istnieje jako `scripts/production-seo-delivery-smoke.sh`,
-- [ ] uruchomić ten smoke przeciw rzeczywistej produkcji po wdrożeniu aktualnego Nginx configu i zachować evidence dla robots/root/static sitemap/feed oraz conditional 304,
+- [ ] po wdrożeniu aktualnego Nginx configu uruchomić STRICT `workflow_dispatch` Production SEO Delivery Smoke i zachować artifact evidence dla robots/root/static sitemap/feed oraz conditional 304; report-only PR #117 już wykazał cache mismatch i nie zalicza tego gate'u,
 - [x] wdrożyć i przetestować `NEWSROOM_PUBLIC_ENABLED` w N3-008 dla obecnie istniejących public detail/redirect + author + IndexNow surfaces; przyszłe N4/N5 discovery surfaces nadal wymagają tego samego gate,
 - [x] dodać N4-001 `NewsroomHomeReadModelServiceTest` dla rollout gate, scalar/cacheable projection i stałego query budgetu niezależnego od liczby kategorii,
 - [x] dodać N4-002 public Hub Blade/browser regression wraz z rzeczywistym publicznym rendererem,
@@ -1547,6 +1547,14 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-19 — v0.38
+
+- PR #117 dodał `.github/workflows/production-seo-delivery-smoke.yml` nad istniejącym `scripts/production-seo-delivery-smoke.sh`,
+- PR mode jest REPORT-ONLY, manualny `workflow_dispatch` domyślnie STRICT; raport jest uploadowany jako artifact,
+- exact-head CI #420: 1137 passed / 20 207 assertions / 2 skipped, PostgreSQL 7/94, Pint 1102 files PASS, frontend 9.66 s; post-merge CI #421 powtórzył 1137 / 20 207 / 2 skipped, PostgreSQL 7/94, Pint 1102 files PASS i frontend 5.49 s,
+- report-only run przeciw produkcji miał underlying exit code 1, bo `/robots.txt` zwrócił `Cache-Control: max-age=14400` zamiast oczekiwanego `public, max-age=3600`; nie zapisujemy tego jako production PASS,
+- następny twardy release gate: zastosować aktualny Nginx config i uzyskać zielony STRICT workflow run; scheduler-definition/lock-contention regression pozostaje osobnym open evidence.
 
 ### 2026-09-18 — v0.37
 
