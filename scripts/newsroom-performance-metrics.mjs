@@ -45,6 +45,7 @@ export function assertPerformanceBudget(label, metrics, budget) {
 
 async function collectImages(html, context) {
     const tags = [...html.matchAll(/<img\b[^>]*>/gi)].map((match) => match[0]);
+    const uniqueTags = [...new Map(tags.map((tag) => [readAttribute(tag, 'src') ?? tag, tag])).values()];
     const items = [];
     const unresolved = [];
 
