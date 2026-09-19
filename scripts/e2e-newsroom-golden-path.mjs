@@ -11,6 +11,7 @@ const reportPath = path.join(outputDir, 'report.json');
 const heroPath = path.join(outputDir, 'hero.png');
 const port = Number(process.env.E2E_NEWSROOM_GOLDEN_PORT ?? '8133');
 const baseUrl = `http://127.0.0.1:${port}`;
+const useExternalServer = process.env.E2E_NEWSROOM_EXTERNAL_SERVER === 'true';
 const title = 'E2E N6 golden path — pełny przepływ redakcyjny';
 const slug = 'e2e-n6-golden-path';
 const adminEmail = 'newsroom-golden@example.test';
@@ -48,8 +49,12 @@ try {
     const fixture = await seedPrerequisites();
     report.steps.push('store-hero-through-media-service');
 
-    console.log('[newsroom-golden] start Laravel server');
-    serverProcess = startLaravelServer();
+    if (useExternalServer) {
+        console.log('[newsroom-golden] use external Laravel server');
+    } else {
+        console.log('[newsroom-golden] start Laravel server');
+        serverProcess = startLaravelServer();
+    }
     await waitForHttp(`${baseUrl}/admin/login`);
 
     browser = await chromium.launch({ headless: true });

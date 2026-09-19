@@ -508,6 +508,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       APP_ENV: testing
+      APP_URL: http://127.0.0.1:8000
       NEWSROOM_PUBLIC_ENABLED: 'true'
       DB_CONNECTION: sqlite
       DB_DATABASE: database/database.sqlite
@@ -517,6 +518,11 @@ jobs:
       QUEUE_CONNECTION: sync
       MAIL_MAILER: log
       MEDIA_LOCAL_ROOT: ${{ github.workspace }}/storage/app/public-media
+      MEDIA_LOCAL_HOST_ROOT: ${{ github.workspace }}/storage/app/public-media
+      MEDIA_LOCAL_URL: http://127.0.0.1:8081
+      AUDIO_GENERATOR_HOST_ROOT: ${{ github.workspace }}/storage/app/audio-generator-stub
+      E2E_NEWSROOM_EXTERNAL_SERVER: 'true'
+      E2E_NEWSROOM_GOLDEN_PORT: '8000'
 
     steps:
       - name: Checkout repository
@@ -555,8 +561,39 @@ jobs:
       - name: Build frontend assets
         run: npm run build
 
+      - name: Start stable Docker browser server
+        run: |
+          mkdir -p storage/app/public-media storage/app/audio-generator-stub
+          chmod -R a+rwX database storage bootstrap/cache
+          export APP_KEY_VALUE="$(grep '^APP_KEY=' .env | cut -d= -f2-)"
+          cat > /tmp/newsroom-golden.compose.yml <<'EOF'
+          services:
+            app:
+              environment:
+                APP_KEY: ${APP_KEY_VALUE}
+                APP_ENV: testing
+                APP_DEBUG: "true"
+                APP_URL: http://127.0.0.1:8000
+                NEWSROOM_PUBLIC_ENABLED: "true"
+                DB_CONNECTION: sqlite
+                DB_DATABASE: /var/www/html/database/database.sqlite
+                DB_URL: ""
+                SESSION_DRIVER: file
+                CACHE_STORE: file
+                QUEUE_CONNECTION: sync
+                MAIL_MAILER: log
+                MEDIA_NEWSROOM_DISK: media_local
+          EOF
+          docker compose -f docker-compose.yml -f /tmp/newsroom-golden.compose.yml up -d --build app web media
+          docker compose -f docker-compose.yml -f /tmp/newsroom-golden.compose.yml ps
+          curl --fail --retry 30 --retry-all-errors --retry-delay 1 http://127.0.0.1:8000/admin/login >/dev/null
+
       - name: Run newsroom N6 golden path
         run: npm run e2e:newsroom-golden-path
+
+      - name: Stop stable Docker browser server
+        if: always()
+        run: docker compose -f docker-compose.yml -f /tmp/newsroom-golden.compose.yml down --remove-orphans || true
 
       - name: Upload newsroom golden path artifacts
         if: always()
