@@ -518,6 +518,7 @@ jobs:
       QUEUE_CONNECTION: sync
       MAIL_MAILER: log
       MEDIA_LOCAL_ROOT: ${{ github.workspace }}/storage/app/public-media
+      MEDIA_NEWSROOM_DISK: media_local
       MEDIA_LOCAL_HOST_ROOT: ${{ github.workspace }}/storage/app/public-media
       MEDIA_LOCAL_URL: http://127.0.0.1:8081
       AUDIO_GENERATOR_HOST_ROOT: ${{ github.workspace }}/storage/app/audio-generator-stub
