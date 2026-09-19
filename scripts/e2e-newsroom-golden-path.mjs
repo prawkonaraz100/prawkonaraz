@@ -1,0 +1,675 @@
+import { spawn } from 'node:child_process';
+import fs from 'node:fs/promises';
+import http from 'node:http';
+import path from 'node:path';
+import process from 'node:process';
+import { chromium } from 'playwright';
+
+const cwd = process.cwd();
+const outputDir = path.join(cwd, 'output', 'playwright', 'newsroom-golden-path');
+const reportPath = path.join(outputDir, 'report.json');
+const heroPath = path.join(outputDir, 'hero.png');
+const port = Number(process.env.E2E_NEWSROOM_GOLDEN_PORT ?? '8133');
+const baseUrl = `http://127.0.0.1:${port}`;
+const useExternalServer = process.env.E2E_NEWSROOM_EXTERNAL_SERVER === 'true';
+const title = 'E2E N6 golden path — pełny przepływ redakcyjny';
+const slug = 'e2e-n6-golden-path';
+const adminEmail = 'newsroom-golden@example.test';
+const adminPassword = 'password';
+
+process.env.APP_URL = baseUrl;
+process.env.NEWSROOM_PUBLIC_ENABLED = 'true';
+
+const report = {
+    started_at: new Date().toISOString(),
+    status: 'running',
+    base_url: baseUrl,
+    article_title: title,
+    article_slug: slug,
+    steps: [],
+};
+
+let browser;
+let serverProcess;
+
+try {
+    await fs.mkdir(outputDir, { recursive: true });
+    await fs.writeFile(
+        heroPath,
+        Buffer.from(
+            'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAFgwJ/lKxM9QAAAABJRU5ErkJggg==',
+            'base64',
+        ),
+    );
+
+    console.log('[newsroom-golden] migrate');
+    await runCommand('php', ['artisan', 'migrate', '--force']);
+
+    console.log('[newsroom-golden] seed prerequisites');
+    const fixture = await seedPrerequisites();
+    report.steps.push('store-hero-through-media-service');
+
+    if (useExternalServer) {
+        console.log('[newsroom-golden] use external Laravel server');
+    } else {
+        console.log('[newsroom-golden] start Laravel server');
+        serverProcess = startLaravelServer();
+    }
+    await waitForHttp(`${baseUrl}/admin/login`);
+
+    browser = await chromium.launch({ headless: true });
+    const context = await browser.newContext({
+        viewport: { width: 1440, height: 1000 },
+        serviceWorkers: 'block',
+    });
+    const page = await context.newPage();
+    page.setDefaultTimeout(15_000);
+    page.setDefaultNavigationTimeout(20_000);
+
+    console.log('[newsroom-golden] login');
+    await gotoWithRetry(page, `${baseUrl}/admin/login`);
+    await page.locator('input[type="email"]').fill(adminEmail);
+    await page.locator('input[type="password"]').fill(adminPassword);
+    const loginResponsePromise = page.waitForResponse((response) => (
+        response.request().method() === 'POST'
+        && new URL(response.url()).pathname.includes('/livewire-')
+        && new URL(response.url()).pathname.endsWith('/update')
+    ));
+    await page.locator('button[type="submit"]').click({ noWaitAfter: true });
+    const loginResponse = await loginResponsePromise;
+    assert(loginResponse.status() === 200, `Admin login Livewire update returned HTTP ${loginResponse.status()}.`);
+    await page.waitForTimeout(300);
+    report.steps.push('login-admin');
+
+    console.log('[newsroom-golden] create draft through Filament page component');
+    await gotoWithReadyLocator(
+        page,
+        `${baseUrl}${fixture.create_path}`,
+        'form[wire\\:submit]',
+    );
+    assert(
+        new URL(page.url()).pathname === fixture.create_path,
+        `Create page redirected unexpectedly to ${page.url()}.`,
+    );
+    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForTimeout(300);
+
+    await setPageComponentState(page, {
+        'data.type': 'news',
+        'data.category_id': fixture.category_id,
+        'data.title': title,
+        'data.slug': slug,
+        'data.author_id': fixture.author_id,
+        'data.origin_type': 'original',
+        'data.regulatory_status': 'not_applicable',
+        'data.lead': 'Testowy lead integracyjny dla pełnego przepływu redakcyjnego N6-001.',
+        'data.body_blocks': keyedCollection([
+            {
+                type: 'context',
+                data: {
+                    variant: 'uwaga',
+                    title: 'Golden path',
+                    text: 'Ten blok został zapisany przez rzeczywisty komponent Filament i jest częścią publicznego artykułu.',
+                },
+            },
+            {
+                type: 'question_group',
+                data: {
+                    question_ids: [fixture.question_id],
+                },
+            },
+            {
+                type: 'product_cta',
+                data: {
+                    kind: 'test',
+                },
+            },
+        ]),
+        'data.sources': keyedCollection([
+            {
+                source_type: 'official',
+                publisher: 'E2E Instytucja',
+                title: 'E2E źródło oficjalne',
+                url: 'https://example.test/newsroom-golden-source',
+                published_at: null,
+                accessed_at: null,
+                is_primary: true,
+                is_official: true,
+                is_publicly_cited: true,
+                note: null,
+            },
+        ]),
+        'data.topic_ids': [fixture.topic_id],
+        'data.question_relations': keyedCollection([
+            {
+                question_id: fixture.question_id,
+                relation_type: 'direct',
+                note: 'Relacja golden path.',
+            },
+        ]),
+        'data.hero_image_path': keyedCollection([fixture.hero_image_path]),
+        'data.hero_image_alt': 'Testowy obraz hero golden path N6-001',
+        'data.hero_focal_x': 0.35,
+        'data.hero_focal_y': 0.65,
+        'data.editorial_note': 'N6-001 browser golden path.',
+    });
+
+    const createSubmit = page.locator('form[wire\\:submit] button[type="submit"]').first();
+    await createSubmit.waitFor();
+    const createResponsePromise = page.waitForResponse((response) => (
+        response.request().method() === 'POST'
+        && new URL(response.url()).pathname.includes('/livewire-')
+        && new URL(response.url()).pathname.endsWith('/update')
+    ));
+    await createSubmit.click({ noWaitAfter: true });
+    const createResponse = await createResponsePromise;
+    assert(createResponse.status() === 200, `Create Livewire update returned HTTP ${createResponse.status()}.`);
+    await waitForLivewireIdle(page);
+
+    const article = await readCreatedArticle();
+    if (!article.exists) {
+        const validationMessages = await page
+            .locator('.fi-fo-field-wrp-error-message, [data-validation-error], [role="alert"]')
+            .allInnerTexts()
+            .catch(() => []);
+        const bodyText = await page.locator('body').innerText().catch(() => '');
+        await page.screenshot({
+            path: path.join(outputDir, 'create-failure.png'),
+            fullPage: true,
+        }).catch(() => {});
+        throw new Error(
+            `Create page did not persist ContentArticle. URL=${page.url()}; validation=${validationMessages.join(' | ') || 'none'}; body=${bodyText.slice(0, 2000)}`,
+        );
+    }
+    assert(article.workflow_status === 'draft', `Expected draft after create, got ${article.workflow_status}.`);
+    assert(article.sources_count === 1, `Expected one source, got ${article.sources_count}.`);
+    assert(article.questions_count === 1, `Expected one question relation, got ${article.questions_count}.`);
+    assert(article.topics_count === 1, `Expected one topic relation, got ${article.topics_count}.`);
+    assert(Boolean(article.hero_image_path), 'Expected persisted hero image path.');
+    assert(article.hero_image_width > 0 && article.hero_image_height > 0, 'Expected verified hero dimensions.');
+    assert(Math.abs(article.hero_focal_x - 0.35) < 0.001, `Unexpected hero focal X: ${article.hero_focal_x}.`);
+    assert(Math.abs(article.hero_focal_y - 0.65) < 0.001, `Unexpected hero focal Y: ${article.hero_focal_y}.`);
+    report.steps.push('create-draft-body-source-relations-hero');
+
+    console.log('[newsroom-golden] private preview');
+    await gotoWithReadyLocator(
+        page,
+        `${baseUrl}${article.edit_path}`,
+        'button:has-text("Wyślij do review")',
+    );
+    const previewPage = await context.newPage();
+    const previewResponse = await gotoWithRetry(previewPage, `${baseUrl}${article.preview_path}`);
+
+    assert(previewResponse?.status() === 200, `Preview returned HTTP ${previewResponse?.status() ?? 'none'}.`);
+    const previewHeaders = previewResponse.headers();
+    assert(
+        (previewHeaders['cache-control'] ?? '').includes('private')
+            && (previewHeaders['cache-control'] ?? '').includes('no-store'),
+        `Preview cache contract failed: ${previewHeaders['cache-control'] ?? 'missing'}.`,
+    );
+    assert(
+        (previewHeaders['x-robots-tag'] ?? '').toLowerCase().includes('noindex'),
+        `Preview robots contract failed: ${previewHeaders['x-robots-tag'] ?? 'missing'}.`,
+    );
+    await previewPage.getByRole('heading', { level: 1, name: title }).waitFor();
+    const previewText = await previewPage.locator('body').innerText();
+    assert(previewText.includes('Golden path'), 'Preview is missing the body block.');
+    assert(previewText.includes('E2E źródło oficjalne'), 'Preview is missing the public source.');
+    await previewPage.close();
+    report.steps.push('private-preview');
+
+    console.log('[newsroom-golden] review workflow');
+    await runHeaderAction(page, 'Wyślij do review', 'Artykuł wysłany do review.');
+    let workflow = await readCreatedArticle();
+    assert(workflow.workflow_status === 'in_review', `Expected in_review, got ${workflow.workflow_status}.`);
+
+    await gotoWithReadyLocator(
+        page,
+        `${baseUrl}${article.edit_path}`,
+        'button:has-text("Oznacz jako sprawdzony")',
+    );
+    await runHeaderAction(page, 'Oznacz jako sprawdzony', 'Review zakończony.');
+    workflow = await readCreatedArticle();
+    assert(Boolean(workflow.reviewed_at), 'Expected reviewed_at after markReviewed.');
+
+    await gotoWithReadyLocator(
+        page,
+        `${baseUrl}${article.edit_path}`,
+        'button:has-text("Opublikuj teraz")',
+    );
+    await runHeaderAction(page, 'Opublikuj teraz', 'Artykuł został opublikowany.');
+    workflow = await readCreatedArticle();
+    assert(workflow.workflow_status === 'published', `Expected published, got ${workflow.workflow_status}.`);
+    assert(Boolean(workflow.published_at), 'Expected published_at after publish.');
+    report.steps.push('submit-review-mark-reviewed-publish');
+
+    console.log('[newsroom-golden] public hub -> article');
+    const hubResponse = await gotoWithRetry(page, `${baseUrl}/aktualnosci`);
+    assert(hubResponse?.status() === 200, `Newsroom hub returned HTTP ${hubResponse?.status() ?? 'none'}.`);
+
+    const articleLink = page.locator(`a[href="${article.public_path}"]`).first();
+    await articleLink.waitFor();
+    await Promise.all([
+        page.waitForURL((url) => url.pathname === article.public_path),
+        articleLink.click(),
+    ]);
+    await page.getByRole('heading', { level: 1, name: title }).waitFor();
+
+    const bodyText = await page.locator('body').innerText();
+    for (const expected of ['Golden path', 'E2E źródło oficjalne', fixture.topic_title]) {
+        assert(bodyText.includes(expected), `Public article is missing "${expected}".`);
+    }
+    report.steps.push('hub-to-article');
+
+    console.log('[newsroom-golden] article -> related question');
+    const questionLink = page.locator('a[href*="/pytanie/"]').filter({ hasText: fixture.question_external_id }).first();
+    if (await questionLink.count() === 0) {
+        throw new Error('Related public question link was not rendered by the article Product Bridge.');
+    }
+
+    const questionHref = await questionLink.getAttribute('href');
+    assert(Boolean(questionHref), 'Related question link is missing href.');
+    const questionResponsePromise = page.waitForResponse((response) => (
+        response.request().resourceType() === 'document'
+        && new URL(response.url()).pathname.includes('/pytanie/')
+    ));
+    await questionLink.click();
+    const questionResponse = await questionResponsePromise;
+    assert(questionResponse.status() === 200, `Related question returned HTTP ${questionResponse.status()}.`);
+    const questionBody = await page.locator('body').innerText();
+    assert(
+        questionBody.includes(fixture.question_external_id) || questionBody.includes(fixture.question_prompt),
+        'Related question page does not expose the expected question.',
+    );
+    report.steps.push('article-to-related-question');
+
+    console.log('[newsroom-golden] article -> product');
+    await gotoWithRetry(page, `${baseUrl}${article.public_path}`);
+    const productLink = page.getByRole('link', { name: 'Sprawdź się w teście' }).first();
+    const productHref = await productLink.getAttribute('href');
+    assert(productHref?.endsWith('/testy-na-prawo-jazdy'), `Unexpected product CTA href: ${productHref}.`);
+
+    const productResponsePromise = page.waitForResponse((response) => (
+        response.request().resourceType() === 'document'
+        && new URL(response.url()).pathname === '/testy-na-prawo-jazdy'
+    ));
+    await productLink.click();
+    const productResponse = await productResponsePromise;
+    assert(productResponse.status() === 200, `Product landing returned HTTP ${productResponse.status()}.`);
+    assert(new URL(page.url()).pathname === '/testy-na-prawo-jazdy', `Unexpected product landing URL: ${page.url()}.`);
+    report.steps.push('article-to-product');
+
+    await gotoWithRetry(page, `${baseUrl}${article.public_path}`);
+    await page.screenshot({ path: path.join(outputDir, 'public-article.png'), fullPage: true });
+
+    report.article_id = article.id;
+    report.public_path = article.public_path;
+    report.preview_path = article.preview_path;
+    report.related_question_href = questionHref;
+    report.status = 'ok';
+
+    console.log('[newsroom-golden] PASS');
+} catch (error) {
+    report.status = 'failed';
+    report.error = error instanceof Error ? error.message : String(error);
+    console.error('[newsroom-golden] FAIL', report.error);
+    throw error;
+} finally {
+    report.finished_at = new Date().toISOString();
+    await fs.mkdir(outputDir, { recursive: true });
+    await fs.writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
+    await browser?.close().catch(() => {});
+    await stopProcess(serverProcess);
+}
+
+async function seedPrerequisites() {
+    const fixturePath = path.join(outputDir, 'fixture.json');
+    const php = String.raw`
+$admin = \App\Models\User::factory()->admin()->create([
+    'name' => 'Newsroom Golden Admin',
+    'email' => 'newsroom-golden@example.test',
+    'password' => 'password',
+]);
+$category = \App\Models\ContentCategory::factory()->create([
+    'name' => 'Egzaminy E2E',
+    'slug' => 'egzaminy-e2e',
+    'is_active' => true,
+]);
+$author = \App\Models\ContentAuthor::factory()->published()->create([
+    'name' => 'E2E Redaktor',
+    'slug' => 'e2e-redaktor',
+]);
+$topic = \App\Models\ContentTopic::factory()->published()->create([
+    'title' => 'E2E Golden Topic',
+    'slug' => 'e2e-golden-topic',
+]);
+$licenseCategory = \App\Models\LicenseCategory::factory()->categoryB()->create([
+    'sort_order' => 1,
+]);
+$question = \App\Models\Question::factory()->for($licenseCategory, 'licenseCategory')->create([
+    'external_id' => 'N6-GOLDEN-001',
+    'prompt' => 'Czy ten testowy kierowca powinien zastosować się do zasad bezpieczeństwa?',
+    'requires_primary_media' => false,
+    'delivery_issue' => null,
+]);
+$heroFile = base_path('output/playwright/newsroom-golden-path/hero.png');
+$hero = app(\App\Support\NewsroomArticleMediaService::class)->store(
+    new \Illuminate\Http\UploadedFile($heroFile, 'hero.png', 'image/png', null, true),
+);
+file_put_contents(
+    base_path('output/playwright/newsroom-golden-path/fixture.json'),
+    json_encode([
+        'category_id' => $category->id,
+        'author_id' => $author->id,
+        'topic_id' => $topic->id,
+        'topic_title' => $topic->title,
+        'question_id' => $question->id,
+        'question_external_id' => $question->external_id,
+        'question_prompt' => strip_tags((string) $question->prompt),
+        'hero_image_path' => $hero['path'],
+        'hero_image_width' => $hero['width'],
+        'hero_image_height' => $hero['height'],
+        'create_path' => parse_url(
+            \App\Filament\Resources\ContentArticles\ContentArticleResource::getUrl('create', panel: 'admin'),
+            PHP_URL_PATH,
+        ),
+    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+);
+`;
+
+    await runCommand('php', ['artisan', 'tinker', '--execute', php]);
+    return JSON.parse(await fs.readFile(fixturePath, 'utf8'));
+}
+
+async function readCreatedArticle() {
+    const articlePath = path.join(outputDir, 'article.json');
+    const php = String.raw`
+$article = \App\Models\ContentArticle::query()
+    ->where('slug', 'e2e-n6-golden-path')
+    ->withCount(['sources', 'questions', 'topics'])
+    ->first();
+if (! $article) {
+    file_put_contents(
+        base_path('output/playwright/newsroom-golden-path/article.json'),
+        json_encode(['exists' => false], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+    );
+    return;
+}
+file_put_contents(
+    base_path('output/playwright/newsroom-golden-path/article.json'),
+    json_encode([
+        'exists' => true,
+        'id' => $article->id,
+        'workflow_status' => $article->workflow_status?->value ?? (string) $article->workflow_status,
+        'reviewed_at' => $article->reviewed_at?->toISOString(),
+        'published_at' => $article->published_at?->toISOString(),
+        'sources_count' => $article->sources_count,
+        'questions_count' => $article->questions_count,
+        'topics_count' => $article->topics_count,
+        'hero_image_path' => $article->hero_image_path,
+        'hero_image_width' => (int) $article->hero_image_width,
+        'hero_image_height' => (int) $article->hero_image_height,
+        'hero_focal_x' => (float) $article->hero_focal_x,
+        'hero_focal_y' => (float) $article->hero_focal_y,
+        'edit_path' => parse_url(
+            \App\Filament\Resources\ContentArticles\ContentArticleResource::getUrl(
+                'edit',
+                ['record' => $article],
+                panel: 'admin',
+            ),
+            PHP_URL_PATH,
+        ),
+        'preview_path' => parse_url(route('admin.newsroom.articles.preview', $article), PHP_URL_PATH),
+        'public_path' => \App\Support\NewsroomRouteContract::canonicalPath(
+            $article->type?->value ?? (string) $article->type,
+            (string) $article->slug,
+        ),
+    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+);
+`;
+
+    await runCommand('php', ['artisan', 'tinker', '--execute', php]);
+    return JSON.parse(await fs.readFile(articlePath, 'utf8'));
+}
+
+function keyedCollection(items) {
+    return Object.fromEntries(
+        items.map((item, index) => [
+            `00000000-0000-4000-8000-${String(index + 1).padStart(12, '0')}`,
+            item,
+        ]),
+    );
+}
+
+async function setPageComponentState(page, state) {
+    await page.waitForFunction(() => typeof window.Livewire !== 'undefined');
+
+    for (const [key, value] of Object.entries(state)) {
+        await page.evaluate(async ({ property, propertyValue }) => {
+            const form = document.querySelector('form[wire\\:submit]');
+            const root = form?.closest('[wire\\:id]') ?? document.querySelector('[wire\\:id]');
+            const id = root?.getAttribute('wire:id');
+
+            if (!id || !window.Livewire) {
+                throw new Error('Unable to resolve the page Livewire component.');
+            }
+
+            const component = window.Livewire.find(id);
+            component.$set(property, propertyValue, false);
+        }, { property: key, propertyValue: value });
+    }
+}
+
+async function runHeaderAction(page, label, successText) {
+    const action = page.getByRole('button', { name: label, exact: true }).first();
+    await action.waitFor();
+    await action.click();
+
+    const dialog = page.locator('.fi-modal-window:visible, [role="dialog"]:visible').last();
+
+    try {
+        await dialog.waitFor({ timeout: 10_000 });
+    } catch (error) {
+        const visibleModals = await page
+            .locator('.fi-modal-window:visible, [role="dialog"]:visible')
+            .count()
+            .catch(() => 0);
+        const bodyText = await page.locator('body').innerText().catch(() => '');
+        await page.screenshot({
+            path: path.join(
+                outputDir,
+                `workflow-modal-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png`,
+            ),
+            fullPage: true,
+        }).catch(() => {});
+        throw new Error(
+            `Confirmation modal for "${label}" did not appear. visible_modals=${visibleModals}; body=${bodyText.slice(0, 2000)}; cause=${error instanceof Error ? error.message : String(error)}`,
+        );
+    }
+
+    const sameLabelButton = dialog.getByRole('button', { name: label, exact: true });
+    if (await sameLabelButton.count()) {
+        await sameLabelButton.last().click();
+    } else {
+        const submit = dialog.locator('button[type="submit"]').last();
+        if (await submit.count()) {
+            await submit.click();
+        } else {
+            const buttons = dialog.getByRole('button');
+            const count = await buttons.count();
+            if (count === 0) {
+                throw new Error(`No confirmation button found for "${label}".`);
+            }
+            await buttons.nth(count - 1).click();
+        }
+    }
+
+    await waitForLivewireIdle(page);
+
+    const notificationVisible = await page
+        .getByText(successText, { exact: false })
+        .isVisible()
+        .catch(() => false);
+
+    if (!notificationVisible) {
+        console.log(`[newsroom-golden] workflow notification not visible for "${label}"; domain state assertion will decide the step.`);
+    }
+}
+
+async function waitForLivewireIdle(page) {
+    await page.waitForTimeout(400);
+}
+
+function startLaravelServer() {
+    const publicDir = path.join(cwd, 'public');
+    const router = path.join(
+        cwd,
+        'vendor',
+        'laravel',
+        'framework',
+        'src',
+        'Illuminate',
+        'Foundation',
+        'resources',
+        'server.php',
+    );
+    const child = spawn(
+        'php',
+        ['-S', `127.0.0.1:${port}`, router],
+        {
+            cwd: publicDir,
+            env: {
+                ...process.env,
+                APP_URL: baseUrl,
+                NEWSROOM_PUBLIC_ENABLED: 'true',
+                PHP_CLI_SERVER_WORKERS: '4',
+            },
+            stdio: ['ignore', 'pipe', 'pipe'],
+        },
+    );
+
+    child.stdout.on('data', (chunk) => process.stdout.write(`[laravel] ${chunk}`));
+    child.stderr.on('data', (chunk) => process.stderr.write(`[laravel] ${chunk}`));
+    child.on('exit', (code, signal) => {
+        console.log(`[newsroom-golden] Laravel browser server exited code=${code ?? 'null'} signal=${signal ?? 'null'}`);
+    });
+
+    return child;
+}
+
+async function gotoWithReadyLocator(page, url, selector, attempts = 5) {
+    let lastError;
+
+    for (let attempt = 1; attempt <= attempts; attempt += 1) {
+        try {
+            await gotoWithRetry(page, url, 1);
+            await page.locator(selector).first().waitFor({ timeout: 5_000 });
+
+            return;
+        } catch (error) {
+            lastError = error;
+
+            if (attempt === attempts) {
+                throw error;
+            }
+
+            const message = error instanceof Error ? error.message : String(error);
+            console.log(`[newsroom-golden] create page not ready (${attempt}/${attempts}) for ${url}: ${message}`);
+            await page.waitForTimeout(attempt * 300);
+        }
+    }
+
+    throw lastError;
+}
+
+async function gotoWithRetry(page, url, attempts = 5) {
+    let lastError;
+
+    for (let attempt = 1; attempt <= attempts; attempt += 1) {
+        try {
+            return await page.goto(url, { waitUntil: 'domcontentloaded' });
+        } catch (error) {
+            lastError = error;
+            const message = error instanceof Error ? error.message : String(error);
+            const retryable = message.includes('ERR_EMPTY_RESPONSE')
+                || message.includes('ERR_CONNECTION_RESET')
+                || message.includes('ERR_CONNECTION_REFUSED');
+
+            if (!retryable || attempt === attempts) {
+                throw error;
+            }
+
+            console.log(`[newsroom-golden] transient navigation failure (${attempt}/${attempts}) for ${url}: ${message}`);
+            await page.waitForTimeout(attempt * 300);
+        }
+    }
+
+    throw lastError;
+}
+
+async function waitForHttp(url) {
+    const deadline = Date.now() + 20_000;
+
+    while (Date.now() < deadline) {
+        try {
+            const status = await new Promise((resolve, reject) => {
+                const request = http.get(url, (response) => {
+                    response.resume();
+                    resolve(response.statusCode ?? 0);
+                });
+                request.setTimeout(2_000, () => request.destroy(new Error('timeout')));
+                request.on('error', reject);
+            });
+
+            if (status >= 200 && status < 500) {
+                return;
+            }
+        } catch {
+            // Server is still starting.
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+
+    throw new Error(`Laravel server did not become ready at ${url}.`);
+}
+
+async function stopProcess(child) {
+    if (!child || child.exitCode !== null) return;
+
+    child.kill('SIGTERM');
+
+    await new Promise((resolve) => {
+        const timer = setTimeout(() => {
+            child.kill('SIGKILL');
+            resolve();
+        }, 5_000);
+
+        child.once('exit', () => {
+            clearTimeout(timer);
+            resolve();
+        });
+    });
+}
+
+async function runCommand(command, args) {
+    await new Promise((resolve, reject) => {
+        const child = spawn(command, args, {
+            cwd,
+            env: process.env,
+            stdio: 'inherit',
+        });
+
+        child.once('error', reject);
+        child.once('exit', (code) => {
+            if (code === 0) resolve();
+            else reject(new Error(`${command} ${args.join(' ')} exited with code ${code}.`));
+        });
+    });
+}
+
+function assert(condition, message) {
+    if (!condition) {
+        throw new Error(message);
+    }
+}

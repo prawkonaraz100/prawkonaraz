@@ -51,6 +51,7 @@ on:
       - 'scripts/e2e-newsroom-home.mjs'
       - 'scripts/e2e-newsroom-topic.mjs'
       - 'scripts/e2e-newsroom-semantic-links.mjs'
+      - 'scripts/e2e-newsroom-golden-path.mjs'
       - 'package.json'
 
 jobs:
@@ -499,5 +500,107 @@ jobs:
         with:
           name: newsroom-semantic-links-browser-qa
           path: output/playwright/newsroom-semantic-links
+          if-no-files-found: warn
+          retention-days: 3
+
+  newsroom-golden-path:
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    env:
+      APP_ENV: testing
+      APP_URL: http://127.0.0.1:8000
+      NEWSROOM_PUBLIC_ENABLED: 'true'
+      DB_CONNECTION: sqlite
+      DB_DATABASE: database/database.sqlite
+      DB_URL: ''
+      CACHE_STORE: file
+      SESSION_DRIVER: file
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: log
+      MEDIA_LOCAL_ROOT: ${{ github.workspace }}/storage/app/public-media
+      MEDIA_NEWSROOM_DISK: media_local
+      MEDIA_LOCAL_HOST_ROOT: ${{ github.workspace }}/storage/app/public-media
+      MEDIA_LOCAL_URL: http://127.0.0.1:8081
+      AUDIO_GENERATOR_HOST_ROOT: ${{ github.workspace }}/storage/app/audio-generator-stub
+      E2E_NEWSROOM_EXTERNAL_SERVER: 'true'
+      E2E_NEWSROOM_GOLDEN_PORT: '8000'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          extensions: mbstring, sqlite3, pdo_sqlite, fileinfo
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Prepare application environment
+        run: |
+          cp .env.example .env
+          mkdir -p database storage/app/public storage/app/public-media
+          touch database/database.sqlite
+          php artisan key:generate --force
+          php artisan storage:link
+
+      - name: Build frontend assets
+        run: npm run build
+
+      - name: Start stable Docker browser server
+        run: |
+          mkdir -p storage/app/public-media storage/app/audio-generator-stub
+          chmod -R a+rwX database storage bootstrap/cache
+          export APP_KEY_VALUE="$(grep '^APP_KEY=' .env | cut -d= -f2-)"
+          cat > /tmp/newsroom-golden.compose.yml <<'EOF'
+          services:
+            app:
+              environment:
+                APP_KEY: ${APP_KEY_VALUE}
+                APP_ENV: testing
+                APP_DEBUG: "true"
+                APP_URL: http://127.0.0.1:8000
+                NEWSROOM_PUBLIC_ENABLED: "true"
+                DB_CONNECTION: sqlite
+                DB_DATABASE: /var/www/html/database/database.sqlite
+                DB_URL: ""
+                SESSION_DRIVER: file
+                CACHE_STORE: file
+                QUEUE_CONNECTION: sync
+                MAIL_MAILER: log
+                MEDIA_NEWSROOM_DISK: media_local
+          EOF
+          docker compose -f docker-compose.yml -f /tmp/newsroom-golden.compose.yml up -d --build app web media
+          docker compose -f docker-compose.yml -f /tmp/newsroom-golden.compose.yml ps
+          curl --fail --retry 30 --retry-all-errors --retry-delay 1 http://127.0.0.1:8000/admin/login >/dev/null
+
+      - name: Run newsroom N6 golden path
+        run: npm run e2e:newsroom-golden-path
+
+      - name: Stop stable Docker browser server
+        if: always()
+        run: docker compose -f docker-compose.yml -f /tmp/newsroom-golden.compose.yml down --remove-orphans || true
+
+      - name: Upload newsroom golden path artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newsroom-golden-path
+          path: output/playwright/newsroom-golden-path
           if-no-files-found: warn
           retention-days: 3

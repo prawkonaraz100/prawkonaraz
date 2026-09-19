@@ -14,7 +14,8 @@
         "e2e:public-auth-drawers": "node scripts/e2e-public-auth-drawers.mjs",
         "e2e:smoke": "node scripts/e2e-smoke.mjs",
         "stress:session": "node scripts/session-stress.mjs",
-        "test:unit": "vitest run"
+        "test:unit": "vitest run",
+        "e2e:newsroom-golden-path": "node scripts/e2e-newsroom-golden-path.mjs"
     },
     "devDependencies": {
         "@inertiajs/vue3": "^2.0.0",
