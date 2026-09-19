@@ -4,7 +4,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { spawn } from 'node:child_process';
 import { chromium } from 'playwright';
-import { collectSnapshotPerformance } from './newsroom-performance-metrics.mjs';
+import { assertPerformanceBudget, collectSnapshotPerformance } from './newsroom-performance-metrics.mjs';
 
 const cwd = process.cwd();
 const outputDir = path.join(cwd, 'output', 'playwright', 'newsroom-home');
@@ -17,6 +17,13 @@ const leadTitle = 'Najważniejsza informacja dnia dla kandydatów na kierowców'
 const port = Number(process.env.E2E_NEWSROOM_HOME_PORT ?? '8128');
 const baseUrl = `http://127.0.0.1:${port}`;
 const publicDir = path.join(cwd, 'public');
+const performanceBudget = {
+    max_query_count: 40,
+    max_html_bytes: 120_000,
+    max_image_bytes: 100_000,
+    max_css_bytes: 450_000,
+    max_js_bytes: 20_000,
+};
 const viewports = [
     { name: '360', width: 360, height: 800 },
     { name: '390', width: 390, height: 844 },
@@ -51,6 +58,7 @@ try {
     console.log('[newsroom-home-e2e] render through Laravel kernel');
     report.render_status = await renderHomeSnapshot();
     report.performance = await collectSnapshotPerformance({ cwd, baseUrl, snapshotPath, renderMetricsPath });
+    assertPerformanceBudget('home', report.performance, performanceBudget);
     console.log('[newsroom-home-e2e] performance', JSON.stringify(report.performance));
 
     console.log('[newsroom-home-e2e] start static browser server');
