@@ -10,7 +10,7 @@ const outputDir = path.join(cwd, 'output', 'playwright', 'newsroom-golden-path')
 const reportPath = path.join(outputDir, 'report.json');
 const heroPath = path.join(outputDir, 'hero.png');
 const port = Number(process.env.E2E_NEWSROOM_GOLDEN_PORT ?? '8133');
-const baseUrl = \`http://127.0.0.1:\${port}\`;
+const baseUrl = `http://127.0.0.1:${port}`;
 const title = 'E2E N6 golden path — pełny przepływ redakcyjny';
 const slug = 'e2e-n6-golden-path';
 const adminEmail = 'newsroom-golden@example.test';
@@ -49,7 +49,7 @@ try {
 
     console.log('[newsroom-golden] start Laravel server');
     serverProcess = startLaravelServer();
-    await waitForHttp(\`\${baseUrl}/admin/login\`);
+    await waitForHttp(`${baseUrl}/admin/login`);
 
     browser = await chromium.launch({ headless: true });
     const context = await browser.newContext({
@@ -61,7 +61,7 @@ try {
     page.setDefaultNavigationTimeout(20_000);
 
     console.log('[newsroom-golden] login');
-    await page.goto(\`\${baseUrl}/admin/login\`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${baseUrl}/admin/login`, { waitUntil: 'domcontentloaded' });
     await page.locator('input[type="email"]').fill(adminEmail);
     await page.locator('input[type="password"]').fill(adminPassword);
     await Promise.all([
@@ -71,7 +71,7 @@ try {
     report.steps.push('login-admin');
 
     console.log('[newsroom-golden] create draft through Filament page component');
-    await page.goto(\`\${baseUrl}\${fixture.create_path}\`, { waitUntil: 'networkidle' });
+    await page.goto(`${baseUrl}${fixture.create_path}`, { waitUntil: 'networkidle' });
     await page.getByText('Tożsamość i klasyfikacja', { exact: true }).waitFor();
 
     const uploadInput = page.locator('input[type="file"]').first();
@@ -145,33 +145,33 @@ try {
     await waitForLivewireIdle(page);
 
     const article = await readCreatedArticle();
-    assert(article.workflow_status === 'draft', \`Expected draft after create, got \${article.workflow_status}.\`);
-    assert(article.sources_count === 1, \`Expected one source, got \${article.sources_count}.\`);
-    assert(article.questions_count === 1, \`Expected one question relation, got \${article.questions_count}.\`);
-    assert(article.topics_count === 1, \`Expected one topic relation, got \${article.topics_count}.\`);
+    assert(article.workflow_status === 'draft', `Expected draft after create, got ${article.workflow_status}.`);
+    assert(article.sources_count === 1, `Expected one source, got ${article.sources_count}.`);
+    assert(article.questions_count === 1, `Expected one question relation, got ${article.questions_count}.`);
+    assert(article.topics_count === 1, `Expected one topic relation, got ${article.topics_count}.`);
     assert(Boolean(article.hero_image_path), 'Expected persisted hero image path.');
     assert(article.hero_image_width > 0 && article.hero_image_height > 0, 'Expected verified hero dimensions.');
-    assert(Math.abs(article.hero_focal_x - 0.35) < 0.001, \`Unexpected hero focal X: \${article.hero_focal_x}.\`);
-    assert(Math.abs(article.hero_focal_y - 0.65) < 0.001, \`Unexpected hero focal Y: \${article.hero_focal_y}.\`);
+    assert(Math.abs(article.hero_focal_x - 0.35) < 0.001, `Unexpected hero focal X: ${article.hero_focal_x}.`);
+    assert(Math.abs(article.hero_focal_y - 0.65) < 0.001, `Unexpected hero focal Y: ${article.hero_focal_y}.`);
     report.steps.push('create-draft-body-source-relations-hero');
 
     console.log('[newsroom-golden] private preview');
-    await page.goto(\`\${baseUrl}\${article.edit_path}\`, { waitUntil: 'networkidle' });
+    await page.goto(`${baseUrl}${article.edit_path}`, { waitUntil: 'networkidle' });
     const previewPage = await context.newPage();
-    const previewResponse = await previewPage.goto(\`\${baseUrl}\${article.preview_path}\`, {
+    const previewResponse = await previewPage.goto(`${baseUrl}${article.preview_path}`, {
         waitUntil: 'domcontentloaded',
     });
 
-    assert(previewResponse?.status() === 200, \`Preview returned HTTP \${previewResponse?.status() ?? 'none'}.\`);
+    assert(previewResponse?.status() === 200, `Preview returned HTTP ${previewResponse?.status() ?? 'none'}.`);
     const previewHeaders = previewResponse.headers();
     assert(
         (previewHeaders['cache-control'] ?? '').includes('private')
             && (previewHeaders['cache-control'] ?? '').includes('no-store'),
-        \`Preview cache contract failed: \${previewHeaders['cache-control'] ?? 'missing'}.\`,
+        `Preview cache contract failed: ${previewHeaders['cache-control'] ?? 'missing'}.`,
     );
     assert(
         (previewHeaders['x-robots-tag'] ?? '').toLowerCase().includes('noindex'),
-        \`Preview robots contract failed: \${previewHeaders['x-robots-tag'] ?? 'missing'}.\`,
+        `Preview robots contract failed: ${previewHeaders['x-robots-tag'] ?? 'missing'}.`,
     );
     await previewPage.getByRole('heading', { level: 1, name: title }).waitFor();
     const previewText = await previewPage.locator('body').innerText();
@@ -183,7 +183,7 @@ try {
     console.log('[newsroom-golden] review workflow');
     await runHeaderAction(page, 'Wyślij do review', 'Artykuł wysłany do review.');
     let workflow = await readCreatedArticle();
-    assert(workflow.workflow_status === 'in_review', \`Expected in_review, got \${workflow.workflow_status}.\`);
+    assert(workflow.workflow_status === 'in_review', `Expected in_review, got ${workflow.workflow_status}.`);
 
     await runHeaderAction(page, 'Oznacz jako sprawdzony', 'Review zakończony.');
     workflow = await readCreatedArticle();
@@ -191,15 +191,15 @@ try {
 
     await runHeaderAction(page, 'Opublikuj teraz', 'Artykuł został opublikowany.');
     workflow = await readCreatedArticle();
-    assert(workflow.workflow_status === 'published', \`Expected published, got \${workflow.workflow_status}.\`);
+    assert(workflow.workflow_status === 'published', `Expected published, got ${workflow.workflow_status}.`);
     assert(Boolean(workflow.published_at), 'Expected published_at after publish.');
     report.steps.push('submit-review-mark-reviewed-publish');
 
     console.log('[newsroom-golden] public hub -> article');
-    const hubResponse = await page.goto(\`\${baseUrl}/aktualnosci\`, { waitUntil: 'domcontentloaded' });
-    assert(hubResponse?.status() === 200, \`Newsroom hub returned HTTP \${hubResponse?.status() ?? 'none'}.\`);
+    const hubResponse = await page.goto(`${baseUrl}/aktualnosci`, { waitUntil: 'domcontentloaded' });
+    assert(hubResponse?.status() === 200, `Newsroom hub returned HTTP ${hubResponse?.status() ?? 'none'}.`);
 
-    const articleLink = page.locator(\`a[href="\${article.public_path}"]\`).first();
+    const articleLink = page.locator(`a[href="${article.public_path}"]`).first();
     await articleLink.waitFor();
     await Promise.all([
         page.waitForURL((url) => url.pathname === article.public_path),
@@ -209,7 +209,7 @@ try {
 
     const bodyText = await page.locator('body').innerText();
     for (const expected of ['Golden path', 'E2E źródło oficjalne', fixture.topic_title]) {
-        assert(bodyText.includes(expected), \`Public article is missing "\${expected}".\`);
+        assert(bodyText.includes(expected), `Public article is missing "${expected}".`);
     }
     report.steps.push('hub-to-article');
 
@@ -227,7 +227,7 @@ try {
     ));
     await questionLink.click();
     const questionResponse = await questionResponsePromise;
-    assert(questionResponse.status() === 200, \`Related question returned HTTP \${questionResponse.status()}.\`);
+    assert(questionResponse.status() === 200, `Related question returned HTTP ${questionResponse.status()}.`);
     const questionBody = await page.locator('body').innerText();
     assert(
         questionBody.includes(fixture.question_external_id) || questionBody.includes(fixture.question_prompt),
@@ -236,10 +236,10 @@ try {
     report.steps.push('article-to-related-question');
 
     console.log('[newsroom-golden] article -> product');
-    await page.goto(\`\${baseUrl}\${article.public_path}\`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${baseUrl}${article.public_path}`, { waitUntil: 'domcontentloaded' });
     const productLink = page.getByRole('link', { name: 'Sprawdź się w teście' }).first();
     const productHref = await productLink.getAttribute('href');
-    assert(productHref?.endsWith('/testy-na-prawo-jazdy'), \`Unexpected product CTA href: \${productHref}.\`);
+    assert(productHref?.endsWith('/testy-na-prawo-jazdy'), `Unexpected product CTA href: ${productHref}.`);
 
     const productResponsePromise = page.waitForResponse((response) => (
         response.request().resourceType() === 'document'
@@ -247,11 +247,11 @@ try {
     ));
     await productLink.click();
     const productResponse = await productResponsePromise;
-    assert(productResponse.status() === 200, \`Product landing returned HTTP \${productResponse.status()}.\`);
-    assert(new URL(page.url()).pathname === '/testy-na-prawo-jazdy', \`Unexpected product landing URL: \${page.url()}.\`);
+    assert(productResponse.status() === 200, `Product landing returned HTTP ${productResponse.status()}.`);
+    assert(new URL(page.url()).pathname === '/testy-na-prawo-jazdy', `Unexpected product landing URL: ${page.url()}.`);
     report.steps.push('article-to-product');
 
-    await page.goto(\`\${baseUrl}\${article.public_path}\`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${baseUrl}${article.public_path}`, { waitUntil: 'domcontentloaded' });
     await page.screenshot({ path: path.join(outputDir, 'public-article.png'), fullPage: true });
 
     report.article_id = article.id;
@@ -269,14 +269,14 @@ try {
 } finally {
     report.finished_at = new Date().toISOString();
     await fs.mkdir(outputDir, { recursive: true });
-    await fs.writeFile(reportPath, \`\${JSON.stringify(report, null, 2)}\n\`);
+    await fs.writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
     await browser?.close().catch(() => {});
     await stopProcess(serverProcess);
 }
 
 async function seedPrerequisites() {
     const fixturePath = path.join(outputDir, 'fixture.json');
-    const php = String.raw\`
+    const php = String.raw`
 $admin = \\App\\Models\\User::factory()->admin()->create([
     'name' => 'Newsroom Golden Admin',
     'email' => 'newsroom-golden@example.test',
@@ -320,7 +320,7 @@ file_put_contents(
         ),
     ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
 );
-\`;
+`;
 
     await runCommand('php', ['artisan', 'tinker', '--execute', php]);
     return JSON.parse(await fs.readFile(fixturePath, 'utf8'));
@@ -328,7 +328,7 @@ file_put_contents(
 
 async function readCreatedArticle() {
     const articlePath = path.join(outputDir, 'article.json');
-    const php = String.raw\`
+    const php = String.raw`
 $article = \\App\\Models\\ContentArticle::query()
     ->where('slug', 'e2e-n6-golden-path')
     ->withCount(['sources', 'questions', 'topics'])
@@ -363,7 +363,7 @@ file_put_contents(
         ),
     ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
 );
-\`;
+`;
 
     await runCommand('php', ['artisan', 'tinker', '--execute', php]);
     return JSON.parse(await fs.readFile(articlePath, 'utf8'));
@@ -422,7 +422,7 @@ async function runHeaderAction(page, label, successText) {
             const buttons = dialog.getByRole('button');
             const count = await buttons.count();
             if (count === 0) {
-                throw new Error(\`No confirmation button found for "\${label}".\`);
+                throw new Error(`No confirmation button found for "${label}".`);
             }
             await buttons.nth(count - 1).click();
         }
@@ -439,7 +439,7 @@ async function waitForLivewireIdle(page) {
 function startLaravelServer() {
     const child = spawn(
         'php',
-        ['artisan', 'serve', '--host=127.0.0.1', \`--port=\${port}\`],
+        ['artisan', 'serve', '--host=127.0.0.1', `--port=${port}`],
         {
             cwd,
             env: {
@@ -451,8 +451,8 @@ function startLaravelServer() {
         },
     );
 
-    child.stdout.on('data', (chunk) => process.stdout.write(\`[laravel] \${chunk}\`));
-    child.stderr.on('data', (chunk) => process.stderr.write(\`[laravel] \${chunk}\`));
+    child.stdout.on('data', (chunk) => process.stdout.write(`[laravel] ${chunk}`));
+    child.stderr.on('data', (chunk) => process.stderr.write(`[laravel] ${chunk}`));
 
     return child;
 }
@@ -481,7 +481,7 @@ async function waitForHttp(url) {
         await new Promise((resolve) => setTimeout(resolve, 250));
     }
 
-    throw new Error(\`Laravel server did not become ready at \${url}.\`);
+    throw new Error(`Laravel server did not become ready at ${url}.`);
 }
 
 async function stopProcess(child) {
@@ -513,7 +513,7 @@ async function runCommand(command, args) {
         child.once('error', reject);
         child.once('exit', (code) => {
             if (code === 0) resolve();
-            else reject(new Error(\`\${command} \${args.join(' ')} exited with code \${code}.\`));
+            else reject(new Error(`${command} ${args.join(' ')} exited with code ${code}.`));
         });
     });
 }
