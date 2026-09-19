@@ -51,6 +51,7 @@ on:
       - 'scripts/e2e-newsroom-home.mjs'
       - 'scripts/e2e-newsroom-topic.mjs'
       - 'scripts/e2e-newsroom-semantic-links.mjs'
+      - 'scripts/e2e-newsroom-golden-path.mjs'
       - 'package.json'
 
 jobs:
@@ -499,5 +500,69 @@ jobs:
         with:
           name: newsroom-semantic-links-browser-qa
           path: output/playwright/newsroom-semantic-links
+          if-no-files-found: warn
+          retention-days: 3
+
+  newsroom-golden-path:
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    env:
+      APP_ENV: testing
+      NEWSROOM_PUBLIC_ENABLED: 'true'
+      DB_CONNECTION: sqlite
+      DB_DATABASE: database/database.sqlite
+      DB_URL: ''
+      CACHE_STORE: file
+      SESSION_DRIVER: file
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: log
+      MEDIA_LOCAL_ROOT: ${{ github.workspace }}/storage/app/public-media
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          extensions: mbstring, sqlite3, pdo_sqlite, fileinfo
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Prepare application environment
+        run: |
+          cp .env.example .env
+          mkdir -p database storage/app/public storage/app/public-media
+          touch database/database.sqlite
+          php artisan key:generate --force
+          php artisan storage:link
+
+      - name: Build frontend assets
+        run: npm run build
+
+      - name: Run newsroom N6 golden path
+        run: npm run e2e:newsroom-golden-path
+
+      - name: Upload newsroom golden path artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newsroom-golden-path
+          path: output/playwright/newsroom-golden-path
           if-no-files-found: warn
           retention-days: 3
