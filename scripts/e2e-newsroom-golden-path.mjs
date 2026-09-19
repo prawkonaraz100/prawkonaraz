@@ -479,6 +479,7 @@ function startLaravelServer() {
                 ...process.env,
                 APP_URL: baseUrl,
                 NEWSROOM_PUBLIC_ENABLED: 'true',
+                PHP_CLI_SERVER_WORKERS: '4',
             },
             stdio: ['ignore', 'pipe', 'pipe'],
         },
@@ -486,6 +487,9 @@ function startLaravelServer() {
 
     child.stdout.on('data', (chunk) => process.stdout.write(`[laravel] ${chunk}`));
     child.stderr.on('data', (chunk) => process.stderr.write(`[laravel] ${chunk}`));
+    child.on('exit', (code, signal) => {
+        console.log(`[newsroom-golden] Laravel browser server exited code=${code ?? 'null'} signal=${signal ?? 'null'}`);
+    });
 
     return child;
 }
