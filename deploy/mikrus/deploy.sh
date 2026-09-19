@@ -71,7 +71,8 @@ trap - EXIT
 if [[ "$SEO_RELEASE" == "1" ]]; then
   echo "SEO release: validate active Nginx syntax and public crawler delivery."
   nginx -t
-  REQUIRE_NEWSROOM_FEED="$REQUIRE_NEWSROOM_PUBLIC" \
+  EXPECT_NEWSROOM_PUBLIC="$REQUIRE_NEWSROOM_PUBLIC" \
+    REQUIRE_NEWSROOM_FEED="$REQUIRE_NEWSROOM_PUBLIC" \
     bash scripts/production-seo-delivery-smoke.sh "$SEO_BASE_URL"
   echo "SEO_RELEASE_OK"
 fi
