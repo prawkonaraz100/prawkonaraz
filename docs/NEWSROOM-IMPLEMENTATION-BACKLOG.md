@@ -1990,7 +1990,7 @@ Nie zmieniamy produkcyjnego modelu na runtime generation.
 
 Nie implementować tego jako zwykłego `ShouldQueue`, dopóki produkcja ma `QUEUE_CONNECTION=sync` i brak monitorowanego workera.
 
-### Potwierdzony stan implementacji po PR #109, #112 i #115
+### Potwierdzony stan implementacji po PR #109, #112, #115 i #117
 
 NEWSROOM-N5-007 pozostaje **IN PROGRESS**.
 
@@ -2008,15 +2008,18 @@ Potwierdzone podkroki:
 - PR #115: produkcyjny wzorzec Nginx dla `/robots.txt`, `/sitemap.xml` i `/sitemaps/*` ustawia jawny Content-Type, public `Cache-Control: max-age=3600`, ETag, `if_modified_since exact` i `X-Content-Type-Options: nosniff`,
 - `scripts/production-seo-delivery-smoke.sh` potrafi zweryfikować HTTP 200, Content-Type, public cache, brak `Set-Cookie`, obecność validatora i conditional 304 dla robots/root/static sitemap; dla feedu akceptuje 404 tylko gdy public gate jest wyłączony,
 - `NginxSeoStaticDeliveryConfigurationTest` chroni repo-level Nginx contract dla crawler assets.
+- PR #117: `.github/workflows/production-seo-delivery-smoke.yml` uruchamia istniejący smoke na GitHub-hosted runnerze; PR runs są REPORT-ONLY, a manualny `workflow_dispatch` jest domyślnie STRICT i zapisuje artifact raportu.
 
 Implementation PR #109 miał finalny head `dbcd5cdb2f0e6663c998f930c034624f8fe36bf4` i został zmergowany do `main@1744a93fd8f0bddfe7fc5bff90b146fdea24b016`. Exact-head CI #403 oraz post-merge CI #404 zakończyły pełny PASS: 1130 passed / 20 144 assertions / 2 skipped, PostgreSQL 7/94, Pint 1093 files PASS i frontend build PASS.
 
 Implementation PR #112 miał finalny head `6f1c3b99d11796f74987c7fe640302b2d76578b7` i został zmergowany do `main@79b6de0276ba8cdce500c366a4f98098e528dcd8`. Exact-head CI #409 i post-merge CI #410 zakończyły pełny PASS: 1136 passed / 20 182 assertions / 2 skipped, PostgreSQL 7/94, Pint 1101 files PASS i frontend build PASS.
 
+Implementation PR #117 miał finalny head `2a46398e781b76c260617f5e8990191917a36516` i został zmergowany do `main@38102d1c3867d13666308ee657d6579fcb5f1d7a`. Exact-head CI #420 i post-merge CI #421 zakończyły pełny PASS: 1137 passed / 20 207 assertions / 2 skipped, PostgreSQL 7/94, Pint 1102 files PASS i frontend build PASS (odpowiednio 9.66 s i 5.49 s). Dedykowany PR report-only Production SEO Delivery Smoke również wykonał się na GitHub Actions, ale underlying smoke zakończył się kodem 1 z powodu publicznego `/robots.txt` zwracającego `Cache-Control: max-age=14400` zamiast oczekiwanego `public, max-age=3600`; nie jest to production PASS.
+
 Topology evidence z aktualnych dokumentów wdrożeniowych potwierdza bieżący kontrakt produkcyjny jako 1x VPS Mikrus 4.1 z Nginx/PHP/PostgreSQL/Redis na jednej maszynie, lokalnym `public/` i jednym cronem `schedule:run`. Dla tej topologii same-filesystem atomic replace jest właściwym modelem. Ewentualne przejście na wiele web node'ów ponownie otwiera wymóg wspólnej dystrybucji artifact setu; Redis lock/`onOneServer()` nie synchronizuje lokalnych plików między node'ami.
 
 Nadal niewykonane w N5-007:
-- rzeczywiste uruchomienie `scripts/production-seo-delivery-smoke.sh` przeciw produkcyjnemu `https://prawkonaraz.pl` po wdrożeniu aktualnego Nginx configu,
+- zastosowanie aktualnego Nginx configu na produkcji i udany STRICT `workflow_dispatch` workflow `Production SEO Delivery Smoke`; report-only run z PR #117 wykazał obecnie rozbieżność Cache-Control dla `/robots.txt`,
 - potwierdzenie Cloudflare/origin HTTP evidence dla Content-Type/cache/braku Set-Cookie/ETag lub Last-Modified/conditional 304,
 - production Search Console / GSC verification,
 - dedykowany regression dla scheduler definition / lock contention poza już istniejącymi testami version-state i failure/race semantics.
@@ -2355,7 +2358,7 @@ Docs-only:
 - [x] dirty/version scheduled refresh bez queue-worker assumption — potwierdzone w NEWSROOM-N5-007 PR #112: version/clean-version, shared lock, every-minute scheduler, `onOneServer()` + `withoutOverlapping()`, daily recovery
 - [x] child-before-index atomic static publication — potwierdzone w NEWSROOM-N5-007 PR #109; dirty/version refresh i production delivery smoke pozostają osobnymi otwartymi gate'ami
 - [x] istniejący `SeoSitemapAuditor` rozszerzony o newsroom/news namespace/tag/date/window/eligibility/topology/shard/obsolete-file checks w NEWSROOM-N5-006; generic protocol-limit guards nadal są reużywane
-- [ ] rzeczywisty static/Nginx/CDN delivery smoke (Content-Type/cache/Set-Cookie/validators) — tooling i Nginx contract są wdrożone w PR #115, ale realny production run nadal nie ma evidence
+- [ ] rzeczywisty static/Nginx/CDN delivery smoke (Content-Type/cache/Set-Cookie/validators) — tooling/Nginx contract są w PR #115, workflow w PR #117; report-only produkcja wykazała Cache-Control mismatch, więc brak nadal STRICT production PASS
 - [x] Atom feed + discovery + generation cache/validator contract (NEWSROOM-N5-003)
 - [ ] author ProfilePage / publisher / WebSite
 
@@ -2599,11 +2602,21 @@ Drugi podkrok N5-007, czyli dirty/version freshness coordinator + shared lock + 
 
 Trzeci podkrok N5-007, czyli repo-level production static delivery hardening, jest potwierdzony po PR #115 i post-merge CI #417 na `main@9a9c98d3534492e30ba215fd9785b7dd425a1f75`: Nginx contract dla robots/sitemap, produkcyjny smoke script oraz regression konfiguracji istnieją.
 
-Następnym wykonywalnym podkrokiem pozostaje **faktyczne uruchomienie produkcyjnego smoke** przeciw `https://prawkonaraz.pl` po wdrożeniu aktualnego Nginx configu oraz zapisanie evidence dla Content-Type/cache/Set-Cookie/validators/304. Następnie pozostaje GSC verification. NEWSROOM-N5-007 nadal nie jest DONE.
+Czwarty podkrok N5-007, czyli powtarzalny GitHub Actions production-smoke harness, jest potwierdzony po PR #117 i post-merge CI #421 na `main@38102d1c3867d13666308ee657d6579fcb5f1d7a`. PR run jest celowo REPORT-ONLY, manualny `workflow_dispatch` domyślnie STRICT. Pierwszy report-only run wykazał realną rozbieżność produkcyjną: `/robots.txt` zwrócił `Cache-Control: max-age=14400`, przez co underlying smoke miał exit code 1.
+
+Następnym wykonywalnym podkrokiem pozostaje **zastosowanie aktualnego Nginx configu na produkcji i udany STRICT production smoke** z zapisanym artifactem dla Content-Type/cache/Set-Cookie/validators/304. Następnie pozostaje GSC verification. NEWSROOM-N5-007 nadal nie jest DONE.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-19 — v0.55
+
+- PR #117 dodał dedykowany workflow GitHub Actions `Production SEO Delivery Smoke` bez kopiowania starych wariantów skryptu/testu z PR #114; workflow reużywa potwierdzony kod z PR #115,
+- PR run działa REPORT-ONLY, manualny `workflow_dispatch` jest domyślnie STRICT, a raport jest zapisywany jako artifact,
+- exact-head CI #420 i post-merge CI #421 zakończyły pełny PASS: 1137 passed / 20 207 assertions / 2 skipped, PostgreSQL 7/94, Pint 1102 files PASS, frontend build 9.66 s / 5.49 s,
+- report-only production run nie jest PASS: `/robots.txt` zwrócił `Cache-Control: max-age=14400` zamiast oczekiwanego `public, max-age=3600`, underlying smoke exit code 1,
+- NEWSROOM-N5-007 pozostaje IN PROGRESS; następny twardy gate to wdrożenie aktualnego Nginx configu i zielony STRICT `workflow_dispatch`, potem GSC verification.
 
 ### 2026-09-18 — v0.54
 
