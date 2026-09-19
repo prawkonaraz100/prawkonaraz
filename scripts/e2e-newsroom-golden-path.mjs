@@ -72,9 +72,14 @@ try {
 
     console.log('[newsroom-golden] create draft through Filament page component');
     await page.goto(`${baseUrl}${fixture.create_path}`, { waitUntil: 'networkidle' });
-    await page.getByText('Tożsamość i klasyfikacja', { exact: true }).waitFor();
+    assert(
+        new URL(page.url()).pathname === fixture.create_path,
+        `Create page redirected unexpectedly to ${page.url()}.`,
+    );
+    await page.locator('form').first().waitFor();
 
     const uploadInput = page.locator('input[type="file"]').first();
+    await uploadInput.waitFor();
     if (await uploadInput.count() !== 1) {
         throw new Error('Hero FileUpload input was not found on the create page.');
     }
