@@ -89,6 +89,7 @@ try {
     }
 
     await uploadInput.setInputFiles(heroPath);
+    await waitForComponentStatePresent(page, 'data.hero_image_path', 30_000);
     await waitForLivewireIdle(page);
 
     await setPageComponentState(page, {
@@ -396,6 +397,31 @@ async function setPageComponentState(page, state) {
             component.$set(property, propertyValue, false);
         }, { property: key, propertyValue: value });
     }
+}
+
+async function waitForComponentStatePresent(page, property, timeout = 15_000) {
+    await page.waitForFunction(
+        ({ stateProperty }) => {
+            const form = document.querySelector('form[wire\\:submit]');
+            const root = form?.closest('[wire\\:id]') ?? document.querySelector('[wire\\:id]');
+            const id = root?.getAttribute('wire:id');
+
+            if (!id || !window.Livewire) {
+                return false;
+            }
+
+            const component = window.Livewire.find(id);
+            const value = component.$get(stateProperty);
+
+            if (Array.isArray(value)) {
+                return value.length > 0;
+            }
+
+            return value !== null && value !== undefined && value !== '';
+        },
+        { stateProperty: property },
+        { timeout },
+    );
 }
 
 async function runHeaderAction(page, label, successText) {
