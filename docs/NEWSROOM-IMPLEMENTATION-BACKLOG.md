@@ -2382,14 +2382,35 @@ Kod, testowy gate oraz dokumentacja repo-level N6-004 są więc ponownie spójne
 
 ## NEWSROOM-N6-005 — Security and rollout-gate pass
 
+Status: **IN PROGRESS**
+
 - XSS,
 - preview admin-only/private-no-store,
 - admin policy / no access widening,
 - stale-write/concurrency,
 - AuditLog data minimization,
 - upload validation,
-- source URL no server-side fetch,
+- source URL no server-side fetch — **repo-level PASS potwierdzony**,
 - verify `NEWSROOM_PUBLIC_ENABLED=false` before cutover and controlled enable during release.
+
+### Potwierdzony podkrok: source URL pozostaje metadanymi / no server-side fetch
+
+PR #137 dodał test regresyjny do istniejącego `NewsroomPublishingServiceTest` bez zmiany produkcyjnej logiki ani architektury. Test:
+
+- blokuje wszystkie outbound requesty przez Laravel HTTP client,
+- używa loopback i link-local URL jako źródeł,
+- przechodzi przez rzeczywisty workflow `review -> publish -> Apply public update`,
+- wymaga `Http::assertNothingSent()`, więc przyszła próba dereferencji source URL przez ten path ma failować test.
+
+Finalny HEAD PR #137: `68660f5caa08e5aed82f3bb62cd48fef345d1171`.
+
+Evidence:
+
+- exact-head CI #502: pełny PASS — 1141 passed / 20 231 assertions / 2 skipped, `newsroom-postgres` 7 passed / 94 assertions, Pint 1102 files PASS, frontend build PASS,
+- merge PR #137: `main@f73153ccbb9522201a98e0754d71de269ea7c6f7`,
+- post-merge CI #503: pełny PASS z tym samym bilansem testów i buildów.
+
+Ten podkrok nie zmienia polityki URL: source URL nadal może być poprawnym `http`/`https` adresem, ale backend nie pobiera go w tym workflow. Cały N6-005 pozostaje **IN PROGRESS** do końcowego potwierdzenia pozostałych punktów security/rollout gate.
 
 ---
 
