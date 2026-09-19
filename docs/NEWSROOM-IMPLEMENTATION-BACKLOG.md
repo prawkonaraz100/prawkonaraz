@@ -2410,7 +2410,24 @@ Evidence:
 - merge PR #137: `main@f73153ccbb9522201a98e0754d71de269ea7c6f7`,
 - post-merge CI #503: pełny PASS z tym samym bilansem testów i buildów.
 
-Ten podkrok nie zmienia polityki URL: source URL nadal może być poprawnym `http`/`https` adresem, ale backend nie pobiera go w tym workflow. Cały N6-005 pozostaje **IN PROGRESS** do końcowego potwierdzenia pozostałych punktów security/rollout gate.
+Ten podkrok nie zmienia polityki URL: source URL nadal może być poprawnym `http`/`https` adresem, ale backend nie pobiera go w tym workflow.
+
+### Repo-level security audit po PR #137 / #138
+
+Ponowny audyt aktualnego `main@2ba4cffbe5d065724d876b35394bc50b2051d38e` potwierdził, że pozostałe techniczne punkty N6-005 mają już istniejące wykonanie i regression coverage:
+
+- XSS / executable rich text / unsafe link / raw iframe oraz `embed` fail-closed: `NewsroomBodyContractTest` i admin create regression,
+- preview: moderator/student denied, admin-only, `private, no-store`, noindex/nofollow, brak public analytics i brak wycieku private source evidence: `NewsroomArticlePreviewTest`,
+- admin policy / no access widening: `ContentArticleResourceTest` odrzuca moderatora i studenta; panel pozostaje administrator-only,
+- stale-write/concurrency: draft/public article update i HomeComposer mają deterministic stale-state rejection; same-second child/source conflict nie wykonuje last-write-wins,
+- AuditLog data minimization: publish/public-update/featured/breaking regressions utrzymują allowlisted metadata bez body/lead/editorial/private source note payloadów,
+- upload validation: `NewsroomMediaStorageTest` sprawdza allowlist raster MIME, wyłączenie SVG, actual-bytes MIME/dimensions, byte limits, managed immutable namespace i path traversal,
+- source URL no server-side fetch: PR #137 wymusza brak outbound HTTP przy loopback/link-local source URLs,
+- public gate ma bezpieczny repo default: `config/newsroom.php` i `.env.example` utrzymują `NEWSROOM_PUBLIC_ENABLED=false`, a `NewsroomPublicGateTest` pokrywa dark-deploy suppression i kontrolowane `true` dla istniejących public surfaces.
+
+Post-merge CI #505 na `main@2ba4cffbe5d065724d876b35394bc50b2051d38e` zakończył pełny PASS: 1141 passed / 20 231 assertions / 2 skipped, PostgreSQL 7/94, Pint 1102 files PASS i frontend build PASS.
+
+**N6-005 pozostaje IN PROGRESS wyłącznie dla runtime/release evidence**: zgodnie z istniejącym runbookiem Phase A wymaga faktycznego potwierdzenia `NEWSROOM_PUBLIC_ENABLED=false` na produkcji przed cutoverem, a Phase B jawnego ustawienia `true`, odświeżenia config cache i publicznych smoke checks. `deploy/mikrus/deploy.sh` celowo nie przełącza tego gate automatycznie.
 
 ---
 

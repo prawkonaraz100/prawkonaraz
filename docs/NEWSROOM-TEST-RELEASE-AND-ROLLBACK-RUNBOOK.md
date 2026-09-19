@@ -1079,6 +1079,10 @@ Production after rollout:
 - rate limiting public dynamic endpoints if any,
 - no draft leaks through API/search/sitemap/feed.
 
+Repo-level NEWSROOM-N6-005 security audit na `main@2ba4cffbe5d065724d876b35394bc50b2051d38e` potwierdza istniejące regression coverage dla authz/no-access-widening, private preview, XSS/embed fail-closed, stale-write, AuditLog minimization, actual-object upload validation oraz source URL no-server-side-fetch. PR #137 domknął brakujący bezpośredni no-SSRF regression, PR #138 zsynchronizował jego evidence, a post-merge CI #505 zakończył pełny PASS: 1141 passed / 20 231 assertions / 2 skipped, PostgreSQL 7/94, Pint 1102 files PASS i frontend build PASS.
+
+Pozostały N6-005 gate jest operacyjny, nie repo-level: Phase A musi potwierdzić na rzeczywistej produkcji `NEWSROOM_PUBLIC_ENABLED=false`; Phase B ma jawnie ustawić `true`, odświeżyć config cache i przejść opisane publiczne smoke checks. Istniejący deploy script celowo nie przełącza tego ustawienia automatycznie.
+
 ---
 
 ## 37. CI integration
@@ -1626,6 +1630,13 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-20 — v0.49
+
+- wykonano końcowy repo-level audit NEWSROOM-N6-005 po PR #137/#138 bez zmiany produkcyjnego kodu ani architektury,
+- potwierdzono istniejące regression coverage dla XSS/embed fail-closed, admin-only/private preview, admin panel authz/no-access-widening, stale-write/concurrency, AuditLog minimization, actual-object upload validation, source URL no-fetch oraz bezpiecznego defaultu public gate,
+- post-merge CI #505 na `main@2ba4cffbe5d065724d876b35394bc50b2051d38e` ma pełny PASS — 1141 passed / 20 231 assertions / 2 skipped, PostgreSQL 7/94, Pint 1102 files PASS i frontend build PASS,
+- N6-005 pozostaje IN PROGRESS wyłącznie dla produkcyjnego Phase A/Phase B evidence `NEWSROOM_PUBLIC_ENABLED=false -> true`; deploy script zgodnie z dotychczasową decyzją nie przełącza gate automatycznie.
 
 ### 2026-09-19 — v0.48
 
