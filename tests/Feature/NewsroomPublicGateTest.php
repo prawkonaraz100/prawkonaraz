@@ -164,3 +164,17 @@ test('enabled newsroom public gate exposes only already implemented eligible pub
         ->assertOk()
         ->assertHeader('Content-Type', 'application/atom+xml; charset=UTF-8');
 });
+
+test('newsroom release artifacts keep the public gate explicit and dark by default', function () {
+    $envExample = file_get_contents(base_path('.env.example'));
+    $deploy = file_get_contents(base_path('deploy/mikrus/deploy.sh'));
+    $productionSmoke = file_get_contents(base_path('scripts/production-seo-delivery-smoke.sh'));
+    $enterpriseWorkflow = file_get_contents(base_path('.github/workflows/newsroom-enterprise-seo-production-validation.yml'));
+
+    expect($envExample)->toContain('NEWSROOM_PUBLIC_ENABLED=false')
+        ->and($deploy)->toContain('EXPECT_NEWSROOM_PUBLIC="$REQUIRE_NEWSROOM_PUBLIC"')
+        ->and($productionSmoke)->toContain('EXPECT_NEWSROOM_PUBLIC="${EXPECT_NEWSROOM_PUBLIC:-auto}"')
+        ->and($productionSmoke)->toContain('Expected newsroom public gate disabled, but feed returned HTTP 200.')
+        ->and($productionSmoke)->toContain('Expected newsroom public gate enabled, but feed returned HTTP 404.')
+        ->and($enterpriseWorkflow)->toContain('EXPECT_NEWSROOM_PUBLIC: ${{ github.event_name == \'workflow_dispatch\'');
+});
