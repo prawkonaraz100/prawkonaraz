@@ -79,7 +79,6 @@ try {
     await page.locator('form[wire\\:submit]').first().waitFor();
 
     const uploadInput = page.locator('input[type="file"]').first();
-    await uploadInput.waitFor();
     if (await uploadInput.count() !== 1) {
         throw new Error('Hero FileUpload input was not found on the create page.');
     }
