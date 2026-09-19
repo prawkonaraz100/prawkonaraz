@@ -39,6 +39,7 @@ jobs:
       MEDIA_NEWSROOM_DISK: media_local
       MEDIA_LOCAL_HOST_ROOT: ${{ github.workspace }}/storage/app/public-media
       MEDIA_LOCAL_URL: http://127.0.0.1:8081
+      AUDIO_GENERATOR_HOST_ROOT: ${{ github.workspace }}/storage/app/audio-generator-stub
       N6_SCHEDULED_SMOKE_PORT: '8000'
       N6_SCHEDULED_SMOKE_DELAY_SECONDS: '45'
       N6_SCHEDULED_SMOKE_EXTERNAL_SERVER: 'true'
