@@ -4,7 +4,7 @@ import http from 'node:http';
 import path from 'node:path';
 import process from 'node:process';
 import { chromium } from 'playwright';
-import { collectSnapshotPerformance } from './newsroom-performance-metrics.mjs';
+import { assertPerformanceBudget, collectSnapshotPerformance } from './newsroom-performance-metrics.mjs';
 
 const cwd = process.cwd();
 const outputDir = path.join(cwd, 'output', 'playwright', 'newsroom-article');
@@ -18,6 +18,13 @@ const title = 'Długi testowy tytuł artykułu newsroomu sprawdzający poprawne 
 const port = Number(process.env.E2E_NEWSROOM_PORT ?? '8127');
 const baseUrl = `http://127.0.0.1:${port}`;
 const publicDir = path.join(cwd, 'public');
+const performanceBudget = {
+    max_query_count: 18,
+    max_html_bytes: 75_000,
+    max_image_bytes: 100_000,
+    max_css_bytes: 450_000,
+    max_js_bytes: 20_000,
+};
 const viewports = [
     { name: '360', width: 360, height: 800 },
     { name: '390', width: 390, height: 844 },
@@ -49,6 +56,7 @@ try {
     console.log('[newsroom-e2e] render through Laravel kernel');
     report.render_status = await renderArticleSnapshot();
     report.performance = await collectSnapshotPerformance({ cwd, baseUrl, snapshotPath, renderMetricsPath });
+    assertPerformanceBudget('article', report.performance, performanceBudget);
     console.log('[newsroom-e2e] performance', JSON.stringify(report.performance));
     console.log('[newsroom-e2e] start static browser server');
     staticServer = await startStaticServer();
