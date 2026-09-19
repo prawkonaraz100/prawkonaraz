@@ -13,6 +13,7 @@ const articleStatePath = path.join(outputDir, 'article-state.json');
 const reportPath = path.join(outputDir, 'report.json');
 const port = Number(process.env.N6_SCHEDULED_SMOKE_PORT ?? '8134');
 const dueDelaySeconds = Number(process.env.N6_SCHEDULED_SMOKE_DELAY_SECONDS ?? '45');
+const useExternalServer = process.env.N6_SCHEDULED_SMOKE_EXTERNAL_SERVER === 'true';
 const baseUrl = `http://127.0.0.1:${port}`;
 const runToken = String(process.env.GITHUB_RUN_ID ?? Date.now()).replace(/[^0-9]/g, '').slice(-12) || 'local';
 const slug = `n6-scheduled-smoke-${runToken}`;
@@ -34,6 +35,7 @@ const report = {
     canonical_app_url: process.env.APP_URL ?? null,
     slug,
     due_delay_seconds: dueDelaySeconds,
+    external_server: useExternalServer,
     steps: [],
 };
 
@@ -74,8 +76,12 @@ try {
     report.articles_before_sha256 = sha256(articlesBefore);
     report.news_before_sha256 = sha256(newsBefore);
 
-    console.log('[n6-scheduled] start isolated production-mode HTTP server');
-    serverProcess = startLaravelServer();
+    if (useExternalServer) {
+        console.log('[n6-scheduled] use external stable production-mode HTTP server');
+    } else {
+        console.log('[n6-scheduled] start isolated production-mode HTTP server');
+        serverProcess = startLaravelServer();
+    }
     await waitForHttp(`${baseUrl}/aktualnosci`);
 
     const beforeArticle = await fetchText(`${baseUrl}${fixture.public_path}`);
