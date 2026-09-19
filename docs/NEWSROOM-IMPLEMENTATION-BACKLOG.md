@@ -2188,6 +2188,12 @@ NEWSROOM-N5-007 pozostaje IN PROGRESS z osobnymi live-production Nginx/STRICT HT
 
 ## NEWSROOM-N6-003 — Enterprise SEO production validation
 
+### Status
+
+**IN PROGRESS — repo-level production-validation harness jest wdrożony i zielony w CI, ale live production nie przechodzi jeszcze STRICT contractu.**
+
+Zakres bazowy pozostaje bez zmian:
+
 - homepage site name/WebSite validation,
 - Organization logo crawlability/dimensions,
 - URL Inspection sample per article/category/topic,
@@ -2205,6 +2211,62 @@ NEWSROOM-N5-007 pozostaje IN PROGRESS z osobnymi live-production Nginx/STRICT HT
 - conditional 304 sample na faktycznej warstwie static/CDN, jeśli skonfigurowane,
 - feed validators osobno,
 - Search Console segmentation articles/categories/topics/guides.
+
+### Potwierdzony repo-level podkrok
+
+PR #125 dodał wyłącznie validation tooling:
+
+- `.github/workflows/newsroom-enterprise-seo-production-validation.yml`,
+- `scripts/newsroom-enterprise-seo-production-validation.mjs`,
+- `package.json`.
+
+Nie zmieniono produkcyjnej logiki aplikacji, publikacji, routingu ani architektury.
+
+Workflow działa:
+
+- w PR jako REPORT-ONLY przeciw live production,
+- przez ręczny `workflow_dispatch` domyślnie jako STRICT,
+- reużywa istniejący `scripts/production-seo-delivery-smoke.sh`,
+- sprawdza homepage canonical + WebSite/Organization identity,
+- sprawdza crawlability/dimensions Organization logo,
+- sprawdza newsroom hub public-vs-placeholder indexing contract,
+- sprawdza sitemap index/child HTTP/XML/no-Set-Cookie contract,
+- sprawdza rollout-gated Atom feed i discovery,
+- przy podaniu próbek sprawdza article/category/topic canonical, graph identity oraz article visible-date vs `datePublished`/`dateModified`.
+
+### Evidence repo/CI
+
+- finalny HEAD PR #125: `8a64f81c15fb6c52e2a90db26c5c65c9ad999801`,
+- Newsroom Enterprise SEO Production Validation #2: workflow PASS w REPORT-ONLY mode,
+- Newsroom Scheduled Publication Smoke #12: PASS,
+- Browser Smoke #96: PASS dla wszystkich newsroom jobs, w tym golden path,
+- exact-head CI #472: PASS — 1139 passed / 20 219 assertions / 2 skipped, `newsroom-postgres` PASS, frontend build PASS,
+- merge PR #125: `main@0344427cdf42804a037c688df54da6216f243ca6`,
+- post-merge CI #473 na tym exact `main`: PASS — 1139 passed / 20 219 assertions / 2 skipped, `newsroom-postgres` PASS, frontend build PASS.
+
+### Potwierdzony live-production baseline
+
+REPORT-ONLY run nie jest production PASS. Wykrył rzeczywiste rozbieżności:
+
+- `/robots.txt` nadal zwraca `Cache-Control: max-age=14400` zamiast repo contract `public, max-age=3600`,
+- live homepage zwraca self-canonical i crawlable Organization logo >=112x112, ale aktualna odpowiedź nie zawiera jeszcze stabilnych `WebSite @id=https://prawkonaraz.pl/#website` i `Organization @id=https://prawkonaraz.pl/#organization`, które emituje aktualny kod `main`,
+- live `/aktualnosci` zwraca 200 jako cienka indexable surface bez canonical/H1/meta/structured data i bez wymaganego przez aktualny gate `X-Robots-Tag: noindex, follow`,
+- production sitemap index ma poprawne sprawdzone child XML responses bez `Set-Cookie`, ale nie zawiera jeszcze newsroom article/news sitemap coverage,
+- `/aktualnosci/feed.xml` pozostaje rollout-gated 404.
+
+Search Console evidence z 2026-09-19:
+
+- property: `sc-domain:prawkonaraz.pl`,
+- główny `https://prawkonaraz.pl/sitemap.xml` jest submitted, ostatnio pobrany 2026-09-19, bez reported warnings/errors,
+- URL Inspection dla homepage: `Duplicate, Google chose different canonical than user`, robots allowed, indexing allowed, last crawl 2026-08-27,
+- URL Inspection dla `/aktualnosci`: `URL is unknown to Google`,
+- brak jeszcze Search Analytics rows dla `/aktualnosci` w settled window kończącym się 2026-09-16.
+
+### Boundary / następny krok
+
+N6-003 nie jest DONE i nie wolno zapisywać report-only workflow success jako zielonego production gate'u. Następny krok N6-003 wymaga aktualnego deploy/runtime na produkcji, zielonego STRICT runu oraz reprezentatywnych live article/category/topic samples do URL Inspection/schema/canonical/date validation.
+
+NEWSROOM-N5-007 również pozostaje IN PROGRESS; jego Nginx/STRICT static-delivery/Cloudflare/GSC evidence jest częściowo współdzielone z N6-003, ale oba taski zachowują własny zakres i status.
 
 ---
 
@@ -2685,6 +2747,14 @@ Następnym wykonywalnym podkrokiem pozostaje **zastosowanie aktualnego Nginx con
 ---
 
 # 12. Historia zmian
+
+### 2026-09-19 — v0.59
+
+- NEWSROOM-N6-003 otrzymał repo-level enterprise SEO production-validation harness przez PR #125 bez zmiany produkcyjnej logiki aplikacji ani architektury; zmieniono wyłącznie workflow, Node validator i package script,
+- finalny HEAD `8a64f81c15fb6c52e2a90db26c5c65c9ad999801` przeszedł Enterprise SEO Production Validation #2 (REPORT-ONLY workflow success), Scheduled Publication Smoke #12, Browser Smoke #96 i CI #472,
+- PR #125 zmergowano jako `main@0344427cdf42804a037c688df54da6216f243ca6`; post-merge CI #473 zakończył pełny PASS: 1139 passed / 20 219 assertions / 2 skipped, PostgreSQL PASS, frontend build PASS,
+- report-only live evidence nadal wykazuje produkcyjne rozbieżności: robots cache `max-age=14400`, brak aktualnych stable WebSite/Organization @id na live homepage, niespójny `/aktualnosci` placeholder/indexing contract, brak article/news sitemap coverage i rollout-gated feed 404,
+- GSC URL Inspection 2026-09-19: homepage ma `Duplicate, Google chose different canonical than user`, a `/aktualnosci` jest unknown to Google; N6-003 pozostaje IN PROGRESS do zielonego STRICT production validation i reprezentatywnych live samples.
 
 ### 2026-09-19 — v0.58
 
