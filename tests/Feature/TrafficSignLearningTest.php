@@ -100,22 +100,27 @@ test('traffic sign learning corpus uses only published trainable mvp signs', fun
     ]);
 
     TrafficSign::factory()->published()->for($author, 'author')->for($outsideMvpCategory, 'category')->create([
+        'code' => 'T-91',
         'slug' => 'outside-mvp',
     ]);
     TrafficSign::factory()->published()->for($author, 'author')->for($warningCategory, 'category')->create([
+        'code' => 'A-91',
         'slug' => 'missing-image',
         'image_path' => null,
     ]);
     TrafficSign::factory()->published()->for($author, 'author')->for($warningCategory, 'category')->create([
+        'code' => 'A-92',
         'slug' => 'missing-education',
         'intro_definition' => null,
         'meaning' => null,
         'driver_behavior' => null,
     ]);
     TrafficSign::factory()->published()->for($unpublishedAuthor, 'author')->for($warningCategory, 'category')->create([
+        'code' => 'A-93',
         'slug' => 'unpublished-author',
     ]);
     TrafficSign::factory()->published()->for($author, 'author')->for($unpublishedCategory, 'category')->create([
+        'code' => 'B-91',
         'slug' => 'unpublished-category',
     ]);
 
