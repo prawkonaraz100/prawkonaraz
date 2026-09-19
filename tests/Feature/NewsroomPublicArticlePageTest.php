@@ -269,7 +269,6 @@ test('related article blocks fail closed for non public author or inactive categ
         ->assertDontSee('Materiał z nieaktywną kategorią');
 });
 
-
 test('editorial principles page exposes publisher correction source and sponsorship policy', function () {
     $response = $this->get(route('about.editorial-principles'));
 
