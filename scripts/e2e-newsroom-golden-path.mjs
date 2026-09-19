@@ -76,7 +76,7 @@ try {
         new URL(page.url()).pathname === fixture.create_path,
         `Create page redirected unexpectedly to ${page.url()}.`,
     );
-    await page.locator('form').first().waitFor();
+    await page.locator('form[wire\\:submit]').first().waitFor();
 
     const uploadInput = page.locator('input[type="file"]').first();
     await uploadInput.waitFor();
@@ -146,7 +146,7 @@ try {
         'data.editorial_note': 'N6-001 browser golden path.',
     });
 
-    const createSubmit = page.locator('form button[type="submit"]').first();
+    const createSubmit = page.locator('form[wire\\:submit] button[type="submit"]').first();
     await createSubmit.waitFor();
     await createSubmit.click();
     await page.waitForLoadState('networkidle').catch(() => {});
@@ -382,7 +382,7 @@ async function setPageComponentState(page, state) {
 
     for (const [key, value] of Object.entries(state)) {
         await page.evaluate(async ({ property, propertyValue }) => {
-            const form = document.querySelector('form');
+            const form = document.querySelector('form[wire\\:submit]');
             const root = form?.closest('[wire\\:id]') ?? document.querySelector('[wire\\:id]');
             const id = root?.getAttribute('wire:id');
 
