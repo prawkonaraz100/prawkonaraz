@@ -52,6 +52,7 @@ test('newsroom article schema builds one stable graph aligned with SEO canonical
         ->and($articleNode['mainEntityOfPage'])->toBe(['@id' => $webPageId])
         ->and($articleNode['author'])->toBe(['@id' => $authorId])
         ->and($articleNode['publisher'])->toBe(['@id' => $ids->organization()])
+        ->and($articleNode['publishingPrinciples'])->toBe(route('about.editorial-principles'))
         ->and($articleNode['isPartOf'])->toBe(['@id' => $ids->website()])
         ->and($articleNode['articleSection'])->toBe($article->category->name)
         ->and($webPageNode['mainEntity'])->toBe(['@id' => $articleId])
