@@ -28,6 +28,9 @@ export function assertPerformanceBudget(label, metrics, budget) {
     if (metrics.images.missing_intrinsic_dimensions > 0) {
         failures.push(`images missing intrinsic dimensions: ${metrics.images.missing_intrinsic_dimensions}`);
     }
+    if (metrics.images.missing_declared_dimensions > 0) {
+        failures.push(`images missing declared dimensions: ${metrics.images.missing_declared_dimensions}`);
+    }
     if (metrics.images.total_bytes > budget.max_image_bytes) {
         failures.push(`image_bytes ${metrics.images.total_bytes} > ${budget.max_image_bytes}`);
     }
