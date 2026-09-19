@@ -148,6 +148,22 @@ class TrafficSignSeoService
     }
 
     /**
+     * @return array<string, mixed>
+     */
+    public function editorialPrinciplesPage(): array
+    {
+        $name = (string) config('content.organization.name', config('app.name', 'prawkonaraz.pl'));
+
+        return [
+            'title' => "{$name} - zasady redakcyjne",
+            'description' => 'Poznaj zasady redakcyjne PrawkoNaRaz: autorstwo, źródła, weryfikacja, korekty, niezależność i jawne oznaczanie ewentualnych materiałów sponsorowanych.',
+            'canonical' => route('about.editorial-principles'),
+            'image' => $this->publicUrlResolver->normalize((string) config('content.organization.logo_url', '/favicon.png')),
+            'og_type' => 'website',
+        ];
+    }
+
+    /**
      * @param  array<string, mixed>  $page
      */
     public function supportingPage(array $page, ?ContentAuthor $author = null, ?TrafficSign $primarySign = null): array
