@@ -28,6 +28,7 @@ try {
     await fs.mkdir(outputDir, { recursive: true });
 
     await validateHomepage();
+    await validateCanonicalHostMigration();
     const newsroom = await validateNewsroomHub();
     const sitemap = await validateSitemapIndex();
     await validateFeed(newsroom);
@@ -134,6 +135,88 @@ async function validateHomepage() {
             }
         }
     }
+}
+
+async function validateCanonicalHostMigration() {
+    if (origin !== 'https://prawkonaraz.pl') {
+        addCheck(
+            'canonical-host-migration.not-applicable',
+            'pass',
+            `Skipped production host-migration checks for non-production origin ${origin}.`,
+        );
+        return;
+    }
+
+    const variants = [
+        {
+            label: 'http-apex',
+            url: 'http://prawkonaraz.pl/',
+        },
+        {
+            label: 'https-www',
+            url: 'https://www.prawkonaraz.pl/',
+        },
+        {
+            label: 'http-www',
+            url: 'http://www.prawkonaraz.pl/',
+        },
+        {
+            label: 'legacy-prawkoapp',
+            url: 'https://prawkoapp.pl/',
+        },
+    ];
+    const results = [];
+
+    for (const variant of variants) {
+        try {
+            const result = await followRedirectChain(variant.url);
+            results.push({
+                label: variant.label,
+                start_url: variant.url,
+                final_url: result.finalUrl,
+                final_status: result.finalResponse.status,
+                hops: result.chain,
+            });
+
+            expect(
+                result.chain.length >= 2 && isRedirectStatus(result.chain[0].status),
+                `canonical-host-migration.${variant.label}.redirects`,
+                `Expected ${variant.url} to redirect before serving content; first status=${result.chain[0]?.status ?? 'missing'}.`,
+            );
+            expect(
+                result.finalResponse.status === 200,
+                `canonical-host-migration.${variant.label}.final-http-200`,
+                `Expected final canonical response HTTP 200; got ${result.finalResponse.status}.`,
+            );
+            expect(
+                urlEquals(result.finalUrl, new URL('/', origin).toString()),
+                `canonical-host-migration.${variant.label}.final-canonical`,
+                `Expected ${variant.url} to end at ${origin}/; got ${result.finalUrl}.`,
+            );
+
+            if (result.chain.length > 2) {
+                addCheck(
+                    `canonical-host-migration.${variant.label}.redirect-chain`,
+                    'warn',
+                    `Expected a direct canonical redirect where practical; observed ${result.chain.length - 1} redirect hops.`,
+                );
+            } else {
+                addCheck(
+                    `canonical-host-migration.${variant.label}.redirect-chain`,
+                    'pass',
+                    'Canonical host migration resolves in one redirect hop.',
+                );
+            }
+        } catch (error) {
+            addCheck(
+                `canonical-host-migration.${variant.label}.runtime`,
+                'fail',
+                error instanceof Error ? error.message : String(error),
+            );
+        }
+    }
+
+    report.observations.canonical_host_migration = results;
 }
 
 async function validateNewsroomHub() {
@@ -389,6 +472,47 @@ async function fetchDocument(url) {
         body: await response.text(),
         url,
     };
+}
+
+async function followRedirectChain(startUrl, maxRedirects = 5) {
+    const chain = [];
+    let currentUrl = startUrl;
+
+    for (let redirectCount = 0; redirectCount <= maxRedirects; redirectCount += 1) {
+        const response = await fetchDocument(currentUrl);
+        const location = response.headers.get('location');
+        chain.push({
+            url: currentUrl,
+            status: response.status,
+            location,
+        });
+
+        if (!isRedirectStatus(response.status)) {
+            return {
+                chain,
+                finalUrl: currentUrl,
+                finalResponse: response,
+            };
+        }
+
+        if (!location) {
+            throw new Error(`Redirect response from ${currentUrl} is missing Location header.`);
+        }
+
+        const nextUrl = new URL(location, currentUrl).toString();
+
+        if (chain.some((hop) => urlEquals(hop.url, nextUrl))) {
+            throw new Error(`Redirect loop detected while resolving ${startUrl}: ${nextUrl}.`);
+        }
+
+        currentUrl = nextUrl;
+    }
+
+    throw new Error(`Exceeded ${maxRedirects} redirects while resolving ${startUrl}.`);
+}
+
+function isRedirectStatus(status) {
+    return [301, 302, 303, 307, 308].includes(status);
 }
 
 async function fetchImageMeta(url) {
