@@ -151,12 +151,14 @@ try {
 
     const createSubmit = page.locator('form[wire\\:submit] button[type="submit"]').first();
     await createSubmit.waitFor();
-    await createSubmit.click();
-    await page.waitForURL(
-        (url) => new URL(url).pathname !== fixture.create_path,
-        { timeout: 15_000 },
-    );
-    await page.waitForLoadState('networkidle').catch(() => {});
+    const createResponsePromise = page.waitForResponse((response) => (
+        response.request().method() === 'POST'
+        && new URL(response.url()).pathname.includes('/livewire-')
+        && new URL(response.url()).pathname.endsWith('/update')
+    ));
+    await createSubmit.click({ noWaitAfter: true });
+    const createResponse = await createResponsePromise;
+    assert(createResponse.status() === 200, `Create Livewire update returned HTTP ${createResponse.status()}.`);
     await waitForLivewireIdle(page);
 
     const article = await readCreatedArticle();
