@@ -13,12 +13,42 @@ export async function collectSnapshotPerformance({ cwd, baseUrl, snapshotPath, r
     };
 }
 
+export function assertPerformanceBudget(label, metrics, budget) {
+    const failures = [];
+
+    if (metrics.query_count > budget.max_query_count) {
+        failures.push(`query_count ${metrics.query_count} > ${budget.max_query_count}`);
+    }
+    if (metrics.normalized_html_bytes > budget.max_html_bytes) {
+        failures.push(`html_bytes ${metrics.normalized_html_bytes} > ${budget.max_html_bytes}`);
+    }
+    if (metrics.images.local_count < 1) {
+        failures.push('no local image asset was measured');
+    }
+    if (metrics.images.missing_intrinsic_dimensions > 0) {
+        failures.push(`images missing intrinsic dimensions: ${metrics.images.missing_intrinsic_dimensions}`);
+    }
+    if (metrics.images.total_bytes > budget.max_image_bytes) {
+        failures.push(`image_bytes ${metrics.images.total_bytes} > ${budget.max_image_bytes}`);
+    }
+    if (metrics.build_assets.css_bytes > budget.max_css_bytes) {
+        failures.push(`css_bytes ${metrics.build_assets.css_bytes} > ${budget.max_css_bytes}`);
+    }
+    if (metrics.build_assets.js_bytes > budget.max_js_bytes) {
+        failures.push(`js_bytes ${metrics.build_assets.js_bytes} > ${budget.max_js_bytes}`);
+    }
+
+    if (failures.length > 0) {
+        throw new Error(`${label} performance budget failed: ${failures.join('; ')}`);
+    }
+}
+
 async function collectImages(html, context) {
     const tags = [...html.matchAll(/<img\b[^>]*>/gi)].map((match) => match[0]);
     const items = [];
     const unresolved = [];
 
-    for (const tag of tags) {
+    for (const tag of uniqueTags) {
         const src = readAttribute(tag, 'src');
         const filePath = src ? resolvePublicAsset(src, context) : null;
 
@@ -47,6 +77,7 @@ async function collectImages(html, context) {
     return {
         referenced_count: tags.length,
         local_count: items.length,
+        unique_reference_count: uniqueTags.length,
         total_bytes: items.reduce((total, item) => total + item.bytes, 0),
         missing_intrinsic_dimensions: items.filter((item) => item.width === null || item.height === null).length,
         missing_declared_dimensions: items.filter((item) => item.declared_width === null || item.declared_height === null).length,
@@ -142,8 +173,25 @@ function sniffImageDimensions(bytes, extension) {
     }
 
     if (bytes.length >= 30 && bytes.subarray(0, 4).toString('ascii') === 'RIFF' && bytes.subarray(8, 12).toString('ascii') === 'WEBP') {
-        if (bytes.subarray(12, 16).toString('ascii') === 'VP8X') {
+        const chunk = bytes.subarray(12, 16).toString('ascii');
+
+        if (chunk === 'VP8X') {
             return { width: 1 + bytes.readUIntLE(24, 3), height: 1 + bytes.readUIntLE(27, 3) };
+        }
+
+        if (chunk === 'VP8 ' && bytes.subarray(23, 26).equals(Buffer.from([0x9d, 0x01, 0x2a]))) {
+            return {
+                width: bytes.readUInt16LE(26) & 0x3fff,
+                height: bytes.readUInt16LE(28) & 0x3fff,
+            };
+        }
+
+        if (chunk === 'VP8L' && bytes[20] === 0x2f) {
+            const bits = bytes.readUInt32LE(21);
+            return {
+                width: 1 + (bits & 0x3fff),
+                height: 1 + ((bits >>> 14) & 0x3fff),
+            };
         }
     }
 
