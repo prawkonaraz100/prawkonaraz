@@ -2355,11 +2355,24 @@ Regresyjne repo budgets są oparte na tym zmierzonym baseline:
 
 Kernel render time jest raportowany, ale nie jest twardym gate'em, ponieważ współdzielony GitHub Actions runner nie daje stabilnego środowiska do wiarygodnego progu czasowego.
 
-### Potwierdzony finding / pozostały zakres
+### Potwierdzony CLS hardening / pozostały zakres
 
-Rendered common image ma poprawne intrinsic 1000×750, ale snapshot nadal wykazuje brak deklarowanych HTML `width`/`height` (`missing_declared_dimensions = 1`). Tego PR #131 nie naprawiał i nie wolno oznaczać jako zakończonego CLS hardeningu.
+PR #133 zamknął potwierdzony repo-level finding `missing_declared_dimensions = 1` bez zmiany layoutu, assetu, routingu ani decyzji architektonicznych:
 
-N6-004 pozostaje IN PROGRESS. Produkcyjne LCP/INP/CLS/TTFB nadal wymagają rollout/live production evidence zgodnie z runbookiem. Następny repo-actionable podkrok to usunięcie potwierdzonego braku deklarowanych wymiarów obrazu i ponowne przejście Browser Smoke/CI.
+- `resources/views/components/site/login-drawer.blade.php` i `resources/views/components/site/register-drawer.blade.php` deklarują zweryfikowane `width="1000" height="750"` dla wspólnego `hero-composite-v3.webp`,
+- istniejący N6-004 performance budget failuje teraz również przy dowolnym lokalnym obrazie z `missing_declared_dimensions > 0`,
+- istniejący Browser Smoke uruchamia się również po zmianie obu drawerów i `scripts/newsroom-performance-metrics.mjs`; nie utworzono nowego workflow.
+
+Finalny exact-head PR #133: `18e266dcb5ea45b9757a3b74a8ed1ec65e2ffd19`.
+
+Potwierdzone evidence:
+
+- Browser Smoke #102: wszystkie newsroom joby PASS; article, home oraz category page 1/2 raportują `missing_intrinsic_dimensions = 0` i `missing_declared_dimensions = 0`, a zmierzony obraz ma intrinsic i declared dimensions 1000×750,
+- CI #494: pełny PASS — 1140 passed / 20 229 assertions / 2 skipped, `newsroom-postgres` PASS, Pint 1102 files PASS, frontend build PASS,
+- merge PR #133: `main@f5fba3c069849078aea032429aed7a139d6a5c62`,
+- post-merge CI #495: pełny PASS — 1140 passed / 20 229 assertions / 2 skipped, `newsroom-postgres` PASS, Pint 1102 files PASS, frontend build PASS.
+
+Repo-level brak deklarowanych dimensions jest zamknięty. N6-004 pozostaje jednak **IN PROGRESS**, ponieważ produkcyjne LCP/INP/CLS/TTFB nadal wymagają rollout/live production evidence zgodnie z runbookiem.
 
 ---
 
