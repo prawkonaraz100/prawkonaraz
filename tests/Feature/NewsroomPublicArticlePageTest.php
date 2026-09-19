@@ -280,7 +280,7 @@ test('editorial principles page exposes publisher correction source and sponsors
         ->assertSee('Źródła i weryfikacja')
         ->assertSee('Korekty i aktualizacje')
         ->assertSee('Materiały sponsorowane i konflikty interesów')
-        ->assertSee('materiały sponsorowane nie są częścią newsroomu v1')
+        ->assertSee('Materiały sponsorowane nie są częścią newsroomu v1')
         ->assertSee('href="'.route('about.organization').'"', false)
         ->assertSee('href="'.route('about.contact').'"', false)
         ->assertSee('<link rel="canonical" href="'.route('about.editorial-principles').'">', false)
