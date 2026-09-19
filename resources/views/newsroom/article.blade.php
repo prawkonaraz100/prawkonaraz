@@ -311,6 +311,11 @@
                     </section>
                 @endif
 
+                <p class="mt-8 text-sm leading-6 text-slate-600">
+                    Informacje o autorstwie, źródłach, weryfikacji i korektach opisujemy w
+                    <a href="{{ route('about.editorial-principles') }}" class="font-semibold text-slate-950 underline underline-offset-4">zasadach redakcyjnych</a>.
+                </p>
+
                 @if (($relatedArticles ?? []) !== [])
                     <section class="mt-12 border-t border-slate-200 pt-7" aria-labelledby="newsroom-related-articles-heading">
                         <p class="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Czytaj dalej</p>

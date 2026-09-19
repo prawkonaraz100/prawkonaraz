@@ -35,6 +35,7 @@ use App\Http\Controllers\ContactPageController;
 use App\Http\Controllers\ContentArticleController;
 use App\Http\Controllers\ContentAuthorController;
 use App\Http\Controllers\DashboardApiController;
+use App\Http\Controllers\EditorialPrinciplesPageController;
 use App\Http\Controllers\FriendInvitationClaimController;
 use App\Http\Controllers\FriendInvitationOwnerController;
 use App\Http\Controllers\HealthApiController;
@@ -308,6 +309,8 @@ Route::post('/kontakt', [ContactPageController::class, 'store'])
     ->name('about.contact.store');
 Route::get('/metodologia', MethodologyPageController::class)
     ->name('about.methodology');
+Route::get('/zasady-redakcyjne', EditorialPrinciplesPageController::class)
+    ->name('about.editorial-principles');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', PostAuthRedirectController::class)
