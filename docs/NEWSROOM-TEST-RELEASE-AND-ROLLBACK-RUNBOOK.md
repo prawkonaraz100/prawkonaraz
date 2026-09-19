@@ -1618,7 +1618,7 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - [x] dodać repo-level `SEO_RELEASE=1` deploy guard, który wymusza sitemap refresh/audit + `nginx -t` + publiczny production SEO delivery smoke bez samoczynnego włączania newsroomu lub aplikowania vhosta,
 - [x] dodać canonical-host migration validation dla `http`/`www`/legacy `prawkoapp.pl` i zapisać GSC evidence bez uznawania redirect PASS za rozwiązanie Google-selected canonical mismatchu,
 - [x] dodać N6-004 repo-level performance baseline/budgets do istniejących Browser Smoke article/hub/category z query count, SSR HTML bytes, image bytes/dimensions oraz built JS/CSS bytes,
-- [ ] usunąć potwierdzony brak deklarowanych HTML `width`/`height` dla wspólnego obrazu i ponownie przejść Browser Smoke/CI,
+- [x] usunąć potwierdzony brak deklarowanych HTML `width`/`height` dla wspólnego obrazu i ponownie przejść Browser Smoke/CI — PR #133, Browser Smoke #102, exact-head CI #494 i post-merge CI #495 PASS,
 - [ ] uzyskać production LCP/INP/CLS/TTFB po rollout/live zgodnie z N6-004; kernel render time z GitHub Actions pozostaje raportowanym baseline, nie twardym production SLA,
 - [ ] uzyskać zielony manualny STRICT N6-003 run po aktualnym deploy/runtime i zachować live article/category/topic + GSC evidence,
 - [ ] po pierwszym release wpisać rzeczywiste wyniki i ewentualne różnice od planu.
@@ -1626,6 +1626,14 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-19 — v0.46
+
+- PR #133 zamknął repo-level N6-004 finding `missing_declared_dimensions = 1`: login/register drawer deklarują zweryfikowane `width="1000" height="750"` dla wspólnego `hero-composite-v3.webp`, a istniejący performance budget failuje również przy brakujących deklarowanych dimensions,
+- istniejący Browser Smoke otrzymał brakujące triggery dla obu drawerów i `scripts/newsroom-performance-metrics.mjs`; nie utworzono nowego workflow,
+- finalny HEAD `18e266dcb5ea45b9757a3b74a8ed1ec65e2ffd19` przeszedł Browser Smoke #102 i CI #494; article/home/category page 1/2 mają `missing_intrinsic_dimensions = 0` oraz `missing_declared_dimensions = 0`, a obraz raportuje intrinsic/declared 1000×750,
+- merge PR #133: `main@f5fba3c069849078aea032429aed7a139d6a5c62`; post-merge CI #495 pełny PASS — 1140 passed / 20 229 assertions / 2 skipped, PostgreSQL PASS, Pint 1102 files PASS i frontend build PASS,
+- repo-level declared-dimensions finding jest zamknięty, ale N6-004 pozostaje IN PROGRESS do uzyskania production LCP/INP/CLS/TTFB po rollout/live.
 
 ### 2026-09-19 — v0.45
 
