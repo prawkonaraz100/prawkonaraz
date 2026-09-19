@@ -111,6 +111,16 @@ GSC 2026-09-19:
 
 N6-003 pozostaje IN PROGRESS do aktualnego production deploy/runtime, zielonego STRICT workflow i reprezentatywnych article/category/topic samples.
 
+Stan po PR #127 — repo-level SEO release guard:
+
+- `deploy/mikrus/deploy.sh` ma opt-in `SEO_RELEASE=1`,
+- w tym trybie po standardowym deployu wykonuje `seo:refresh-sitemaps`, `seo:audit-sitemaps`, `nginx -t` i istniejący publiczny `production-seo-delivery-smoke.sh`,
+- `REQUIRE_NEWSROOM_PUBLIC=1` wymusza publiczny feed contract; domyślne `0` nadal pozwala na rollout-gated 404 feedu,
+- guard nie aplikuje ani nie reloaduje aktywnego vhosta Nginx oraz nie włącza `NEWSROOM_PUBLIC_ENABLED`,
+- finalny HEAD PR #127 `e84758d911ffc4f6ff10a04f88a2b8c48beb22c6`: exact-head CI #477 PASS — 1140 passed / 20 229 assertions / 2 skipped, PostgreSQL PASS, Pint 1102 files PASS, frontend build PASS,
+- merge `main@b26317bd979dd0c372b7a9341a8358f2599a9550`: post-merge CI #478 pełny PASS,
+- świeży report-only Production SEO Delivery Smoke przy PR #127 ponownie potwierdził live `/robots.txt` `max-age=14400` i underlying exit `1`; to nadal nie jest production PASS.
+
 Stan po NEWSROOM-N6-002 — scheduled publication release smoke:
 
 - istnieje osobny workflow `Newsroom Scheduled Publication Smoke` uruchamiany dla zmian w scheduler/publishing/SEO-refresh contract oraz ręcznie przez `workflow_dispatch`,
@@ -1595,12 +1605,20 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - [x] dodać N6-001 dedykowany editorial/public Browser Smoke golden path i potwierdzić exact-head oraz post-merge CI,
 - [x] dodać N6-002 production-mode scheduled-publication release smoke i potwierdzić real-clock pre-due/post-due publication, dirty/version oraz feed/sitemap refresh bez daily cron,
 - [x] dodać N6-003 report-only/STRICT enterprise SEO production-validation harness reużywający existing static-delivery smoke,
+- [x] dodać repo-level `SEO_RELEASE=1` deploy guard, który wymusza sitemap refresh/audit + `nginx -t` + publiczny production SEO delivery smoke bez samoczynnego włączania newsroomu lub aplikowania vhosta,
 - [ ] uzyskać zielony manualny STRICT N6-003 run po aktualnym deploy/runtime i zachować live article/category/topic + GSC evidence,
 - [ ] po pierwszym release wpisać rzeczywiste wyniki i ewentualne różnice od planu.
 
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-19 — v0.43
+
+- PR #127 dodał opt-in `SEO_RELEASE=1` do istniejącego `deploy/mikrus/deploy.sh`: refresh/audit sitemap artifacts, `nginx -t` oraz publiczny production SEO delivery smoke po wyjściu z maintenance mode,
+- `REQUIRE_NEWSROOM_PUBLIC=1` mapuje wymaganie rollout na publiczny feed smoke; guard nie stosuje ani nie reloaduje aktywnego vhosta i nie zmienia `NEWSROOM_PUBLIC_ENABLED`,
+- finalny HEAD `e84758d911ffc4f6ff10a04f88a2b8c48beb22c6` przeszedł CI #477; merge `main@b26317bd979dd0c372b7a9341a8358f2599a9550` ma post-merge CI #478 PASS — 1140 passed / 20 229 assertions / 2 skipped, PostgreSQL PASS, Pint 1102 files PASS i frontend build PASS,
+- report-only Production SEO Delivery Smoke nadal wykazuje live `/robots.txt` `max-age=14400` i underlying exit `1`; N6-003/N5-007 pozostają IN PROGRESS do faktycznego deploy/runtime i zielonego STRICT evidence.
 
 ### 2026-09-19 — v0.42
 

@@ -376,6 +376,34 @@ standardowe kroki Laravela:
 - czyszczenie i budowanie cache,
 - powrot aplikacji online.
 
+Od PR #127 skrypt ma dodatkowy, jawny tryb dla release'ow dotykajacych
+robots/sitemap/Nginx/newsroom SEO:
+
+```bash
+SEO_RELEASE=1 bash deploy/mikrus/deploy.sh
+```
+
+W tym trybie, po standardowych krokach aplikacji, skrypt:
+
+- uruchamia `php artisan seo:refresh-sitemaps`,
+- uruchamia `php artisan seo:audit-sitemaps`,
+- po wyjsciu z maintenance mode wykonuje `nginx -t`,
+- uruchamia istniejacy `scripts/production-seo-delivery-smoke.sh` przeciw
+  `SEO_BASE_URL` (domyslnie `https://prawkonaraz.pl`),
+- wypisuje `SEO_RELEASE_OK` dopiero gdy wszystkie te kontrole przejda.
+
+Jesli publiczny newsroom ma byc wymagany w tym samym release, uzyj:
+
+```bash
+SEO_RELEASE=1 REQUIRE_NEWSROOM_PUBLIC=1 bash deploy/mikrus/deploy.sh
+```
+
+To mapuje wymaganie publicznego newsroomu na istniejacy feed smoke. Tryb
+`SEO_RELEASE=1` **nie kopiuje ani nie przeladowuje aktywnego vhosta Nginx** i
+nie wlacza `NEWSROOM_PUBLIC_ENABLED`; te decyzje nadal wykonuje sie jawnie,
+zgodnie z runbookiem. Samo `SEO_RELEASE_OK` jest post-deploy evidence z
+publicznego smoke, a nie substytutem zastosowania poprawnego vhosta.
+
 W praktyce dla mniejszych release'ow czesto uzywamy paczki `.tar.gz` i
 dedykowanego zdalnego skryptu, bo daje to:
 
@@ -430,7 +458,11 @@ Od PR #117 ten sam smoke ma dedykowany workflow GitHub Actions `.github/workflow
 - `workflow_dispatch` jest domyślnie **STRICT** i jest właściwym sposobem zapisania post-deploy production evidence po zastosowaniu aktualnego Nginx configu,
 - opcja `require_newsroom_feed` wymusza publiczny kontrakt Atom feedu dopiero po świadomym włączeniu newsroom public gate.
 
-Pierwszy report-only run workflow z PR #117 nie był production PASS: publiczny `/robots.txt` zwrócił `Cache-Control: max-age=14400`, podczas gdy kontrakt repo oczekuje `public, max-age=3600`; smoke zakończył się kodem `1`. Taki zielony REPORT-ONLY job jest wyłącznie evidence rozbieżności. Production PASS wolno zapisać dopiero po udanym STRICT `workflow_dispatch`.
+Pierwszy report-only run workflow z PR #117 nie był production PASS: publiczny `/robots.txt` zwrócił `Cache-Control: max-age=14400`, podczas gdy kontrakt repo oczekuje `public, max-age=3600`; smoke zakończył się kodem `1`. Świeży report-only run przy PR #127 ponownie potwierdził ten sam live mismatch i underlying smoke exit `1`.
+
+PR #127 dodał repo-level guard do `deploy/mikrus/deploy.sh`, ale nie wykonał live deployu. Exact-head CI #477 oraz post-merge CI #478 na `main@b26317bd979dd0c372b7a9341a8358f2599a9550` są PASS; produkcyjny cache mismatch pozostaje otwarty do faktycznego zastosowania aktualnego vhosta/runtime i udanego STRICT/public smoke.
+
+Zielony REPORT-ONLY job jest wyłącznie evidence rozbieżności. Production PASS wolno zapisać dopiero po udanym STRICT `workflow_dispatch` albo równoważnym post-deploy `SEO_RELEASE=1` smoke przeciw rzeczywistej produkcji.
 
 Minimalny sukces:
 

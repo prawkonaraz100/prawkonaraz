@@ -1990,7 +1990,7 @@ Nie zmieniamy produkcyjnego modelu na runtime generation.
 
 Nie implementować tego jako zwykłego `ShouldQueue`, dopóki produkcja ma `QUEUE_CONNECTION=sync` i brak monitorowanego workera.
 
-### Potwierdzony stan implementacji po PR #109, #112, #115, #117 i #119
+### Potwierdzony stan implementacji po PR #109, #112, #115, #117, #119 i #127
 
 NEWSROOM-N5-007 pozostaje **IN PROGRESS**.
 
@@ -2010,6 +2010,7 @@ Potwierdzone podkroki:
 - `NginxSeoStaticDeliveryConfigurationTest` chroni repo-level Nginx contract dla crawler assets.
 - PR #117: `.github/workflows/production-seo-delivery-smoke.yml` uruchamia istniejący smoke na GitHub-hosted runnerze; PR runs są REPORT-ONLY, a manualny `workflow_dispatch` jest domyślnie STRICT i zapisuje artifact raportu.
 - PR #119: istniejący `NewsroomSeoArtifactRefreshCoordinatorTest` ma dedykowany regression runtime definition schedulera (`everyMinute`, production-only, `onOneServer()`, `withoutOverlapping()`) oraz shared refresh-lock contention; przy zajętym locku komenda kończy się sukcesem bez generatora/audytora i zachowuje dirty state.
+- PR #127: `deploy/mikrus/deploy.sh` ma jawny, opt-in `SEO_RELEASE=1`; po standardowym deployu odświeża i audytuje sitemap artifacts, waliduje aktywną składnię `nginx -t` i uruchamia istniejący publiczny `production-seo-delivery-smoke.sh`. `REQUIRE_NEWSROOM_PUBLIC=1` mapuje się na wymagany feed smoke. Guard nie kopiuje ani nie przeładowuje vhosta i nie włącza `NEWSROOM_PUBLIC_ENABLED`; nadal nie zastępuje faktycznego zastosowania produkcyjnego Nginx/runtime.
 
 Implementation PR #109 miał finalny head `dbcd5cdb2f0e6663c998f930c034624f8fe36bf4` i został zmergowany do `main@1744a93fd8f0bddfe7fc5bff90b146fdea24b016`. Exact-head CI #403 oraz post-merge CI #404 zakończyły pełny PASS: 1130 passed / 20 144 assertions / 2 skipped, PostgreSQL 7/94, Pint 1093 files PASS i frontend build PASS.
 
@@ -2018,6 +2019,8 @@ Implementation PR #112 miał finalny head `6f1c3b99d11796f74987c7fe640302b2d7657
 Implementation PR #117 miał finalny head `2a46398e781b76c260617f5e8990191917a36516` i został zmergowany do `main@38102d1c3867d13666308ee657d6579fcb5f1d7a`. Exact-head CI #420 i post-merge CI #421 zakończyły pełny PASS: 1137 passed / 20 207 assertions / 2 skipped, PostgreSQL 7/94, Pint 1102 files PASS i frontend build PASS (odpowiednio 9.66 s i 5.49 s). Dedykowany PR report-only Production SEO Delivery Smoke również wykonał się na GitHub Actions, ale underlying smoke zakończył się kodem 1 z powodu publicznego `/robots.txt` zwracającego `Cache-Control: max-age=14400` zamiast oczekiwanego `public, max-age=3600`; nie jest to production PASS.
 
 Test-evidence PR #119 miał finalny head `30935470028d5fe830ea1f2809d4ac8edcf97b0d` i został zmergowany do `main@abb42032370a185a4cf7d7ee9a474ccbca6d86a4`. Exact-head CI #424 i post-merge CI #425 zakończyły pełny PASS: 1139 passed / 20 219 assertions / 2 skipped, PostgreSQL 7/94, Pint 1102 files PASS i frontend build PASS (odpowiednio 9.86 s i 9.04 s). Zakres #119 zmienił wyłącznie istniejący test; kod produkcyjny i decyzje architektoniczne pozostały bez zmian.
+
+Deployment-guard PR #127 miał finalny head `e84758d911ffc4f6ff10a04f88a2b8c48beb22c6` i został zmergowany do `main@b26317bd979dd0c372b7a9341a8358f2599a9550`. Exact-head CI #477 oraz post-merge CI #478 zakończyły pełny PASS: 1140 passed / 20 229 assertions / 2 skipped, `newsroom-postgres` PASS, Pint 1102 files PASS i frontend build PASS. Świeży PR report-only Production SEO Delivery Smoke ponownie miał underlying exit `1` z powodu live `/robots.txt` `Cache-Control: max-age=14400`; to potwierdza drift i nie jest production PASS.
 
 Topology evidence z aktualnych dokumentów wdrożeniowych potwierdza bieżący kontrakt produkcyjny jako 1x VPS Mikrus 4.1 z Nginx/PHP/PostgreSQL/Redis na jednej maszynie, lokalnym `public/` i jednym cronem `schedule:run`. Dla tej topologii same-filesystem atomic replace jest właściwym modelem. Ewentualne przejście na wiele web node'ów ponownie otwiera wymóg wspólnej dystrybucji artifact setu; Redis lock/`onOneServer()` nie synchronizuje lokalnych plików między node'ami.
 
@@ -2234,6 +2237,13 @@ Workflow działa:
 - sprawdza rollout-gated Atom feed i discovery,
 - przy podaniu próbek sprawdza article/category/topic canonical, graph identity oraz article visible-date vs `datePublished`/`dateModified`.
 
+PR #127 domknął osobny repo-level deployment-drift guard bez zmiany architektury rollout:
+
+- `deploy/mikrus/deploy.sh` obsługuje opt-in `SEO_RELEASE=1`,
+- w tym trybie wykonuje `seo:refresh-sitemaps`, `seo:audit-sitemaps`, `nginx -t` i istniejący publiczny production SEO delivery smoke,
+- `REQUIRE_NEWSROOM_PUBLIC=1` wymaga publicznego feed contractu,
+- guard nie stosuje sam aktywnego vhosta Nginx i nie przełącza `NEWSROOM_PUBLIC_ENABLED`; live deploy nadal pozostaje osobnym wymaganym krokiem.
+
 ### Evidence repo/CI
 
 - finalny HEAD PR #125: `8a64f81c15fb6c52e2a90db26c5c65c9ad999801`,
@@ -2243,6 +2253,8 @@ Workflow działa:
 - exact-head CI #472: PASS — 1139 passed / 20 219 assertions / 2 skipped, `newsroom-postgres` PASS, frontend build PASS,
 - merge PR #125: `main@0344427cdf42804a037c688df54da6216f243ca6`,
 - post-merge CI #473 na tym exact `main`: PASS — 1139 passed / 20 219 assertions / 2 skipped, `newsroom-postgres` PASS, frontend build PASS.
+- deployment-guard PR #127 finalny HEAD `e84758d911ffc4f6ff10a04f88a2b8c48beb22c6`: CI #477 PASS — 1140 passed / 20 229 assertions / 2 skipped, `newsroom-postgres` PASS, Pint 1102 files PASS, frontend build PASS,
+- merge PR #127: `main@b26317bd979dd0c372b7a9341a8358f2599a9550`; post-merge CI #478 również pełny PASS.
 
 ### Potwierdzony live-production baseline
 
@@ -2747,6 +2759,13 @@ Następnym wykonywalnym podkrokiem pozostaje **zastosowanie aktualnego Nginx con
 ---
 
 # 12. Historia zmian
+
+### 2026-09-19 — v0.60
+
+- PR #127 dodał do istniejącego `deploy/mikrus/deploy.sh` jawny `SEO_RELEASE=1` guard: refresh/audit sitemap artifacts, `nginx -t` oraz publiczny production SEO delivery smoke; `REQUIRE_NEWSROOM_PUBLIC=1` wymusza feed contract,
+- guard nie zmienia manualnego modelu deployu, nie aplikuje sam vhosta Nginx i nie włącza `NEWSROOM_PUBLIC_ENABLED`, więc nie jest dowodem naprawy live production,
+- finalny HEAD `e84758d911ffc4f6ff10a04f88a2b8c48beb22c6` przeszedł CI #477; PR #127 zmergowano jako `main@b26317bd979dd0c372b7a9341a8358f2599a9550`, a post-merge CI #478 zakończył pełny PASS: 1140 passed / 20 229 assertions / 2 skipped, PostgreSQL PASS, Pint 1102 files PASS, frontend build PASS,
+- świeży report-only Production SEO Delivery Smoke przy PR #127 ponownie potwierdził live `/robots.txt` `Cache-Control: max-age=14400` i underlying exit `1`; N5-007 oraz N6-003 nadal pozostają IN PROGRESS do faktycznego deploy/runtime i zielonego STRICT production evidence.
 
 ### 2026-09-19 — v0.59
 
