@@ -83,6 +83,8 @@ try {
         `Create page redirected unexpectedly to ${page.url()}.`,
     );
     await page.locator('form[wire\\:submit]').first().waitFor();
+    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForTimeout(300);
 
     await setPageComponentState(page, {
         'data.type': 'news',
@@ -147,6 +149,10 @@ try {
     const createSubmit = page.locator('form[wire\\:submit] button[type="submit"]').first();
     await createSubmit.waitFor();
     await createSubmit.click();
+    await page.waitForURL(
+        (url) => new URL(url).pathname !== fixture.create_path,
+        { timeout: 15_000 },
+    );
     await page.waitForLoadState('networkidle').catch(() => {});
     await waitForLivewireIdle(page);
 
