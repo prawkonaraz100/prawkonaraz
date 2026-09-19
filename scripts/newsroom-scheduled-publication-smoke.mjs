@@ -348,18 +348,34 @@ async function waitForHttp(url) {
 }
 
 async function fetchText(url) {
-    const response = await fetch(url, {
-        redirect: 'manual',
-        headers: {
-            Accept: 'text/html,application/atom+xml,application/xml;q=0.9,*/*;q=0.8',
-            Host: new URL(process.env.APP_URL ?? 'https://prawkonaraz.pl').host,
-        },
-    });
+    const target = new URL(url);
+    const canonicalHost = new URL(process.env.APP_URL ?? 'https://prawkonaraz.pl').host;
 
-    return {
-        status: response.status,
-        body: await response.text(),
-    };
+    return await new Promise((resolve, reject) => {
+        const request = http.request({
+            hostname: target.hostname,
+            port: target.port,
+            path: `${target.pathname}${target.search}`,
+            method: 'GET',
+            headers: {
+                Host: canonicalHost,
+                Accept: 'text/html,application/atom+xml,application/xml;q=0.9,*/*;q=0.8',
+            },
+        }, (response) => {
+            const chunks = [];
+
+            response.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
+            response.on('end', () => resolve({
+                status: response.statusCode ?? 0,
+                body: Buffer.concat(chunks).toString('utf8'),
+                location: response.headers.location ?? null,
+            }));
+        });
+
+        request.setTimeout(10_000, () => request.destroy(new Error(`timeout fetching ${url}`)));
+        request.on('error', reject);
+        request.end();
+    });
 }
 
 async function readRequiredFile(file) {
