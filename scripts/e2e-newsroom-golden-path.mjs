@@ -103,7 +103,7 @@ try {
         'data.origin_type': 'original',
         'data.regulatory_status': 'not_applicable',
         'data.lead': 'Testowy lead integracyjny dla pełnego przepływu redakcyjnego N6-001.',
-        'data.body_blocks': [
+        'data.body_blocks': keyedCollection([
             {
                 type: 'context',
                 data: {
@@ -124,8 +124,8 @@ try {
                     kind: 'test',
                 },
             },
-        ],
-        'data.sources': [
+        ]),
+        'data.sources': keyedCollection([
             {
                 source_type: 'official',
                 publisher: 'E2E Instytucja',
@@ -138,16 +138,16 @@ try {
                 is_publicly_cited: true,
                 note: null,
             },
-        ],
+        ]),
         'data.topic_ids': [fixture.topic_id],
-        'data.question_relations': [
+        'data.question_relations': keyedCollection([
             {
                 question_id: fixture.question_id,
                 relation_type: 'direct',
                 note: 'Relacja golden path.',
             },
-        ],
-        'data.hero_image_path': [fixture.hero_image_path],
+        ]),
+        'data.hero_image_path': keyedCollection([fixture.hero_image_path]),
         'data.hero_image_alt': 'Testowy obraz hero golden path N6-001',
         'data.hero_focal_x': 0.35,
         'data.hero_focal_y': 0.65,
@@ -167,6 +167,20 @@ try {
     await waitForLivewireIdle(page);
 
     const article = await readCreatedArticle();
+    if (!article.exists) {
+        const validationMessages = await page
+            .locator('.fi-fo-field-wrp-error-message, [data-validation-error], [role="alert"]')
+            .allInnerTexts()
+            .catch(() => []);
+        const bodyText = await page.locator('body').innerText().catch(() => '');
+        await page.screenshot({
+            path: path.join(outputDir, 'create-failure.png'),
+            fullPage: true,
+        }).catch(() => {});
+        throw new Error(
+            `Create page did not persist ContentArticle. URL=${page.url()}; validation=${validationMessages.join(' | ') || 'none'}; body=${bodyText.slice(0, 2000)}`,
+        );
+    }
     assert(article.workflow_status === 'draft', `Expected draft after create, got ${article.workflow_status}.`);
     assert(article.sources_count === 1, `Expected one source, got ${article.sources_count}.`);
     assert(article.questions_count === 1, `Expected one question relation, got ${article.questions_count}.`);
@@ -363,10 +377,18 @@ async function readCreatedArticle() {
 $article = \App\Models\ContentArticle::query()
     ->where('slug', 'e2e-n6-golden-path')
     ->withCount(['sources', 'questions', 'topics'])
-    ->firstOrFail();
+    ->first();
+if (! $article) {
+    file_put_contents(
+        base_path('output/playwright/newsroom-golden-path/article.json'),
+        json_encode(['exists' => false], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+    );
+    return;
+}
 file_put_contents(
     base_path('output/playwright/newsroom-golden-path/article.json'),
     json_encode([
+        'exists' => true,
         'id' => $article->id,
         'workflow_status' => $article->workflow_status?->value ?? (string) $article->workflow_status,
         'reviewed_at' => $article->reviewed_at?->toISOString(),
@@ -398,6 +420,15 @@ file_put_contents(
 
     await runCommand('php', ['artisan', 'tinker', '--execute', php]);
     return JSON.parse(await fs.readFile(articlePath, 'utf8'));
+}
+
+function keyedCollection(items) {
+    return Object.fromEntries(
+        items.map((item, index) => [
+            `00000000-0000-4000-8000-${String(index + 1).padStart(12, '0')}`,
+            item,
+        ]),
+    );
 }
 
 async function setPageComponentState(page, state) {
