@@ -1542,9 +1542,9 @@ Szczegółowym źródłem backlogu jest [NEWSROOM-IMPLEMENTATION-BACKLOG.md](./N
 - [x] `NEWSROOM-N5-004` — privacy-safe delegated analytics hooks reużywające istniejący `trackAnalyticsEvent` i GA/consent layer, bez backendowego event store i zmian schema.
 - [x] `NEWSROOM-N5-005` — article-specific IndexNow lifecycle integration przez dedicated after-commit event/listener nad istniejącym `IndexNowQueueService`/submission pipeline, bez nowego klienta, kolejki ani schema.
 - [x] `NEWSROOM-N5-006` — istniejący `SeoSitemapAuditor` rozszerzony o newsroom/news audit hardening oraz site-wide `newsroom:audit-links` nad istniejącym semantic graph, bez drugiego validatora, graph subsystemu, migracji ani schema.
-- [ ] `NEWSROOM-N5-007` — **IN PROGRESS**: PR #109 domknął pre-validation, child-before-index atomic publication i post-switch cleanup zarządzanych article/news sitemap files; PR #112 cache-backed dirty/version coordinator, shared lock, every-minute scheduler i aktualny single-node topology gate; PR #115 repo-level Nginx/static-delivery contract oraz production smoke tooling. Realny production HTTP/Cloudflare/GSC evidence nadal pozostaje otwarty.
+- [ ] `NEWSROOM-N5-007` — **IN PROGRESS**: PR #109 domknął pre-validation, child-before-index atomic publication i post-switch cleanup zarządzanych article/news sitemap files; PR #112 cache-backed dirty/version coordinator, shared lock, every-minute scheduler i aktualny single-node topology gate; PR #115 repo-level Nginx/static-delivery contract oraz production smoke tooling; PR #117 dedykowany GitHub Actions smoke harness z REPORT-ONLY PR mode i STRICT manual mode. Report-only produkcja wykazała Cache-Control mismatch, więc realny production HTTP/Cloudflare/GSC PASS nadal pozostaje otwarty.
 
-N5-001..N5-006 oraz trzy repo-level podkroki N5-007 są zmaterializowane i potwierdzone na `main@9a9c98d3534492e30ba215fd9785b7dd425a1f75`; decyzje o jednym static sitemap pipeline, jednym `NewsroomPublicGate`, jednym semantic-link graph i jednym IndexNow queue/submission pipeline pozostały bez zmian. PR #109 materializuje pre-validation + child-before-index atomic publication + post-switch cleanup, PR #112 cache-backed dirty/version coordinator, shared lock, every-minute scheduler i version-safe marker clearing bez queue workera, a PR #115 crawler-safe Nginx delivery contract + production smoke script. Aktualne deployment docs potwierdzają 1x Mikrus 4.1 z lokalnym `public/`, więc topology gate jest spełniony dla obecnego single-node contractu. Następnym wykonywalnym podkrokiem N5-007 jest faktyczne production smoke execution i zapis HTTP/Cloudflare evidence, a następnie GSC verification; N5-007 nadal nie jest DONE.
+N5-001..N5-006 oraz cztery repo-level podkroki N5-007 są zmaterializowane i potwierdzone na `main@38102d1c3867d13666308ee657d6579fcb5f1d7a`; decyzje o jednym static sitemap pipeline, jednym `NewsroomPublicGate`, jednym semantic-link graph i jednym IndexNow queue/submission pipeline pozostały bez zmian. PR #109 materializuje pre-validation + child-before-index atomic publication + post-switch cleanup, PR #112 cache-backed dirty/version coordinator, shared lock, every-minute scheduler i version-safe marker clearing bez queue workera, PR #115 crawler-safe Nginx delivery contract + production smoke script, a PR #117 GitHub Actions smoke harness. Aktualne deployment docs potwierdzają 1x Mikrus 4.1 z lokalnym `public/`, więc topology gate jest spełniony dla obecnego single-node contractu. Report-only run #117 wykazał, że aktywny publiczny delivery nadal nie spełnia cache contractu dla `/robots.txt`; następnym wykonywalnym podkrokiem jest zastosowanie configu i zielony STRICT smoke, a następnie GSC verification. N5-007 nadal nie jest DONE.
 
 ---
 ## 28. Zasady utrzymania dokumentu
@@ -1569,6 +1569,14 @@ Jeżeli implementacja odchodzi od tego dokumentu, należy:
 ---
 
 ## 29. Historia zmian
+
+### 2026-09-19 — v0.55
+
+- PR #117 dodał GitHub Actions production-smoke harness nad istniejącym skryptem z PR #115; nie zmienia static source of truth ani decyzji architektonicznej,
+- PR run jest REPORT-ONLY, manualny `workflow_dispatch` domyślnie STRICT; artifact zachowuje evidence,
+- exact-head CI #420 i post-merge CI #421 są pełnym PASS na finalnym workflow/main,
+- report-only public run wykazał `Cache-Control: max-age=14400` dla `/robots.txt` zamiast repo contractu `public, max-age=3600`; z tego powodu nie zapisujemy production PASS,
+- N5-007 pozostaje IN PROGRESS do wdrożenia aktualnego Nginx configu, zielonego STRICT smoke i GSC verification.
 
 ### 2026-09-18 — v0.54
 
