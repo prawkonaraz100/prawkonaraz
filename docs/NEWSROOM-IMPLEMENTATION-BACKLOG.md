@@ -2372,7 +2372,11 @@ Potwierdzone evidence:
 - merge PR #133: `main@f5fba3c069849078aea032429aed7a139d6a5c62`,
 - post-merge CI #495: pełny PASS — 1140 passed / 20 229 assertions / 2 skipped, `newsroom-postgres` PASS, Pint 1102 files PASS, frontend build PASS.
 
-Repo-level brak deklarowanych dimensions jest zamknięty. N6-004 pozostaje jednak **IN PROGRESS**, ponieważ produkcyjne LCP/INP/CLS/TTFB nadal wymagają rollout/live production evidence zgodnie z runbookiem.
+Repo-level brak deklarowanych dimensions jest zamknięty. Dokumentacyjne domknięcie tego repo-level podkroku przeszło exact-head CI #496 na PR #134 i zostało zmergowane jako `main@f68509d7e3add7b14386f33f2b4b377bc60829e1`. Post-merge CI #497 ujawnił niezależny, niedeterministyczny failure w `TrafficSignLearningTest`: test tworzył jawne `A-1`, a późniejszy negatywny fixture bez jawnego `code` mógł losowo otrzymać ten sam kod z `TrafficSignFactory` i naruszyć UNIQUE constraint `traffic_signs.code`. Merge commit PR #134 nie miał żadnych różnic plikowych względem jego exact-head SHA, więc failure nie był regresją dokumentacji ani N6-004.
+
+PR #135 ustabilizował wyłącznie testowy fixture przez jawne unikalne kody dla pięciu negatywnych rekordów, bez zmiany produkcyjnej logiki, schematu, globalnej factory ani architektury. Exact-head `4f992a4f9716fd8a7aa8138b99f97b4e834a9b9b` przeszedł CI #498 — 1140 passed / 20 229 assertions / 2 skipped, `newsroom-postgres` PASS, Pint 1102 files PASS, frontend build PASS. Merge PR #135: `main@d15976687e56fd825a1eeb29d24fbca6fdf36c04`; post-merge CI #499 również pełny PASS z tym samym bilansem testów i buildów.
+
+Kod, testowy gate oraz dokumentacja repo-level N6-004 są więc ponownie spójne i zielone. N6-004 pozostaje jednak **IN PROGRESS**, ponieważ produkcyjne LCP/INP/CLS/TTFB nadal wymagają rollout/live production evidence zgodnie z runbookiem.
 
 ---
 

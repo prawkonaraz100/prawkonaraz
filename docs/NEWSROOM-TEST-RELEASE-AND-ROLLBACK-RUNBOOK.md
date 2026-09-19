@@ -1627,6 +1627,14 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 
 ## 60. Historia zmian
 
+### 2026-09-19 — v0.47
+
+- PR #134 zapisał potwierdzony stan N6-004 po PR #133 wyłącznie w nadrzędnym backlogu i runbooku; exact-head CI #496 miał pełny PASS i merge utworzył `main@f68509d7e3add7b14386f33f2b4b377bc60829e1`,
+- post-merge CI #497 zatrzymał workflow przez niezależny, niedeterministyczny `TrafficSignLearningTest`: jawne `A-1` mogło zderzyć się z losowym factory `code=A-1` w negatywnym fixture; merge commit PR #134 nie miał żadnych różnic plikowych względem exact-head PR,
+- PR #135 zmienił wyłącznie testowy fixture, nadając pięciu negatywnym rekordom jawne unikalne kody; nie zmieniono produkcyjnej logiki, schematu, globalnej factory ani architektury,
+- finalny HEAD PR #135 `4f992a4f9716fd8a7aa8138b99f97b4e834a9b9b` przeszedł CI #498, a merge `main@d15976687e56fd825a1eeb29d24fbca6fdf36c04` ma post-merge CI #499 pełny PASS — 1140 passed / 20 229 assertions / 2 skipped, PostgreSQL PASS, Pint 1102 files PASS i frontend build PASS,
+- N6-004 nadal pozostaje IN PROGRESS wyłącznie w części wymagającej production LCP/INP/CLS/TTFB po rollout/live.
+
 ### 2026-09-19 — v0.46
 
 - PR #133 zamknął repo-level N6-004 finding `missing_declared_dimensions = 1`: login/register drawer deklarują zweryfikowane `width="1000" height="750"` dla wspólnego `hero-composite-v3.webp`, a istniejący performance budget failuje również przy brakujących deklarowanych dimensions,
