@@ -455,8 +455,27 @@ async function runHeaderAction(page, label, successText) {
     await action.waitFor();
     await action.click();
 
-    const dialog = page.locator('[role="dialog"]:visible').last();
-    await dialog.waitFor();
+    const dialog = page.locator('.fi-modal-window:visible, [role="dialog"]:visible').last();
+
+    try {
+        await dialog.waitFor({ timeout: 10_000 });
+    } catch (error) {
+        const visibleModals = await page
+            .locator('.fi-modal-window:visible, [role="dialog"]:visible')
+            .count()
+            .catch(() => 0);
+        const bodyText = await page.locator('body').innerText().catch(() => '');
+        await page.screenshot({
+            path: path.join(
+                outputDir,
+                `workflow-modal-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png`,
+            ),
+            fullPage: true,
+        }).catch(() => {});
+        throw new Error(
+            `Confirmation modal for "${label}" did not appear. visible_modals=${visibleModals}; body=${bodyText.slice(0, 2000)}; cause=${error instanceof Error ? error.message : String(error)}`,
+        );
+    }
 
     const sameLabelButton = dialog.getByRole('button', { name: label, exact: true });
     if (await sameLabelButton.count()) {
