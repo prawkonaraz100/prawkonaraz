@@ -77,12 +77,15 @@ try {
     report.steps.push('login-admin');
 
     console.log('[newsroom-golden] create draft through Filament page component');
-    await gotoWithRetry(page, `${baseUrl}${fixture.create_path}`);
+    await gotoWithReadyLocator(
+        page,
+        `${baseUrl}${fixture.create_path}`,
+        'form[wire\\:submit]',
+    );
     assert(
         new URL(page.url()).pathname === fixture.create_path,
         `Create page redirected unexpectedly to ${page.url()}.`,
     );
-    await page.locator('form[wire\\:submit]').first().waitFor();
     await page.waitForLoadState('networkidle').catch(() => {});
     await page.waitForTimeout(300);
 
@@ -473,6 +476,31 @@ function startLaravelServer() {
     });
 
     return child;
+}
+
+async function gotoWithReadyLocator(page, url, selector, attempts = 5) {
+    let lastError;
+
+    for (let attempt = 1; attempt <= attempts; attempt += 1) {
+        try {
+            await gotoWithRetry(page, url, 1);
+            await page.locator(selector).first().waitFor({ timeout: 5_000 });
+
+            return;
+        } catch (error) {
+            lastError = error;
+
+            if (attempt === attempts) {
+                throw error;
+            }
+
+            const message = error instanceof Error ? error.message : String(error);
+            console.log(`[newsroom-golden] create page not ready (${attempt}/${attempts}) for ${url}: ${message}`);
+            await page.waitForTimeout(attempt * 300);
+        }
+    }
+
+    throw lastError;
 }
 
 async function gotoWithRetry(page, url, attempts = 5) {
