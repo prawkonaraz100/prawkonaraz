@@ -87,6 +87,17 @@ Dla:
 
 Dla krytycznego redakcyjnego golden path.
 
+Stan po NEWSROOM-N6-001:
+
+- istnieje dedykowany `scripts/e2e-newsroom-golden-path.mjs` uruchamiany jako osobny job `newsroom-golden-path` w istniejącym Browser Smoke workflow,
+- admin path obejmuje realny login, create przez komponent Filament, ordered body/source/topic/question/hero state, private preview oraz workflow `draft -> in_review -> reviewed -> published`,
+- public path obejmuje `/aktualnosci` hub -> article -> related public question -> product CTA,
+- workflow transition jest uznawany na podstawie potwierdzonego stanu domenowego; toast jest tylko dodatkowym UI evidence,
+- finalny HEAD PR #121 `76d0fa7d428b11f2db9d901eac698c7a169722ff` przeszedł Browser Smoke #84 i CI #454,
+- merge `main@b0b29d9b4a3337f4e527334f6ead8b1be85303ad` przeszedł post-merge CI #455.
+
+N6-001 nie zastępuje N6-002 scheduled-publication production smoke ani nadal otwartych produkcyjnych evidence N5-007.
+
 ---
 
 ## 4. Proponowana mapa testów
@@ -1542,11 +1553,20 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - [x] dodać N4-006 cache regression dla snapshot reuse, event invalidation i after-commit transaction boundary,
 - [x] dodać N4-007 topic feature/browser regression dla HTTP lifecycle, eligible corpus, featured dedupe, pagination/canonical i responsive SSR,
 - [x] dodać N4-008 semantic-link feature/browser regression dla category/topic/related/reverse modules, gate i responsive no-overflow,
+- [x] dodać N6-001 dedykowany editorial/public Browser Smoke golden path i potwierdzić exact-head oraz post-merge CI,
 - [ ] po pierwszym release wpisać rzeczywiste wyniki i ewentualne różnice od planu.
 
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-19 — v0.40
+
+- NEWSROOM-N6-001 zrealizowano w PR #121 jako dedykowany Browser Smoke golden path bez zmiany produkcyjnego kodu ani architektury; zmieniono wyłącznie `.github/workflows/browser-smoke.yml`, `package.json` i `scripts/e2e-newsroom-golden-path.mjs`,
+- golden path potwierdza create draft przez rzeczywisty Filament state, source/topic/question/hero persistence, private/no-store/noindex preview, workflow `draft -> in_review -> reviewed -> published`, a następnie public hub -> article -> related question -> product CTA,
+- finalny implementation/test HEAD `76d0fa7d428b11f2db9d901eac698c7a169722ff`: Browser Smoke #84 PASS oraz CI #454 PASS — 1139 passed / 20 219 assertions / 2 skipped, PostgreSQL PASS, Pint 1102 files PASS, frontend build 9.47 s,
+- merge PR #121 to `main@b0b29d9b4a3337f4e527334f6ead8b1be85303ad`; post-merge CI #455 również PASS — 1139 passed / 20 219 assertions / 2 skipped, PostgreSQL PASS, Pint 1102 files PASS, frontend build 10.17 s,
+- następny N6 task to NEWSROOM-N6-002 scheduled-publication production smoke; N5-007 produkcyjne Nginx/STRICT HTTP/GSC gate'y pozostają otwarte.
 
 ### 2026-09-19 — v0.39
 
