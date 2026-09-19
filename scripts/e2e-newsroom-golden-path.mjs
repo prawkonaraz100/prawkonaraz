@@ -61,7 +61,7 @@ try {
     page.setDefaultNavigationTimeout(20_000);
 
     console.log('[newsroom-golden] login');
-    await page.goto(`${baseUrl}/admin/login`, { waitUntil: 'domcontentloaded' });
+    await gotoWithRetry(page, `${baseUrl}/admin/login`);
     await page.locator('input[type="email"]').fill(adminEmail);
     await page.locator('input[type="password"]').fill(adminPassword);
     const loginResponsePromise = page.waitForResponse((response) => (
@@ -76,7 +76,7 @@ try {
     report.steps.push('login-admin');
 
     console.log('[newsroom-golden] create draft through Filament page component');
-    await page.goto(`${baseUrl}${fixture.create_path}`, { waitUntil: 'networkidle' });
+    await gotoWithRetry(page, `${baseUrl}${fixture.create_path}`);
     assert(
         new URL(page.url()).pathname === fixture.create_path,
         `Create page redirected unexpectedly to ${page.url()}.`,
@@ -168,11 +168,9 @@ try {
     report.steps.push('create-draft-body-source-relations-hero');
 
     console.log('[newsroom-golden] private preview');
-    await page.goto(`${baseUrl}${article.edit_path}`, { waitUntil: 'networkidle' });
+    await gotoWithRetry(page, `${baseUrl}${article.edit_path}`);
     const previewPage = await context.newPage();
-    const previewResponse = await previewPage.goto(`${baseUrl}${article.preview_path}`, {
-        waitUntil: 'domcontentloaded',
-    });
+    const previewResponse = await gotoWithRetry(previewPage, `${baseUrl}${article.preview_path}`);
 
     assert(previewResponse?.status() === 200, `Preview returned HTTP ${previewResponse?.status() ?? 'none'}.`);
     const previewHeaders = previewResponse.headers();
@@ -208,7 +206,7 @@ try {
     report.steps.push('submit-review-mark-reviewed-publish');
 
     console.log('[newsroom-golden] public hub -> article');
-    const hubResponse = await page.goto(`${baseUrl}/aktualnosci`, { waitUntil: 'domcontentloaded' });
+    const hubResponse = await gotoWithRetry(page, `${baseUrl}/aktualnosci`);
     assert(hubResponse?.status() === 200, `Newsroom hub returned HTTP ${hubResponse?.status() ?? 'none'}.`);
 
     const articleLink = page.locator(`a[href="${article.public_path}"]`).first();
@@ -248,7 +246,7 @@ try {
     report.steps.push('article-to-related-question');
 
     console.log('[newsroom-golden] article -> product');
-    await page.goto(`${baseUrl}${article.public_path}`, { waitUntil: 'domcontentloaded' });
+    await gotoWithRetry(page, `${baseUrl}${article.public_path}`);
     const productLink = page.getByRole('link', { name: 'Sprawdź się w teście' }).first();
     const productHref = await productLink.getAttribute('href');
     assert(productHref?.endsWith('/testy-na-prawo-jazdy'), `Unexpected product CTA href: ${productHref}.`);
@@ -263,7 +261,7 @@ try {
     assert(new URL(page.url()).pathname === '/testy-na-prawo-jazdy', `Unexpected product landing URL: ${page.url()}.`);
     report.steps.push('article-to-product');
 
-    await page.goto(`${baseUrl}${article.public_path}`, { waitUntil: 'domcontentloaded' });
+    await gotoWithRetry(page, `${baseUrl}${article.public_path}`);
     await page.screenshot({ path: path.join(outputDir, 'public-article.png'), fullPage: true });
 
     report.article_id = article.id;
@@ -453,6 +451,31 @@ function startLaravelServer() {
     child.stderr.on('data', (chunk) => process.stderr.write(`[laravel] ${chunk}`));
 
     return child;
+}
+
+async function gotoWithRetry(page, url, attempts = 5) {
+    let lastError;
+
+    for (let attempt = 1; attempt <= attempts; attempt += 1) {
+        try {
+            return await page.goto(url, { waitUntil: 'domcontentloaded' });
+        } catch (error) {
+            lastError = error;
+            const message = error instanceof Error ? error.message : String(error);
+            const retryable = message.includes('ERR_EMPTY_RESPONSE')
+                || message.includes('ERR_CONNECTION_RESET')
+                || message.includes('ERR_CONNECTION_REFUSED');
+
+            if (!retryable || attempt === attempts) {
+                throw error;
+            }
+
+            console.log(`[newsroom-golden] transient navigation failure (${attempt}/${attempts}) for ${url}: ${message}`);
+            await page.waitForTimeout(attempt * 300);
+        }
+    }
+
+    throw lastError;
 }
 
 async function waitForHttp(url) {
