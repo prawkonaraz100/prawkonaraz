@@ -383,7 +383,7 @@ async function setPageComponentState(page, state) {
             }
 
             const component = window.Livewire.find(id);
-            await component.$wire.$set(property, propertyValue);
+            await component.$set(property, propertyValue, false);
         }, { property: key, propertyValue: value });
     }
 }
@@ -399,7 +399,7 @@ async function callPageComponent(page, method, ...args) {
         }
 
         const component = window.Livewire.find(id);
-        await component.$wire.$call(targetMethod, ...targetArgs);
+        await component.$call(targetMethod, ...targetArgs);
     }, { targetMethod: method, targetArgs: args });
 }
 
