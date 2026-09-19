@@ -6,6 +6,7 @@ use App\Events\ContentHomePlacementChanged;
 use App\Support\NewsroomSeoArtifactRefreshCoordinator;
 use App\Support\SeoSitemapAuditor;
 use App\Support\SeoSitemapGenerator;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Cache;
 use Mockery\MockInterface;
 
@@ -49,6 +50,44 @@ it('marks SEO artifacts dirty from public newsroom lifecycle events', function (
 
     expect($coordinator->currentVersion())->toBe(3)
         ->and($coordinator->isDirty())->toBeTrue();
+});
+
+it('defines the newsroom SEO refresh scheduler as a production singleton every minute', function () {
+    $event = collect(app(Schedule::class)->events())
+        ->first(fn ($event): bool => str_contains((string) $event->command, 'newsroom:refresh-seo-artifacts-if-dirty'));
+
+    expect($event)->not->toBeNull()
+        ->and($event->expression)->toBe('* * * * *')
+        ->and($event->environments)->toBe(['production'])
+        ->and($event->onOneServer)->toBeTrue()
+        ->and($event->withoutOverlapping)->toBeTrue();
+});
+
+it('keeps dirty state and skips generation while the shared refresh lock is held', function () {
+    $coordinator = app(NewsroomSeoArtifactRefreshCoordinator::class);
+    $coordinator->markDirty();
+
+    $this->mock(SeoSitemapGenerator::class, function (MockInterface $mock) {
+        $mock->shouldNotReceive('generate');
+    });
+    $this->mock(SeoSitemapAuditor::class, function (MockInterface $mock) {
+        $mock->shouldNotReceive('audit');
+    });
+
+    $lock = $coordinator->lock();
+
+    expect($lock->get())->toBeTrue();
+
+    try {
+        $this->artisan('newsroom:refresh-seo-artifacts-if-dirty')
+            ->expectsOutput('Newsroom SEO artifact refresh is already locked by another process.')
+            ->assertSuccessful();
+
+        expect($coordinator->cleanVersion())->toBe(0)
+            ->and($coordinator->isDirty())->toBeTrue();
+    } finally {
+        $lock->release();
+    }
 });
 
 it('skips sitemap generation when the artifact version is already clean', function () {
