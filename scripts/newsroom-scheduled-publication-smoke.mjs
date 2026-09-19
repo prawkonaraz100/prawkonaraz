@@ -352,6 +352,7 @@ async function fetchText(url) {
         redirect: 'manual',
         headers: {
             Accept: 'text/html,application/atom+xml,application/xml;q=0.9,*/*;q=0.8',
+            Host: new URL(process.env.APP_URL ?? 'https://prawkonaraz.pl').host,
         },
     });
 
