@@ -26,7 +26,7 @@ jobs:
     env:
       APP_ENV: production
       APP_DEBUG: 'false'
-      APP_URL: http://127.0.0.1:8134
+      APP_URL: https://prawkonaraz.pl
       NEWSROOM_PUBLIC_ENABLED: 'true'
       DB_CONNECTION: sqlite
       DB_DATABASE: database/database.sqlite
