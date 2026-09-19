@@ -223,10 +223,20 @@ try {
     let workflow = await readCreatedArticle();
     assert(workflow.workflow_status === 'in_review', `Expected in_review, got ${workflow.workflow_status}.`);
 
+    await gotoWithReadyLocator(
+        page,
+        `${baseUrl}${article.edit_path}`,
+        'button:has-text("Oznacz jako sprawdzony")',
+    );
     await runHeaderAction(page, 'Oznacz jako sprawdzony', 'Review zakończony.');
     workflow = await readCreatedArticle();
     assert(Boolean(workflow.reviewed_at), 'Expected reviewed_at after markReviewed.');
 
+    await gotoWithReadyLocator(
+        page,
+        `${baseUrl}${article.edit_path}`,
+        'button:has-text("Opublikuj teraz")',
+    );
     await runHeaderAction(page, 'Opublikuj teraz', 'Artykuł został opublikowany.');
     workflow = await readCreatedArticle();
     assert(workflow.workflow_status === 'published', `Expected published, got ${workflow.workflow_status}.`);
