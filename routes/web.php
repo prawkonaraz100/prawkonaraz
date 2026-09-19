@@ -45,6 +45,7 @@ use App\Http\Controllers\LegalContentController;
 use App\Http\Controllers\LlmsTextController;
 use App\Http\Controllers\MeProfileController;
 use App\Http\Controllers\MethodologyPageController;
+use App\Http\Controllers\EditorialPrinciplesPageController;
 use App\Http\Controllers\ModeratorAccountsController;
 use App\Http\Controllers\NewsroomCategoryController;
 use App\Http\Controllers\NewsroomFeedController;
@@ -308,6 +309,8 @@ Route::post('/kontakt', [ContactPageController::class, 'store'])
     ->name('about.contact.store');
 Route::get('/metodologia', MethodologyPageController::class)
     ->name('about.methodology');
+Route::get('/zasady-redakcyjne', EditorialPrinciplesPageController::class)
+    ->name('about.editorial-principles');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', PostAuthRedirectController::class)
