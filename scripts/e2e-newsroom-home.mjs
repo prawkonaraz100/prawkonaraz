@@ -51,6 +51,7 @@ try {
     console.log('[newsroom-home-e2e] render through Laravel kernel');
     report.render_status = await renderHomeSnapshot();
     report.performance = await collectSnapshotPerformance({ cwd, baseUrl, snapshotPath, renderMetricsPath });
+    console.log('[newsroom-home-e2e] performance', JSON.stringify(report.performance));
 
     console.log('[newsroom-home-e2e] start static browser server');
     staticServer = await startStaticServer();
