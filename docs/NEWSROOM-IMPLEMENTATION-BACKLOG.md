@@ -2296,6 +2296,8 @@ NEWSROOM-N5-007 również pozostaje IN PROGRESS; jego Nginx/STRICT static-delive
 
 ## NEWSROOM-N6-004 — Performance pass
 
+Status: **IN PROGRESS**
+
 Measure:
 
 - article,
@@ -2309,6 +2311,55 @@ Check:
 - TTFB,
 - query count,
 - image weight.
+
+### Potwierdzony repo-level baseline po PR #131
+
+PR #131 rozszerzył istniejące Browser Smoke harnessy dla article/hub/category bez zmiany produkcyjnej logiki aplikacji. Harnessy zapisują i raportują:
+
+- Laravel kernel render duration,
+- SQL query count,
+- SSR HTML bytes,
+- lokalne obrazy z rzeczywistą wagą i intrinsic dimensions,
+- użyte built JS/CSS asset bytes.
+
+Finalny implementation/test HEAD: `0d1e16a66faaf7481b30ccde589aca291e398b83`.
+
+Exact-head evidence:
+
+- Browser Smoke #101: pełny PASS dla newsroom article/home/category/topic/guides/semantic-links/golden-path,
+- CI #489: pełny PASS — 1140 passed / 20 229 assertions / 2 skipped, PostgreSQL PASS, Pint 1102 files PASS, frontend build PASS.
+
+Merge PR #131: `main@f147af4fb504ffbf9b953701c891c275ecf2d98d`.
+
+Post-merge CI #490: pełny PASS — 1140 passed / 20 229 assertions / 2 skipped, PostgreSQL PASS, Pint 1102 files PASS, frontend build PASS.
+
+Potwierdzone baseline'y z Browser Smoke #101:
+
+- article: 14 queries, 61 098 B HTML, 73.48 ms kernel render,
+- hub: 33 queries, 95 354 B HTML, 87.75 ms kernel render,
+- category page 1: 9 queries, 96 622 B HTML, 48.66 ms kernel render,
+- category page 2: 7 queries, 62 499 B HTML, 29.15 ms kernel render,
+- wspólny WebP: 71 342 B, 1000×750 px,
+- built CSS: 402 335 B,
+- built JS: 15 225 B.
+
+Regresyjne repo budgets są oparte na tym zmierzonym baseline:
+
+- article: query ≤ 18, HTML ≤ 75 000 B,
+- hub: query ≤ 40, HTML ≤ 120 000 B,
+- category: query ≤ 12, HTML ≤ 120 000 B,
+- obrazy lokalne ≤ 100 000 B,
+- CSS ≤ 450 000 B,
+- JS ≤ 20 000 B,
+- intrinsic image dimensions muszą być rozpoznawalne.
+
+Kernel render time jest raportowany, ale nie jest twardym gate'em, ponieważ współdzielony GitHub Actions runner nie daje stabilnego środowiska do wiarygodnego progu czasowego.
+
+### Potwierdzony finding / pozostały zakres
+
+Rendered common image ma poprawne intrinsic 1000×750, ale snapshot nadal wykazuje brak deklarowanych HTML `width`/`height` (`missing_declared_dimensions = 1`). Tego PR #131 nie naprawiał i nie wolno oznaczać jako zakończonego CLS hardeningu.
+
+N6-004 pozostaje IN PROGRESS. Produkcyjne LCP/INP/CLS/TTFB nadal wymagają rollout/live production evidence zgodnie z runbookiem. Następny repo-actionable podkrok to usunięcie potwierdzonego braku deklarowanych wymiarów obrazu i ponowne przejście Browser Smoke/CI.
 
 ---
 
@@ -2771,6 +2822,14 @@ Następnym wykonywalnym podkrokiem pozostaje **zastosowanie aktualnego Nginx con
 ---
 
 # 12. Historia zmian
+
+### 2026-09-19 — v0.62
+
+- PR #131 dodał repo-level performance baseline i regresyjne budgets do istniejących Browser Smoke harnessów article/hub/category bez zmiany produkcyjnej logiki aplikacji,
+- finalny HEAD `0d1e16a66faaf7481b30ccde589aca291e398b83` przeszedł Browser Smoke #101 i CI #489; merge `main@f147af4fb504ffbf9b953701c891c275ecf2d98d` ma post-merge CI #490 pełny PASS — 1140 passed / 20 229 assertions / 2 skipped, PostgreSQL PASS, Pint 1102 files PASS i frontend build PASS,
+- potwierdzone baseline'y: article 14 queries / 61 098 B HTML, hub 33 / 95 354 B, category page 1 9 / 96 622 B, page 2 7 / 62 499 B; wspólny WebP 71 342 B i 1000×750; CSS 402 335 B, JS 15 225 B,
+- collector wykrywa brak deklarowanych HTML `width`/`height` dla wspólnego obrazu; to pozostaje otwartym repo-actionable CLS findingiem,
+- N6-004 pozostaje IN PROGRESS; production LCP/INP/CLS/TTFB nadal wymagają live rollout evidence.
 
 ### 2026-09-19 — v0.61
 
