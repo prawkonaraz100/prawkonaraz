@@ -4,18 +4,27 @@ import http from 'node:http';
 import path from 'node:path';
 import process from 'node:process';
 import { chromium } from 'playwright';
+import { assertPerformanceBudget, collectSnapshotPerformance } from './newsroom-performance-metrics.mjs';
 
 const cwd = process.cwd();
 const outputDir = path.join(cwd, 'output', 'playwright', 'newsroom-article');
 const reportPath = path.join(outputDir, 'report.json');
 const snapshotPath = path.join(outputDir, 'article.html');
 const renderStatusPath = path.join(outputDir, 'render-status.txt');
+const renderMetricsPath = path.join(outputDir, 'render-metrics.json');
 const slug = 'e2e-newsroom-article';
 const articlePath = `/aktualnosci/${slug}`;
 const title = 'Długi testowy tytuł artykułu newsroomu sprawdzający poprawne zawijanie na małych ekranach';
 const port = Number(process.env.E2E_NEWSROOM_PORT ?? '8127');
 const baseUrl = `http://127.0.0.1:${port}`;
 const publicDir = path.join(cwd, 'public');
+const performanceBudget = {
+    max_query_count: 18,
+    max_html_bytes: 75_000,
+    max_image_bytes: 100_000,
+    max_css_bytes: 450_000,
+    max_js_bytes: 20_000,
+};
 const viewports = [
     { name: '360', width: 360, height: 800 },
     { name: '390', width: 390, height: 844 },
@@ -32,6 +41,7 @@ const report = {
     render_status: null,
     viewports: [],
     analytics: null,
+    performance: null,
 };
 
 let browser;
@@ -45,6 +55,9 @@ try {
     await seedArticle();
     console.log('[newsroom-e2e] render through Laravel kernel');
     report.render_status = await renderArticleSnapshot();
+    report.performance = await collectSnapshotPerformance({ cwd, baseUrl, snapshotPath, renderMetricsPath });
+    assertPerformanceBudget('article', report.performance, performanceBudget);
+    console.log('[newsroom-e2e] performance', JSON.stringify(report.performance));
     console.log('[newsroom-e2e] start static browser server');
     staticServer = await startStaticServer();
     browser = await chromium.launch({ headless: true });
@@ -410,11 +423,24 @@ $article = \App\Models\ContentArticle::factory()->published()->create([
 
 async function renderArticleSnapshot() {
     const php = String.raw`
+$connection = \Illuminate\Support\Facades\DB::connection();
+$connection->flushQueryLog();
+$connection->enableQueryLog();
+$startedAt = hrtime(true);
 $request = \Illuminate\Http\Request::create('${baseUrl}${articlePath}', 'GET');
 $response = app(\Illuminate\Contracts\Http\Kernel::class)->handle($request);
+$durationMs = (hrtime(true) - $startedAt) / 1000000;
+$queryCount = count($connection->getQueryLog());
+$connection->disableQueryLog();
 $status = $response->getStatusCode();
 if ($status !== 200) { throw new \RuntimeException('Newsroom article render returned HTTP '.$status); }
-file_put_contents(base_path('output/playwright/newsroom-article/article.html'), $response->getContent());
+$content = (string) $response->getContent();
+file_put_contents(base_path('output/playwright/newsroom-article/article.html'), $content);
+file_put_contents(base_path('output/playwright/newsroom-article/render-metrics.json'), json_encode([
+    'kernel_render_ms' => round($durationMs, 2),
+    'query_count' => $queryCount,
+    'html_bytes' => strlen($content),
+], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 app(\Illuminate\Contracts\Http\Kernel::class)->terminate($request, $response);
 file_put_contents(base_path('output/playwright/newsroom-article/render-status.txt'), (string) $status);
 `;
