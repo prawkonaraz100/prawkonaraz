@@ -1617,12 +1617,23 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - [x] dodać N6-003 report-only/STRICT enterprise SEO production-validation harness reużywający existing static-delivery smoke,
 - [x] dodać repo-level `SEO_RELEASE=1` deploy guard, który wymusza sitemap refresh/audit + `nginx -t` + publiczny production SEO delivery smoke bez samoczynnego włączania newsroomu lub aplikowania vhosta,
 - [x] dodać canonical-host migration validation dla `http`/`www`/legacy `prawkoapp.pl` i zapisać GSC evidence bez uznawania redirect PASS za rozwiązanie Google-selected canonical mismatchu,
+- [x] dodać N6-004 repo-level performance baseline/budgets do istniejących Browser Smoke article/hub/category z query count, SSR HTML bytes, image bytes/dimensions oraz built JS/CSS bytes,
+- [ ] usunąć potwierdzony brak deklarowanych HTML `width`/`height` dla wspólnego obrazu i ponownie przejść Browser Smoke/CI,
+- [ ] uzyskać production LCP/INP/CLS/TTFB po rollout/live zgodnie z N6-004; kernel render time z GitHub Actions pozostaje raportowanym baseline, nie twardym production SLA,
 - [ ] uzyskać zielony manualny STRICT N6-003 run po aktualnym deploy/runtime i zachować live article/category/topic + GSC evidence,
 - [ ] po pierwszym release wpisać rzeczywiste wyniki i ewentualne różnice od planu.
 
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-19 — v0.45
+
+- PR #131 rozszerzył istniejące newsroom Browser Smoke harnessy o N6-004 performance baseline i regresyjne budgets bez zmiany produkcyjnej logiki aplikacji; mierzone są query count, kernel render duration, SSR HTML bytes, lokalne image bytes/intrinsic dimensions oraz built JS/CSS bytes,
+- finalny HEAD `0d1e16a66faaf7481b30ccde589aca291e398b83` przeszedł Browser Smoke #101 i CI #489; merge `main@f147af4fb504ffbf9b953701c891c275ecf2d98d` ma post-merge CI #490 pełny PASS — 1140 passed / 20 229 assertions / 2 skipped, PostgreSQL PASS, Pint 1102 files PASS i frontend build PASS,
+- potwierdzone baseline'y: article 14 queries / 61 098 B HTML / 73.48 ms, hub 33 / 95 354 B / 87.75 ms, category page 1 9 / 96 622 B / 48.66 ms, category page 2 7 / 62 499 B / 29.15 ms; wspólny WebP 71 342 B i 1000×750; CSS 402 335 B, JS 15 225 B,
+- twarde repo budgets chronią query/HTML/image/CSS/JS oraz wymagają rozpoznawalnych intrinsic image dimensions; kernel render time nie jest twardym budgetem z powodu niestabilności współdzielonego Actions runnera,
+- snapshot nadal wykazuje `missing_declared_dimensions = 1` dla wspólnego obrazu; N6-004 pozostaje IN PROGRESS, a production LCP/INP/CLS/TTFB nadal wymagają live rollout evidence.
 
 ### 2026-09-19 — v0.44
 
