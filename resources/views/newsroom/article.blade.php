@@ -243,7 +243,10 @@
                                 @break
 
                             @case('context')
-                                <aside class="border-l-4 border-[#efc54f] bg-[#fffdf3] px-5 py-5 sm:px-6">
+                                <aside
+                                    class="border-l-4 border-[#efc54f] bg-[#fffdf3] px-5 py-5 sm:px-6"
+                                    aria-label="{{ $block['data']['title'] ?: 'Kontekst' }}"
+                                >
                                     @if ($block['data']['title'])
                                         <h2 class="text-lg font-semibold text-slate-950">{{ $block['data']['title'] }}</h2>
                                     @endif
@@ -252,7 +255,7 @@
                                 @break
 
                             @case('related_article')
-                                <aside class="border border-slate-200 bg-slate-50 px-5 py-5">
+                                <aside class="border border-slate-200 bg-slate-50 px-5 py-5" aria-label="Czytaj także">
                                     <p class="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Czytaj także</p>
                                     <a
                                         href="{{ $block['related_article']['url'] }}"
