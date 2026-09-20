@@ -6,18 +6,17 @@ use App\Models\LicenseCategory;
 use App\Support\PublicQuestionDifficultyService;
 use App\Support\StudyContextService;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
-use Inertia\Response;
+use Illuminate\View\View;
 
 class PublicQuestionDifficultyController extends Controller
 {
     public function index(
         Request $request,
         PublicQuestionDifficultyService $publicQuestionDifficultyService,
-    ): Response {
+    ): View {
         $ranking = $this->validatedRanking($request);
 
-        return Inertia::render('Public/HardestQuestions/Index', $publicQuestionDifficultyService->build(
+        return $this->renderDifficultyPage($publicQuestionDifficultyService->build(
             selectedCategory: null,
             ranking: $ranking,
         ));
@@ -28,7 +27,7 @@ class PublicQuestionDifficultyController extends Controller
         Request $request,
         PublicQuestionDifficultyService $publicQuestionDifficultyService,
         StudyContextService $studyContextService,
-    ): Response {
+    ): View {
         $category = $studyContextService->visibleCategoriesQuery()
             ->where('slug', $categorySlug)
             ->first();
@@ -37,10 +36,27 @@ class PublicQuestionDifficultyController extends Controller
 
         $ranking = $this->validatedRanking($request);
 
-        return Inertia::render('Public/HardestQuestions/Index', $publicQuestionDifficultyService->build(
+        return $this->renderDifficultyPage($publicQuestionDifficultyService->build(
             selectedCategory: $category,
             ranking: $ranking,
         ));
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    protected function renderDifficultyPage(array $payload): View
+    {
+        $page = $payload['page'];
+
+        return view('hardest-questions.index', [
+            ...$payload,
+            'meta' => [
+                'title' => $page['title'],
+                'description' => $page['description'],
+                'canonical' => url($page['canonical_path']),
+            ],
+        ]);
     }
 
     protected function validatedRanking(Request $request): string
