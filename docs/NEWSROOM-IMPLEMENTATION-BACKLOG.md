@@ -2653,7 +2653,7 @@ Docs-only:
 - [ ] NEWSROOM_PUBLIC_ENABLED controlled rollout/rollback gate
 - [x] publisher transparency/contact/editorial principles gate
 - [ ] scheduler monitored
-- [ ] audit
+- [x] audit — AuditLog operacyjny + site-wide `newsroom:audit-links`/SEO audit mają regression evidence
 - [ ] correction flow
 - [ ] freshness
 - [x] analytics
@@ -2897,6 +2897,11 @@ Następnym wykonywalnym podkrokiem pozostaje **zastosowanie aktualnego Nginx con
 ---
 
 # 12. Historia zmian
+
+### 2026-09-20 — v0.66
+
+- audyt globalnego DoD po post-merge CI #517 potwierdził, że operacyjny audit nie jest już luką: istniejący `AuditLog` zachowuje User actor/allowlisted metadata, a NEWSROOM-N5-006 dostarcza site-wide `newsroom:audit-links` oraz rozszerzony `SeoSitemapAuditor`,
+- pozostawiono otwarte pełny correction flow, pełny freshness workflow/admin section, accessibility oraz production-only rollout/static-delivery/monitoring smoke; audyt nie oznacza ich wykonania.
 
 ### 2026-09-20 — v0.65
 
