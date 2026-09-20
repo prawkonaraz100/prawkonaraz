@@ -2520,7 +2520,18 @@ Preferować istniejące Organization/Contact/Methodology pages. Nowy publiczny d
 
 ### Status
 
-**TODO — repo-level pre-deploy gap potwierdzony audytem DoD; brak implementation evidence.**
+**DONE — NEWSROOM-N6-010 zmergowano przez PR #146 jako `main@c58feafe6cffbb8bf54bbfcd0b3f1d4587fee97d` po pełnym exact-head i post-merge Quality Gate.**
+
+### Potwierdzony stan implementacji
+
+- finalny implementation HEAD: `9abb721a69bfb9a8d9a50c5e881166ad189d68a6`,
+- exact-head CI #522: 1149 passed / 20 300 assertions / 2 skipped, `newsroom-postgres` PASS, Pint 1103 files PASS, frontend build PASS,
+- Newsroom Scheduled Publication Smoke #13: PASS; brak regresji scheduler/feed/sitemap refresh,
+- merge PR #146: `main@c58feafe6cffbb8bf54bbfcd0b3f1d4587fee97d`,
+- post-merge CI #523: 1149 passed / 20 300 assertions / 2 skipped, `newsroom-postgres` PASS, Pint 1103 files PASS, frontend build PASS,
+- Browser Smoke nie był triggerowany przez path contract dla zmian Filament/service; publiczny renderer `correction_note` nie był zmieniany i jego istniejący public feature regression pozostał bez zmian.
+
+Faktycznie wdrożono dedykowane `Apply correction` na bazie tego samego stale-safe, atomowego `Apply public update` boundary. Korekta wymaga niepustego publicznego `correction_note` oraz istniejącego fresh-review contractu, zapisuje content + note w jednej transakcji, aktualizuje `last_substantive_update_at` przy semantycznej zmianie i tworzy allowlisted `content_article.corrected` AuditLog bez pełnego body/lead/note payloadu. Nie dodano revision/snapshot systemu, nowych pól, migracji ani zmian RBAC.
 
 ### Cel
 
@@ -2760,7 +2771,7 @@ Docs-only:
 - [x] publisher transparency/contact/editorial principles gate
 - [ ] scheduler monitored
 - [x] audit — AuditLog operacyjny + site-wide `newsroom:audit-links`/SEO audit mają regression evidence
-- [ ] correction flow
+- [x] correction flow — NEWSROOM-N6-010 / PR #146 / post-merge CI #523
 - [ ] freshness
 - [x] analytics
 - [ ] production smoke
@@ -2988,11 +2999,13 @@ Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-008 na `main@3d7ac8ab8a3ed1c299cb0c
 
 ### Repo-level przed operacyjnym deployem
 
-**NEWSROOM-N6-010 — Correction workflow hardening.**
+**NEWSROOM-N6-011 — Editorial freshness workflow hardening.**
 
-Audyt DoD po CI #519 potwierdził trzy brakujące pre-deploy taski, które wcześniej istniały wyłącznie jako przekrojowe wymagania specyfikacji/DoD bez własnego wpisu wykonawczego: N6-010 correction flow, N6-011 editorial freshness workflow oraz N6-012 accessibility gate.
+NEWSROOM-N6-010 correction flow jest zamknięty po PR #146 i post-merge CI #523. Następny repo-level brak z audytu DoD to pełny freshness workflow/admin section.
 
 N6-011 ma jedno jawne nierozstrzygnięcie policy: dokumentacja wymienia status `due soon`, ale nie definiuje progu czasowego. Nie wolno go hardcodować bez osobnej decyzji.
+
+Po N6-011 pozostaje NEWSROOM-N6-012 Accessibility gate.
 
 ### Równoległy production-only blocker
 
@@ -3001,6 +3014,13 @@ NEWSROOM-N5-007 pozostaje **IN PROGRESS** i wymaga zastosowania aktualnego Nginx
 ---
 
 # 12. Historia zmian
+
+### 2026-09-20 — v0.68
+
+- NEWSROOM-N6-010 correction workflow hardening wdrożono przez PR #146 bez migracji, nowych pól, revision/snapshot systemu ani zmian RBAC,
+- finalny implementation HEAD `9abb721a69bfb9a8d9a50c5e881166ad189d68a6` przeszedł CI #522 — 1149 passed / 20 300 assertions / 2 skipped, PostgreSQL PASS, Pint 1103 files PASS, frontend PASS; Scheduled Publication Smoke #13 również PASS,
+- PR #146 zmergowano jako `main@c58feafe6cffbb8bf54bbfcd0b3f1d4587fee97d`; post-merge CI #523 powtórzył pełny PASS z tym samym bilansem testów,
+- globalny DoD correction flow zamknięto; następny repo-level task to NEWSROOM-N6-011 editorial freshness workflow, a N5-007 pozostaje oddzielnym production-only blockerem.
 
 ### 2026-09-20 — v0.67
 
