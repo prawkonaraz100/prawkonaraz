@@ -2613,7 +2613,7 @@ Domknąć istniejący kontrakt freshness z `NEWSROOM-ADMIN-CMS-SPEC.md` §29 i `
 
 ### Status
 
-**IN PROGRESS — implementation na PR #152 ma exact-head CI #538 PASS i Browser Smoke #108 PASS; merge/post-merge evidence jeszcze nie istnieje.**
+**DONE — PR #152 zmergowano jako `main@0f3645475a2a7c72c69cac80388891d2a9ed2a72` po finalnym exact-head CI #542 i Browser Smoke #112 PASS; post-merge CI #543 również ma pełny PASS.**
 
 ### Cel
 
@@ -2656,7 +2656,17 @@ Domknąć istniejący accessibility contract z public UI/test runbooku dla publi
 - manual screenshot evidence sprawdzono na mobile 390 i desktop 1024 dla article/home/category/topic/guides; focus menu jest widoczny, a nie wykryto wizualnych blockerów kontrastu,
 - reprezentatywne pary kontrastu użyte w renderze: slate-950/white 17.85:1, slate-500/white 4.76:1, #0d47a1/white 8.63:1, slate-950/#efc54f 10.86:1, slate-500/slate-50 4.55:1,
 - exact-head CI #538 na `23eea2eec14fc5396ce40bd1831112cf47572450`: 1151 passed / 20 326 assertions / 2 skipped, PostgreSQL PASS, Pint 1103 files PASS, frontend PASS,
-- status pozostaje IN PROGRESS do finalnego docs-sync CI, merge i post-merge CI; pełnego WCAG 2.2 AA nie wyprowadzamy z samego Browser Smoke.
+- na etapie tego pre-merge snapshotu status pozostawał IN PROGRESS do finalnego docs-sync CI, merge i post-merge CI; pełnego WCAG 2.2 AA nie wyprowadzamy z samego Browser Smoke.
+
+### Finalne evidence po merge
+
+- finalny PR HEAD `14c3e9a1840e9d593e28533f36ccb8003aa9d686` zawiera dodatkowe uszczelnienie checkera: nazwy `nav` i wielokrotnych `aside` muszą pochodzić z author-provided `aria-label` / `aria-labelledby`, a nie z samego `textContent`,
+- exact-head CI #542 na tym SHA ma pełny PASS: `newsroom-postgres`, backend suite, Pint i frontend build,
+- Browser Smoke #112 ma PASS dla siedmiu dedykowanych newsroom jobów: article, home, category, topic, guides, semantic-links i golden-path; genericzny manual-only `browser-smoke` był prawidłowo skipped,
+- Newsroom Enterprise SEO Production Validation #11 ma PASS,
+- PR #152 zmergowano jako `main@0f3645475a2a7c72c69cac80388891d2a9ed2a72`,
+- post-merge CI #543 na tym exact `main` powtórzył pełny PASS: `newsroom-postgres`, backend suite, Pint i frontend build,
+- NEWSROOM-N6-012 jest DONE na poziomie repo-level accessibility gate; zachowujemy rozróżnienie między tym regression evidence a formalną zewnętrzną certyfikacją całego serwisu WCAG 2.2 AA.
 
 ---
 
@@ -2776,7 +2786,7 @@ Docs-only:
 - [x] category
 - [x] topic/dossier
 - [x] guides
-- [ ] responsive/accessibility — PR #152 ma implementation CI #538 i Browser Smoke #108 PASS oraz manual contrast/focus evidence; pozostaje finalny docs-sync CI, merge i post-merge evidence
+- [x] responsive/accessibility — NEWSROOM-N6-012 DONE po finalnym PR HEAD `14c3e9a1840e9d593e28533f36ccb8003aa9d686`, CI #542, Browser Smoke #112, merge `main@0f3645475a2a7c72c69cac80388891d2a9ed2a72` i post-merge CI #543 PASS
 
 ### SEO
 
@@ -3039,6 +3049,13 @@ NEWSROOM-N5-007 pozostaje **IN PROGRESS** i wymaga zastosowania aktualnego Nginx
 ---
 
 # 12. Historia zmian
+
+### 2026-09-20 — v0.72
+
+- NEWSROOM-N6-012 jest DONE po finalnym PR HEAD `14c3e9a1840e9d593e28533f36ccb8003aa9d686`; checker dodatkowo rozdziela author-provided landmark names od nazw kontrolek wynikających z treści,
+- exact-head CI #542, Browser Smoke #112 (7 dedykowanych newsroom jobów PASS) oraz Enterprise SEO Production Validation #11 mają PASS,
+- PR #152 zmergowano jako `main@0f3645475a2a7c72c69cac80388891d2a9ed2a72`; post-merge CI #543 powtórzył pełny PASS dla PostgreSQL, backendu, Pint i frontendu,
+- manual focus/contrast evidence pozostaje zgodne z wcześniejszym snapshotem; nie deklarujemy repo-level gate jako formalnej zewnętrznej certyfikacji całego serwisu WCAG 2.2 AA.
 
 ### 2026-09-20 — v0.71
 
