@@ -310,8 +310,18 @@ class EditContentArticle extends EditRecord
                 $this->assertFreshToken($locked, $loadedToken);
 
                 $locked->forceFill([
-                    'editorial_note' => $data['editorial_note'] ?? $locked->editorial_note,
-                    'image_license_note' => $data['image_license_note'] ?? $locked->image_license_note,
+                    'editorial_note' => array_key_exists('editorial_note', $data)
+                        ? $data['editorial_note']
+                        : $locked->editorial_note,
+                    'image_license_note' => array_key_exists('image_license_note', $data)
+                        ? $data['image_license_note']
+                        : $locked->image_license_note,
+                    'source_checked_at' => array_key_exists('source_checked_at', $data)
+                        ? $data['source_checked_at']
+                        : $locked->source_checked_at,
+                    'freshness_review_due_at' => array_key_exists('freshness_review_due_at', $data)
+                        ? $data['freshness_review_due_at']
+                        : $locked->freshness_review_due_at,
                 ])->save();
 
                 return $locked->refresh();

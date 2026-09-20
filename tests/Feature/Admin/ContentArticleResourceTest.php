@@ -58,6 +58,7 @@ test('admin can access content article resource with eager loaded editorial rela
         ->assertTableColumnExists('workflow_status')
         ->assertTableColumnExists('author.name')
         ->assertTableColumnExists('reviewer.name')
+        ->assertTableColumnExists('freshness_status_display')
         ->assertTableFilterExists('workflow_status')
         ->assertTableFilterExists('type')
         ->assertTableFilterExists('category_id')
@@ -172,6 +173,86 @@ test('article list search and filters narrow records', function () {
         ->filterTable('category_id', $newsCategory->id)
         ->assertCanSeeTableRecords([$matching])
         ->assertCanNotSeeTableRecords([$other]);
+});
+
+test('freshness status distinguishes not scheduled fresh and overdue without changing workflow', function () {
+    Carbon::setTestNow('2026-09-20 04:00:00');
+
+    $article = ContentArticle::factory()->published()->create([
+        'freshness_review_due_at' => null,
+    ]);
+
+    expect($article->freshnessStatus())->toBe('not_scheduled')
+        ->and($article->workflow_status)->toBe(ContentArticleWorkflowStatus::Published)
+        ->and($article->isActivelyDistributed())->toBeTrue();
+
+    $article->freshness_review_due_at = Carbon::parse('2026-09-21 04:00:00');
+
+    expect($article->freshnessStatus())->toBe('fresh')
+        ->and($article->workflow_status)->toBe(ContentArticleWorkflowStatus::Published);
+
+    $article->freshness_review_due_at = Carbon::parse('2026-09-20 03:59:59');
+
+    expect($article->freshnessStatus())->toBe('overdue')
+        ->and($article->workflow_status)->toBe(ContentArticleWorkflowStatus::Published)
+        ->and($article->isActivelyDistributed())->toBeTrue();
+
+    Carbon::setTestNow();
+});
+
+test('ordinary public save can maintain freshness metadata without changing public content workflow or service timestamps', function () {
+    Carbon::setTestNow('2026-09-20 04:00:00');
+
+    $admin = User::factory()->admin()->create();
+    $article = ContentArticle::factory()->published()->create([
+        'title' => 'Publiczny tytuł freshness',
+        'lead' => 'Publiczny lead freshness',
+        'source_checked_at' => null,
+        'freshness_review_due_at' => null,
+        'last_substantive_update_at' => Carbon::parse('2026-09-18 09:00:00'),
+        'public_state_changed_at' => Carbon::parse('2026-09-18 10:00:00'),
+    ]);
+
+    $originalPublishedAt = $article->published_at;
+    $originalLastSubstantiveUpdateAt = $article->last_substantive_update_at;
+    $originalPublicStateChangedAt = $article->public_state_changed_at;
+
+    $this->actingAs($admin);
+
+    Livewire::test(EditContentArticle::class, ['record' => $article->getRouteKey()])
+        ->set('data.title', 'Próba zmiany publicznego tytułu przez ordinary save')
+        ->set('data.source_checked_at', '2026-09-20 03:30:00')
+        ->set('data.freshness_review_due_at', '2026-09-20 03:45:00')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $article = $article->fresh();
+
+    expect($article->title)->toBe('Publiczny tytuł freshness')
+        ->and($article->source_checked_at?->toDateTimeString())->toBe('2026-09-20 03:30:00')
+        ->and($article->freshness_review_due_at?->toDateTimeString())->toBe('2026-09-20 03:45:00')
+        ->and($article->freshnessStatus())->toBe('overdue')
+        ->and($article->workflow_status)->toBe(ContentArticleWorkflowStatus::Published)
+        ->and($article->isActivelyDistributed())->toBeTrue()
+        ->and($article->published_at?->equalTo($originalPublishedAt))->toBeTrue()
+        ->and($article->last_substantive_update_at?->equalTo($originalLastSubstantiveUpdateAt))->toBeTrue()
+        ->and($article->public_state_changed_at?->equalTo($originalPublicStateChangedAt))->toBeTrue();
+
+    Livewire::test(EditContentArticle::class, ['record' => $article->getRouteKey()])
+        ->set('data.freshness_review_due_at', null)
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $article = $article->fresh();
+
+    expect($article->freshness_review_due_at)->toBeNull()
+        ->and($article->freshnessStatus())->toBe('not_scheduled')
+        ->and($article->workflow_status)->toBe(ContentArticleWorkflowStatus::Published)
+        ->and($article->isActivelyDistributed())->toBeTrue()
+        ->and($article->last_substantive_update_at?->equalTo($originalLastSubstantiveUpdateAt))->toBeTrue()
+        ->and($article->public_state_changed_at?->equalTo($originalPublicStateChangedAt))->toBeTrue();
+
+    Carbon::setTestNow();
 });
 
 test('draft edit routes slug and type changes through domain service', function () {

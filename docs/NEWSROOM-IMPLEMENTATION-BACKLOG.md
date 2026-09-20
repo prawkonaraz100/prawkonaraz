@@ -2564,7 +2564,7 @@ Zmaterializować istniejący kontrakt `Apply correction` z `NEWSROOM-ADMIN-CMS-S
 
 ### Status
 
-**TODO — częściowe fundamenty istnieją; pełny admin/editorial workflow nie jest potwierdzony.**
+**IN PROGRESS — implementation na PR #148 jest zmaterializowany i ma exact-head CI #526 PASS; merge/post-merge evidence jeszcze nie istnieje.**
 
 ### Cel
 
@@ -2592,6 +2592,18 @@ Domknąć istniejący kontrakt freshness z `NEWSROOM-ADMIN-CMS-SPEC.md` §29 i `
 - overdue pozostaje filtrem/kolejką pracy, a nie automatycznym transition,
 - brak wymyślonego `due soon` threshold bez decyzji w source-of-truth policy,
 - exact-head CI + wymagane regression PASS.
+
+### Potwierdzony implementation evidence przed merge
+
+- finalny implementation HEAD przed docs-sync: `cee06ee552208dd19d06110009237c2c0d90fb03`,
+- exact-head CI #526: 1151 passed / 20 326 assertions / 2 skipped, `newsroom-postgres` PASS, Pint 1103 files PASS, frontend build PASS,
+- zmaterializowano `ContentArticle::freshnessStatus()` dla `fresh` / `overdue` / `not_scheduled`; `due soon` nie jest wyliczany, ponieważ source-of-truth policy nadal nie definiuje progu,
+- Filament ma sekcję Freshness z edytowalnymi `source_checked_at` i `freshness_review_due_at` oraz read-only service-controlled timestamps,
+- ordinary public Save zapisuje wyłącznie bezpieczne freshness/internal metadata pod istniejącym stale-token guardem; public content, workflow i service-controlled timestamps pozostają niezmienione,
+- tabela i infolist pokazują computed freshness status/backlog,
+- regression potwierdza, że overdue nie zmienia `workflow_status` ani active distribution oraz że termin można jawnie wyczyścić do `not_scheduled`,
+- Browser Smoke nie był triggerowany przez path contract: PR zmienia wyłącznie model/admin Filament/feature regression, bez publicznego renderera.
+- status pozostaje IN PROGRESS do finalnego exact-head CI po docs-sync, merge i post-merge CI.
 
 ---
 
@@ -3014,6 +3026,13 @@ NEWSROOM-N5-007 pozostaje **IN PROGRESS** i wymaga zastosowania aktualnego Nginx
 ---
 
 # 12. Historia zmian
+
+### 2026-09-20 — v0.69
+
+- NEWSROOM-N6-011 implementation zmaterializowano na PR #148 bez migracji, zmian publicznego renderera lub nowego workflow transition,
+- implementation HEAD `cee06ee552208dd19d06110009237c2c0d90fb03` przeszedł CI #526: 1151 passed / 20 326 assertions / 2 skipped, PostgreSQL PASS, Pint 1103 files PASS, frontend PASS,
+- computed freshness ma wyłącznie `fresh` / `overdue` / `not_scheduled`; `due soon` pozostaje jawnie niewdrożone z powodu braku zdefiniowanego progu policy,
+- backlog nie oznacza N6-011 jako DONE przed finalnym docs-sync CI, merge i post-merge evidence.
 
 ### 2026-09-20 — v0.68
 

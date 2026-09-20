@@ -764,6 +764,18 @@ Standardowy review:
 News historyczny nie musi być sztucznie „odświeżany”.
 Jeśli zmienia się historia, dodajemy update lub nowy materiał zależnie od reguł z sekcji 17.
 
+### 26.4. Stan implementacji NEWSROOM-N6-011 przed merge
+
+PR #148 materializuje operacyjny freshness backlog bez automatyzowania decyzji redakcyjnej:
+
+- `source_checked_at` i `freshness_review_due_at` są utrzymywane jako backoffice metadata,
+- computed status rozróżnia `fresh`, `overdue` oraz `not scheduled`,
+- osiągnięcie terminu nie wykonuje `Mark needs review`, nie zmienia active distribution i nie dotyka publicznych timestampów merytorycznych,
+- `due soon` pozostaje świadomie niewdrożone, ponieważ policy nie ma zdefiniowanego progu czasowego,
+- publiczny ordinary Save zachowuje blokadę public content i zapisuje freshness metadata pod istniejącym stale-token guardem.
+
+Exact-head implementation CI #526 na `cee06ee552208dd19d06110009237c2c0d90fb03`: 1151 passed / 20 326 assertions / 2 skipped, PostgreSQL/Pint/frontend PASS. Finalny status wymaga jeszcze docs-sync CI, merge i post-merge CI.
+
 ---
 
 ## 27. „Stan na dzień”
@@ -1168,13 +1180,21 @@ Na 2026-09-16:
 - [x] wdrożyć focal-point review,
 - [x] N2-006: workflow/schedule/exposure actions + atomowy stale-safe `Apply public update` dla `ContentArticle`,
 - [x] N2-012: analogiczny stale-write guard dla `NewsroomHomeComposer`,
-- [ ] wdrożyć corrections,
-- [x] wdrożyć freshness filters — tabela ContentArticle ma testowany filtr `freshness_overdue`; pełny freshness workflow/admin section pozostaje osobnym otwartym zakresem,
+- [x] wdrożyć corrections — NEWSROOM-N6-010 / PR #146 / post-merge CI #523,
+- [ ] domknąć pełny freshness workflow/admin section — PR #148 ma implementation CI #526 PASS, ale merge/post-merge evidence jeszcze nie istnieje; filtr `freshness_overdue` pozostaje już wdrożony,
 - [x] przygotować publiczną stronę zasad redakcyjnych przed większym rolloutem — NEWSROOM-N6-009.
 
 ---
 
 ## 49. Historia zmian
+
+### 2026-09-20 — v0.23
+
+- NEWSROOM-N6-011 na PR #148 materializuje pełną sekcję freshness CMS, bez automatycznego transition do `needs_review`,
+- `source_checked_at` i `freshness_review_due_at` są backoffice metadata; service-controlled timestamps pozostają read-only,
+- computed status obejmuje `fresh` / `overdue` / `not scheduled`; `due soon` pozostaje niewdrożone do czasu jawnej decyzji policy,
+- exact-head implementation CI #526 na `cee06ee552208dd19d06110009237c2c0d90fb03` ma pełny PASS — 1151 / 20 326 / 2 skipped, PostgreSQL/Pint/frontend PASS,
+- status pełnego freshness workflow pozostaje otwarty do finalnego docs-sync CI, merge i post-merge gate; skorygowano też przestarzały checkbox corrections wyłącznie na podstawie wcześniej potwierdzonego N6-010.
 
 ### 2026-09-20 — v0.22
 

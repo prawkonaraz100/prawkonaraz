@@ -819,6 +819,21 @@ Status computed:
 
 `overdue` jest filtrem/kolejką pracy, **nie** automatycznym workflow transition. Upływ `freshness_review_due_at` nie może sam wyrzucić artykułu z home/category/feed. Akcja `Mark needs review` pozostaje oddzielną, audytowaną decyzją.
 
+### Stan implementacji NEWSROOM-N6-011 przed merge
+
+PR #148 materializuje ten kontrakt bez zmiany modelu danych:
+
+- formularz Filament ma osobną sekcję Freshness,
+- `source_checked_at` i `freshness_review_due_at` są edytowalne przez ordinary Save również dla publicly-visible article,
+- ten zapis pozostaje pod istniejącym stale-token guardem i nie odblokowuje title/lead/body/source/relations,
+- `reviewed_at`, `last_substantive_update_at` i `public_state_changed_at` są pokazane read-only,
+- tabela i infolist pokazują computed `fresh` / `overdue` / `not scheduled`,
+- `due soon` **nie jest obecnie wyliczany**; dokumentacja wymienia ten docelowy status, ale nie definiuje threshold i implementacja nie może go hardcodować,
+- pola freshness są wyłączone podczas `Apply public update` / `Apply correction`, aby uniknąć pozornego zapisu przez inną allowlistę,
+- regression potwierdza, że overdue nie zmienia `workflow_status`, active distribution, `last_substantive_update_at` ani `public_state_changed_at`.
+
+Exact-head implementation CI #526 na `cee06ee552208dd19d06110009237c2c0d90fb03`: 1151 passed / 20 326 assertions / 2 skipped, PostgreSQL PASS, Pint 1103 files PASS, frontend PASS. Status pozostaje pre-merge do finalnego gate'u PR.
+
 ---
 
 ## 30. Checklista publikacyjna w adminie
