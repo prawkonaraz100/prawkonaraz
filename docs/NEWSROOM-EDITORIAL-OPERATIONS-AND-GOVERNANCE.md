@@ -1151,22 +1151,27 @@ Na 2026-09-16:
 
 ## 48. Pozostałe zadania
 
-- [ ] wdrożyć admin-only policies bez rozszerzania panel access i spiąć AuditLog User actor,
+- [x] wdrożyć admin-only policies bez rozszerzania panel access i spiąć AuditLog User actor,
 - [x] N2-007: mandatory publish readiness jest współdzielone między checklistą i backend validation; warningi są addytywne i nie osłabiają gate'ów,
 - [x] N2-008: admin-only private/no-store article preview z noindex,nofollow, bez public analytics i private-source leakage,
-- [ ] wdrożyć origin/regulatory governance w CMS,
+- [x] wdrożyć origin/regulatory governance w CMS,
 - [x] wdrożyć homepage placements i future home preview,
-- [ ] wdrożyć topic governance,
-- [ ] wdrożyć focal-point review,
+- [x] wdrożyć topic governance,
+- [x] wdrożyć focal-point review,
 - [x] N2-006: workflow/schedule/exposure actions + atomowy stale-safe `Apply public update` dla `ContentArticle`,
 - [x] N2-012: analogiczny stale-write guard dla `NewsroomHomeComposer`,
 - [ ] wdrożyć corrections,
-- [ ] wdrożyć freshness filters,
-- [ ] przygotować publiczną stronę zasad redakcyjnych przed większym rolloutem.
+- [x] wdrożyć freshness filters — tabela ContentArticle ma testowany filtr `freshness_overdue`; pełny freshness workflow/admin section pozostaje osobnym otwartym zakresem,
+- [x] przygotować publiczną stronę zasad redakcyjnych przed większym rolloutem — NEWSROOM-N6-009.
 
 ---
 
 ## 49. Historia zmian
+
+### 2026-09-20 — v0.21
+
+- zsynchronizowano listę pozostałych zadań z potwierdzonym kodem: admin-only/AuditLog, origin/regulatory governance, topic governance, focal-point review, filtr `freshness_overdue` oraz publiczne zasady redakcyjne są wdrożone,
+- `Apply correction` nadal nie istnieje jako dedykowany workflow, a pełny freshness workflow/admin section nadal nie jest ukończony; tych braków nie oznaczono jako zamknięte.
 
 ### 2026-09-16 — v0.13
 
