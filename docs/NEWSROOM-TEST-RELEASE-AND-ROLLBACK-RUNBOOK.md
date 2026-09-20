@@ -1079,7 +1079,17 @@ Stan NEWSROOM-N6-012 przed merge:
 - manual evidence z artifactów 390/1024 dla article/home/category/topic/guides potwierdza widoczny focus menu i brak wizualnych blockerów kontrastu,
 - reprezentatywne pary CSS/renderu: slate-950/white 17.85:1, slate-500/white 4.76:1, #0d47a1/white 8.63:1, slate-950/#efc54f 10.86:1, slate-500/slate-50 4.55:1,
 - exact-head implementation CI #538 na `23eea2eec14fc5396ce40bd1831112cf47572450`: 1151 passed / 20 326 assertions / 2 skipped, PostgreSQL PASS, Pint 1103 files PASS, frontend PASS,
-- status pozostaje pre-merge; finalny docs-sync CI, merge i post-merge CI są nadal wymagane przed DONE.
+- na etapie tego snapshotu status pozostawał pre-merge; finalny docs-sync CI, merge i post-merge CI były nadal wymagane przed DONE.
+
+Finalne evidence NEWSROOM-N6-012:
+
+- finalny PR HEAD `14c3e9a1840e9d593e28533f36ccb8003aa9d686` uszczelnia landmark-name validation: `nav` i wielokrotne `aside` wymagają author-provided `aria-label` / `aria-labelledby`,
+- exact-head CI #542 ma pełny PASS,
+- Browser Smoke #112 ma PASS dla siedmiu dedykowanych newsroom jobów; genericzny manual-only `browser-smoke` był prawidłowo skipped,
+- Newsroom Enterprise SEO Production Validation #11 ma PASS,
+- PR #152 zmergowano jako `main@0f3645475a2a7c72c69cac80388891d2a9ed2a72`,
+- post-merge CI #543 ma pełny PASS dla PostgreSQL, backend suite, Pint i frontend build,
+- NEWSROOM-N6-012 jest DONE jako repo-level accessibility gate.
 
 Ten gate jest repo-level regression evidence dla zdefiniowanego zakresu i nie jest deklarowany jako zewnętrzna certyfikacja całego serwisu WCAG 2.2 AA.
 
@@ -1658,6 +1668,7 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - [x] dodać repo-level `SEO_RELEASE=1` deploy guard, który wymusza sitemap refresh/audit + `nginx -t` + publiczny production SEO delivery smoke bez samoczynnego włączania newsroomu lub aplikowania vhosta,
 - [x] dodać canonical-host migration validation dla `http`/`www`/legacy `prawkoapp.pl` i zapisać GSC evidence bez uznawania redirect PASS za rozwiązanie Google-selected canonical mismatchu,
 - [x] dodać N6-004 repo-level performance baseline/budgets do istniejących Browser Smoke article/hub/category z query count, SSR HTML bytes, image bytes/dimensions oraz built JS/CSS bytes,
+- [x] domknąć NEWSROOM-N6-012 repo-level accessibility gate — finalny PR HEAD `14c3e9a1840e9d593e28533f36ccb8003aa9d686`, CI #542, Browser Smoke #112, merge `main@0f3645475a2a7c72c69cac80388891d2a9ed2a72` i post-merge CI #543 PASS,
 - [x] usunąć potwierdzony brak deklarowanych HTML `width`/`height` dla wspólnego obrazu i ponownie przejść Browser Smoke/CI — PR #133, Browser Smoke #102, exact-head CI #494 i post-merge CI #495 PASS,
 - [ ] uzyskać production LCP/INP/CLS/TTFB po rollout/live zgodnie z N6-004; kernel render time z GitHub Actions pozostaje raportowanym baseline, nie twardym production SLA,
 - [ ] uzyskać zielony manualny STRICT N6-003 run po aktualnym deploy/runtime i zachować live article/category/topic + GSC evidence,
@@ -1666,6 +1677,13 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-20 — v0.53
+
+- NEWSROOM-N6-012 jest DONE po finalnym PR HEAD `14c3e9a1840e9d593e28533f36ccb8003aa9d686`; author-provided landmark-name validation eliminuje false-negative wynikający z samego `textContent`,
+- exact-head CI #542, Browser Smoke #112 oraz Enterprise SEO Production Validation #11 mają PASS,
+- PR #152 zmergowano jako `main@0f3645475a2a7c72c69cac80388891d2a9ed2a72`; post-merge CI #543 powtórzył pełny PASS dla PostgreSQL, backendu, Pint i frontendu,
+- zachowano rozdzielenie automated regression evidence, manual focus/contrast review oraz zewnętrznej certyfikacji WCAG.
 
 ### 2026-09-20 — v0.52
 
