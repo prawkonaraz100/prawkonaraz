@@ -475,6 +475,55 @@ test('explicit public update mode applies validated public fields and records th
     Carbon::setTestNow();
 });
 
+test('admin correction mode publishes content and correction note through the dedicated action', function () {
+    Carbon::setTestNow('2026-09-16 19:30:00');
+
+    $admin = User::factory()->admin()->create();
+    $article = ContentArticle::factory()->published()->create([
+        'title' => 'Tytuł przed korektą CMS',
+        'lead' => 'Lead przed korektą CMS',
+    ]);
+    ContentArticleSource::factory()
+        ->for($article, 'article')
+        ->create([
+            'source_type' => ContentArticleSourceType::Official->value,
+            'title' => 'Źródło korekty CMS',
+            'url' => 'https://example.test/correction-cms',
+            'is_publicly_cited' => true,
+        ]);
+
+    $this->actingAs($admin);
+
+    Livewire::test(EditContentArticle::class, ['record' => $article->getRouteKey()])
+        ->call('beginCorrection')
+        ->assertSet('publicUpdateMode', true)
+        ->assertSet('correctionMode', true)
+        ->set('data.title', 'Tytuł po korekcie CMS')
+        ->set('data.lead', 'Lead po korekcie CMS')
+        ->call('applyCorrection', 'Poprawiono istotną informację w materiale.')
+        ->assertSet('publicUpdateMode', false)
+        ->assertSet('correctionMode', false)
+        ->assertHasNoErrors();
+
+    $article = $article->fresh();
+    $audit = AuditLog::query()
+        ->where('action', 'content_article.corrected')
+        ->where('entity_id', (string) $article->id)
+        ->sole();
+
+    expect($article->title)->toBe('Tytuł po korekcie CMS')
+        ->and($article->lead)->toBe('Lead po korekcie CMS')
+        ->and($article->correction_note)->toBe('Poprawiono istotną informację w materiale.')
+        ->and($article->last_substantive_update_at?->toDateTimeString())->toBe('2026-09-16 19:30:00')
+        ->and($audit->actor_user_id)->toBe($admin->id)
+        ->and($audit->metadata['correction_applied'])->toBeTrue()
+        ->and($audit->metadata)->not->toHaveKey('correction_note')
+        ->and($audit->metadata)->not->toHaveKey('body_blocks')
+        ->and($audit->metadata)->not->toHaveKey('lead');
+
+    Carbon::setTestNow();
+});
+
 test('admin can persist ordered article sources including private evidence without a url', function () {
     $undoRepeaterFake = Repeater::fake();
 
