@@ -954,6 +954,21 @@ Minimum:
 - poprawne labels,
 - reduced motion.
 
+### Stan implementacji NEWSROOM-N6-012 przed merge
+
+PR #152 materializuje repo-level gate bez zmiany design systemu ani architektury publicznych stron:
+
+- wspólny `layouts.public-content` dodaje skip link `Przejdź do treści` do `main#main-content`,
+- service-menu desktop/mobile ma jawny keyboard focus outline,
+- wielokrotne article complementary landmarks mają dostępne nazwy,
+- article/home/category/topic/guides reużywają shared Playwright accessibility checker,
+- checker obejmuje landmark naming, H1/heading order, alt, accessible names, labels, error association, keyboard focus i reduced-motion behavior,
+- Browser Smoke #108 przeszedł dla article/home/category/topic/guides oraz istniejących semantic-links/golden-path jobs,
+- manual screenshot review wykonano dla 390 i 1024 px; focus menu jest widoczny, a reprezentatywne pary kontrastu mają: 17.85:1, 4.76:1, 8.63:1, 10.86:1 i 4.55:1,
+- exact-head implementation CI #538 na `23eea2eec14fc5396ce40bd1831112cf47572450` ma pełny PASS: 1151 / 20 326 / 2 skipped, PostgreSQL PASS, Pint 1103 files PASS, frontend PASS.
+
+To jest pre-merge evidence. Pełny status DONE wymaga jeszcze finalnego docs-sync CI, merge i post-merge CI; nie utożsamiamy Browser Smoke ani reprezentatywnego contrast review z formalną zewnętrzną certyfikacją WCAG.
+
 ---
 
 ## 48. Link targets
@@ -1367,7 +1382,7 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - [x] zbudować category page w NEWSROOM-N4-003,
 - [x] zbudować article page,
 - [x] dodać responsive Browser QA dla article detail na wymaganej macierzy N3-004,
-- [ ] domknąć pełny accessibility QA newsroomu,
+- [ ] domknąć pełny accessibility QA newsroomu — PR #152 ma CI #538 + Browser Smoke #108 + manual focus/contrast evidence PASS; merge/post-merge evidence jeszcze nie istnieje,
 - [x] dodać dedykowany browser snapshot/E2E dla article detail,
 - [x] zbudować NEWSROOM-N3-005 Product Bridge dla questions/legal/signs/contextual CTA,
 - [x] zbudować NEWSROOM-N3-006 historical redirect resolver HTTP,
@@ -1386,6 +1401,13 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 ---
 
 ## 69. Historia zmian
+
+### 2026-09-20 — v0.26
+
+- NEWSROOM-N6-012 na PR #152 dodaje wspólny skip link/main target, visible keyboard focus dla service-menu i dostępne nazwy article complementary landmarks,
+- istniejące article/home/category/topic/guides Browser QA reużywają jeden shared accessibility checker zamiast nowego równoległego systemu,
+- Browser Smoke #108 oraz exact-head CI #538 są PASS; manualne screenshot/contrast evidence obejmuje mobile 390 i desktop 1024,
+- pełny accessibility QA pozostaje otwarty do finalnego docs-sync CI, merge i post-merge CI.
 
 ### 2026-09-18 — v0.25
 
