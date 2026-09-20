@@ -2516,6 +2516,112 @@ Preferować istniejące Organization/Contact/Methodology pages. Nowy publiczny d
 
 ---
 
+## NEWSROOM-N6-010 — Correction workflow hardening
+
+### Status
+
+**TODO — repo-level pre-deploy gap potwierdzony audytem DoD; brak implementation evidence.**
+
+### Cel
+
+Zmaterializować istniejący kontrakt `Apply correction` z `NEWSROOM-ADMIN-CMS-SPEC.md` §28.1 oraz politykę korekt z `NEWSROOM-EDITORIAL-OPERATIONS-AND-GOVERNANCE.md` §16/§34 bez dodawania revision/snapshot systemu.
+
+### Zakres
+
+- dedykowana akcja `Apply correction` wyłącznie dla publicznie widocznego artykułu,
+- wymagany krótki publiczny `correction_note` dla istotnej korekty,
+- wymagany aktualny/fresh review zgodnie z istniejącą policy,
+- re-use istniejącego stale-safe, atomowego `Apply public update` transaction/write path zamiast drugiej ścieżki zapisu,
+- treść + correction note publikowane w jednym commit,
+- istotna korekta aktualizuje `last_substantive_update_at`,
+- AuditLog zachowuje `User` actora i allowlisted metadata bez pełnego body/lead/private notes,
+- publiczny renderer nadal pokazuje correction note z istniejącego pola,
+- drobna korekta bez wpływu na sens nadal może użyć zwykłego `Apply public update` bez correction note.
+
+### DoD
+
+- brak możliwości zatwierdzenia istotnej korekty bez correction note i fresh review,
+- stale token / validation failure nie pozostawia częściowej korekty,
+- korekta używa istniejącego domain service/write boundary, bez równoległej logiki publikacji,
+- testy pokrywają success, brak note, stale state, brak fresh review, atomic rollback i AuditLog minimization,
+- exact-head CI + wymagane browser/feature regression PASS przed merge,
+- docs po implementacji opisują wyłącznie potwierdzony stan.
+
+---
+
+## NEWSROOM-N6-011 — Editorial freshness workflow hardening
+
+### Status
+
+**TODO — częściowe fundamenty istnieją; pełny admin/editorial workflow nie jest potwierdzony.**
+
+### Cel
+
+Domknąć istniejący kontrakt freshness z `NEWSROOM-ADMIN-CMS-SPEC.md` §29 i `NEWSROOM-EDITORIAL-OPERATIONS-AND-GOVERNANCE.md` §26 bez automatycznego zmieniania workflow po upływie terminu.
+
+### Potwierdzony fundament
+
+- model ma `source_checked_at`, `freshness_review_due_at`, `last_substantive_update_at`, `public_state_changed_at`,
+- tabela CMS pokazuje `freshness_review_due_at`,
+- testowany filtr `freshness_overdue` już istnieje,
+- `freshness_review_due_at <= now()` jest wyłącznie kolejką pracy; `Mark needs review` pozostaje jawną, audytowaną decyzją.
+
+### Pozostały zakres
+
+- pełna sekcja freshness w CMS zgodna z istniejącym kontraktem pól,
+- kontrolowana edycja `source_checked_at` i `freshness_review_due_at`,
+- service-controlled timestamps pozostają read-only,
+- czytelny computed status co najmniej `fresh` / `overdue` / `not scheduled`,
+- `due soon` pozostaje **nierozstrzygniętym progiem policy**: obecne źródła prawdy nie definiują liczby dni, więc implementacja nie może jej hardcodować bez osobnej decyzji,
+- regression potwierdzający, że overdue nie zmienia samoczynnie `workflow_status` ani public distribution.
+
+### DoD
+
+- CMS pozwala operacyjnie utrzymywać freshness bez bezpośredniej mutacji service-controlled timestamps,
+- overdue pozostaje filtrem/kolejką pracy, a nie automatycznym transition,
+- brak wymyślonego `due soon` threshold bez decyzji w source-of-truth policy,
+- exact-head CI + wymagane regression PASS.
+
+---
+
+## NEWSROOM-N6-012 — Accessibility gate
+
+### Status
+
+**TODO — responsive/browser smoke PASS nie jest pełnym accessibility evidence.**
+
+### Cel
+
+Domknąć istniejący accessibility contract z public UI/test runbooku dla publicznych newsroom surfaces przed regularnym rolloutem.
+
+### Zakres
+
+- article,
+- hub,
+- category,
+- topic/dossier,
+- guides,
+- Product Bridge i istotne CTA/navigation elementy,
+- heading order,
+- landmarks,
+- keyboard navigation,
+- visible focus,
+- link/control names,
+- image alt,
+- form/control labels tam, gdzie występują,
+- error association tam, gdzie występuje,
+- reduced-motion behavior,
+- contrast/manual evidence tam, gdzie automatyczny check nie jest wystarczający.
+
+### DoD
+
+- automatyczne testy i wymagane manual evidence są jawnie rozdzielone,
+- istniejący responsive Browser Smoke pozostaje regression gate, ale nie jest samodzielnie traktowany jako a11y PASS,
+- wykryte repo-level problemy są naprawione przed oznaczeniem tasku DONE,
+- exact-head CI/Browser Smoke PASS i dokumentacja zsynchronizowana z faktycznym wynikiem.
+
+---
+
 # 4. PR boundaries
 
 Rekomendacja:
@@ -2880,23 +2986,28 @@ Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-008 na `main@3d7ac8ab8a3ed1c299cb0c
 
 # 11. Pierwszy następny task
 
-NEWSROOM-N5-007 — Static sitemap publication + freshness + delivery hardening — **kontynuacja**.
+### Repo-level przed operacyjnym deployem
 
-Pierwszy podkrok N5-007, czyli pre-validation + child-before-index atomic publication + post-switch cleanup zarządzanych article/news sitemap files, jest potwierdzony po PR #109 i post-merge CI #404 na `main@1744a93fd8f0bddfe7fc5bff90b146fdea24b016`.
+**NEWSROOM-N6-010 — Correction workflow hardening.**
 
-Drugi podkrok N5-007, czyli dirty/version freshness coordinator + shared lock + every-minute scheduler, jest potwierdzony po PR #112 i post-merge CI #410 na `main@79b6de0276ba8cdce500c366a4f98098e528dcd8`. Aktualne deployment docs potwierdzają single-node topology z lokalnym `public/`, więc obecny topology gate jest spełniony dla tej topologii.
+Audyt DoD po CI #519 potwierdził trzy brakujące pre-deploy taski, które wcześniej istniały wyłącznie jako przekrojowe wymagania specyfikacji/DoD bez własnego wpisu wykonawczego: N6-010 correction flow, N6-011 editorial freshness workflow oraz N6-012 accessibility gate.
 
-Trzeci podkrok N5-007, czyli repo-level production static delivery hardening, jest potwierdzony po PR #115 i post-merge CI #417 na `main@9a9c98d3534492e30ba215fd9785b7dd425a1f75`: Nginx contract dla robots/sitemap, produkcyjny smoke script oraz regression konfiguracji istnieją.
+N6-011 ma jedno jawne nierozstrzygnięcie policy: dokumentacja wymienia status `due soon`, ale nie definiuje progu czasowego. Nie wolno go hardcodować bez osobnej decyzji.
 
-Czwarty podkrok N5-007, czyli powtarzalny GitHub Actions production-smoke harness, jest potwierdzony po PR #117 i post-merge CI #421 na `main@38102d1c3867d13666308ee657d6579fcb5f1d7a`. PR run jest celowo REPORT-ONLY, manualny `workflow_dispatch` domyślnie STRICT. Pierwszy report-only run wykazał realną rozbieżność produkcyjną: `/robots.txt` zwrócił `Cache-Control: max-age=14400`, przez co underlying smoke miał exit code 1.
+### Równoległy production-only blocker
 
-Piąty podkrok N5-007, czyli dedykowany scheduler-definition/shared-lock regression, jest potwierdzony po PR #119 i post-merge CI #425 na `main@abb42032370a185a4cf7d7ee9a474ccbca6d86a4`; test chroni runtime schedule contract oraz zachowanie komendy przy zajętym shared cache locku bez zmiany produkcyjnej implementacji.
-
-Następnym wykonywalnym podkrokiem pozostaje **zastosowanie aktualnego Nginx configu na produkcji i udany STRICT production smoke** z zapisanym artifactem dla Content-Type/cache/Set-Cookie/validators/304. Następnie pozostaje GSC verification. NEWSROOM-N5-007 nadal nie jest DONE.
+NEWSROOM-N5-007 pozostaje **IN PROGRESS** i wymaga zastosowania aktualnego Nginx configu na produkcji, udanego STRICT Production SEO Delivery Smoke oraz późniejszego GSC verification. Brak dostępu GitHub do serwera nie jest zastępowany nową ścieżką SSH/deployment architecture.
 
 ---
 
 # 12. Historia zmian
+
+### 2026-09-20 — v0.67
+
+- audyt historii backlogu wykazał, że correction flow, pełny editorial freshness workflow oraz accessibility od początku były wymaganiami globalnego DoD/specyfikacji, ale nie otrzymały własnych atomowych tasków wykonawczych,
+- dodano NEWSROOM-N6-010/N6-011/N6-012 jako pre-deploy hardening bez zmiany architektury lub modelu danych; scope wyprowadzono wyłącznie z istniejących source-of-truth docs,
+- dla N6-011 zachowano jawne nierozstrzygnięcie: `due soon` nie ma obecnie zdefiniowanego threshold i nie wolno go wymyślać w implementacji,
+- repo-level next task ustawiono na N6-010; N5-007 pozostaje równoległym production-only blockerem.
 
 ### 2026-09-20 — v0.66
 
