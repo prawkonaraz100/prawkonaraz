@@ -4,6 +4,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { spawn } from 'node:child_process';
 import { chromium } from 'playwright';
+import { assertNewsroomAccessibility } from './newsroom-accessibility-checks.mjs';
 
 const cwd = process.cwd();
 const outputDir = path.join(cwd, 'output', 'playwright', 'newsroom-guides');
@@ -143,6 +144,11 @@ try {
         if (!nextHref?.endsWith(`${guidesPath}?page=2`)) {
             throw new Error(`Guides pagination target failed at ${viewport.name}px: ${nextHref}`);
         }
+
+        await assertNewsroomAccessibility(page, {
+            surface: 'guides',
+            viewportName: viewport.name,
+        });
 
         const cdp = await context.newCDPSession(page);
         const metrics = await cdp.send('Page.getLayoutMetrics');
