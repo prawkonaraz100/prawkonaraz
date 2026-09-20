@@ -4,6 +4,7 @@ import http from 'node:http';
 import path from 'node:path';
 import process from 'node:process';
 import { chromium } from 'playwright';
+import { assertNewsroomAccessibility } from './support/newsroom-accessibility.mjs';
 import { assertPerformanceBudget, collectSnapshotPerformance } from './newsroom-performance-metrics.mjs';
 
 const cwd = process.cwd();
@@ -185,6 +186,8 @@ try {
             );
         }
 
+        const accessibility = await assertNewsroomAccessibility(page, { surface: 'article', viewport: viewport.name });
+
         const screenshot = path.join(outputDir, `article-${viewport.name}.png`);
         await page.screenshot({ path: screenshot, fullPage: true, timeout: 15_000 });
         report.viewports.push({
@@ -192,6 +195,7 @@ try {
             status: 'ok',
             scroll_width: scrollWidth,
             screenshot,
+            accessibility,
         });
 
         await context.close();
