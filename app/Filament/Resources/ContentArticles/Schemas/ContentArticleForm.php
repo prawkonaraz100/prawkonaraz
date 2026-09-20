@@ -434,6 +434,36 @@ class ContentArticleForm
                             ->columnSpanFull(),
                     ])
                     ->columns(2),
+                Section::make('Freshness')
+                    ->description('Backoffice metadata do planowania ponownej weryfikacji. Termin overdue tworzy kolejkę pracy, ale nie zmienia automatycznie workflow ani publicznej dystrybucji.')
+                    ->schema([
+                        Placeholder::make('freshness_status_display')
+                            ->label('Status freshness')
+                            ->content(fn (?ContentArticle $record): string => static::freshnessStatusLabel($record)),
+                        DateTimePicker::make('source_checked_at')
+                            ->label('Źródła sprawdzone')
+                            ->timezone('Europe/Warsaw')
+                            ->seconds(false)
+                            ->helperText('Ręczny timestamp ostatniego sprawdzenia źródeł. Nie zmienia publicznej treści ani workflow.'),
+                        DateTimePicker::make('freshness_review_due_at')
+                            ->label('Review freshness do')
+                            ->timezone('Europe/Warsaw')
+                            ->seconds(false)
+                            ->helperText('Po przekroczeniu terminu status staje się overdue. Sam termin nie wykonuje Mark needs review.'),
+                        Placeholder::make('reviewed_at_display')
+                            ->label('Ostatnie review')
+                            ->content(fn (?ContentArticle $record): string => static::dateTimeLabel($record?->reviewed_at)),
+                        Placeholder::make('last_substantive_update_at_display')
+                            ->label('Ostatnia istotna aktualizacja')
+                            ->content(fn (?ContentArticle $record): string => static::dateTimeLabel($record?->last_substantive_update_at)),
+                        Placeholder::make('public_state_changed_at_display')
+                            ->label('Ostatnia zmiana public state')
+                            ->content(fn (?ContentArticle $record): string => static::dateTimeLabel($record?->public_state_changed_at)),
+                        Placeholder::make('freshness_due_soon_policy')
+                            ->label('Due soon')
+                            ->content('Brak zdefiniowanego progu policy — status nie jest obecnie wyliczany i nie może być hardcodowany bez osobnej decyzji.'),
+                    ])
+                    ->columns(2),
                 Section::make('Notatka wewnętrzna')
                     ->description('Pole tylko dla backoffice. Nie jest publiczną treścią artykułu i pozostaje edytowalne także dla publicznego rekordu.')
                     ->schema([
@@ -1148,6 +1178,24 @@ class ContentArticleForm
         }
 
         return new HtmlString($html.'</div>');
+    }
+
+    protected static function freshnessStatusLabel(?ContentArticle $record): string
+    {
+        return match ($record?->freshnessStatus()) {
+            'fresh' => 'Fresh',
+            'overdue' => 'Overdue',
+            default => 'Not scheduled',
+        };
+    }
+
+    protected static function dateTimeLabel(mixed $value): string
+    {
+        if (! $value instanceof \DateTimeInterface) {
+            return '-';
+        }
+
+        return $value->setTimezone(new \DateTimeZone('Europe/Warsaw'))->format('d.m.Y H:i');
     }
 
     protected static function workflowLabel(?ContentArticle $record): string
