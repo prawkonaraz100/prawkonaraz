@@ -4,6 +4,7 @@ import http from 'node:http';
 import path from 'node:path';
 import process from 'node:process';
 import { chromium } from 'playwright';
+import { assertNewsroomAccessibility } from './support/newsroom-accessibility.mjs';
 
 const cwd = process.cwd();
 const outputDir = path.join(cwd, 'output', 'playwright', 'newsroom-golden-path');
@@ -300,6 +301,7 @@ try {
     report.steps.push('article-to-product');
 
     await gotoWithRetry(page, `${baseUrl}${article.public_path}`);
+    report.accessibility = await assertNewsroomAccessibility(page, { surface: 'golden-article-product-bridge', viewport: 'desktop' });
     await page.screenshot({ path: path.join(outputDir, 'public-article.png'), fullPage: true });
 
     report.article_id = article.id;
