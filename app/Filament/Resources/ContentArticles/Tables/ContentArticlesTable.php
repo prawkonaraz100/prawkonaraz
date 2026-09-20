@@ -89,6 +89,13 @@ class ContentArticlesTable
                     ->label('Breaking')
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('freshness_status_display')
+                    ->label('Freshness')
+                    ->state(fn (ContentArticle $record): string => $record->freshnessStatus())
+                    ->formatStateUsing(fn (mixed $state): string => static::freshnessStatusLabel($state))
+                    ->badge()
+                    ->color(fn (mixed $state): string => static::freshnessStatusColor($state))
+                    ->toggleable(),
                 TextColumn::make('freshness_review_due_at')
                     ->label('Freshness review')
                     ->dateTime('d.m.Y H:i')
@@ -267,6 +274,24 @@ class ContentArticlesTable
         $value = $state instanceof ContentArticleWorkflowStatus ? $state->value : (string) $state;
 
         return static::workflowOptions()[$value] ?? $value;
+    }
+
+    protected static function freshnessStatusLabel(mixed $state): string
+    {
+        return match ((string) $state) {
+            'fresh' => 'Fresh',
+            'overdue' => 'Overdue',
+            default => 'Not scheduled',
+        };
+    }
+
+    protected static function freshnessStatusColor(mixed $state): string
+    {
+        return match ((string) $state) {
+            'fresh' => 'success',
+            'overdue' => 'danger',
+            default => 'gray',
+        };
     }
 
     protected static function workflowColor(mixed $state): string
