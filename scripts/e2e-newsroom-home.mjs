@@ -4,6 +4,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { spawn } from 'node:child_process';
 import { chromium } from 'playwright';
+import { assertNewsroomAccessibility } from './newsroom-accessibility-checks.mjs';
 import { assertPerformanceBudget, collectSnapshotPerformance } from './newsroom-performance-metrics.mjs';
 
 const cwd = process.cwd();
@@ -165,6 +166,11 @@ try {
         if (robots !== 'index,follow,max-image-preview:large') {
             throw new Error(`Hub robots contract failed at ${viewport.name}px: ${robots}`);
         }
+
+        await assertNewsroomAccessibility(page, {
+            surface: 'home',
+            viewportName: viewport.name,
+        });
 
         const cdp = await context.newCDPSession(page);
         const metrics = await cdp.send('Page.getLayoutMetrics');
