@@ -212,7 +212,7 @@ test('pending review photo is visible only to its owner or administrator', funct
     $this->actingAs($otherUser)->get(route('reviews.photo', $review))->assertNotFound();
     $this->actingAs($owner)->get(route('reviews.photo', $review))
         ->assertOk()
-        ->assertHeader('Cache-Control', 'private, no-store');
+        ->assertHeader('Cache-Control', 'no-store, private');
 });
 
 test('approved review photo is publicly visible', function () {

@@ -46,10 +46,9 @@ class StoreUserReviewRequest extends FormRequest
                 'max:5120',
                 'dimensions:max_width=5000,max_height=5000',
             ],
-            'photo_privacy_confirmed' => [
-                Rule::requiredIf(fn (): bool => $this->hasFile('photo')),
-                'accepted',
-            ],
+            'photo_privacy_confirmed' => $this->hasFile('photo')
+                ? ['required', 'accepted']
+                : ['nullable'],
             'remove_photo' => ['nullable', 'boolean'],
             'social_links' => ['nullable', 'array:facebook,instagram,tiktok,youtube,website'],
             'social_links.facebook' => $this->platformUrlRules('Facebook', ['facebook.com', 'fb.com']),
