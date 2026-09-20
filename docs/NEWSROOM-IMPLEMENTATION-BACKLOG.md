@@ -2613,7 +2613,7 @@ Domknąć istniejący kontrakt freshness z `NEWSROOM-ADMIN-CMS-SPEC.md` §29 i `
 
 ### Status
 
-**TODO — responsive/browser smoke PASS nie jest pełnym accessibility evidence.**
+**IN PROGRESS — implementation na PR #152 ma exact-head CI #538 PASS i Browser Smoke #108 PASS; merge/post-merge evidence jeszcze nie istnieje.**
 
 ### Cel
 
@@ -2644,6 +2644,19 @@ Domknąć istniejący accessibility contract z public UI/test runbooku dla publi
 - istniejący responsive Browser Smoke pozostaje regression gate, ale nie jest samodzielnie traktowany jako a11y PASS,
 - wykryte repo-level problemy są naprawione przed oznaczeniem tasku DONE,
 - exact-head CI/Browser Smoke PASS i dokumentacja zsynchronizowana z faktycznym wynikiem.
+
+### Potwierdzony stan implementacji przed merge
+
+- wspólny `layouts.public-content` ma keyboard-first skip link do `main#main-content`; target ma `tabindex="-1"`,
+- globalny service-menu `summary` ma jawny visible-focus outline zamiast `outline: 0`,
+- article context/related oraz Product Bridge CTA mają nazwy complementary landmarks; istniejący legal-reference aside zachowuje własną nazwę,
+- wspólny `scripts/newsroom-accessibility-checks.mjs` jest reużywany przez istniejące article/home/category/topic/guides Playwright harnessy zamiast tworzenia równoległego workflow,
+- automat sprawdza landmarks/nav naming, jeden H1 i heading order, image alt, accessible names, labels/error association, pierwszy keyboard focus/skip link, focus service-menu oraz reduced motion,
+- Browser Smoke #108: `newsroom-article`, `newsroom-home`, `newsroom-category`, `newsroom-topic`, `newsroom-guides`, `newsroom-semantic-links` i `newsroom-golden-path` PASS; genericzny manual-only `browser-smoke` prawidłowo skipped na PR,
+- manual screenshot evidence sprawdzono na mobile 390 i desktop 1024 dla article/home/category/topic/guides; focus menu jest widoczny, a nie wykryto wizualnych blockerów kontrastu,
+- reprezentatywne pary kontrastu użyte w renderze: slate-950/white 17.85:1, slate-500/white 4.76:1, #0d47a1/white 8.63:1, slate-950/#efc54f 10.86:1, slate-500/slate-50 4.55:1,
+- exact-head CI #538 na `23eea2eec14fc5396ce40bd1831112cf47572450`: 1151 passed / 20 326 assertions / 2 skipped, PostgreSQL PASS, Pint 1103 files PASS, frontend PASS,
+- status pozostaje IN PROGRESS do finalnego docs-sync CI, merge i post-merge CI; pełnego WCAG 2.2 AA nie wyprowadzamy z samego Browser Smoke.
 
 ---
 
@@ -2763,7 +2776,7 @@ Docs-only:
 - [x] category
 - [x] topic/dossier
 - [x] guides
-- [ ] responsive/accessibility — article detail/Product Bridge ma PASS wymaganej macierzy responsive, ale pełny accessibility gate pozostaje dalszym hardeningiem
+- [ ] responsive/accessibility — PR #152 ma implementation CI #538 i Browser Smoke #108 PASS oraz manual contrast/focus evidence; pozostaje finalny docs-sync CI, merge i post-merge evidence
 
 ### SEO
 
@@ -3026,6 +3039,14 @@ NEWSROOM-N5-007 pozostaje **IN PROGRESS** i wymaga zastosowania aktualnego Nginx
 ---
 
 # 12. Historia zmian
+
+### 2026-09-20 — v0.71
+
+- NEWSROOM-N6-012 zmaterializowano na PR #152 bez zmian architektury, routingu, modelu danych ani publicznego content contract,
+- dodano wspólny skip link/main target, visible-focus dla menu oraz nazwy complementary landmarks; istniejące Browser Smoke harnessy reużywają jeden shared a11y checker,
+- exact-head implementation CI #538 na `23eea2eec14fc5396ce40bd1831112cf47572450` ma pełny PASS: 1151 passed / 20 326 assertions / 2 skipped, PostgreSQL PASS, Pint 1103 files PASS, frontend PASS,
+- Browser Smoke #108 ma PASS dla siedmiu dedykowanych newsroom jobów; manual screenshot/contrast evidence dla article/home/category/topic/guides nie wykazał repo-level blockerów,
+- N6-012 pozostaje IN PROGRESS do finalnego docs-sync CI, merge i post-merge CI; nie oznaczamy samego pre-merge Browser Smoke jako DONE.
 
 ### 2026-09-20 — v0.70
 
