@@ -4,6 +4,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { spawn } from 'node:child_process';
 import { chromium } from 'playwright';
+import { assertNewsroomAccessibility } from './newsroom-accessibility-checks.mjs';
 import { assertPerformanceBudget, collectSnapshotPerformance } from './newsroom-performance-metrics.mjs';
 
 const cwd = process.cwd();
@@ -148,6 +149,11 @@ try {
         if (!nextHref?.endsWith(`${categoryPath}?page=2`)) {
             throw new Error(`Category pagination target failed at ${viewport.name}px: ${nextHref}`);
         }
+
+        await assertNewsroomAccessibility(page, {
+            surface: 'category',
+            viewportName: viewport.name,
+        });
 
         const cdp = await context.newCDPSession(page);
         const metrics = await cdp.send('Page.getLayoutMetrics');
