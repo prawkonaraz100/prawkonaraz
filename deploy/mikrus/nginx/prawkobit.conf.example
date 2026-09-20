@@ -49,6 +49,7 @@ server {
     }
 
     location = /sitemap.xml {
+        types { }
         default_type application/xml;
         etag on;
         if_modified_since exact;
@@ -58,6 +59,7 @@ server {
     }
 
     location ^~ /sitemaps/ {
+        types { }
         default_type application/xml;
         etag on;
         if_modified_since exact;

@@ -1999,8 +1999,10 @@ NEWSROOM-N5-007 pozostaje **IN PROGRESS**.
 - aplikacja została wdrożona jako release `/var/www/prawkobit/releases/20260920150051-newsroom-dod-d0a336c` z markerem `d0a336c18bd3815dc0e8fded1331f8493ea1ad88`; późniejsze `main@55cdb0be8060611cd87fbf1fc6224d5b9d26c09f` zmienia wyłącznie dokumentację SEO i nie wymaga redeployu runtime,
 - aktywny vhost Nginx ma zastosowany repo contract dla `/robots.txt`, `/sitemap.xml` i `/sitemaps/*`; `nginx -t` oraz reload zakończyły się powodzeniem,
 - origin `127.0.0.1` z `Host: prawkonaraz.pl` zwraca dla `/robots.txt` `200`, `text/plain`, `Cache-Control: public, max-age=3600`, `ETag` i brak `Set-Cookie`,
-- publiczny `/sitemap.xml` zwraca `200`, `text/xml`, `Cache-Control: public, max-age=3600`, `ETag` i brak `Set-Cookie`,
-- publiczny `/robots.txt` nadal jest nadpisywany przez warstwę Cloudflare do `Cache-Control: public, max-age=14400`; świeży STRICT smoke kończy się kodem `1` wyłącznie na tej rozbieżności,
+- publiczny `/sitemap.xml` zwraca `200`, `application/xml`, `Cache-Control: public, max-age=3600`, `ETag` i brak `Set-Cookie`,
+- Cloudflare Browser Cache TTL został przełączony z `4 hours` na `Respect Existing Headers`, a cache selektywnie wyczyszczony wyłącznie dla `/robots.txt` i `/sitemap.xml`,
+- publiczny `/robots.txt` zwraca po zmianie `Cache-Control: public, max-age=3600`, a sitemap XML `application/xml`; dodatkowe `types { }` w lokalizacjach sitemap zapobiega odziedziczeniu mapowania `text/xml` z globalnego `mime.types`,
+- świeży STRICT `production-seo-delivery-smoke.sh` zakończył się kodem `0`: PASS dla `/robots.txt`, `/sitemap.xml`, `/sitemaps/static.xml` oraz oczekiwanego 404 `/aktualnosci/feed.xml` przy wyłączonym publicznym gate,
 - produkcyjny scheduler wykonuje co minutę `newsroom:publish-due` oraz `newsroom:refresh-seo-artifacts-if-dirty`; log z 2026-09-20 17:25–17:27 CEST potwierdza kolejne wykonania `DONE` bez bieżących błędów.
 
 Potwierdzone podkroki:
@@ -2033,10 +2035,9 @@ Deployment-guard PR #127 miał finalny head `e84758d911ffc4f6ff10a04f88a2b8c48be
 
 Topology evidence z aktualnych dokumentów wdrożeniowych potwierdza bieżący kontrakt produkcyjny jako 1x VPS Mikrus 4.1 z Nginx/PHP/PostgreSQL/Redis na jednej maszynie, lokalnym `public/` i jednym cronem `schedule:run`. Dla tej topologii same-filesystem atomic replace jest właściwym modelem. Ewentualne przejście na wiele web node'ów ponownie otwiera wymóg wspólnej dystrybucji artifact setu; Redis lock/`onOneServer()` nie synchronizuje lokalnych plików między node'ami.
 
-Nadal niewykonane w N5-007:
-- zastosowanie aktualnego Nginx configu na produkcji i udany STRICT `workflow_dispatch` workflow `Production SEO Delivery Smoke`; report-only run z PR #117 wykazał obecnie rozbieżność Cache-Control dla `/robots.txt`,
-- potwierdzenie Cloudflare/origin HTTP evidence dla Content-Type/cache/braku Set-Cookie/ETag lub Last-Modified/conditional 304,
-- production Search Console / GSC verification.
+Pozostałe gate'y N5-007:
+- uruchomić STRICT `workflow_dispatch` workflow `Production SEO Delivery Smoke` po utrwaleniu poprawki MIME w repo,
+- GSC ma już główny sitemap submitted i pobrany bez reported warnings/errors; po publicznym rolloutcie N6-007 przejmie obserwację newsroom article/news sitemap i nie blokuje to dark-deploy static delivery.
 
 ### Robots compatibility
 
@@ -2304,7 +2305,7 @@ Search Console evidence odświeżone 2026-09-20:
 - aktualny runtime emituje stabilne WebSite/Organization `@id` oraz poprawny placeholder `/aktualnosci` z `noindex`; wcześniejsze trzy failures z report-only runu nie opisują już bieżącego deployu,
 - enterprise validator wykonał `102 checks / 0 failures / 2 warnings`; ostrzeżenia dotyczą dwuhopowego redirectu `http-www` oraz oczekiwanego braku newsroom article/news sitemap przy wyłączonym publicznym gate i pustym corpusie,
 - `NEWSROOM_PUBLIC_ENABLED=false` jest potwierdzone w aktywnym release, a produkcyjna baza ma `0` articles, `0` categories i `0` topics,
-- N5-007 STRICT static-delivery smoke nadal failuje na publicznym `/robots.txt` z Cloudflare `max-age=14400`; origin ma poprawne `max-age=3600`.
+- N5-007 STRICT static-delivery smoke po korekcie Cloudflare i typu MIME zakończył się pełnym PASS; runtime pozostaje dark-deployed, więc article/news samples są odłożone do kontrolowanego rollout'u.
 
 ### Boundary / następny krok
 
