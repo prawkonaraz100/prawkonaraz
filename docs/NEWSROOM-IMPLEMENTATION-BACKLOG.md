@@ -3032,15 +3032,13 @@ Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-008 na `main@3d7ac8ab8a3ed1c299cb0c
 
 ---
 
-# 11. Pierwszy następny task
+# 11. Następny potwierdzony obszar pracy
 
-### Repo-level przed operacyjnym deployem
+### Po repo-level hardening
 
-**NEWSROOM-N6-012 — Accessibility gate.**
+NEWSROOM-N6-012 Accessibility gate jest zamknięty po PR #152, finalnym CI #542 / Browser Smoke #112, merge `main@0f3645475a2a7c72c69cac80388891d2a9ed2a72` i post-merge CI #543.
 
-NEWSROOM-N6-011 freshness workflow jest zamknięty po PR #148 i post-merge CI #531. To ostatni repo-level brak wykryty przez audyt DoD.
-
-Po N6-012 nie ma kolejnego zaplanowanego repo-level feature/hardening tasku newsroomu; dalsza praca przechodzi do production/release evidence zgodnie z istniejącymi N5-007/N6-000/N6-003/N6-004/N6-005/N6-006/N6-007/N6-008.
+Nie ma kolejnego zaplanowanego repo-level feature/hardening tasku newsroomu. Dalsza praca przechodzi wyłącznie do istniejącego production/release evidence zgodnie z N5-007/N6-000/N6-003/N6-004/N6-005/N6-006/N6-007/N6-008; nie tworzymy nowej architektury ani nowego tasku tylko po to, żeby zastąpić production evidence.
 
 ### Równoległy production-only blocker
 
