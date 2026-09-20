@@ -4,6 +4,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { spawn } from 'node:child_process';
 import { chromium } from 'playwright';
+import { assertNewsroomAccessibility } from './newsroom-accessibility-checks.mjs';
 
 const cwd = process.cwd();
 const outputDir = path.join(cwd, 'output', 'playwright', 'newsroom-topic');
@@ -118,6 +119,11 @@ try {
         if (!canonical?.endsWith(topicPath)) {
             throw new Error(`Topic canonical failed at ${viewport.name}px: ${canonical}`);
         }
+
+        await assertNewsroomAccessibility(page, {
+            surface: 'topic',
+            viewportName: viewport.name,
+        });
 
         const cdp = await context.newCDPSession(page);
         const metrics = await cdp.send('Page.getLayoutMetrics');
