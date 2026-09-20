@@ -96,18 +96,20 @@ Stan po NEWSROOM-N6-003 — enterprise SEO production validation:
 - finalny HEAD PR #125 `8a64f81c15fb6c52e2a90db26c5c65c9ad999801`: Enterprise SEO Production Validation #2 workflow success w REPORT-ONLY mode, Scheduled Publication Smoke #12 PASS, Browser Smoke #96 PASS, CI #472 PASS,
 - merge `main@0344427cdf42804a037c688df54da6216f243ca6`: post-merge CI #473 PASS — 1139 passed / 20 219 assertions / 2 skipped, PostgreSQL PASS, frontend build PASS.
 
-Live baseline z report-only evidence nadal ma failures i dlatego nie jest release PASS:
+Live baseline nadal ma failures i dlatego nie jest release PASS. Najnowszy Enterprise SEO Production Validation #11 z 2026-09-20 zakończył wrapper workflow jako `success` wyłącznie w REPORT-ONLY mode; underlying static-delivery smoke ma exit `1`, a enterprise validator exit `1` z bilansem `102 checks / 3 failures / 2 warnings`:
 
 - robots cache nadal `max-age=14400`,
-- live homepage nie ma jeszcze stable WebSite/Organization `@id` zgodnych z aktualnym `main`,
-- live `/aktualnosci` nie spełnia ani publicznego newsroom contractu, ani repo placeholder `noindex` contractu,
+- live homepage WebSite/Organization nodes nadal nie mają stable `@id` zgodnych z aktualnym `main`; repo emituje je i ma `HomePageTest`,
+- live `/aktualnosci` nadal nie spełnia repo placeholder `noindex` contractu; repo ustawia `X-Robots-Tag: noindex, follow` i ma `NewsroomPublicGateTest`,
 - brak article/news sitemap coverage i feed pozostaje 404.
 
-GSC 2026-09-19:
+GSC odświeżone 2026-09-20:
 
-- homepage URL Inspection: `Duplicate, Google chose different canonical than user`,
-- `/aktualnosci`: `URL is unknown to Google`,
-- główny sitemap index jest submitted i ostatnio pobrany 2026-09-19 bez reported warnings/errors.
+- canonical homepage URL Inspection: `PASS / Submitted and indexed`, robots/indexing allowed, fetch successful, last crawl 2026-09-19 17:02:38Z,
+- wcześniejszy `Duplicate, Google chose different canonical than user` jest historycznym verdict, nie aktualnym stanem,
+- `/aktualnosci`: nadal `URL is unknown to Google`,
+- główny sitemap index jest submitted, ostatnio pobrany 2026-09-19, bez reported warnings/errors,
+- settled Search Analytics do 2026-09-17 ma dla `/aktualnosci` 0 clicks / 0 impressions.
 
 N6-003 pozostaje IN PROGRESS do aktualnego production deploy/runtime, zielonego STRICT workflow i reprezentatywnych article/category/topic samples.
 
@@ -1677,6 +1679,13 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-20 — v0.54
+
+- potwierdzono, że trzy najnowsze live failures N6-003 są deployment/runtime drift, a nie brak w repo: current `main` ma stable WebSite/Organization `@id`, placeholder `X-Robots-Tag: noindex, follow` i Nginx `public, max-age=3600`, wszystkie objęte regression coverage,
+- Enterprise SEO Production Validation #11 ma GitHub conclusion `success` tylko jako REPORT-ONLY wrapper; static smoke i enterprise validator oba mają exit `1`, enterprise `102 checks / 3 failures / 2 warnings`,
+- GSC 2026-09-20: canonical homepage ma `PASS / Submitted and indexed` po crawl 2026-09-19 17:02:38Z; wcześniejszy canonical-mismatch verdict przestał być aktualny, natomiast `/aktualnosci` nadal jest unknown to Google,
+- N5-007/N6-003 pozostają otwarte do live deploy/runtime, zielonego STRICT evidence i representative article/category/topic verification.
 
 ### 2026-09-20 — v0.53
 
