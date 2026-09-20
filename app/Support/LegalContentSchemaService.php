@@ -247,9 +247,6 @@ class LegalContentSchemaService
                     'description' => $this->legalContentDescription($page),
                     'item' => [
                         '@id' => $this->schemaIds->legalContentPageEntity($page),
-                        '@type' => 'Article',
-                        'name' => $page->title,
-                        'url' => route('public.regulations.show', $page->slug),
                     ],
                 ], fn (mixed $value): bool => $value !== null && $value !== ''))
                 ->all(),

@@ -565,6 +565,17 @@ test('public regulations hub and methodology render enterprise schema graph', fu
         ->and($articleList)->toBeArray()
         ->and($articleList['numberOfItems'] ?? null)->toBe(33);
 
+    $articleItemReferences = collect($articleList['itemListElement'] ?? [])
+        ->pluck('item');
+
+    expect($articleItemReferences)->toHaveCount(33);
+
+    $articleItemReferences->each(function (mixed $item): void {
+        expect($item)->toBeArray()
+            ->and(array_keys($item))->toBe(['@id'])
+            ->and($item['@id'] ?? null)->toBeString()->not->toBeEmpty();
+    });
+
     $methodologyResponse = $this->get(route('public.regulations.methodology'));
     $methodologyGraph = legalContentJsonLdGraph($methodologyResponse);
 
