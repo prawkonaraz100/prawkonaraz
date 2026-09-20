@@ -1992,7 +1992,7 @@ Nie implementować tego jako zwykłego `ShouldQueue`, dopóki produkcja ma `QUEU
 
 ### Potwierdzony stan implementacji po PR #109, #112, #115, #117, #119 i #127
 
-NEWSROOM-N5-007 pozostaje **IN PROGRESS**.
+NEWSROOM-N5-007 jest **DONE — repo contract, live Nginx/Cloudflare delivery, scheduler oraz STRICT GitHub Actions smoke potwierdzone 2026-09-20**.
 
 ### Live production evidence — 2026-09-20
 
@@ -2035,9 +2035,9 @@ Deployment-guard PR #127 miał finalny head `e84758d911ffc4f6ff10a04f88a2b8c48be
 
 Topology evidence z aktualnych dokumentów wdrożeniowych potwierdza bieżący kontrakt produkcyjny jako 1x VPS Mikrus 4.1 z Nginx/PHP/PostgreSQL/Redis na jednej maszynie, lokalnym `public/` i jednym cronem `schedule:run`. Dla tej topologii same-filesystem atomic replace jest właściwym modelem. Ewentualne przejście na wiele web node'ów ponownie otwiera wymóg wspólnej dystrybucji artifact setu; Redis lock/`onOneServer()` nie synchronizuje lokalnych plików między node'ami.
 
-Pozostałe gate'y N5-007:
-- uruchomić STRICT `workflow_dispatch` workflow `Production SEO Delivery Smoke` po utrwaleniu poprawki MIME w repo,
-- GSC ma już główny sitemap submitted i pobrany bez reported warnings/errors; po publicznym rolloutcie N6-007 przejmie obserwację newsroom article/news sitemap i nie blokuje to dark-deploy static delivery.
+Zamknięcie produkcyjne N5-007:
+- STRICT `workflow_dispatch` `Production SEO Delivery Smoke #7` na `main@55cdb0be8060611cd87fbf1fc6224d5b9d26c09f` zakończył się `Success` w 12 s: `https://github.com/prawkonaraz100/prawkonaraz/actions/runs/35531241469`,
+- GSC ma główny sitemap submitted i pobrany bez reported warnings/errors; po publicznym rolloutcie N6-007 przejmie obserwację newsroom article/news sitemap i nie blokuje to zamkniętego dark-deploy static delivery.
 
 ### Robots compatibility
 
@@ -2819,7 +2819,7 @@ Docs-only:
 - [x] dirty/version scheduled refresh bez queue-worker assumption — potwierdzone w NEWSROOM-N5-007 PR #112: version/clean-version, shared lock, every-minute scheduler, `onOneServer()` + `withoutOverlapping()`, daily recovery
 - [x] child-before-index atomic static publication — potwierdzone w NEWSROOM-N5-007 PR #109; dirty/version refresh i production delivery smoke pozostają osobnymi otwartymi gate'ami
 - [x] istniejący `SeoSitemapAuditor` rozszerzony o newsroom/news namespace/tag/date/window/eligibility/topology/shard/obsolete-file checks w NEWSROOM-N5-006; generic protocol-limit guards nadal są reużywane
-- [ ] rzeczywisty static/Nginx/CDN delivery smoke (Content-Type/cache/Set-Cookie/validators) — tooling/Nginx contract są w PR #115, workflow w PR #117; report-only produkcja wykazała Cache-Control mismatch, więc brak nadal STRICT production PASS
+- [x] rzeczywisty static/Nginx/CDN delivery smoke (Content-Type/cache/Set-Cookie/validators) — Cloudflare respektuje origin headers, sitemap ma `application/xml`, a STRICT Production SEO Delivery Smoke #7 zakończył się PASS 2026-09-20
 - [x] Atom feed + discovery + generation cache/validator contract (NEWSROOM-N5-003)
 - [x] author ProfilePage / publisher / WebSite
 
