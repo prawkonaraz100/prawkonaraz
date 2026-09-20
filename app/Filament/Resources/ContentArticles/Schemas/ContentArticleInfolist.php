@@ -70,15 +70,42 @@ class ContentArticleInfolist
                                 ->label('Zaplanowano')
                                 ->dateTime('d.m.Y H:i')
                                 ->placeholder('-'),
-                            TextEntry::make('freshness_review_due_at')
-                                ->label('Freshness review')
-                                ->dateTime('d.m.Y H:i')
-                                ->placeholder('-'),
                             TextEntry::make('updated_at')
                                 ->label('Aktualizacja')
                                 ->dateTime('d.m.Y H:i'),
                         ]),
                 ]),
+                Section::make('Freshness')
+                    ->description('Backoffice status ponownej weryfikacji. Overdue nie zmienia automatycznie workflow ani dystrybucji.')
+                    ->schema([
+                        TextEntry::make('freshness_status_display')
+                            ->label('Status freshness')
+                            ->state(fn ($record): string => $record?->freshnessStatus() ?? 'not_scheduled')
+                            ->formatStateUsing(fn (mixed $state): string => static::freshnessStatusLabel($state))
+                            ->badge()
+                            ->color(fn (mixed $state): string => static::freshnessStatusColor($state)),
+                        TextEntry::make('source_checked_at')
+                            ->label('Źródła sprawdzone')
+                            ->dateTime('d.m.Y H:i')
+                            ->placeholder('-'),
+                        TextEntry::make('freshness_review_due_at')
+                            ->label('Review freshness do')
+                            ->dateTime('d.m.Y H:i')
+                            ->placeholder('-'),
+                        TextEntry::make('reviewed_at')
+                            ->label('Ostatnie review')
+                            ->dateTime('d.m.Y H:i')
+                            ->placeholder('-'),
+                        TextEntry::make('last_substantive_update_at')
+                            ->label('Ostatnia istotna aktualizacja')
+                            ->dateTime('d.m.Y H:i')
+                            ->placeholder('-'),
+                        TextEntry::make('public_state_changed_at')
+                            ->label('Ostatnia zmiana public state')
+                            ->dateTime('d.m.Y H:i')
+                            ->placeholder('-'),
+                    ])
+                    ->columns(2),
                 Section::make('Pochodzenie i kontekst')
                     ->schema([
                         TextEntry::make('origin_type')
@@ -213,6 +240,24 @@ class ContentArticleInfolist
             'analysis' => 'Analiza',
             'report' => 'Raport',
             default => $value,
+        };
+    }
+
+    protected static function freshnessStatusLabel(mixed $state): string
+    {
+        return match ((string) $state) {
+            'fresh' => 'Fresh',
+            'overdue' => 'Overdue',
+            default => 'Not scheduled',
+        };
+    }
+
+    protected static function freshnessStatusColor(mixed $state): string
+    {
+        return match ((string) $state) {
+            'fresh' => 'success',
+            'overdue' => 'danger',
+            default => 'gray',
         };
     }
 
