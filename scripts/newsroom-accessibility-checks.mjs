@@ -13,17 +13,21 @@ export async function assertNewsroomAccessibility(page, { surface, viewportName 
                 && rect.height > 0;
         };
 
-        const accessibleName = (node) => {
+        const authorProvidedName = (node) => {
             const ariaLabel = (node.getAttribute('aria-label') ?? '').trim();
             if (ariaLabel) return ariaLabel;
 
-            const labelledBy = (node.getAttribute('aria-labelledby') ?? '')
+            return (node.getAttribute('aria-labelledby') ?? '')
                 .split(/\s+/)
                 .filter(Boolean)
                 .map((id) => document.getElementById(id)?.textContent?.trim() ?? '')
                 .filter(Boolean)
                 .join(' ');
-            if (labelledBy) return labelledBy;
+        };
+
+        const accessibleName = (node) => {
+            const authorName = authorProvidedName(node);
+            if (authorName) return authorName;
 
             if ('labels' in node) {
                 const labelText = Array.from(node.labels ?? [])
@@ -61,12 +65,12 @@ export async function assertNewsroomAccessibility(page, { surface, viewportName 
             footerCount: document.querySelectorAll('footer').length,
             navigationProblems: Array.from(document.querySelectorAll('nav'))
                 .filter(isVisible)
-                .filter((node) => !accessibleName(node))
+                .filter((node) => !authorProvidedName(node))
                 .map((node) => node.outerHTML.slice(0, 220)),
             complementaryProblems: visibleAsides.length <= 1
                 ? []
                 : visibleAsides
-                    .filter((node) => !accessibleName(node))
+                    .filter((node) => !authorProvidedName(node))
                     .map((node) => node.outerHTML.slice(0, 220)),
             headings: visibleHeadings,
             imagesMissingAlt: Array.from(document.querySelectorAll('img:not([alt])'))
