@@ -2263,28 +2263,28 @@ PR #127 domknął osobny repo-level deployment-drift guard bez zmiany architektu
 - deployment-guard PR #127 finalny HEAD `e84758d911ffc4f6ff10a04f88a2b8c48beb22c6`: CI #477 PASS — 1140 passed / 20 229 assertions / 2 skipped, `newsroom-postgres` PASS, Pint 1102 files PASS, frontend build PASS,
 - merge PR #127: `main@b26317bd979dd0c372b7a9341a8358f2599a9550`; post-merge CI #478 również pełny PASS.
 - canonical-host validator PR #129 finalny HEAD `379f673e681c504322dbcabe370de110ce03dcc5`: Enterprise SEO Production Validation #3 workflow success w REPORT-ONLY mode oraz exact-head CI #481 PASS — 1140 passed / 20 229 assertions / 2 skipped, `newsroom-postgres` PASS, Pint 1102 files PASS, frontend build PASS,
-- merge PR #129: `main@8ea54ba1a8b1ca5349a468353e519fa7262a16d4`; post-merge CI #482 również pełny PASS — 1140 passed / 20 229 assertions / 2 skipped, `newsroom-postgres` PASS, Pint 1102 files PASS, frontend build PASS.
+- merge PR #129: `main@8ea54ba1a8b1ca5349a468353e519fa7262a16d4`; post-merge CI #482 również pełny PASS — 1140 passed / 20 229 assertions / 2 skipped, `newsroom-postgres` PASS, Pint 1102 files PASS, frontend build PASS,
+- najnowszy Enterprise SEO Production Validation #11 z 2026-09-20 ma GitHub workflow conclusion `success` wyłącznie dlatego, że PR mode działa jako REPORT-ONLY; underlying static-delivery smoke zakończył się exit `1`, enterprise validator również exit `1` (`102 checks / 3 failures / 2 warnings`), więc nie jest to production PASS.
 
 ### Potwierdzony live-production baseline
 
-REPORT-ONLY run nie jest production PASS. Wykrył rzeczywiste rozbieżności:
+REPORT-ONLY workflow success nie jest production PASS. Najnowszy run #11 z 2026-09-20 ponownie wykazał rzeczywiste rozbieżności: static-delivery smoke exit `1`, enterprise validator exit `1` (`102 checks / 3 failures / 2 warnings`).
 
 - `/robots.txt` nadal zwraca `Cache-Control: max-age=14400` zamiast repo contract `public, max-age=3600`,
-- live homepage zwraca self-canonical i crawlable Organization logo >=112x112, ale aktualna odpowiedź nie zawiera jeszcze stabilnych `WebSite @id=https://prawkonaraz.pl/#website` i `Organization @id=https://prawkonaraz.pl/#organization`, które emituje aktualny kod `main`,
-- live `/aktualnosci` zwraca 200 jako cienka indexable surface bez canonical/H1/meta/structured data i bez wymaganego przez aktualny gate `X-Robots-Tag: noindex, follow`,
+- live homepage ma WebSite i Organization nodes, ale bez stabilnych `@id=https://prawkonaraz.pl/#website` i `@id=https://prawkonaraz.pl/#organization`; aktualny `main` emituje oba ID i `HomePageTest` chroni ten contract,
+- live `/aktualnosci` nadal nie ma repo placeholder `noindex`; aktualny `NewsroomPlaceholderController` ustawia `X-Robots-Tag: noindex, follow`, a `NewsroomPublicGateTest` chroni ten contract,
 - production sitemap index ma poprawne sprawdzone child XML responses bez `Set-Cookie`, ale nie zawiera jeszcze newsroom article/news sitemap coverage,
 - `/aktualnosci/feed.xml` pozostaje rollout-gated 404.
 
-Search Console evidence z 2026-09-19:
+Search Console evidence odświeżone 2026-09-20:
 
 - property: `sc-domain:prawkonaraz.pl`,
 - główny `https://prawkonaraz.pl/sitemap.xml` jest submitted, ostatnio pobrany 2026-09-19, bez reported warnings/errors,
-- URL Inspection dla homepage: `Duplicate, Google chose different canonical than user`, robots allowed, indexing allowed, last crawl 2026-08-27,
-- URL Inspection dla `/aktualnosci`: `URL is unknown to Google`,
-- brak jeszcze Search Analytics rows dla `/aktualnosci` w settled window kończącym się 2026-09-16.
-- dodatkowy URL Inspection 2026-09-19: `http://prawkonaraz.pl/` = `Page with redirect`; `https://www.prawkonaraz.pl/` i `http://www.prawkonaraz.pl/` = `URL is unknown to Google`; homepage nadal wskazuje `https://prawkoapp.pl/` jako referring URL,
-- Enterprise SEO Production Validation #3 potwierdził live HTTP migration: `http://prawkonaraz.pl/`, `https://www.prawkonaraz.pl/` i `https://prawkoapp.pl/` kończą na canonical homepage w jednym redirect hop; `http://www.prawkonaraz.pl/` kończy poprawnie, ale ma dwa redirect hops (warning),
-- ten wynik zawęża diagnozę: aktualny Google-selected canonical mismatch homepage nie jest potwierdzony jako aktywna awaria host-migration; przyczyna pozostaje nierozstrzygnięta do ponownego crawl/deploy i dalszego GSC evidence.
+- homepage URL Inspection ma teraz `PASS / Submitted and indexed`, robots allowed, indexing allowed, page fetch successful; ostatni crawl: 2026-09-19 17:02:38Z,
+- wcześniejszy stan `Duplicate, Google chose different canonical than user` pozostaje historycznym evidence z poprzedniej inspekcji i nie jest już aktualnym verdict,
+- `/aktualnosci` nadal ma `URL is unknown to Google`,
+- settled Search Analytics do 2026-09-17 ma dla `/aktualnosci` 0 clicks / 0 impressions; homepage ma w tym 28-dniowym oknie 2 clicks / 2 impressions,
+- aktualna inspekcja homepage nadal zwraca referring URLs `https://prawkoapp.pl/` i `http://prawkonaraz.pl/`; samo ich występowanie nie jest obecnie dowodem canonical failure, ponieważ canonical HTTPS homepage ma verdict PASS.
 
 ### Boundary / następny krok
 
@@ -2663,7 +2663,7 @@ Domknąć istniejący accessibility contract z public UI/test runbooku dla publi
 - finalny PR HEAD `14c3e9a1840e9d593e28533f36ccb8003aa9d686` zawiera dodatkowe uszczelnienie checkera: nazwy `nav` i wielokrotnych `aside` muszą pochodzić z author-provided `aria-label` / `aria-labelledby`, a nie z samego `textContent`,
 - exact-head CI #542 na tym SHA ma pełny PASS: `newsroom-postgres`, backend suite, Pint i frontend build,
 - Browser Smoke #112 ma PASS dla siedmiu dedykowanych newsroom jobów: article, home, category, topic, guides, semantic-links i golden-path; genericzny manual-only `browser-smoke` był prawidłowo skipped,
-- Newsroom Enterprise SEO Production Validation #11 ma PASS,
+- Newsroom Enterprise SEO Production Validation #11 ma workflow conclusion PASS w REPORT-ONLY mode; underlying production validation nadal ma failures i nie jest production PASS,
 - PR #152 zmergowano jako `main@0f3645475a2a7c72c69cac80388891d2a9ed2a72`,
 - post-merge CI #543 na tym exact `main` powtórzył pełny PASS: `newsroom-postgres`, backend suite, Pint i frontend build,
 - NEWSROOM-N6-012 jest DONE na poziomie repo-level accessibility gate; zachowujemy rozróżnienie między tym regression evidence a formalną zewnętrzną certyfikacją całego serwisu WCAG 2.2 AA.
@@ -3047,6 +3047,13 @@ NEWSROOM-N5-007 pozostaje **IN PROGRESS** i wymaga zastosowania aktualnego Nginx
 ---
 
 # 12. Historia zmian
+
+### 2026-09-20 — v0.73
+
+- odświeżono production evidence N5-007/N6-003 bez zmian kodu ani architektury: current `main` już zawiera WebSite/Organization `@id`, placeholder `X-Robots-Tag: noindex, follow` oraz Nginx `public, max-age=3600` contract wraz z regression tests,
+- Enterprise SEO Production Validation #11 ma wrapper conclusion `success` tylko w REPORT-ONLY mode; underlying static smoke i enterprise validator oba zakończyły się exit `1`, z bilansem enterprise `102 checks / 3 failures / 2 warnings`,
+- GSC 2026-09-20 zmienił homepage z wcześniejszego canonical-mismatch verdict na `PASS / Submitted and indexed` po crawl 2026-09-19 17:02:38Z; `/aktualnosci` pozostaje `URL is unknown to Google`,
+- N5-007/N6-003 pozostają IN PROGRESS: live runtime nadal nie odpowiada repo contract dla robots cache, schema IDs i placeholder noindex, a zielony STRICT run oraz representative live newsroom samples nadal nie istnieją.
 
 ### 2026-09-20 — v0.72
 
