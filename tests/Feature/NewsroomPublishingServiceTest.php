@@ -463,6 +463,32 @@ test('correction requires a completed fresh review before changing public conten
             ->exists())->toBeFalse();
 });
 
+test('correction rejects a review older than the latest needs-review transition', function () {
+    Carbon::setTestNow('2026-09-16 19:05:00');
+
+    $article = ContentArticle::factory()->needsReview()->create([
+        'title' => 'Tytuł wymagający świeżego review',
+        'reviewed_at' => Carbon::parse('2026-09-16 18:00:00'),
+        'needs_review_at' => Carbon::parse('2026-09-16 18:30:00'),
+    ]);
+    ContentArticleSource::factory()->for($article, 'article')->create();
+    $loadedToken = app(ContentArticleEditToken::class)->make($article->fresh());
+
+    expect(fn () => newsroomPublishingService()->applyCorrection(
+        $article,
+        newsroomPublicUpdatePayload($article, ['title' => 'Zmiana po starym review']),
+        $loadedToken,
+        'Istotna korekta po nieaktualnym review.',
+    ))->toThrow(DomainException::class, 'fresh review');
+
+    expect($article->fresh()->title)->toBe('Tytuł wymagający świeżego review')
+        ->and($article->fresh()->correction_note)->toBeNull()
+        ->and(AuditLog::query()
+            ->where('action', 'content_article.corrected')
+            ->where('entity_id', (string) $article->id)
+            ->exists())->toBeFalse();
+});
+
 test('correction rejects stale editor state before writing the correction note', function () {
     Carbon::setTestNow('2026-09-16 19:10:00');
 
