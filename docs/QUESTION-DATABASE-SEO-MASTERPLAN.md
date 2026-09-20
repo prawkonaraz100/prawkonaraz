@@ -806,25 +806,34 @@ Definition of Done: **PASS na poziomie repo**.
 
 ### SEO-INDEX-002 — Structured data huba `/przepisy`
 
-Status: **TODO / CONFIRMED BUG**
+Status: **DONE / REPO-LEVEL**
 
-Potwierdzony stan:
-- `LegalContentSchemaService::legalContentItemListSchema()` deklaruje zagniezdzone `@type: Article` z samym `@id/name/url`,
-- live audit raportuje dla tych encji powtarzalne braki `headline`, `image` i `datePublished`,
-- detail pages maja osobny pelny Article contract; hub nie powinien tworzyc pol-Article tylko po to, aby nazwac element listy.
+Zrealizowany zakres:
+- `LegalContentSchemaService::legalContentItemListSchema()` nie deklaruje juz zagniezdzonych, niepelnych `Article` z samym `@id/name/url`,
+- kazdy `ListItem.item` na hubie `/przepisy` zawiera teraz tylko stabilna referencje `{ "@id": ... }` do Article nalezacego do strony detail,
+- `CollectionPage`, `ItemList`, `ListItem`, nazwy, opisy i URL-e listy pozostaly bez zmian,
+- detail page nadal jest jedynym miejscem, ktore deklaruje pelny `Article` z `headline`, datami, publisherem, autorem i innymi potwierdzonymi polami,
+- nie dodano sztucznych `headline`, `image` ani `datePublished` na hubie.
 
-Preferowany minimalny kierunek:
-- w `ItemList` zostawic lekka referencje `item: { "@id": ... }`,
-- nie dopisywac sztucznych `headline/image/datePublished`,
-- zachowac poprawne `CollectionPage` i `ItemList`,
-- rozszerzyc istniejacy `LegalTrustLayerMvpTest` o twardy regression dla item nodes.
+Regression evidence:
+- istniejacy `tests/Feature/Public/LegalTrustLayerMvpTest.php` zostal rozszerzony,
+- test potwierdza 33 elementy listy oraz wymaga, aby kazde `item` mial dokladnie jeden klucz: `@id`,
+- test detail page nadal potwierdza pelny `Article` pod tym samym stabilnym ID.
 
-Definition of Done:
-- brak niepelnych Article nodes na hubie,
-- CollectionPage/ItemList pozostaja spojne,
-- test structured-data regression PASS,
-- live audit po deployu nie zglasza tego samego bledu,
-- pelny Quality Gate PASS.
+Potwierdzony finalny stan:
+- implementation PR #158,
+- implementation head `71ed905dbaf382a67a65ea3ede662c3cf3a3ea8d`,
+- exact-head CI #554: `quality` PASS i `newsroom-postgres` PASS, w tym backend suite, Pint/code style i frontend build,
+- merge `main@9c879a99734f81d7083032b6981dc6ef018c56a1`,
+- post-merge CI #555: `quality` PASS i `newsroom-postgres` PASS.
+
+Granica potwierdzenia:
+- task jest DONE na poziomie repo,
+- production validator uruchomiony przy PR #158 byl w trybie report-only i jego wrapper success nie oznacza live PASS: `static_delivery_exit=1`, `enterprise_seo_exit=1`, 102 checks / 3 failures / 2 warnings,
+- te live problemy dotycza osobnego production/runtime evidence i nie sa dowodem regresji tego taska przed deployem,
+- live verification poprawionej struktury `/przepisy` pozostaje w `SEO-INDEX-004`; GSC evidence pozostaje w `SEO-INDEX-005`.
+
+Definition of Done: **PASS na poziomie repo**.
 
 ### SEO-INDEX-003 — SEO-critical raw HTML dla `/najtrudniejsze-pytania-na-prawo-jazdy`
 
