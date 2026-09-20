@@ -2651,7 +2651,7 @@ Docs-only:
 ### Operations
 
 - [ ] NEWSROOM_PUBLIC_ENABLED controlled rollout/rollback gate
-- [ ] publisher transparency/contact/editorial principles gate
+- [x] publisher transparency/contact/editorial principles gate
 - [ ] scheduler monitored
 - [ ] audit
 - [ ] correction flow
@@ -2897,6 +2897,11 @@ Następnym wykonywalnym podkrokiem pozostaje **zastosowanie aktualnego Nginx con
 ---
 
 # 12. Historia zmian
+
+### 2026-09-20 — v0.64
+
+- zsynchronizowano globalny Definition of Done z potwierdzonym stanem NEWSROOM-N6-009: publisher transparency/contact/editorial principles gate jest zamknięty po PR #140, docs-sync PR #141 i post-merge CI #513 na exact `main@763bd868d8a1a9c8c9b0bc0eed78f1d17c6ae35b`,
+- nie zmieniono zakresu funkcjonalnego, architektury ani statusu pozostałych gate'ów produkcyjnych.
 
 ### 2026-09-20 — v0.63
 
