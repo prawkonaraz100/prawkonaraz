@@ -782,6 +782,21 @@ Dla istotnej korekty publicznego artykułu action `Apply correction`:
 
 Drobna korekta bez wpływu na sens może użyć `Apply public update` bez public correction note, ale nadal ma audit.
 
+### Stan implementacji po NEWSROOM-N6-010
+
+Po PR #146 dedykowany correction flow jest zmaterializowany w istniejącym `EditContentArticle` i `ContentArticlePublishingService`:
+
+- `Apply correction` otwiera ten sam public-update editor boundary, ale końcowa akcja wymaga niepustej publicznej `correction_note`,
+- service reużywa ten sam row-lock, deterministic edit-token, article/source/relation sync i publication validation co `Apply public update`; nie istnieje drugi low-level public Save,
+- correction path wywołuje istniejący `ContentArticlePublicationChecklist::assertFreshReview()`; brak review oraz review starsze od ostatniego `needs_review_at` są odrzucane przed publiczną mutacją,
+- treść i `correction_note` są zapisywane w jednej transakcji; późniejszy validation failure lub stale token wycofuje cały zapis,
+- semantyczna korekta ustawia `last_substantive_update_at`,
+- AuditLog używa `content_article.corrected`, zapisuje `User` actor i allowlisted metadata bez publicznej noty korekty, body, lead ani editorial/private notes,
+- publiczny renderer correction note nie został przebudowany; korzysta z istniejącego `ContentArticle.correction_note`,
+- V1 nadal nie ma revision/snapshot systemu ani technicznego dowodu „four eyes” jako dwóch różnych zalogowanych osób; zachowana pozostaje istniejąca identity policy `User` actor vs `ContentAuthor` author/reviewer.
+
+Evidence: implementation HEAD `9abb721a69bfb9a8d9a50c5e881166ad189d68a6`, CI #522 PASS (1149 / 20 300 / 2 skipped, PostgreSQL/Pint/frontend PASS), Scheduled Publication Smoke #13 PASS, merge PR #146 `main@c58feafe6cffbb8bf54bbfcd0b3f1d4587fee97d`, post-merge CI #523 pełny PASS.
+
 ---
 
 ## 29. Freshness section

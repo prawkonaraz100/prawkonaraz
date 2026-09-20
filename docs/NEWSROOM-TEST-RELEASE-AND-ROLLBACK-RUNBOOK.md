@@ -403,6 +403,16 @@ Given publiclyVisible article:
 - scheduled republish publicznego 200 jest rejected,
 - audit nie przechowuje pełnego body.
 
+Stan po NEWSROOM-N6-010:
+
+- `NewsroomPublishingServiceTest` pokrywa successful correction, brak correction note, brak review, stale review względem `needs_review_at`, stale editor token oraz rollback content/source/note po późniejszym validation failure,
+- `ContentArticleResourceTest` pokrywa rzeczywisty Filament correction mode oraz zapis actor/audit,
+- istniejący `NewsroomPublicArticlePageTest` nadal pokrywa publiczny rendering `correction_note`; N6-010 nie zmieniał publicznego renderera,
+- finalny implementation HEAD `9abb721a69bfb9a8d9a50c5e881166ad189d68a6`: CI #522 PASS — 1149 passed / 20 300 assertions / 2 skipped, PostgreSQL PASS, Pint 1103 files PASS, frontend build PASS,
+- Scheduled Publication Smoke #13 PASS,
+- Browser Smoke nie był automatycznie uruchamiany, ponieważ workflow path contract obejmuje publiczne renderery/read modele, a N6-010 zmienia wyłącznie Filament/service + feature regressions; nie zapisujemy nieuruchomionego Browser Smoke jako PASS,
+- merge PR #146: `main@c58feafe6cffbb8bf54bbfcd0b3f1d4587fee97d`; post-merge CI #523 pełny PASS z tym samym bilansem backend/Pint/frontend/PostgreSQL.
+
 ---
 
 ## 12. Preview security tests
