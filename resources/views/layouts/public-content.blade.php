@@ -149,6 +149,39 @@
                 padding-bottom: 2rem;
             }
 
+            .public-skip-link {
+                position: fixed;
+                z-index: 1000;
+                top: 12px;
+                left: 12px;
+                padding: 10px 14px;
+                border-radius: 6px;
+                background: #ffffff;
+                color: #0f172a;
+                font-size: 14px;
+                font-weight: 700;
+                text-decoration: none;
+                box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
+                transform: translateY(-180%);
+                transition: transform 120ms ease;
+            }
+
+            .public-skip-link:focus-visible {
+                outline: 3px solid #0a66c2;
+                outline-offset: 3px;
+                transform: translateY(0);
+            }
+
+            #main-content:focus {
+                outline: none;
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                .public-skip-link {
+                    transition: none;
+                }
+            }
+
             @media (min-width: 768px) {
                 .content-hero-section {
                     padding-top: 2.75rem;
@@ -183,13 +216,21 @@
         @endforeach
     </head>
     <body class="flex min-h-screen flex-col bg-white text-slate-950">
+        <a
+            href="#main-content"
+            class="public-skip-link"
+            data-public-skip-link
+        >
+            Przejdź do treści
+        </a>
+
         @hasSection('site_header')
             @yield('site_header')
         @else
             <x-site.home-header :immediate="true" />
         @endif
 
-        <main class="flex-1">
+        <main id="main-content" tabindex="-1" class="flex-1">
             @if ($breadcrumbs !== [])
                 @php
                     $breadcrumbBandClass = trim($__env->yieldContent('breadcrumb_band_class')) ?: 'content-band';
