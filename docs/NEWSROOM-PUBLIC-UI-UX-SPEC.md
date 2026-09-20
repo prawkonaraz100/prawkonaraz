@@ -967,7 +967,15 @@ PR #152 materializuje repo-level gate bez zmiany design systemu ani architektury
 - manual screenshot review wykonano dla 390 i 1024 px; focus menu jest widoczny, a reprezentatywne pary kontrastu mają: 17.85:1, 4.76:1, 8.63:1, 10.86:1 i 4.55:1,
 - exact-head implementation CI #538 na `23eea2eec14fc5396ce40bd1831112cf47572450` ma pełny PASS: 1151 / 20 326 / 2 skipped, PostgreSQL PASS, Pint 1103 files PASS, frontend PASS.
 
-To jest pre-merge evidence. Pełny status DONE wymaga jeszcze finalnego docs-sync CI, merge i post-merge CI; nie utożsamiamy Browser Smoke ani reprezentatywnego contrast review z formalną zewnętrzną certyfikacją WCAG.
+To jest historyczny pre-merge evidence snapshot. Na tym etapie pełny status DONE wymagał jeszcze finalnego docs-sync CI, merge i post-merge CI; nie utożsamiamy Browser Smoke ani reprezentatywnego contrast review z formalną zewnętrzną certyfikacją WCAG.
+
+### Finalny stan NEWSROOM-N6-012
+
+- finalny PR HEAD `14c3e9a1840e9d593e28533f36ccb8003aa9d686` wymaga dla `nav` i wielokrotnych `aside` author-provided `aria-label` / `aria-labelledby`, dzięki czemu zwykły tekst landmarku nie maskuje braku dostępnej nazwy,
+- CI #542 ma pełny PASS; Browser Smoke #112 ma PASS dla article/home/category/topic/guides/semantic-links/golden-path, a Enterprise SEO Production Validation #11 również ma PASS,
+- PR #152 zmergowano jako `main@0f3645475a2a7c72c69cac80388891d2a9ed2a72`,
+- post-merge CI #543 ma pełny PASS dla `newsroom-postgres`, backend suite, Pint i frontend build,
+- NEWSROOM-N6-012 jest DONE jako repo-level accessibility regression gate; WCAG 2.2 AA pozostaje targetem i nie jest tu deklarowane jako zewnętrzna certyfikacja całego serwisu.
 
 ---
 
@@ -1382,7 +1390,7 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 - [x] zbudować category page w NEWSROOM-N4-003,
 - [x] zbudować article page,
 - [x] dodać responsive Browser QA dla article detail na wymaganej macierzy N3-004,
-- [ ] domknąć pełny accessibility QA newsroomu — PR #152 ma CI #538 + Browser Smoke #108 + manual focus/contrast evidence PASS; merge/post-merge evidence jeszcze nie istnieje,
+- [x] domknąć repo-level accessibility QA newsroomu — NEWSROOM-N6-012 DONE po CI #542 + Browser Smoke #112 + manual focus/contrast evidence, merge `main@0f3645475a2a7c72c69cac80388891d2a9ed2a72` i post-merge CI #543 PASS,
 - [x] dodać dedykowany browser snapshot/E2E dla article detail,
 - [x] zbudować NEWSROOM-N3-005 Product Bridge dla questions/legal/signs/contextual CTA,
 - [x] zbudować NEWSROOM-N3-006 historical redirect resolver HTTP,
@@ -1401,6 +1409,13 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 ---
 
 ## 69. Historia zmian
+
+### 2026-09-20 — v0.27
+
+- NEWSROOM-N6-012 domknięto na finalnym PR HEAD `14c3e9a1840e9d593e28533f36ccb8003aa9d686` z author-provided landmark-name checks,
+- CI #542, Browser Smoke #112 i Enterprise SEO Production Validation #11 mają PASS,
+- PR #152 zmergowano jako `main@0f3645475a2a7c72c69cac80388891d2a9ed2a72`, a post-merge CI #543 powtórzył pełny PASS,
+- repo-level accessibility QA jest zamknięty; dokument nadal nie deklaruje formalnej zewnętrznej certyfikacji całego serwisu WCAG 2.2 AA.
 
 ### 2026-09-20 — v0.26
 
