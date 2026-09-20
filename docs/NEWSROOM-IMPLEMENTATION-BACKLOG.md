@@ -1994,6 +1994,15 @@ Nie implementować tego jako zwykłego `ShouldQueue`, dopóki produkcja ma `QUEU
 
 NEWSROOM-N5-007 pozostaje **IN PROGRESS**.
 
+### Live production evidence — 2026-09-20
+
+- aplikacja została wdrożona jako release `/var/www/prawkobit/releases/20260920150051-newsroom-dod-d0a336c` z markerem `d0a336c18bd3815dc0e8fded1331f8493ea1ad88`; późniejsze `main@55cdb0be8060611cd87fbf1fc6224d5b9d26c09f` zmienia wyłącznie dokumentację SEO i nie wymaga redeployu runtime,
+- aktywny vhost Nginx ma zastosowany repo contract dla `/robots.txt`, `/sitemap.xml` i `/sitemaps/*`; `nginx -t` oraz reload zakończyły się powodzeniem,
+- origin `127.0.0.1` z `Host: prawkonaraz.pl` zwraca dla `/robots.txt` `200`, `text/plain`, `Cache-Control: public, max-age=3600`, `ETag` i brak `Set-Cookie`,
+- publiczny `/sitemap.xml` zwraca `200`, `text/xml`, `Cache-Control: public, max-age=3600`, `ETag` i brak `Set-Cookie`,
+- publiczny `/robots.txt` nadal jest nadpisywany przez warstwę Cloudflare do `Cache-Control: public, max-age=14400`; świeży STRICT smoke kończy się kodem `1` wyłącznie na tej rozbieżności,
+- produkcyjny scheduler wykonuje co minutę `newsroom:publish-due` oraz `newsroom:refresh-seo-artifacts-if-dirty`; log z 2026-09-20 17:25–17:27 CEST potwierdza kolejne wykonania `DONE` bez bieżących błędów.
+
 Potwierdzone podkroki:
 - PR #109: `SeoSitemapGenerator::generate()` buduje cały replacement set i waliduje protocol limits oraz XML przed modyfikacją opublikowanych plików,
 - child XML są zapisywane atomowo przed głównym `sitemap.xml`,
@@ -2079,9 +2088,13 @@ Feed może mieć validators aplikacyjne osobno.
 
 ## NEWSROOM-N6-000 — Repository merge-gate enforcement
 
+### Status
+
+**DONE — operational repository settings verified 2026-09-20.**
+
 ### Potwierdzony stan
 
-GitHub branch `main` jest obecnie niechroniony i nie ma required status checks. G0–G6 są więc proceduralne, dopóki repo rules tego nie egzekwują.
+GitHub branch `main` ma aktywną ochronę gałęzi. Normalna praca wymaga pull requestu, strict required status checks obejmują `quality` i `newsroom-postgres`, wymagane jest rozwiązanie rozmów, a force push i usuwanie gałęzi są wyłączone. Review count pozostaje `0`, a ochrona nie jest wymuszana na administratorach; jest to świadoma minimalna konfiguracja operacyjna dla obecnego jednoosobowego maintainer flow.
 
 ### Gate przed publicznym rolloutem
 
@@ -2286,9 +2299,16 @@ Search Console evidence odświeżone 2026-09-20:
 - settled Search Analytics do 2026-09-17 ma dla `/aktualnosci` 0 clicks / 0 impressions; homepage ma w tym 28-dniowym oknie 2 clicks / 2 impressions,
 - aktualna inspekcja homepage nadal zwraca referring URLs `https://prawkoapp.pl/` i `http://prawkonaraz.pl/`; samo ich występowanie nie jest obecnie dowodem canonical failure, ponieważ canonical HTTPS homepage ma verdict PASS.
 
+### Live production revalidation po deployu — 2026-09-20
+
+- aktualny runtime emituje stabilne WebSite/Organization `@id` oraz poprawny placeholder `/aktualnosci` z `noindex`; wcześniejsze trzy failures z report-only runu nie opisują już bieżącego deployu,
+- enterprise validator wykonał `102 checks / 0 failures / 2 warnings`; ostrzeżenia dotyczą dwuhopowego redirectu `http-www` oraz oczekiwanego braku newsroom article/news sitemap przy wyłączonym publicznym gate i pustym corpusie,
+- `NEWSROOM_PUBLIC_ENABLED=false` jest potwierdzone w aktywnym release, a produkcyjna baza ma `0` articles, `0` categories i `0` topics,
+- N5-007 STRICT static-delivery smoke nadal failuje na publicznym `/robots.txt` z Cloudflare `max-age=14400`; origin ma poprawne `max-age=3600`.
+
 ### Boundary / następny krok
 
-N6-003 nie jest DONE i nie wolno zapisywać report-only workflow success jako zielonego production gate'u. Następny krok N6-003 wymaga aktualnego deploy/runtime na produkcji, zielonego STRICT runu oraz reprezentatywnych live article/category/topic samples do URL Inspection/schema/canonical/date validation.
+N6-003 nie jest DONE i nie wolno zapisywać report-only workflow success jako zielonego production gate'u. Następny krok N6-003 wymaga korekty reguły Cloudflare i zielonego STRICT runu, a po kontrolowanym rolloutcie także reprezentatywnych live article/category/topic samples do URL Inspection/schema/canonical/date validation.
 
 NEWSROOM-N5-007 również pozostaje IN PROGRESS; jego Nginx/STRICT static-delivery/Cloudflare/GSC evidence jest częściowo współdzielone z N6-003, ale oba taski zachowują własny zakres i status.
 
@@ -2427,7 +2447,7 @@ Ponowny audyt aktualnego `main@2ba4cffbe5d065724d876b35394bc50b2051d38e` potwier
 
 Post-merge CI #505 na `main@2ba4cffbe5d065724d876b35394bc50b2051d38e` zakończył pełny PASS: 1141 passed / 20 231 assertions / 2 skipped, PostgreSQL 7/94, Pint 1102 files PASS i frontend build PASS.
 
-**N6-005 pozostaje IN PROGRESS wyłącznie dla runtime/release evidence**: zgodnie z istniejącym runbookiem Phase A wymaga faktycznego potwierdzenia `NEWSROOM_PUBLIC_ENABLED=false` na produkcji przed cutoverem, a Phase B jawnego ustawienia `true`, odświeżenia config cache i publicznych smoke checks. `deploy/mikrus/deploy.sh` celowo nie przełącza tego gate automatycznie.
+**N6-005 pozostaje IN PROGRESS wyłącznie dla Phase B rollout evidence**. Phase A została potwierdzona 2026-09-20 na aktywnym release: `.env` i zcache'owany runtime utrzymują `NEWSROOM_PUBLIC_ENABLED=false`, publiczny feed pozostaje 404, a produkcyjna baza nie zawiera artykułów, kategorii ani tematów. Phase B wymaga dopiero jawnego ustawienia `true` po przygotowaniu realnego batcha redakcyjnego, odświeżenia config cache i publicznych smoke checks. `deploy/mikrus/deploy.sh` celowo nie przełącza tego gate automatycznie.
 
 ---
 
@@ -2806,7 +2826,7 @@ Docs-only:
 
 - [ ] NEWSROOM_PUBLIC_ENABLED controlled rollout/rollback gate
 - [x] publisher transparency/contact/editorial principles gate
-- [ ] scheduler monitored
+- [x] scheduler monitored — produkcyjny cron i kolejne wykonania `newsroom:publish-due` / `newsroom:refresh-seo-artifacts-if-dirty` potwierdzone 2026-09-20
 - [x] audit — AuditLog operacyjny + site-wide `newsroom:audit-links`/SEO audit mają regression evidence
 - [x] correction flow — NEWSROOM-N6-010 / PR #146 / post-merge CI #523
 - [x] freshness — NEWSROOM-N6-011 / PR #148 / post-merge CI #531
