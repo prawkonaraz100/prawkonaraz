@@ -262,6 +262,17 @@ class ContentArticle extends Model
             ->where('freshness_review_due_at', '<=', now());
     }
 
+    public function freshnessStatus(): string
+    {
+        if ($this->freshness_review_due_at === null) {
+            return 'not_scheduled';
+        }
+
+        return $this->freshness_review_due_at->lte(now())
+            ? 'overdue'
+            : 'fresh';
+    }
+
     public function isPubliclyVisible(): bool
     {
         return $this->first_published_at !== null
