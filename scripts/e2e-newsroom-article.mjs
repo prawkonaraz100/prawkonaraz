@@ -4,6 +4,7 @@ import http from 'node:http';
 import path from 'node:path';
 import process from 'node:process';
 import { chromium } from 'playwright';
+import { assertNewsroomAccessibility } from './newsroom-accessibility-checks.mjs';
 import { assertPerformanceBudget, collectSnapshotPerformance } from './newsroom-performance-metrics.mjs';
 
 const cwd = process.cwd();
@@ -173,6 +174,11 @@ try {
         if (await page.locator('script[type="application/ld+json"]').count() < 1) {
             throw new Error(`JSON-LD is missing at ${viewport.name}px.`);
         }
+
+        await assertNewsroomAccessibility(page, {
+            surface: 'article',
+            viewportName: viewport.name,
+        });
 
         const cdp = await context.newCDPSession(page);
         const metrics = await cdp.send('Page.getLayoutMetrics');
