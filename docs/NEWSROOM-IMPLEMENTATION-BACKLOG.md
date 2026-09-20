@@ -2601,18 +2601,18 @@ Docs-only:
 - [x] models/factories
 - [x] publishing service
 - [x] scheduling
-- [ ] public HTTP redirects / withdrawn 410 disposition
+- [x] public HTTP redirects / withdrawn 410 disposition
 
 ### CMS
 
 - [x] article resource
 - [x] category resource
-- [ ] topic resource
+- [x] topic resource
 - [x] controlled block editor
 - [x] sources
 - [x] relations
-- [ ] origin/regulatory fields
-- [ ] focal point/crop preview
+- [x] origin/regulatory fields
+- [x] focal point/crop preview — CSS previews 16:9/4:3/1:1 + focal point; bez deklarowania fizycznych crop variants
 - [x] article preview
 - [x] home composer + future preview
 - [x] checklist
@@ -2626,12 +2626,12 @@ Docs-only:
 - [x] article + controlled block renderer
 - [x] regulatory context box/provenance
 - [x] Product Bridge questions/legal/signs/contextual CTA z explicit-pivot/public-eligibility guard
-- [ ] author profile/newsroom publication integration
-- [ ] semantic silo + controlled reverse links
-- [ ] newsroom hub with placements/fallback/dedupe
-- [ ] category
-- [ ] topic/dossier
-- [ ] guides
+- [x] author profile/newsroom publication integration
+- [x] semantic silo + controlled reverse links
+- [x] newsroom hub with placements/fallback/dedupe
+- [x] category
+- [x] topic/dossier
+- [x] guides
 - [ ] responsive/accessibility — article detail/Product Bridge ma PASS wymaganej macierzy responsive, ale pełny accessibility gate pozostaje dalszym hardeningiem
 
 ### SEO
@@ -2646,7 +2646,7 @@ Docs-only:
 - [x] istniejący `SeoSitemapAuditor` rozszerzony o newsroom/news namespace/tag/date/window/eligibility/topology/shard/obsolete-file checks w NEWSROOM-N5-006; generic protocol-limit guards nadal są reużywane
 - [ ] rzeczywisty static/Nginx/CDN delivery smoke (Content-Type/cache/Set-Cookie/validators) — tooling/Nginx contract są w PR #115, workflow w PR #117; report-only produkcja wykazała Cache-Control mismatch, więc brak nadal STRICT production PASS
 - [x] Atom feed + discovery + generation cache/validator contract (NEWSROOM-N5-003)
-- [ ] author ProfilePage / publisher / WebSite
+- [x] author ProfilePage / publisher / WebSite
 
 ### Operations
 
@@ -2656,7 +2656,7 @@ Docs-only:
 - [ ] audit
 - [ ] correction flow
 - [ ] freshness
-- [ ] analytics
+- [x] analytics
 - [ ] production smoke
 
 ---
@@ -2897,6 +2897,11 @@ Następnym wykonywalnym podkrokiem pozostaje **zastosowanie aktualnego Nginx con
 ---
 
 # 12. Historia zmian
+
+### 2026-09-20 — v0.65
+
+- zsynchronizowano globalny Definition of Done z istniejącymi, wcześniej potwierdzonymi taskami i kodem bez zmiany funkcjonalności: publiczne 301/withdrawn 410, ContentTopicResource, provenance/regulatory fields, focal-point/CSS crop preview, author profile integration, hub/category/topic/guides, semantic reverse links, author ProfilePage/publisher/WebSite oraz analytics mają już zakończone implementation i regression evidence,
+- pozostawiono otwarte wyłącznie pozycje, których nie potwierdza jeszcze repo-level evidence albo wymagają runtime/production: pełny accessibility gate, static/Nginx/CDN STRICT smoke, controlled public rollout, scheduler monitoring, operations audit/correction/freshness oraz live production smoke.
 
 ### 2026-09-20 — v0.64
 
