@@ -444,12 +444,14 @@ class ContentArticleForm
                             ->label('Źródła sprawdzone')
                             ->timezone('Europe/Warsaw')
                             ->seconds(false)
-                            ->helperText('Ręczny timestamp ostatniego sprawdzenia źródeł. Nie zmienia publicznej treści ani workflow.'),
+                            ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::freshnessFieldsLocked($record, $livewire))
+                            ->helperText('Ręczny timestamp ostatniego sprawdzenia źródeł. Zapisuj zwykłym Save; pole jest wyłączone w trybie public update/correction.'),
                         DateTimePicker::make('freshness_review_due_at')
                             ->label('Review freshness do')
                             ->timezone('Europe/Warsaw')
                             ->seconds(false)
-                            ->helperText('Po przekroczeniu terminu status staje się overdue. Sam termin nie wykonuje Mark needs review.'),
+                            ->disabled(fn (?ContentArticle $record, mixed $livewire): bool => static::freshnessFieldsLocked($record, $livewire))
+                            ->helperText('Po przekroczeniu terminu status staje się overdue. Sam termin nie wykonuje Mark needs review; zapisuj zwykłym Save.'),
                         Placeholder::make('reviewed_at_display')
                             ->label('Ostatnie review')
                             ->content(fn (?ContentArticle $record): string => static::dateTimeLabel($record?->reviewed_at)),
@@ -1088,6 +1090,14 @@ class ContentArticleForm
             'related_questions' => 'Powiązane pytania',
             'learning' => 'Nauka',
         ];
+    }
+
+    protected static function freshnessFieldsLocked(?ContentArticle $record, mixed $livewire = null): bool
+    {
+        return ($record?->isPubliclyVisible() ?? false)
+            && is_object($livewire)
+            && method_exists($livewire, 'isPublicUpdateMode')
+            && $livewire->isPublicUpdateMode();
     }
 
     protected static function publicFieldsLocked(?ContentArticle $record, mixed $livewire = null): bool
