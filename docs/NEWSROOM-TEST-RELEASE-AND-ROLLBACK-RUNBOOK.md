@@ -413,7 +413,7 @@ Stan po NEWSROOM-N6-010:
 - Browser Smoke nie był automatycznie uruchamiany, ponieważ workflow path contract obejmuje publiczne renderery/read modele, a N6-010 zmienia wyłącznie Filament/service + feature regressions; nie zapisujemy nieuruchomionego Browser Smoke jako PASS,
 - merge PR #146: `main@c58feafe6cffbb8bf54bbfcd0b3f1d4587fee97d`; post-merge CI #523 pełny PASS z tym samym bilansem backend/Pint/frontend/PostgreSQL.
 
-Stan NEWSROOM-N6-011 przed merge:
+Stan po NEWSROOM-N6-011:
 
 - `ContentArticleResourceTest` pokrywa computed `not_scheduled -> fresh -> overdue`,
 - regression potwierdza, że overdue nie zmienia `workflow_status` ani `isActivelyDistributed()`,
@@ -421,7 +421,9 @@ Stan NEWSROOM-N6-011 przed merge:
 - ten sam regression potwierdza brak zmian `last_substantive_update_at`, `public_state_changed_at` i `published_at`,
 - service-controlled timestamps są tylko prezentowane w adminie, nie edytowane,
 - `due soon` nie ma automatycznego testu/statusu, ponieważ source-of-truth policy nie definiuje progu; nie zapisujemy wymyślonego threshold,
-- finalny implementation HEAD przed docs-sync `cee06ee552208dd19d06110009237c2c0d90fb03`: CI #526 PASS — 1151 passed / 20 326 assertions / 2 skipped, PostgreSQL PASS, Pint 1103 files PASS, frontend build PASS,
+- implementation HEAD `cee06ee552208dd19d06110009237c2c0d90fb03`: CI #526 PASS — 1151 passed / 20 326 assertions / 2 skipped, PostgreSQL PASS, Pint 1103 files PASS, frontend build PASS,
+- finalny PR HEAD `fbd87e99d731813431fe33d0deefbb4a374ec262`: CI #530 PASS z tym samym bilansem,
+- merge PR #148 utworzył `main@6b816afe64a818392cca402a1b7b16e09393e4f4`; post-merge CI #531 również pełny PASS,
 - Browser Smoke nie został triggerowany przez path contract, ponieważ N6-011 zmienia model/admin Filament/feature regression bez publicznego renderera; nie traktujemy nieuruchomionego Browser Smoke jako PASS.
 
 ---
@@ -1651,6 +1653,12 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-20 — v0.51
+
+- NEWSROOM-N6-011 jest DONE po finalnym PR HEAD `fbd87e99d731813431fe33d0deefbb4a374ec262`, CI #530, merge PR #148 i post-merge CI #531,
+- finalny gate potwierdza 1151 passed / 20 326 assertions / 2 skipped, PostgreSQL PASS, Pint 1103 files PASS i frontend PASS,
+- Browser Smoke nie był triggerowany dla admin/model-only path scope i nie jest fałszywie deklarowany jako PASS.
 
 ### 2026-09-20 — v0.50
 

@@ -2564,7 +2564,7 @@ Zmaterializować istniejący kontrakt `Apply correction` z `NEWSROOM-ADMIN-CMS-S
 
 ### Status
 
-**IN PROGRESS — implementation na PR #148 jest zmaterializowany i ma exact-head CI #526 PASS; merge/post-merge evidence jeszcze nie istnieje.**
+**DONE — NEWSROOM-N6-011 zmergowano przez PR #148 jako `main@6b816afe64a818392cca402a1b7b16e09393e4f4` po pełnym exact-head i post-merge Quality Gate.**
 
 ### Cel
 
@@ -2603,7 +2603,9 @@ Domknąć istniejący kontrakt freshness z `NEWSROOM-ADMIN-CMS-SPEC.md` §29 i `
 - tabela i infolist pokazują computed freshness status/backlog,
 - regression potwierdza, że overdue nie zmienia `workflow_status` ani active distribution oraz że termin można jawnie wyczyścić do `not_scheduled`,
 - Browser Smoke nie był triggerowany przez path contract: PR zmienia wyłącznie model/admin Filament/feature regression, bez publicznego renderera.
-- status pozostaje IN PROGRESS do finalnego exact-head CI po docs-sync, merge i post-merge CI.
+- finalny PR HEAD `fbd87e99d731813431fe33d0deefbb4a374ec262` przeszedł exact-head CI #530: 1151 passed / 20 326 assertions / 2 skipped, `newsroom-postgres` PASS, Pint 1103 files PASS, frontend PASS,
+- PR #148 zmergowano jako `main@6b816afe64a818392cca402a1b7b16e09393e4f4`, a post-merge CI #531 powtórzył pełny PASS z tym samym bilansem,
+- Browser Smoke nadal nie był triggerowany przez path contract, ponieważ zakres nie zmieniał publicznego renderera; nie zapisujemy nieuruchomionego gate'u jako PASS.
 
 ---
 
@@ -2784,7 +2786,7 @@ Docs-only:
 - [ ] scheduler monitored
 - [x] audit — AuditLog operacyjny + site-wide `newsroom:audit-links`/SEO audit mają regression evidence
 - [x] correction flow — NEWSROOM-N6-010 / PR #146 / post-merge CI #523
-- [ ] freshness
+- [x] freshness — NEWSROOM-N6-011 / PR #148 / post-merge CI #531
 - [x] analytics
 - [ ] production smoke
 
@@ -3011,13 +3013,11 @@ Na 2026-09-18, po zweryfikowanym NEWSROOM-N4-008 na `main@3d7ac8ab8a3ed1c299cb0c
 
 ### Repo-level przed operacyjnym deployem
 
-**NEWSROOM-N6-011 — Editorial freshness workflow hardening.**
+**NEWSROOM-N6-012 — Accessibility gate.**
 
-NEWSROOM-N6-010 correction flow jest zamknięty po PR #146 i post-merge CI #523. Następny repo-level brak z audytu DoD to pełny freshness workflow/admin section.
+NEWSROOM-N6-011 freshness workflow jest zamknięty po PR #148 i post-merge CI #531. To ostatni repo-level brak wykryty przez audyt DoD.
 
-N6-011 ma jedno jawne nierozstrzygnięcie policy: dokumentacja wymienia status `due soon`, ale nie definiuje progu czasowego. Nie wolno go hardcodować bez osobnej decyzji.
-
-Po N6-011 pozostaje NEWSROOM-N6-012 Accessibility gate.
+Po N6-012 nie ma kolejnego zaplanowanego repo-level feature/hardening tasku newsroomu; dalsza praca przechodzi do production/release evidence zgodnie z istniejącymi N5-007/N6-000/N6-003/N6-004/N6-005/N6-006/N6-007/N6-008.
 
 ### Równoległy production-only blocker
 
@@ -3026,6 +3026,13 @@ NEWSROOM-N5-007 pozostaje **IN PROGRESS** i wymaga zastosowania aktualnego Nginx
 ---
 
 # 12. Historia zmian
+
+### 2026-09-20 — v0.70
+
+- NEWSROOM-N6-011 freshness workflow hardening jest DONE po PR #148,
+- finalny PR HEAD `fbd87e99d731813431fe33d0deefbb4a374ec262` przeszedł CI #530: 1151 passed / 20 326 assertions / 2 skipped, PostgreSQL PASS, Pint 1103 files PASS, frontend PASS,
+- merge utworzył `main@6b816afe64a818392cca402a1b7b16e09393e4f4`; post-merge CI #531 powtórzył pełny PASS z tym samym bilansem,
+- globalny DoD `freshness` zamknięto; następny i ostatni repo-level brak z audytu DoD to NEWSROOM-N6-012 Accessibility gate.
 
 ### 2026-09-20 — v0.69
 
