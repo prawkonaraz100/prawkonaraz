@@ -1070,6 +1070,19 @@ Automated + manual:
 
 Nie uznajemy samego Lighthouse score za pełny accessibility test. PASS N3-005 Browser QA nie oznacza zamknięcia pełnego accessibility gate.
 
+Stan NEWSROOM-N6-012 przed merge:
+
+- wspólny `scripts/newsroom-accessibility-checks.mjs` jest wykonywany w istniejących article/home/category/topic/guides Browser QA,
+- automat egzekwuje `main#main-content` + skip link, nazwane nav/complementary landmarks, dokładnie jeden H1 i heading order, alt, accessible control names, labels/error association, keyboard-first focus oraz reduced-motion behavior,
+- public layout i header otrzymały tylko potwierdzone repo-level poprawki: shared skip link/target oraz visible outline service-menu; article context/related/Product Bridge complementary landmarks mają dostępne nazwy,
+- Browser Smoke #108: article/home/category/topic/guides/semantic-links/golden-path PASS; genericzny manual-only browser-smoke prawidłowo skipped dla PR,
+- manual evidence z artifactów 390/1024 dla article/home/category/topic/guides potwierdza widoczny focus menu i brak wizualnych blockerów kontrastu,
+- reprezentatywne pary CSS/renderu: slate-950/white 17.85:1, slate-500/white 4.76:1, #0d47a1/white 8.63:1, slate-950/#efc54f 10.86:1, slate-500/slate-50 4.55:1,
+- exact-head implementation CI #538 na `23eea2eec14fc5396ce40bd1831112cf47572450`: 1151 passed / 20 326 assertions / 2 skipped, PostgreSQL PASS, Pint 1103 files PASS, frontend PASS,
+- status pozostaje pre-merge; finalny docs-sync CI, merge i post-merge CI są nadal wymagane przed DONE.
+
+Ten gate jest repo-level regression evidence dla zdefiniowanego zakresu i nie jest deklarowany jako zewnętrzna certyfikacja całego serwisu WCAG 2.2 AA.
+
 ---
 
 ## 35. Performance QA
@@ -1653,6 +1666,13 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-20 — v0.52
+
+- NEWSROOM-N6-012 na PR #152 rozszerza istniejące Browser Smoke o shared accessibility checker zamiast osobnego równoległego harnessu,
+- implementation exact-head `23eea2eec14fc5396ce40bd1831112cf47572450` przeszedł CI #538 i Browser Smoke #108; siedem dedykowanych newsroom jobów ma PASS,
+- manual screenshot/contrast evidence obejmuje article/home/category/topic/guides na 390 i 1024 px; reprezentatywne pary tekst/tło spełniają 4.5:1,
+- task pozostaje pre-merge do finalnego docs-sync CI, merge i post-merge gate.
 
 ### 2026-09-20 — v0.51
 

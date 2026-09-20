@@ -77,7 +77,10 @@
 @endif
 
 @if ($block['type'] === 'product_cta' && ! empty($block['product_cta']))
-    <aside class="border border-slate-200 bg-slate-50 px-5 py-5 sm:flex sm:items-center sm:justify-between sm:gap-6 sm:px-6">
+    <aside
+        class="border border-slate-200 bg-slate-50 px-5 py-5 sm:flex sm:items-center sm:justify-between sm:gap-6 sm:px-6"
+        aria-label="PrawkoNaRaz — dalsza nauka"
+    >
         <div>
             <p class="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">PrawkoNaRaz</p>
             <p class="mt-1 text-sm leading-6 text-slate-700">{{ $block['product_cta']['description'] }}</p>

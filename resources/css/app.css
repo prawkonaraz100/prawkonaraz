@@ -7079,6 +7079,12 @@ html:has(.auth-drawer-top-navigation):has([data-register-drawer-open='true'])
     outline: 0;
 }
 
+.home-site-header__launcher > summary:focus-visible,
+.home-site-header__mobile-menu > summary:focus-visible {
+    outline: 2px solid #0a66c2;
+    outline-offset: 3px;
+}
+
 .home-site-header__launcher-icon {
     display: grid;
     width: 27px;
