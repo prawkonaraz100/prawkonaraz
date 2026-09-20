@@ -837,29 +837,35 @@ Definition of Done: **PASS na poziomie repo**.
 
 ### SEO-INDEX-003 — SEO-critical raw HTML dla `/najtrudniejsze-pytania-na-prawo-jazdy`
 
-Status: **TODO / CONFIRMED ARCHITECTURAL SEO GAP**
+Status: **DONE / REPO-LEVEL**
 Priorytet: **P0**
 
-Potwierdzony stan:
-- controller zwraca `Inertia::render('Public/HardestQuestions/Index', ...)`,
-- title/meta/canonical/H1/glowna tresc sa w Vue,
-- repo nie ma potwierdzonego Inertia SSR entrypoint/build/`createSSRApp`,
-- aktualny feature test sprawdza Inertia props, ale nie raw HTML,
-- live raw-HTML audit widzi title `prawkonaraz.pl`, brak H1, canonicala i meta description, bardzo cienki shell oraz brak normalnych internal links,
-- istniejacy masterplan juz przyjmuje zasade, ze SEO-critical HTML nie powinien zalezec od client-side Inertia.
+Zrealizowany zakres:
+- `PublicQuestionDifficultyController` nie zwraca juz client-only `Inertia::render(...)`; publiczny hub i wariant kategorii renderuja istniejacy Blade shell `layouts.public-content`,
+- `PublicQuestionDifficultyService` pozostaje jedynym read modelem/source danych dla rankingu; nie dodano drugiej implementacji rankingu,
+- zachowano istniejace route'y, kontrakt parametru `ranking` i URL-e kategorii,
+- raw HTML zawiera title, meta description, self-canonical, H1, glowny opis, crawlable linki do kategorii i typow rankingu oraz liste rankingowa,
+- `QuestionTextFormatter` nadal obsluguje istniejacy inline markup tresci pytan,
+- nie wdrozono globalnego Inertia SSR ani nowego entrypointu SSR.
 
-Preferowany minimalny kierunek:
-- pozostawic `PublicQuestionDifficultyService` jako source/read model,
-- wyrenderowac hub jako Blade SSR wykorzystujacy te same dane,
-- zachowac aktualna tresc/design funkcjonalnie bez wdrazania globalnego Inertia SSR,
-- Vue moze pozostac enhancementem tylko jezeli nie jest zrodlem podstawowego SEO HTML.
+Regression evidence:
+- `tests/Feature/PublicQuestionDifficultyPageTest.php` sprawdza teraz raw SEO HTML zamiast samych Inertia props,
+- test potwierdza title, meta description, self-canonical, H1, glowna tresc, crawlable category links i link do wariantu rankingu,
+- test wariantu kategorii nadal potwierdza routing po slug oraz poprawny selected ranking/category behavior.
 
-Definition of Done:
-- raw HTTP bez JS zawiera prawidlowy title, meta description, self-canonical i H1,
-- raw HTML zawiera glowny opis i crawlable linki do kategorii,
-- ranking i wariant kategorii nadal dzialaja,
-- feature regression sprawdza raw HTML,
-- pelny Quality Gate PASS.
+Potwierdzony finalny stan:
+- implementation PR #160,
+- implementation head `04c5aba997dc76ea382d24607104797ac1b2b559`,
+- exact-head CI #559: `quality` PASS i `newsroom-postgres` PASS,
+- merge `main@d0a336c18bd3815dc0e8fded1331f8493ea1ad88`,
+- post-merge CI #560: `quality` PASS i `newsroom-postgres` PASS, w tym smoke verification, backend suite, Pint/code style i frontend build.
+
+Granica potwierdzenia:
+- task jest DONE na poziomie repo,
+- nie oznacza to jeszcze potwierdzonego deployu ani live raw-HTML production verification,
+- deploy i live verification pozostaja w `SEO-INDEX-004`; GSC evidence pozostaje w `SEO-INDEX-005`.
+
+Definition of Done: **PASS na poziomie repo**.
 
 ### SEO-INDEX-004 — Deploy i live verification po 001-003
 
