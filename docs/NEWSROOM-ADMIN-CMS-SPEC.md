@@ -819,7 +819,7 @@ Status computed:
 
 `overdue` jest filtrem/kolejką pracy, **nie** automatycznym workflow transition. Upływ `freshness_review_due_at` nie może sam wyrzucić artykułu z home/category/feed. Akcja `Mark needs review` pozostaje oddzielną, audytowaną decyzją.
 
-### Stan implementacji NEWSROOM-N6-011 przed merge
+### Stan implementacji po NEWSROOM-N6-011
 
 PR #148 materializuje ten kontrakt bez zmiany modelu danych:
 
@@ -832,7 +832,7 @@ PR #148 materializuje ten kontrakt bez zmiany modelu danych:
 - pola freshness są wyłączone podczas `Apply public update` / `Apply correction`, aby uniknąć pozornego zapisu przez inną allowlistę,
 - regression potwierdza, że overdue nie zmienia `workflow_status`, active distribution, `last_substantive_update_at` ani `public_state_changed_at`.
 
-Exact-head implementation CI #526 na `cee06ee552208dd19d06110009237c2c0d90fb03`: 1151 passed / 20 326 assertions / 2 skipped, PostgreSQL PASS, Pint 1103 files PASS, frontend PASS. Status pozostaje pre-merge do finalnego gate'u PR.
+Implementation HEAD `cee06ee552208dd19d06110009237c2c0d90fb03` przeszedł CI #526, finalny PR HEAD `fbd87e99d731813431fe33d0deefbb4a374ec262` przeszedł CI #530, a merge PR #148 utworzył `main@6b816afe64a818392cca402a1b7b16e09393e4f4`. Post-merge CI #531 powtórzył pełny PASS: 1151 passed / 20 326 assertions / 2 skipped, PostgreSQL PASS, Pint 1103 files PASS, frontend PASS. NEWSROOM-N6-011 jest DONE.
 
 ---
 
