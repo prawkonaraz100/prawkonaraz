@@ -764,7 +764,7 @@ Standardowy review:
 News historyczny nie musi być sztucznie „odświeżany”.
 Jeśli zmienia się historia, dodajemy update lub nowy materiał zależnie od reguł z sekcji 17.
 
-### 26.4. Stan implementacji NEWSROOM-N6-011 przed merge
+### 26.4. Stan implementacji po NEWSROOM-N6-011
 
 PR #148 materializuje operacyjny freshness backlog bez automatyzowania decyzji redakcyjnej:
 
@@ -774,7 +774,7 @@ PR #148 materializuje operacyjny freshness backlog bez automatyzowania decyzji r
 - `due soon` pozostaje świadomie niewdrożone, ponieważ policy nie ma zdefiniowanego progu czasowego,
 - publiczny ordinary Save zachowuje blokadę public content i zapisuje freshness metadata pod istniejącym stale-token guardem.
 
-Exact-head implementation CI #526 na `cee06ee552208dd19d06110009237c2c0d90fb03`: 1151 passed / 20 326 assertions / 2 skipped, PostgreSQL/Pint/frontend PASS. Finalny status wymaga jeszcze docs-sync CI, merge i post-merge CI.
+Implementation HEAD `cee06ee552208dd19d06110009237c2c0d90fb03` przeszedł CI #526; finalny PR HEAD `fbd87e99d731813431fe33d0deefbb4a374ec262` przeszedł CI #530. PR #148 zmergowano jako `main@6b816afe64a818392cca402a1b7b16e09393e4f4`, a post-merge CI #531 powtórzył pełny PASS: 1151 passed / 20 326 assertions / 2 skipped, PostgreSQL/Pint/frontend PASS. NEWSROOM-N6-011 jest DONE.
 
 ---
 
@@ -1181,12 +1181,18 @@ Na 2026-09-16:
 - [x] N2-006: workflow/schedule/exposure actions + atomowy stale-safe `Apply public update` dla `ContentArticle`,
 - [x] N2-012: analogiczny stale-write guard dla `NewsroomHomeComposer`,
 - [x] wdrożyć corrections — NEWSROOM-N6-010 / PR #146 / post-merge CI #523,
-- [ ] domknąć pełny freshness workflow/admin section — PR #148 ma implementation CI #526 PASS, ale merge/post-merge evidence jeszcze nie istnieje; filtr `freshness_overdue` pozostaje już wdrożony,
+- [x] domknąć pełny freshness workflow/admin section — NEWSROOM-N6-011 / PR #148 / post-merge CI #531; filtr `freshness_overdue` pozostaje częścią tego samego potwierdzonego backlogu,
 - [x] przygotować publiczną stronę zasad redakcyjnych przed większym rolloutem — NEWSROOM-N6-009.
 
 ---
 
 ## 49. Historia zmian
+
+### 2026-09-20 — v0.24
+
+- NEWSROOM-N6-011 jest DONE po finalnym PR HEAD `fbd87e99d731813431fe33d0deefbb4a374ec262`, CI #530, merge PR #148 i post-merge CI #531,
+- finalny post-merge bilans: 1151 passed / 20 326 assertions / 2 skipped, PostgreSQL PASS, Pint 1103 files PASS, frontend PASS,
+- pełny freshness workflow/admin section zamknięto bez automatycznego `needs_review` transition i bez wymyślania `due soon` threshold.
 
 ### 2026-09-20 — v0.23
 
