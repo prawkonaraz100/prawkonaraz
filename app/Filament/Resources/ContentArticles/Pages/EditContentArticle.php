@@ -17,6 +17,7 @@ use App\Support\NewsroomBodyEditorAdapter;
 use DomainException;
 use Filament\Actions\Action;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Resources\Events\RecordSaved;
 use Filament\Resources\Events\RecordUpdated;
@@ -38,6 +39,8 @@ class EditContentArticle extends EditRecord
     protected static string $resource = ContentArticleResource::class;
 
     public bool $publicUpdateMode = false;
+
+    public bool $correctionMode = false;
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
@@ -65,6 +68,7 @@ class EditContentArticle extends EditRecord
         }
 
         $this->publicUpdateMode = true;
+        $this->correctionMode = false;
 
         Notification::make()
             ->warning()
@@ -73,9 +77,26 @@ class EditContentArticle extends EditRecord
             ->send();
     }
 
+    public function beginCorrection(): void
+    {
+        if (! ($this->record instanceof ContentArticle) || ! $this->record->isPubliclyVisible()) {
+            return;
+        }
+
+        $this->publicUpdateMode = true;
+        $this->correctionMode = true;
+
+        Notification::make()
+            ->warning()
+            ->title('Tryb Apply correction jest aktywny.')
+            ->body('Edytuj publiczne pola, a następnie użyj Apply correction i podaj publiczną notę korekty.')
+            ->send();
+    }
+
     public function cancelPublicUpdate(): void
     {
         $this->publicUpdateMode = false;
+        $this->correctionMode = false;
 
         if ($this->record instanceof ContentArticle) {
             $this->record = $this->record->refresh();
@@ -141,9 +162,81 @@ class EditContentArticle extends EditRecord
         }
     }
 
+    public function applyCorrection(string $correctionNote): void
+    {
+        if (
+            ! ($this->record instanceof ContentArticle)
+            || ! $this->record->isPubliclyVisible()
+            || ! $this->correctionMode
+        ) {
+            return;
+        }
+
+        $this->authorizeAccess();
+
+        try {
+            $this->callHook('beforeValidate');
+            $this->form->validate();
+            $this->callHook('afterValidate');
+            $this->callHook('beforeSave');
+
+            $payload = $this->validatedEditorPayload();
+
+            $loadedToken = trim((string) ($payload['_edit_token'] ?? ''));
+            $actor = auth()->user();
+            $actor = $actor instanceof User ? $actor : null;
+
+            $updated = app(ContentArticlePublishingService::class)->applyCorrection(
+                $this->record,
+                $payload,
+                $loadedToken,
+                $correctionNote,
+                $actor,
+            );
+
+            $this->record = $updated;
+            $this->publicUpdateMode = false;
+            $this->correctionMode = false;
+            $this->fillForm();
+            $this->callHook('afterSave');
+            Event::dispatch(RecordUpdated::class, [
+                'record' => $this->record,
+                'data' => $payload,
+                'page' => $this,
+            ]);
+            Event::dispatch(RecordSaved::class, [
+                'record' => $this->record,
+                'data' => $payload,
+                'page' => $this,
+            ]);
+            $this->rememberData();
+
+            Notification::make()
+                ->success()
+                ->title('Korekta została opublikowana.')
+                ->send();
+        } catch (DomainException|InvalidArgumentException $exception) {
+            Notification::make()
+                ->danger()
+                ->title('Nie opublikowano korekty.')
+                ->body($exception->getMessage())
+                ->persistent()
+                ->send();
+        }
+    }
+
     public function save(bool $shouldRedirect = true, bool $shouldSendSavedNotification = true): void
     {
         if ($this->isPublicUpdateMode()) {
+            if ($this->correctionMode) {
+                Notification::make()
+                    ->danger()
+                    ->title('Użyj Apply correction, aby opublikować korektę.')
+                    ->send();
+
+                return;
+            }
+
             $this->applyPublicUpdate();
 
             return;
@@ -325,6 +418,29 @@ class EditContentArticle extends EditRecord
             return parent::getFormActions();
         }
 
+        if ($this->correctionMode) {
+            return [
+                Action::make('applyCorrection')
+                    ->label('Apply correction')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->modalHeading('Opublikować istotną korektę?')
+                    ->modalDescription('Korekta wymaga aktualnego review. Treść i publiczna nota korekty zostaną zapisane atomowo.')
+                    ->schema([
+                        Textarea::make('correction_note')
+                            ->label('Publiczna nota korekty')
+                            ->required(),
+                    ])
+                    ->action(fn (array $data) => $this->applyCorrection(
+                        (string) ($data['correction_note'] ?? ''),
+                    )),
+                Action::make('cancelPublicUpdate')
+                    ->label('Anuluj korektę')
+                    ->color('gray')
+                    ->action(fn () => $this->cancelPublicUpdate()),
+            ];
+        }
+
         return [
             Action::make('applyPublicUpdate')
                 ->label('Apply public update')
@@ -355,6 +471,13 @@ class EditContentArticle extends EditRecord
                     && $this->record->isPubliclyVisible()
                     && ! $this->isPublicUpdateMode())
                 ->action(fn () => $this->beginPublicUpdate()),
+            Action::make('beginCorrection')
+                ->label('Apply correction')
+                ->color('warning')
+                ->visible(fn (): bool => $this->record instanceof ContentArticle
+                    && $this->record->isPubliclyVisible()
+                    && ! $this->isPublicUpdateMode())
+                ->action(fn () => $this->beginCorrection()),
             ...$this->contentArticleWorkflowActions(),
         ];
     }
@@ -367,6 +490,7 @@ class EditContentArticle extends EditRecord
 
         $this->record = $this->record->refresh();
         $this->publicUpdateMode = false;
+        $this->correctionMode = false;
         $this->fillForm();
         $this->rememberData();
     }

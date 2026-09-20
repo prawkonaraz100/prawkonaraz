@@ -553,7 +553,59 @@ final class ContentArticlePublishingService
         string $loadedToken,
         ?User $actor = null,
     ): ContentArticle {
-        return DB::transaction(function () use ($article, $payload, $loadedToken, $actor): ContentArticle {
+        return $this->applyPublicEditorChange(
+            $article,
+            $payload,
+            $loadedToken,
+            $actor,
+        );
+    }
+
+    /**
+     * Apply an editorially reviewed substantive correction through the same
+     * stale-safe atomic public-update boundary.
+     *
+     * @param  array<string, mixed>  $payload
+     */
+    public function applyCorrection(
+        ContentArticle $article,
+        array $payload,
+        string $loadedToken,
+        string $correctionNote,
+        ?User $actor = null,
+    ): ContentArticle {
+        $correctionNote = trim($correctionNote);
+
+        if ($correctionNote === '') {
+            throw new InvalidArgumentException('Correction note is required.');
+        }
+
+        return $this->applyPublicEditorChange(
+            $article,
+            $payload,
+            $loadedToken,
+            $actor,
+            $correctionNote,
+        );
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    private function applyPublicEditorChange(
+        ContentArticle $article,
+        array $payload,
+        string $loadedToken,
+        ?User $actor,
+        ?string $correctionNote = null,
+    ): ContentArticle {
+        return DB::transaction(function () use (
+            $article,
+            $payload,
+            $loadedToken,
+            $actor,
+            $correctionNote,
+        ): ContentArticle {
             $locked = $this->lockArticle($article);
 
             if (! $locked->isPubliclyVisible()) {
@@ -561,6 +613,11 @@ final class ContentArticlePublishingService
             }
 
             $this->assertFreshEditToken($locked, $loadedToken);
+
+            if ($correctionNote !== null) {
+                $this->publicationChecklist->assertFreshReview($locked);
+            }
+
             $beforePublicFingerprint = $this->editToken->publicFingerprint($locked);
             $canonicalPathBefore = $this->canonicalPath($locked);
 
@@ -623,6 +680,11 @@ final class ContentArticlePublishingService
             unset($articleData['type'], $articleData['slug']);
 
             $locked->fill($articleData);
+
+            if ($correctionNote !== null) {
+                $locked->correction_note = $correctionNote;
+            }
+
             $locked->save();
 
             $currentType = $locked->type instanceof ContentArticleType
@@ -657,14 +719,19 @@ final class ContentArticlePublishingService
                 $locked->save();
             }
 
+            $auditAction = $correctionNote !== null
+                ? 'content_article.corrected'
+                : 'content_article.public_updated';
+
             $this->auditLogService->record(
-                action: 'content_article.public_updated',
+                action: $auditAction,
                 entityType: ContentArticle::class,
                 entityId: $locked->getKey(),
                 actor: $actor,
                 metadata: [
                     'workflow_status' => $this->statusValue($locked),
                     'substantive_change' => $substantiveChange,
+                    'correction_applied' => $correctionNote !== null,
                     'last_substantive_update_at' => $locked->last_substantive_update_at,
                     'source_count' => count($sources),
                     'question_relation_count' => count($relations['questions']),
