@@ -22,12 +22,15 @@ test('newsroom primary navigation links stay canonical and duplicate free', func
     expect($hrefs->count())->toBe($hrefs->unique()->count());
 });
 
-test('shared footer exposes each newsroom hub exactly once for blade and vue renderers', function () {
+test('shared footer exposes strategic discovery hubs exactly once for blade and vue renderers', function () {
     $navigation = app(PublicNavigation::class)->data(null);
     $footer = app(PublicFooter::class)->data(null, $navigation);
     $serviceLinks = collect($footer['service_links']);
 
-    expect($serviceLinks->where('href', route('public.news', absolute: false)))->toHaveCount(1)
+    expect($serviceLinks->where('href', route('public.questions.hub', absolute: false)))->toHaveCount(1)
+        ->and($serviceLinks->where('href', route('traffic-signs.index', absolute: false)))->toHaveCount(1)
+        ->and($serviceLinks->where('href', route('public.regulations', absolute: false)))->toHaveCount(1)
+        ->and($serviceLinks->where('href', route('public.news', absolute: false)))->toHaveCount(1)
         ->and($serviceLinks->where('href', route('public.guides', absolute: false)))->toHaveCount(1)
         ->and($serviceLinks->pluck('href')->count())->toBe($serviceLinks->pluck('href')->unique()->count());
 

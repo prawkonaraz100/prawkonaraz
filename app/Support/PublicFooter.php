@@ -41,6 +41,8 @@ class PublicFooter
             ],
             'service_links' => [
                 ['label' => 'Baza pytań', 'href' => route('public.questions.hub', absolute: false)],
+                ['label' => 'Znaki drogowe', 'href' => route('traffic-signs.index', absolute: false)],
+                ['label' => 'Przepisy', 'href' => route('public.regulations', absolute: false)],
                 ['label' => 'Testy na prawo jazdy', 'href' => route('public.tests', absolute: false)],
                 ['label' => 'Aktualności', 'href' => route('public.news', absolute: false)],
                 ['label' => 'Poradniki', 'href' => route('public.guides', absolute: false)],
