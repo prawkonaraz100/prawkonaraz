@@ -760,36 +760,46 @@ Jesli backlog ma wejsc do systemu taskowego, rekomendowana kolejnosc to:
 
 ## 16. SEO-INDEX repair queue po audycie 2026-09-20
 
-Ta kolejka powstala po ponownym sprawdzeniu aktualnego kodu, live HTML i zapisanych danych GSC. Nie zastepuje istniejacych taskow NEWSROOM-N6 ani starego backlogu SEO-DB. NEWSROOM-N6-012 pozostaje nastepnym repo-level taskiem z audytu DoD; ponizsze taski sa osobnym cross-site SEO pre-deploy backlogiem.
+Ta kolejka powstala po ponownym sprawdzeniu aktualnego kodu, live HTML i danych GSC. Nie zastepuje istniejacych taskow NEWSROOM-N5/N6 ani starego backlogu SEO-DB. NEWSROOM-N6-012 jest juz DONE na poziomie repo i ma potwierdzony post-merge Quality Gate; ponizsza kolejka jest teraz trwalym cross-site SEO repair backlogiem. N5-007/N6-003 pozostaja osobnym torem production/runtime evidence.
+
+### SEO-INDEX-000 — Baseline i Quality Gate przed kazdym taskiem
+
+Status: **ACTIVE PROCESS GATE**
+
+Przed rozpoczeciem kazdego kolejnego taska:
+- odczytac aktualny `main@HEAD`,
+- sprawdzic wymagane GitHub Actions dla tego exact SHA,
+- wymagane joby i kroki musza miec `completed / success`,
+- nie przechodzic dalej przy `in_progress`, `queued`, `failure` ani przy report-only wrapper success ukrywajacym underlying failure,
+- po implementacji powtorzyc exact-head CI, a po merge rowniez post-merge Quality Gate.
+
+Task nie jest osobna funkcja produktu; jest obowiazkowa bramka procesu dla `SEO-INDEX-001...`.
 
 ### SEO-INDEX-001 — Globalne discovery strategicznych hubow
 
-Status: **TODO / CONFIRMED**
+Status: **PARTIAL / OPEN**
 
 Zakres:
 - zapewnic staly crawlable HTML link do `/znaki-drogowe`,
 - zapewnic staly crawlable HTML link do `/przepisy`,
 - zachowac obecny link do huba bazy pytan,
-- uzyc wspolnego source-of-truth dla Blade i Inertia/Vue zamiast drugiego systemu nawigacji,
+- ujednolicic discovery pomiedzy aktualnymi publicznymi shellami bez tworzenia kolejnego systemu nawigacji,
 - zachowac minimalistyczny header; nie renderowac automatycznie calego `primary`.
 
-Potwierdzony stan:
+Potwierdzony stan na `main@b56ce943bf172ce3410fdc927e4adbf50c54fe14`:
 - `PublicNavigation::primary` zawiera Znaki drogowe i Przepisy,
-- oba globalne headery uzywaja `navigation.top`, gdzie tych linkow nie ma,
-- `PublicFooter::service_links` jest wspolnym zrodlem renderowanym przez Blade i Vue, ale nie zawiera tych dwoch hubow,
-- live hub `/znaki-drogowe` jest technicznie indexable i ma pelny SSR HTML; problem discovery jest oddzielny od samej jakosci huba.
-
-Preferowany minimalny kierunek:
-- rozszerzyc istniejace `PublicFooter::service_links` o oba strategiczne huby,
-- dodac regression test wspolnego Blade/Vue footer contract,
-- nie zmieniac top-nav bez osobnej potrzeby UX.
+- Blade `home-header.blade.php` oraz `PublicTopNavigation.vue` nadal renderuja `navigation.top`, gdzie tych dwoch linkow nie ma,
+- nowszy `SiteHeader.vue` ma juz bezposrednie linki do `/znaki-drogowe` i `/przepisy`, wiec problem nie jest juz jednolity dla calego Vue,
+- `PublicFooter::service_links`, renderowane przez Blade i `SiteFooter.vue`, nie zawieraja obecnie ani `/znaki-drogowe`, ani `/przepisy`,
+- hub `/znaki-drogowe` broni sie technicznie jako Blade SSR; ten task dotyczy discovery, nie przebudowy samego huba.
 
 Definition of Done:
-- oba URL-e maja staly globalny HTML `<a href>`,
-- Blade i Vue korzystaja z tego samego payloadu,
-- brak duplikatow href w service links,
-- regression test PASS,
-- pelny Quality Gate PASS.
+- `/znaki-drogowe` i `/przepisy` maja stabilny globalny crawlable `<a href>` w uzgodnionym publicznym shellu,
+- rozwiazanie jest spojne dla Blade i Inertia/Vue tam, gdzie wspoldziela sie ten sam shell/payload,
+- baza pytan zachowuje obecne discovery,
+- test regresyjny potwierdza wymagane linki i brak przypadkowych duplikatow,
+- pelny exact-head Quality Gate PASS,
+- po merge post-merge Quality Gate PASS.
 
 ### SEO-INDEX-002 — Structured data huba `/przepisy`
 
@@ -856,33 +866,83 @@ Po zmergowaniu i post-merge PASS dla 001-003:
 
 Status: **TODO / OBSERVATION GATE**
 
-Baseline z audytu przekazanego 2026-09-20:
+Historyczny baseline z audytu:
 - kontrolna probka: `0/30 indexed`,
 - 25 `Crawled - currently not indexed`,
 - 3 `URL is unknown to Google`,
 - 1 canonical mismatch,
 - 1 access forbidden 403.
 
-Oddzielny ponowny odczyt zapisanej historii GSC z 2026-09-20 pokazal 22 najnowsze unikalne URL-e i 0 verdict PASS; to inna probka i nie zastepuje historycznego baseline `0/30`.
+Nie kasowac tego baseline — sluzy do porownania po deployu.
+
+Odnowione evidence z 2026-09-20:
+- homepage `https://prawkonaraz.pl/`: `PASS / Submitted and indexed`, last crawl 2026-09-19 17:02:38Z,
+- `/oficjalna-baza-pytan-na-prawo-jazdy`: `URL is unknown to Google`,
+- `/oficjalna-baza-pytan-na-prawo-jazdy/b`: `Crawled - currently not indexed`,
+- `/znaki-drogowe`: `Crawled - currently not indexed`,
+- `/przepisy`: `URL is unknown to Google`,
+- `/najtrudniejsze-pytania-na-prawo-jazdy`: `Blocked due to access forbidden (403)`; ostatni zapisany crawl Google z 2026-06-01,
+- aktualny homepage PASS oznacza, ze starszy homepage canonical-mismatch verdict jest historyczny, a nie aktualny.
 
 Po deployu mierzyc:
 - nowe crawl time,
 - `URL unknown -> crawled`,
 - `crawled-not-indexed -> indexed`,
-- homepage canonical state,
 - status `/najtrudniejsze-pytania-na-prawo-jazdy`,
 - liczbe indexed w tej samej kontrolnej probce,
-- impressions.
+- impressions i settled Search Analytics.
 
-Task zamyka sie dopiero na podstawie nowego GSC evidence; sam deploy ani schema validator nie wystarcza.
+Task zamyka sie dopiero na podstawie nowego GSC evidence; sam deploy, schema validator albo zielony CI nie wystarcza.
+
+### SEO-INDEX-006 — Wiarygodnosc `lastmod` hubow
+
+Status: **DEFERRED / P2**
+
+Zakres:
+- po zamknieciu krytycznych problemow sprawdzic authority dla `lastmod` strategicznych hubow,
+- nie uzywac `lastmod = now()` jako hacka,
+- nie przebudowywac obecnej generacji sitemap bez dowodu, ze obecny sygnal freshness jest realnym problemem.
+
+Potwierdzony kontekst:
+- aktualny `SeoSitemapBuilder` uwzglednia rowniez zmiany wybranych plikow routes/config/views/public frontend,
+- pojedyncze huby moga nadal opierac `lastmod` glownie o dane potomne,
+- raport klasyfikuje to jako nizszy priorytet niz discovery, structured data i raw HTML.
+
+Definition of Done:
+- authority `lastmod` jest jawnie ustalone dla badanego huba albo brak potrzeby zmiany jest udokumentowany dowodem,
+- brak sztucznego timestamp churn,
+- kazda ewentualna zmiana ma regression test i pelny Quality Gate PASS.
+
+### SEO-INDEX-007 — Skalowanie napraw na pojedyncze pytania dopiero po pilocie
+
+Status: **BLOCKED / P3**
+
+Nie rozpoczynac masowych zmian na tysiacach question URL-i przed wynikiem `SEO-INDEX-005`.
+
+Po pilocie:
+- wybrac historycznie reprezentatywna probke question pages,
+- porownac crawl/indexation/impressions,
+- dopiero na podstawie evidence zdecydowac, czy potrzebne sa dalsze zmiany metadata, contentu, internal linkingu lub innych kontraktow.
+
+Definition of Done:
+- decyzja o dalszym scale-out wynika z danych po pilocie,
+- brak szerokich zmian wykonywanych tylko dlatego, ze pojedyncze URL-e sa `Crawled - currently not indexed`.
 
 ### Kolejnosc wzgledem aktualnego toru
 
-1. domknac NEWSROOM-N6-012 Accessibility gate zgodnie z newsroom backlogiem,
-2. wykonac repo-level SEO-INDEX-001,
-3. wykonac repo-level SEO-INDEX-002,
-4. wykonac repo-level SEO-INDEX-003,
-5. SEO-INDEX-004 deploy + live verification,
-6. SEO-INDEX-005 GSC / Indexing Tracker.
+Aktualny punkt startowy:
+- `main@b56ce943bf172ce3410fdc927e4adbf50c54fe14`,
+- post-merge CI #547: `quality` PASS i `newsroom-postgres` PASS,
+- NEWSROOM-N6-012: DONE.
+
+Kolejnosc wykonawcza:
+1. `SEO-INDEX-000` — zawsze potwierdzic aktualny HEAD i pelny Quality Gate,
+2. `SEO-INDEX-001` — globalne discovery,
+3. `SEO-INDEX-002` — schema `/przepisy`,
+4. `SEO-INDEX-003` — SEO-critical raw HTML `/najtrudniejsze...`,
+5. `SEO-INDEX-004` — deploy + live verification,
+6. `SEO-INDEX-005` — GSC / Indexing Tracker,
+7. `SEO-INDEX-006` — lastmod tylko jesli po pilocie nadal istnieje uzasadniona luka,
+8. `SEO-INDEX-007` — ewentualny scale-out na question pages dopiero po danych z pilota.
 
 Nie przebudowywac ponownie atomic sitemap publication, canonical-host redirects ani calego Inertia SSR bez nowego dowodu i jawnej decyzji architektonicznej.
