@@ -777,29 +777,32 @@ Task nie jest osobna funkcja produktu; jest obowiazkowa bramka procesu dla `SEO-
 
 ### SEO-INDEX-001 — Globalne discovery strategicznych hubow
 
-Status: **PARTIAL / OPEN**
+Status: **DONE / REPO-LEVEL**
 
-Zakres:
-- zapewnic staly crawlable HTML link do `/znaki-drogowe`,
-- zapewnic staly crawlable HTML link do `/przepisy`,
-- zachowac obecny link do huba bazy pytan,
-- ujednolicic discovery pomiedzy aktualnymi publicznymi shellami bez tworzenia kolejnego systemu nawigacji,
-- zachowac minimalistyczny header; nie renderowac automatycznie calego `primary`.
+Zrealizowany zakres:
+- `PublicFooter::service_links` zawiera teraz stabilne crawlable linki do `/znaki-drogowe` i `/przepisy`,
+- istniejacy link do huba bazy pytan zostal zachowany,
+- Blade `public-footer.blade.php` i Vue `SiteFooter.vue` nadal renderuja ten sam `footer.service_links` payload,
+- minimalistyczny top-nav nie zostal rozszerzony ani przebudowany,
+- nie utworzono drugiego systemu nawigacji.
 
-Potwierdzony stan na `main@b56ce943bf172ce3410fdc927e4adbf50c54fe14`:
-- `PublicNavigation::primary` zawiera Znaki drogowe i Przepisy,
-- Blade `home-header.blade.php` oraz `PublicTopNavigation.vue` nadal renderuja `navigation.top`, gdzie tych dwoch linkow nie ma,
-- nowszy `SiteHeader.vue` ma juz bezposrednie linki do `/znaki-drogowe` i `/przepisy`, wiec problem nie jest juz jednolity dla calego Vue,
-- `PublicFooter::service_links`, renderowane przez Blade i `SiteFooter.vue`, nie zawieraja obecnie ani `/znaki-drogowe`, ani `/przepisy`,
-- hub `/znaki-drogowe` broni sie technicznie jako Blade SSR; ten task dotyczy discovery, nie przebudowy samego huba.
+Regression evidence:
+- `tests/Feature/Public/NewsroomNavigationIntegrationTest.php` potwierdza dokladnie po jednym href dla bazy pytan, znakow, przepisow, aktualnosci i poradnikow,
+- ten sam test potwierdza brak duplikatow `service_links` oraz wspolny renderer contract Blade/Vue.
 
-Definition of Done:
-- `/znaki-drogowe` i `/przepisy` maja stabilny globalny crawlable `<a href>` w uzgodnionym publicznym shellu,
-- rozwiazanie jest spojne dla Blade i Inertia/Vue tam, gdzie wspoldziela sie ten sam shell/payload,
-- baza pytan zachowuje obecne discovery,
-- test regresyjny potwierdza wymagane linki i brak przypadkowych duplikatow,
-- pelny exact-head Quality Gate PASS,
-- po merge post-merge Quality Gate PASS.
+Potwierdzony finalny stan:
+- implementation PR #156,
+- implementation head `89555c08a9051280d8019a5da26620eb9bebee1b`,
+- exact-head CI #550: `quality` PASS i `newsroom-postgres` PASS,
+- Browser Smoke #113: wszystkie uruchomione newsroom browser QA PASS; wrapper `browser-smoke` byl celowo skipped zgodnie z macierza,
+- merge `main@c6d9990dba2af8cfc327020283aefb3168e49130`,
+- post-merge CI #551: `quality` PASS i `newsroom-postgres` PASS, w tym backend suite, Pint/code style i frontend build.
+
+Granica potwierdzenia:
+- task jest DONE na poziomie repo,
+- nie oznacza to jeszcze potwierdzonego deployu ani recrawlu Google; live verification pozostaje w `SEO-INDEX-004`, a GSC evidence w `SEO-INDEX-005`.
+
+Definition of Done: **PASS na poziomie repo**.
 
 ### SEO-INDEX-002 — Structured data huba `/przepisy`
 
