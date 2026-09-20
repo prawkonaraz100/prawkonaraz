@@ -1,101 +1,149 @@
 export async function assertNewsroomAccessibility(page, { surface, viewportName }) {
     const prefix = '[newsroom-a11y:' + surface + ':' + viewportName + ']';
 
-    const main = page.locator('main#main-content');
-    if (await main.count() !== 1) {
+    const audit = await page.evaluate(() => {
+        const isVisible = (node) => {
+            const style = getComputedStyle(node);
+            const rect = node.getBoundingClientRect();
+
+            return style.display !== 'none'
+                && style.visibility !== 'hidden'
+                && Number.parseFloat(style.opacity || '1') > 0
+                && rect.width > 0
+                && rect.height > 0;
+        };
+
+        const accessibleName = (node) => {
+            const ariaLabel = (node.getAttribute('aria-label') ?? '').trim();
+            if (ariaLabel) return ariaLabel;
+
+            const labelledBy = (node.getAttribute('aria-labelledby') ?? '')
+                .split(/\s+/)
+                .filter(Boolean)
+                .map((id) => document.getElementById(id)?.textContent?.trim() ?? '')
+                .filter(Boolean)
+                .join(' ');
+            if (labelledBy) return labelledBy;
+
+            if ('labels' in node) {
+                const labelText = Array.from(node.labels ?? [])
+                    .map((label) => label.textContent?.trim() ?? '')
+                    .filter(Boolean)
+                    .join(' ');
+                if (labelText) return labelText;
+            }
+
+            const text = (node.textContent ?? '').trim().replace(/\s+/g, ' ');
+            if (text) return text;
+
+            const imageAlt = node.querySelector?.('img[alt]')?.getAttribute('alt')?.trim();
+            if (imageAlt) return imageAlt;
+
+            const value = 'value' in node ? String(node.value ?? '').trim() : '';
+            if (value) return value;
+
+            return (node.getAttribute('title') ?? '').trim();
+        };
+
+        const visibleHeadings = Array.from(document.querySelectorAll('h1,h2,h3,h4,h5,h6'))
+            .filter(isVisible)
+            .map((node) => ({
+                level: Number(node.tagName.slice(1)),
+                text: (node.textContent ?? '').trim().replace(/\s+/g, ' ').slice(0, 120),
+            }));
+
+        const visibleAsides = Array.from(document.querySelectorAll('aside')).filter(isVisible);
+
+        return {
+            mainCount: document.querySelectorAll('main#main-content').length,
+            skipCount: document.querySelectorAll('a[data-public-skip-link][href="#main-content"]').length,
+            headerCount: document.querySelectorAll('header').length,
+            footerCount: document.querySelectorAll('footer').length,
+            navigationProblems: Array.from(document.querySelectorAll('nav'))
+                .filter(isVisible)
+                .filter((node) => !accessibleName(node))
+                .map((node) => node.outerHTML.slice(0, 220)),
+            complementaryProblems: visibleAsides.length <= 1
+                ? []
+                : visibleAsides
+                    .filter((node) => !accessibleName(node))
+                    .map((node) => node.outerHTML.slice(0, 220)),
+            headings: visibleHeadings,
+            imagesMissingAlt: Array.from(document.querySelectorAll('img:not([alt])'))
+                .filter(isVisible)
+                .map((node) => node.outerHTML.slice(0, 220)),
+            unnamedControls: Array.from(document.querySelectorAll('a[href],button,summary,input:not([type="hidden"]),select,textarea'))
+                .filter(isVisible)
+                .filter((node) => !accessibleName(node))
+                .map((node) => node.outerHTML.slice(0, 220)),
+            unlabeledFields: Array.from(document.querySelectorAll('input:not([type="hidden"]),select,textarea'))
+                .filter(isVisible)
+                .filter((node) => {
+                    const labels = 'labels' in node ? Array.from(node.labels ?? []) : [];
+                    return !node.getAttribute('aria-label')
+                        && !node.getAttribute('aria-labelledby')
+                        && labels.every((label) => !(label.textContent ?? '').trim());
+                })
+                .map((node) => node.outerHTML.slice(0, 220)),
+            invalidWithoutErrorAssociation: Array.from(document.querySelectorAll('[aria-invalid="true"]'))
+                .filter(isVisible)
+                .filter((node) => !node.getAttribute('aria-describedby') && !node.getAttribute('aria-errormessage'))
+                .map((node) => node.outerHTML.slice(0, 220)),
+        };
+    });
+
+    if (audit.mainCount !== 1) {
         throw new Error(prefix + ' expected exactly one main#main-content landmark.');
     }
 
-    const skipLink = page.locator('a[data-public-skip-link][href="#main-content"]');
-    if (await skipLink.count() !== 1) {
+    if (audit.skipCount !== 1) {
         throw new Error(prefix + ' missing the shared skip link.');
     }
 
-    for (const selector of ['header', 'footer']) {
-        if (await page.locator(selector).count() < 1) {
-            throw new Error(prefix + ' missing ' + selector + ' landmark.');
-        }
+    if (audit.headerCount < 1 || audit.footerCount < 1) {
+        throw new Error(prefix + ' missing shared header/footer landmarks.');
     }
 
-    const navigationProblems = await page.locator('nav').evaluateAll((nodes) => nodes
-        .filter((node) => isVisible(node))
-        .filter((node) => !accessibleName(node))
-        .map((node) => node.outerHTML.slice(0, 220)));
-    if (navigationProblems.length > 0) {
-        throw new Error(prefix + ' unnamed nav landmarks: ' + navigationProblems.join(' | '));
+    if (audit.navigationProblems.length > 0) {
+        throw new Error(prefix + ' unnamed nav landmarks: ' + audit.navigationProblems.join(' | '));
     }
 
-    const complementaryProblems = await page.locator('aside').evaluateAll((nodes) => {
-        const visible = nodes.filter((node) => isVisible(node));
-        if (visible.length <= 1) return [];
-
-        return visible
-            .filter((node) => !accessibleName(node))
-            .map((node) => node.outerHTML.slice(0, 220));
-    });
-    if (complementaryProblems.length > 0) {
-        throw new Error(prefix + ' multiple unnamed complementary landmarks: ' + complementaryProblems.join(' | '));
+    if (audit.complementaryProblems.length > 0) {
+        throw new Error(prefix + ' multiple unnamed complementary landmarks: ' + audit.complementaryProblems.join(' | '));
     }
 
-    const headings = await page.locator('h1,h2,h3,h4,h5,h6').evaluateAll((nodes) => nodes
-        .filter((node) => isVisible(node))
-        .map((node) => ({
-            level: Number(node.tagName.slice(1)),
-            text: (node.textContent ?? '').trim().replace(/\s+/g, ' ').slice(0, 120),
-        })));
-
-    const h1Count = headings.filter((heading) => heading.level === 1).length;
+    const h1Count = audit.headings.filter((heading) => heading.level === 1).length;
     if (h1Count !== 1) {
         throw new Error(prefix + ' expected exactly one visible H1, got ' + h1Count + '.');
     }
 
-    if (headings[0]?.level !== 1) {
+    if (audit.headings[0]?.level !== 1) {
         throw new Error(prefix + ' first visible heading must be H1.');
     }
 
-    for (let index = 1; index < headings.length; index += 1) {
-        if (headings[index].level > headings[index - 1].level + 1) {
+    for (let index = 1; index < audit.headings.length; index += 1) {
+        if (audit.headings[index].level > audit.headings[index - 1].level + 1) {
             throw new Error(
-                prefix + ' heading level jumps from H' + headings[index - 1].level + ' "' + headings[index - 1].text
-                + '" to H' + headings[index].level + ' "' + headings[index].text + '".',
+                prefix + ' heading level jumps from H' + audit.headings[index - 1].level + ' "' + audit.headings[index - 1].text
+                + '" to H' + audit.headings[index].level + ' "' + audit.headings[index].text + '".',
             );
         }
     }
 
-    const imagesMissingAlt = await page.locator('img:not([alt])').evaluateAll((nodes) => nodes
-        .filter((node) => isVisible(node))
-        .map((node) => node.outerHTML.slice(0, 220)));
-    if (imagesMissingAlt.length > 0) {
-        throw new Error(prefix + ' visible images without alt: ' + imagesMissingAlt.join(' | '));
+    if (audit.imagesMissingAlt.length > 0) {
+        throw new Error(prefix + ' visible images without alt: ' + audit.imagesMissingAlt.join(' | '));
     }
 
-    const unnamedControls = await page.locator('a[href],button,summary,input:not([type="hidden"]),select,textarea').evaluateAll((nodes) => nodes
-        .filter((node) => isVisible(node))
-        .filter((node) => !accessibleName(node))
-        .map((node) => node.outerHTML.slice(0, 220)));
-    if (unnamedControls.length > 0) {
-        throw new Error(prefix + ' visible interactive elements without accessible names: ' + unnamedControls.join(' | '));
+    if (audit.unnamedControls.length > 0) {
+        throw new Error(prefix + ' visible interactive elements without accessible names: ' + audit.unnamedControls.join(' | '));
     }
 
-    const unlabeledFields = await page.locator('input:not([type="hidden"]),select,textarea').evaluateAll((nodes) => nodes
-        .filter((node) => isVisible(node))
-        .filter((node) => {
-            const labels = 'labels' in node ? Array.from(node.labels ?? []) : [];
-            return !node.getAttribute('aria-label')
-                && !node.getAttribute('aria-labelledby')
-                && labels.every((label) => !(label.textContent ?? '').trim());
-        })
-        .map((node) => node.outerHTML.slice(0, 220)));
-    if (unlabeledFields.length > 0) {
-        throw new Error(prefix + ' visible form controls without labels: ' + unlabeledFields.join(' | '));
+    if (audit.unlabeledFields.length > 0) {
+        throw new Error(prefix + ' visible form controls without labels: ' + audit.unlabeledFields.join(' | '));
     }
 
-    const invalidWithoutErrorAssociation = await page.locator('[aria-invalid="true"]').evaluateAll((nodes) => nodes
-        .filter((node) => isVisible(node))
-        .filter((node) => !node.getAttribute('aria-describedby') && !node.getAttribute('aria-errormessage'))
-        .map((node) => node.outerHTML.slice(0, 220)));
-    if (invalidWithoutErrorAssociation.length > 0) {
-        throw new Error(prefix + ' invalid controls without error association: ' + invalidWithoutErrorAssociation.join(' | '));
+    if (audit.invalidWithoutErrorAssociation.length > 0) {
+        throw new Error(prefix + ' invalid controls without error association: ' + audit.invalidWithoutErrorAssociation.join(' | '));
     }
 
     if (viewportName === '390' || viewportName === '1024') {
@@ -125,11 +173,16 @@ async function assertKeyboardFocus(page, prefix) {
 
         const style = getComputedStyle(active);
         const rect = active.getBoundingClientRect();
+        const outlineWidth = Number.parseFloat(style.outlineWidth || '0');
+        const outlineVisible = outlineWidth >= 1
+            && style.outlineStyle !== 'none'
+            && style.outlineColor !== 'transparent'
+            && style.outlineColor !== 'rgba(0, 0, 0, 0)';
 
         return {
             skip: active.hasAttribute('data-public-skip-link'),
             visible: rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden' && style.display !== 'none',
-            indicator: hasVisibleFocusIndicator(style),
+            indicator: outlineVisible || (style.boxShadow && style.boxShadow !== 'none'),
         };
     });
 
@@ -146,9 +199,14 @@ async function assertKeyboardFocus(page, prefix) {
             if (!(active instanceof HTMLElement) || active.tagName !== 'SUMMARY') return null;
 
             const style = getComputedStyle(active);
+            const outlineWidth = Number.parseFloat(style.outlineWidth || '0');
+            const outlineVisible = outlineWidth >= 1
+                && style.outlineStyle !== 'none'
+                && style.outlineColor !== 'transparent'
+                && style.outlineColor !== 'rgba(0, 0, 0, 0)';
 
             return {
-                indicator: hasVisibleFocusIndicator(style),
+                indicator: outlineVisible || (style.boxShadow && style.boxShadow !== 'none'),
                 label: active.getAttribute('aria-label') ?? (active.textContent ?? '').trim(),
             };
         });
@@ -169,6 +227,17 @@ async function assertReducedMotion(page, prefix) {
     await page.emulateMedia({ reducedMotion: 'reduce' });
 
     const result = await page.evaluate(() => {
+        const isVisible = (node) => {
+            const style = getComputedStyle(node);
+            const rect = node.getBoundingClientRect();
+
+            return style.display !== 'none'
+                && style.visibility !== 'hidden'
+                && Number.parseFloat(style.opacity || '1') > 0
+                && rect.width > 0
+                && rect.height > 0;
+        };
+
         const parseDuration = (value) => Math.max(...value.split(',').map((part) => {
             const trimmed = part.trim();
             if (trimmed.endsWith('ms')) return Number.parseFloat(trimmed);
@@ -182,7 +251,7 @@ async function assertReducedMotion(page, prefix) {
             : null;
 
         const activeAnimations = Array.from(document.querySelectorAll('main *, header *, footer *'))
-            .filter((node) => isVisible(node))
+            .filter(isVisible)
             .map((node) => {
                 const style = getComputedStyle(node);
                 return {
@@ -215,57 +284,4 @@ async function assertReducedMotion(page, prefix) {
     if (result.activeAnimations.length > 0) {
         throw new Error(prefix + ' active animations remain under reduced motion: ' + result.activeAnimations.join(' | '));
     }
-}
-
-function isVisible(node) {
-    const style = getComputedStyle(node);
-    const rect = node.getBoundingClientRect();
-
-    return style.display !== 'none'
-        && style.visibility !== 'hidden'
-        && Number.parseFloat(style.opacity || '1') > 0
-        && rect.width > 0
-        && rect.height > 0;
-}
-
-function accessibleName(node) {
-    const ariaLabel = (node.getAttribute('aria-label') ?? '').trim();
-    if (ariaLabel) return ariaLabel;
-
-    const labelledBy = (node.getAttribute('aria-labelledby') ?? '')
-        .split(/\s+/)
-        .filter(Boolean)
-        .map((id) => document.getElementById(id)?.textContent?.trim() ?? '')
-        .filter(Boolean)
-        .join(' ');
-    if (labelledBy) return labelledBy;
-
-    if ('labels' in node) {
-        const labelText = Array.from(node.labels ?? [])
-            .map((label) => label.textContent?.trim() ?? '')
-            .filter(Boolean)
-            .join(' ');
-        if (labelText) return labelText;
-    }
-
-    const text = (node.textContent ?? '').trim().replace(/\s+/g, ' ');
-    if (text) return text;
-
-    const imageAlt = node.querySelector?.('img[alt]')?.getAttribute('alt')?.trim();
-    if (imageAlt) return imageAlt;
-
-    const value = 'value' in node ? String(node.value ?? '').trim() : '';
-    if (value) return value;
-
-    return (node.getAttribute('title') ?? '').trim();
-}
-
-function hasVisibleFocusIndicator(style) {
-    const outlineWidth = Number.parseFloat(style.outlineWidth || '0');
-    const outlineVisible = outlineWidth >= 1
-        && style.outlineStyle !== 'none'
-        && style.outlineColor !== 'transparent'
-        && style.outlineColor !== 'rgba(0, 0, 0, 0)';
-
-    return outlineVisible || (style.boxShadow && style.boxShadow !== 'none');
 }
