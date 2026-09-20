@@ -4,6 +4,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { spawn } from 'node:child_process';
 import { chromium } from 'playwright';
+import { assertNewsroomAccessibility } from './support/newsroom-accessibility.mjs';
 
 const cwd = process.cwd();
 const outputDir = path.join(cwd, 'output', 'playwright', 'newsroom-semantic-links');
@@ -213,6 +214,10 @@ try {
                 }
             }
 
+            const accessibility = surface.key === 'article'
+                ? await assertNewsroomAccessibility(page, { surface: 'semantic-article', viewport: viewport.name })
+                : null;
+
             const screenshot = path.join(outputDir, `${surface.key}-${viewport.name}.png`);
             await page.screenshot({ path: screenshot, fullPage: true, timeout: 15_000 });
 
@@ -222,6 +227,7 @@ try {
                 status: 'ok',
                 measured_width: measuredWidth,
                 screenshot,
+                accessibility,
             });
 
             await context.close();
