@@ -118,6 +118,48 @@
                 background: #ffffff;
             }
 
+            .public-content-skip-link {
+                position: fixed;
+                z-index: 200;
+                top: 0.75rem;
+                left: 0.75rem;
+                transform: translateY(-200%);
+                border-radius: 0.375rem;
+                padding: 0.75rem 1rem;
+                background: #0f172a;
+                color: #ffffff;
+                font-size: 0.875rem;
+                font-weight: 700;
+                line-height: 1.25;
+                text-decoration: none;
+            }
+
+            .public-content-skip-link:focus-visible {
+                transform: translateY(0);
+            }
+
+            body.public-content-page :is(
+                a[href],
+                button:not([disabled]),
+                summary,
+                [tabindex]:not([tabindex="-1"])
+            ):focus-visible {
+                outline: 3px solid #0a66c2 !important;
+                outline-offset: 3px !important;
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                body.public-content-page,
+                body.public-content-page *,
+                body.public-content-page *::before,
+                body.public-content-page *::after {
+                    scroll-behavior: auto !important;
+                    transition-duration: 0.01ms !important;
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                }
+            }
+
             .content-muted {
                 color: #4b5563;
             }
@@ -182,14 +224,16 @@
             <script type="application/ld+json">{!! json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
         @endforeach
     </head>
-    <body class="flex min-h-screen flex-col bg-white text-slate-950">
+    <body class="public-content-page flex min-h-screen flex-col bg-white text-slate-950">
+        <a class="public-content-skip-link" href="#main-content">Przejdź do treści</a>
+
         @hasSection('site_header')
             @yield('site_header')
         @else
             <x-site.home-header :immediate="true" />
         @endif
 
-        <main class="flex-1">
+        <main id="main-content" tabindex="-1" class="flex-1">
             @if ($breadcrumbs !== [])
                 @php
                     $breadcrumbBandClass = trim($__env->yieldContent('breadcrumb_band_class')) ?: 'content-band';

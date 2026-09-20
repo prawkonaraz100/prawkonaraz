@@ -30,6 +30,7 @@ on:
       - 'app/Support/NewsroomSemanticLinkService.php'
       - 'app/Support/NewsroomArticleProductBridgeService.php'
       - 'resources/views/newsroom/**'
+      - 'resources/views/layouts/public-content.blade.php'
       - 'resources/views/components/public/newsroom-reverse-links.blade.php'
       - 'resources/views/questions-database/show.blade.php'
       - 'resources/views/legal-content/show.blade.php'
@@ -55,6 +56,7 @@ on:
       - 'scripts/e2e-newsroom-semantic-links.mjs'
       - 'scripts/e2e-newsroom-golden-path.mjs'
       - 'scripts/newsroom-performance-metrics.mjs'
+      - 'scripts/support/newsroom-accessibility.mjs'
       - 'package.json'
 
 jobs:

@@ -4,6 +4,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { spawn } from 'node:child_process';
 import { chromium } from 'playwright';
+import { assertNewsroomAccessibility } from './support/newsroom-accessibility.mjs';
 import { assertPerformanceBudget, collectSnapshotPerformance } from './newsroom-performance-metrics.mjs';
 
 const cwd = process.cwd();
@@ -175,6 +176,8 @@ try {
             throw new Error(`Horizontal overflow at ${viewport.name}px: ${scrollWidth}px > ${viewportWidth}px.`);
         }
 
+        const accessibility = await assertNewsroomAccessibility(page, { surface: 'home', viewport: viewport.name });
+
         const screenshot = path.join(outputDir, `home-${viewport.name}.png`);
         await page.screenshot({ path: screenshot, fullPage: true, timeout: 15_000 });
 
@@ -183,6 +186,7 @@ try {
             status: 'ok',
             scroll_width: scrollWidth,
             screenshot,
+            accessibility,
         });
 
         await context.close();
