@@ -413,6 +413,17 @@ Stan po NEWSROOM-N6-010:
 - Browser Smoke nie był automatycznie uruchamiany, ponieważ workflow path contract obejmuje publiczne renderery/read modele, a N6-010 zmienia wyłącznie Filament/service + feature regressions; nie zapisujemy nieuruchomionego Browser Smoke jako PASS,
 - merge PR #146: `main@c58feafe6cffbb8bf54bbfcd0b3f1d4587fee97d`; post-merge CI #523 pełny PASS z tym samym bilansem backend/Pint/frontend/PostgreSQL.
 
+Stan NEWSROOM-N6-011 przed merge:
+
+- `ContentArticleResourceTest` pokrywa computed `not_scheduled -> fresh -> overdue`,
+- regression potwierdza, że overdue nie zmienia `workflow_status` ani `isActivelyDistributed()`,
+- ordinary public Save może ustawić i wyczyścić `source_checked_at` / `freshness_review_due_at` pod istniejącym stale-token guardem bez mutacji title/public content,
+- ten sam regression potwierdza brak zmian `last_substantive_update_at`, `public_state_changed_at` i `published_at`,
+- service-controlled timestamps są tylko prezentowane w adminie, nie edytowane,
+- `due soon` nie ma automatycznego testu/statusu, ponieważ source-of-truth policy nie definiuje progu; nie zapisujemy wymyślonego threshold,
+- finalny implementation HEAD przed docs-sync `cee06ee552208dd19d06110009237c2c0d90fb03`: CI #526 PASS — 1151 passed / 20 326 assertions / 2 skipped, PostgreSQL PASS, Pint 1103 files PASS, frontend build PASS,
+- Browser Smoke nie został triggerowany przez path contract, ponieważ N6-011 zmienia model/admin Filament/feature regression bez publicznego renderera; nie traktujemy nieuruchomionego Browser Smoke jako PASS.
+
 ---
 
 ## 12. Preview security tests
@@ -1640,6 +1651,13 @@ Na 2026-09-18 po NEWSROOM-N4-008, zweryfikowanym na `main@3d7ac8ab8a3ed1c299cb0c
 ---
 
 ## 60. Historia zmian
+
+### 2026-09-20 — v0.50
+
+- NEWSROOM-N6-011 na PR #148 dodał repo-level regression dla freshness status/backlog i bezpiecznego admin metadata Save bez zmiany publicznej dystrybucji,
+- exact-head implementation CI #526 na `cee06ee552208dd19d06110009237c2c0d90fb03` ma pełny PASS: 1151 passed / 20 326 assertions / 2 skipped, PostgreSQL PASS, Pint 1103 files PASS, frontend PASS,
+- `due soon` pozostaje jawnie bez threshold/testu do czasu decyzji policy; Browser Smoke nie był triggerowany dla admin/model-only path scope,
+- finalne N6-011 evidence pozostaje otwarte do docs-sync CI, merge i post-merge CI.
 
 ### 2026-09-20 — v0.49
 
