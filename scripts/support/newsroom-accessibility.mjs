@@ -278,6 +278,14 @@ export async function assertNewsroomAccessibility(page, { surface, viewport }) {
         );
     }
 
+    const skipLink = page.locator('.public-content-skip-link:visible').first();
+    const initialSkipBox = await skipLink.boundingBox();
+    if (!initialSkipBox || initialSkipBox.y + initialSkipBox.height > 0) {
+        throw new Error(
+            `[a11y:${surface}:${viewport}] skip link must be visually hidden before keyboard focus`,
+        );
+    }
+
     const focusChecks = [
         ['skip-link', '.public-content-skip-link:visible'],
         ['header-menu', 'header summary:visible'],
@@ -306,7 +314,6 @@ export async function assertNewsroomAccessibility(page, { surface, viewport }) {
         }
     }
 
-    const skipLink = page.locator('.public-content-skip-link:visible').first();
     await skipLink.focus();
     await page.keyboard.press('Enter');
     await page.waitForTimeout(20);
@@ -366,6 +373,19 @@ export async function assertNewsroomAccessibility(page, { surface, viewport }) {
         return { checked, offenders };
     });
     await page.emulateMedia({ reducedMotion: 'no-preference' });
+
+    await page.evaluate(() => {
+        if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+        }
+    });
+
+    const finalSkipBox = await skipLink.boundingBox();
+    if (!finalSkipBox || finalSkipBox.y + finalSkipBox.height > 0) {
+        throw new Error(
+            `[a11y:${surface}:${viewport}] skip link remained visually exposed after accessibility checks`,
+        );
+    }
 
     if (motion.offenders.length) {
         throw new Error(
