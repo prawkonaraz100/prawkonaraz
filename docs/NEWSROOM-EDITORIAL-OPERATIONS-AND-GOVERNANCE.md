@@ -475,6 +475,14 @@ Wymaga:
 - ponownego review,
 - publicznej informacji o korekcie, jeśli błąd mógł wpłynąć na odbiorcę.
 
+Stan implementacji po NEWSROOM-N6-010:
+
+- admin ma dedykowane `Apply correction` dla publicly-visible article,
+- akcja wymaga publicznej `correction_note` i korzysta z istniejącego fresh-review contractu; brak review albo review starsze od ostatniego `needs_review_at` blokuje korektę,
+- correction content + note są atomowe i stale-safe; nieudana walidacja nie pozostawia częściowego publicznego zapisu,
+- istotna korekta ma osobny allowlisted AuditLog `content_article.corrected`, bez kopiowania body/lead/correction note do metadata,
+- zachowany pozostaje v1 identity model: system nie udowadnia osobnej zalogowanej osoby reviewera bez nowego RBAC/linku User↔ContentAuthor i nie dodaje revision/snapshot systemu.
+
 ### 16.3. Wycofanie materiału
 
 Jeśli cały materiał jest nieprawdziwy lub nie powinien być publiczny:
@@ -1167,6 +1175,14 @@ Na 2026-09-16:
 ---
 
 ## 49. Historia zmian
+
+### 2026-09-20 — v0.22
+
+- NEWSROOM-N6-010 zmaterializował dedykowane `Apply correction` na istniejącym stale-safe/atomic `Apply public update` boundary; correction note, public content i substantive timestamp są spójne transakcyjnie,
+- wymagany review korzysta z istniejącej `assertFreshReview()`; brak review oraz stale review po `needs_review_at` są regresyjnie blokowane,
+- audit dla korekty używa `content_article.corrected` i nie przechowuje pełnej treści ani publicznej noty w metadata,
+- PR #146: exact-head CI #522 PASS, Scheduled Publication Smoke #13 PASS, merge `main@c58feafe6cffbb8bf54bbfcd0b3f1d4587fee97d`, post-merge CI #523 PASS,
+- pełny freshness workflow/admin section pozostaje odrębnym NEWSROOM-N6-011.
 
 ### 2026-09-20 — v0.21
 
