@@ -372,6 +372,165 @@ test('invalid public update rolls back article and source mutations', function (
             ->exists())->toBeFalse();
 });
 
+test('correction uses the public update boundary and records a public correction note atomically', function () {
+    Carbon::setTestNow('2026-09-16 19:00:00');
+
+    $actor = User::factory()->admin()->create();
+    $article = ContentArticle::factory()->published()->create([
+        'title' => 'Tytuł przed korektą',
+        'lead' => 'Lead przed korektą',
+    ]);
+    ContentArticleSource::factory()
+        ->for($article, 'article')
+        ->create([
+            'source_type' => ContentArticleSourceType::Official->value,
+            'title' => 'Źródło korekty',
+            'url' => 'https://example.test/correction-source',
+            'is_publicly_cited' => true,
+        ]);
+
+    $loadedToken = app(ContentArticleEditToken::class)->make($article->fresh());
+
+    $updated = newsroomPublishingService()->applyCorrection(
+        $article,
+        newsroomPublicUpdatePayload($article, [
+            'title' => 'Tytuł po korekcie',
+            'lead' => 'Lead po korekcie',
+        ]),
+        $loadedToken,
+        'Poprawiono błędną datę obowiązywania przepisu.',
+        $actor,
+    );
+
+    $audit = AuditLog::query()
+        ->where('action', 'content_article.corrected')
+        ->where('entity_id', (string) $article->id)
+        ->sole();
+
+    expect($updated->title)->toBe('Tytuł po korekcie')
+        ->and($updated->lead)->toBe('Lead po korekcie')
+        ->and($updated->correction_note)->toBe('Poprawiono błędną datę obowiązywania przepisu.')
+        ->and($updated->last_substantive_update_at?->toDateTimeString())->toBe('2026-09-16 19:00:00')
+        ->and($audit->actor_user_id)->toBe($actor->id)
+        ->and($audit->metadata['substantive_change'])->toBeTrue()
+        ->and($audit->metadata['correction_applied'])->toBeTrue()
+        ->and($audit->metadata)->not->toHaveKey('correction_note')
+        ->and($audit->metadata)->not->toHaveKey('body_blocks')
+        ->and($audit->metadata)->not->toHaveKey('lead')
+        ->and($audit->metadata)->not->toHaveKey('editorial_note');
+});
+
+test('correction requires a non-empty public correction note', function () {
+    $article = ContentArticle::factory()->published()->create();
+    ContentArticleSource::factory()->for($article, 'article')->create();
+    $loadedToken = app(ContentArticleEditToken::class)->make($article->fresh());
+
+    expect(fn () => newsroomPublishingService()->applyCorrection(
+        $article,
+        newsroomPublicUpdatePayload($article, ['title' => 'Nie zapisuj tej zmiany']),
+        $loadedToken,
+        '   ',
+    ))->toThrow(InvalidArgumentException::class, 'Correction note is required');
+
+    expect($article->fresh()->title)->not->toBe('Nie zapisuj tej zmiany')
+        ->and($article->fresh()->correction_note)->toBeNull()
+        ->and(AuditLog::query()
+            ->where('action', 'content_article.corrected')
+            ->where('entity_id', (string) $article->id)
+            ->exists())->toBeFalse();
+});
+
+test('correction requires a completed fresh review before changing public content', function () {
+    $article = ContentArticle::factory()->published()->create([
+        'reviewed_at' => null,
+        'title' => 'Tytuł bez review',
+    ]);
+    ContentArticleSource::factory()->for($article, 'article')->create();
+    $loadedToken = app(ContentArticleEditToken::class)->make($article->fresh());
+
+    expect(fn () => newsroomPublishingService()->applyCorrection(
+        $article,
+        newsroomPublicUpdatePayload($article, ['title' => 'Zmiana bez review']),
+        $loadedToken,
+        'Istotna korekta wymagająca review.',
+    ))->toThrow(DomainException::class, 'completed review');
+
+    expect($article->fresh()->title)->toBe('Tytuł bez review')
+        ->and($article->fresh()->correction_note)->toBeNull()
+        ->and(AuditLog::query()
+            ->where('action', 'content_article.corrected')
+            ->where('entity_id', (string) $article->id)
+            ->exists())->toBeFalse();
+});
+
+test('correction rejects stale editor state before writing the correction note', function () {
+    Carbon::setTestNow('2026-09-16 19:10:00');
+
+    $article = ContentArticle::factory()->published()->create([
+        'title' => 'Tytuł przed konfliktem',
+    ]);
+    $source = ContentArticleSource::factory()
+        ->for($article, 'article')
+        ->create([
+            'title' => 'Źródło załadowane',
+        ]);
+
+    $loadedToken = app(ContentArticleEditToken::class)->make($article->fresh());
+
+    $source->update([
+        'title' => 'Równoległa zmiana źródła',
+    ]);
+
+    expect(fn () => newsroomPublishingService()->applyCorrection(
+        $article,
+        newsroomPublicUpdatePayload($article, ['title' => 'Nie nadpisuj']),
+        $loadedToken,
+        'Nota nie może zostać zapisana.',
+    ))->toThrow(DomainException::class, 'changed after this form was loaded');
+
+    expect($article->fresh()->title)->toBe('Tytuł przed konfliktem')
+        ->and($article->fresh()->correction_note)->toBeNull()
+        ->and($source->fresh()->title)->toBe('Równoległa zmiana źródła')
+        ->and(AuditLog::query()
+            ->where('action', 'content_article.corrected')
+            ->where('entity_id', (string) $article->id)
+            ->exists())->toBeFalse();
+});
+
+test('invalid correction rolls back content sources and correction note together', function () {
+    Carbon::setTestNow('2026-09-16 19:20:00');
+
+    $article = ContentArticle::factory()->published()->create([
+        'title' => 'Tytuł przed nieudaną korektą',
+    ]);
+    $source = ContentArticleSource::factory()
+        ->for($article, 'article')
+        ->create([
+            'title' => 'Źródło przed nieudaną korektą',
+        ]);
+    $loadedToken = app(ContentArticleEditToken::class)->make($article->fresh());
+
+    expect(fn () => newsroomPublishingService()->applyCorrection(
+        $article,
+        newsroomPublicUpdatePayload($article, [
+            'title' => 'Tytuł ma zostać wycofany',
+            'sources' => [],
+        ]),
+        $loadedToken,
+        'Ta nota także ma zostać wycofana.',
+    ))->toThrow(DomainException::class, 'requires at least one source');
+
+    expect($article->fresh()->title)->toBe('Tytuł przed nieudaną korektą')
+        ->and($article->fresh()->correction_note)->toBeNull()
+        ->and($source->fresh()->title)->toBe('Źródło przed nieudaną korektą')
+        ->and($article->fresh()->sources()->count())->toBe(1)
+        ->and($article->fresh()->last_substantive_update_at)->toBeNull()
+        ->and(AuditLog::query()
+            ->where('action', 'content_article.corrected')
+            ->where('entity_id', (string) $article->id)
+            ->exists())->toBeFalse();
+});
+
 test('schedule is initial publish only and due publication preserves date semantics', function () {
     Carbon::setTestNow('2026-09-16 08:00:00');
 
