@@ -6,9 +6,8 @@ use App\Models\StudySession;
 use App\Models\StudySessionAnswer;
 use App\Models\User;
 use App\Models\UserQuestionProgress;
-use Inertia\Testing\AssertableInertia as Assert;
 
-test('public hardest questions hub renders aggregated ranking', function () {
+test('public hardest questions hub renders raw seo html and aggregated ranking', function () {
     $category = LicenseCategory::factory()->categoryB()->create([
         'name' => 'Kategoria B',
         'sort_order' => 1,
@@ -87,23 +86,29 @@ test('public hardest questions hub renders aggregated ranking', function () {
         'next_review_at' => today()->addDays(3),
     ]);
 
-    $this->get(route('public.hardest-questions.index'))
+    $response = $this->get(route('public.hardest-questions.index'));
+
+    $response
         ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page
-            ->component('Public/HardestQuestions/Index')
-            ->where('page.title', 'Najtrudniejsze pytania na prawo jazdy')
-            ->where('summary.questions_analyzed', 1)
-            ->where('summary.answers_count', 3)
-            ->where('summary.users_count', 2)
-            ->where('summary.window_label', 'Ostatnie 365 dni')
-            ->where('top_questions.0.external_id', 'B-900')
-            ->where('top_questions.0.category.code', 'B')
-            ->where('featured_question.external_id', 'B-900')
-            ->has('categories', 2)
-        );
+        ->assertSee('<title>Najtrudniejsze pytania na prawo jazdy</title>', false)
+        ->assertSee(
+            '<meta name="description" content="Publiczny ranking pytań, które realnie sprawiają kursantom największą trudność.">',
+            false,
+        )
+        ->assertSee(
+            '<link rel="canonical" href="'.route('public.hardest-questions.index').'">',
+            false,
+        )
+        ->assertSee('<h1', false)
+        ->assertSeeText('Najtrudniejsze pytania na prawo jazdy')
+        ->assertSeeText('Publiczny ranking pytań, które realnie sprawiają kursantom największą trudność.')
+        ->assertSeeText('Czy przed przejsciem dla pieszych musisz zachowac szczegolna ostroznosc?')
+        ->assertSee('href="/najtrudniejsze-pytania-na-prawo-jazdy/kategoria/b"', false)
+        ->assertSee('href="/najtrudniejsze-pytania-na-prawo-jazdy/kategoria/c"', false)
+        ->assertSee('href="/najtrudniejsze-pytania-na-prawo-jazdy?ranking=first_try"', false);
 });
 
-test('public hardest questions category page resolves category by slug', function () {
+test('public hardest questions category page renders raw seo html for selected ranking', function () {
     $category = LicenseCategory::factory()->categoryC()->create([
         'name' => 'Kategoria C',
         'sort_order' => 1,
@@ -138,14 +143,22 @@ test('public hardest questions category page resolves category by slug', functio
         'next_review_at' => today(),
     ]);
 
-    $this->get(route('public.hardest-questions.categories.show', ['categorySlug' => $category->slug]))
+    $canonical = route('public.hardest-questions.categories.show', ['categorySlug' => $category->slug]);
+
+    $this->get($canonical.'?ranking=first_try')
         ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page
-            ->component('Public/HardestQuestions/Index')
-            ->where('selected_category.code', 'C')
-            ->where('selected_category.slug', 'c')
-            ->where('summary.questions_analyzed', 1)
-            ->where('summary.window_label', 'Ostatnie 365 dni')
-            ->where('top_questions.0.external_id', 'C-101')
+        ->assertSee('<title>Najtrudniejsze pytania na prawo jazdy kategorii C</title>', false)
+        ->assertSee(
+            '<meta name="description" content="Publiczny ranking pytań, które sprawiają największą trudność kursantom kategorii C.">',
+            false,
+        )
+        ->assertSee('<link rel="canonical" href="'.$canonical.'">', false)
+        ->assertSeeText('Najtrudniejsze pytania na prawo jazdy kategorii C')
+        ->assertSeeText('Najczęściej mylone na starcie')
+        ->assertSeeText('Czy kierowca pojazdu ciezarowego powinien utrzymac bezpieczny odstep?')
+        ->assertSee(
+            'href="/najtrudniejsze-pytania-na-prawo-jazdy/kategoria/c?ranking=repeat_fail"',
+            false,
         );
 });
+
