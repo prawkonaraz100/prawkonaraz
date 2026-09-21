@@ -5,14 +5,18 @@ namespace App\Http\Controllers;
 use App\Support\NewsroomGuideHubReadModelService;
 use App\Support\NewsroomGuideHubSchemaService;
 use App\Support\NewsroomHomeReadModelService;
+use App\Support\NewsroomHomeSchemaService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response;
 
 class NewsroomPlaceholderController extends Controller
 {
-    public function news(Request $request, NewsroomHomeReadModelService $readModelService): Response
-    {
+    public function news(
+        Request $request,
+        NewsroomHomeReadModelService $readModelService,
+        NewsroomHomeSchemaService $schemaService,
+    ): Response {
         $home = $readModelService->build();
 
         if ($home === null) {
@@ -24,14 +28,33 @@ class NewsroomPlaceholderController extends Controller
             );
         }
 
+        $canonical = route('public.news');
+        $description = 'Aktualności, wyjaśnienia i poradniki o prawie jazdy, egzaminach, przepisach, WORD i bezpieczeństwie ruchu.';
+        $breadcrumbs = [
+            [
+                'label' => 'Strona główna',
+                'url' => route('home'),
+            ],
+            [
+                'label' => 'Aktualności',
+                'url' => $canonical,
+            ],
+        ];
+
         return response()->view('newsroom.home', [
             'home' => $home,
             'meta' => [
                 'title' => 'Aktualności o prawie jazdy, egzaminach i przepisach | prawkonaraz.pl',
-                'description' => 'Aktualności, wyjaśnienia i poradniki o prawie jazdy, egzaminach, przepisach, WORD i bezpieczeństwie ruchu.',
-                'canonical' => route('public.news'),
+                'description' => $description,
+                'canonical' => $canonical,
                 'robots' => 'index,follow,max-image-preview:large',
             ],
+            'breadcrumbs' => $breadcrumbs,
+            'structuredData' => $schemaService->build(
+                $breadcrumbs,
+                $canonical,
+                $description,
+            ),
         ]);
     }
 
