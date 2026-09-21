@@ -1992,7 +1992,18 @@ Nie implementować tego jako zwykłego `ShouldQueue`, dopóki produkcja ma `QUEU
 
 ### Potwierdzony stan implementacji po PR #109, #112, #115, #117, #119 i #127
 
-NEWSROOM-N5-007 pozostaje **IN PROGRESS**.
+NEWSROOM-N5-007 jest **DONE — repo contract, live Nginx/Cloudflare delivery, scheduler oraz STRICT GitHub Actions smoke potwierdzone 2026-09-20**.
+
+### Live production evidence — 2026-09-20
+
+- aplikacja została wdrożona jako release `/var/www/prawkobit/releases/20260920150051-newsroom-dod-d0a336c` z markerem `d0a336c18bd3815dc0e8fded1331f8493ea1ad88`; późniejsze `main@55cdb0be8060611cd87fbf1fc6224d5b9d26c09f` zmienia wyłącznie dokumentację SEO i nie wymaga redeployu runtime,
+- aktywny vhost Nginx ma zastosowany repo contract dla `/robots.txt`, `/sitemap.xml` i `/sitemaps/*`; `nginx -t` oraz reload zakończyły się powodzeniem,
+- origin `127.0.0.1` z `Host: prawkonaraz.pl` zwraca dla `/robots.txt` `200`, `text/plain`, `Cache-Control: public, max-age=3600`, `ETag` i brak `Set-Cookie`,
+- publiczny `/sitemap.xml` zwraca `200`, `application/xml`, `Cache-Control: public, max-age=3600`, `ETag` i brak `Set-Cookie`,
+- Cloudflare Browser Cache TTL został przełączony z `4 hours` na `Respect Existing Headers`, a cache selektywnie wyczyszczony wyłącznie dla `/robots.txt` i `/sitemap.xml`,
+- publiczny `/robots.txt` zwraca po zmianie `Cache-Control: public, max-age=3600`, a sitemap XML `application/xml`; dodatkowe `types { }` w lokalizacjach sitemap zapobiega odziedziczeniu mapowania `text/xml` z globalnego `mime.types`,
+- świeży STRICT `production-seo-delivery-smoke.sh` zakończył się kodem `0`: PASS dla `/robots.txt`, `/sitemap.xml`, `/sitemaps/static.xml` oraz oczekiwanego 404 `/aktualnosci/feed.xml` przy wyłączonym publicznym gate,
+- produkcyjny scheduler wykonuje co minutę `newsroom:publish-due` oraz `newsroom:refresh-seo-artifacts-if-dirty`; log z 2026-09-20 17:25–17:27 CEST potwierdza kolejne wykonania `DONE` bez bieżących błędów.
 
 Potwierdzone podkroki:
 - PR #109: `SeoSitemapGenerator::generate()` buduje cały replacement set i waliduje protocol limits oraz XML przed modyfikacją opublikowanych plików,
@@ -2024,10 +2035,9 @@ Deployment-guard PR #127 miał finalny head `e84758d911ffc4f6ff10a04f88a2b8c48be
 
 Topology evidence z aktualnych dokumentów wdrożeniowych potwierdza bieżący kontrakt produkcyjny jako 1x VPS Mikrus 4.1 z Nginx/PHP/PostgreSQL/Redis na jednej maszynie, lokalnym `public/` i jednym cronem `schedule:run`. Dla tej topologii same-filesystem atomic replace jest właściwym modelem. Ewentualne przejście na wiele web node'ów ponownie otwiera wymóg wspólnej dystrybucji artifact setu; Redis lock/`onOneServer()` nie synchronizuje lokalnych plików między node'ami.
 
-Nadal niewykonane w N5-007:
-- zastosowanie aktualnego Nginx configu na produkcji i udany STRICT `workflow_dispatch` workflow `Production SEO Delivery Smoke`; report-only run z PR #117 wykazał obecnie rozbieżność Cache-Control dla `/robots.txt`,
-- potwierdzenie Cloudflare/origin HTTP evidence dla Content-Type/cache/braku Set-Cookie/ETag lub Last-Modified/conditional 304,
-- production Search Console / GSC verification.
+Zamknięcie produkcyjne N5-007:
+- STRICT `workflow_dispatch` `Production SEO Delivery Smoke #7` na `main@55cdb0be8060611cd87fbf1fc6224d5b9d26c09f` zakończył się `Success` w 12 s: `https://github.com/prawkonaraz100/prawkonaraz/actions/runs/35531241469`,
+- GSC ma główny sitemap submitted i pobrany bez reported warnings/errors; po publicznym rolloutcie N6-007 przejmie obserwację newsroom article/news sitemap i nie blokuje to zamkniętego dark-deploy static delivery.
 
 ### Robots compatibility
 
@@ -2079,9 +2089,13 @@ Feed może mieć validators aplikacyjne osobno.
 
 ## NEWSROOM-N6-000 — Repository merge-gate enforcement
 
+### Status
+
+**DONE — operational repository settings verified 2026-09-20.**
+
 ### Potwierdzony stan
 
-GitHub branch `main` jest obecnie niechroniony i nie ma required status checks. G0–G6 są więc proceduralne, dopóki repo rules tego nie egzekwują.
+GitHub branch `main` ma aktywną ochronę gałęzi. Normalna praca wymaga pull requestu, strict required status checks obejmują `quality` i `newsroom-postgres`, wymagane jest rozwiązanie rozmów, a force push i usuwanie gałęzi są wyłączone. Review count pozostaje `0`, a ochrona nie jest wymuszana na administratorach; jest to świadoma minimalna konfiguracja operacyjna dla obecnego jednoosobowego maintainer flow.
 
 ### Gate przed publicznym rolloutem
 
@@ -2286,9 +2300,16 @@ Search Console evidence odświeżone 2026-09-20:
 - settled Search Analytics do 2026-09-17 ma dla `/aktualnosci` 0 clicks / 0 impressions; homepage ma w tym 28-dniowym oknie 2 clicks / 2 impressions,
 - aktualna inspekcja homepage nadal zwraca referring URLs `https://prawkoapp.pl/` i `http://prawkonaraz.pl/`; samo ich występowanie nie jest obecnie dowodem canonical failure, ponieważ canonical HTTPS homepage ma verdict PASS.
 
+### Live production revalidation po deployu — 2026-09-20
+
+- aktualny runtime emituje stabilne WebSite/Organization `@id` oraz poprawny placeholder `/aktualnosci` z `noindex`; wcześniejsze trzy failures z report-only runu nie opisują już bieżącego deployu,
+- enterprise validator wykonał `102 checks / 0 failures / 2 warnings`; ostrzeżenia dotyczą dwuhopowego redirectu `http-www` oraz oczekiwanego braku newsroom article/news sitemap przy wyłączonym publicznym gate i pustym corpusie,
+- `NEWSROOM_PUBLIC_ENABLED=false` jest potwierdzone w aktywnym release, a produkcyjna baza ma `0` articles, `0` categories i `0` topics,
+- N5-007 STRICT static-delivery smoke po korekcie Cloudflare i typu MIME zakończył się pełnym PASS; runtime pozostaje dark-deployed, więc article/news samples są odłożone do kontrolowanego rollout'u.
+
 ### Boundary / następny krok
 
-N6-003 nie jest DONE i nie wolno zapisywać report-only workflow success jako zielonego production gate'u. Następny krok N6-003 wymaga aktualnego deploy/runtime na produkcji, zielonego STRICT runu oraz reprezentatywnych live article/category/topic samples do URL Inspection/schema/canonical/date validation.
+N6-003 nie jest DONE i nie wolno zapisywać report-only workflow success jako zielonego production gate'u. Następny krok N6-003 wymaga korekty reguły Cloudflare i zielonego STRICT runu, a po kontrolowanym rolloutcie także reprezentatywnych live article/category/topic samples do URL Inspection/schema/canonical/date validation.
 
 NEWSROOM-N5-007 również pozostaje IN PROGRESS; jego Nginx/STRICT static-delivery/Cloudflare/GSC evidence jest częściowo współdzielone z N6-003, ale oba taski zachowują własny zakres i status.
 
@@ -2427,7 +2448,7 @@ Ponowny audyt aktualnego `main@2ba4cffbe5d065724d876b35394bc50b2051d38e` potwier
 
 Post-merge CI #505 na `main@2ba4cffbe5d065724d876b35394bc50b2051d38e` zakończył pełny PASS: 1141 passed / 20 231 assertions / 2 skipped, PostgreSQL 7/94, Pint 1102 files PASS i frontend build PASS.
 
-**N6-005 pozostaje IN PROGRESS wyłącznie dla runtime/release evidence**: zgodnie z istniejącym runbookiem Phase A wymaga faktycznego potwierdzenia `NEWSROOM_PUBLIC_ENABLED=false` na produkcji przed cutoverem, a Phase B jawnego ustawienia `true`, odświeżenia config cache i publicznych smoke checks. `deploy/mikrus/deploy.sh` celowo nie przełącza tego gate automatycznie.
+**N6-005 pozostaje IN PROGRESS wyłącznie dla Phase B rollout evidence**. Phase A została potwierdzona 2026-09-20 na aktywnym release: `.env` i zcache'owany runtime utrzymują `NEWSROOM_PUBLIC_ENABLED=false`, publiczny feed pozostaje 404, a produkcyjna baza nie zawiera artykułów, kategorii ani tematów. Phase B wymaga dopiero jawnego ustawienia `true` po przygotowaniu realnego batcha redakcyjnego, odświeżenia config cache i publicznych smoke checks. `deploy/mikrus/deploy.sh` celowo nie przełącza tego gate automatycznie.
 
 ---
 
@@ -2798,7 +2819,7 @@ Docs-only:
 - [x] dirty/version scheduled refresh bez queue-worker assumption — potwierdzone w NEWSROOM-N5-007 PR #112: version/clean-version, shared lock, every-minute scheduler, `onOneServer()` + `withoutOverlapping()`, daily recovery
 - [x] child-before-index atomic static publication — potwierdzone w NEWSROOM-N5-007 PR #109; dirty/version refresh i production delivery smoke pozostają osobnymi otwartymi gate'ami
 - [x] istniejący `SeoSitemapAuditor` rozszerzony o newsroom/news namespace/tag/date/window/eligibility/topology/shard/obsolete-file checks w NEWSROOM-N5-006; generic protocol-limit guards nadal są reużywane
-- [ ] rzeczywisty static/Nginx/CDN delivery smoke (Content-Type/cache/Set-Cookie/validators) — tooling/Nginx contract są w PR #115, workflow w PR #117; report-only produkcja wykazała Cache-Control mismatch, więc brak nadal STRICT production PASS
+- [x] rzeczywisty static/Nginx/CDN delivery smoke (Content-Type/cache/Set-Cookie/validators) — Cloudflare respektuje origin headers, sitemap ma `application/xml`, a STRICT Production SEO Delivery Smoke #7 zakończył się PASS 2026-09-20
 - [x] Atom feed + discovery + generation cache/validator contract (NEWSROOM-N5-003)
 - [x] author ProfilePage / publisher / WebSite
 
@@ -2806,7 +2827,7 @@ Docs-only:
 
 - [ ] NEWSROOM_PUBLIC_ENABLED controlled rollout/rollback gate
 - [x] publisher transparency/contact/editorial principles gate
-- [ ] scheduler monitored
+- [x] scheduler monitored — produkcyjny cron i kolejne wykonania `newsroom:publish-due` / `newsroom:refresh-seo-artifacts-if-dirty` potwierdzone 2026-09-20
 - [x] audit — AuditLog operacyjny + site-wide `newsroom:audit-links`/SEO audit mają regression evidence
 - [x] correction flow — NEWSROOM-N6-010 / PR #146 / post-merge CI #523
 - [x] freshness — NEWSROOM-N6-011 / PR #148 / post-merge CI #531
