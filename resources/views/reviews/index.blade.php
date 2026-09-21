@@ -1,5 +1,13 @@
 @extends('layouts.public-content')
 
+@push('styles')
+    @vite('resources/css/home.css')
+@endpush
+
+@push('scripts')
+    @vite('resources/js/home.ts')
+@endpush
+
 @section('content')
     <section class="reviews-page__hero">
         <div class="reviews-page__shell">

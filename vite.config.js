@@ -8,6 +8,8 @@ export default defineConfig({
             input: [
                 'resources/js/app.ts',
                 'resources/js/public-content.ts',
+                'resources/js/home.ts',
+                'resources/css/home.css',
             ],
             refresh: true,
         }),

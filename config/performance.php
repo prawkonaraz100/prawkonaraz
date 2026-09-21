@@ -2,7 +2,7 @@
 
 return [
     'public_auth_drawers' => [
-        'lazy' => (bool) env('PUBLIC_AUTH_DRAWERS_LAZY', false),
+        'lazy' => (bool) env('PUBLIC_AUTH_DRAWERS_LAZY', true),
     ],
 
     'perf_smoke' => [

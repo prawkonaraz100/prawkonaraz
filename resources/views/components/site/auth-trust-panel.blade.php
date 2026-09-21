@@ -13,6 +13,8 @@
         src="{{ $trustArtwork }}"
         alt="Kursantka pokazująca aplikację do nauki na telefonie"
         class="auth-dialog__trust-artwork"
+        width="1254"
+        height="1254"
     >
 
     <p class="auth-dialog__trust-note">Prawo jazdy na wyciągnięcie ręki!</p>

@@ -1,5 +1,13 @@
 @extends('layouts.public-content')
 
+@push('styles')
+    @vite('resources/css/home.css')
+@endpush
+
+@push('scripts')
+    @vite('resources/js/home.ts')
+@endpush
+
 @php
     $heroScene = \Illuminate\Support\Facades\Vite::asset('resources/images/home/hero-composite-v3.webp');
     $mobileAppScreen = \Illuminate\Support\Facades\Vite::asset('resources/images/home/hero-mobile.png');
