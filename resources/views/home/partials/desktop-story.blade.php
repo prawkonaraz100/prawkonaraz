@@ -152,6 +152,8 @@
                 <div class="home-mobile-app-banner__brand">
                     <img
                         src="{{ asset('images/site-brand-mark-shield-v2.png') }}"
+                        width="256"
+                        height="256"
                         alt=""
                         width="1200"
                         height="1200"

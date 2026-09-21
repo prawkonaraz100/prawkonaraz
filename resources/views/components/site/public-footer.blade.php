@@ -6,10 +6,19 @@
     <div class="site-footer__shell">
         <div class="site-footer__main">
             <a href="{{ $footer['home_href'] }}" class="site-footer__brand-lockup" aria-label="{{ $footer['brand']['aria_label'] }}">
-                <img src="{{ asset('images/site-brand-mark-shield-v2.png') }}" alt="" aria-hidden="true">
+                <img src="{{ asset('images/site-brand-mark-shield-v2.png') }}" alt="" aria-hidden="true" width="256" height="256">
                 <span>prawko<strong>naraz</strong><em>.pl</em></span>
                 <small>{{ $footer['brand']['tagline'] }}</small>
             </a>
+
+            <nav class="site-footer__group" aria-labelledby="site-footer-service-links">
+                <h2 id="site-footer-service-links">Odkrywaj</h2>
+                <ul>
+                    @foreach ($footer['service_links'] as $link)
+                        <li><a href="{{ $link['href'] }}">{{ $link['label'] }}</a></li>
+                    @endforeach
+                </ul>
+            </nav>
 
             @foreach ($footer['groups'] as $group)
                 <nav class="site-footer__group" aria-labelledby="site-footer-group-{{ $loop->index }}">

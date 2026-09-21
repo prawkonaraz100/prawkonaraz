@@ -21,6 +21,8 @@
                         class="home-site-header__back-icon-full"
                         src="{{ asset('images/site-brand-mark-shield-v2.png') }}"
                         alt=""
+                        width="256"
+                        height="256"
                     >
                     <svg class="home-site-header__back-icon-compact" viewBox="0 0 20 28" fill="none">
                         <path d="m12.5 5.5-7.25 8.5 7.25 8.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>

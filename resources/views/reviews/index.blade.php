@@ -60,6 +60,8 @@
                                 </div>
                                 <img
                                     src="{{ asset('images/site-brand-mark-shield-v2.png') }}"
+                                    width="256"
+                                    height="256"
                                     alt=""
                                     aria-hidden="true"
                                     loading="lazy"

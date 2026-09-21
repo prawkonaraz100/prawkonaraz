@@ -9197,8 +9197,8 @@ html:has(.auth-drawer-top-navigation):has([data-register-drawer-open='true'])
 
 .site-footer__main {
     display: grid;
-    grid-template-columns: minmax(230px, 1.25fr) repeat(4, minmax(150px, 0.8fr));
-    gap: 2.75rem;
+    grid-template-columns: minmax(220px, 1.2fr) repeat(5, minmax(125px, 0.75fr));
+    gap: 2rem;
     padding: 3.3rem 0 2.8rem;
 }
 
