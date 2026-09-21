@@ -34,6 +34,14 @@ test('production nginx gives robots and static sitemaps crawler safe cache heade
             ->toContain('add_header X-Content-Type-Options "nosniff";')
             ->toContain('try_files $uri /index.php?$query_string;');
     }
+
+    foreach (['location = /sitemap.xml {', 'location ^~ /sitemaps/ {'] as $location) {
+        $start = strpos($config, $location);
+        $end = strpos($config, "\n    }", $start);
+        $block = substr($config, $start, $end - $start);
+
+        expect($block)->toContain('types { }');
+    }
 });
 
 test('mikrus deploy can enforce seo release refresh audit and public delivery smoke', function () {
