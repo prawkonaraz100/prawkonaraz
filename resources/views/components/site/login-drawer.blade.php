@@ -230,14 +230,28 @@
             @endif
 
             <footer class="auth-dialog__footer">
-                <p class="auth-dialog__legal-consent">
-                    <span class="auth-dialog__legal-line">
-                        Logując się, akceptujesz <a href="{{ route('legal.terms', absolute: false) }}">regulamin serwisu</a>
-                    </span>
-                    <span class="auth-dialog__legal-line">
-                        oraz <a href="{{ route('legal.privacy', absolute: false) }}">politykę prywatności</a>.
-                    </span>
+                <p class="auth-login-drawer-return">
+                    Po zalogowaniu wrócisz dokładnie tam, gdzie skończyłeś naukę.
                 </p>
+                @if (in_array('google', $enabledSocialProviders, true))
+                    <p class="auth-dialog__legal-consent">
+                        <span class="auth-dialog__legal-line">
+                            Kontynuując z Google, akceptujesz <a href="{{ route('legal.terms', absolute: false) }}">Regulamin</a>
+                        </span>
+                        <span class="auth-dialog__legal-line">
+                            i potwierdzasz zapoznanie się z <a href="{{ route('legal.privacy', absolute: false) }}">Polityką prywatności</a>.
+                        </span>
+                    </p>
+                @else
+                    <p class="auth-dialog__legal-consent">
+                        <span class="auth-dialog__legal-line">
+                            Logując się, akceptujesz <a href="{{ route('legal.terms', absolute: false) }}">regulamin serwisu</a>
+                        </span>
+                        <span class="auth-dialog__legal-line">
+                            oraz <a href="{{ route('legal.privacy', absolute: false) }}">politykę prywatności</a>.
+                        </span>
+                    </p>
+                @endif
             </footer>
             </div>
         </div>

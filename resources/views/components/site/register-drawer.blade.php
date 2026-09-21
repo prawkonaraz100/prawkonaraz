@@ -346,14 +346,25 @@
                     </p>
                 @endif
 
-                <p class="auth-dialog__legal-consent">
-                    <span class="auth-dialog__legal-line">
-                        Zakładając konto, akceptujesz <a href="{{ route('legal.terms', absolute: false) }}">regulamin serwisu</a>
-                    </span>
-                    <span class="auth-dialog__legal-line">
-                        oraz <a href="{{ route('legal.privacy', absolute: false) }}">politykę prywatności</a>.
-                    </span>
-                </p>
+                @if (in_array('google', $enabledSocialProviders, true))
+                    <p class="auth-dialog__legal-consent">
+                        <span class="auth-dialog__legal-line">
+                            Kontynuując z Google, akceptujesz <a href="{{ route('legal.terms', absolute: false) }}">Regulamin</a>
+                        </span>
+                        <span class="auth-dialog__legal-line">
+                            i potwierdzasz zapoznanie się z <a href="{{ route('legal.privacy', absolute: false) }}">Polityką prywatności</a>.
+                        </span>
+                    </p>
+                @else
+                    <p class="auth-dialog__legal-consent">
+                        <span class="auth-dialog__legal-line">
+                            Zakładając konto, akceptujesz <a href="{{ route('legal.terms', absolute: false) }}">regulamin serwisu</a>
+                        </span>
+                        <span class="auth-dialog__legal-line">
+                            oraz <a href="{{ route('legal.privacy', absolute: false) }}">politykę prywatności</a>.
+                        </span>
+                    </p>
+                @endif
             </footer>
             </div>
         </div>
