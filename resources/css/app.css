@@ -7044,19 +7044,50 @@ html:has(.auth-drawer-top-navigation):has([data-register-drawer-open='true'])
     display: none;
 }
 
+.home-site-header__chevron {
+    display: block;
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+    transition: transform 180ms ease;
+}
+
+.home-site-header__courses[open] > summary .home-site-header__chevron {
+    transform: rotate(180deg);
+}
+
+.home-site-header__courses[open] > summary,
+.home-site-header__courses > summary:hover {
+    color: #1b66c8;
+}
+
 .home-site-header__courses > div {
     position: absolute;
     z-index: 20;
     top: calc(100% - 4px);
     left: 50%;
     display: grid;
-    width: 190px;
+    width: 390px;
     border: 1px solid #e2e6eb;
-    border-radius: 14px;
-    padding: 8px;
+    border-radius: 20px;
+    padding: 12px;
     background: #fff;
     box-shadow: 0 16px 38px rgba(15, 23, 42, 0.12);
     transform: translateX(-50%);
+}
+
+.home-site-header__courses[open] > div {
+    animation: home-menu-reveal 180ms ease-out;
+}
+
+@keyframes home-menu-reveal {
+    from { opacity: 0; transform: translate(-50%, -6px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .home-site-header__courses[open] > div { animation: none; }
+    .home-site-header__chevron { transition: none; }
 }
 
 .home-site-header__courses:not([open]) > div {
@@ -7064,13 +7095,21 @@ html:has(.auth-drawer-top-navigation):has([data-register-drawer-open='true'])
 }
 
 .home-site-header__courses > div a {
-    min-height: 42px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 76px;
     justify-content: flex-start;
     border-radius: 9px;
     padding: 0 12px;
     font-size: 14px;
     text-transform: none;
 }
+
+.home-site-header__courses > div a > svg { width: 24px; height: 24px; flex: 0 0 24px; color: #1b66c8; }
+.home-site-header__courses > div a > span { display: grid; gap: 7px; }
+.home-site-header__courses > div a strong { font-size: 14px; font-weight: 600; }
+.home-site-header__courses > div a small { font-size: 12px; font-weight: 400; line-height: 1.5; color: #6b7280; white-space: normal; }
 
 .home-site-header__courses > div a:hover {
     background: #f4f7fb;
@@ -7124,23 +7163,7 @@ html:has(.auth-drawer-top-navigation):has([data-register-drawer-open='true'])
 }
 
 .home-site-header__nav a::after {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    height: 2px;
-    border-radius: 999px;
-    background: #0a66c2;
-    content: "";
-    opacity: 0;
-    transform: scaleX(0.55);
-    transition: opacity 160ms ease, transform 160ms ease;
-}
-
-.home-site-header__nav a:hover::after,
-.home-site-header__nav a:focus-visible::after {
-    opacity: 1;
-    transform: scaleX(1);
+    content: none;
 }
 
 .home-site-header__desktop-actions {

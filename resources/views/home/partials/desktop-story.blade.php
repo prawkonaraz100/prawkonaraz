@@ -4,21 +4,17 @@
             && filled(config('services.google.client_secret'));
     @endphp
 
-    <section class="home-entry" aria-labelledby="home-entry-title">
+    <section id="home-reference" class="home-entry" aria-labelledby="home-entry-title">
         <div class="home-entry__shell home-entry__grid home-entry__grid--reference">
             <div class="home-entry__copy" data-home-reveal>
                 <h1 id="home-entry-title">
                     <span class="home-entry__seo-kicker">Testy na prawo jazdy <span class="home-entry__seo-kicker-accent">{{ $seoYear }}</span></span>
                     <span class="home-entry__headline-line">Ucz się szybko</span>
-                    <span class="home-entry__headline-line home-entry__headline-line--second">zdaj <em>prawko na raz!</em></span>
+                    <span class="home-entry__headline-line home-entry__headline-line--second">zdaj <span class="home-entry__headline-accent">prawko na raz!</span></span>
                 </h1>
                 <div class="home-entry__conversion">
                     <div class="home-entry__proof" aria-label="Zaufanie kursantów">
-                        <span class="home-entry__proof-avatars" aria-hidden="true">
-                            @foreach (array_slice($contactAdvisorImages, 0, 5, true) as $avatar)
-                                <img src="{{ $avatar }}" alt="" width="42" height="42">
-                            @endforeach
-                        </span>
+                        <img class="home-entry__reference-avatars" src="{{ asset('images/home-reference-avatars.png') }}" alt="" width="170" height="44" aria-hidden="true">
                         <span>Zaufało nam <strong>2137</strong> kursantów</span>
                     </div>
                     <a href="{{ auth()->check() ? route('session.index', absolute: false) : route('public.tests', absolute: false) }}" class="home-entry__reference-cta">
@@ -39,12 +35,12 @@
 
         <div class="home-entry__shell">
             <div class="home-entry__showcase-meta" data-home-reveal>
-                <strong>Oficjalna baza pytań WORD {{ $seoYear }} <span aria-hidden="true">↘</span></strong>
+                <strong>Oficjalna baza pytań WORD {{ $seoYear }} <svg class="home-entry__source-arrow" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M3 5C24 3 37 18 36 40m-9-10 9 12 6-14" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></strong>
                 <nav aria-label="Media społecznościowe PrawkoNaRaz">
                     <span>Znajdź nas</span>
-                    <a href="https://www.youtube.com/channel/UCSrCDt_Aj1yslMY8sfXFBkg" target="_blank" rel="noopener noreferrer" aria-label="YouTube">▶</a>
-                    <a href="https://www.instagram.com/prawkonaraz.pl/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">◎</a>
-                    <a href="https://www.tiktok.com/@prawkonaraz" target="_blank" rel="noopener noreferrer" aria-label="TikTok">♪</a>
+                    <a href="https://www.youtube.com/channel/UCSrCDt_Aj1yslMY8sfXFBkg" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="5" fill="currentColor"/><path d="m10 8 6 4-6 4Z" fill="white"/></svg></a>
+                    <a href="https://www.instagram.com/prawkonaraz.pl/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.5" cy="6.7" r="1" fill="currentColor" stroke="none"/></svg></a>
+                    <a href="https://www.tiktok.com/@prawkonaraz" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M14.8 3v11.3a4.7 4.7 0 1 1-4-4.6v3.1a1.7 1.7 0 1 0 1 1.5V3h3Zm0 0c.5 2.5 1.9 4 4.5 4.5v3.1a8.4 8.4 0 0 1-4.5-1.7"/></svg></a>
                 </nav>
             </div>
             <section class="home-showcase" aria-labelledby="home-showcase-title" data-home-reveal>

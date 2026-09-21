@@ -6,13 +6,19 @@
 @php
     $user = auth()->user();
     $navigation = app(\App\Support\PublicNavigation::class)->data($user);
-    $links = $navigation['top'];
+    $links = array_merge(
+        [
+            ['label' => 'Portal', 'href' => route('public.news', absolute: false)],
+            ['label' => 'Dlaczego my?', 'href' => '/#home-learning-title'],
+        ],
+        array_values(array_filter($navigation['top'], fn ($link) => ! in_array($link['label'], ['O nas', 'Kontakt'], true))),
+    );
     $googleLoginAvailable = filled(config('services.google.client_id'))
         && filled(config('services.google.client_secret'));
 @endphp
 
 <header
-    class="home-site-header {{ $immediate ? 'is-visible' : 'home-site-header--awaiting-pointer' }} {{ $authOverlay ? 'auth-page-header auth-drawer-top-navigation' : '' }}"
+    class="home-site-header {{ request()->routeIs('home') ? 'home-site-header--reference' : '' }} {{ $immediate ? 'is-visible' : 'home-site-header--awaiting-pointer' }} {{ $authOverlay ? 'auth-page-header auth-drawer-top-navigation' : '' }}"
     data-home-site-header
 >
     <div class="home-site-header__shell">
@@ -38,23 +44,23 @@
         </div>
 
         <nav class="home-site-header__nav home-site-header__nav--reference" aria-label="Nawigacja strony głównej">
-            <a href="{{ $navigation['learning_href'] }}"><span>Portal</span></a>
-            <details class="home-site-header__courses">
-                <summary>Kursy <span aria-hidden="true">⌄</span></summary>
+            <a href="{{ route('public.news', absolute: false) }}"><span>Portal</span></a>
+            <details class="home-site-header__courses" data-home-header-menu>
+                <summary>Kursy <svg class="home-site-header__chevron" aria-hidden="true" viewBox="0 0 20 20" fill="none"><path d="m5 7.5 5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
                 <div>
-                    <a href="{{ route('public.course', absolute: false) }}">Kurs teorii</a>
-                    <a href="{{ route('public.tests', absolute: false) }}">Testy online</a>
-                    <a href="{{ route('public.lectures', absolute: false) }}">Wykłady</a>
+                    <a href="{{ route('public.tests', absolute: false) }}"><x-heroicon-o-clipboard-document-check aria-hidden="true" /><span><strong>Testy online</strong><small>Sprawdź swoją wiedzę przed egzaminem.</small></span></a>
+                    <a href="{{ route('public.course', absolute: false) }}"><x-heroicon-o-academic-cap aria-hidden="true" /><span><strong>Kurs teorii Online</strong><small>Ucz się krok po kroku, dział po dziale.</small></span></a>
+                    <a href="{{ route('public.lectures', absolute: false) }}"><x-heroicon-o-play-circle aria-hidden="true" /><span><strong>Wykłady z instruktorem Online</strong><small>Poznaj przepisy i zasady ruchu drogowego.</small></span></a>
+                    <a href="{{ route('public.code95', absolute: false) }}"><x-heroicon-o-academic-cap aria-hidden="true" /><span><strong>Kod 95 — kierowca zawodowy</strong><small>Kurs dla kierowców zawodowych.</small></span></a>
                 </div>
             </details>
-            <a href="#aplikacje"><span>Aplikacje</span></a>
+            <a href="/#home-learning-title"><span>Dlaczego my?</span></a>
+            <a href="/#aplikacje"><span>Aplikacje</span></a>
             <a href="{{ route('public.pricing', absolute: false) }}"><span>Cennik</span></a>
-            <a href="{{ route('about.organization', absolute: false) }}"><span>O nas</span></a>
-            <a href="{{ route('about.contact', absolute: false) }}"><span>Kontakt</span></a>
         </nav>
 
         <div class="home-site-header__desktop-actions">
-            <a class="home-site-header__osk" href="{{ route('about.contact', absolute: false) }}">Strefa OSK</a>
+            <a class="home-site-header__osk" href="{{ route('public.osk', absolute: false) }}">Strefa OSK</a>
             @guest
                 <a
                     class="home-site-header__google"

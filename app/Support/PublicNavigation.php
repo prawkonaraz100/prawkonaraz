@@ -66,15 +66,19 @@ class PublicNavigation
                 [
                     'title' => 'Nauka',
                     'links' => [
+                        $this->link('Testy online', route('public.tests', absolute: false), ['/testy-na-prawo-jazdy']),
+                        $this->link('Kurs teorii Online', route('public.course', absolute: false), ['/kurs']),
+                        $this->link('Wykłady z instruktorem Online', route('public.lectures', absolute: false), ['/wyklady']),
+                        $this->link('Kod 95 — kierowca zawodowy', route('public.code95', absolute: false), ['/kurs-kod-95']),
                         $this->link('Rozpocznij naukę', $learningHref, [$learningHref]),
                         $this->link('Baza pytań', route('public.questions.hub', absolute: false), ['/oficjalna-baza-pytan-na-prawo-jazdy', '/pytanie']),
-                        $this->link('Kurs', route('public.course', absolute: false), ['/kurs']),
-                        $this->link('Wykłady', route('public.lectures', absolute: false), ['/wyklady']),
                     ],
                 ],
                 [
                     'title' => 'Serwis',
                     'links' => [
+                        $this->link('Strefa OSK', route('public.osk', absolute: false), ['/strefa-osk']),
+                        $this->link('Aplikacje', '/#aplikacje', []),
                         $this->link('Znaki drogowe', route('traffic-signs.index', absolute: false), ['/znaki-drogowe']),
                         $this->link('Statystyki', route('public.statistics', absolute: false), ['/statystyki']),
                         $this->link(
@@ -88,6 +92,7 @@ class PublicNavigation
                 [
                     'title' => 'Informacje',
                     'links' => [
+                        $this->link('Dlaczego my?', '/#home-learning-title', []),
                         $this->link('O nas', route('about.organization', absolute: false), ['/o-nas', '/autorzy']),
                         $this->link('Jak to działa', route('about.how-it-works', absolute: false), ['/jak-to-dziala']),
                         $this->link('Kontakt', route('about.contact', absolute: false), ['/kontakt']),

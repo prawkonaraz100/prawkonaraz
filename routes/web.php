@@ -174,15 +174,25 @@ Route::post('/testy-na-prawo-jazdy/demo/restart', [PublicDemoStudyController::cl
     ->middleware('throttle:20,1')
     ->name('public.tests.demo.restart');
 Route::get('/kurs', fn () => Inertia::render('Public/MarketingPlaceholder', [
-    'title' => 'Kurs',
+    'title' => 'Kurs teorii Online',
     'eyebrow' => 'Oferta',
     'description' => 'Ta sekcja została przygotowana jako pusta strona kursu, żebyśmy mogli podpiąć tu właściwy układ i treści w kolejnym kroku.',
 ]))->name('public.course');
 Route::get('/wyklady', fn () => Inertia::render('Public/MarketingPlaceholder', [
-    'title' => 'Wykłady',
+    'title' => 'Wykłady z instruktorem Online',
     'eyebrow' => 'Materiały',
     'description' => 'Wykłady mają już własną trasę i pusty ekran startowy, gotowy do dalszego wypełnienia treścią.',
 ]))->name('public.lectures');
+Route::get('/kurs-kod-95', fn () => Inertia::render('Public/MarketingPlaceholder', [
+    'title' => 'Kod 95 — kierowca zawodowy',
+    'eyebrow' => 'Strona przykładowa — w przygotowaniu',
+    'description' => 'Tutaj przedstawimy program kursu dla kierowców zawodowych, zakres materiałów i informacje o zapisach. Oferta nie jest jeszcze dostępna.',
+]))->name('public.code95');
+Route::get('/strefa-osk', fn () => Inertia::render('Public/MarketingPlaceholder', [
+    'title' => 'Strefa OSK',
+    'eyebrow' => 'Dla szkół jazdy — w przygotowaniu',
+    'description' => 'Przygotowujemy miejsce dla ośrodków szkolenia kierowców i instruktorów. Tutaj przedstawimy możliwości współpracy z PrawkoNaRaz oraz narzędzia wspierające naukę kursantów. To strona przykładowa — oferta nie jest jeszcze dostępna.',
+]))->name('public.osk');
 Route::get('/szkolenia-z-instruktorem', fn () => Inertia::render('Public/MarketingPlaceholder', [
     'title' => 'Szkolenia z instruktorem',
     'eyebrow' => 'Wsparcie',
