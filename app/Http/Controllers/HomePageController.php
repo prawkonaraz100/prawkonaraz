@@ -231,5 +231,4 @@ class HomePageController extends Controller
             'homepageVideos' => $homepageVideos,
         ]);
     }
-
 }

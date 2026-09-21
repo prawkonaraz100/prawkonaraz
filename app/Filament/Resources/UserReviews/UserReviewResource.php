@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\UserReviews;
 
-use App\Filament\Resources\UserReviews\Pages\ListUserReviews;
 use App\Filament\Resources\UserReviews\Pages\EditUserReview;
+use App\Filament\Resources\UserReviews\Pages\ListUserReviews;
 use App\Filament\Resources\UserReviews\Schemas\UserReviewForm;
 use App\Filament\Resources\UserReviews\Tables\UserReviewsTable;
 use App\Models\UserReview;
