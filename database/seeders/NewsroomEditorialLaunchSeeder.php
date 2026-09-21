@@ -41,7 +41,8 @@ final class NewsroomEditorialLaunchSeeder extends Seeder
                 $media = $existing?->hero_image_path
                     ? ['path' => $existing->hero_image_path, 'width' => $existing->hero_image_width, 'height' => $existing->hero_image_height]
                     : $this->storeHero($definition['image']);
-                $publishedAt = now()->subMinutes(60 - ($index * 5));
+                // Keep launch records safely in the past across PHP/PostgreSQL timezone settings.
+                $publishedAt = now('UTC')->subHours(4)->addMinutes($index * 5);
 
                 $article = ContentArticle::query()->updateOrCreate(
                     ['slug' => $definition['slug']],
@@ -60,8 +61,8 @@ final class NewsroomEditorialLaunchSeeder extends Seeder
                         'applies_to' => $definition['applies_to'],
                         'exam_impact' => $definition['exam_impact'],
                         'workflow_status' => ContentArticleWorkflowStatus::Published->value,
-                        'published_at' => $existing?->published_at ?? $publishedAt,
-                        'first_published_at' => $existing?->first_published_at ?? $publishedAt,
+                        'published_at' => $publishedAt,
+                        'first_published_at' => $publishedAt,
                         'reviewed_at' => now(),
                         'is_featured' => $index < 3,
                         'editorial_priority' => 100 - $index,
