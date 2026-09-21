@@ -63,7 +63,7 @@ final class NewsroomEditorialLaunchSeeder extends Seeder
                         'workflow_status' => ContentArticleWorkflowStatus::Published->value,
                         'published_at' => $publishedAt,
                         'first_published_at' => $publishedAt,
-                        'reviewed_at' => now(),
+                        'reviewed_at' => $publishedAt,
                         'is_featured' => $index < 3,
                         'editorial_priority' => 100 - $index,
                         'hero_image_path' => $media['path'],
@@ -82,10 +82,10 @@ final class NewsroomEditorialLaunchSeeder extends Seeder
                         'seo_title' => $definition['seo_title'],
                         'seo_description' => $definition['seo_description'],
                         'robots' => 'index,follow',
-                        'source_checked_at' => now(),
-                        'freshness_review_due_at' => now()->addMonths(3),
-                        'last_substantive_update_at' => now(),
-                        'public_state_changed_at' => now(),
+                        'source_checked_at' => $publishedAt,
+                        'freshness_review_due_at' => now('UTC')->addMonths(3),
+                        'last_substantive_update_at' => $publishedAt,
+                        'public_state_changed_at' => $publishedAt,
                     ],
                 );
 
