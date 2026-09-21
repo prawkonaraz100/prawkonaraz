@@ -14,7 +14,7 @@
                 </h1>
                 <div class="home-entry__conversion">
                     <div class="home-entry__proof" aria-label="Zaufanie kursantów">
-                        <img class="home-entry__reference-avatars" src="{{ asset('images/home-reference-avatars.png') }}" alt="" width="170" height="44" aria-hidden="true">
+                        <img class="home-entry__reference-avatars" src="{{ asset('images/home-reference-avatars-optimized.webp') }}" alt="" width="170" height="44" aria-hidden="true">
                         <span>Zaufało nam <strong>2137</strong> kursantów</span>
                     </div>
                     <a href="{{ auth()->check() ? route('session.index', absolute: false) : route('public.tests', absolute: false) }}" class="home-entry__reference-cta">
@@ -47,7 +47,7 @@
                 <h2 id="home-showcase-title" class="sr-only">Najważniejsze możliwości PrawkoNaRaz</h2>
 
                 <div class="home-showcase__track" role="list">
-                    <article class="home-showcase__card home-showcase__card--blue" role="listitem">
+                    <div class="home-showcase__card home-showcase__card--blue" role="listitem">
                         <div class="home-showcase__copy">
                             <h3>Cała nauka<br>w jednym miejscu</h3>
                             <p>Pytania · wyjaśnienia · postęp</p>
@@ -56,9 +56,9 @@
                             <span aria-hidden="true"></span>
                             <img src="{{ $mobileAppScreen }}" alt="Pytanie egzaminacyjne w aplikacji PrawkoNaRaz" loading="lazy" decoding="async">
                         </div>
-                    </article>
+                    </div>
 
-                    <article class="home-showcase__card home-showcase__card--violet" role="listitem">
+                    <div class="home-showcase__card home-showcase__card--violet" role="listitem">
                         <div class="home-showcase__copy">
                             <h3>Oficjalne pytania.<br>Zawsze pod ręką.</h3>
                             <p>Uczysz się z aktualnej bazy.</p>
@@ -67,17 +67,17 @@
                             <i aria-hidden="true"></i>
                             <img src="{{ $proofDashboard }}" alt="Panel nauki z oficjalną bazą pytań" loading="lazy" decoding="async">
                         </div>
-                    </article>
+                    </div>
 
-                    <article class="home-showcase__card home-showcase__card--focus" role="listitem">
+                    <div class="home-showcase__card home-showcase__card--focus" role="listitem">
                         <div class="home-showcase__badge">Egzamin próbny</div>
                         <div class="home-showcase__phone home-showcase__phone--focus">
                             <span aria-hidden="true"></span>
-                            <img src="{{ $mobileAppScreen }}" alt="Mobilny egzamin próbny PrawkoNaRaz" loading="lazy" decoding="async">
+                            <img src="{{ $mobileAppScreen }}" alt="Mobilny egzamin próbny PrawkoNaRaz" loading="eager" fetchpriority="high" decoding="async">
                         </div>
-                    </article>
+                    </div>
 
-                    <article class="home-showcase__card home-showcase__card--light" role="listitem">
+                    <div class="home-showcase__card home-showcase__card--light" role="listitem">
                         <div class="home-showcase__copy">
                             <h3>Uczysz się mądrzej,<br>nie dłużej.</h3>
                             <p>Plan powtórek dopasowany do Ciebie.</p>
@@ -86,9 +86,9 @@
                             <i aria-hidden="true"></i>
                             <img src="{{ $proofMemoryTrainer }}" alt="Trener pamięci z planem dziennym" loading="lazy" decoding="async">
                         </div>
-                    </article>
+                    </div>
 
-                    <article class="home-showcase__card home-showcase__card--deep" role="listitem">
+                    <div class="home-showcase__card home-showcase__card--deep" role="listitem">
                         <div class="home-showcase__copy">
                             <h3>Każdy błąd<br>zamieniasz w postęp.</h3>
                             <p>Wracasz dokładnie do tego, co sprawia trudność.</p>
@@ -97,7 +97,7 @@
                             <i aria-hidden="true"></i>
                             <img src="{{ $proofIncorrectQuestions }}" alt="Lista pytań wymagających powtórki" loading="lazy" decoding="async">
                         </div>
-                    </article>
+                    </div>
                 </div>
             </section>
         </div>
@@ -115,7 +115,7 @@
             <div class="home-mobile-app-banner__copy">
                 <div class="home-mobile-app-banner__brand">
                     <img
-                        src="{{ asset('images/site-brand-mark-shield-v2.png') }}"
+                        src="{{ asset('images/site-brand-mark-shield-v2-optimized.webp') }}"
                         width="256"
                         height="256"
                         alt=""
@@ -149,12 +149,12 @@
                     </li>
                     <li>
                         <a href="https://www.gov.pl/web/infrastruktura" class="home-trust__logo home-trust__logo--ministry" rel="noopener noreferrer" target="_blank">
-                            <img src="{{ asset('images/partners/ministerstwo-infrastruktury.png') }}" alt="Ministerstwo Infrastruktury" width="903" height="328" loading="lazy" decoding="async">
+                            <img src="{{ asset('images/partners/ministerstwo-infrastruktury-optimized.webp') }}" alt="Ministerstwo Infrastruktury" width="903" height="328" loading="lazy" decoding="async">
                         </a>
                     </li>
                     <li>
                         <a href="https://www.gov.pl/web/cepik" class="home-trust__logo home-trust__logo--cepik" rel="noopener noreferrer" target="_blank">
-                            <img src="{{ asset('images/partners/cepik-gov.png') }}" alt="CEPiK — Centralna Ewidencja Pojazdów i Kierowców" width="564" height="147" loading="lazy" decoding="async">
+                            <img src="{{ asset('images/partners/cepik-gov-optimized.webp') }}" alt="CEPiK — Centralna Ewidencja Pojazdów i Kierowców" width="564" height="147" loading="lazy" decoding="async">
                         </a>
                     </li>
                     <li>

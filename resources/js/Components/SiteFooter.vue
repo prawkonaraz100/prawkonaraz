@@ -16,7 +16,7 @@ const footer = computed(() => page.props.footer);
         <div class="site-footer__shell" :class="props.shellWidthClass">
             <div class="site-footer__main">
                 <a :href="footer.home_href" class="site-footer__brand-lockup" :aria-label="footer.brand.aria_label">
-                    <img src="/images/site-brand-mark-shield-v2.png" alt="" aria-hidden="true" width="256" height="256" />
+                    <img src="/images/site-brand-mark-shield-v2-optimized.webp" alt="" aria-hidden="true" width="256" height="256" />
                     <span>prawko<strong>naraz</strong><em>.pl</em></span>
                     <small>{{ footer.brand.tagline }}</small>
                 </a>

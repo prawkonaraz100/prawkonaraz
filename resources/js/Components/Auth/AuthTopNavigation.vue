@@ -74,7 +74,7 @@ onUnmounted(() => {
                     <span class="home-site-header__back-icon" aria-hidden="true">
                         <img
                             class="home-site-header__back-icon-full"
-                            src="/images/site-brand-mark-shield-v2.png"
+                            src="/images/site-brand-mark-shield-v2-optimized.webp"
                             alt=""
                         >
                         <svg class="home-site-header__back-icon-compact" viewBox="0 0 20 28" fill="none">

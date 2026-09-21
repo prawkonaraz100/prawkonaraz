@@ -105,10 +105,18 @@ export const setupPublicAuthDrawerLoader = () => {
         window.location.pathname === '/'
         && root.dataset.googleOneTapEnabled === 'true'
     ) {
-        void getController()
-            .then((controller) => controller.setupOneTap())
-            .catch(() => {
-                // One Tap is optional; classic login links remain available.
-            });
+        let oneTapStarted = false;
+        const startOneTap = () => {
+            if (oneTapStarted) return;
+            oneTapStarted = true;
+            void getController()
+                .then((controller) => controller.setupOneTap())
+                .catch(() => {
+                    // One Tap is optional; classic login links remain available.
+                });
+        };
+        // Keep the optional SDK off the initial rendering path.
+        window.addEventListener('pointerdown', startOneTap, { once: true, passive: true });
+        window.addEventListener('keydown', startOneTap, { once: true });
     }
 };

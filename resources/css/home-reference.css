@@ -16,14 +16,14 @@
 #home-reference .home-entry__headline-line--second { padding-left: 514px; }
 #home-reference .home-entry__headline-accent { color: #1b66c8; }
 #home-reference .home-entry__conversion { width: 836px; max-width: 100%; margin: 77px 0 0 78px; grid-template-columns: 376px 400px; gap: 60px; }
-#home-reference .home-entry__proof { justify-content: flex-start; gap: 10px; font-size: 14px; color: #7b7487; }
+#home-reference .home-entry__proof { justify-content: flex-start; gap: 10px; font-size: 14px; color: #62596e; }
 #home-reference .home-entry__reference-avatars { width: 170px; height: 44px; flex: 0 0 170px; object-fit: contain; }
 #home-reference .home-entry__reference-cta { min-height: 48px; background: #1b66c3; font-weight: 700; }
-#home-reference .home-entry__lead { max-width: none; margin: 54px -60px 0 30px; padding: 0; font-size: 18px; line-height: 26px; color: #7b7487; }
+#home-reference .home-entry__lead { max-width: none; margin: 54px -60px 0 30px; padding: 0; font-size: 18px; line-height: 26px; color: #62596e; }
 #home-reference .home-entry__showcase-meta { height: 64px; margin: 0; padding: 0 12px; align-items: flex-start; }
 #home-reference .home-entry__showcase-meta > strong { display: flex; align-items: flex-start; gap: 10px; padding-top: 13px; font-size: 18px; font-weight: 600; }
 #home-reference .home-entry__source-arrow { width: 44px; height: 48px; flex: 0 0 44px; }
-#home-reference .home-entry__showcase-meta nav { padding-top: 16px; gap: 15px; color: #7b7487; }
+#home-reference .home-entry__showcase-meta nav { padding-top: 16px; gap: 15px; color: #62596e; }
 #home-reference .home-entry__showcase-meta nav svg { width: 26px; height: 26px; }
 #home-reference .home-showcase { margin-top: 34px; }
 @media (max-width: 1450px) {

@@ -27,7 +27,7 @@
                 <span class="home-site-header__back-icon" aria-hidden="true">
                     <img
                         class="home-site-header__back-icon-full"
-                        src="{{ asset('images/site-brand-mark-shield-v2.png') }}"
+                        src="{{ asset('images/site-brand-mark-shield-v2-optimized.webp') }}"
                         alt=""
                         width="256"
                         height="256"

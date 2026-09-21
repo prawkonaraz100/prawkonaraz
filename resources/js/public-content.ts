@@ -1,4 +1,5 @@
 import '../css/app.css';
+import '../images/analytics/cookie-mascot-optimized.webp';
 import '../images/analytics/cookie-mascot-blink.webp';
 import '../images/analytics/cookie-mascot.png';
 import { setupCsrfRefreshForms } from './lib/csrfForms';

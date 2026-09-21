@@ -16,12 +16,12 @@
             aria-hidden="true"
         >
             <source
-                srcset="{{ \Illuminate\Support\Facades\Vite::asset('resources/images/analytics/cookie-mascot-blink.webp') }}"
+                srcset="{{ \Illuminate\Support\Facades\Vite::asset('resources/images/analytics/cookie-mascot-optimized.webp') }}"
                 type="image/webp"
             >
             <img
                 class="analytics-consent__mascot-image"
-                src="{{ \Illuminate\Support\Facades\Vite::asset('resources/images/analytics/cookie-mascot.png') }}"
+                src="{{ \Illuminate\Support\Facades\Vite::asset('resources/images/analytics/cookie-mascot-optimized.webp') }}"
                 alt=""
                 loading="lazy"
                 decoding="async"

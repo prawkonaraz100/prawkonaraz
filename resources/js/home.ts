@@ -1,4 +1,5 @@
 import '../images/home/hero-composite-v3.webp';
+import.meta.glob('../images/home/**/*-optimized.webp', { eager: true, query: '?url', import: 'default' });
 import '../images/home/hero-mobile.png';
 import '../images/home/mobile-app-banner.webp';
 import '../images/home/learning/classic-mode.png';

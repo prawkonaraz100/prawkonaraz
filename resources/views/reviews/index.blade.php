@@ -59,7 +59,7 @@
                                     <time>{{ $review['published_label'] }}</time>
                                 </div>
                                 <img
-                                    src="{{ asset('images/site-brand-mark-shield-v2.png') }}"
+                                    src="{{ asset('images/site-brand-mark-shield-v2-optimized.webp') }}"
                                     width="256"
                                     height="256"
                                     alt=""

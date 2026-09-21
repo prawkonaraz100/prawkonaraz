@@ -44,7 +44,7 @@
                             <div class="home-learning__quote-author">
                                 @if ($jakubQuoteAuthor)
                                     <a href="{{ route('content-authors.show', $jakubQuoteAuthor->slug, absolute: false) }}">
-                                        <img src="{{ asset($jakubQuoteAuthor->photo_path) }}" alt="{{ $jakubQuoteAuthor->name }}" width="64" height="64">
+                                        <img src="{{ asset($jakubQuoteAuthor->photo_path === 'images/authors/jakub-wisniewski.png' ? 'images/authors/jakub-wisniewski-optimized.webp' : $jakubQuoteAuthor->photo_path) }}" alt="{{ $jakubQuoteAuthor->name }}" width="64" height="64" loading="lazy" decoding="async">
                                         <strong>{{ $jakubQuoteAuthor->name }}</strong>
                                     </a>
                                     <span>{{ $jakubQuoteAuthor->job_title }}</span>
@@ -87,7 +87,7 @@
                             <div class="home-learning__quote-author">
                                 @if ($katarzynaQuoteAuthor)
                                     <a href="{{ route('content-authors.show', $katarzynaQuoteAuthor->slug, absolute: false) }}">
-                                        <img src="{{ asset($katarzynaQuoteAuthor->photo_path) }}" alt="{{ $katarzynaQuoteAuthor->name }}" width="64" height="64">
+                                        <img src="{{ asset($katarzynaQuoteAuthor->photo_path === 'images/authors/katarzyna-wisniewska.png' ? 'images/authors/katarzyna-wisniewska-optimized.webp' : $katarzynaQuoteAuthor->photo_path) }}" alt="{{ $katarzynaQuoteAuthor->name }}" width="64" height="64" loading="lazy" decoding="async">
                                         <strong>{{ $katarzynaQuoteAuthor->name }}</strong>
                                     </a>
                                     <span>{{ $katarzynaQuoteAuthor->job_title }}</span>
@@ -290,11 +290,10 @@
                     <figure class="home-learning__feature-screen home-learning__feature-screen--video home-learning__feature-screen--sticky">
                         <video
                             controls
-                            autoplay
                             muted
                             loop
                             playsinline
-                            preload="metadata"
+                            preload="none"
                             poster="{{ $mistakesLearningPoster }}"
                             aria-label="Film pokazujący pracę z błędnymi pytaniami w PrawkoNaRaz"
                         >

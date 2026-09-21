@@ -38,6 +38,8 @@
 <html lang="pl">
     <head>
         <meta charset="utf-8">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>{{ $title }}</title>
@@ -97,7 +99,9 @@
             <x-analytics.google-tag />
         @endif
         @if ($hasViteAssets)
-            @vite(['resources/js/public-content.ts'])
+            @vite(request()->routeIs('home')
+                ? ['resources/js/public-content.ts', 'resources/css/home.css', 'resources/js/home.ts']
+                : ['resources/js/public-content.ts'])
         @endif
         @stack('styles')
         <style>

@@ -122,7 +122,7 @@
             }
 
             .analytics-consent__button {
-                min-height: 27px;
+                min-height: 44px;
                 border-radius: 999px;
                 border: 0;
                 padding: 0 10px;
@@ -133,7 +133,7 @@
             }
 
             .analytics-consent__button--secondary {
-                min-height: auto;
+                min-height: 44px;
                 background: transparent;
                 color: #4b5563;
                 font-size: 10px;

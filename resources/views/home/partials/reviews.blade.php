@@ -46,7 +46,7 @@
                                 </div>
                                 <img
                                     class="home-reviews__source-mark"
-                                    src="{{ asset('images/site-brand-mark-shield-v2.png') }}"
+                                    src="{{ asset('images/site-brand-mark-shield-v2-optimized.webp') }}"
                                     width="256"
                                     height="256"
                                     alt=""
@@ -57,7 +57,7 @@
                                     aria-hidden="true"
                                 >
                             </header>
-                            <div class="home-reviews__stars" aria-label="Ocena {{ $review['rating'] }} z 5">
+                            <div class="home-reviews__stars" role="img" aria-label="Ocena {{ $review['rating'] }} z 5">
                                 @for ($star = 1; $star <= 5; $star++)
                                     <span class="{{ $star <= $review['rating'] ? 'is-filled' : '' }}" aria-hidden="true">★</span>
                                 @endfor

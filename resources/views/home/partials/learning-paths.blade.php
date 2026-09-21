@@ -5,7 +5,7 @@
             'description' => 'Rozwiązuj <strong>aktualne pytania egzaminacyjne WORD</strong> w układzie zgodnym z egzaminem państwowym. Po każdej odpowiedzi możesz sprawdzić jasne wyjaśnienie.',
             'cta' => 'Rozpocznij darmowy test',
             'href' => route('public.tests', absolute: false),
-            'image' => \Illuminate\Support\Facades\Vite::asset('resources/images/home/proof/exam.webp'),
+            'image' => \Illuminate\Support\Facades\Vite::asset('resources/images/home/proof/exam-optimized.webp'),
             'alt' => 'Próbny test teoretyczny na prawo jazdy w PrawkoNaRaz',
         ],
         [
@@ -13,7 +13,7 @@
             'description' => 'Ucz się działami i przechodź przez całą <strong>oficjalną bazę pytań na prawo jazdy</strong>. Postęp zapisuje się, więc zawsze wiesz, co już umiesz.',
             'cta' => 'Zobacz kurs na prawo jazdy',
             'href' => route('public.course', absolute: false),
-            'image' => \Illuminate\Support\Facades\Vite::asset('resources/images/home/proof/dashboard.webp'),
+            'image' => \Illuminate\Support\Facades\Vite::asset('resources/images/home/proof/dashboard-optimized.webp'),
             'alt' => 'Panel kursu na prawo jazdy z postępem nauki',
         ],
         [
@@ -21,7 +21,7 @@
             'description' => 'Przeglądaj pytania według kategorii i tematów. Zobacz <strong>poprawną odpowiedź, wyjaśnienie, podstawę prawną</strong> oraz poziom trudności.',
             'cta' => 'Przeglądaj pytania egzaminacyjne',
             'href' => route('public.questions.hub', absolute: false),
-            'image' => \Illuminate\Support\Facades\Vite::asset('resources/images/home/proof/explanation.webp'),
+            'image' => \Illuminate\Support\Facades\Vite::asset('resources/images/home/proof/explanation-optimized.webp'),
             'alt' => 'Wyjaśnienie odpowiedzi do pytania egzaminacyjnego',
         ],
         [
@@ -29,7 +29,7 @@
             'description' => 'Pomyłki trafiają na osobną listę. Wracasz tylko do zagadnień, które sprawiają Ci trudność, i <strong>utrwalasz je we własnym tempie</strong>.',
             'cta' => 'Załóż konto i zapisuj błędy',
             'href' => route('register', absolute: false),
-            'image' => \Illuminate\Support\Facades\Vite::asset('resources/images/home/proof/incorrect-questions.webp'),
+            'image' => \Illuminate\Support\Facades\Vite::asset('resources/images/home/proof/incorrect-questions-optimized.webp'),
             'alt' => 'Lista błędnych pytań do ponownej nauki',
         ],
         [
@@ -37,7 +37,7 @@
             'description' => 'Inteligentne powtórki pomagają wracać do materiału w odpowiednim momencie. Dzięki temu <strong>zapamiętujesz przepisy na dłużej</strong>, zamiast uczyć się na ostatnią chwilę.',
             'cta' => 'Rozpocznij skuteczną naukę',
             'href' => route('register', absolute: false),
-            'image' => \Illuminate\Support\Facades\Vite::asset('resources/images/home/proof/memory-trainer.webp'),
+            'image' => \Illuminate\Support\Facades\Vite::asset('resources/images/home/proof/memory-trainer-optimized.webp'),
             'alt' => 'Trener pamięci wspierający naukę teorii na prawo jazdy',
         ],
         [
