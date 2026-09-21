@@ -873,13 +873,20 @@ Status: **TODO / PRODUCTION-ONLY**
 
 Nie oznaczac jako DONE na podstawie samego CI.
 
-Aktualne production evidence — 2026-09-21:
+Historyczne production evidence — 2026-09-21:
 - repo baseline: `main@9d7b4e5f6ef317733b25e57267c908bd338db68a`,
 - post-merge CI `#580` dla tego SHA zakonczyl sie pelnym PASS: `newsroom-postgres` = success oraz `quality` = success; w `quality` PASS maja smoke verification, backend test suite, code style checks i frontend build,
-- publiczne `/znaki-drogowe`, `/przepisy` i `/najtrudniejsze-pytania-na-prawo-jazdy` zwracaja obecnie `503 Service Unavailable`,
+- w tej probie publiczne `/znaki-drogowe`, `/przepisy` i `/najtrudniejsze-pytania-na-prawo-jazdy` zwracaly `503 Service Unavailable`,
 - z tego powodu live raw-HTML/on-page/schema/canonical verification nie jest mozliwa i task pozostaje otwarty,
 - ten stan nie jest dowodem regresji repo; jest production blockerem do usuniecia zgodnie z istniejacym deployment runbookiem,
 - nie przechodzic do `SEO-INDEX-005` dopoki te trzy URL-e nie przejda wymaganej live verification po deployu.
+
+Aktualne partial live evidence — 2026-09-22:
+- historyczny blocker `503` nie reprodukuje sie: `/znaki-drogowe`, `/przepisy` i `/najtrudniejsze-pytania-na-prawo-jazdy` sa ponownie publicznie pobieralne jako HTML,
+- dla wszystkich trzech potwierdzono widoczna tresc i crawlable linki; dla `/najtrudniejsze-pytania-na-prawo-jazdy` live HTML zawiera ranking i pytania, czyli repo naprawa SEO-critical raw HTML jest obecna na publicznym endpointcie,
+- repo baseline przed bieżącym PR to `main@8b3cba58dae2408756bd10072449eef47ceba458`; post-merge CI #582 dla tego SHA ma pełny PASS,
+- to evidence usuwa wyłącznie availability blocker. Nie jest jeszcze kompletnym dowodem deploy provenance oraz wszystkich wymaganych self-canonical/on-page/schema checks dla 004,
+- `SEO-INDEX-004` pozostaje `TODO / PRODUCTION-ONLY`; nie przechodzic do `SEO-INDEX-005` na podstawie samego odzyskania HTTP/HTML.
 
 Po zmergowaniu i post-merge PASS dla 001-003:
 - wdrozyc aktualny main zgodnie z istniejacym deployment runbookiem,
