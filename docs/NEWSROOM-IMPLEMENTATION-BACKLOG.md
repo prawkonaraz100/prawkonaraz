@@ -2307,11 +2307,22 @@ Search Console evidence odświeżone 2026-09-20:
 - `NEWSROOM_PUBLIC_ENABLED=false` jest potwierdzone w aktywnym release, a produkcyjna baza ma `0` articles, `0` categories i `0` topics,
 - N5-007 STRICT static-delivery smoke po korekcie Cloudflare i typu MIME zakończył się pełnym PASS; runtime pozostaje dark-deployed, więc article/news samples są odłożone do kontrolowanego rollout'u.
 
+### Live production revalidation i repo repair — 2026-09-22
+
+- świeży PR-mode Enterprise SEO Production Validation #21 ma wrapper `success`, ale zgodnie z REPORT-ONLY semantics underlying wynik nie jest production PASS: static-delivery smoke `exit=0`, enterprise validator `exit=1`, `110 checks / 1 failure / 2 warnings`,
+- jedyny failure dotyczy publicznego `/aktualnosci`: live hub zwraca `200`, self-canonical, H1, meta description i `index,follow`, ale nie emituje `CollectionPage/WebPage` JSON-LD; ostrzeżenia pozostają przy 2-hop `http-www` oraz report-only sitemap coverage,
+- root cause jest repo-actionable na baseline `main@8b3cba58dae2408756bd10072449eef47ceba458`: publiczna gałąź `NewsroomPlaceholderController::news()` przekazuje `meta`, ale nie przekazuje `structuredData` do `layouts.public-content`,
+- implementation head PR #166 `a58e74aeadc18a9a0e2e2b9bcbb1a2319a986be2` dodaje dedykowany `NewsroomHomeSchemaService` w istniejącym wzorcu category/topic/guides oraz przekazuje `CollectionPage` + `BreadcrumbList` dla publicznego huba; nie zmienia routingu, modeli danych ani rollout/deploy architecture,
+- ten sam head koryguje wyłącznie stale Browser Smoke assertion dla stopki: produkcyjny kontrakt od commita `cc58e267fd36eceb7eff3bc622afe3c6ecb044a2` brzmi `Portal — aktualności`, podczas gdy `e2e-newsroom-guides.mjs` nadal wymagał historycznego `Aktualności`,
+- exact-head CI #584: `1169 passed / 20 578 assertions / 2 skipped`, PostgreSQL `7 passed / 94 assertions`, Pint `1133 files` PASS, frontend build PASS,
+- Browser Smoke #121: wszystkie 7 dedykowanych newsroom jobów PASS, w tym `newsroom-home`, `newsroom-guides` i `newsroom-golden-path`,
+- production nadal nie zawiera tej repo poprawki; REPORT-ONLY failure jest więc oczekiwanym dowodem pre-deploy i nie wolno go zapisywać jako zamknięty N6-003.
+
 ### Boundary / następny krok
 
-N6-003 nie jest DONE i nie wolno zapisywać report-only workflow success jako zielonego production gate'u. Następny krok N6-003 wymaga korekty reguły Cloudflare i zielonego STRICT runu, a po kontrolowanym rolloutcie także reprezentatywnych live article/category/topic samples do URL Inspection/schema/canonical/date validation.
+N6-003 nie jest DONE. Po merge i post-merge Quality Gate repo repair wymaga wdrożenia aktualnego `main`, a następnie świeżego STRICT `workflow_dispatch` z `require_newsroom_public=true` oraz reprezentatywnymi article/category/topic URL-ami. Dopiero wtedy można zamknąć live schema/canonical/date validation i przejść do odpowiadającego jej GSC evidence. REPORT-ONLY wrapper success nie zastępuje tego gate'u.
 
-NEWSROOM-N5-007 również pozostaje IN PROGRESS; jego Nginx/STRICT static-delivery/Cloudflare/GSC evidence jest częściowo współdzielone z N6-003, ale oba taski zachowują własny zakres i status.
+NEWSROOM-N5-007 static-delivery contract jest już potwierdzony osobnym live evidence; nie otwieramy go ponownie z powodu brakującego JSON-LD huba. Aktualny blocker należy do N6-003.
 
 ---
 
@@ -3068,6 +3079,15 @@ NEWSROOM-N5-007 pozostaje **IN PROGRESS** i wymaga zastosowania aktualnego Nginx
 ---
 
 # 12. Historia zmian
+
+### 2026-09-22 — v0.74
+
+- świeży live Enterprise SEO report ujawnił publiczny `/aktualnosci` bez JSON-LD: `110 checks / 1 failure / 2 warnings`, `static_delivery_exit=0`, `enterprise_seo_exit=1`; wrapper pozostaje REPORT-ONLY i nie jest production PASS,
+- root cause na baseline `main@8b3cba58dae2408756bd10072449eef47ceba458` to brak `structuredData` w publicznej gałęzi `NewsroomPlaceholderController::news()`,
+- PR #166 implementation head `a58e74aeadc18a9a0e2e2b9bcbb1a2319a986be2` dodaje newsroom home `CollectionPage`/`BreadcrumbList` w istniejącym schema-service pattern i regression coverage bez zmian routingu, danych ani rollout architecture,
+- CI #584 ma pełny PASS: 1169 passed / 20 578 assertions / 2 skipped, PostgreSQL 7/94, Pint 1133 files i frontend build; Browser Smoke #121 ma 7/7 dedykowanych newsroom jobów PASS,
+- stale guides footer assertion zostało wyrównane do istniejącego od `cc58e267fd36eceb7eff3bc622afe3c6ecb044a2` kontraktu `Portal — aktualności`; nie cofano aktualnego UI,
+- N6-003 pozostaje IN PROGRESS do merge/post-merge, deployu i świeżego STRICT public production validation z reprezentatywnymi article/category/topic samples.
 
 ### 2026-09-20 — v0.73
 
