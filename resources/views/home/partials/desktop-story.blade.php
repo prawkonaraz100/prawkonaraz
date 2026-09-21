@@ -5,80 +5,48 @@
     @endphp
 
     <section class="home-entry" aria-labelledby="home-entry-title">
-        <div class="home-entry__shell home-entry__grid">
+        <div class="home-entry__shell home-entry__grid home-entry__grid--reference">
             <div class="home-entry__copy" data-home-reveal>
                 <h1 id="home-entry-title">
                     <span class="home-entry__seo-kicker">Testy na prawo jazdy <span class="home-entry__seo-kicker-accent">{{ $seoYear }}</span></span>
-                    Ucz się szybko<br>
-                    i zdaj <span>prawko na raz!</span>
+                    <span class="home-entry__headline-line">Ucz się szybko</span>
+                    <span class="home-entry__headline-line home-entry__headline-line--second">zdaj <em>prawko na raz!</em></span>
                 </h1>
+                <div class="home-entry__conversion">
+                    <div class="home-entry__proof" aria-label="Zaufanie kursantów">
+                        <span class="home-entry__proof-avatars" aria-hidden="true">
+                            @foreach (array_slice($contactAdvisorImages, 0, 5, true) as $avatar)
+                                <img src="{{ $avatar }}" alt="" width="42" height="42">
+                            @endforeach
+                        </span>
+                        <span>Zaufało nam <strong>2137</strong> kursantów</span>
+                    </div>
+                    <a href="{{ auth()->check() ? route('session.index', absolute: false) : route('public.tests', absolute: false) }}" class="home-entry__reference-cta">
+                        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                            <path d="M8 5.5h8M9 3h6a1 1 0 0 1 1 1v2H8V4a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                            <path d="M7 5.5H5.5A1.5 1.5 0 0 0 4 7v12a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 20 19V7a1.5 1.5 0 0 0-1.5-1.5H17" stroke="currentColor" stroke-width="1.8"/>
+                            <path d="m8 13 2.2 2.2L16.5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>{{ auth()->check() ? 'Kontynuuj naukę' : 'Rozpocznij naukę za darmo' }}</span>
+                    </a>
+                </div>
                 <p class="home-entry__lead">
-                    Oficjalna baza pytań na prawo jazdy, testy próbne i proste wyjaśnienia.
+                    Oficjalna baza pytań na prawo jazdy, testy próbne i proste wyjaśnienia.<br>
                     Przygotuj się do egzaminu teoretycznego krok po kroku.
                 </p>
-
-                @guest
-                    <div class="home-entry__auth" aria-label="Szybkie logowanie">
-                        <div class="home-entry__test-action">
-                            <a href="{{ route('public.tests', absolute: false) }}" class="home-entry__auth-button home-entry__auth-button--primary">
-                                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
-                                    <path d="M8 5.5h8M9 3h6a1 1 0 0 1 1 1v2H8V4a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                                    <path d="M7 5.5H5.5A1.5 1.5 0 0 0 4 7v12a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 20 19V7a1.5 1.5 0 0 0-1.5-1.5H17" stroke="currentColor" stroke-width="1.8"/>
-                                    <path d="m8 13 2.2 2.2L16.5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                                <span>Rozpocznij darmowy test</span>
-                            </a>
-                            <p class="home-entry__test-note">20 pytań · bez logowania</p>
-                        </div>
-                        <a
-                            href="{{ $googleLoginAvailable ? route('social.redirect', ['provider' => 'google'], absolute: false) : route('login', absolute: false) }}"
-                            class="home-entry__auth-button"
-                        >
-                            <svg aria-hidden="true" viewBox="0 0 48 48">
-                                <path fill="#EA4335" d="M24 9.5c3.2 0 6.1 1.1 8.4 3.2l6.3-6.3C34.8 2.8 29.7.8 24 .8 14.8.8 6.9 6 3 13.6l7.3 5.7C12.1 13.6 17.5 9.5 24 9.5Z"/>
-                                <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.5 2.8-2.2 5.2-4.7 6.8l7.2 5.6c4.2-3.9 7.3-9.6 7.3-16.4Z"/>
-                                <path fill="#FBBC05" d="M10.3 28.7A14.6 14.6 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7L3 13.6A23.1 23.1 0 0 0 .5 24c0 3.7.9 7.3 2.5 10.4l7.3-5.7Z"/>
-                                <path fill="#34A853" d="M24 47.2c5.7 0 10.6-1.9 14.1-5.1l-6.1-6.8c-1.7 1.1-4 1.9-8 1.9-6.5 0-11.9-4.1-13.7-9.8L3 33.1c3.9 7.8 11.8 14.1 21 14.1Z"/>
-                            </svg>
-                            <span>Kontynuuj z Google</span>
-                        </a>
-                        <a href="{{ route('login', absolute: false) }}" class="home-entry__auth-button">
-                            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
-                                <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/>
-                                <path d="m4.5 7 7.5 6 7.5-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span>Zaloguj się e-mailem</span>
-                        </a>
-                    </div>
-                    <p class="home-entry__register">Nie masz konta? <a href="{{ route('register', absolute: false) }}">Załóż konto</a></p>
-                    <p class="home-entry__legal">
-                        <span>Kontynuując, akceptujesz <a href="{{ route('legal.terms', absolute: false) }}">Regulamin</a> i potwierdzasz</span>
-                        <span>zapoznanie się z <a href="{{ route('legal.privacy', absolute: false) }}">Polityką prywatności</a>.</span>
-                    </p>
-                @else
-                    <div class="home-entry__member-actions">
-                        <a href="{{ route('session.index', absolute: false) }}" class="home-entry__member-primary">Kontynuuj naukę</a>
-                        <a href="{{ route('public.tests', absolute: false) }}" class="home-entry__member-secondary">Uruchom egzamin próbny</a>
-                    </div>
-                @endguest
             </div>
-
-            <figure class="home-entry__visual home-entry__visual--composite" data-home-reveal>
-                <img
-                    src="{{ $heroScene }}"
-                    alt="Nauka do egzaminu na laptopie, znak nauki jazdy i podręczniki"
-                    class="home-entry__hero-art"
-                    width="1000"
-                    height="750"
-                    loading="eager"
-                    fetchpriority="high"
-                    decoding="async"
-                >
-                <figcaption class="sr-only">Oficjalne pytania egzaminacyjne dostępne na komputerze.</figcaption>
-            </figure>
         </div>
 
         <div class="home-entry__shell">
+            <div class="home-entry__showcase-meta" data-home-reveal>
+                <strong>Oficjalna baza pytań WORD {{ $seoYear }} <span aria-hidden="true">↘</span></strong>
+                <nav aria-label="Media społecznościowe PrawkoNaRaz">
+                    <span>Znajdź nas</span>
+                    <a href="https://www.youtube.com/channel/UCSrCDt_Aj1yslMY8sfXFBkg" target="_blank" rel="noopener noreferrer" aria-label="YouTube">▶</a>
+                    <a href="https://www.instagram.com/prawkonaraz.pl/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">◎</a>
+                    <a href="https://www.tiktok.com/@prawkonaraz" target="_blank" rel="noopener noreferrer" aria-label="TikTok">♪</a>
+                </nav>
+            </div>
             <section class="home-showcase" aria-labelledby="home-showcase-title" data-home-reveal>
                 <h2 id="home-showcase-title" class="sr-only">Najważniejsze możliwości PrawkoNaRaz</h2>
 
@@ -138,7 +106,7 @@
             </section>
         </div>
 
-        <section class="home-mobile-app-banner" aria-label="Aplikacja mobilna PrawkoNaRaz" data-home-reveal>
+        <section id="aplikacje" class="home-mobile-app-banner" aria-label="Aplikacja mobilna PrawkoNaRaz" data-home-reveal>
             <img
                 class="home-mobile-app-banner__image"
                 src="{{ $mobileAppBanner }}"

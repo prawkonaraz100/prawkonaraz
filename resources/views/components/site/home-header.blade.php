@@ -7,6 +7,8 @@
     $user = auth()->user();
     $navigation = app(\App\Support\PublicNavigation::class)->data($user);
     $links = $navigation['top'];
+    $googleLoginAvailable = filled(config('services.google.client_id'))
+        && filled(config('services.google.client_secret'));
 @endphp
 
 <header
@@ -35,15 +37,38 @@
             </a>
         </div>
 
-        <nav class="home-site-header__nav" aria-label="Nawigacja strony głównej">
-            @foreach ($links as $link)
-                <a href="{{ $link['href'] }}">
-                    <span>{{ $link['label'] }}</span>
-                </a>
-            @endforeach
+        <nav class="home-site-header__nav home-site-header__nav--reference" aria-label="Nawigacja strony głównej">
+            <a href="{{ $navigation['learning_href'] }}"><span>Portal</span></a>
+            <details class="home-site-header__courses">
+                <summary>Kursy <span aria-hidden="true">⌄</span></summary>
+                <div>
+                    <a href="{{ route('public.course', absolute: false) }}">Kurs teorii</a>
+                    <a href="{{ route('public.tests', absolute: false) }}">Testy online</a>
+                    <a href="{{ route('public.lectures', absolute: false) }}">Wykłady</a>
+                </div>
+            </details>
+            <a href="#aplikacje"><span>Aplikacje</span></a>
+            <a href="{{ route('public.pricing', absolute: false) }}"><span>Cennik</span></a>
+            <a href="{{ route('about.organization', absolute: false) }}"><span>O nas</span></a>
+            <a href="{{ route('about.contact', absolute: false) }}"><span>Kontakt</span></a>
         </nav>
 
         <div class="home-site-header__desktop-actions">
+            <a class="home-site-header__osk" href="{{ route('about.contact', absolute: false) }}">Strefa OSK</a>
+            @guest
+                <a
+                    class="home-site-header__google"
+                    href="{{ $googleLoginAvailable ? route('social.redirect', ['provider' => 'google'], absolute: false) : route('login', absolute: false) }}"
+                >
+                    <svg aria-hidden="true" viewBox="0 0 48 48">
+                        <path fill="#EA4335" d="M24 9.5c3.2 0 6.1 1.1 8.4 3.2l6.3-6.3C34.8 2.8 29.7.8 24 .8 14.8.8 6.9 6 3 13.6l7.3 5.7C12.1 13.6 17.5 9.5 24 9.5Z"/>
+                        <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.5 2.8-2.2 5.2-4.7 6.8l7.2 5.6c4.2-3.9 7.3-9.6 7.3-16.4Z"/>
+                        <path fill="#FBBC05" d="M10.3 28.7A14.6 14.6 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7L3 13.6A23.1 23.1 0 0 0 .5 24c0 3.7.9 7.3 2.5 10.4l7.3-5.7Z"/>
+                        <path fill="#34A853" d="M24 47.2c5.7 0 10.6-1.9 14.1-5.1l-6.1-6.8c-1.7 1.1-4 1.9-8 1.9-6.5 0-11.9-4.1-13.7-9.8L3 33.1c3.9 7.8 11.8 14.1 21 14.1Z"/>
+                    </svg>
+                    <span>Kontynuuj z Google</span>
+                </a>
+            @endguest
             <a class="home-site-header__account" href="{{ $user ? route('profile.edit', absolute: false) : route('login', absolute: false) }}">
                 <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
                     <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/>
