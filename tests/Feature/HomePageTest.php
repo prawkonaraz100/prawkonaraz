@@ -41,7 +41,7 @@ test('home page renders the public landing page', function () {
         ->assertSeeText('Kontynuuj z Google')
         ->assertSee('data-home-site-header', false)
         ->assertSee('data-home-header-menu', false)
-        ->assertSee('class="home-site-header is-visible', false)
+        ->assertSee('class="home-site-header home-site-header--reference is-visible', false)
         ->assertSee('aria-label="Otwórz menu serwisu"', false)
         ->assertSeeText('Cała nauka')
         ->assertSeeText('Każdy błąd')
