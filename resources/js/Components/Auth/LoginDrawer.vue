@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import InputError from '@/Components/InputError.vue';
+import AuthBrand from '@/Components/Auth/AuthBrand.vue';
+import AuthTrustPanel from '@/Components/Auth/AuthTrustPanel.vue';
 import { refreshCsrfSession } from '@/lib/csrfSession';
 import type { PageProps } from '@/types';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
 import { computed, onUnmounted, ref, watch } from 'vue';
-import authScene from '../../../images/home/hero-composite-v3.webp';
 
 const props = withDefaults(
     defineProps<{
@@ -141,12 +142,13 @@ onUnmounted(() => {
 <template>
     <Teleport to="body">
         <div
-            v-if="open || retainVisual"
+            v-show="open || retainVisual"
             class="auth-dialog-overlay fixed inset-0 z-[90] flex font-[system-ui,-apple-system,'Segoe_UI',Roboto,Helvetica,Arial,sans-serif]"
             :class="{
                 'auth-dialog-overlay--retain-visual': retainVisual,
                 'auth-dialog-overlay--form-layer': open && hideVisual,
                 'auth-dialog-overlay--standalone': standalone,
+                'auth-dialog-overlay--page': standalone,
             }"
             :data-auth-dialog-open="open ? 'true' : undefined"
             @click.self="close"
@@ -169,22 +171,24 @@ onUnmounted(() => {
                     </svg>
                 </button>
 
-                <figure class="auth-dialog__visual" aria-hidden="true">
-                    <img :src="authScene" alt="" class="auth-dialog__visual-image">
-                </figure>
+                <AuthTrustPanel />
 
                 <div class="auth-dialog__panel">
                     <div class="auth-login-drawer-body auth-dialog__content">
                     <header class="auth-dialog__header">
+                        <AuthBrand />
                         <h2
                             id="login-drawer-title"
                             class="auth-login-drawer-title auth-dialog__title"
                         >
-                            Zaloguj się i kontynuuj naukę
+                            Ucz się teorii szybciej i zdaj prawo jazdy <span>na raz!</span>
                         </h2>
                         <p class="auth-login-drawer-lead auth-dialog__lead">
-                            Wróć dokładnie do miejsca, w którym skończyłeś.
+                            Oficjalne pytania, szczegółowe wyjaśnienia i wygodna nauka — wszystko w jednym miejscu.
                         </p>
+                    </header>
+
+                    <div class="auth-dialog__switcher-row">
                         <div class="auth-switcher" role="tablist" aria-label="Wybierz formularz konta">
                             <button
                                 type="button"
@@ -204,7 +208,7 @@ onUnmounted(() => {
                                 Rejestracja
                             </button>
                         </div>
-                    </header>
+                    </div>
 
                     <div
                         v-if="status"
@@ -350,18 +354,19 @@ onUnmounted(() => {
                         </div>
 
                         <div class="auth-dialog__divider">
-                            <span>albo</span>
+                            <span>LUB</span>
                         </div>
                     </div>
 
                     <footer class="auth-dialog__footer">
-                    <p class="auth-login-drawer-return">
-                        Po zalogowaniu wrócisz dokładnie tam, gdzie skończyłeś naukę.
-                    </p>
-                    <p v-if="googleProvider" class="auth-dialog__legal-consent">
-                        Kontynuując z Google, akceptujesz <a :href="route('legal.terms')">Regulamin</a>
-                        i potwierdzasz zapoznanie się z <a :href="route('legal.privacy')">Polityką prywatności</a>.
-                    </p>
+                        <p class="auth-dialog__legal-consent">
+                            <span class="auth-dialog__legal-line">
+                                Logując się, akceptujesz <a :href="route('legal.terms')">regulamin serwisu</a>
+                            </span>
+                            <span class="auth-dialog__legal-line">
+                                oraz <a :href="route('legal.privacy')">politykę prywatności</a>.
+                            </span>
+                        </p>
                     </footer>
                     </div>
                 </div>

@@ -14,6 +14,7 @@ use App\Models\LicenseCategory;
 use App\Models\QuestionSeoTopic;
 use App\Models\TrafficSign;
 use App\Models\TrafficSignCategory;
+use App\Models\UserReview;
 use App\SEO\Schema\SiteIdentitySchema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
@@ -153,6 +154,7 @@ class SeoSitemapBuilder
             ['loc' => route('home'), 'lastmod' => null, 'images' => []],
             ['loc' => route('public.tests'), 'lastmod' => null, 'images' => []],
             ['loc' => route('public.pricing'), 'lastmod' => null, 'images' => []],
+            ['loc' => route('reviews.index'), 'lastmod' => $this->maxLastModified(UserReview::query()->publiclyVisible()->max('updated_at')), 'images' => []],
             ['loc' => route('legal.terms'), 'lastmod' => null, 'images' => []],
             ['loc' => route('legal.privacy'), 'lastmod' => null, 'images' => []],
             ['loc' => route('public.hardest-questions.index'), 'lastmod' => $this->publicQuestionCatalogService->latestQuestionLastModified(), 'images' => []],

@@ -31,13 +31,12 @@ class PublicFooter
                 'href' => route('public.questions.hub', absolute: false),
             ],
             'legal_links' => [
-                ['label' => 'O nas', 'href' => route('about.organization', absolute: false)],
-                ['label' => 'Jak to działa', 'href' => route('about.how-it-works', absolute: false)],
                 ['label' => 'Regulamin', 'href' => route('legal.terms', absolute: false)],
                 ['label' => 'Polityka prywatności', 'href' => route('legal.privacy', absolute: false)],
                 ['label' => 'Metodologia', 'href' => route('about.methodology', absolute: false)],
                 ['label' => 'Zasady redakcyjne', 'href' => route('about.editorial-principles', absolute: false)],
                 ['label' => 'Kontakt', 'href' => route('about.contact', absolute: false)],
+                ['label' => 'Ustawienia plików cookie', 'href' => route('legal.privacy', absolute: false).'#cookies'],
             ],
             'service_links' => [
                 ['label' => 'Baza pytań', 'href' => route('public.questions.hub', absolute: false)],
@@ -48,16 +47,21 @@ class PublicFooter
                 ['label' => 'Poradniki', 'href' => route('public.guides', absolute: false)],
                 ['label' => 'Kurs', 'href' => route('public.course', absolute: false)],
                 ['label' => 'Cennik', 'href' => route('public.pricing', absolute: false)],
+                ['label' => 'Opinie', 'href' => route('reviews.index', absolute: false)],
             ],
             'social_links' => [
-                ['label' => 'Facebook', 'href' => 'https://www.facebook.com/PrawkoNaRaz/'],
-                ['label' => 'Instagram', 'href' => 'https://www.instagram.com/prawkonaraz.pl/'],
-                ['label' => 'TikTok', 'href' => 'https://www.tiktok.com/@prawkonaraz'],
-                ['label' => 'YouTube', 'href' => 'https://www.youtube.com/channel/UCSrCDt_Aj1yslMY8sfXFBkg'],
+                ['label' => 'Facebook', 'href' => 'https://www.facebook.com/PrawkoNaRaz/', 'icon' => 'facebook'],
+                ['label' => 'YouTube', 'href' => 'https://www.youtube.com/channel/UCSrCDt_Aj1yslMY8sfXFBkg', 'icon' => 'youtube'],
+                ['label' => 'Instagram', 'href' => 'https://www.instagram.com/prawkonaraz.pl/', 'icon' => 'instagram'],
+                ['label' => 'TikTok', 'href' => 'https://www.tiktok.com/@prawkonaraz', 'icon' => 'tiktok'],
+            ],
+            'mobile_apps' => [
+                ['label' => 'App Store', 'icon' => 'apple', 'status' => 'w przygotowaniu'],
+                ['label' => 'Google Play', 'icon' => 'google-play', 'status' => 'w przygotowaniu'],
             ],
             'language' => 'Polski',
             'groups' => $navigation['footer_groups'],
-            'copyright' => '© '.now()->year,
+            'copyright' => '© '.now()->year.' PrawkoNaRaz.pl',
         ];
     }
 }

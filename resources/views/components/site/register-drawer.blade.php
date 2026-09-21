@@ -1,7 +1,6 @@
 @props(['open' => null])
 
 @php
-    $authScene = \Illuminate\Support\Facades\Vite::asset('resources/images/home/hero-composite-v3.webp');
     $studyContextService = app(\App\Support\StudyContextService::class);
     $categories = $studyContextService->activeCategories()
         ->map(fn ($category) => [
@@ -44,22 +43,27 @@
             </svg>
         </button>
 
-        <figure class="auth-dialog__visual" aria-hidden="true">
-            <img src="{{ $authScene }}" alt="" width="1000" height="750" class="auth-dialog__visual-image">
-        </figure>
+        <x-site.auth-trust-panel />
 
         <div class="auth-dialog__panel">
             <div class="auth-register-drawer-body auth-dialog__content auth-dialog__content--register">
             <header class="auth-register-drawer-header auth-dialog__header">
+                <a href="/" class="auth-dialog__brand" aria-label="PrawkoNaRaz.pl — strona główna">
+                    <span class="auth-dialog__brand-name">prawko<strong>naraz.pl</strong></span>
+                    <span class="auth-dialog__brand-tagline">Ucz się szybko i zdaj prawko na raz!</span>
+                </a>
                 <h2
                     id="public-register-drawer-title"
                     class="auth-register-drawer-title auth-dialog__title"
                 >
-                    Załóż konto i rozpocznij test
+                    Ucz się teorii szybciej i zdaj prawo jazdy <span>na raz!</span>
                 </h2>
                 <p class="auth-register-drawer-lead auth-dialog__lead">
-                    Wybierz kategorię i zacznij uczyć się w swoim tempie.
+                    Oficjalne pytania, szczegółowe wyjaśnienia i wygodna nauka — wszystko w jednym miejscu.
                 </p>
+            </header>
+
+            <div class="auth-dialog__switcher-row">
                 <nav class="auth-switcher" aria-label="Wybierz formularz konta">
                     <button
                         type="button"
@@ -70,7 +74,7 @@
                     </button>
                     <span class="auth-switcher__tab is-active" aria-current="page">Rejestracja</span>
                 </nav>
-            </header>
+            </div>
 
             <form
                 class="auth-register-drawer-form auth-dialog__form space-y-4"
@@ -294,7 +298,7 @@
             <div class="auth-register-social mt-6">
                 <div class="flex items-center gap-4">
                     <div class="h-px flex-1 bg-[#e2e7ee]"></div>
-                    <span class="text-[0.82rem] font-normal text-[#8b95a1]">Szybki start</span>
+                    <span class="text-[0.82rem] font-normal text-[#8b95a1]">LUB</span>
                     <div class="h-px flex-1 bg-[#e2e7ee]"></div>
                 </div>
 
@@ -330,25 +334,37 @@
             @endif
 
             <footer class="auth-dialog__footer">
-            @if ($friendInvitationsEnabled)
-            <p class="auth-register-invite">
-                Masz kod od znajomego?
-                <a
-                    href="{{ route('friend-invitations.code.create', absolute: false) }}"
-                    class="font-normal text-[#0a66c2] underline decoration-[#0a66c2]/35 underline-offset-2 transition hover:text-[#084f96]"
-                >
-                    Wpisz kod zaproszenia
-                </a>
-            </p>
-            @endif
+                @if ($friendInvitationsEnabled)
+                    <p class="auth-register-invite">
+                        Masz kod od znajomego?
+                        <a
+                            href="{{ route('friend-invitations.code.create', absolute: false) }}"
+                            class="font-normal text-[#0a66c2] underline decoration-[#0a66c2]/35 underline-offset-2 transition hover:text-[#084f96]"
+                        >
+                            Wpisz kod zaproszenia
+                        </a>
+                    </p>
+                @endif
 
-            @if (in_array('google', $enabledSocialProviders, true))
-            <p class="auth-dialog__legal-consent">
-                Kontynuując z Google, akceptujesz <a href="{{ route('legal.terms', absolute: false) }}">Regulamin</a>
-                i potwierdzasz zapoznanie się z <a href="{{ route('legal.privacy', absolute: false) }}">Polityką prywatności</a>.
-            </p>
-            @endif
-
+                @if (in_array('google', $enabledSocialProviders, true))
+                    <p class="auth-dialog__legal-consent">
+                        <span class="auth-dialog__legal-line">
+                            Kontynuując z Google, akceptujesz <a href="{{ route('legal.terms', absolute: false) }}">Regulamin</a>
+                        </span>
+                        <span class="auth-dialog__legal-line">
+                            i potwierdzasz zapoznanie się z <a href="{{ route('legal.privacy', absolute: false) }}">Polityką prywatności</a>.
+                        </span>
+                    </p>
+                @else
+                    <p class="auth-dialog__legal-consent">
+                        <span class="auth-dialog__legal-line">
+                            Zakładając konto, akceptujesz <a href="{{ route('legal.terms', absolute: false) }}">regulamin serwisu</a>
+                        </span>
+                        <span class="auth-dialog__legal-line">
+                            oraz <a href="{{ route('legal.privacy', absolute: false) }}">politykę prywatności</a>.
+                        </span>
+                    </p>
+                @endif
             </footer>
             </div>
         </div>

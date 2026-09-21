@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import AuthPricingBackdrop from '@/Components/Auth/AuthPricingBackdrop.vue';
-import AuthTopNavigation from '@/Components/Auth/AuthTopNavigation.vue';
 import LoginDrawer from '@/Components/Auth/LoginDrawer.vue';
 import RegisterDrawer from '@/Components/Auth/RegisterDrawer.vue';
 import type { PageProps, StudyContextCategory } from '@/types';
@@ -42,12 +40,6 @@ const openRegisterPanel = () => {
     <Head title="Rejestracja" />
 
     <div class="auth-page--standalone relative min-h-screen overflow-hidden bg-white text-[#111827]">
-        <AuthTopNavigation />
-
-        <div inert aria-hidden="true">
-            <AuthPricingBackdrop />
-        </div>
-
         <RegisterDrawer
             standalone
             :open="activePanel === 'register'"

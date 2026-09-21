@@ -99,6 +99,7 @@
         @if ($hasViteAssets)
             @vite(['resources/js/public-content.ts'])
         @endif
+        @stack('styles')
         <style>
             :root {
                 --site-shell-max: 1440px;

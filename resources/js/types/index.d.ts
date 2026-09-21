@@ -51,6 +51,13 @@ export interface FooterActionData {
 export interface FooterLinkData {
     label: string;
     href: string;
+    icon?: 'facebook' | 'youtube' | 'instagram' | 'tiktok';
+}
+
+export interface FooterMobileAppData {
+    label: string;
+    icon: 'apple' | 'google-play';
+    status: string;
 }
 
 export interface FooterData {
@@ -62,6 +69,7 @@ export interface FooterData {
     legal_links: FooterLinkData[];
     service_links: FooterLinkData[];
     social_links: FooterLinkData[];
+    mobile_apps: FooterMobileAppData[];
     language: string;
     groups: NavigationGroup[];
     copyright: string;

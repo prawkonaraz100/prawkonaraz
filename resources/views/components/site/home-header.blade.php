@@ -17,10 +17,13 @@
         <div class="home-site-header__identity">
             <a class="home-site-header__back" href="/" aria-label="Wróć na stronę główną">
                 <span class="home-site-header__back-icon" aria-hidden="true">
-                    <svg class="home-site-header__back-icon-full" viewBox="0 0 40 40" fill="none">
-                        <circle cx="20" cy="20" r="18.75" stroke="currentColor" stroke-width="1.5"/>
-                        <path d="m21.5 12.75-7.25 7.25 7.25 7.25M14.5 20h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                    <img
+                        class="home-site-header__back-icon-full"
+                        src="{{ asset('images/site-brand-mark-shield-v2.png') }}"
+                        alt=""
+                        width="256"
+                        height="256"
+                    >
                     <svg class="home-site-header__back-icon-compact" viewBox="0 0 20 28" fill="none">
                         <path d="m12.5 5.5-7.25 8.5 7.25 8.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>

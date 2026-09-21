@@ -39,6 +39,7 @@ class ProfileController extends Controller
         FriendInvitationProfilePresenter $friendInvitationProfilePresenter,
     ): Response {
         $profile = $userProfileService->profileFor($request->user())->load('targetCategory');
+        $review = $request->user()->review()->first();
         $generatedInvitation = $request->session()->get('friend_invitation_created');
 
         return Inertia::render('Profile/Edit', [
@@ -73,6 +74,12 @@ class ProfileController extends Controller
                 $request->user(),
                 is_array($generatedInvitation) ? $generatedInvitation : null,
             ),
+            'review' => [
+                'exists' => $review !== null,
+                'status' => $review?->status,
+                'status_label' => $review?->statusLabel(),
+                'edit_url' => route('reviews.index', absolute: false).'#dodaj-opinie',
+            ],
         ]);
     }
 

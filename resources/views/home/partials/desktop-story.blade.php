@@ -8,6 +8,7 @@
         <div class="home-entry__shell home-entry__grid">
             <div class="home-entry__copy" data-home-reveal>
                 <h1 id="home-entry-title">
+                    <span class="home-entry__seo-kicker">Testy na prawo jazdy <span class="home-entry__seo-kicker-accent">{{ $seoYear }}</span></span>
                     Ucz się szybko<br>
                     i zdaj <span>prawko na raz!</span>
                 </h1>
@@ -18,14 +19,17 @@
 
                 @guest
                     <div class="home-entry__auth" aria-label="Szybkie logowanie">
-                        <a href="{{ route('public.tests', absolute: false) }}" class="home-entry__auth-button home-entry__auth-button--primary">
-                            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
-                                <path d="M8 5.5h8M9 3h6a1 1 0 0 1 1 1v2H8V4a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                                <path d="M7 5.5H5.5A1.5 1.5 0 0 0 4 7v12a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 20 19V7a1.5 1.5 0 0 0-1.5-1.5H17" stroke="currentColor" stroke-width="1.8"/>
-                                <path d="m8 13 2.2 2.2L16.5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span>Rozpocznij test</span>
-                        </a>
+                        <div class="home-entry__test-action">
+                            <a href="{{ route('public.tests', absolute: false) }}" class="home-entry__auth-button home-entry__auth-button--primary">
+                                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                                    <path d="M8 5.5h8M9 3h6a1 1 0 0 1 1 1v2H8V4a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                                    <path d="M7 5.5H5.5A1.5 1.5 0 0 0 4 7v12a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 20 19V7a1.5 1.5 0 0 0-1.5-1.5H17" stroke="currentColor" stroke-width="1.8"/>
+                                    <path d="m8 13 2.2 2.2L16.5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span>Rozpocznij darmowy test</span>
+                            </a>
+                            <p class="home-entry__test-note">20 pytań · bez logowania</p>
+                        </div>
                         <a
                             href="{{ $googleLoginAvailable ? route('social.redirect', ['provider' => 'google'], absolute: false) : route('login', absolute: false) }}"
                             class="home-entry__auth-button"
@@ -132,7 +136,42 @@
                     </article>
                 </div>
             </section>
+        </div>
 
+        <section class="home-mobile-app-banner" aria-label="Aplikacja mobilna PrawkoNaRaz" data-home-reveal>
+            <img
+                class="home-mobile-app-banner__image"
+                src="{{ $mobileAppBanner }}"
+                alt="Aplikacja mobilna PrawkoNaRaz dostępna w Google Play, App Store i AppGallery"
+                width="1920"
+                height="480"
+                loading="lazy"
+                decoding="async"
+            >
+            <div class="home-mobile-app-banner__copy">
+                <div class="home-mobile-app-banner__brand">
+                    <img
+                        src="{{ asset('images/site-brand-mark-shield-v2.png') }}"
+                        width="256"
+                        height="256"
+                        alt=""
+                        width="1200"
+                        height="1200"
+                        loading="lazy"
+                        decoding="async"
+                        aria-hidden="true"
+                    >
+                    <div class="home-mobile-app-banner__brand-text">
+                        <strong><span>prawko</span>naraz<em>.pl</em></strong>
+                        <small>Ucz się szybko i zdaj prawko na raz!</small>
+                    </div>
+                </div>
+                <h2>Pobierz aplikację mobilną<br>i ucz się teorii <span>gdzie chcesz</span></h2>
+                <p>Setki pytań, realne testy i pełna wygoda.<br>Ucz się w domu, w podróży, wszędzie!</p>
+            </div>
+        </section>
+
+        <div class="home-entry__shell">
             <section class="home-trust" aria-labelledby="home-trust-title" data-home-reveal>
                 <h2 id="home-trust-title" class="home-trust__caption">
                     Oficjalne źródła
@@ -160,69 +199,12 @@
                         </a>
                     </li>
                 </ul>
-
-                <details class="home-trust__audit">
-                    <summary class="home-trust__audit-toggle">
-                        <strong>Zgodność platformy z wymaganiami e-learningu OSK</strong>
-                        <span class="home-trust__audit-action">
-                            <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
-                                <path d="m6 8 4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </span>
-                    </summary>
-
-                    <div class="home-trust__audit-content">
-                    <p class="home-trust__audit-intro">Pozytywny audyt obejmuje cztery kluczowe obszary działania platformy oraz ich odniesienia do obowiązujących przepisów.</p>
-
-                    <ol class="home-trust__audit-list">
-                        <li>
-                            <div>
-                                <h4>Nadzór OSK nad szkoleniem</h4>
-                                <p>Ośrodek ma dostęp do przebiegu szkolenia i postępu kursanta.</p>
-                                <div class="home-trust__audit-basis">
-                                    <span>Podstawa prawna</span>
-                                    <p>art. 23 ust. 3, art. 26 ust. 7 ustawy o kierujących pojazdami</p>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div>
-                                <h4>Czas szkolenia zgodny z przepisami</h4>
-                                <p>System rozlicza zajęcia teoretyczne zgodnie z wymogami prawnymi – 1 godzina zajęć teoretycznych = 45 minut.</p>
-                                <div class="home-trust__audit-basis">
-                                    <span>Podstawa prawna</span>
-                                    <p>§ 9 i § 10 rozporządzenia w sprawie szkolenia</p>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div>
-                                <h4>Dokumentowanie przebiegu kursu</h4>
-                                <p>System rejestruje realizację materiału, czas szkolenia oraz historię aktywności kursanta.</p>
-                                <div class="home-trust__audit-basis">
-                                    <span>Podstawa prawna</span>
-                                    <p>art. 27 ustawy o kierujących pojazdami oraz przepisy wykonawcze</p>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div>
-                                <h4>Dane dostępne do kontroli</h4>
-                                <p>Uprawniony użytkownik może odczytać i przygotować dokumentację na potrzeby kontroli lub urzędu.</p>
-                                <div class="home-trust__audit-basis">
-                                    <span>Podstawa prawna</span>
-                                    <p>art. 27 ust. 7 ustawy o kierujących pojazdami oraz przepisy wykonawcze</p>
-                                </div>
-                            </div>
-                        </li>
-                    </ol>
-
-                    </div>
-                </details>
             </section>
 
         </div>
     </section>
+
+    @include('home.partials.learning-story')
 
     @if (false)
     <section class="home-ops__app-teaser" aria-labelledby="home-ops-app-teaser-title">

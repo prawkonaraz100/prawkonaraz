@@ -1,7 +1,6 @@
 @props(['open' => null])
 
 @php
-    $authScene = \Illuminate\Support\Facades\Vite::asset('resources/images/home/hero-composite-v3.webp');
     $authPanel = old('_auth_panel');
     $shouldOpen = is_bool($open)
         ? $open
@@ -34,22 +33,27 @@
             </svg>
         </button>
 
-        <figure class="auth-dialog__visual" aria-hidden="true">
-            <img src="{{ $authScene }}" alt="" width="1000" height="750" class="auth-dialog__visual-image">
-        </figure>
+        <x-site.auth-trust-panel />
 
         <div class="auth-dialog__panel">
             <div class="auth-login-drawer-body auth-dialog__content">
             <header class="auth-dialog__header">
+                <a href="/" class="auth-dialog__brand" aria-label="PrawkoNaRaz.pl — strona główna">
+                    <span class="auth-dialog__brand-name">prawko<strong>naraz.pl</strong></span>
+                    <span class="auth-dialog__brand-tagline">Ucz się szybko i zdaj prawko na raz!</span>
+                </a>
                 <h2
                     id="public-login-drawer-title"
                     class="auth-login-drawer-title auth-dialog__title"
                 >
-                    Zaloguj się i kontynuuj naukę
+                    Ucz się teorii szybciej i zdaj prawo jazdy <span>na raz!</span>
                 </h2>
                 <p class="auth-login-drawer-lead auth-dialog__lead">
-                    Wróć dokładnie do miejsca, w którym skończyłeś.
+                    Oficjalne pytania, szczegółowe wyjaśnienia i wygodna nauka — wszystko w jednym miejscu.
                 </p>
+            </header>
+
+            <div class="auth-dialog__switcher-row">
                 <nav class="auth-switcher" aria-label="Wybierz formularz konta">
                     <span class="auth-switcher__tab is-active" aria-current="page">Logowanie</span>
                     <button
@@ -60,7 +64,7 @@
                         Rejestracja
                     </button>
                 </nav>
-            </header>
+            </div>
 
             @if (session('status'))
                 <div class="auth-dialog__notice" role="status">
@@ -220,21 +224,34 @@
                 </div>
 
                 <div class="auth-dialog__divider">
-                    <span>albo</span>
+                    <span>LUB</span>
                 </div>
             </div>
             @endif
 
             <footer class="auth-dialog__footer">
-            <p class="auth-login-drawer-return">
-                Po zalogowaniu wrócisz dokładnie tam, gdzie skończyłeś naukę.
-            </p>
-            @if (in_array('google', $enabledSocialProviders, true))
-            <p class="auth-dialog__legal-consent">
-                Kontynuując z Google, akceptujesz <a href="{{ route('legal.terms', absolute: false) }}">Regulamin</a>
-                i potwierdzasz zapoznanie się z <a href="{{ route('legal.privacy', absolute: false) }}">Polityką prywatności</a>.
-            </p>
-            @endif
+                <p class="auth-login-drawer-return">
+                    Po zalogowaniu wrócisz dokładnie tam, gdzie skończyłeś naukę.
+                </p>
+                @if (in_array('google', $enabledSocialProviders, true))
+                    <p class="auth-dialog__legal-consent">
+                        <span class="auth-dialog__legal-line">
+                            Kontynuując z Google, akceptujesz <a href="{{ route('legal.terms', absolute: false) }}">Regulamin</a>
+                        </span>
+                        <span class="auth-dialog__legal-line">
+                            i potwierdzasz zapoznanie się z <a href="{{ route('legal.privacy', absolute: false) }}">Polityką prywatności</a>.
+                        </span>
+                    </p>
+                @else
+                    <p class="auth-dialog__legal-consent">
+                        <span class="auth-dialog__legal-line">
+                            Logując się, akceptujesz <a href="{{ route('legal.terms', absolute: false) }}">regulamin serwisu</a>
+                        </span>
+                        <span class="auth-dialog__legal-line">
+                            oraz <a href="{{ route('legal.privacy', absolute: false) }}">politykę prywatności</a>.
+                        </span>
+                    </p>
+                @endif
             </footer>
             </div>
         </div>
