@@ -37,7 +37,7 @@ test('home page renders the public landing page', function () {
         ->assertSeeText('Ucz się szybko')
         ->assertSeeText('prawko na raz!')
         ->assertSeeText('Rozpocznij darmowy test')
-        ->assertSeeText('20 pytań · bez logowania')
+        ->assertSeeText('Rozpocznij naukę za darmo')
         ->assertSeeText('Kontynuuj z Google')
         ->assertSee('data-home-site-header', false)
         ->assertSee('data-home-header-menu', false)
