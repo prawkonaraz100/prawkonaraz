@@ -3074,7 +3074,7 @@ Nie ma kolejnego zaplanowanego repo-level feature/hardening tasku newsroomu. Dal
 
 ### Równoległy production-only blocker
 
-NEWSROOM-N5-007 pozostaje **IN PROGRESS** i wymaga zastosowania aktualnego Nginx configu na produkcji, udanego STRICT Production SEO Delivery Smoke oraz późniejszego GSC verification. Brak dostępu GitHub do serwera nie jest zastępowany nową ścieżką SSH/deployment architecture.
+NEWSROOM-N5-007 jest **DONE** dla repo contract, live Nginx/Cloudflare static delivery, schedulera oraz STRICT Production SEO Delivery Smoke zgodnie z potwierdzonym evidence z 2026-09-20. Bieżący production-only blocker w tym obszarze należy do N6-003: publiczny newsroom wymaga deployu repo repair oraz świeżego STRICT schema/canonical/date validation. Brak dostępu GitHub do serwera nie jest zastępowany nową ścieżką SSH/deployment architecture.
 
 ---
 
