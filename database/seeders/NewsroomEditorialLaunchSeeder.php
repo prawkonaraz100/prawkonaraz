@@ -47,7 +47,7 @@ final class NewsroomEditorialLaunchSeeder extends Seeder
                 $article = ContentArticle::query()->updateOrCreate(
                     ['slug' => $definition['slug']],
                     [
-                        'type' => ContentArticleType::Guide->value,
+                        'type' => ContentArticleType::Explainer->value,
                         'category_id' => $category->getKey(),
                         'author_id' => $author->getKey(),
                         'reviewer_id' => $definition['author'] === 'jakub' ? $katarzyna->getKey() : $jakub->getKey(),
