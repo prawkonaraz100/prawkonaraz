@@ -54,6 +54,7 @@ const {
 const user = computed(() => page.props.auth.user);
 const isAuthed = computed(() => Boolean(user.value));
 const navigation = computed(() => page.props.navigation);
+const showPricingLink = computed(() => page.props.authDrawers.paymentRequired);
 const mobileMenuOpen = ref(false);
 const accountMenuOpen = ref(false);
 const loginDrawerOpen = ref(false);
@@ -114,7 +115,7 @@ const mobilePrimaryLinks = computed<HeaderNavigationLink[]>(() => [
     { label: 'Znaki drogowe', href: '/znaki-drogowe', match: ['/znaki-drogowe'], icon: 'signs' },
     { label: 'Przepisy', href: '/przepisy', match: ['/przepisy'], icon: 'book' },
     { label: 'Testy online', href: '/testy-na-prawo-jazdy', match: ['/testy-na-prawo-jazdy'], icon: 'monitor' },
-    { label: 'Cennik', href: '/cennik', match: ['/cennik'], icon: 'tag' },
+    ...(showPricingLink.value ? [{ label: 'Cennik', href: '/cennik', match: ['/cennik'], icon: 'tag' as const }] : []),
 ]);
 
 const desktopPrimaryLinks = computed<HeaderNavigationLink[]>(() => [
@@ -127,7 +128,7 @@ const desktopPrimaryLinks = computed<HeaderNavigationLink[]>(() => [
     { label: 'Testy', href: '/testy-na-prawo-jazdy', match: ['/testy-na-prawo-jazdy'], icon: 'monitor' },
     { label: 'Znaki', href: '/znaki-drogowe', match: ['/znaki-drogowe'], icon: 'signs' },
     { label: 'Przepisy', href: '/przepisy', match: ['/przepisy'], icon: 'book' },
-    { label: 'Cennik', href: '/cennik', match: ['/cennik'], icon: 'tag' },
+    ...(showPricingLink.value ? [{ label: 'Cennik', href: '/cennik', match: ['/cennik'], icon: 'tag' as const }] : []),
 ]);
 
 const mobilePanelActions = computed(() => headerActions.value);

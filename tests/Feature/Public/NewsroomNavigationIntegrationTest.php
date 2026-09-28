@@ -1,5 +1,17 @@
 <?php
 
+test('public and account headers share the same top links and course order', function () {
+    $navigation = app(\App\Support\PublicNavigation::class)->data(null);
+
+    expect(array_column($navigation['top'], 'label'))->toBe(['Portal', 'Dlaczego my?', 'Aplikacje', 'Cennik'])
+        ->and(array_column($navigation['courses'], 'label'))->toBe([
+            'Testy online', 'Kurs teorii Online', 'Wykłady z instruktorem Online', 'Kod 95 — kierowca zawodowy',
+        ]);
+
+    $layout = file_get_contents(resource_path('js/Layouts/AuthenticatedLayout.vue'));
+    expect($layout)->toContain('<PublicTopNavigation />');
+});
+
 use App\Support\PublicFooter;
 use App\Support\PublicNavigation;
 

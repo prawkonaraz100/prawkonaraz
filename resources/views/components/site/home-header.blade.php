@@ -6,13 +6,7 @@
 @php
     $user = auth()->user();
     $navigation = app(\App\Support\PublicNavigation::class)->data($user);
-    $links = array_merge(
-        [
-            ['label' => 'Portal', 'href' => route('public.news', absolute: false)],
-            ['label' => 'Dlaczego my?', 'href' => '/#home-learning-title'],
-        ],
-        array_values(array_filter($navigation['top'], fn ($link) => ! in_array($link['label'], ['O nas', 'Kontakt'], true))),
-    );
+    $links = $navigation['top'];
     $googleLoginAvailable = filled(config('services.google.client_id'))
         && filled(config('services.google.client_secret'));
 @endphp
@@ -44,19 +38,19 @@
         </div>
 
         <nav class="home-site-header__nav home-site-header__nav--reference" aria-label="Nawigacja strony głównej">
-            <a href="{{ route('public.news', absolute: false) }}"><span>Portal</span></a>
+            @foreach ($links as $link)
+            <a href="{{ $link['href'] }}"><span>{{ $link['label'] }}</span></a>
+            @if ($loop->first)
             <details class="home-site-header__courses" data-home-header-menu>
                 <summary>Kursy <svg class="home-site-header__chevron" aria-hidden="true" viewBox="0 0 20 20" fill="none"><path d="m5 7.5 5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
                 <div>
-                    <a href="{{ route('public.tests', absolute: false) }}"><x-heroicon-o-clipboard-document-check aria-hidden="true" /><span><strong>Testy online</strong><small>Sprawdź swoją wiedzę przed egzaminem.</small></span></a>
-                    <a href="{{ route('public.course', absolute: false) }}"><x-heroicon-o-academic-cap aria-hidden="true" /><span><strong>Kurs teorii Online</strong><small>Ucz się krok po kroku, dział po dziale.</small></span></a>
-                    <a href="{{ route('public.lectures', absolute: false) }}"><x-heroicon-o-play-circle aria-hidden="true" /><span><strong>Wykłady z instruktorem Online</strong><small>Poznaj przepisy i zasady ruchu drogowego.</small></span></a>
-                    <a href="{{ route('public.code95', absolute: false) }}"><x-heroicon-o-academic-cap aria-hidden="true" /><span><strong>Kod 95 — kierowca zawodowy</strong><small>Kurs dla kierowców zawodowych.</small></span></a>
+                    @foreach ($navigation['courses'] as $course)
+                    <a href="{{ $course['href'] }}"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg><span><strong>{{ $course['label'] }}</strong><small>{{ $course['description'] }}</small></span></a>
+                    @endforeach
                 </div>
             </details>
-            <a href="/#home-learning-title"><span>Dlaczego my?</span></a>
-            <a href="/#aplikacje"><span>Aplikacje</span></a>
-            <a href="{{ route('public.pricing', absolute: false) }}"><span>Cennik</span></a>
+            @endif
+            @endforeach
         </nav>
 
         <div class="home-site-header__desktop-actions">
@@ -142,7 +136,13 @@
                 <nav aria-label="Nawigacja mobilna strony głównej">
                     @foreach ($links as $link)
                         <a href="{{ $link['href'] }}">{{ $link['label'] }}</a>
+                        @if ($loop->first)
+                            @foreach ($navigation['courses'] as $course)
+                                <a href="{{ $course['href'] }}">{{ $course['label'] }}</a>
+                            @endforeach
+                        @endif
                     @endforeach
+                    <a href="{{ route('public.osk', absolute: false) }}">Strefa OSK</a>
                 </nav>
                 <div>
                     @if ($user)

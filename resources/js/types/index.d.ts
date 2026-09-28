@@ -28,6 +28,7 @@ export interface NavigationGroup {
 }
 
 export interface NavigationData {
+    courses: { label: string; href: string; description: string }[];
     top: NavigationLink[];
     utility: NavigationLink[];
     primary: NavigationLink[];

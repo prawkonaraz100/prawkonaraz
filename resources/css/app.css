@@ -10285,3 +10285,13 @@ html:has(.auth-drawer-top-navigation):has([data-register-drawer-open='true'])
         height: 3.45rem !important;
     }
 }
+
+/* Shared top navigation on public and account pages. */
+.home-site-header.home-site-header--reference { border-bottom: 0; }
+.home-site-header--reference .home-site-header__shell { width: min(calc(100% - 64px), 1448px); min-height: 66px; gap: 28px; }
+.home-site-header--reference .home-site-header__nav { flex: 0 1 auto; margin-left: auto; margin-right: auto; gap: 38px; }
+.home-site-header--reference .home-site-header__nav > a { font-size: 16px; font-weight: 400; }
+.home-site-header--reference .home-site-header__courses > summary { font-size: 14px; font-weight: 500; text-transform: uppercase; }
+.home-site-header--reference .home-site-header__desktop-actions { gap: 20px; }
+.home-site-header--reference .home-site-header__osk { margin-right: 10px; font-weight: 500; }
+@media (max-width: 1450px) { .home-site-header--reference .home-site-header__nav { gap: 22px; } .home-site-header--reference .home-site-header__desktop-actions { gap: 12px; } }

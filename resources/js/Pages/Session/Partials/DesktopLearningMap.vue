@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import CourseModules from '@/Pages/QuestionCollections/Partials/CourseModules.vue';
 import { topicArtworkForKey } from '@/lib/topicArtwork';
-import { Link } from '@inertiajs/vue3';
+import type { PageProps } from '@/types';
+import { Link, usePage } from '@inertiajs/vue3';
 import { GraduationCap, RotateCcw } from '@lucide/vue';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import rocketButtonIcon from '../../../../images/session/rocket-button.png';
 
 type LearningPath = 'pjm' | 'traffic-signs' | 'classic' | 'zen' | 'exam' | 'memory' | 'ranking';
 type QuestionScope = 'all' | 'basic' | 'specialist';
+type PathViewMode = 'map' | 'list';
 
 interface TopicOption {
     id: number;
@@ -144,6 +146,9 @@ const emit = defineEmits<{
 }>();
 
 const isTopicLearningPath = computed(() => props.isClassicPath || props.isZenPath);
+const page = usePage<PageProps>();
+const pathViewMode = ref<PathViewMode>('map');
+const pathViewStorageKey = computed(() => `prawkonaraz.learning-path-view.v1.${page.props.auth.user?.id ?? 'guest'}`);
 const isSessionSetupOpen = ref(Boolean(props.errors.licenseCategory || props.errors.topic || props.errors.status));
 const isNavigationCollapsed = ref(true);
 const selectedProfessionalCourseCode = ref<string | null>(
@@ -240,6 +245,16 @@ function openSessionSetup(topicId: number): void {
     isSessionSetupOpen.value = true;
 }
 
+function selectPathViewMode(mode: PathViewMode): void {
+    pathViewMode.value = mode;
+
+    try {
+        window.localStorage.setItem(pathViewStorageKey.value, mode);
+    } catch {
+        // The view remains usable when browser storage is unavailable.
+    }
+}
+
 function closeSessionSetup(): void {
     isSessionSetupOpen.value = false;
 }
@@ -322,6 +337,14 @@ watch(
 );
 
 onMounted(() => {
+    try {
+        if (window.localStorage.getItem(pathViewStorageKey.value) === 'list') {
+            pathViewMode.value = 'list';
+        }
+    } catch {
+        // Keep the default map view when browser storage is unavailable.
+    }
+
     window.addEventListener('keydown', handleKeydown);
 });
 onBeforeUnmount(() => window.removeEventListener('keydown', handleKeydown));
@@ -336,6 +359,17 @@ function progressPercent(topic: TopicOption): number {
     }
 
     return Math.min(Math.round((answeredCount(topic) / topic.questions_count) * 100), 100);
+}
+
+function questionCountLabel(count: number): string {
+    if (count === 1) {
+        return '1 pytanie';
+    }
+
+    const lastTwoDigits = count % 100;
+    const lastDigit = count % 10;
+
+    return `${count} ${lastDigit >= 2 && lastDigit <= 4 && (lastTwoDigits < 12 || lastTwoDigits > 14) ? 'pytania' : 'pytań'}`;
 }
 
 function topicState(topic: TopicOption): 'next' | 'attention' | 'complete' | 'progress' | 'pending' {
@@ -586,7 +620,7 @@ function topicArtworkFor(topic: TopicOption): string | null {
             </template>
 
             <template v-else-if="isTopicLearningPath">
-                <section class="min-w-0" aria-label="Mapa działów nauki">
+                <section class="min-w-0" aria-label="Ścieżka nauki">
                     <div class="min-h-[calc(100vh-6.5rem)] overflow-hidden bg-[#fbfcfd] px-4 py-5 sm:px-6 xl:px-10 xl:py-6">
                         <header class="flex flex-wrap items-start justify-between gap-4">
                             <div class="border-l-[4px] border-[#1e73e8] pl-3.5">
@@ -602,6 +636,23 @@ function topicArtworkFor(topic: TopicOption): string | null {
                                 </div>
                             </div>
 
+                            <div class="flex flex-wrap items-end gap-3">
+                                <div class="flex flex-col gap-1.5">
+                                    <span class="text-[0.68rem] font-semibold text-[#65727d]">Widok ścieżki</span>
+                                    <div class="inline-flex rounded-[8px] border border-[#d9e2e8] bg-white p-1" role="group" aria-label="Wybierz widok ścieżki nauki">
+                                        <button
+                                            v-for="mode in ([{ value: 'map', label: 'Mapa' }, { value: 'list', label: 'Lista' }] as const)"
+                                            :key="mode.value"
+                                            type="button"
+                                            class="min-h-9 rounded-[6px] px-3 text-[0.78rem] font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1e73e8]"
+                                            :class="pathViewMode === mode.value ? 'bg-[#1e73e8] text-white' : 'text-[#52606d] hover:bg-[#f0f5fa]'"
+                                            :aria-pressed="pathViewMode === mode.value"
+                                            @click="selectPathViewMode(mode.value)"
+                                        >
+                                            {{ mode.label }}
+                                        </button>
+                                    </div>
+                                </div>
                             <dl class="flex min-w-[17.75rem] divide-x divide-[#e7ecef] overflow-hidden rounded-[9px] border border-[#e7ecef] bg-white shadow-[0_7px_20px_rgba(16,24,32,0.045)]">
                                 <div class="flex min-w-[9.9rem] items-center gap-2.5 px-4 py-2.5">
                                     <div class="grid h-9 w-9 shrink-0 place-items-center rounded-full" :style="mapProgressStyle" aria-hidden="true">
@@ -619,9 +670,10 @@ function topicArtworkFor(topic: TopicOption): string | null {
                                     </dd>
                                 </div>
                             </dl>
+                            </div>
                         </header>
 
-                        <div v-if="mapRows.length > 0" class="relative mt-7 w-full xl:mt-8" :style="{ minHeight: `${mapRouteHeight}px` }">
+                        <div v-if="pathViewMode === 'map' && mapRows.length > 0" class="relative mt-7 w-full xl:mt-8" :style="{ minHeight: `${mapRouteHeight}px` }">
                             <svg
                                 aria-hidden="true"
                                 class="pointer-events-none absolute inset-0 z-0 h-full w-full"
@@ -704,6 +756,39 @@ function topicArtworkFor(topic: TopicOption): string | null {
                                         </button>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div v-else-if="mapTopics.length > 0" class="mt-6 space-y-2" role="list" aria-label="Lista działów nauki">
+                            <div v-for="topic in mapTopics" :key="topic.id" role="listitem">
+                                <button
+                                    type="button"
+                                    class="group grid min-h-[5.5rem] w-full grid-cols-[2.75rem_minmax(0,1fr)_9.5rem] items-center gap-x-3 gap-y-1.5 rounded-[8px] border border-[#e5eaee] bg-white px-3 py-2.5 text-left transition hover:border-[#a9bdd1] hover:shadow-[0_6px_20px_rgba(16,24,32,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1e73e8] focus-visible:ring-offset-2 min-[900px]:grid-cols-[2.75rem_minmax(9rem,1.5fr)_5.5rem_minmax(7rem,1fr)_9.5rem] min-[900px]:gap-x-4 min-[900px]:px-4"
+                                    :aria-label="`${topic.label}. ${topicStateLabel(topic)}. Przerobiono ${answeredCount(topic)} / ${topic.questions_count}. Otwórz ustawienia nauki.`"
+                                    @click="openSessionSetup(topic.id)"
+                                >
+                                    <span class="row-span-2 grid h-11 w-11 shrink-0 place-items-center rounded-[6px] bg-[#f5f8fb] min-[900px]:row-span-1" :style="{ color: mapTone(topic) }" aria-hidden="true">
+                                        <img v-if="topicArtworkFor(topic)" :src="topicArtworkFor(topic) ?? ''" alt="" class="h-9 w-9 object-contain" />
+                                        <svg v-else-if="topicIcon(topic) === 'sign'" class="h-7 w-7" viewBox="0 0 32 32" fill="none"><path d="M16 3 29 27H3L16 3Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><path d="M16 11v7m0 4h.01" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg>
+                                        <svg v-else-if="topicIcon(topic) === 'junction'" class="h-7 w-7" viewBox="0 0 32 32" fill="none"><path d="M16 4v24M16 16 6 9M16 16l10-7" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/><circle cx="16" cy="16" r="3.2" fill="currentColor" /></svg>
+                                        <svg v-else-if="topicIcon(topic) === 'signal'" class="h-7 w-7" viewBox="0 0 32 32" fill="none"><rect x="11" y="3" width="10" height="26" rx="4" stroke="currentColor" stroke-width="2"/><circle cx="16" cy="9" r="2.2" fill="currentColor"/><circle cx="16" cy="16" r="2.2" fill="currentColor" opacity=".48"/><circle cx="16" cy="23" r="2.2" fill="currentColor" /></svg>
+                                        <svg v-else class="h-7 w-7" viewBox="0 0 32 32" fill="none"><path d="M6 25c6-10 14-10 20-18M9 6h5v5M18 21h5v5" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7" cy="25" r="2.5" fill="currentColor"/></svg>
+                                    </span>
+                                    <span class="min-w-0">
+                                        <span class="block text-[0.86rem] font-semibold leading-5 text-[#172029]">{{ topic.label }}</span>
+                                        <span class="block text-[0.7rem] text-[#77838d] min-[900px]:hidden">{{ questionCountLabel(topic.questions_count) }} · {{ topicStateLabel(topic) }}</span>
+                                    </span>
+                                    <span class="hidden text-[0.76rem] font-medium text-[#667582] min-[900px]:block">{{ questionCountLabel(topic.questions_count) }}</span>
+                                    <span class="col-start-2 flex min-w-0 items-center gap-2 min-[900px]:col-auto">
+                                        <span class="w-9 shrink-0 text-[0.75rem] font-bold" :style="{ color: mapTone(topic) }">{{ progressPercent(topic) }}%</span>
+                                        <span class="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-[#e8edf0]" role="progressbar" :aria-label="`Postęp: ${topic.label}`" :aria-valuenow="progressPercent(topic)" aria-valuemin="0" aria-valuemax="100">
+                                            <span class="block h-full rounded-full" :style="{ width: `${progressPercent(topic)}%`, backgroundColor: mapTone(topic) }" />
+                                        </span>
+                                    </span>
+                                    <span class="col-start-3 row-span-2 inline-flex min-h-9 items-center justify-center rounded-[5px] bg-[#eaf3ff] px-2 text-center text-[0.72rem] font-semibold leading-4 text-[#175cb5] transition group-hover:bg-[#1e73e8] group-hover:text-white min-[900px]:col-auto min-[900px]:row-span-1">
+                                        {{ progressPercent(topic) === 100 ? 'Powtórz dział' : progressPercent(topic) > 0 ? 'Kontynuuj naukę' : 'Rozpocznij naukę' }}
+                                    </span>
+                                </button>
                             </div>
                         </div>
 

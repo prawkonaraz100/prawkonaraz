@@ -183,11 +183,7 @@ Route::get('/wyklady', fn () => Inertia::render('Public/MarketingPlaceholder', [
     'eyebrow' => 'Materiały',
     'description' => 'Wykłady mają już własną trasę i pusty ekran startowy, gotowy do dalszego wypełnienia treścią.',
 ]))->name('public.lectures');
-Route::get('/kurs-kod-95', fn () => Inertia::render('Public/MarketingPlaceholder', [
-    'title' => 'Kod 95 — kierowca zawodowy',
-    'eyebrow' => 'Strona przykładowa — w przygotowaniu',
-    'description' => 'Tutaj przedstawimy program kursu dla kierowców zawodowych, zakres materiałów i informacje o zapisach. Oferta nie jest jeszcze dostępna.',
-]))->name('public.code95');
+Route::get('/kurs-kod-95', fn () => Inertia::render('Public/Code95'))->name('public.code95');
 Route::get('/strefa-osk', fn () => Inertia::render('Public/MarketingPlaceholder', [
     'title' => 'Strefa OSK',
     'eyebrow' => 'Dla szkół jazdy — w przygotowaniu',

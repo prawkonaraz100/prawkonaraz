@@ -6,12 +6,17 @@ use App\Models\User;
 
 class PublicNavigation
 {
+    public function __construct(
+        protected PaymentRequirementService $paymentRequirementService,
+    ) {}
+
     /**
      * @return array<string, mixed>
      */
     public function data(?User $user): array
     {
         $isAuthed = $user instanceof User;
+        $paymentRequired = $this->paymentRequirementService->requiresPayment();
         $learningHref = $isAuthed ? '/nauka' : '/login';
         $primaryLinks = [
             $this->link('Aktualności', route('public.news', absolute: false), ['/aktualnosci']),
@@ -32,11 +37,21 @@ class PublicNavigation
 
         return [
             'top' => [
-                $this->link('Baza pytań', route('public.questions.hub', absolute: false), ['/oficjalna-baza-pytan-na-prawo-jazdy', '/pytanie'], icon: 'baza-pytan'),
-                $this->link('Plany nauki', route('public.pricing', absolute: false), ['/cennik'], icon: 'plany-nauki'),
-                $this->link('Kursy', route('public.course', absolute: false), ['/kurs'], icon: 'kursy'),
-                $this->link('Cennik', route('public.pricing', absolute: false), ['/cennik'], icon: 'cennik'),
-                $this->link('Kontakt', route('about.contact', absolute: false), ['/kontakt'], icon: 'kontakt'),
+                $this->link('Portal', route('public.news', absolute: false), ['/aktualnosci']),
+                ...($isAuthed ? [
+                    $this->link('Nauka', $learningHref, ['/nauka', '/study-sessions', '/trener-pamieci']),
+                ] : []),
+                $this->link('Dlaczego my?', '/#home-learning-title', []),
+                $this->link('Aplikacje', '/#aplikacje', []),
+                ...($paymentRequired ? [
+                    $this->link('Cennik', route('public.pricing', absolute: false), ['/cennik'], icon: 'cennik'),
+                ] : []),
+            ],
+            'courses' => [
+                ['label' => 'Testy online', 'href' => route('public.tests', absolute: false), 'description' => 'Sprawdź swoją wiedzę przed egzaminem.'],
+                ['label' => 'Kurs teorii Online', 'href' => route('public.course', absolute: false), 'description' => 'Ucz się krok po kroku, dział po dziale.'],
+                ['label' => 'Wykłady z instruktorem Online', 'href' => route('public.lectures', absolute: false), 'description' => 'Poznaj przepisy i zasady ruchu drogowego.'],
+                ['label' => 'Kod 95 — kierowca zawodowy', 'href' => route('public.code95', absolute: false), 'description' => 'Kurs dla kierowców zawodowych.'],
             ],
             'utility' => [
                 $this->link('O nas', route('about.organization', absolute: false), ['/o-nas', '/autorzy']),

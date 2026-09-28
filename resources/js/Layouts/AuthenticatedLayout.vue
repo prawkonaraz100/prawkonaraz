@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import MobileBottomNavigation from '@/Components/MobileBottomNavigation.vue';
 import SiteFooter from '@/Components/SiteFooter.vue';
-import SiteHeader from '@/Components/SiteHeader.vue';
+import PublicTopNavigation from '@/Components/PublicTopNavigation.vue';
 import { usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
@@ -123,7 +123,7 @@ const shouldShowMobileBottomNavigation = computed(() => (
 <template>
     <div class="flex min-h-screen flex-col text-[#1f1d18]" :class="rootBackgroundClass">
         <div :class="siteHeaderVisibilityClass">
-            <SiteHeader :shell-width-class="navShellWidthClass" :learning-panel="isSessionIndexPage" />
+            <PublicTopNavigation />
         </div>
 
         <header v-if="$slots.header" class="border-b" :class="[headerBackgroundClass, headerBorderClass, pageHeaderVisibilityClass]">
