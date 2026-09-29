@@ -1284,7 +1284,7 @@ const startDesktopHeroLearning = () => {
                 v-if="category"
                 class="pb-3 pt-0 sm:px-0 sm:pb-0 sm:pt-0"
             >
-                <div class="w-full md:space-y-4">
+                <div class="w-full">
                     <section
                         class="hidden"
                         :style="recommendedHeroStyle"

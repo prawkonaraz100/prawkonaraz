@@ -589,7 +589,6 @@ function topicArtworkFor(topic: TopicOption): string | null {
                         </header>
 
                         <CourseModules
-                            class="mt-4"
                             compact
                             :modules="selectedProfessionalCourse.modules"
                             :active-session="activeSession"
@@ -891,7 +890,7 @@ function topicArtworkFor(topic: TopicOption): string | null {
                                         </fieldset>
                                     </div>
 
-                                    <div class="flex flex-col justify-center px-6 py-6 xl:px-7">
+                                    <div class="flex flex-col justify-start px-6 py-6 xl:px-7">
                                         <div class="flex items-center gap-3">
                                             <span class="grid h-10 w-10 shrink-0 place-items-center text-[#008c4b]">
                                                 <GraduationCap :size="32" :stroke-width="1.8" aria-hidden="true" />

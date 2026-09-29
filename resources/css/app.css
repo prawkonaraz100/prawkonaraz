@@ -10295,3 +10295,30 @@ html:has(.auth-drawer-top-navigation):has([data-register-drawer-open='true'])
 .home-site-header--reference .home-site-header__desktop-actions { gap: 20px; }
 .home-site-header--reference .home-site-header__osk { margin-right: 10px; font-weight: 500; }
 @media (max-width: 1450px) { .home-site-header--reference .home-site-header__nav { gap: 22px; } .home-site-header--reference .home-site-header__desktop-actions { gap: 12px; } }
+
+@media (min-width: 1051px) {
+    .home-site-header.home-site-header--learning-navigation .home-site-header__shell,
+    .home-site-header.home-site-header--learning-navigation .home-site-header__nav > a {
+        min-height: 46px;
+    }
+
+    .home-site-header--learning-navigation .home-site-header__identity {
+        transform: none;
+    }
+
+    .home-site-header--learning-navigation:not(.is-compact) .home-site-header__back,
+    .home-site-header--learning-navigation:not(.is-compact) .home-site-header__back-icon {
+        width: 34px;
+        height: 34px;
+        flex-basis: 34px;
+    }
+
+    .home-site-header--learning-navigation:not(.is-compact) .home-site-header__account {
+        min-height: 34px;
+    }
+
+    .home-site-header--learning-navigation:not(.is-compact) .home-site-header__launcher > summary {
+        width: 34px;
+        height: 34px;
+    }
+}

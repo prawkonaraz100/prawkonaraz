@@ -90,7 +90,7 @@ const compactActionLabel = (module: CourseModule): string => module.progress.per
 </script>
 
 <template>
-    <section aria-labelledby="course-modules-heading">
+    <section class="mt-7" aria-labelledby="course-modules-heading">
         <div v-if="compact" class="flex flex-wrap items-center justify-between gap-x-5 gap-y-2 pb-3">
             <div class="flex items-baseline gap-3">
                 <h2 id="course-modules-heading" class="text-lg font-semibold text-[#101828]">{{ heading }}</h2>

@@ -88,7 +88,7 @@ const props = defineProps<{
                     </Link>
                 </section>
 
-                <CourseModules class="mt-7" :modules="collection.modules" :active-session="active_session" />
+                <CourseModules :modules="collection.modules" :active-session="active_session" />
             </div>
         </main>
     </AuthenticatedLayout>
