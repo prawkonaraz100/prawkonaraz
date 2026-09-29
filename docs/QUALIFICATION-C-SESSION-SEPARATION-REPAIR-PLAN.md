@@ -1,7 +1,7 @@
 # Plan naprawy: rozdzielenie sesji kategorii C i kwalifikacji wstępnej przyspieszonej
 
-Data: 2026-09-29  
-Status: **usterka lokalna odtworzona i poprawiona, desktop/mobile zweryfikowane; commit i wdrożenie pozostają otwarte**  
+Data: 2026-09-29
+Status: **poprawka lokalna zatwierdzona; wdrożenie i kontrola produkcyjna są odrębnymi krokami**
 Zakres: lokalne `/nauka`, kurs `qualification-c-accelerated`, sesje modułów i powtórki błędów; bez zmian w danych ani na produkcji na etapie diagnozy.
 
 ## Cel i kryterium końcowe
