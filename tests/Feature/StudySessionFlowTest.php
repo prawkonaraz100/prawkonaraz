@@ -2050,9 +2050,15 @@ test('study session follow up request returns json redirect for incorrect questi
             'next_review_at' => today(),
         ]);
 
+    $sourceSession = StudySession::factory()
+        ->for($user)
+        ->for($category, 'licenseCategory')
+        ->create(['mode' => 'learn']);
+
     $this->actingAs($user)
         ->withHeader('X-Study-Session-Switch', 'follow-up')
         ->postJson(route('study-sessions.store'), [
+            'source_study_session_id' => $sourceSession->getKey(),
             'license_category_id' => $category->getKey(),
             'mode' => 'learn',
             'question_count' => 2,
@@ -2064,7 +2070,7 @@ test('study session follow up request returns json redirect for incorrect questi
         ->assertJsonPath('redirect', route('study-sessions.current'))
         ->assertJsonPath('session.status', 'in_progress');
 
-    $studySession = StudySession::query()->latest()->firstOrFail();
+    $studySession = StudySession::query()->orderByDesc('id')->firstOrFail();
 
     expect($studySession->status)->toBe('in_progress');
     expect($studySession->payload['filters']['question_status'] ?? null)->toBe('incorrect');

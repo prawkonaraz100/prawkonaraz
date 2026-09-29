@@ -68,6 +68,9 @@ interface SessionContext {
     title: string | null;
     collection_name: string | null;
     return_url: string;
+    course_url: string;
+    restart_url: string | null;
+    incorrect_questions_url: string | null;
 }
 
 interface SessionSummary {
@@ -78,6 +81,7 @@ interface SessionSummary {
     license_category_id: number | null;
     license_category_code: string | null;
     license_category_name: string | null;
+    scope: 'regular_category' | 'course_module' | 'course_review';
     context: SessionContext | null;
     started_at: string | null;
     completed_at: string | null;
@@ -614,6 +618,8 @@ const followUpSessionForm = useForm<{
     randomize_order: props.sessionFilters.randomize_order,
     question_count: props.sessionFilters.question_count,
 });
+const courseModuleRestartForm = useForm({ replace_active_session: true });
+const courseModuleRestartError = ref<string | null>(null);
 const selectedAnswer = ref<string | null>(null);
 const presentedAt = ref<number | null>(null);
 const questionStage = ref<'preview' | 'answer'>('answer');
@@ -1033,6 +1039,9 @@ const isLongPromptOnPhone = computed(
 const isExamMode = computed(() => props.session.mode === 'exam');
 const isPjmMode = computed(() => props.session.mode === 'pjm');
 const isReviewTrainerMode = computed(() => props.session.mode === 'sr_review' || props.session.mode === 'review');
+const isCourseModuleSession = computed(() => sessionState.value.scope === 'course_module');
+const isCourseReviewSession = computed(() => sessionState.value.scope === 'course_review');
+const isCourseSession = computed(() => isCourseModuleSession.value || isCourseReviewSession.value);
 const isLocalLearningMode = computed(() => props.session.mode === 'learn' || isPjmMode.value || isReviewTrainerMode.value);
 const sessionContextLabel = computed(() => sessionState.value.context?.label ?? null);
 const currentQuestionContextLabel = computed(() =>
@@ -1724,6 +1733,7 @@ const completionShellClass = computed(() =>
 );
 const showCompletionProgressPanel = computed(() =>
     props.session.mode === 'learn'
+    && !isCourseSession.value
     && localSessionCompleted.value
     && !useFlatPhoneCompletionSummary.value
     && sessionRoadmap.value.length > 0,
@@ -2962,6 +2972,14 @@ const completionReturnLabel = computed(() => {
         return currentReviewCompletion.value?.next_step.primary_action_label ?? 'Wróć do trenera';
     }
 
+    if (isCourseReviewSession.value) {
+        return 'Wróć do pytań do poprawy';
+    }
+
+    if (isCourseModuleSession.value) {
+        return 'Wróć do kursu';
+    }
+
     return 'Wróć do panelu nauki';
 });
 const completionAnsweredScopeLabel = computed(() =>
@@ -2969,6 +2987,10 @@ const completionAnsweredScopeLabel = computed(() =>
         ? 'pytań próbnych'
         : isPjmMode.value
         ? 'pytań z tłumaczeniem PJM'
+        : isCourseReviewSession.value
+            ? 'pytań w tej powtórce'
+        : isCourseModuleSession.value
+            ? 'pytań w tym module'
         : isReviewTrainerMode.value
             ? 'pytań w treningu pamięci'
             : 'pytań w tym dziale',
@@ -3110,6 +3132,7 @@ const topicCompletionOverview = computed(() => topicCompletionOverviewState.valu
 const topicCompletionRows = computed(() => topicCompletionOverview.value?.items ?? []);
 const showTopicCompletionOverview = computed(() =>
     props.session.mode === 'learn'
+    && !isCourseSession.value
     && localSessionCompleted.value
     && topicCompletionRows.value.length > 0,
 );
@@ -3214,7 +3237,7 @@ const filteredTopicGroups = computed(() => {
     return props.topicGroups;
 });
 const canUseTopicPicker = computed(() =>
-    !isPjmMode.value && !isReviewTrainerMode.value && filteredTopicGroups.value.length > 0,
+    !isPjmMode.value && !isReviewTrainerMode.value && !isCourseSession.value && filteredTopicGroups.value.length > 0,
 );
 const allSessionTopicOptions = computed<RoadmapTopicOption[]>(() =>
     props.topicGroups.flatMap((group) =>
@@ -3322,6 +3345,7 @@ const roadmapOverallProgressPercent = computed(() =>
 );
 const showSessionRoadmap = computed(() =>
     props.session.mode === 'learn'
+    && !isCourseSession.value
     && localSessionCompleted.value
     && roadmapTopicOptions.value.length > 0,
 );
@@ -3658,15 +3682,27 @@ const displaySessionStatus = computed(() =>
         : formatStatus(sessionState.value.status),
 );
 const completionDecisionTitle = computed(() =>
-    isReviewTrainerMode.value
-        ? (hasIncorrectAnswers.value
-            ? 'Najlepiej wrócić do materiału do odzyskania.'
-            : 'Możesz wrócić do planu pamięci.')
-        : hasIncorrectAnswers.value
-            ? 'Najlepiej od razu poprawić błędne pytania.'
-            : 'Możesz od razu przejść do kolejnego działu.',
+    isCourseReviewSession.value
+        ? 'Sprawdź aktualną listę pytań do poprawy w tym kursie.'
+        : isCourseModuleSession.value
+            ? (hasIncorrectAnswers.value
+                ? 'Wróć do błędów kursu albo powtórz ten moduł.'
+                : 'Możesz powtórzyć ten moduł lub wrócić do kursu.')
+        : isReviewTrainerMode.value
+            ? (hasIncorrectAnswers.value
+                ? 'Najlepiej wrócić do materiału do odzyskania.'
+                : 'Możesz wrócić do planu pamięci.')
+            : hasIncorrectAnswers.value
+                ? 'Najlepiej od razu poprawić błędne pytania.'
+                : 'Możesz od razu przejść do kolejnego działu.',
 );
 const completionDecisionLead = computed(() => {
+    if (isCourseSession.value) {
+        return isCourseReviewSession.value
+            ? 'Lista błędów kursu może zmienić się po poprawnych odpowiedziach. Sprawdź ją przed kolejną powtórką.'
+            : 'Postęp tego modułu i pytania do poprawy pozostają w kursie kwalifikacji.';
+    }
+
     if (isReviewTrainerMode.value) {
         return hasIncorrectAnswers.value
             ? 'To nie kara za błąd, tylko czysty sygnał: tutaj pamięć wymaga kolejnego spokojnego odzyskania.'
@@ -3911,7 +3947,7 @@ const currentQuestionSourceBadgeLabel = computed(() => {
     }
 
     if (activeQuestion.value?.source) {
-        return `Źródło techniczne: ${activeQuestion.value.source}`;
+        return 'Źródło techniczne';
     }
 
     return 'Źródło pytania';
@@ -4518,7 +4554,7 @@ const answerOptionStateClass = (optionKey: string) => {
     if (visualState === 'correct') {
         return isSelected
             ? 'bg-[#edf4ef]/92 text-[#163222] ring-2 ring-[#406a54] shadow-[0_8px_18px_rgba(25,64,41,0.08)]'
-            : 'bg-[#edf4ef]/86 text-[#163222] shadow-[0_8px_18px_rgba(25,64,41,0.06)]';
+            : 'bg-[#edf4ef]/86 text-[#163222] ring-2 ring-[#2f7d4a] shadow-[0_8px_18px_rgba(25,64,41,0.06)]';
     }
 
     if (visualState === 'incorrect') {
@@ -4547,7 +4583,7 @@ const examLikeAnswerOptionClass = (optionKey: string) => {
     if (visualState === 'correct') {
         return isSelected
             ? 'border-[#93b6a0] bg-[#edf4ef] text-[#163222]'
-            : 'border-[#b8d0c0] bg-[#f1f7f3] text-[#163222]';
+            : 'border-[#2f7d4a] bg-[#f1f7f3] text-[#163222] ring-2 ring-[#2f7d4a]';
     }
 
     if (visualState === 'incorrect') {
@@ -4663,11 +4699,19 @@ watch([() => completionProgressPanelItems.value.length, activeSessionTopicId], a
 });
 const canUseCompletionActions = computed(() =>
     !followUpActionInFlight.value
+    && !courseModuleRestartForm.processing
     && !completeForm.processing
     && !pjmSessionForm.processing
     && !topicSwitchInFlight.value
     && !sessionExpired.value
     && syncError.value === null,
+);
+const canRestartCourseModule = computed(() =>
+    isCourseModuleSession.value
+    && localSessionCompleted.value
+    && !courseModuleRestartForm.processing
+    && !completeForm.processing
+    && !sessionExpired.value,
 );
 const showSaveAnswerErrorModal = computed(() =>
     Boolean(syncError.value)
@@ -4731,6 +4775,7 @@ const startTopicSession = ({
         route('study-sessions.store'),
         {
             license_category_id: switchTopicForm.license_category_id,
+            source_study_session_id: props.session.id,
             mode: switchTopicForm.mode,
             ui_shell: switchTopicForm.ui_shell,
             question_topic_id: switchTopicForm.question_topic_id,
@@ -4760,7 +4805,7 @@ const startTopicSession = ({
 };
 
 const startFollowUpSession = (questionStatus: SessionFilters['question_status']) => {
-    if (!props.session.license_category_id || !canUseCompletionActions.value) {
+    if (isCourseSession.value || !props.session.license_category_id || !canUseCompletionActions.value) {
         return;
     }
 
@@ -4797,6 +4842,7 @@ const startFollowUpSession = (questionStatus: SessionFilters['question_status'])
         route('study-sessions.store'),
         {
             license_category_id: followUpSessionForm.license_category_id,
+            source_study_session_id: props.session.id,
             mode: followUpSessionForm.mode,
             ui_shell: followUpSessionForm.ui_shell,
             question_topic_id: followUpSessionForm.question_topic_id,
@@ -4819,12 +4865,30 @@ const startFollowUpSession = (questionStatus: SessionFilters['question_status'])
     }).catch((error) => {
         if (!handleSessionExpiryError(error)) {
             syncError.value = isApiClientError(error)
-                ? ((error.data as { errors?: { license_category_id?: string[] } })?.errors?.license_category_id?.[0]
+                ? ((error.data as { errors?: { license_category_id?: string[]; source_study_session_id?: string[] } })?.errors?.source_study_session_id?.[0]
+                    ?? (error.data as { errors?: { license_category_id?: string[] } })?.errors?.license_category_id?.[0]
                     ?? 'Nie udało się rozpocząć kolejnej sesji. Spróbuj ponownie za chwilę.')
                 : 'Nie udało się rozpocząć kolejnej sesji. Spróbuj ponownie za chwilę.';
         }
     }).finally(() => {
         followUpActionInFlight.value = false;
+    });
+};
+
+const restartCourseModule = () => {
+    const restartUrl = sessionState.value.context?.restart_url;
+
+    if (!restartUrl || !canRestartCourseModule.value) {
+        return;
+    }
+
+    courseModuleRestartError.value = null;
+    courseModuleRestartForm.post(restartUrl, {
+        preserveState: 'errors',
+        onError: (errors) => {
+            courseModuleRestartError.value = Object.values(errors)[0]
+                ?? 'Nie udało się ponownie uruchomić modułu. Spróbuj ponownie za chwilę.';
+        },
     });
 };
 
@@ -8199,9 +8263,6 @@ watch(
                                         aria-hidden="true"
                                     />
                                     <span>{{ currentQuestionSourceBadgeLabel }}</span>
-                                    <span class="font-semibold text-[#1f1d18]">
-                                        {{ currentQuestionSourceNumber }}
-                                    </span>
                                 </span>
                             </div>
 
@@ -9478,7 +9539,7 @@ watch(
                                     ? `Kategoria ${sessionState.license_category_code}`
                                     : 'Tryb nauki')"
                                 :back-href="completionReturnHref"
-                                back-label="Wróć do nauki"
+                                :back-label="completionReturnLabel"
                             >
                                 <template #action>
                                     <span class="inline-flex h-9 items-center rounded-[0.5rem] bg-[#f2f4f7] px-3 text-[0.72rem] font-semibold tabular-nums text-[#475467]">
@@ -9558,7 +9619,34 @@ watch(
                                         </div>
                                     </div>
 
-                                    <div class="mx-auto mt-6 grid max-w-[21rem] gap-2.5">
+                                    <div v-if="isCourseSession" class="mx-auto mt-6 grid max-w-[21rem] gap-2.5">
+                                        <button
+                                            v-if="isCourseModuleSession && sessionState.context?.restart_url"
+                                            type="button"
+                                            class="inline-flex min-h-12 items-center justify-center rounded-[0.5rem] bg-[#0b5cff] px-5 py-3 text-[0.9rem] font-semibold text-white transition-colors hover:bg-[#0646c8] disabled:cursor-not-allowed disabled:bg-[#d0d5dd]"
+                                            :disabled="!canRestartCourseModule"
+                                            @click="restartCourseModule"
+                                        >
+                                            {{ courseModuleRestartForm.processing ? 'Uruchamianie modułu…' : 'Powtórz ten moduł' }}
+                                        </button>
+                                        <p v-if="courseModuleRestartError" class="text-sm text-[#b42318]" role="alert">
+                                            {{ courseModuleRestartError }}
+                                        </p>
+                                        <Link
+                                            v-if="sessionState.context?.incorrect_questions_url"
+                                            :href="sessionState.context.incorrect_questions_url"
+                                            class="inline-flex min-h-12 items-center justify-center rounded-[0.5rem] border border-[#d0d5dd] bg-white px-5 py-3 text-[0.9rem] font-semibold text-[#344054] transition-colors hover:bg-[#f9fafb]"
+                                        >
+                                            Pytania do poprawy w kursie
+                                        </Link>
+                                        <Link
+                                            :href="isCourseReviewSession ? (sessionState.context?.course_url ?? completionReturnHref) : completionReturnHref"
+                                            class="inline-flex min-h-12 items-center justify-center rounded-[0.5rem] border border-[#d0d5dd] bg-white px-5 py-3 text-[0.9rem] font-semibold text-[#344054] transition-colors hover:bg-[#f9fafb]"
+                                        >
+                                            {{ isCourseReviewSession ? 'Wróć do kursu' : completionReturnLabel }}
+                                        </Link>
+                                    </div>
+                                    <div v-else class="mx-auto mt-6 grid max-w-[21rem] gap-2.5">
                                         <button
                                             v-if="hasIncorrectAnswers"
                                             type="button"
@@ -9635,7 +9723,7 @@ watch(
                                 </section>
 
                                 <section
-                                    v-if="hasIncorrectAnswers || nextSessionTopic"
+                                    v-if="!isCourseSession && (hasIncorrectAnswers || nextSessionTopic)"
                                     class="border-b border-[#eaecf0] px-5 py-5"
                                     aria-labelledby="mobile-next-step-title"
                                 >
@@ -10004,7 +10092,36 @@ watch(
                         </Link>
 
                         <button
-                            v-if="!isPublicDemoMode && !isPjmMode && !isReviewTrainerMode && hasIncorrectAnswers"
+                            v-if="isCourseModuleSession && sessionState.context?.restart_url"
+                            type="button"
+                            :class="completionQuickNavPrimaryButtonClass"
+                            :disabled="!canRestartCourseModule"
+                            @click="restartCourseModule"
+                        >
+                            {{ courseModuleRestartForm.processing ? 'Uruchamianie modułu…' : 'Powtórz ten moduł' }}
+                        </button>
+                        <p v-if="isCourseModuleSession && courseModuleRestartError" class="text-sm text-[#b42318]" role="alert">
+                            {{ courseModuleRestartError }}
+                        </p>
+
+                        <Link
+                            v-if="isCourseSession && sessionState.context?.incorrect_questions_url"
+                            :href="sessionState.context.incorrect_questions_url"
+                            :class="isCourseReviewSession ? completionQuickNavPrimaryButtonClass : completionQuickNavButtonClass"
+                        >
+                            Pytania do poprawy w kursie
+                        </Link>
+
+                        <Link
+                            v-if="isCourseReviewSession && sessionState.context?.course_url"
+                            :href="sessionState.context.course_url"
+                            :class="completionQuickNavButtonClass"
+                        >
+                            Wróć do kursu
+                        </Link>
+
+                        <button
+                            v-if="!isPublicDemoMode && !isPjmMode && !isReviewTrainerMode && !isCourseSession && hasIncorrectAnswers"
                             type="button"
                             :class="completionQuickNavPrimaryButtonClass"
                             :disabled="!canUseCompletionActions || reviewIncorrectQuestionCount <= 0"
@@ -10025,7 +10142,7 @@ watch(
                         </button>
 
                         <button
-                            v-if="!isPublicDemoMode && !isPjmMode && !isReviewTrainerMode"
+                            v-if="!isPublicDemoMode && !isPjmMode && !isReviewTrainerMode && !isCourseSession"
                             type="button"
                             :class="completionQuickNavButtonClass"
                             :disabled="!canUseCompletionActions || restartTopicQuestionCount <= 0"
@@ -10036,7 +10153,7 @@ watch(
                         </button>
 
                         <button
-                            v-if="!isPublicDemoMode && !isPjmMode && !isReviewTrainerMode && nextSessionTopic"
+                            v-if="!isPublicDemoMode && !isPjmMode && !isReviewTrainerMode && !isCourseSession && nextSessionTopic"
                             type="button"
                             :class="hasIncorrectAnswers ? completionQuickNavButtonClass : completionQuickNavPrimaryButtonClass"
                             :disabled="!canUseCompletionActions || nextTopicQuestionCount <= 0"

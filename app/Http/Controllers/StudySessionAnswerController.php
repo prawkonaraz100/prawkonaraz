@@ -12,6 +12,7 @@ use App\Support\QuestionExplanationAnnotationPayloadBuilder;
 use App\Support\QuestionExplanationAssetPayloadBuilder;
 use App\Support\QuestionExplanationSignReferencePayloadBuilder;
 use App\Support\QuestionMediaPayloadBuilder;
+use App\Support\QuestionCollectionAccessService;
 use App\Support\ReviewTrainerCompletionSummaryService;
 use App\Support\SharedQuestionExplanationAssetResolver;
 use App\Support\StudySessionAnswerKind;
@@ -223,9 +224,7 @@ class StudySessionAnswerController extends Controller
 
     protected function isQuestionModuleSession(StudySession $studySession): bool
     {
-        return $studySession->question_collection_id !== null
-            || $studySession->question_module_id !== null
-            || data_get($studySession->payload, 'context.type') === 'question_module';
+        return app(QuestionCollectionAccessService::class)->isCourseSession($studySession);
     }
 
     /**

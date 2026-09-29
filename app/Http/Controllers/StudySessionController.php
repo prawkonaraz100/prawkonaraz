@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Filament\Pages\ProfessionalCourses;
 use App\Http\Requests\StudySessionStoreRequest;
 use App\Models\Question;
+use App\Models\QuestionCollection;
+use App\Models\QuestionModule;
 use App\Models\StudySession;
 use App\Models\StudySessionAnswer;
 use App\Support\PjmCoverageService;
@@ -13,6 +14,7 @@ use App\Support\PjmSignLanguageAssetPayloadBuilder;
 use App\Support\ProductAccessResolver;
 use App\Support\PublicQuestionExplanationLinkResolver;
 use App\Support\QuestionAudioPayloadBuilder;
+use App\Support\QuestionCollectionAccessService;
 use App\Support\QuestionExplanationAnnotationPayloadBuilder;
 use App\Support\QuestionExplanationAssetPayloadBuilder;
 use App\Support\QuestionExplanationSignReferencePayloadBuilder;
@@ -30,6 +32,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -46,6 +49,26 @@ class StudySessionController extends Controller
         StudyContextService $studyContextService,
         StudySessionManager $studySessionManager,
     ): JsonResponse|RedirectResponse {
+        $switchType = $request->header('X-Study-Session-Switch');
+        if (in_array($switchType, ['topic', 'follow-up'], true)) {
+            $sourceId = $request->integer('source_study_session_id');
+            $source = $sourceId > 0
+                ? StudySession::query()->where('user_id', $request->user()->getKey())->find($sourceId)
+                : null;
+
+            if (! $source) {
+                throw ValidationException::withMessages([
+                    'source_study_session_id' => 'Odśwież stronę przed kontynuowaniem nauki.',
+                ]);
+            }
+
+            if (app(QuestionCollectionAccessService::class)->isCourseSession($source)) {
+                throw ValidationException::withMessages([
+                    'source_study_session_id' => 'Ta sesja należy do osobnego kursu. Wróć do kursu i uruchom właściwy moduł.',
+                ]);
+            }
+        }
+
         $category = $studyContextService
             ->visibleCategoriesQuery()
             ->findOrFail($request->integer('license_category_id'));
@@ -634,6 +657,7 @@ class StudySessionController extends Controller
                 'license_category_id' => $studySession->licenseCategory?->getKey(),
                 'license_category_code' => $studySession->licenseCategory?->code,
                 'license_category_name' => $studySession->licenseCategory?->name,
+                'scope' => $this->sessionScope($studySession),
                 'context' => $this->sessionContext($studySession),
                 'started_at' => $studySession->started_at?->toIso8601String(),
                 'completed_at' => $studySession->completed_at?->toIso8601String(),
@@ -790,9 +814,18 @@ class StudySessionController extends Controller
 
     protected function isQuestionModuleSession(StudySession $studySession): bool
     {
-        return $studySession->question_collection_id !== null
-            || $studySession->question_module_id !== null
-            || data_get($studySession->payload, 'context.type') === 'question_module';
+        return app(QuestionCollectionAccessService::class)->isCourseSession($studySession);
+    }
+
+    protected function sessionScope(StudySession $studySession): string
+    {
+        if (! $this->isQuestionModuleSession($studySession)) {
+            return 'regular_category';
+        }
+
+        return app(QuestionCollectionAccessService::class)->isCollectionReviewSession($studySession)
+            ? 'course_review'
+            : 'course_module';
     }
 
     /**
@@ -805,21 +838,38 @@ class StudySessionController extends Controller
         }
 
         $context = data_get($studySession->payload, 'context');
-
-        if (! is_array($context)) {
-            return null;
-        }
-
-        $isCollectionReview = ($context['type'] ?? null) === 'question_collection_review';
+        $context = is_array($context) ? $context : [];
+        $collection = $studySession->question_collection_id !== null
+            ? $studySession->questionCollection
+            : QuestionCollection::query()->where('code', $context['collection_code'] ?? '')->first();
+        $module = $studySession->question_module_id !== null
+            ? $studySession->questionModule
+            : QuestionModule::query()->find($context['question_module_id'] ?? null);
+        $isCollectionReview = $this->sessionScope($studySession) === 'course_review';
+        $moduleBelongsToCollection = $collection instanceof QuestionCollection
+            && $module instanceof QuestionModule
+            && $module->question_collection_id === $collection->getKey();
+        $courseUrl = $collection instanceof QuestionCollection
+            ? route('learning.question-collections.show', ['questionCollection' => $collection->slug], absolute: false)
+            : route('session.index', absolute: false);
+        $incorrectQuestionsUrl = $collection instanceof QuestionCollection
+            ? route('learning.question-collections.incorrect-questions.index', ['questionCollection' => $collection->slug], absolute: false)
+            : null;
 
         return [
             'type' => $isCollectionReview ? 'question_collection_review' : 'question_module',
-            'label' => $isCollectionReview ? 'Powtórka kursu' : 'Moduł '.($context['module_code'] ?? ''),
-            'title' => $isCollectionReview ? 'Pytania do poprawy' : ($context['module_name'] ?? null),
-            'collection_name' => $context['collection_name'] ?? null,
-            'return_url' => is_string($context['return_url'] ?? null) && str_starts_with($context['return_url'], '/nauka/kursy/')
-                ? $context['return_url']
-                : ProfessionalCourses::getUrl(panel: 'admin'),
+            'label' => $isCollectionReview ? 'Powtórka kursu' : 'Moduł '.($module?->code ?? $context['module_code'] ?? ''),
+            'title' => $isCollectionReview ? 'Pytania do poprawy' : ($module?->name ?? $context['module_name'] ?? null),
+            'collection_name' => $collection?->name ?? $context['collection_name'] ?? null,
+            'return_url' => $isCollectionReview ? ($incorrectQuestionsUrl ?? $courseUrl) : $courseUrl,
+            'course_url' => $courseUrl,
+            'restart_url' => ! $isCollectionReview && $moduleBelongsToCollection
+                ? route('learning.question-collections.modules.start', [
+                    'questionCollection' => $collection->slug,
+                    'module' => $module->slug,
+                ], absolute: false)
+                : null,
+            'incorrect_questions_url' => $incorrectQuestionsUrl,
         ];
     }
 

@@ -569,47 +569,28 @@ function topicArtworkFor(topic: TopicOption): string | null {
             </section>
 
             <template v-if="selectedProfessionalCourse">
-                <section class="min-h-[calc(100vh-6.5rem)] bg-[#fbfcfd] px-6 py-9 xl:px-10 xl:py-12" aria-label="Kurs zawodowy">
-                    <div class="mx-auto max-w-[88rem]">
-                        <header class="border-b border-[#d7dde1] pb-8 2xl:grid 2xl:grid-cols-[minmax(0,1fr)_29rem] 2xl:gap-x-14">
-                            <div>
-                            <p class="text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-[#ef3b26]">Kurs zawodowy</p>
-                                <h2 class="mt-3 max-w-4xl text-3xl font-semibold leading-tight text-[#101820] xl:text-[2.55rem]">{{ selectedProfessionalCourse.name }}</h2>
-                            <p v-if="selectedProfessionalCourse.description" class="mt-4 max-w-2xl text-base leading-7 text-[#475467]">
-                                {{ selectedProfessionalCourse.description }}
-                            </p>
-                                <p v-if="selectedProfessionalCourse.category_name" class="mt-5 text-sm font-medium text-[#667085]">
-                                {{ selectedProfessionalCourse.category_name }}
-                            </p>
+                <section class="min-h-[calc(100vh-6.5rem)] bg-[#fbfcfd] px-4 py-5 sm:px-6 xl:py-6" aria-label="Kurs zawodowy">
+                    <div class="mx-auto max-w-[64rem]">
+                        <header class="border-b border-[#d7dde1] pb-4">
+                            <p class="text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-[#667085]">Kurs zawodowy</p>
+                            <div class="mt-1 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+                                <h2 class="text-xl font-semibold leading-tight text-[#101820] sm:text-2xl">{{ selectedProfessionalCourse.name }}</h2>
+                                <span v-if="selectedProfessionalCourse.category_name" class="text-sm font-medium text-[#667085]">{{ selectedProfessionalCourse.category_name }}</span>
                             </div>
-
-                            <dl class="mt-8 grid grid-cols-3 border-y border-[#d7dde1] 2xl:mt-0 2xl:self-end">
-                                <div class="py-4 pr-4">
-                                    <dt class="text-[0.68rem] font-semibold uppercase tracking-[0.1em] text-[#78838d]">Przerobione</dt>
-                                    <dd class="mt-2 text-xl font-semibold text-[#101820]">
-                                        {{ selectedProfessionalCourse.progress.answered_count }}
-                                        <span class="text-sm font-medium text-[#667085]">/ {{ selectedProfessionalCourse.progress.total_questions }}</span>
-                                    </dd>
-                                </div>
-                                <div class="border-l border-[#d7dde1] px-4 py-4">
-                                    <dt class="text-[0.68rem] font-semibold uppercase tracking-[0.1em] text-[#78838d]">Ukończenie</dt>
-                                    <dd class="mt-2 text-xl font-semibold text-[#101820]">{{ selectedProfessionalCourse.progress.percent }}%</dd>
-                                </div>
-                                <div class="border-l border-[#d7dde1] py-4 pl-4">
-                                    <dt class="text-[0.68rem] font-semibold uppercase tracking-[0.1em] text-[#78838d]">Do poprawy</dt>
-                                    <dd class="mt-2 text-xl font-semibold" :class="selectedProfessionalCourse.incorrect_questions.count > 0 ? 'text-[#d92d20]' : 'text-[#101820]'">
-                                        {{ selectedProfessionalCourse.incorrect_questions.count }}
-                                    </dd>
-                                </div>
+                            <p v-if="selectedProfessionalCourse.description" class="mt-2 text-sm leading-5 text-[#667085]">{{ selectedProfessionalCourse.description }}</p>
+                            <dl class="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-[#475467]">
+                                <div class="flex gap-1"><dt>Przerobione:</dt><dd class="font-semibold text-[#101820]">{{ selectedProfessionalCourse.progress.answered_count }}/{{ selectedProfessionalCourse.progress.total_questions }}</dd></div>
+                                <div class="flex gap-1"><dt>Ukończenie:</dt><dd class="font-semibold text-[#101820]">{{ selectedProfessionalCourse.progress.percent }}%</dd></div>
+                                <div class="flex gap-1"><dt>Do poprawy:</dt><dd class="font-semibold text-[#101820]">{{ selectedProfessionalCourse.incorrect_questions.count }}</dd></div>
                             </dl>
-
-                            <div class="col-span-2 mt-7 h-2 overflow-hidden bg-[#e4e9ed]" role="progressbar" :aria-valuenow="selectedProfessionalCourse.progress.percent" aria-valuemin="0" aria-valuemax="100" aria-label="Postęp kursu">
-                                <span class="block h-full bg-[#ef3b26] transition-[width] duration-300" :style="{ width: `${selectedProfessionalCourse.progress.percent}%` }" />
+                            <div class="mt-3 h-1.5 overflow-hidden rounded-full bg-[#e6e8e9]" role="progressbar" :aria-valuenow="selectedProfessionalCourse.progress.percent" aria-valuemin="0" aria-valuemax="100" aria-label="Postęp kursu">
+                                <span class="block h-full rounded-full bg-[#00d88b] transition-[width] duration-300" :style="{ width: `${selectedProfessionalCourse.progress.percent}%` }" />
                             </div>
                         </header>
 
                         <CourseModules
-                            class="mt-9"
+                            class="mt-4"
+                            compact
                             :modules="selectedProfessionalCourse.modules"
                             :active-session="activeSession"
                             :review-count="selectedProfessionalCourse.incorrect_questions.count"
@@ -759,33 +740,33 @@ function topicArtworkFor(topic: TopicOption): string | null {
                             </div>
                         </div>
 
-                        <div v-else-if="mapTopics.length > 0" class="mt-6 space-y-2" role="list" aria-label="Lista działów nauki">
+                        <div v-else-if="mapTopics.length > 0" class="mx-auto mt-6 w-[calc(100%-2rem)] max-w-[64rem] space-y-2" role="list" aria-label="Lista działów nauki">
                             <div v-for="topic in mapTopics" :key="topic.id" role="listitem">
                                 <button
                                     type="button"
-                                    class="group grid min-h-[5.5rem] w-full grid-cols-[2.75rem_minmax(0,1fr)_9.5rem] items-center gap-x-3 gap-y-1.5 rounded-[8px] border border-[#e5eaee] bg-white px-3 py-2.5 text-left transition hover:border-[#a9bdd1] hover:shadow-[0_6px_20px_rgba(16,24,32,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1e73e8] focus-visible:ring-offset-2 min-[900px]:grid-cols-[2.75rem_minmax(9rem,1.5fr)_5.5rem_minmax(7rem,1fr)_9.5rem] min-[900px]:gap-x-4 min-[900px]:px-4"
+                                    class="group grid min-h-[3.8rem] w-full grid-cols-[3.5rem_minmax(0,1fr)_9rem] items-center gap-x-2 gap-y-1 bg-white px-2 py-2 text-left transition hover:bg-[#f8fbfd] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1e73e8] focus-visible:ring-offset-2 min-[900px]:grid-cols-[2fr_8fr_3fr_5fr_6fr] min-[900px]:gap-0"
                                     :aria-label="`${topic.label}. ${topicStateLabel(topic)}. Przerobiono ${answeredCount(topic)} / ${topic.questions_count}. Otwórz ustawienia nauki.`"
                                     @click="openSessionSetup(topic.id)"
                                 >
-                                    <span class="row-span-2 grid h-11 w-11 shrink-0 place-items-center rounded-[6px] bg-[#f5f8fb] min-[900px]:row-span-1" :style="{ color: mapTone(topic) }" aria-hidden="true">
-                                        <img v-if="topicArtworkFor(topic)" :src="topicArtworkFor(topic) ?? ''" alt="" class="h-9 w-9 object-contain" />
+                                    <span class="row-span-2 flex h-8 w-[3.25rem] shrink-0 items-center justify-center border-r border-[#e5e9ec] text-[#2869df] min-[900px]:row-span-1" aria-hidden="true">
+                                        <img v-if="topicArtworkFor(topic)" :src="topicArtworkFor(topic) ?? ''" alt="" class="h-7 w-7 object-contain" />
                                         <svg v-else-if="topicIcon(topic) === 'sign'" class="h-7 w-7" viewBox="0 0 32 32" fill="none"><path d="M16 3 29 27H3L16 3Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><path d="M16 11v7m0 4h.01" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg>
                                         <svg v-else-if="topicIcon(topic) === 'junction'" class="h-7 w-7" viewBox="0 0 32 32" fill="none"><path d="M16 4v24M16 16 6 9M16 16l10-7" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/><circle cx="16" cy="16" r="3.2" fill="currentColor" /></svg>
                                         <svg v-else-if="topicIcon(topic) === 'signal'" class="h-7 w-7" viewBox="0 0 32 32" fill="none"><rect x="11" y="3" width="10" height="26" rx="4" stroke="currentColor" stroke-width="2"/><circle cx="16" cy="9" r="2.2" fill="currentColor"/><circle cx="16" cy="16" r="2.2" fill="currentColor" opacity=".48"/><circle cx="16" cy="23" r="2.2" fill="currentColor" /></svg>
                                         <svg v-else class="h-7 w-7" viewBox="0 0 32 32" fill="none"><path d="M6 25c6-10 14-10 20-18M9 6h5v5M18 21h5v5" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7" cy="25" r="2.5" fill="currentColor"/></svg>
                                     </span>
-                                    <span class="min-w-0">
-                                        <span class="block text-[0.86rem] font-semibold leading-5 text-[#172029]">{{ topic.label }}</span>
+                                    <span class="min-w-0 px-1">
+                                        <span class="block truncate text-sm font-semibold leading-5 text-[#172029] min-[900px]:text-base">{{ topic.label }}</span>
                                         <span class="block text-[0.7rem] text-[#77838d] min-[900px]:hidden">{{ questionCountLabel(topic.questions_count) }} · {{ topicStateLabel(topic) }}</span>
                                     </span>
-                                    <span class="hidden text-[0.76rem] font-medium text-[#667582] min-[900px]:block">{{ questionCountLabel(topic.questions_count) }}</span>
-                                    <span class="col-start-2 flex min-w-0 items-center gap-2 min-[900px]:col-auto">
-                                        <span class="w-9 shrink-0 text-[0.75rem] font-bold" :style="{ color: mapTone(topic) }">{{ progressPercent(topic) }}%</span>
-                                        <span class="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-[#e8edf0]" role="progressbar" :aria-label="`Postęp: ${topic.label}`" :aria-valuenow="progressPercent(topic)" aria-valuemin="0" aria-valuemax="100">
-                                            <span class="block h-full rounded-full" :style="{ width: `${progressPercent(topic)}%`, backgroundColor: mapTone(topic) }" />
+                                    <span class="hidden px-1 text-sm font-medium text-[#4d5b66] min-[900px]:block min-[900px]:text-base">{{ questionCountLabel(topic.questions_count) }}</span>
+                                    <span class="col-start-2 flex min-w-0 items-center gap-2 px-1 min-[900px]:col-auto">
+                                        <span class="w-8 shrink-0 text-sm font-semibold text-[#00bb78]">{{ progressPercent(topic) }}%</span>
+                                        <span class="h-2 min-w-0 flex-1 overflow-hidden bg-[#e6e8e9]" role="progressbar" :aria-label="`Postęp: ${topic.label}`" :aria-valuenow="progressPercent(topic)" aria-valuemin="0" aria-valuemax="100">
+                                            <span class="block h-full rounded-full bg-[#00d88b]" :style="{ width: `${progressPercent(topic)}%` }" />
                                         </span>
                                     </span>
-                                    <span class="col-start-3 row-span-2 inline-flex min-h-9 items-center justify-center rounded-[5px] bg-[#eaf3ff] px-2 text-center text-[0.72rem] font-semibold leading-4 text-[#175cb5] transition group-hover:bg-[#1e73e8] group-hover:text-white min-[900px]:col-auto min-[900px]:row-span-1">
+                                    <span class="col-start-3 row-span-2 mx-1 inline-flex min-h-[2.2rem] items-center justify-center bg-[#edf0f2] px-2 text-center text-sm font-medium leading-4 text-[#172029] transition group-hover:bg-[#e0e5e8] min-[900px]:col-auto min-[900px]:row-span-1">
                                         {{ progressPercent(topic) === 100 ? 'Powtórz dział' : progressPercent(topic) > 0 ? 'Kontynuuj naukę' : 'Rozpocznij naukę' }}
                                     </span>
                                 </button>
@@ -809,138 +790,137 @@ function topicArtworkFor(topic: TopicOption): string | null {
                     >
                         <section
                             v-if="isSessionSetupOpen"
-                            class="fixed inset-0 z-[70] hidden bg-[#101820]/45 p-5 backdrop-blur-[2px] md:grid md:place-items-center xl:p-7"
+                            class="fixed inset-0 z-[70] hidden bg-[#43546c]/45 p-5 backdrop-blur-[3px] md:grid md:place-items-center xl:p-8"
+                            role="dialog"
+                            aria-modal="true"
                             aria-labelledby="learning-settings-title"
                         >
-                            <div class="flex max-h-[calc(100vh-2.5rem)] w-full max-w-[74rem] flex-col overflow-hidden rounded-[14px] border border-[#dce3e8] bg-white shadow-[0_24px_80px_rgba(15,23,42,0.3)] xl:max-h-[calc(100vh-3.5rem)]">
-                                <header class="flex items-center justify-between gap-5 border-b border-[#e7ebee] px-6 py-4 xl:px-8">
-                                    <div class="flex min-w-0 items-center gap-4">
-                                        <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#215fbe] text-xs font-semibold text-white shadow-[0_4px_10px_rgba(33,95,190,0.2)]">
-                                            {{ selectedTopic ? topicNumber(selectedTopic) : '—' }}
-                                        </span>
-                                        <span v-if="selectedTopic && topicArtworkFor(selectedTopic)" class="grid h-12 w-12 shrink-0 place-items-center overflow-hidden">
-                                            <img :src="topicArtworkFor(selectedTopic) ?? ''" alt="" class="h-11 w-11 object-contain" />
+                            <div class="flex max-h-[calc(100vh-2.5rem)] w-full max-w-[100rem] flex-col overflow-hidden rounded-[18px] border border-[#dce4ed] bg-white shadow-[0_28px_90px_rgba(20,35,55,0.26)] xl:max-h-[calc(100vh-4rem)]">
+                                <header class="flex items-center justify-between gap-5 border-b border-[#e2e9f0] px-6 py-5 xl:px-8 xl:py-5">
+                                    <div class="flex min-w-0 items-center gap-5">
+                                        <span v-if="selectedTopic && topicArtworkFor(selectedTopic)" class="grid h-14 w-14 shrink-0 place-items-center xl:h-16 xl:w-16">
+                                            <img :src="topicArtworkFor(selectedTopic) ?? ''" alt="" class="h-full w-full object-contain" />
                                         </span>
                                         <div class="min-w-0">
-                                            <h2 id="learning-settings-title" class="truncate text-lg font-semibold leading-tight text-[#101820]">
+                                            <h2 id="learning-settings-title" class="text-xl font-semibold leading-tight text-[#102033] xl:text-[1.6rem]">
                                                 {{ selectedTopic?.label ?? 'Wybierz dział na mapie' }}
                                             </h2>
-                                            <p class="mt-1 text-[0.78rem] font-medium text-[#71808b]">Konfiguracja sesji nauki</p>
+                                            <p class="mt-1 text-sm font-medium text-[#788ba4] xl:text-base">Konfiguracja sesji nauki</p>
                                         </div>
                                     </div>
                                     <button
                                         type="button"
-                                        class="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-[#d9e0e5] text-[#52606d] transition hover:border-[#101820] hover:text-[#101820] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ef3b26] focus-visible:ring-offset-2"
+                                        class="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-[#dbe4ec] text-[#52657c] transition hover:border-[#8ca0b5] hover:text-[#102033] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f6bdd] focus-visible:ring-offset-2 xl:h-11 xl:w-11"
                                         title="Zamknij konfigurację sesji"
                                         aria-label="Zamknij konfigurację sesji"
                                         @click="closeSessionSetup"
                                     >
-                                        <svg class="h-4 w-4" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                        <svg class="h-5 w-5" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                                             <path d="m3 3 10 10M13 3 3 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
                                         </svg>
                                     </button>
                                 </header>
 
-                                <div class="grid min-h-0 overflow-y-auto divide-y divide-[#e7ebee] lg:grid-cols-[1.14fr_0.78fr_0.82fr_1.1fr] lg:divide-x lg:divide-y-0">
-                                    <div class="px-6 py-5 xl:px-7">
+                                <div class="grid min-h-0 overflow-y-auto md:grid-cols-2 xl:min-h-[31rem] xl:grid-cols-[1.3fr_1fr_1fr_1.25fr]">
+                                    <div class="border-b border-[#edf1f5] px-6 py-6 md:border-r xl:border-b-0 xl:px-7 xl:py-6">
                                         <div class="flex items-center justify-between gap-4">
-                                            <p class="text-sm font-semibold text-[#202a33]">Zestaw pytań</p>
-                                            <span class="shrink-0 text-[0.76rem] font-semibold text-[#52616c]">{{ selectedQuestionCount }}</span>
+                                            <h3 class="text-base font-semibold text-[#102033] xl:text-lg">Zestaw pytań</h3>
+                                            <span class="grid h-8 min-w-8 shrink-0 place-items-center rounded-full bg-[#f0f4f8] px-2 text-xs font-semibold text-[#435873]">{{ selectedQuestionCount }}</span>
                                         </div>
                                         <div class="mt-3 space-y-2">
                                             <button
                                                 v-for="option in visibleSessionStatusOptions"
                                                 :key="option.value"
                                                 type="button"
-                                                class="flex min-h-[3.55rem] w-full items-center gap-3 rounded-[7px] border px-3 py-2 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2869ca] focus-visible:ring-offset-2"
+                                                class="flex min-h-[4rem] w-full items-center gap-3 rounded-[12px] border px-3 py-2 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2869ca] focus-visible:ring-offset-2 xl:min-h-[4.25rem]"
                                                 :class="selectedStatus === option.value
-                                                    ? 'border-[#7da5e8] bg-[#f5f9ff] text-[#172a44] shadow-[0_3px_10px_rgba(38,105,202,0.08)]'
-                                                    : 'border-[#e1e6ea] bg-white text-[#35414a] hover:border-[#aeb8c0]'"
+                                                    ? 'border-[#91b6ff] bg-[#f2f7ff] text-[#163c79] shadow-[0_4px_12px_rgba(38,105,202,0.06)]'
+                                                    : 'border-[#e1e9f1] bg-white text-[#102033] hover:border-[#a9bbd0]'"
                                                 :aria-pressed="selectedStatus === option.value"
                                                 @click="emit('selectStatus', option.value)"
                                             >
-                                                <span class="grid h-5 w-5 shrink-0 place-items-center rounded-full border-2" :class="selectedStatus === option.value ? 'border-[#2869ca] bg-[#2869ca] text-white' : 'border-[#aeb9c3] bg-white text-transparent'">
-                                                    <svg class="h-3 w-3" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                                <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full border-2" :class="selectedStatus === option.value ? 'border-[#1f6bdd] bg-[#1f6bdd] text-white' : 'border-[#98a8bb] bg-white text-transparent'">
+                                                    <svg class="h-4 w-4" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                                                         <path d="m3.2 8.1 2.8 2.8 6.6-6.4" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" />
                                                     </svg>
                                                 </span>
                                                 <span class="min-w-0 flex-1">
-                                                    <span class="block text-[0.78rem] font-semibold leading-tight">{{ option.label }}</span>
-                                                    <span class="mt-1 block text-[0.68rem] leading-tight text-[#6b7883]">{{ sessionStatusDescription(option.value) }}</span>
+                                                    <span class="block text-sm font-semibold leading-tight">{{ option.label }}</span>
+                                                    <span class="mt-1 block text-xs leading-tight text-[#7689a2]">{{ sessionStatusDescription(option.value) }}</span>
                                                 </span>
-                                                <span class="grid h-7 min-w-7 shrink-0 place-items-center rounded-full bg-[#edf1f5] px-1.5 text-[0.68rem] font-semibold text-[#43515d]">{{ option.count }}</span>
+                                                <span class="grid h-8 min-w-8 shrink-0 place-items-center rounded-full px-2 text-xs font-semibold" :class="selectedStatus === option.value ? 'bg-[#dfeaff] text-[#19478d]' : 'bg-[#f0f4f8] text-[#435873]'">{{ option.count }}</span>
                                             </button>
                                         </div>
                                         <Link
                                             v-if="hasGlobalIncorrectQuestions && managedIncorrectListEnabled"
                                             :href="incorrectQuestionsUrl"
-                                            class="mt-4 inline-flex items-center gap-2 text-[0.74rem] font-semibold text-[#2869ca] transition hover:text-[#164a9c]"
+                                            class="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-[#1468dd] transition hover:text-[#164a9c] xl:text-sm"
                                         >
                                             <svg class="h-4 w-4" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 3h10M3 8h10M3 13h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M1 3h.01M1 8h.01M1 13h.01" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/></svg>
                                             Zarządzaj listą błędnych pytań
                                         </Link>
                                     </div>
 
-                                    <div class="px-6 py-5 xl:px-7">
+                                    <div class="border-b border-[#edf1f5] px-6 py-6 xl:border-r xl:border-b-0 xl:px-7 xl:py-6">
                                         <fieldset>
-                                            <legend class="text-sm font-semibold text-[#202a33]">Kolejność pytań</legend>
-                                            <div class="mt-4 grid grid-cols-2 overflow-hidden rounded-[7px] border border-[#dde4e9]">
-                                                <button type="button" class="min-h-11 border-r border-[#dde4e9] px-3 text-center text-[0.78rem] font-semibold transition" :class="!randomizeOrder ? 'border-[#101820] bg-[#101820] text-white' : 'bg-white text-[#5c6a75] hover:bg-[#f7f9fa]'" :aria-pressed="!randomizeOrder" @click="emit('setRandomOrder', false)">Stała</button>
-                                                <button type="button" class="min-h-11 px-3 text-center text-[0.78rem] font-semibold transition" :class="randomizeOrder ? 'bg-[#101820] text-white' : 'bg-white text-[#5c6a75] hover:bg-[#f7f9fa]'" :aria-pressed="randomizeOrder" @click="emit('setRandomOrder', true)">Losowa</button>
+                                            <legend class="text-base font-semibold text-[#102033] xl:text-lg">Kolejność pytań</legend>
+                                            <div class="mt-5 grid grid-cols-2 overflow-hidden rounded-[13px] border border-[#dce5ee] p-0.5">
+                                                <button type="button" class="min-h-12 rounded-[10px] px-3 text-center text-sm font-semibold transition" :class="!randomizeOrder ? 'bg-[#1c303d] text-white shadow-[0_5px_12px_rgba(19,38,51,0.18)]' : 'bg-white text-[#526780] hover:bg-[#f5f8fb]'" :aria-pressed="!randomizeOrder" @click="emit('setRandomOrder', false)">Stała</button>
+                                                <button type="button" class="min-h-12 rounded-[10px] px-3 text-center text-sm font-semibold transition" :class="randomizeOrder ? 'bg-[#1c303d] text-white shadow-[0_5px_12px_rgba(19,38,51,0.18)]' : 'bg-white text-[#526780] hover:bg-[#f5f8fb]'" :aria-pressed="randomizeOrder" @click="emit('setRandomOrder', true)">Losowa</button>
                                             </div>
-                                            <p class="mt-4 flex gap-2 text-[0.7rem] leading-5 text-[#71808b]">
-                                                <svg class="mt-0.5 h-4 w-4 shrink-0" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.2" stroke="currentColor" stroke-width="1.5"/><path d="M8 7.1v3.5M8 4.8h.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-                                                Pytania będą wyświetlane w ustalonej kolejności.
+                                            <p class="mt-5 flex gap-2 text-xs leading-5 text-[#7689a2] xl:text-sm">
+                                                <svg class="mt-0.5 h-5 w-5 shrink-0" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.2" stroke="currentColor" stroke-width="1.5"/><path d="M8 7.1v3.5M8 4.8h.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                                                {{ randomizeOrder ? 'Pytania będą wyświetlane w losowej kolejności.' : 'Pytania będą wyświetlane w ustalonej kolejności.' }}
                                             </p>
                                         </fieldset>
                                     </div>
 
-                                    <div class="px-6 py-5 xl:px-7">
+                                    <div class="border-b border-[#edf1f5] px-6 py-6 md:border-r xl:border-b-0 xl:px-7 xl:py-6">
                                         <fieldset>
-                                            <legend class="text-sm font-semibold text-[#202a33]">Zakres pytań</legend>
-                                            <div class="mt-4 space-y-2">
-                                                <button v-for="scope in questionScopeOptions" :key="scope.value" type="button" class="flex min-h-10 w-full items-center justify-between rounded-[7px] border px-3 text-left text-[0.78rem] font-semibold transition" :class="selectedScope === scope.value ? 'border-[#101820] bg-[#101820] text-white' : 'border-[#e1e6ea] bg-white text-[#5c6a75] hover:border-[#aeb8c0]'" :aria-pressed="selectedScope === scope.value" @click="emit('selectScope', scope.value)">
+                                            <legend class="text-base font-semibold text-[#102033] xl:text-lg">Zakres pytań</legend>
+                                            <div class="mt-5 space-y-2">
+                                                <button v-for="scope in questionScopeOptions" :key="scope.value" type="button" class="flex min-h-12 w-full items-center justify-between rounded-[11px] border px-4 text-left text-sm font-semibold transition" :class="selectedScope === scope.value ? 'border-[#abc9ff] bg-[#f2f7ff] text-[#163c79]' : 'border-[#dfe7ef] bg-white text-[#526780] hover:border-[#a9bbd0]'" :aria-pressed="selectedScope === scope.value" @click="emit('selectScope', scope.value)">
                                                     {{ scope.label }}
-                                                    <svg v-if="selectedScope === scope.value" class="h-4 w-4" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m3.2 8.1 2.8 2.8 6.6-6.4" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                                                    <svg v-if="selectedScope === scope.value" class="h-5 w-5 text-[#1f6bdd]" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m3.2 8.1 2.8 2.8 6.6-6.4" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" /></svg>
                                                 </button>
                                             </div>
-                                            <p class="mt-4 flex gap-2 text-[0.7rem] leading-5 text-[#71808b]">
-                                                <svg class="mt-0.5 h-4 w-4 shrink-0" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.2" stroke="currentColor" stroke-width="1.5"/><path d="M8 7.1v3.5M8 4.8h.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-                                                Zawiera pytania podstawowe i specjalistyczne.
+                                            <p class="mt-5 flex gap-2 text-xs leading-5 text-[#7689a2] xl:text-sm">
+                                                <svg class="mt-0.5 h-5 w-5 shrink-0" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.2" stroke="currentColor" stroke-width="1.5"/><path d="M8 7.1v3.5M8 4.8h.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                                                {{ selectedScope === 'all' ? 'Zawiera pytania podstawowe i specjalistyczne.' : selectedScope === 'basic' ? 'Zawiera tylko pytania podstawowe.' : 'Zawiera tylko pytania specjalistyczne.' }}
                                             </p>
                                         </fieldset>
                                     </div>
 
-                                    <div class="flex flex-col justify-center bg-[#fbfcfb] px-6 py-5 xl:px-7">
+                                    <div class="flex flex-col justify-center px-6 py-6 xl:px-7">
                                         <div class="flex items-center gap-3">
-                                            <span class="grid h-11 w-11 place-items-center text-[#16823b]">
-                                                <GraduationCap :size="26" :stroke-width="2" aria-hidden="true" />
+                                            <span class="grid h-10 w-10 shrink-0 place-items-center text-[#008c4b]">
+                                                <GraduationCap :size="32" :stroke-width="1.8" aria-hidden="true" />
                                             </span>
                                             <div>
-                                                <p class="text-sm font-semibold text-[#1d2a23]">Gotowe do nauki</p>
-                                                <p class="mt-1 text-[0.71rem] font-medium text-[#718078]">{{ selectedQuestionCount }} pytań <span class="px-1 text-[#c1c9c3]">•</span> {{ randomizeOrder ? 'losowa kolejność' : 'stała kolejność' }} <span class="px-1 text-[#c1c9c3]">•</span> {{ questionScopeOptions.find((scope) => scope.value === selectedScope)?.label.toLowerCase() }}</p>
+                                                <p class="text-base font-semibold text-[#17212b] xl:text-lg">Gotowe do nauki</p>
+                                                <p class="mt-1 text-xs font-medium text-[#7689a2] xl:text-sm">{{ questionCountLabel(selectedQuestionCount) }} <span class="px-1 text-[#b4c0cd]">•</span> {{ randomizeOrder ? 'losowa kolejność' : 'stała kolejność' }} <span class="px-1 text-[#b4c0cd]">•</span> {{ questionScopeOptions.find((scope) => scope.value === selectedScope)?.label.toLowerCase() }}</p>
                                             </div>
                                         </div>
                                         <button
                                             type="button"
-                                            class="mt-6 inline-flex min-h-[61px] w-full items-center justify-center gap-3 rounded-[7px] bg-[#16823b] px-5 text-[0.92rem] font-semibold text-white shadow-[0_10px_20px_rgba(22,130,59,0.18)] transition hover:bg-[#126b30] disabled:cursor-not-allowed disabled:opacity-55"
+                                            class="mt-6 inline-flex min-h-[4rem] w-full items-center justify-center gap-3 rounded-[11px] bg-gradient-to-b from-[#0eaa60] to-[#008545] px-4 text-base font-semibold text-white shadow-[0_14px_28px_rgba(0,128,69,0.18)] transition hover:from-[#0b9856] hover:to-[#00783f] disabled:cursor-not-allowed disabled:opacity-55"
                                             :disabled="sessionProcessing || (canUseFullProduct && !canStartLearning)"
                                             @click="emit('startLearning')"
                                         >
                                             <img :src="rocketButtonIcon" alt="" class="h-8 w-8 object-contain" />
                                             {{ sessionProcessing ? 'Uruchamianie...' : startButtonLabel }} <span aria-hidden="true">→</span>
                                         </button>
-                                        <div v-if="hasGlobalIncorrectQuestions" class="my-5 flex items-center gap-3 text-center text-[0.7rem] font-semibold text-[#718078] before:h-px before:flex-1 before:bg-[#dce5de] after:h-px after:flex-1 after:bg-[#dce5de]">lub</div>
+                                        <div v-if="hasGlobalIncorrectQuestions" class="my-5 flex items-center gap-3 text-center text-xs font-medium text-[#667a92] before:h-px before:flex-1 before:bg-[#e2eaf0] after:h-px after:flex-1 after:bg-[#e2eaf0]">lub</div>
                                         <button
                                             v-if="hasGlobalIncorrectQuestions"
                                             type="button"
-                                            class="grid min-h-12 w-full grid-cols-[2rem_minmax(0,1fr)_2rem] items-center gap-2 rounded-[7px] bg-[#16823b] px-4 text-[0.82rem] font-semibold text-white shadow-[0_10px_20px_rgba(22,130,59,0.18)] transition hover:bg-[#126b30] disabled:cursor-not-allowed disabled:opacity-55"
+                                            class="grid min-h-[3.75rem] w-full grid-cols-[2rem_minmax(0,1fr)_2rem] items-center gap-2 rounded-[11px] border border-[#23bd77] bg-[#f7fffb] px-4 text-sm font-semibold text-[#008849] transition hover:bg-[#e9fff3] disabled:cursor-not-allowed disabled:opacity-55"
                                             :disabled="sessionProcessing || globalIncorrectProcessing"
                                             @click="emit('startGlobalIncorrectLearning')"
                                         >
-                                            <span class="grid h-8 w-8 place-items-center" aria-hidden="true"><RotateCcw :size="20" :stroke-width="2.2" /></span>
+                                            <span class="grid h-8 w-8 place-items-center" aria-hidden="true"><RotateCcw :size="22" :stroke-width="1.9" /></span>
                                             <span class="truncate text-center">{{ globalIncorrectProcessing ? 'Uruchamianie...' : 'Błędy z całego kursu' }}</span>
-                                            <span class="text-center text-[0.78rem] text-white">{{ totalIncorrectQuestions }}</span>
+                                            <span class="grid h-8 min-w-8 place-items-center rounded-full bg-[#dff9ec] px-1 text-center text-xs">{{ totalIncorrectQuestions }}</span>
                                         </button>
                                     </div>
                                 </div>

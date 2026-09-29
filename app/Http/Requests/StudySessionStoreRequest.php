@@ -30,6 +30,7 @@ class StudySessionStoreRequest extends FormRequest
             'question_topic_id' => ['nullable', 'integer', 'exists:question_topics,id'],
             'question_status' => ['nullable', 'string', 'in:all,unanswered,memorized,incorrect,correct,mistake_list'],
             'randomize_order' => ['nullable', 'boolean'],
+            'source_study_session_id' => ['nullable', 'integer', 'min:1'],
         ];
     }
 }

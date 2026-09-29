@@ -84,7 +84,10 @@ class StudySession extends Model
             ->where(function (Builder $query): void {
                 $query
                     ->whereNull('payload->context->type')
-                    ->orWhere('payload->context->type', '!=', 'question_module');
+                    ->orWhereNotIn('payload->context->type', [
+                        'question_module',
+                        'question_collection_review',
+                    ]);
             });
     }
 

@@ -25,11 +25,13 @@ const props = withDefaults(defineProps<{
     reviewUrl?: string | null;
     heading?: string;
     lead?: string;
+    compact?: boolean;
 }>(), {
     heading: 'Moduły kursu',
     lead: 'Wybierz moduł, od którego chcesz zacząć.',
     reviewCount: 0,
     reviewUrl: null,
+    compact: false,
 });
 
 const startForm = useForm({
@@ -69,11 +71,36 @@ const confirmReplacement = () => {
 const moduleActionLabel = (module: CourseModule): string => module.progress.answered_count > 0
     ? 'Kontynuuj'
     : 'Rozpocznij';
+
+const questionCountLabel = (count: number): string => {
+    const suffix = count % 10 === 1 && count % 100 !== 11
+        ? 'pytanie'
+        : count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 12 || count % 100 > 14)
+            ? 'pytania'
+            : 'pytań';
+
+    return `${count} ${suffix}`;
+};
+
+const compactActionLabel = (module: CourseModule): string => module.progress.percent === 100
+    ? 'Powtórz moduł'
+    : module.progress.answered_count > 0
+        ? 'Kontynuuj naukę'
+        : 'Rozpocznij naukę';
 </script>
 
 <template>
     <section aria-labelledby="course-modules-heading">
-        <div class="flex flex-wrap items-end justify-between gap-x-8 gap-y-5 border-b border-[#d7dde1] pb-5">
+        <div v-if="compact" class="flex flex-wrap items-center justify-between gap-x-5 gap-y-2 pb-3">
+            <div class="flex items-baseline gap-3">
+                <h2 id="course-modules-heading" class="text-lg font-semibold text-[#101828]">{{ heading }}</h2>
+                <span class="text-sm text-[#667085]">{{ modules.length }} modułów</span>
+            </div>
+            <Link v-if="reviewUrl" :href="reviewUrl" class="text-sm font-medium text-[#344054] underline underline-offset-4 hover:text-[#101828] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff]">
+                Pytania do poprawy: {{ reviewCount }} <span aria-hidden="true">→</span>
+            </Link>
+        </div>
+        <div v-else class="flex flex-wrap items-end justify-between gap-x-8 gap-y-5 border-b border-[#d7dde1] pb-5">
             <div>
                 <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                     <h2 id="course-modules-heading" class="text-2xl font-semibold text-[#101828]">{{ heading }}</h2>
@@ -108,6 +135,31 @@ const moduleActionLabel = (module: CourseModule): string => module.progress.answ
             <p class="text-base font-semibold text-[#101828]">Moduły są chwilowo niedostępne.</p>
             <p class="mt-2 text-sm leading-6 text-[#667085]">Wróć później lub wybierz inny tryb nauki.</p>
         </div>
+
+        <ol v-else-if="compact" class="space-y-2" aria-label="Lista modułów kursu">
+            <li v-for="module in modules" :key="module.id" class="grid min-h-[3.8rem] grid-cols-[3.5rem_minmax(0,1fr)_9rem] items-center gap-x-2 gap-y-1 bg-white px-2 py-2 transition-colors hover:bg-[#f8fbfd] min-[900px]:grid-cols-[2fr_8fr_3fr_5fr_6fr] min-[900px]:gap-0">
+                <span class="row-span-2 flex h-8 w-[3.25rem] items-center justify-center border-r border-[#e5e9ec] text-sm font-semibold text-[#344054] min-[900px]:row-span-1" aria-hidden="true">{{ module.code }}</span>
+                <div class="min-w-0 px-1">
+                    <h3 class="truncate text-sm font-semibold leading-5 text-[#172029] min-[900px]:text-base" :title="module.description ?? module.name">{{ module.name }}</h3>
+                    <span class="block text-[0.7rem] text-[#77838d] min-[900px]:hidden">{{ questionCountLabel(module.questions_count) }}</span>
+                </div>
+                <span class="hidden px-1 text-sm font-medium text-[#4d5b66] min-[900px]:block min-[900px]:text-base">{{ questionCountLabel(module.questions_count) }}</span>
+                <div class="col-start-2 flex min-w-0 items-center gap-2 px-1 min-[900px]:col-auto">
+                    <span class="w-8 shrink-0 text-sm font-semibold text-[#00bb78]">{{ module.progress.percent }}%</span>
+                    <span class="h-2 min-w-0 flex-1 overflow-hidden bg-[#e6e8e9]" role="progressbar" :aria-valuenow="module.progress.percent" aria-valuemin="0" aria-valuemax="100" :aria-label="`Postęp: ${module.name}`">
+                        <span class="block h-full rounded-full bg-[#00d88b]" :style="{ width: `${module.progress.percent}%` }" />
+                    </span>
+                </div>
+                <button
+                    type="button"
+                    class="col-start-3 row-span-2 mx-1 inline-flex min-h-[2.2rem] items-center justify-center bg-[#edf0f2] px-2 text-center text-sm font-medium leading-4 text-[#172029] transition hover:bg-[#e0e5e8] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] disabled:cursor-not-allowed disabled:opacity-50 min-[900px]:col-auto min-[900px]:row-span-1"
+                    :disabled="startForm.processing"
+                    @click="startModule(module)"
+                >
+                    {{ compactActionLabel(module) }}
+                </button>
+            </li>
+        </ol>
 
         <ol v-else class="mt-6 divide-y divide-[#dfe3e8] border-y border-[#dfe3e8] bg-white">
             <li v-for="module in modules" :key="module.id" class="group grid gap-5 px-5 py-6 transition-colors hover:bg-[#fbfcfd] sm:grid-cols-[4.5rem_minmax(0,1fr)_auto] sm:items-center sm:px-6 xl:px-8">

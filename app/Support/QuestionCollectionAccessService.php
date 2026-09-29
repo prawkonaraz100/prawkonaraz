@@ -95,7 +95,7 @@ class QuestionCollectionAccessService
 
     public function isCollectionReviewSession(StudySession $studySession): bool
     {
-        return $studySession->question_collection_id !== null
+        return $this->isCourseSession($studySession)
             && $studySession->question_module_id === null
             && data_get($studySession->payload, 'context.type') === 'question_collection_review';
     }
