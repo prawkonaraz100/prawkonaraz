@@ -11,7 +11,7 @@ import type { PageProps } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import {
     renderExplanationHtml,
-    renderInlineFormattedHtml,
+    renderExamPromptHtml,
 } from '@/utils/explanationFormatting';
 import {
     resolveImageAnnotations,
@@ -161,58 +161,16 @@ const visualExplanationsEnabled = computed(
     () => page.props.studyContext?.visualExplanationsEnabled ?? true,
 );
 const statusLabel = computed(() => passed.value ? 'Egzamin zdany' : 'Egzamin niezdany');
-const statusLead = computed(() => passed.value
-    ? 'Minimalny próg punktowy został osiągnięty. Możesz przejść do kolejnych działań bez powtarzania tego podejścia.'
-    : 'Próg punktowy nie został osiągnięty. Warto przejrzeć pytania z błędem lub bez odpowiedzi przed kolejnym egzaminem.');
-
-const summaryCards = computed(() => [
-    {
-        label: 'Wynik punktowy',
-        value: `${props.examResult.earned_points} pkt`,
-        detail: `Próg zaliczenia ${props.examResult.pass_threshold} / ${props.examResult.official_max_points} pkt`,
-        tone: 'border-t-[3px] border-t-[#d9b24c]',
-        valueClass: 'text-[#6b4f00]',
-    },
-    {
-        label: 'Skuteczność',
-        value: props.session.score_percent !== null ? `${Math.round(props.session.score_percent)}%` : '0%',
-        detail: `${props.examResult.correct_answers_count} poprawnych odpowiedzi`,
-        tone: passed.value
-            ? 'border-t-[3px] border-t-[#96b79a]'
-            : 'border-t-[3px] border-t-[#d7a1a1]',
-        valueClass: passed.value ? 'text-[#285c28]' : 'text-[#8f3838]',
-    },
-    {
-        label: 'Czas egzaminu',
-        value: formatDuration(props.completionTiming.duration_seconds),
-        detail: props.completionTiming.average_correct_response_time_ms !== null
-            ? `Śr. poprawna odpowiedź ${formatResponseTime(props.completionTiming.average_correct_response_time_ms)}`
-            : 'Brak poprawnych odpowiedzi do wyliczenia średniej',
-        tone: 'border-t-[3px] border-t-[#bfc6ce]',
-        valueClass: 'text-[#334155]',
-    },
-    {
-        label: 'Kategoria',
-        value: props.session.license_category_name ?? 'Brak kategorii',
-        detail: props.session.license_category_code ? `Kod ${props.session.license_category_code}` : 'Egzamin teoretyczny',
-        tone: 'border-t-[3px] border-t-[#d8d8d8]',
-        valueClass: 'text-[#16202c]',
-    },
-]);
 
 const sectionCards = computed(() => [
     {
         key: 'basic',
         label: 'Pytania podstawowe',
-        detail: 'Pierwsza część egzaminu',
-        accentClass: 'text-[#46566a] bg-[#f6f8fb] border-[#dde3ea]',
         ...props.examResult.basic,
     },
     {
         key: 'specialist',
         label: 'Pytania specjalistyczne',
-        detail: 'Druga część egzaminu',
-        accentClass: 'text-[#7a5a16] bg-[#fbf8ef] border-[#eadfbd]',
         ...props.examResult.specialist,
     },
 ]);
@@ -245,16 +203,6 @@ const formatDuration = (seconds: number | null) => {
     }
 
     return `${minutes} min ${String(remainingSeconds).padStart(2, '0')} s`;
-};
-
-const formatResponseTime = (milliseconds: number | null) => {
-    if (milliseconds === null) {
-        return 'Brak danych';
-    }
-
-    const seconds = milliseconds / 1000;
-
-    return `${seconds.toFixed(seconds >= 10 ? 0 : 1)} s`;
 };
 
 const sectionProgressWidth = (section: ExamSectionResult) => {
@@ -294,16 +242,6 @@ const questionStatusLabel = (result: ResultItem) => {
     }
 
     return result.selected_answer === null ? 'Brak odpowiedzi' : 'Błędna';
-};
-
-const questionStatusTone = (result: ResultItem) => {
-    if (result.is_correct === true) {
-        return 'border-[#c7d9c7] bg-[#f3faf3] text-[#285c28]';
-    }
-
-    return result.selected_answer === null
-        ? 'border-[#decaa4] bg-[#fff8ea] text-[#8b6220]'
-        : 'border-[#dcc2c2] bg-[#fff4f4] text-[#8f3838]';
 };
 
 const scopeLabel = (scope: string | null) =>
@@ -354,7 +292,7 @@ const freezeResultVideoPreview = (event: Event) => {
     <Head title="Wynik egzaminu" />
 
     <SessionExamLayout>
-        <div class="-mx-3 -my-3 min-h-[100svh] bg-white text-[#101828] md:hidden">
+        <div class="-mx-3 -my-3 min-h-[100svh] bg-white text-[#101828] sm:-mx-4 sm:-my-4 md:hidden">
             <MobileAppBar
                 title="Wynik egzaminu"
                 :subtitle="`Kategoria ${session.license_category_code ?? '—'}`"
@@ -373,8 +311,7 @@ const freezeResultVideoPreview = (event: Event) => {
 
             <main class="pb-5">
                 <section
-                    class="border-b border-[#e4e7ec] px-4 py-6"
-                    :class="passed ? 'bg-[#f6fbf7]' : 'bg-[#fff8f7]'"
+                    class="border-b border-[#d1d8df] bg-white px-4 py-6"
                     aria-labelledby="mobile-exam-status-heading"
                 >
                     <div class="flex items-start gap-3">
@@ -391,10 +328,7 @@ const freezeResultVideoPreview = (event: Event) => {
                             </svg>
                         </span>
                         <div class="min-w-0 flex-1">
-                            <p class="text-[0.7rem] font-semibold" :class="passed ? 'text-[#067647]' : 'text-[#b42318]'">
-                                {{ passed ? 'Wynik pozytywny' : 'Wynik negatywny' }}
-                            </p>
-                            <h2 id="mobile-exam-status-heading" class="mt-1 text-[1.55rem] font-semibold leading-8 text-[#101828]">
+                            <h2 id="mobile-exam-status-heading" class="text-[1.55rem] font-semibold leading-8 text-[#101828]">
                                 {{ statusLabel }}
                             </h2>
                             <p class="mt-1 text-[0.76rem] leading-5 text-[#667085]">
@@ -405,21 +339,17 @@ const freezeResultVideoPreview = (event: Event) => {
                         </div>
                     </div>
 
-                    <div class="mt-6 flex items-end justify-between gap-4">
+                    <div class="mt-6">
                         <div>
                             <p class="text-[2.7rem] font-semibold leading-none text-[#101828]">
-                                {{ examResult.earned_points }}<span class="text-[1.15rem] text-[#667085]"> pkt</span>
+                                {{ examResult.earned_points }}<span class="text-[1.15rem] text-[#667085]"> / {{ examResult.official_max_points }} pkt</span>
                             </p>
                             <p class="mt-2 text-[0.7rem] text-[#667085]">
-                                Próg zaliczenia: {{ examResult.pass_threshold }} / {{ examResult.official_max_points }} pkt
+                                Próg zaliczenia: {{ examResult.pass_threshold }} pkt
                             </p>
                         </div>
-                        <p class="shrink-0 text-right text-[0.72rem] font-semibold text-[#475467]">
-                            {{ session.score_percent !== null ? `${Math.round(session.score_percent)}%` : '0%' }}<br>
-                            <span class="font-normal text-[#667085]">skuteczności</span>
-                        </p>
                     </div>
-                    <div class="mt-4 h-2 overflow-hidden rounded-full bg-white/80" aria-hidden="true">
+                    <div class="mt-4 h-2 overflow-hidden rounded-full bg-[#e5e9ee]" aria-hidden="true">
                         <div
                             class="h-full rounded-full transition-[width] duration-300 motion-reduce:transition-none"
                             :class="passed ? 'bg-[#12b76a]' : 'bg-[#f04438]'"
@@ -431,14 +361,13 @@ const freezeResultVideoPreview = (event: Event) => {
                         <a
                             v-if="incorrectOrUnansweredResults.length > 0"
                             href="#mobile-exam-review"
-                            class="inline-flex min-h-12 w-full items-center justify-center rounded-[0.5rem] bg-[#0b5cff] px-4 text-[0.84rem] font-semibold text-white transition hover:bg-[#064bd4] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] focus-visible:ring-offset-2"
+                            class="inline-flex min-h-12 w-full items-center justify-center rounded-[4px] border border-[#d1d8df] bg-white px-4 text-[0.84rem] font-semibold text-[#223547] transition hover:bg-[#f7f8fa] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#334155] focus-visible:ring-offset-2"
                         >
                             Przejrzyj {{ formatQuestionCount(incorrectOrUnansweredResults.length) }}
                         </a>
                         <Link
                             :href="route('session.index')"
-                            class="inline-flex min-h-12 w-full items-center justify-center rounded-[0.5rem] border border-[#d0d5dd] bg-white px-4 text-[0.84rem] font-semibold text-[#344054] transition hover:bg-[#f9fafb] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff]"
-                            :class="incorrectOrUnansweredResults.length === 0 ? 'border-transparent bg-[#0b5cff] text-white hover:bg-[#064bd4]' : ''"
+                            class="inline-flex min-h-12 w-full items-center justify-center rounded-[4px] border border-[#d2b35b] bg-[#efc54f] px-4 text-[0.84rem] font-semibold text-[#463309] transition hover:bg-[#e8bd4c] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#334155]"
                         >
                             Wróć do nauki
                         </Link>
@@ -462,21 +391,17 @@ const freezeResultVideoPreview = (event: Event) => {
                         </div>
                     </div>
 
-                    <dl class="mt-4 border-b border-[#e4e7ec]">
-                        <div class="flex min-h-12 items-center justify-between gap-4 border-t border-[#e4e7ec] py-3">
-                            <dt class="text-[0.76rem] text-[#667085]">Czas egzaminu</dt>
-                            <dd class="text-[0.76rem] font-semibold text-[#344054]">{{ formatDuration(completionTiming.duration_seconds) }}</dd>
-                        </div>
-                        <div class="flex min-h-12 items-center justify-between gap-4 border-t border-[#e4e7ec] py-3">
-                            <dt class="text-[0.76rem] text-[#667085]">Średnia poprawna odpowiedź</dt>
-                            <dd class="text-[0.76rem] font-semibold text-[#344054]">{{ formatResponseTime(completionTiming.average_correct_response_time_ms) }}</dd>
-                        </div>
-                    </dl>
+                    <p class="mt-4 border-t border-[#e4e7ec] pt-3 text-[0.76rem] text-[#667085]">
+                        Czas egzaminu: <strong class="text-[#344054]">{{ formatDuration(completionTiming.duration_seconds) }}</strong>
+                    </p>
                 </section>
 
-                <section class="border-t border-[#e4e7ec] px-4 py-6" aria-labelledby="mobile-exam-sections-heading">
-                    <h2 id="mobile-exam-sections-heading" class="text-[1rem] font-semibold leading-5">Części egzaminu</h2>
-                    <div class="mt-4 border-b border-[#e4e7ec]">
+                <details class="group border-t border-[#e4e7ec] px-4 py-4">
+                    <summary class="flex cursor-pointer list-none items-center justify-between text-[0.9rem] font-semibold [&::-webkit-details-marker]:hidden">
+                        Wynik w częściach egzaminu
+                        <span class="text-[#667085] transition-transform group-open:rotate-180" aria-hidden="true">⌄</span>
+                    </summary>
+                    <div class="mt-3 border-b border-[#e4e7ec]">
                         <article
                             v-for="section in sectionCards"
                             :key="section.key"
@@ -491,7 +416,7 @@ const freezeResultVideoPreview = (event: Event) => {
                             </div>
                             <div class="mt-3 h-1.5 overflow-hidden rounded-full bg-[#eaecf0]" aria-hidden="true">
                                 <div
-                                    class="h-full rounded-full bg-[#0b5cff]"
+                                    class="h-full rounded-full bg-[#556476]"
                                     :style="{ width: sectionProgressWidth(section) }"
                                 />
                             </div>
@@ -500,7 +425,7 @@ const freezeResultVideoPreview = (event: Event) => {
                             </p>
                         </article>
                     </div>
-                </section>
+                </details>
 
                 <section id="mobile-exam-review" class="scroll-mt-16 border-t border-[#e4e7ec] px-4 py-6" aria-labelledby="mobile-exam-review-heading">
                     <h2 id="mobile-exam-review-heading" class="text-[1rem] font-semibold leading-5">Pytania do przejrzenia</h2>
@@ -512,7 +437,7 @@ const freezeResultVideoPreview = (event: Event) => {
                             :key="result.id"
                             class="group border-t border-[#e4e7ec]"
                         >
-                            <summary class="flex min-h-14 cursor-pointer list-none items-start gap-3 py-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0b5cff] [&::-webkit-details-marker]:hidden">
+                            <summary class="flex min-h-14 cursor-pointer list-none items-start gap-3 py-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#334155] [&::-webkit-details-marker]:hidden">
                                 <span
                                     class="mt-1 h-2.5 w-2.5 shrink-0 rounded-full"
                                     :class="result.selected_answer === null ? 'bg-[#f79009]' : 'bg-[#f04438]'"
@@ -524,7 +449,7 @@ const freezeResultVideoPreview = (event: Event) => {
                                     </span>
                                     <span
                                         class="mobile-exam-question mt-1.5 block text-[0.82rem] font-medium leading-5 text-[#101828] [&_strong]:font-semibold"
-                                        v-html="renderInlineFormattedHtml(result.prompt)"
+                                        v-html="renderExamPromptHtml(result.prompt)"
                                     />
                                 </span>
                                 <svg aria-hidden="true" class="mt-1 h-4 w-4 shrink-0 text-[#667085] transition-transform group-open:rotate-180 motion-reduce:transition-none" viewBox="0 0 24 24" fill="none">
@@ -611,153 +536,64 @@ const freezeResultVideoPreview = (event: Event) => {
             <MobileBottomNavigation />
         </div>
 
-        <div class="hidden space-y-0 md:block md:space-y-4">
-            <section class="border-y border-[#d7d7d7] bg-white sm:border">
-                <div class="border-b border-[#dddddd] px-4 py-4 sm:px-5 sm:py-3">
-                    <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                        <div class="space-y-2">
-                            <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#737373]">
-                                Wynik egzaminu teoretycznego
-                            </p>
-                            <div class="flex flex-wrap items-center gap-2">
-                                <h1 class="text-2xl font-semibold text-[#16202c]">
-                                    {{ statusLabel }}
-                                </h1>
-                                <span
-                                    class="inline-flex items-center border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em]"
-                                    :class="passed ? 'border-[#c7d9c7] bg-[#f3faf3] text-[#285c28]' : 'border-[#dcc2c2] bg-[#fff4f4] text-[#8f3838]'"
-                                >
-                                    {{ passed ? 'Pozytywny' : 'Negatywny' }}
-                                </span>
-                            </div>
-                            <p class="max-w-3xl text-sm leading-6 text-[#5f5f5f]">
-                                {{ statusLead }}
-                            </p>
-                        </div>
-
-                        <div class="grid gap-2 sm:flex sm:flex-wrap sm:items-center">
-                            <a
-                                href="#przeglad-pytan"
-                                class="inline-flex min-h-[2.75rem] w-full items-center justify-center border border-[#d7d7d7] bg-white px-4 py-2 text-sm font-medium text-[#2b2b2b] transition hover:border-[#c4c4c4] hover:bg-[#f7f7f7] sm:w-auto"
-                            >
-                                Przejrzyj pytania
-                            </a>
-                            <Link
-                                :href="route('session.index')"
-                                class="inline-flex min-h-[2.75rem] w-full items-center justify-center border border-[#d8b241] bg-[#efc54f] px-4 py-2 text-sm font-semibold text-[#4f3a05] transition hover:border-[#c9a334] hover:bg-[#e4bb47] sm:w-auto"
-                            >
-                                Wróć do nauki
-                            </Link>
-                        </div>
+        <div class="mx-auto hidden max-w-6xl space-y-5 py-5 md:block">
+            <section class="border border-[#d1d8df] bg-white px-6 py-5">
+                <div class="flex flex-wrap items-start justify-between gap-5">
+                    <div>
+                        <p class="text-xs text-[#5f6f82]">Wynik egzaminu · kat. {{ session.license_category_code ?? '—' }}</p>
+                        <h1 class="mt-1 text-2xl font-semibold text-[#16202c]">{{ statusLabel }}</h1>
+                        <p class="mt-2 text-sm text-[#5f6f82]">
+                            {{ passed ? 'Próg zaliczenia osiągnięty.' : 'Próg zaliczenia nie został osiągnięty.' }}
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <a v-if="incorrectOrUnansweredResults.length" href="#przeglad-pytan" class="inline-flex min-h-10 items-center border border-[#d1d8df] px-4 text-sm font-medium text-[#223547] hover:bg-[#f7f8fa]">
+                            Przejrzyj pytania ({{ incorrectOrUnansweredResults.length }})
+                        </a>
+                        <Link :href="route('session.index')" class="inline-flex min-h-10 items-center border border-[#d2b35b] bg-[#efc54f] px-4 text-sm font-semibold text-[#463309] hover:bg-[#e8bd4c]">
+                            Wróć do nauki
+                        </Link>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2 bg-white px-4 pb-4 sm:gap-px sm:bg-[#dddddd] sm:px-0 sm:pb-0 md:grid-cols-2 xl:grid-cols-4">
-                    <div
-                        v-for="card in summaryCards"
-                        :key="card.label"
-                        class="border border-[#e5e7eb] bg-[#fafafa] px-3 py-3 sm:border-0 sm:bg-white sm:px-5 sm:py-4"
-                        :class="card.tone"
-                    >
-                        <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#767676]">
-                            {{ card.label }}
-                        </p>
-                        <p class="mt-2 text-xl font-semibold sm:text-2xl" :class="card.valueClass">
-                            {{ card.value }}
-                        </p>
-                        <p class="mt-1 text-[0.82rem] leading-5 text-[#616161] sm:text-sm">
-                            {{ card.detail }}
+                <div class="mt-5 flex flex-wrap items-end gap-x-8 gap-y-3 border-t border-[#e4e7ec] pt-5">
+                    <div>
+                        <p class="text-xs text-[#5f6f82]">Zdobyte punkty</p>
+                        <p class="text-4xl font-semibold tabular-nums" :class="passed ? 'text-[#285c28]' : 'text-[#8f3838]'">
+                            {{ examResult.earned_points }} <span class="text-xl text-[#5f6f82]">/ {{ examResult.official_max_points }}</span>
                         </p>
                     </div>
+                    <p class="pb-1 text-sm text-[#5f6f82]">Do zaliczenia: <strong class="text-[#16202c]">{{ examResult.pass_threshold }} pkt</strong></p>
+                    <p class="pb-1 text-sm text-[#5f6f82]">Czas: <strong class="text-[#16202c]">{{ formatDuration(completionTiming.duration_seconds) }}</strong></p>
+                </div>
+                <div class="mt-4 h-1.5 bg-[#e5e9ee]" aria-hidden="true">
+                    <div class="h-full" :class="passed ? 'bg-[#4d8d62]' : 'bg-[#b56b6b]'" :style="{ width: resultProgressWidth }" />
+                </div>
+                <div class="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-sm text-[#5f6f82]">
+                    <p>Poprawne: <strong class="text-[#16202c]">{{ examResult.correct_answers_count }}</strong></p>
+                    <p>Błędne: <strong class="text-[#16202c]">{{ examResult.incorrect_answers_count }}</strong></p>
+                    <p>Bez odpowiedzi: <strong class="text-[#16202c]">{{ examResult.unanswered_count }}</strong></p>
                 </div>
             </section>
 
-            <div class="grid gap-0 sm:gap-4 xl:grid-cols-[minmax(0,2.2fr)_19rem]">
-                <div class="space-y-0 sm:space-y-4">
-                    <section class="border-b border-[#d7d7d7] bg-white sm:border">
-                        <div class="border-b border-[#dddddd] px-4 py-3 sm:px-5">
-                            <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#767676]">
-                                Podsumowanie sekcji
-                            </p>
-                        </div>
+            <details class="group border border-[#d1d8df] bg-white">
+                <summary class="flex cursor-pointer list-none items-center justify-between px-6 py-4 text-sm font-semibold text-[#223547] [&::-webkit-details-marker]:hidden">
+                    Wynik w częściach egzaminu
+                    <span class="text-[#5f6f82] transition-transform group-open:rotate-180" aria-hidden="true">⌄</span>
+                </summary>
+                <div class="grid gap-4 border-t border-[#e4e7ec] px-6 py-4 md:grid-cols-2">
+                    <div v-for="section in sectionCards" :key="section.key">
+                        <p class="text-sm font-semibold text-[#16202c]">{{ section.label }}</p>
+                        <p class="mt-1 text-sm text-[#5f6f82]">{{ section.earned_points }} / {{ section.available_points }} pkt · {{ section.correct }} z {{ section.total }} poprawnych</p>
+                    </div>
+                </div>
+            </details>
 
-                        <div class="grid gap-2 bg-white px-4 py-4 sm:gap-px sm:bg-[#dddddd] sm:px-0 sm:py-0 md:grid-cols-2">
-                            <article
-                                v-for="section in sectionCards"
-                                :key="section.key"
-                                class="space-y-4 border border-[#e5e7eb] bg-[#fafafa] px-3 py-3 sm:border-0 sm:bg-white sm:px-5 sm:py-4"
-                            >
-                                <div>
-                                    <div
-                                        class="inline-flex items-center border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em]"
-                                        :class="section.accentClass"
-                                    >
-                                        {{ section.label }}
-                                    </div>
-                                    <h2 class="mt-3 text-lg font-semibold text-[#16202c]">
-                                        {{ section.label }}
-                                    </h2>
-                                    <p class="text-sm text-[#666666]">
-                                        {{ section.detail }}
-                                    </p>
-                                </div>
-
-                                <dl class="grid grid-cols-2 gap-2 text-sm sm:gap-3">
-                                    <div class="border border-[#e1e1e1] bg-white px-3 py-2">
-                                        <dt class="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#7a7a7a]">
-                                            Poprawne
-                                        </dt>
-                                        <dd class="mt-1 text-lg font-semibold text-[#16202c]">
-                                            {{ section.correct }} / {{ section.total }}
-                                        </dd>
-                                    </div>
-                                    <div class="border border-[#e1e1e1] bg-white px-3 py-2">
-                                        <dt class="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#7a7a7a]">
-                                            Punkty
-                                        </dt>
-                                        <dd class="mt-1 text-lg font-semibold text-[#16202c]">
-                                            {{ section.earned_points }} pkt
-                                        </dd>
-                                    </div>
-                                    <div class="border border-[#e1e1e1] bg-white px-3 py-2">
-                                        <dt class="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#7a7a7a]">
-                                            Błędne
-                                        </dt>
-                                        <dd class="mt-1 text-lg font-semibold text-[#16202c]">
-                                            {{ section.incorrect }}
-                                        </dd>
-                                    </div>
-                                    <div class="border border-[#e1e1e1] bg-white px-3 py-2">
-                                        <dt class="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#7a7a7a]">
-                                            Bez odpowiedzi
-                                        </dt>
-                                        <dd class="mt-1 text-lg font-semibold text-[#16202c]">
-                                            {{ section.unanswered }}
-                                        </dd>
-                                    </div>
-                                </dl>
-                            </article>
-                        </div>
-                    </section>
-
-                    <section
-                        id="przeglad-pytan"
-                        class="border-b border-[#d7d7d7] bg-white sm:border"
-                    >
-                        <div class="border-b border-[#dddddd] px-4 py-3 sm:px-5">
-                            <div class="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-                                <div>
-                                    <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#767676]">
-                                        Pytania wymagające uwagi
-                                    </p>
-                                    <h2 class="mt-1 text-lg font-semibold text-[#16202c]">
-                                        {{ incorrectOrUnansweredResults.length }} pozycji do przejrzenia
-                                    </h2>
-                                </div>
-                                <p class="text-sm text-[#666666]">
-                                    Błędy i brak odpowiedzi z tego podejścia egzaminacyjnego.
-                                </p>
-                            </div>
+                    <section id="przeglad-pytan" class="scroll-mt-5 border border-[#d1d8df] bg-white">
+                        <div class="border-b border-[#e4e7ec] px-6 py-4">
+                            <h2 class="text-base font-semibold text-[#16202c]">
+                                {{ incorrectOrUnansweredResults.length ? `Do przejrzenia: ${incorrectOrUnansweredResults.length}` : 'Pytania do przejrzenia' }}
+                            </h2>
                         </div>
 
                         <div
@@ -771,13 +607,21 @@ const freezeResultVideoPreview = (event: Event) => {
                             v-else
                             class="divide-y divide-[#e6e6e6]"
                         >
-                            <article
+                            <details
                                 v-for="result in incorrectOrUnansweredResults"
                                 :key="result.id"
-                                class="space-y-4 px-4 py-4 sm:px-5"
+                                class="group"
                             >
-                                <div class="grid gap-5 lg:grid-cols-[minmax(14rem,0.72fr)_minmax(0,1fr)]">
-                                    <div class="bg-white sm:border sm:border-[#e3e3e3] sm:bg-[#fafafa] sm:px-3 sm:py-3">
+                                <summary class="flex cursor-pointer list-none items-start gap-4 px-6 py-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#334155] [&::-webkit-details-marker]:hidden">
+                                    <span class="w-7 shrink-0 text-sm font-semibold tabular-nums text-[#5f6f82]">{{ result.sequence_number }}.</span>
+                                    <span class="min-w-0 flex-1">
+                                        <span class="block text-sm font-medium leading-5 text-[#16202c]" v-html="renderExamPromptHtml(result.prompt)" />
+                                        <span class="mt-1 block text-xs text-[#5f6f82]">{{ questionStatusLabel(result) }} · {{ scopeLabel(result.structure_scope) }}</span>
+                                    </span>
+                                    <span class="shrink-0 text-[#5f6f82] transition-transform group-open:rotate-180" aria-hidden="true">⌄</span>
+                                </summary>
+                                <div class="grid gap-5 border-t border-[#e4e7ec] px-6 py-5" :class="result.media.length ? 'lg:grid-cols-[minmax(14rem,0.72fr)_minmax(0,1fr)]' : ''">
+                                    <div v-if="result.media.length" class="bg-white sm:border sm:border-[#e3e3e3] sm:bg-[#fafafa] sm:px-3 sm:py-3">
                                         <div class="flex min-h-[10.5rem] items-center justify-center bg-white py-2 sm:px-3 sm:py-3 md:min-h-[16rem]">
                                             <div class="w-full">
                                                 <template v-if="result.media.length > 0">
@@ -833,41 +677,6 @@ const freezeResultVideoPreview = (event: Event) => {
                                     </div>
 
                                     <div class="space-y-4">
-                                        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                                            <div class="space-y-2">
-                                                <div class="flex flex-wrap items-center gap-2">
-                                                    <span class="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#767676]">
-                                                        Pytanie {{ result.sequence_number }}
-                                                    </span>
-                                                    <span class="inline-flex items-center border border-[#dddddd] bg-[#f7f7f7] px-2 py-0.5 text-[11px] font-medium text-[#666666]">
-                                                        {{ scopeLabel(result.structure_scope) }}
-                                                    </span>
-                                                    <span
-                                                        class="inline-flex items-center border px-2 py-0.5 text-[11px] font-medium"
-                                                        :class="questionStatusTone(result)"
-                                                    >
-                                                        {{ questionStatusLabel(result) }}
-                                                    </span>
-                                                    <span
-                                                        v-if="result.points !== null"
-                                                        class="inline-flex items-center border border-[#e6dcc1] bg-[#fcf8ed] px-2 py-0.5 text-[11px] font-medium text-[#7a5a16]"
-                                                    >
-                                                        {{ result.points }} pkt
-                                                    </span>
-                                                </div>
-                                                <h3 class="text-base font-semibold leading-7 text-[#16202c]">
-                                                    <span
-                                                        class="[&_strong]:font-semibold [&_strong]:text-inherit"
-                                                        v-html="renderInlineFormattedHtml(result.prompt)"
-                                                    />
-                                                </h3>
-                                            </div>
-
-                                            <div class="text-sm text-[#696969] sm:text-right">
-                                                {{ result.response_time_ms !== null ? formatResponseTime(result.response_time_ms) : 'Brak czasu odpowiedzi' }}
-                                            </div>
-                                        </div>
-
                                         <dl class="grid gap-3 md:grid-cols-2">
                                             <div class="border border-[#e1e1e1] bg-white px-3 py-3">
                                                 <dt class="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#7a7a7a]">
@@ -897,65 +706,9 @@ const freezeResultVideoPreview = (event: Event) => {
                                         />
                                     </div>
                                 </div>
-                            </article>
+                            </details>
                         </div>
                     </section>
-                </div>
-
-                <aside class="space-y-0 sm:space-y-4">
-                    <section class="border-b border-[#d7d7d7] bg-white sm:border">
-                        <div class="border-b border-[#dddddd] px-4 py-3">
-                            <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#767676]">
-                                Status podejścia
-                            </p>
-                        </div>
-                        <dl class="space-y-4 px-4 py-4 text-sm">
-                            <div class="flex items-start justify-between gap-4">
-                                <dt class="text-[#696969]">Poprawne odpowiedzi</dt>
-                                <dd class="font-semibold text-[#16202c]">
-                                    {{ examResult.correct_answers_count }}
-                                </dd>
-                            </div>
-                            <div class="flex items-start justify-between gap-4">
-                                <dt class="text-[#696969]">Błędne odpowiedzi</dt>
-                                <dd class="font-semibold text-[#16202c]">
-                                    {{ examResult.incorrect_answers_count }}
-                                </dd>
-                            </div>
-                            <div class="flex items-start justify-between gap-4">
-                                <dt class="text-[#696969]">Bez odpowiedzi</dt>
-                                <dd class="font-semibold text-[#16202c]">
-                                    {{ examResult.unanswered_count }}
-                                </dd>
-                            </div>
-                            <div class="flex items-start justify-between gap-4">
-                                <dt class="text-[#696969]">Przerobione pytania</dt>
-                                <dd class="font-semibold text-[#16202c]">
-                                    {{ progress.answered }} / {{ progress.total }}
-                                </dd>
-                            </div>
-                        </dl>
-                    </section>
-
-                    <section class="border-b border-[#d7d7d7] bg-white sm:border">
-                        <div class="border-b border-[#dddddd] px-4 py-3">
-                            <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#767676]">
-                                Zasada zaliczenia
-                            </p>
-                        </div>
-                        <div class="space-y-3 px-4 py-4 text-sm text-[#616161]">
-                            <p>
-                                Egzamin teoretyczny uznaje się za zaliczony po osiągnięciu minimum
-                                <span class="font-semibold text-[#16202c]">{{ examResult.pass_threshold }} punktów</span>.
-                            </p>
-                            <p>
-                                Referencyjna maksymalna pula punktów dla pełnego egzaminu wynosi
-                                <span class="font-semibold text-[#16202c]">{{ examResult.official_max_points }} punktów</span>.
-                            </p>
-                        </div>
-                    </section>
-                </aside>
-            </div>
         </div>
     </SessionExamLayout>
 </template>

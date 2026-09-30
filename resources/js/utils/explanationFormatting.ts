@@ -149,6 +149,9 @@ export const renderInlineFormattedHtml = (
     return applyInlineMarkup(escapeHtml(normalized), options).replace(/\n/g, '<br>');
 };
 
+export const renderExamPromptHtml = (value: string | null | undefined) =>
+    renderInlineFormattedHtml(value, { enableBold: false, enableColors: false });
+
 /**
  * Replaces a recognized traffic-sign code in already-sanitized explanation HTML.
  * Tags are preserved untouched so image markup can only be inserted into text nodes.

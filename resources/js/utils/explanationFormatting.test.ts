@@ -2,11 +2,19 @@ import { describe, expect, it } from 'vitest';
 import {
     injectExplanationSignImages,
     normalizeExplanationPlainText,
+    renderExamPromptHtml,
     renderExplanationHtml,
     renderInlineFormattedHtml,
 } from './explanationFormatting';
 
 describe('explanationFormatting', () => {
+    it('keeps exam prompts plain while preserving escaped text', () => {
+        expect(renderExamPromptHtml('Czy [red]**musisz**[/red] ustąpić?'))
+            .toBe('Czy musisz ustąpić?');
+        expect(renderExamPromptHtml('A < B'))
+            .toBe('A &lt; B');
+    });
+
     it('renders nested color and bold markers together', () => {
         const rendered = renderInlineFormattedHtml('[green]**tekst**[/green]', {
             palette: 'classic',

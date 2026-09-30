@@ -4581,6 +4581,10 @@ const examLikeAnswerOptionClass = (optionKey: string) => {
     }
 
     if (visualState === 'correct') {
+        if (!isCourseSession.value) {
+            return 'border-[#d1d5db] bg-[#edf4ef] text-[#163222]';
+        }
+
         return isSelected
             ? 'border-[#93b6a0] bg-[#edf4ef] text-[#163222]'
             : 'border-[#2f7d4a] bg-[#f1f7f3] text-[#163222] ring-2 ring-[#2f7d4a]';

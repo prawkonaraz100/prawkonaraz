@@ -4,8 +4,9 @@ import { useSessionExpiry } from '@/composables/useSessionExpiry';
 import questionSourceEmblem from '../../../images/session/question-source-emblem-crop.png';
 import SessionExamLayout from '@/Layouts/SessionExamLayout.vue';
 import { apiClient } from '@/lib/apiClient';
-import { renderInlineFormattedHtml } from '@/utils/explanationFormatting';
+import { renderExamPromptHtml } from '@/utils/explanationFormatting';
 import { Head, useForm } from '@inertiajs/vue3';
+import { Clock3 } from '@lucide/vue';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 interface SessionSummary {
@@ -175,6 +176,11 @@ const questionNumber = computed(() =>
 const questionProgressLabel = computed(() =>
     `${questionNumber.value ?? '-'} / ${progressState.value.total}`,
 );
+const sectionProgressRingStyle = (answered: number, total: number) => {
+    const percent = total > 0 ? Math.min(Math.max((answered / total) * 100, 0), 100) : 0;
+
+    return { background: `conic-gradient(#556476 0% ${percent}%, #e5e9ee ${percent}% 100%)` };
+};
 const isMobileExamLayout = computed(() =>
     viewportWidth.value > 0 && viewportWidth.value <= 1023,
 );
@@ -267,7 +273,9 @@ const stageCounterLabel = computed(() =>
         : questionRemainingLabel.value,
 );
 const shouldPinMobileAnswerPanel = computed(() =>
-    isMobileExamLayout.value && Boolean(activeQuestion.value),
+    isMobileExamLayout.value
+    && Boolean(activeQuestion.value)
+    && (activeQuestion.value?.question_type === 'boolean' || viewportWidth.value >= 640),
 );
 const canSelectAnswer = computed(() =>
     Boolean(activeQuestion.value)
@@ -294,11 +302,11 @@ const finishButtonDisabled = computed(() =>
     || sessionExpired.value,
 );
 const mobileHeaderStatClass =
-    'min-w-0 border border-[#e5e9ee] bg-[#fbfcfd] px-2.5 py-1.5';
+    'min-w-0 rounded-lg border border-[#d1d8df] bg-white px-2 py-1.5';
 const mobileHeaderLabelClass =
-    'text-[0.58rem] font-medium uppercase tracking-[0.08em] text-[#6b7280]';
+    'text-[0.58rem] font-medium uppercase tracking-[0.08em] text-[#5f6f82]';
 const mobileHeaderValueClass =
-    'mt-1 text-[0.98rem] font-semibold leading-5 text-[#111827]';
+    'mt-1 text-[0.98rem] font-bold leading-5 text-[#223547]';
 const examTimerClass = computed(() => {
     if (examRemainingSeconds.value <= 120) {
         return 'border-[#dca6a6] bg-[#fff1f1] text-[#8f2f2f]';
@@ -322,8 +330,8 @@ const mediaDisplayUrl = (media: QuestionMedia | null) =>
 
 const mobileAnswerDockWrapperClass = computed(() =>
     shouldPinMobileAnswerPanel.value
-        ? 'fixed inset-x-0 bottom-0 z-40 border-t border-[#dfe4ea] bg-white px-3 pt-3'
-        : '',
+        ? 'fixed inset-x-0 bottom-0 z-40 max-h-[55dvh] overflow-y-auto border-t border-[#d1d8df] bg-white px-3 pt-3'
+        : 'px-4 py-4',
 );
 
 const mobileAnswerDockWrapperStyle = computed<Record<string, string>>(() => {
@@ -365,7 +373,7 @@ const mobileResponsiveFrameStyle = computed<Record<string, string>>(() => {
 });
 
 const mobileAnswerDockInnerStyle = computed<Record<string, string>>(() => {
-    if (!shouldPinMobileAnswerPanel.value) {
+    if (!isMobileExamLayout.value) {
         return {} as Record<string, string>;
     }
 
@@ -379,70 +387,72 @@ const mobileAnswerOptionsClass = computed(() =>
 );
 const examSessionShellClass = computed(() =>
     isMobileExamLayout.value
-        ? 'flex h-full min-h-screen flex-col gap-0 max-lg:-mx-3 max-lg:-my-3'
-        : 'flex h-full min-h-[calc(100vh-5rem)] flex-col gap-2.5 xl:gap-2',
+        ? 'flex min-h-screen flex-col gap-0 max-lg:-mx-3 max-lg:-my-3 sm:min-h-[calc(100dvh-0.5rem)]'
+        : 'flex min-h-[calc(100dvh-1rem)] flex-col gap-4 pt-5 pb-5',
 );
 const examMobileHeaderClass = computed(() =>
-    'border-b border-[#e5e7eb] bg-white lg:hidden',
+    'border-b border-[#d1d8df] bg-white lg:hidden',
 );
 const examMobileHeaderGridClass = computed(() =>
-    'grid grid-cols-[minmax(3.75rem,0.78fr)_minmax(4.25rem,0.78fr)_auto_auto] items-center gap-2 px-4 py-3',
+    'grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto_auto] items-center gap-1 px-2 py-2.5 sm:gap-2 sm:px-4 sm:py-3',
 );
 const examMobileOptionsButtonClass = computed(() =>
-    'inline-flex min-h-[2.45rem] items-center justify-center border border-[#e5e9ee] bg-white px-2.5 py-1.5 text-sm font-medium text-[#5f6f82] transition hover:border-[#cfd7df] hover:bg-[#f8fafc] hover:text-[#111827] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0057a3]',
+    'inline-flex min-h-[2.45rem] items-center justify-center rounded-md border border-[#d1d8df] bg-white px-2 py-1.5 text-xs font-medium text-[#223547] transition hover:border-[#b7c2cf] hover:bg-[#f7f8fa] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#334155] sm:px-2.5 sm:text-sm',
 );
 const examMobileFinishButtonClass = computed(() =>
-    'inline-flex min-h-[2.45rem] items-center justify-center border border-[#d2b35b] bg-[#efc54f] px-3 py-2 text-sm font-semibold leading-tight text-[#463309] transition hover:bg-[#e8bd4c] disabled:cursor-not-allowed disabled:opacity-60',
+    'inline-flex min-h-[2.45rem] items-center justify-center rounded-md border border-[#d1d8df] bg-white px-2 py-1.5 text-xs font-semibold leading-tight text-[#223547] transition hover:border-[#b7c2cf] hover:bg-[#f7f8fa] disabled:cursor-not-allowed disabled:opacity-60 sm:px-3 sm:py-2 sm:text-sm',
 );
 const examContentGridClass = computed(() =>
     isMobileExamLayout.value
-        ? 'grid flex-1 gap-0'
-        : 'grid flex-1 gap-3 xl:gap-2.5 lg:grid-cols-[minmax(0,1fr)_11.5rem] xl:grid-cols-[minmax(0,1fr)_12rem] 2xl:grid-cols-[minmax(0,1fr)_13.25rem]',
+        ? 'grid gap-0'
+        : 'grid flex-1 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]',
 );
 const examQuestionPaneClass = computed(() =>
     isMobileExamLayout.value
         ? 'bg-white'
-        : 'border border-[#d1d8df] bg-white',
+        : 'min-w-0 bg-white',
 );
 const examScopeHeaderClass = computed(() =>
     isMobileExamLayout.value
-        ? 'border-b border-[#e5e7eb] px-4 py-3'
+        ? 'border-b border-[#d1d8df] px-4 py-3'
         : 'border-b border-[#d1d8df] px-3 py-2.5 xl:px-3.5 xl:py-2.5',
 );
 const examMediaOuterClass = computed(() =>
     isMobileExamLayout.value
-        ? 'py-0'
-        : 'px-3 py-3 xl:px-3.5 xl:py-3',
+        ? 'mx-auto w-[calc(100%-2rem)] max-w-[48rem] py-3'
+        : 'mx-auto w-full max-w-[64rem]',
 );
 const examMediaShellClass = computed(() =>
     isMobileExamLayout.value
-        ? 'bg-white'
-        : 'border border-[#d1d8df] bg-white',
+        ? 'overflow-hidden rounded-[7px] border border-[#d1d8df] bg-white'
+        : 'overflow-hidden rounded-[7px] bg-white',
 );
 const examPreviewPanelClass = computed(() =>
     isMobileExamLayout.value
         ? 'flex min-h-[8.75rem] items-center justify-center bg-[#f7f8fa] px-5 py-6 text-center'
-        : 'flex items-center justify-center bg-[#f7f8fa] px-5 py-6 text-center min-h-[9.5rem] sm:min-h-[14rem] xl:min-h-[18rem] 2xl:min-h-[24rem]',
+        : 'flex aspect-video items-center justify-center bg-[#f7f8fa] px-5 py-6 text-center',
 );
 const examMediaPanelClass = computed(() =>
     isMobileExamLayout.value
         ? 'flex min-h-[12rem] items-center justify-center bg-white'
-        : 'flex items-center justify-center bg-white px-3 py-3 min-h-[11rem] sm:min-h-[14rem] xl:min-h-[18rem] 2xl:min-h-[24rem]',
+        : activeQuestion.value?.question_type === 'boolean'
+            ? 'flex aspect-video items-center justify-center bg-white'
+            : 'flex aspect-video max-h-[max(12rem,calc(100dvh-26rem))] items-center justify-center bg-white',
 );
 const examMediaAssetClass = computed(() =>
     isMobileExamLayout.value
-        ? 'max-h-[15rem] w-full object-contain'
-        : 'max-h-[13rem] w-full object-contain sm:max-h-[17rem] lg:max-h-[20rem] xl:max-h-[18rem] 2xl:max-h-[28rem]',
+        ? 'max-h-[min(45dvh,28rem)] w-full object-contain'
+        : 'max-h-full max-w-full object-contain',
 );
 const examPromptBlockClass = computed(() =>
     isMobileExamLayout.value
-        ? 'border-t border-[#e5e7eb] px-4 py-4'
-        : 'border-t border-[#d1d8df] px-3 py-3 xl:px-3.5 xl:py-3',
+        ? 'mx-auto w-full max-w-[48rem] px-4 pt-1 pb-4 text-left'
+        : 'mx-auto w-full max-w-[64rem] pt-4 text-left',
 );
 const examPromptTextClass = computed(() =>
     isMobileExamLayout.value
-        ? 'mt-2.5 text-[1.05rem] leading-7 text-[#111827] [&_strong]:font-semibold [&_strong]:text-inherit'
-        : 'mt-2.5 text-[1rem] leading-6 text-[#111827] xl:text-[0.95rem] [&_strong]:font-semibold [&_strong]:text-inherit',
+        ? 'mt-1 text-[1.03rem] font-semibold leading-7 text-[#111827] [&_strong]:font-semibold [&_strong]:text-inherit'
+        : 'text-[1.03rem] font-semibold leading-7 text-[#111827] [&_strong]:font-semibold [&_strong]:text-inherit',
 );
 
 const syncMobileAnswerDockHeight = () => {
@@ -853,7 +863,7 @@ onBeforeUnmount(() => {
 
     <SessionExpiredNotice v-if="sessionExpired" />
 
-    <SessionExamLayout :lock-viewport="Boolean(activeQuestion)">
+    <SessionExamLayout wide>
         <section :class="examSessionShellClass">
             <p
                 v-if="examRequestError && !sessionExpired"
@@ -891,62 +901,58 @@ onBeforeUnmount(() => {
                 </div>
             </header>
 
-            <header class="hidden border border-[#d1d8df] bg-white lg:block">
-                <div class="flex flex-col gap-2.5 px-3 py-2.5 xl:gap-2 xl:px-2.5 xl:py-2 lg:flex-row lg:items-start lg:justify-between">
-                    <div class="grid gap-2 sm:grid-cols-[11rem_12rem_12rem]">
-                        <div class="border border-[#d1d8df] bg-white px-3 py-2 xl:px-2.5 xl:py-1.5">
-                            <p class="text-[0.63rem] font-medium uppercase tracking-[0.08em] text-[#5f6f82]">
-                                Wartość punktowa
-                            </p>
-                            <p class="mt-1 inline-flex min-w-[2rem] items-center justify-center border border-[#d7dce2] bg-[#f7f8fa] px-2 py-0.5 text-base font-semibold text-[#223547]">
-                                {{ questionValue ?? '-' }}
-                            </p>
-                        </div>
+            <header class="hidden lg:flex lg:flex-wrap lg:items-start lg:justify-between lg:gap-3">
+                <div class="flex flex-wrap gap-2">
+                    <div class="w-40 rounded-lg border border-[#d1d8df] bg-white px-3 py-1.5">
+                        <p class="text-sm text-[#5f6f82]">Aktualna kategoria</p>
+                        <p class="mt-1 text-base font-bold text-[#223547]">
+                            {{ sessionState.license_category_code || '-' }}
+                        </p>
+                    </div>
 
-                        <div class="border border-[#d1d8df] bg-white px-3 py-2 xl:px-2.5 xl:py-1.5">
-                            <p class="text-[0.63rem] font-medium uppercase tracking-[0.08em] text-[#5f6f82]">
-                                Aktualna kategoria
-                            </p>
-                            <p class="mt-1 inline-flex min-w-[2rem] items-center justify-center border border-[#d7dce2] bg-[#f7f8fa] px-2 py-0.5 text-base font-semibold text-[#223547]">
-                                {{ sessionState.license_category_code ? sessionState.license_category_code : '-' }}
-                            </p>
-                        </div>
+                    <div class="w-40 rounded-lg border border-[#d1d8df] bg-white px-3 py-1.5">
+                        <p class="text-sm text-[#5f6f82]">Wartość punktowa</p>
+                        <p class="mt-1 text-base font-bold text-[#223547]">{{ questionValue ?? '-' }}</p>
+                    </div>
 
-                        <div class="border px-3 py-2 xl:px-2.5 xl:py-1.5" :class="examTimerClass">
-                            <p class="text-[0.63rem] font-medium uppercase tracking-[0.08em]">
-                                Czas do końca egzaminu
-                            </p>
-                            <p class="mt-1 inline-flex min-w-[3.5rem] items-center justify-center border border-current bg-white px-2 py-0.5 text-base font-semibold tabular-nums">
-                                {{ examRemainingLabel }}
-                            </p>
+                    <div class="w-52 rounded-lg border px-3 py-1.5" :class="examTimerClass">
+                        <p class="text-sm">Czas do końca egzaminu</p>
+                        <p class="mt-1 text-base font-bold tabular-nums">{{ examRemainingLabel }}</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                    <div class="flex w-52 items-center gap-2 rounded-lg border border-[#d1d8df] bg-white px-3 py-1.5">
+                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full p-[5px]" :style="sectionProgressRingStyle(examUiState.basic.answered, examUiState.basic.total)">
+                            <div class="h-full w-full rounded-full bg-white" />
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-[0.72rem] leading-4 text-[#5f6f82]">Pytania podstawowe</p>
+                            <p class="mt-1 text-sm font-bold tabular-nums text-[#223547]">{{ examUiState.basic.answered }}/{{ examUiState.basic.total }}</p>
                         </div>
                     </div>
 
-                    <div class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-end">
-                        <div class="border border-[#d1d8df] bg-white px-3 py-2 text-sm font-medium text-[#4b5563] xl:px-2.5 xl:py-1.5">
-                            Pytanie {{ questionProgressLabel }}
+                    <div class="flex w-52 items-center gap-2 rounded-lg border border-[#d1d8df] bg-white px-3 py-1.5">
+                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full p-[5px]" :style="sectionProgressRingStyle(examUiState.specialist.answered, examUiState.specialist.total)">
+                            <div class="h-full w-full rounded-full bg-white" />
                         </div>
-                        <button
-                            type="button"
-                            class="border border-[#d2b35b] bg-[#efc54f] px-5 py-2 text-sm font-semibold text-[#463309] transition hover:bg-[#e8bd4c] disabled:cursor-not-allowed disabled:opacity-60 xl:px-4 xl:py-1.5"
-                            :disabled="finishButtonDisabled"
-                            @click="finishExam"
-                        >
-                            {{ finishExamInFlight ? 'Kończę egzamin...' : 'Zakończ egzamin' }}
-                        </button>
+                        <div class="min-w-0">
+                            <p class="text-[0.72rem] leading-4 text-[#5f6f82]">Pytania specjalistyczne</p>
+                            <p class="mt-1 text-sm font-bold tabular-nums text-[#223547]">{{ examUiState.specialist.answered }}/{{ examUiState.specialist.total }}</p>
+                        </div>
                     </div>
                 </div>
             </header>
 
             <div :class="examContentGridClass">
                 <section :class="examQuestionPaneClass">
-                    <div :class="examScopeHeaderClass">
+                    <div v-if="isMobileExamLayout" :class="examScopeHeaderClass">
                         <div class="flex flex-wrap items-center justify-between gap-3">
                             <div>
                                 <p class="text-[0.64rem] font-medium uppercase tracking-[0.08em] text-[#5f6f82]">
                                     {{ currentScopeLabel }}
                                 </p>
-                                <p class="mt-1 text-sm font-medium text-[#374151]">
+                                <p class="exam-mobile-topic mt-1 text-sm font-medium text-[#374151]">
                                     {{ activeQuestion?.topic?.name ?? 'Zakres egzaminacyjny' }}
                                 </p>
                             </div>
@@ -956,7 +962,7 @@ onBeforeUnmount(() => {
                     <div :class="examMediaOuterClass">
                         <div :class="examMediaShellClass">
                             <div
-                                v-if="isBasicPreviewStage"
+                                v-if="isBasicPreviewStage && activeMedia && mediaDisplayUrl(activeMedia)"
                                 :class="examPreviewPanelClass"
                             >
                                 <div class="max-w-md space-y-3">
@@ -999,7 +1005,7 @@ onBeforeUnmount(() => {
 
                                 <div
                                     v-else
-                                    class="flex items-center justify-center px-5 py-7 text-center text-sm text-[#6b7280] min-h-[11rem] sm:min-h-[14rem] xl:min-h-[18rem] 2xl:min-h-[24rem]"
+                                    class="flex min-h-16 items-center justify-center px-5 py-4 text-center text-sm text-[#6b7280]"
                                 >
                                     Brak materialu graficznego dla tego pytania.
                                 </div>
@@ -1008,16 +1014,16 @@ onBeforeUnmount(() => {
                     </div>
 
                     <div :class="examPromptBlockClass">
-                        <p class="text-[0.64rem] font-medium uppercase tracking-[0.08em] text-[#5f6f82]">
+                        <p class="text-[0.64rem] font-medium uppercase tracking-[0.08em] text-[#5f6f82] lg:sr-only">
                             Treść pytania
                         </p>
                         <p
                             :class="examPromptTextClass"
-                            v-html="renderInlineFormattedHtml(activeQuestion?.prompt ?? 'Trwa przygotowanie pytania.')"
+                            v-html="renderExamPromptHtml(activeQuestion?.prompt ?? 'Trwa przygotowanie pytania.')"
                         />
                     </div>
 
-                    <div v-if="!isMobileExamLayout" class="border-t border-[#d1d8df] px-4 py-4 xl:px-3.5 xl:py-3">
+                    <div v-if="!isMobileExamLayout" class="mx-auto mt-4 w-full max-w-[64rem]">
                         <div
                             v-if="isBasicPreviewStage && activeQuestion?.question_type === 'boolean'"
                             class="grid gap-2 sm:grid-cols-2"
@@ -1027,14 +1033,9 @@ onBeforeUnmount(() => {
                                 :key="option.key"
                                 type="button"
                                 disabled
-                                class="flex w-full cursor-not-allowed items-start gap-0 border border-[#d6dce2] bg-[#f7f8fa] text-left text-sm text-[#7b8794]"
+                                class="flex min-h-[3.9rem] w-full cursor-not-allowed items-center justify-center border border-[#d6dce2] bg-[#f7f8fa] px-4 text-center text-base font-semibold text-[#7b8794]"
                             >
-                                <span class="inline-flex min-w-[2.5rem] items-center justify-center self-stretch border-r border-[#d1d8df] bg-[#f0f1f3] px-2 py-2.5 text-xs font-semibold text-[#7b8794]">
-                                    {{ option.label }}
-                                </span>
-                                <span class="px-3 py-2.5 leading-5">
-                                    {{ option.text.toUpperCase() }}
-                                </span>
+                                {{ option.text.toUpperCase() }}
                             </button>
                         </div>
 
@@ -1050,15 +1051,20 @@ onBeforeUnmount(() => {
                                 v-for="option in activeQuestion?.options ?? []"
                                 :key="option.key"
                                 type="button"
-                                class="flex w-full items-start gap-0 border text-left text-sm transition"
-                                :class="answerOptionClass(option.key)"
+                                class="flex min-h-[3.9rem] w-full items-center gap-2 border px-4 text-base font-semibold transition disabled:cursor-not-allowed"
+                                :class="[
+                                    answerOptionClass(option.key),
+                                    activeQuestion?.question_type === 'boolean'
+                                        ? 'justify-center text-center'
+                                        : 'justify-start text-left',
+                                ]"
                                 :disabled="!canSelectAnswer"
                                 @click="selectAnswer(option.key)"
                             >
-                                <span class="inline-flex min-w-[2.5rem] items-center justify-center self-stretch border-r border-[#d1d8df] bg-[#334155] px-2 py-2.5 text-xs font-semibold text-white">
+                                <span v-if="activeQuestion?.question_type !== 'boolean'" class="w-5 shrink-0 font-bold">
                                     {{ option.label }}
                                 </span>
-                                <span class="px-3 py-2.5 leading-5">
+                                <span class="leading-5">
                                     {{
                                         activeQuestion?.question_type === 'boolean'
                                             ? option.text.toUpperCase()
@@ -1070,108 +1076,45 @@ onBeforeUnmount(() => {
                     </div>
                 </section>
 
-                <aside class="hidden space-y-3 lg:block">
-                    <div class="border border-[#d1d8df] bg-white px-3 py-3 xl:px-2.5 xl:py-2.5">
-                        <p class="text-[0.63rem] font-medium uppercase tracking-[0.08em] text-[#5f6f82]">
-                            Bieżące pytanie
-                        </p>
-                        <div class="mt-3 space-y-3 text-sm text-[#111827]">
-                            <div class="flex items-center justify-between gap-3">
-                                <span class="text-[#6b7280]">Nr w sesji</span>
-                                <span class="inline-flex min-w-[4.4rem] items-center justify-center border border-[#d7dce2] bg-[#f7f8fa] px-2 py-0.5 font-semibold text-[#223547]">
-                                    {{ questionProgressLabel }}
-                                </span>
-                            </div>
-                            <div class="flex items-center justify-between gap-3">
-                                <span class="text-[#6b7280]">Źródło</span>
-                                <div class="min-w-0 max-w-[9rem]">
-                                    <span class="inline-flex max-w-full items-center gap-1.5 border border-[#d7dce2] bg-[#f7f8fa] px-2 py-1 text-[0.72rem] font-semibold text-[#223547]">
-                                        <img
-                                            :src="questionSourceEmblem"
-                                            alt=""
-                                            class="h-4 w-4 shrink-0 object-contain"
-                                            aria-hidden="true"
-                                        />
-                                        <span class="truncate">{{ currentQuestionSourceBadgeLabel }}</span>
-                                        <span class="text-[#98a2ad]">-</span>
-                                        <span class="shrink-0 text-[#111827]">{{ currentQuestionSourceNumber }}</span>
-                                    </span>
-                                </div>
-                            </div>
+                <aside class="hidden space-y-5 lg:block lg:pt-7">
+                    <div class="flex min-h-[4.4rem] items-center gap-2 rounded-lg border border-[#d1d8df] bg-white px-3 py-3">
+                        <Clock3 :size="22" :stroke-width="2.5" class="shrink-0 text-[#334155]" aria-hidden="true" />
+                        <div class="min-w-0">
+                            <p class="whitespace-nowrap text-xs leading-4 text-[#5f6f82]">{{ questionStage === 'answer' ? 'Czas na udzielenie odpowiedzi' : stageTitle }}</p>
+                            <p class="mt-1 text-base font-bold tabular-nums text-[#223547]">{{ stageCounterLabel }}</p>
                         </div>
-                    </div>
-
-                    <div class="border border-[#d1d8df] bg-white px-3 py-3 xl:px-2.5 xl:py-2.5">
-                        <p class="text-[0.63rem] font-medium uppercase tracking-[0.08em] text-[#5f6f82]">
-                            Pytania podstawowe
-                        </p>
-                        <p class="mt-2 inline-flex min-w-[3.8rem] items-center justify-center border border-[#d7dce2] bg-[#f7f8fa] px-2 py-0.5 text-sm font-semibold text-[#223547]">
-                            {{ examUiState.basic.answered }} / {{ examUiState.basic.total }}
-                        </p>
-                    </div>
-
-                    <div class="border border-[#d1d8df] bg-white px-3 py-3 xl:px-2.5 xl:py-2.5">
-                        <p class="text-[0.63rem] font-medium uppercase tracking-[0.08em] text-[#5f6f82]">
-                            Pytania specjalistyczne
-                        </p>
-                        <p class="mt-2 inline-flex min-w-[3.8rem] items-center justify-center border border-[#d7dce2] bg-[#f7f8fa] px-2 py-0.5 text-sm font-semibold text-[#223547]">
-                            {{ examUiState.specialist.answered }} / {{ examUiState.specialist.total }}
-                        </p>
-                    </div>
-
-                    <div class="border border-[#d1d8df] bg-white px-3 py-3 xl:px-2.5 xl:py-2.5">
-                        <p class="text-[0.63rem] font-medium uppercase tracking-[0.08em] text-[#5f6f82]">
-                            {{ stageTitle }}
-                        </p>
-
-                        <div v-if="questionStage === 'preview'" class="mt-3 grid grid-cols-[minmax(0,1fr)_4rem] gap-2">
-                            <button
-                                type="button"
-                                class="border border-[#334155] bg-[#334155] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#273445] disabled:cursor-not-allowed disabled:opacity-60"
-                                :disabled="examSyncInFlight"
-                                @click="() => void syncExamState('start-answer')"
-                            >
-                                {{ examSyncInFlight ? 'Ładowanie...' : 'Start' }}
-                            </button>
-
-                            <div class="border border-[#d2b35b] bg-[#efc54f] px-2 py-2 text-center text-sm font-semibold tabular-nums text-[#463309]">
-                                {{ questionRemainingLabel }}
-                            </div>
-                        </div>
-
-                        <div v-else class="mt-3 border border-[#d2b35b] bg-[#efc54f] px-3 py-2 text-center text-lg font-semibold tabular-nums text-[#463309]">
-                            {{ stageCounterLabel }}
-                        </div>
-
-                        <p class="mt-3 text-xs leading-5 text-[#6b7280]">
-                            {{ stageLead }}
-                        </p>
+                        <button
+                            v-if="questionStage === 'preview'"
+                            type="button"
+                            class="ml-auto shrink-0 rounded-md bg-[#334155] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#273445] disabled:opacity-50"
+                            :disabled="examSyncInFlight"
+                            @click="() => void syncExamState('start-answer')"
+                        >
+                            {{ examSyncInFlight ? 'Ładowanie...' : 'Start' }}
+                        </button>
                     </div>
 
                     <button
                         type="button"
-                        class="w-full border border-[#d2b35b] bg-[#efc54f] px-4 py-3 text-sm font-semibold text-[#463309] transition hover:bg-[#e8bd4c] disabled:cursor-not-allowed disabled:border-[#d1d5db] disabled:bg-[#f3f4f6] disabled:text-[#9ca3af] xl:px-3 xl:py-2.5"
+                        class="min-h-[3.75rem] w-full rounded-[4px] border border-[#d2b35b] bg-[#efc54f] px-4 py-3 text-base font-semibold text-[#463309] transition hover:bg-[#e8bd4c] disabled:cursor-not-allowed disabled:border-[#d1d5db] disabled:bg-[#f3f4f6] disabled:text-[#9ca3af]"
                         :disabled="nextButtonDisabled"
                         @click="submitSelectedAnswer"
                     >
                         {{ answerSubmitInFlight ? 'Zapisywanie...' : 'Następne pytanie' }}
                     </button>
 
-                    <div class="border border-[#d1d8df] bg-white px-3 py-3 text-xs leading-5 text-[#6b7280] xl:px-2.5 xl:py-2.5">
-                        Odpowiedź zostanie zapisana po kliknięciu przycisku przejścia do kolejnego pytania.
+                    <div class="flex items-center justify-between gap-4 text-xs text-[#6b7280]">
+                        <span>Pytanie {{ questionProgressLabel }}</span>
+                        <button
+                            type="button"
+                            class="underline underline-offset-2 transition hover:text-[#223547] disabled:opacity-50"
+                            :disabled="finishButtonDisabled"
+                            @click="finishExam"
+                        >
+                            {{ finishExamInFlight ? 'Kończę...' : 'Zakończ egzamin' }}
+                        </button>
                     </div>
-
-                    <div class="border border-[#d1d8df] bg-white px-3 py-3 xl:px-2.5 xl:py-2.5">
-                        <p class="text-[0.63rem] font-medium uppercase tracking-[0.08em] text-[#5f6f82]">
-                            Wynik bieżący
-                        </p>
-                        <p class="mt-2 text-sm font-semibold text-[#111827]">
-                            {{ sessionState.correct_answers_count }} poprawnych odpowiedzi
-                        </p>
-                        <p class="mt-2 text-xs leading-5 text-[#6b7280]">
-                            Do zaliczenia potrzeba {{ examUiState.pass_threshold }} z {{ examUiState.max_points }} punktow.
-                        </p>
-                    </div>
+                    <p class="sr-only">{{ stageLead }}</p>
                 </aside>
             </div>
 
@@ -1187,7 +1130,7 @@ onBeforeUnmount(() => {
                     <template v-if="questionStage === 'answer'">
                         <div>
                             <p class="text-[0.64rem] font-medium uppercase tracking-[0.08em] text-[#5f6f82]">
-                            Odpowiedź
+                                Odpowiedź
                             </p>
                         </div>
 
@@ -1196,7 +1139,7 @@ onBeforeUnmount(() => {
                                 v-for="option in activeQuestion?.options ?? []"
                                 :key="option.key"
                                 type="button"
-                                class="border text-sm transition"
+                                class="border text-[0.95rem] font-semibold transition"
                                 :class="[
                                     answerOptionClass(option.key),
                                     activeQuestion?.question_type === 'boolean'
@@ -1222,7 +1165,7 @@ onBeforeUnmount(() => {
 
                         <button
                             type="button"
-                            class="w-full border border-[#d2b35b] bg-[#efc54f] px-4 py-3 text-sm font-semibold text-[#463309] transition hover:bg-[#e8bd4c] disabled:cursor-not-allowed disabled:border-[#d1d5db] disabled:bg-[#f3f4f6] disabled:text-[#9ca3af]"
+                            class="w-full rounded-[4px] border border-[#d2b35b] bg-[#efc54f] px-4 py-3 text-sm font-semibold text-[#463309] transition hover:bg-[#e8bd4c] disabled:cursor-not-allowed disabled:border-[#d1d5db] disabled:bg-[#f3f4f6] disabled:text-[#9ca3af]"
                             :disabled="nextButtonDisabled"
                             @click="submitSelectedAnswer"
                         >
@@ -1237,13 +1180,13 @@ onBeforeUnmount(() => {
                         <div class="grid grid-cols-[minmax(0,1fr)_5rem] gap-2">
                             <button
                                 type="button"
-                                class="border border-[#334155] bg-[#334155] px-3 py-3 text-sm font-semibold text-white transition hover:bg-[#273445] disabled:cursor-not-allowed disabled:opacity-60"
+                                class="rounded-[4px] border border-[#334155] bg-[#334155] px-3 py-3 text-sm font-semibold text-white transition hover:bg-[#273445] disabled:cursor-not-allowed disabled:opacity-60"
                                 :disabled="examSyncInFlight"
                                 @click="() => void syncExamState('start-answer')"
                             >
                                 {{ examSyncInFlight ? 'Ładowanie...' : 'Start' }}
                             </button>
-                            <div class="border border-[#d2b35b] bg-[#efc54f] px-2 py-3 text-center text-sm font-semibold tabular-nums text-[#463309]">
+                            <div class="rounded-[4px] border border-[#d1d8df] bg-white px-2 py-3 text-center text-sm font-semibold tabular-nums text-[#223547]">
                                 {{ questionRemainingLabel }}
                             </div>
                         </div>
@@ -1253,7 +1196,7 @@ onBeforeUnmount(() => {
                         <p class="text-[0.64rem] font-medium uppercase tracking-[0.08em] text-[#5f6f82]">
                             Etap pytania
                         </p>
-                        <div class="border border-[#d2b35b] bg-[#efc54f] px-3 py-3 text-center text-base font-semibold tabular-nums text-[#463309]">
+                        <div class="rounded-[4px] border border-[#d1d8df] bg-white px-3 py-3 text-center text-base font-semibold tabular-nums text-[#223547]">
                             {{ stageCounterLabel }}
                         </div>
                     </template>
@@ -1265,7 +1208,7 @@ onBeforeUnmount(() => {
                 class="fixed inset-0 z-50 flex items-end bg-[#111827]/45 lg:hidden"
                 @click.self="mobileExamMenuOpen = false"
             >
-                <div class="w-full rounded-t-[1.5rem] border border-[#d9dfe6] bg-white px-4 pt-4 pb-5 shadow-[0_-18px_40px_rgba(15,23,42,0.14)]">
+                <div class="max-h-[calc(100dvh-1rem)] w-full overflow-y-auto overscroll-contain rounded-t-[1.5rem] border border-[#d1d8df] bg-white px-4 pt-4 pb-[calc(env(safe-area-inset-bottom,0px)+1.25rem)]">
                     <div class="mx-auto mb-4 h-1.5 w-14 rounded-full bg-[#d6dce2]" />
 
                     <div class="flex items-center justify-between gap-3">
@@ -1280,7 +1223,7 @@ onBeforeUnmount(() => {
 
                         <button
                             type="button"
-                            class="border border-[#d9dfe6] bg-white px-3 py-2 text-sm font-medium text-[#223547]"
+                            class="rounded-md border border-[#d1d8df] bg-white px-3 py-2 text-sm font-medium text-[#223547]"
                             @click="mobileExamMenuOpen = false"
                         >
                             Zamknij
@@ -1289,7 +1232,7 @@ onBeforeUnmount(() => {
 
                     <div class="mt-4 space-y-3">
                         <div class="grid grid-cols-2 gap-3">
-                            <div class="border border-[#d9dfe6] bg-[#fbfcfd] px-3 py-3">
+                            <div class="rounded-lg border border-[#d1d8df] bg-white px-3 py-3">
                                 <p class="text-[0.64rem] font-medium uppercase tracking-[0.08em] text-[#5f6f82]">
                                     Kategoria
                                 </p>
@@ -1297,7 +1240,7 @@ onBeforeUnmount(() => {
                                     {{ sessionState.license_category_code ? sessionState.license_category_code : '-' }}
                                 </p>
                             </div>
-                            <div class="border border-[#d9dfe6] bg-[#fbfcfd] px-3 py-3">
+                            <div class="rounded-lg border border-[#d1d8df] bg-white px-3 py-3">
                                 <p class="text-[0.64rem] font-medium uppercase tracking-[0.08em] text-[#5f6f82]">
                                     Punkty
                                 </p>
@@ -1307,7 +1250,7 @@ onBeforeUnmount(() => {
                             </div>
                         </div>
 
-                        <div class="border border-[#d9dfe6] bg-[#fbfcfd] px-3 py-3">
+                        <div class="rounded-lg border border-[#d1d8df] bg-white px-3 py-3">
                             <p class="text-[0.64rem] font-medium uppercase tracking-[0.08em] text-[#5f6f82]">
                                 Bieżące pytanie
                             </p>
@@ -1336,7 +1279,7 @@ onBeforeUnmount(() => {
                                             <p class="mt-1 text-sm text-[#4b5563]">
                                                 {{ currentQuestionSourceDescription }}
                                             </p>
-                                            <p class="mt-1 whitespace-nowrap text-[0.92rem] font-semibold tracking-[0.02em] text-[#111827]">
+                                            <p class="mt-1 break-all text-[0.92rem] font-semibold tracking-[0.02em] text-[#111827]">
                                                 {{ currentQuestionSourceNumber }}
                                             </p>
                                         </div>
@@ -1346,7 +1289,7 @@ onBeforeUnmount(() => {
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
-                            <div class="border border-[#d9dfe6] bg-[#fbfcfd] px-3 py-3">
+                            <div class="rounded-lg border border-[#d1d8df] bg-white px-3 py-3">
                                 <p class="text-[0.64rem] font-medium uppercase tracking-[0.08em] text-[#5f6f82]">
                                     Podstawowe
                                 </p>
@@ -1354,7 +1297,7 @@ onBeforeUnmount(() => {
                                     {{ examUiState.basic.answered }} / {{ examUiState.basic.total }}
                                 </p>
                             </div>
-                            <div class="border border-[#d9dfe6] bg-[#fbfcfd] px-3 py-3">
+                            <div class="rounded-lg border border-[#d1d8df] bg-white px-3 py-3">
                                 <p class="text-[0.64rem] font-medium uppercase tracking-[0.08em] text-[#5f6f82]">
                                     Specjalistyczne
                                 </p>
@@ -1364,7 +1307,7 @@ onBeforeUnmount(() => {
                             </div>
                         </div>
 
-                        <div class="border border-[#d9dfe6] bg-[#fbfcfd] px-3 py-3">
+                        <div class="rounded-lg border border-[#d1d8df] bg-white px-3 py-3">
                             <p class="text-[0.64rem] font-medium uppercase tracking-[0.08em] text-[#5f6f82]">
                                 Wynik bieżący
                             </p>
@@ -1381,3 +1324,14 @@ onBeforeUnmount(() => {
         </section>
     </SessionExamLayout>
 </template>
+
+<style scoped>
+@media (max-width: 639px) {
+    .exam-mobile-topic {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+    }
+}
+</style>
