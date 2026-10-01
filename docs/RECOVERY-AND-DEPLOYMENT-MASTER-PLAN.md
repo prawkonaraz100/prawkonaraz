@@ -176,7 +176,7 @@ zawiera sekretów ani danych produkcyjnych.
 - [x] Nie przechowywać pełnej kopii produkcji ani wielkich paczek wdrożeniowych
   jako artefaktów GitHub Actions.
 
-Aktualny wynik pierwszego PR:
+Historyczny wynik pierwszego PR:
 
 - pull request `#1` naprawia uruchamianie odzyskanej bazy w CI oraz rozbieżności
   ujawnione przez pierwszy przebieg,
@@ -188,8 +188,29 @@ Aktualny wynik pierwszego PR:
   9 min 14 s,
 - lokalny Docker montuje teraz także katalog `scripts`, dzięki czemu Pint nie
   sprawdza już jego nieaktualnej kopii zapisanej w obrazie,
-- PR pozostaje otwarty; jego połączenie z `main` wymaga osobnej decyzji
-  użytkownika i nie uruchamia automatycznego deploymentu.
+- PR `#1` został połączony z `main` 2026-09-03 w commicie
+  `5e795b05a36a0d03469fff0ea846e23f70a12729`; sam merge nie uruchomił
+  automatycznego deploymentu.
+
+### Aktualna weryfikacja CI — 2026-09-15
+
+- `main@4b10738705f3696bc2bcce730a707473eab8cd2b` nie ma obecnie zielonego
+  wyniku CI. Run `34348998381` z 2026-09-09 doszedł do pełnego backendowego
+  test suite i zakończył się wynikiem **830 passed / 4 failed / 2 skipped
+  (18226 assertions)**.
+- Trzy failure'y dotyczyły `ContactMessageTest`: żądania testowe otrzymały
+  HTTP `429` od throttlingu zamiast oczekiwanych redirectów / error bag.
+- Czwarty failure dotyczył `TrafficSignPagesTest`: hub znaków nie zawierał
+  oczekiwanego tekstu `Nauka`.
+- Przebiegi dokumentacyjnego PR `#6` od run `34995086557` (#19) do
+  `35002036529` (#25) powtarzały ten sam wzorzec awarii podczas inicjalizacji
+  joba `quality`: runner nie został przydzielony, a job miał **0 kroków**.
+  Tych przebiegów nie wolno traktować jako test evidence kodu ani dokumentacji;
+  przed merge trzeba sprawdzić najnowszy run dla aktualnego headu PR.
+- Bieżący PR `#6` zmienia wyłącznie dokumentację OSK/recovery. Powyższe
+  runtime failures na `main` są odnotowane jako istniejący baseline i nie są
+  naprawiane w tym dokumentacyjnym kroku.
+
 
 Warunek zakończenia: zielony CI potwierdza, że świeży checkout można zbudować i
 przetestować bez dostępu do sekretów produkcyjnych.
@@ -252,6 +273,24 @@ Warunek zakończenia: wyczerpanie limitu Actions lub awaria GitHuba nie blokuje
 kontrolowanego deploymentu z dysku F.
 
 ### Etap 6 — odzyskanie niedokończonego modułu OSK
+
+**Stan weryfikacji 2026-09-15 — aktualna implementacja, bez zmiany decyzji architektonicznych:**
+
+- [x] Zweryfikowano aktualne `main@4b10738705f3696bc2bcce730a707473eab8cd2b`
+  oraz branch `docs/osk-learning-flow-verification-2026-09-15`.
+- [x] Potwierdzono, że dostępne drzewo kodu nie zawiera runtime'u OSK opisanego
+  w odzyskanych dokumentach: brak trasy `/osk/nauka/{...}`, katalogu
+  `resources/js/Pages/Osk`, `LessonPlayer.vue`, `TheoryLearningController`
+  i `PublishedCourseProgramPayloadBuilder`.
+- [x] Potwierdzono, że dokumentacja w
+  `docs/recovered-from-old-project-2026-09-03/osk` pozostaje historycznym
+  snapshotem; jej sierpniowe statusy implementacyjne nie są dowodem stanu
+  aktualnego `main`.
+- [!] Ta weryfikacja nie oznacza odzyskania kodu OSK ani zakończenia Etapu 6.
+  Nie wolno rekonstruować bieżącego statusu implementacji wyłącznie z dokumentacji.
+- [ ] Nadal trzeba wskazać rzeczywisty working tree / commit uruchamiany lokalnie
+  dla `/osk/nauka/...`, zanim będzie można porównać zachowanie runtime z
+  kontraktami Etapów 4B/5D/5E/5G.
 
 - [ ] Utworzyć gałąź `recovery/osk-after-crash` z aktualnego `main`.
 - [ ] Sporządzić inwentarz możliwych do odzyskania commitów, obiektów i plików ze
@@ -320,13 +359,20 @@ Przed pierwszym wdrożeniem zmian wykonanych po odzyskaniu muszą być spełnion
 
 ## 9. Najbliższy następny krok
 
-**Przejrzeć zakres PR `#1`, włączyć ochronę gałęzi `main`, a następnie połączyć
-PR dopiero po jawnej decyzji użytkownika.**
+**Bieżący krok po weryfikacji z 2026-09-15:** zidentyfikować rzeczywisty working
+tree / commit uruchamiający lokalny `/osk/nauka/...`. Dopiero w tym drzewie
+należy prześledzić `LessonPlayer -> zapis ostatniego kroku -> progress ->
+session close / heartbeat -> następna lekcja lub dział` i porównać zachowanie
+z odzyskanymi kontraktami OSK.
 
-Zielony CI nie jest zgodą na deployment. Przed pierwszym wdrożeniem nadal trzeba
-przygotować zweryfikowany backup, wersjonowane wydania, procedurę rollbacku oraz
-osobnego użytkownika `deploy`. Odzyskiwanie OSK powinno otrzymać osobną gałąź po
-ustabilizowaniu bazy w `main`.
+Do tego czasu nie odzyskiwać ani nie promować modułu OSK do `main` na podstawie
+samej dokumentacji historycznej.
+
+**Historia:** 2026-09-03 najbliższym krokiem był przegląd i merge PR `#1`.
+PR `#1` został później połączony do `main` w commicie
+`5e795b05a36a0d03469fff0ea846e23f70a12729`, więc ten punkt nie jest już
+bieżącym zadaniem. Zielony CI nadal nie jest zgodą na deployment; wymagania
+backup/rollback i osobnej decyzji o wdrożeniu pozostają bez zmian.
 
 ## 10. Jak aktualizować ten dokument
 
@@ -350,6 +396,7 @@ Po zakończeniu zadania agent powinien:
 | 2026-09-03 | Zweryfikowano historię przed publikacją i świeże klonowanie | Gitleaks 8.30.1, `git fsck --full --strict` |
 | 2026-09-03 | Uruchomiono pierwszy PR i ujawniono stan testów odzyskanej bazy | PR `#1`, 743 zaliczone / 69 niezaliczonych / 2 pominięte |
 | 2026-09-03 | Doprowadzono główny pipeline PR do stanu zielonego | PR `#1`, commit `2d64b73`, run `33803149375`, 814 testów, Pint 922 pliki, build OK |
+| 2026-09-15 | Zweryfikowano bieżący stan odzyskanego modułu OSK względem dostępnego kodu; potwierdzono brak runtime'u OSK w aktualnym `main` i pozostawiono status odzyskania jako otwarty | `main@4b107387`, branch `docs/osk-learning-flow-verification-2026-09-15`, audyt drzewa 3209 wpisów |
 
 ## 12. Dokumenty powiązane
 
