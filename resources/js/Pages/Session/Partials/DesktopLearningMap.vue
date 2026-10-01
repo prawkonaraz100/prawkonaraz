@@ -3,8 +3,9 @@ import CourseModules from '@/Pages/QuestionCollections/Partials/CourseModules.vu
 import { topicArtworkForKey } from '@/lib/topicArtwork';
 import type { PageProps } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { GraduationCap, RotateCcw } from '@lucide/vue';
+import { BookOpen, Brain, BriefcaseBusiness, ClipboardCheck, GraduationCap, List, Map, RotateCcw, Trophy } from '@lucide/vue';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import learningPathLandscape from '../../../../images/session/learning-path-landscape-v1.png';
 import rocketButtonIcon from '../../../../images/session/rocket-button.png';
 
 type LearningPath = 'pjm' | 'traffic-signs' | 'classic' | 'zen' | 'exam' | 'memory' | 'ranking';
@@ -147,10 +148,9 @@ const emit = defineEmits<{
 
 const isTopicLearningPath = computed(() => props.isClassicPath || props.isZenPath);
 const page = usePage<PageProps>();
-const pathViewMode = ref<PathViewMode>('map');
+const pathViewMode = ref<PathViewMode>('list');
 const pathViewStorageKey = computed(() => `prawkonaraz.learning-path-view.v1.${page.props.auth.user?.id ?? 'guest'}`);
 const isSessionSetupOpen = ref(Boolean(props.errors.licenseCategory || props.errors.topic || props.errors.status));
-const isNavigationCollapsed = ref(true);
 const selectedProfessionalCourseCode = ref<string | null>(
     props.professionalCourses.some((course) => course.code === props.initialProfessionalCourseCode)
         ? props.initialProfessionalCourseCode
@@ -159,9 +159,6 @@ const selectedProfessionalCourseCode = ref<string | null>(
 const hiddenSessionStatusValues = new Set(['correct', 'memorized']);
 const visibleSessionStatusOptions = computed(() =>
     props.statusOptions.filter((option) => !hiddenSessionStatusValues.has(option.value)),
-);
-const sidebarLearningPathTabs = computed(() =>
-    props.learningPathTabs.filter((tab) => tab.value !== 'memory'),
 );
 const mapTopics = computed(() => props.filteredGroupOptions.flatMap((group) => group.options));
 const specialistTopicIds = computed(() =>
@@ -176,6 +173,9 @@ const selectedTopic = computed(() =>
 );
 const selectedProfessionalCourse = computed(() =>
     props.professionalCourses.find((course) => course.code === selectedProfessionalCourseCode.value) ?? null,
+);
+const topLearningPathTabs = computed(() =>
+    props.learningPathTabs.filter((tab) => tab.value === 'classic' || tab.value === 'zen' || tab.value === 'exam'),
 );
 const firstUnansweredTopicId = computed(() =>
     mapTopics.value.find((topic) => (topic.counts.unanswered ?? 0) > 0)?.id ?? null,
@@ -231,9 +231,9 @@ const mapRoutePath = computed(() => {
 
     return path;
 });
-const mapProgressStyle = computed(() => ({
-    background: `conic-gradient(#1e73e8 0deg ${props.courseProgressPercent * 3.6}deg, #e5edf0 ${props.courseProgressPercent * 3.6}deg 360deg)`,
-}));
+function toggleQuestionScope(scope: Exclude<QuestionScope, 'all'>): void {
+    emit('selectScope', props.selectedScope === scope ? 'all' : scope);
+}
 
 function openSessionSetup(topicId: number): void {
     emit('selectTopic', topicId);
@@ -298,27 +298,17 @@ function selectLearningPath(path: LearningPath): void {
 }
 
 function selectProfessionalCourse(courseCode: string): void {
+    if (!props.professionalCourses.some((course) => course.code === courseCode)) {
+        return;
+    }
+
     closeSessionSetup();
     selectedProfessionalCourseCode.value = courseCode;
     updateProfessionalCourseUrl(courseCode);
 }
 
-function expandNavigation(): void {
-    isNavigationCollapsed.value = false;
-}
-
-function collapseNavigation(): void {
-    isNavigationCollapsed.value = true;
-}
-
-function handleNavigationFocusOut(event: FocusEvent): void {
-    const nextFocusedElement = event.relatedTarget;
-
-    if (nextFocusedElement instanceof Node && event.currentTarget instanceof HTMLElement && event.currentTarget.contains(nextFocusedElement)) {
-        return;
-    }
-
-    collapseNavigation();
+function onProfessionalCourseChange(event: Event): void {
+    selectProfessionalCourse((event.target as HTMLSelectElement).value);
 }
 
 function handleKeydown(event: KeyboardEvent): void {
@@ -338,11 +328,11 @@ watch(
 
 onMounted(() => {
     try {
-        if (window.localStorage.getItem(pathViewStorageKey.value) === 'list') {
-            pathViewMode.value = 'list';
+        if (window.localStorage.getItem(pathViewStorageKey.value) === 'map') {
+            pathViewMode.value = 'map';
         }
     } catch {
-        // Keep the default map view when browser storage is unavailable.
+        // Keep the default list view when browser storage is unavailable.
     }
 
     window.addEventListener('keydown', handleKeydown);
@@ -445,215 +435,234 @@ function topicArtworkFor(topic: TopicOption): string | null {
 </script>
 
 <template>
-    <section class="hidden bg-[#fbfcfd] md:block" aria-label="Panel nauki">
-        <div class="w-full">
-            <div
-                class="grid min-h-[calc(100vh-6.5rem)] transition-[grid-template-columns] duration-200 ease-out"
-                :class="isNavigationCollapsed ? 'md:grid-cols-[4.75rem_minmax(0,1fr)]' : 'md:grid-cols-[14.5rem_minmax(0,1fr)]'"
-            >
-                <aside
-                    class="flex min-h-full flex-col border-r border-[#e5eaed] bg-[#fdfefe] py-4 transition-[padding] duration-200 ease-out"
-                    :class="isNavigationCollapsed ? 'px-2' : 'px-3 xl:px-4'"
-                    aria-label="Tryby nauki"
-                    @mouseenter="expandNavigation"
-                    @mouseleave="collapseNavigation"
-                    @focusin="expandNavigation"
-                    @focusout="handleNavigationFocusOut"
-                >
-                    <nav class="space-y-1" aria-label="Tryby nauki">
-                        <button
-                            v-for="tab in sidebarLearningPathTabs"
-                            :key="tab.value"
-                            type="button"
-                            class="group relative flex min-h-12 w-full items-center gap-3 rounded-[10px] text-left transition-[background-color,color,transform] duration-150 hover:bg-[#f1f4f5] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ef3b26] disabled:cursor-not-allowed disabled:opacity-45"
-                            :class="selectedPath === tab.value
-                                ? `${isNavigationCollapsed ? 'justify-center px-0' : 'px-2.5'} bg-[#eef1f3] text-[#101820]`
-                                : `${isNavigationCollapsed ? 'justify-center px-0' : 'px-2.5'} text-[#66737d] hover:text-[#101820]`"
-                            :disabled="tab.disabled"
-                            :aria-pressed="selectedPath === tab.value"
-                            :aria-label="isNavigationCollapsed ? `${tab.label}: ${tab.summary}` : undefined"
-                            :title="isNavigationCollapsed ? `${tab.label}: ${tab.summary}` : undefined"
-                            @click="selectLearningPath(tab.value)"
-                        >
-                            <span
-                                class="grid h-10 min-w-10 place-items-center text-[#596771] transition-transform duration-150 group-hover:scale-105 group-hover:text-[#101820]"
-                                :class="selectedPath === tab.value ? 'text-[#101820]' : ''"
-                                aria-hidden="true"
-                            >
-                                <svg v-if="tab.value === 'classic'" class="h-6 w-6" viewBox="0 0 24 24" fill="none">
-                                    <path d="M4 5.75A2.75 2.75 0 0 1 6.75 3H10v17H6.75A2.75 2.75 0 0 0 4 22V5.75Zm16 0A2.75 2.75 0 0 0 17.25 3H14v17h3.25A2.75 2.75 0 0 1 20 22V5.75Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
-                                </svg>
-                                <svg v-else-if="tab.value === 'zen'" class="h-6 w-6" viewBox="0 0 24 24" fill="none">
-                                    <circle cx="12" cy="12" r="3.25" stroke="currentColor" stroke-width="1.8" />
-                                    <path d="M12 3v2.25M12 18.75V21M3 12h2.25M18.75 12H21M5.64 5.64l1.6 1.6m9.52 9.52 1.6 1.6m0-12.72-1.6 1.6m-9.52 9.52-1.6 1.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-                                </svg>
-                                <svg v-else-if="tab.value === 'memory'" class="h-6 w-6" viewBox="0 0 24 24" fill="none">
-                                    <path d="M9.1 18.5H8a4 4 0 0 1-1.2-7.82A5.25 5.25 0 0 1 16.9 9a4 4 0 0 1-.9 7.84h-1.1M12 7.5v9M9.75 10.5h4.5M10 20.5h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                                <svg v-else-if="tab.value === 'exam'" class="h-6 w-6" viewBox="0 0 24 24" fill="none">
-                                    <rect x="5" y="3.5" width="14" height="17" rx="2.25" stroke="currentColor" stroke-width="1.8" />
-                                    <path d="M9 3.5h6v3H9v-3Zm1 10 1.5 1.5 3-3M9 17h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                                <svg v-else class="h-6 w-6" viewBox="0 0 24 24" fill="none">
-                                    <path d="M12 3.5 20 8v8l-8 4.5L4 16V8l8-4.5ZM8.5 10.5l3.5 2 3.5-2M12 12.5V17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </span>
-                            <span v-if="!isNavigationCollapsed" class="min-w-0">
-                                <span class="block truncate text-[0.84rem] font-semibold leading-5">{{ tab.label }}</span>
-                                <span class="block truncate text-[0.71rem] leading-4" :class="selectedPath === tab.value ? 'text-[#697681]' : 'text-[#8a969e]'">{{ tab.summary }}</span>
-                            </span>
-                        </button>
-                    </nav>
-
-                    <div v-if="professionalCourses.length > 0" class="mt-6 border-t border-[#e8edef] pt-4">
-                        <p
-                            v-if="!isNavigationCollapsed"
-                            class="px-2.5 text-[0.64rem] font-semibold uppercase tracking-[0.1em] text-[#87929b]"
-                        >
-                            Kursy zawodowe
-                        </p>
-                        <div class="mt-2 space-y-1">
-                            <button
-                                v-for="course in professionalCourses"
-                                :key="course.id"
-                                type="button"
-                                class="group relative flex min-h-12 w-full items-center gap-3 rounded-[10px] text-left transition-[background-color,color,transform] duration-150 hover:bg-[#f1f4f5] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ef3b26]"
-                                :class="selectedProfessionalCourse?.code === course.code
-                                    ? `${isNavigationCollapsed ? 'justify-center px-0' : 'px-2.5'} bg-[#eef1f3] text-[#101820]`
-                                    : `${isNavigationCollapsed ? 'justify-center px-0' : 'px-2.5'} text-[#66737d] hover:text-[#101820]`"
-                                :aria-pressed="selectedProfessionalCourse?.code === course.code"
-                                :aria-label="isNavigationCollapsed ? `Kurs zawodowy: ${course.name}` : undefined"
-                                :title="isNavigationCollapsed ? `Kurs zawodowy: ${course.name}` : undefined"
-                                @click="selectProfessionalCourse(course.code)"
-                            >
-                                <span
-                                    class="grid h-10 min-w-10 place-items-center text-[#596771] transition-transform duration-150 group-hover:scale-105 group-hover:text-[#101820]"
-                                    :class="selectedProfessionalCourse?.code === course.code ? 'text-[#101820]' : ''"
-                                    aria-hidden="true"
-                                >
-                                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none">
-                                        <rect x="4" y="7" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.8" />
-                                        <path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7m-11 4h16M10 11v2h4v-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                </span>
-                                <span v-if="!isNavigationCollapsed" class="min-w-0">
-                                    <span class="block truncate text-[0.84rem] font-semibold leading-5">{{ course.name }}</span>
-                                    <span class="block truncate text-[0.71rem] leading-4 text-[#8a969e]">{{ course.modules.length }} modułów</span>
-                                </span>
-                            </button>
-                        </div>
-                    </div>
-
-                </aside>
-
-                <main class="min-w-0">
+    <section class="hidden bg-transparent md:block" aria-label="Panel nauki">
+        <main class="min-w-0">
 
             <section
                 v-if="activeSession"
-                class="flex flex-wrap items-center justify-between gap-4 bg-[#101820] px-6 py-4 text-white xl:px-9"
+                class="mx-auto w-full max-w-[82rem] px-4 pt-3 sm:px-6 xl:px-7"
                 aria-label="Aktywna sesja"
             >
-                <div class="min-w-0">
-                    <p class="text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-white/62">Bieżąca sesja</p>
-                    <p class="mt-1 truncate text-[1rem] font-semibold">{{ activeSession.title }}</p>
-                    <p class="mt-1 text-sm text-white/70">
-                        {{ activeSession.subtitle }} · {{ activeSession.progress.answered }}/{{ activeSession.progress.total }} pytań
-                    </p>
+                <div class="flex w-full max-w-[58rem] flex-wrap items-center gap-4 rounded-2xl border border-[#dfe7f0] bg-white/95 px-4 py-3 sm:flex-nowrap sm:gap-5">
+                    <div class="flex min-w-0 flex-1 items-center gap-3">
+                        <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#eaf2ff] text-[#0d5cc6]" aria-hidden="true">
+                            <RotateCcw :size="20" :stroke-width="1.8" />
+                        </span>
+                        <div class="min-w-0">
+                            <p class="text-[0.65rem] font-bold uppercase tracking-[0.1em] text-[#64799a]">Bieżąca sesja</p>
+                            <p class="mt-0.5 truncate text-sm font-bold text-[#071b45]">{{ activeSession.title }}</p>
+                            <p class="truncate text-xs text-[#53698b]">{{ activeSession.subtitle }} · {{ activeSession.progress.answered }}/{{ activeSession.progress.total }} pytań</p>
+                        </div>
+                    </div>
+                    <div class="w-24 shrink-0" role="progressbar" aria-label="Postęp bieżącej sesji" :aria-valuenow="activeSession.progress.percent" aria-valuemin="0" aria-valuemax="100">
+                        <p class="mb-1 text-right text-xs font-semibold text-[#53698b]">{{ activeSession.progress.percent }}%</p>
+                        <div class="h-1.5 overflow-hidden rounded-full bg-[#e7edf2]">
+                            <span class="block h-full rounded-full bg-[#00cf85]" :style="{ width: `${activeSession.progress.percent}%` }" />
+                        </div>
+                    </div>
+                    <Link
+                        :href="activeSession.resume_url"
+                        class="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#071b45] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#12346e] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0876f8] focus-visible:ring-offset-2"
+                    >
+                        Wróć do sesji <span aria-hidden="true">→</span>
+                    </Link>
                 </div>
-                <Link
-                    :href="activeSession.resume_url"
-                    class="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-[5px] bg-white px-5 text-sm font-semibold text-[#101820] transition hover:bg-[#f1f4f6] focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#101820]"
-                >
-                    Wróć do sesji <span aria-hidden="true">→</span>
-                </Link>
             </section>
 
-            <template v-if="selectedProfessionalCourse">
-                <section class="min-h-[calc(100vh-6.5rem)] bg-[#fbfcfd] px-4 py-5 sm:px-6 xl:py-6" aria-label="Kurs zawodowy">
-                    <div class="mx-auto max-w-[64rem]">
-                        <header class="border-b border-[#d7dde1] pb-4">
-                            <p class="text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-[#667085]">Kurs zawodowy</p>
-                            <div class="mt-1 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-                                <h2 class="text-xl font-semibold leading-tight text-[#101820] sm:text-2xl">{{ selectedProfessionalCourse.name }}</h2>
-                                <span v-if="selectedProfessionalCourse.category_name" class="text-sm font-medium text-[#667085]">{{ selectedProfessionalCourse.category_name }}</span>
-                            </div>
-                            <p v-if="selectedProfessionalCourse.description" class="mt-2 text-sm leading-5 text-[#667085]">{{ selectedProfessionalCourse.description }}</p>
-                            <dl class="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-[#475467]">
-                                <div class="flex gap-1"><dt>Przerobione:</dt><dd class="font-semibold text-[#101820]">{{ selectedProfessionalCourse.progress.answered_count }}/{{ selectedProfessionalCourse.progress.total_questions }}</dd></div>
-                                <div class="flex gap-1"><dt>Ukończenie:</dt><dd class="font-semibold text-[#101820]">{{ selectedProfessionalCourse.progress.percent }}%</dd></div>
-                                <div class="flex gap-1"><dt>Do poprawy:</dt><dd class="font-semibold text-[#101820]">{{ selectedProfessionalCourse.incorrect_questions.count }}</dd></div>
-                            </dl>
-                            <div class="mt-3 h-1.5 overflow-hidden rounded-full bg-[#e6e8e9]" role="progressbar" :aria-valuenow="selectedProfessionalCourse.progress.percent" aria-valuemin="0" aria-valuemax="100" aria-label="Postęp kursu">
-                                <span class="block h-full rounded-full bg-[#00d88b] transition-[width] duration-300" :style="{ width: `${selectedProfessionalCourse.progress.percent}%` }" />
-                            </div>
-                        </header>
-
-                        <CourseModules
-                            compact
-                            :modules="selectedProfessionalCourse.modules"
-                            :active-session="activeSession"
-                            :review-count="selectedProfessionalCourse.incorrect_questions.count"
-                            :review-url="selectedProfessionalCourse.incorrect_questions.url"
-                        />
-                    </div>
-                </section>
-            </template>
-
-            <template v-else-if="isTopicLearningPath">
+            <template v-if="selectedProfessionalCourse || isTopicLearningPath || isExamPath">
                 <section class="min-w-0" aria-label="Ścieżka nauki">
-                    <div class="min-h-[calc(100vh-6.5rem)] overflow-hidden bg-[#fbfcfd] px-4 py-5 sm:px-6 xl:px-10 xl:py-6">
-                        <header class="flex flex-wrap items-start justify-between gap-4">
-                            <div class="border-l-[4px] border-[#1e73e8] pl-3.5">
-                                <h1 class="text-[1.05rem] font-semibold leading-5 text-[#172029] xl:text-[1.2rem]">
-                                    Ścieżka nauki
-                                </h1>
-                                <p class="mt-0.5 text-[0.75rem] font-medium text-[#74818b] xl:text-[0.8rem]">
-                                    {{ mapTopics.length }} działów · Ucz się krok po kroku
-                                </p>
-                                <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.66rem] font-semibold text-[#65727d]">
-                                    <span class="inline-flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-[#1e73e8]" aria-hidden="true" />Pytania podstawowe</span>
-                                    <span class="inline-flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-[#ef7d24]" aria-hidden="true" />Pytania specjalistyczne</span>
+                    <div class="min-h-[calc(100vh-6.5rem)] bg-transparent">
+                        <div class="mx-auto w-full max-w-[82rem] px-4 pb-8 pt-3 sm:px-6 xl:px-7">
+                            <header class="relative z-20 min-h-[14rem]" aria-label="Postęp ścieżki nauki">
+                                <div
+                                    class="pointer-events-none absolute inset-0"
+                                    :style="{
+                                        maskImage: 'linear-gradient(to right, transparent, #000 38%, #000 78%, transparent)',
+                                        WebkitMaskImage: 'linear-gradient(to right, transparent, #000 38%, #000 78%, transparent)',
+                                    }"
+                                    aria-hidden="true"
+                                >
+                                    <div
+                                        class="absolute inset-0 bg-cover bg-right bg-no-repeat"
+                                        :style="{
+                                            backgroundImage: `url(${learningPathLandscape})`,
+                                            maskImage: 'linear-gradient(to bottom, transparent, #000 12%, #000 68%, transparent)',
+                                            WebkitMaskImage: 'linear-gradient(to bottom, transparent, #000 12%, #000 68%, transparent)',
+                                        }"
+                                    ></div>
+                                </div>
+                                <div class="relative flex min-h-[14rem] flex-wrap items-center justify-between gap-5 px-2 py-6 lg:flex-nowrap lg:px-3">
+                                    <div class="max-w-[39rem]">
+                                        <h1 class="text-[clamp(2.25rem,3.4vw,3.4rem)] font-bold leading-[1.05] tracking-tight text-[#071b45]">{{ selectedProfessionalCourse ? 'Kurs zawodowy' : 'Ścieżka nauki' }}</h1>
+                                        <p class="mt-2 text-[clamp(0.95rem,1.25vw,1.18rem)] leading-snug text-[#53698b]">{{ selectedProfessionalCourse ? selectedProfessionalCourse.name : `${mapTopics.length} działów · Ucz się krok po kroku, od podstaw do egzaminu.` }}</p>
+                                        <div v-if="!selectedProfessionalCourse" class="mt-6 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm font-medium text-[#263b61]" role="group" aria-label="Filtruj działy według typu pytań">
+                                            <button
+                                                type="button"
+                                                class="inline-flex min-h-9 items-center gap-2 rounded-md border border-transparent px-2.5 transition hover:bg-white/55 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#071b45] focus-visible:ring-offset-2"
+                                                :class="selectedScope === 'all' ? 'border-[#dfe5ec] bg-white/70' : ''"
+                                                :aria-pressed="selectedScope === 'all'"
+                                                title="Pokaż wszystkie pytania"
+                                                @click="emit('selectScope', 'all')"
+                                            >
+                                                <span class="h-4 w-4 rounded-full bg-[#6f7f96]" aria-hidden="true" />
+                                                <span>Wszystkie</span>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="inline-flex min-h-9 items-center gap-2 rounded-md border border-transparent px-2.5 transition hover:bg-white/55 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0876f8] focus-visible:ring-offset-2"
+                                                :class="selectedScope === 'basic' ? 'border-[#d9e6f8] bg-white/70' : ''"
+                                                :aria-pressed="selectedScope === 'basic'"
+                                                title="Pokaż tylko pytania podstawowe"
+                                                @click="toggleQuestionScope('basic')"
+                                            >
+                                                <span class="h-4 w-4 rounded-full bg-[#0876f8]" aria-hidden="true" />
+                                                <span>Pytania podstawowe</span>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="inline-flex min-h-9 items-center gap-2 rounded-md border border-transparent px-2.5 transition hover:bg-white/55 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ff9f2e] focus-visible:ring-offset-2"
+                                                :class="selectedScope === 'specialist' ? 'border-[#f2dfc8] bg-white/70' : ''"
+                                                :aria-pressed="selectedScope === 'specialist'"
+                                                title="Pokaż tylko pytania specjalistyczne"
+                                                @click="toggleQuestionScope('specialist')"
+                                            >
+                                                <span class="h-4 w-4 rounded-full bg-[#ff9f2e]" aria-hidden="true" />
+                                                <span>Pytania specjalistyczne</span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid w-full max-w-[26rem] grid-cols-[minmax(0,1fr)_8.75rem] gap-x-4 rounded-2xl border border-white/80 bg-white/95 px-5 py-4 shadow-[0_14px_38px_rgba(32,65,105,0.12)] backdrop-blur-sm">
+                                        <div>
+                                            <p class="text-sm font-semibold text-[#0b1d42]">{{ selectedProfessionalCourse ? 'Postęp kursu' : 'Twój postęp' }}</p>
+                                            <p class="mt-0.5 text-[2rem] font-bold leading-none text-[#071b45]">{{ selectedProfessionalCourse?.progress.percent ?? courseProgressPercent }}%</p>
+                                            <div class="mt-2 h-2 overflow-hidden rounded-full bg-[#e7edf2]" role="progressbar" :aria-label="selectedProfessionalCourse ? 'Postęp kursu' : 'Twój postęp'" :aria-valuenow="selectedProfessionalCourse?.progress.percent ?? courseProgressPercent" aria-valuemin="0" aria-valuemax="100">
+                                                <span class="block h-full rounded-full bg-[#00cf85] transition-[width] duration-300" :style="{ width: `${selectedProfessionalCourse?.progress.percent ?? courseProgressPercent}%` }" />
+                                            </div>
+                                        </div>
+                                        <div class="group relative border-l border-[#e1e9f0] pl-4">
+                                            <p class="flex items-center gap-1 text-xs text-[#53698b]">
+                                                {{ selectedProfessionalCourse ? 'Moduły' : 'Działy zaliczone' }}
+                                                <button v-if="!selectedProfessionalCourse" type="button" class="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[#53698b] hover:text-[#071b45] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0876f8]" aria-label="Kiedy dział jest zaliczony?" aria-describedby="completed-topics-tooltip">
+                                                    <svg class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 9v5m0-8h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                                                </button>
+                                            </p>
+                                            <p class="mt-1 text-lg font-bold leading-5 text-[#071b45]">{{ selectedProfessionalCourse ? selectedProfessionalCourse.modules.length : `${completedTopicCount} / ${mapTopics.length}` }}</p>
+                                            <span v-if="!selectedProfessionalCourse" id="completed-topics-tooltip" role="tooltip" class="pointer-events-none invisible absolute right-0 top-full z-30 mt-2 w-72 max-w-[80vw] rounded-lg border border-[#d8e0e7] bg-white p-3 text-left text-xs font-normal leading-5 text-[#40505e] opacity-0 shadow-md transition-opacity group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                                                Dział jest zaliczony, gdy przerobisz wszystkie pytania i żadne nie pozostaje w statusie „do poprawy”. Pytania po błędzie powtarzaj, aż uzyskają status „zapamiętane” — samo 100% przerobienia nie wystarczy.
+                                            </span>
+                                        </div>
+                                        <div class="col-span-2 mt-3 flex items-center gap-2 border-t border-[#edf1f5] pt-3">
+                                            <Trophy :size="22" class="shrink-0 text-[#f3ad2c]" aria-hidden="true" />
+                                            <p class="text-[0.72rem] leading-tight text-[#53698b]"><strong class="block text-xs text-[#0b1d42]">{{ selectedProfessionalCourse ? 'Ucz się moduł po module' : courseProgressPercent >= 90 ? 'Świetna robota!' : 'Tak trzymaj!' }}</strong>{{ selectedProfessionalCourse ? 'Postęp kursu aktualizuje się po odpowiedziach.' : courseProgressPercent >= 90 ? 'Jesteś bardzo blisko zakończenia nauki.' : 'Każde pytanie przybliża Cię do celu.' }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </header>
+
+                            <div class="relative z-10 mt-1 flex flex-wrap items-center justify-between gap-4">
+                                <nav class="grid w-full gap-2 rounded-2xl bg-white p-1.5 shadow-[0_10px_30px_rgba(30,57,97,0.08)]" :class="professionalCourses.length > 0 ? 'max-w-[62rem] grid-cols-2 min-[1200px]:grid-cols-4' : 'max-w-[49rem] grid-cols-3'" aria-label="Tryb nauki">
+                                    <button
+                                        v-for="tab in topLearningPathTabs"
+                                        :key="tab.value"
+                                        type="button"
+                                        class="flex min-h-[3.65rem] min-w-0 items-center gap-3 rounded-xl px-3 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0876f8] disabled:cursor-not-allowed disabled:opacity-45"
+                                        :class="!selectedProfessionalCourse && selectedPath === tab.value ? 'bg-[#ffe5a5] text-[#071b45]' : 'bg-[#f5f8fc] text-[#071b45] hover:bg-[#eaf1f9]'"
+                                        :disabled="tab.disabled"
+                                        :aria-pressed="!selectedProfessionalCourse && selectedPath === tab.value"
+                                        @click="selectLearningPath(tab.value)"
+                                    >
+                                        <BookOpen v-if="tab.value === 'classic'" :size="26" :stroke-width="1.8" class="shrink-0" aria-hidden="true" />
+                                        <Brain v-else-if="tab.value === 'zen'" :size="26" :stroke-width="1.8" class="shrink-0" aria-hidden="true" />
+                                        <ClipboardCheck v-else :size="26" :stroke-width="1.8" class="shrink-0" aria-hidden="true" />
+                                        <span class="min-w-0"><strong class="block truncate text-sm leading-4">{{ tab.label }}</strong><span class="mt-1 block truncate text-xs text-[#65799a]">{{ tab.summary }}</span></span>
+                                    </button>
+                                    <button
+                                        v-if="professionalCourses.length > 0"
+                                        type="button"
+                                        class="flex min-h-[3.65rem] min-w-0 items-center gap-3 rounded-xl px-3 text-left text-[#071b45] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0876f8]"
+                                        :class="selectedProfessionalCourse ? 'bg-[#ffe5a5]' : 'bg-[#f5f8fc] hover:bg-[#eaf1f9]'"
+                                        :aria-pressed="Boolean(selectedProfessionalCourse)"
+                                        @click="selectProfessionalCourse(selectedProfessionalCourse?.code ?? professionalCourses[0].code)"
+                                    >
+                                        <BriefcaseBusiness :size="26" :stroke-width="1.8" class="shrink-0" aria-hidden="true" />
+                                        <span class="min-w-0"><strong class="block truncate text-sm leading-4">Kurs zawodowy Kod 95</strong><span class="mt-1 block truncate text-xs text-[#65799a]">{{ professionalCourses.length === 1 ? professionalCourses[0].name : `${professionalCourses.length} dostępne kursy` }}</span></span>
+                                    </button>
+                                </nav>
+                                <div v-if="isTopicLearningPath && !selectedProfessionalCourse" class="inline-flex gap-1" role="group" aria-label="Wybierz widok ścieżki nauki">
+                                    <button
+                                        v-for="mode in ([{ value: 'map', label: 'Mapa' }, { value: 'list', label: 'Lista' }] as const)"
+                                        :key="mode.value"
+                                        type="button"
+                                        class="inline-flex min-h-11 min-w-[7rem] items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0876f8]"
+                                        :class="pathViewMode === mode.value ? 'bg-[#071b45] text-white' : 'border border-[#e3eaf3] bg-white/70 text-[#0b1d42] hover:bg-white'"
+                                        :aria-pressed="pathViewMode === mode.value"
+                                        @click="selectPathViewMode(mode.value)"
+                                    >
+                                        <Map v-if="mode.value === 'map'" :size="19" aria-hidden="true" />
+                                        <List v-else :size="19" aria-hidden="true" />
+                                        {{ mode.label }}
+                                    </button>
                                 </div>
                             </div>
 
-                            <div class="flex flex-wrap items-end gap-3">
-                                <div class="flex flex-col gap-1.5">
-                                    <span class="text-[0.68rem] font-semibold text-[#65727d]">Widok ścieżki</span>
-                                    <div class="inline-flex rounded-[8px] border border-[#d9e2e8] bg-white p-1" role="group" aria-label="Wybierz widok ścieżki nauki">
-                                        <button
-                                            v-for="mode in ([{ value: 'map', label: 'Mapa' }, { value: 'list', label: 'Lista' }] as const)"
-                                            :key="mode.value"
-                                            type="button"
-                                            class="min-h-9 rounded-[6px] px-3 text-[0.78rem] font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1e73e8]"
-                                            :class="pathViewMode === mode.value ? 'bg-[#1e73e8] text-white' : 'text-[#52606d] hover:bg-[#f0f5fa]'"
-                                            :aria-pressed="pathViewMode === mode.value"
-                                            @click="selectPathViewMode(mode.value)"
-                                        >
-                                            {{ mode.label }}
-                                        </button>
+                            <div class="mt-4">
+                        <section v-if="selectedProfessionalCourse" class="rounded-2xl bg-white p-5 shadow-[0_5px_17px_rgba(31,66,110,0.05)] sm:p-8" aria-labelledby="professional-course-title">
+                            <div class="mx-auto max-w-[64rem]">
+                                <header class="border-b border-[#e7edf5] pb-5">
+                                    <div class="flex flex-wrap items-start justify-between gap-4">
+                                        <div class="min-w-0 max-w-2xl">
+                                            <p class="text-xs font-semibold uppercase tracking-[0.12em] text-[#e79625]">Kurs zawodowy</p>
+                                            <h2 id="professional-course-title" class="mt-2 text-2xl font-bold leading-tight text-[#071b45]">{{ selectedProfessionalCourse.name }}</h2>
+                                            <p v-if="selectedProfessionalCourse.category_name" class="mt-1 text-sm font-medium text-[#53698b]">{{ selectedProfessionalCourse.category_name }}</p>
+                                            <p v-if="selectedProfessionalCourse.description" class="mt-2 text-sm leading-6 text-[#53698b]">{{ selectedProfessionalCourse.description }}</p>
+                                        </div>
+                                        <div v-if="professionalCourses.length > 1" class="min-w-[14rem]">
+                                            <label for="professional-course-selector" class="block text-xs font-semibold text-[#53698b]">Wybierz kurs</label>
+                                            <select id="professional-course-selector" :value="selectedProfessionalCourse.code" class="mt-1 w-full rounded-lg border border-[#dce5ee] bg-white px-3 py-2 text-sm font-medium text-[#071b45] focus:border-[#0876f8] focus:ring-[#0876f8]" @change="onProfessionalCourseChange">
+                                                <option v-for="course in professionalCourses" :key="course.id" :value="course.code">{{ course.name }}</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
-                            <dl class="flex min-w-[17.75rem] divide-x divide-[#e7ecef] overflow-hidden rounded-[9px] border border-[#e7ecef] bg-white shadow-[0_7px_20px_rgba(16,24,32,0.045)]">
-                                <div class="flex min-w-[9.9rem] items-center gap-2.5 px-4 py-2.5">
-                                    <div class="grid h-9 w-9 shrink-0 place-items-center rounded-full" :style="mapProgressStyle" aria-hidden="true">
-                                        <span class="h-6 w-6 rounded-full bg-white" />
-                                    </div>
-                                    <div>
-                                        <dt class="text-[0.63rem] font-semibold leading-3 text-[#74818b]">Twój postęp</dt>
-                                        <dd class="mt-0.5 text-[0.9rem] font-bold leading-4 text-[#172029]">{{ courseProgressPercent }}%</dd>
-                                    </div>
-                                </div>
-                                <div class="min-w-[7.85rem] px-4 py-2.5">
-                                    <dt class="text-[0.63rem] font-semibold leading-3 text-[#74818b]">Działy zaliczone</dt>
-                                    <dd class="mt-0.5 text-[0.9rem] font-bold leading-4 text-[#172029]">
-                                        {{ completedTopicCount }} / {{ mapTopics.length }}
-                                    </dd>
-                                </div>
-                            </dl>
+                                    <dl class="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-sm text-[#53698b]">
+                                        <div class="flex gap-1"><dt>Przerobione:</dt><dd class="font-semibold text-[#071b45]">{{ selectedProfessionalCourse.progress.answered_count }}/{{ selectedProfessionalCourse.progress.total_questions }}</dd></div>
+                                        <div class="flex gap-1"><dt>Ukończenie:</dt><dd class="font-semibold text-[#071b45]">{{ selectedProfessionalCourse.progress.percent }}%</dd></div>
+                                        <div class="flex gap-1"><dt>Do poprawy:</dt><dd class="font-semibold text-[#071b45]">{{ selectedProfessionalCourse.incorrect_questions.count }}</dd></div>
+                                    </dl>
+                                </header>
+                                <CourseModules
+                                    compact
+                                    :modules="selectedProfessionalCourse.modules"
+                                    :active-session="activeSession"
+                                    :review-count="selectedProfessionalCourse.incorrect_questions.count"
+                                    :review-url="selectedProfessionalCourse.incorrect_questions.url"
+                                />
                             </div>
-                        </header>
-
-                        <div v-if="pathViewMode === 'map' && mapRows.length > 0" class="relative mt-7 w-full xl:mt-8" :style="{ minHeight: `${mapRouteHeight}px` }">
+                        </section>
+                        <section v-else-if="isExamPath" class="rounded-2xl bg-white p-6 shadow-[0_5px_17px_rgba(31,66,110,0.05)] sm:p-8" aria-labelledby="learning-exam-title">
+                            <div class="flex flex-wrap items-start justify-between gap-6">
+                                <div class="max-w-2xl">
+                                    <p class="text-xs font-semibold uppercase tracking-[0.12em] text-[#e79625]">Tryb egzaminacyjny</p>
+                                    <h2 id="learning-exam-title" class="mt-2 text-2xl font-bold text-[#071b45]">Egzamin próbny</h2>
+                                    <p class="mt-2 text-sm leading-6 text-[#53698b]">{{ learningPathLead }}</p>
+                                </div>
+                                <button
+                                    type="button"
+                                    class="inline-flex min-h-12 items-center justify-center gap-3 rounded-xl bg-[#071b45] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#12346e] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0876f8] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-55"
+                                    :disabled="sessionProcessing || (canUseFullProduct && !canStartLearning)"
+                                    @click="emit('startLearning')"
+                                >
+                                    {{ sessionProcessing ? 'Uruchamianie...' : startButtonLabel }} <span aria-hidden="true">→</span>
+                                </button>
+                            </div>
+                            <div class="mt-7 grid gap-3 border-t border-[#e7edf5] pt-6 sm:grid-cols-2 xl:grid-cols-4">
+                                <div v-for="fact in examFacts" :key="fact.label" class="rounded-xl bg-[#f5f8fc] px-4 py-3">
+                                    <p class="text-xs text-[#65799a]">{{ fact.label }}</p>
+                                    <p class="mt-1 text-base font-semibold text-[#071b45]">{{ fact.value }}</p>
+                                </div>
+                            </div>
+                        </section>
+                        <div v-else-if="pathViewMode === 'map' && mapRows.length > 0" class="relative w-full" :style="{ minHeight: `${mapRouteHeight}px` }">
                             <svg
                                 aria-hidden="true"
                                 class="pointer-events-none absolute inset-0 z-0 h-full w-full"
@@ -739,34 +748,32 @@ function topicArtworkFor(topic: TopicOption): string | null {
                             </div>
                         </div>
 
-                        <div v-else-if="mapTopics.length > 0" class="mx-auto mt-6 w-[calc(100%-2rem)] max-w-[64rem] space-y-2" role="list" aria-label="Lista działów nauki">
-                            <div v-for="topic in mapTopics" :key="topic.id" role="listitem">
+                        <div v-else-if="mapTopics.length > 0" class="w-full space-y-1.5" role="list" aria-label="Lista działów nauki">
+                            <div v-for="(topic, index) in mapTopics" :key="topic.id" role="listitem">
                                 <button
                                     type="button"
-                                    class="group grid min-h-[3.8rem] w-full grid-cols-[3.5rem_minmax(0,1fr)_9rem] items-center gap-x-2 gap-y-1 bg-white px-2 py-2 text-left transition hover:bg-[#f8fbfd] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1e73e8] focus-visible:ring-offset-2 min-[900px]:grid-cols-[2fr_8fr_3fr_5fr_6fr] min-[900px]:gap-0"
+                                    class="group grid min-h-[3.1rem] w-full grid-cols-[3.25rem_2.5rem_minmax(0,1fr)_8.5rem] items-center gap-x-2 gap-y-0.5 rounded-xl bg-white px-3 py-1.5 text-left shadow-[0_5px_17px_rgba(31,66,110,0.05)] transition hover:bg-[#f8fbff] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0876f8] focus-visible:ring-offset-2 min-[1150px]:grid-cols-[4rem_2.5rem_minmax(0,1fr)_6.5rem_12rem_11.5rem] min-[1150px]:gap-x-3"
                                     :aria-label="`${topic.label}. ${topicStateLabel(topic)}. Przerobiono ${answeredCount(topic)} / ${topic.questions_count}. Otwórz ustawienia nauki.`"
                                     @click="openSessionSetup(topic.id)"
                                 >
-                                    <span class="row-span-2 flex h-8 w-[3.25rem] shrink-0 items-center justify-center border-r border-[#e5e9ec] text-[#2869df] min-[900px]:row-span-1" aria-hidden="true">
+                                    <span class="row-span-2 flex h-8 w-full shrink-0 items-center justify-center border-r border-[#e5eaf2] text-[#0876f8] min-[1150px]:row-span-1" aria-hidden="true">
                                         <img v-if="topicArtworkFor(topic)" :src="topicArtworkFor(topic) ?? ''" alt="" class="h-7 w-7 object-contain" />
                                         <svg v-else-if="topicIcon(topic) === 'sign'" class="h-7 w-7" viewBox="0 0 32 32" fill="none"><path d="M16 3 29 27H3L16 3Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><path d="M16 11v7m0 4h.01" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg>
                                         <svg v-else-if="topicIcon(topic) === 'junction'" class="h-7 w-7" viewBox="0 0 32 32" fill="none"><path d="M16 4v24M16 16 6 9M16 16l10-7" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/><circle cx="16" cy="16" r="3.2" fill="currentColor" /></svg>
                                         <svg v-else-if="topicIcon(topic) === 'signal'" class="h-7 w-7" viewBox="0 0 32 32" fill="none"><rect x="11" y="3" width="10" height="26" rx="4" stroke="currentColor" stroke-width="2"/><circle cx="16" cy="9" r="2.2" fill="currentColor"/><circle cx="16" cy="16" r="2.2" fill="currentColor" opacity=".48"/><circle cx="16" cy="23" r="2.2" fill="currentColor" /></svg>
                                         <svg v-else class="h-7 w-7" viewBox="0 0 32 32" fill="none"><path d="M6 25c6-10 14-10 20-18M9 6h5v5M18 21h5v5" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7" cy="25" r="2.5" fill="currentColor"/></svg>
                                     </span>
-                                    <span class="min-w-0 px-1">
-                                        <span class="block truncate text-sm font-semibold leading-5 text-[#172029] min-[900px]:text-base">{{ topic.label }}</span>
-                                        <span class="block text-[0.7rem] text-[#77838d] min-[900px]:hidden">{{ questionCountLabel(topic.questions_count) }} · {{ topicStateLabel(topic) }}</span>
-                                    </span>
-                                    <span class="hidden px-1 text-sm font-medium text-[#4d5b66] min-[900px]:block min-[900px]:text-base">{{ questionCountLabel(topic.questions_count) }}</span>
-                                    <span class="col-start-2 flex min-w-0 items-center gap-2 px-1 min-[900px]:col-auto">
-                                        <span class="w-8 shrink-0 text-sm font-semibold text-[#00bb78]">{{ progressPercent(topic) }}%</span>
-                                        <span class="h-2 min-w-0 flex-1 overflow-hidden bg-[#e6e8e9]" role="progressbar" :aria-label="`Postęp: ${topic.label}`" :aria-valuenow="progressPercent(topic)" aria-valuemin="0" aria-valuemax="100">
-                                            <span class="block h-full rounded-full bg-[#00d88b]" :style="{ width: `${progressPercent(topic)}%` }" />
+                                    <span class="row-span-2 text-xs font-medium text-[#7188ac] min-[1150px]:row-span-1">{{ String(index + 1).padStart(2, '0') }}</span>
+                                    <span class="col-start-3 min-w-0 truncate text-sm font-semibold leading-5 text-[#071b45] min-[1150px]:col-auto min-[1150px]:text-[0.94rem]">{{ topic.label }}</span>
+                                    <span class="col-start-3 row-start-2 text-xs text-[#7188ac] min-[1150px]:col-auto min-[1150px]:row-auto min-[1150px]:text-sm">{{ questionCountLabel(topic.questions_count) }}</span>
+                                    <span class="col-start-4 row-start-1 flex min-w-0 items-center gap-2 min-[1150px]:col-auto min-[1150px]:row-auto">
+                                        <span class="h-2 min-w-0 flex-1 overflow-hidden rounded-full bg-[#e6edf0]" role="progressbar" :aria-label="`Postęp: ${topic.label}`" :aria-valuenow="progressPercent(topic)" aria-valuemin="0" aria-valuemax="100">
+                                            <span class="block h-full rounded-full bg-[#00cf85]" :style="{ width: `${progressPercent(topic)}%` }" />
                                         </span>
+                                        <span class="w-9 shrink-0 text-xs font-semibold text-[#00bd78]">{{ progressPercent(topic) }}%</span>
                                     </span>
-                                    <span class="col-start-3 row-span-2 mx-1 inline-flex min-h-[2.2rem] items-center justify-center bg-[#edf0f2] px-2 text-center text-sm font-medium leading-4 text-[#172029] transition group-hover:bg-[#e0e5e8] min-[900px]:col-auto min-[900px]:row-span-1">
-                                        {{ progressPercent(topic) === 100 ? 'Powtórz dział' : progressPercent(topic) > 0 ? 'Kontynuuj naukę' : 'Rozpocznij naukę' }}
+                                    <span class="col-start-4 row-start-2 inline-flex min-h-8 items-center justify-center gap-2 rounded-lg bg-[#f1f4f8] px-2 text-center text-xs font-semibold leading-4 text-[#071b45] transition group-hover:bg-[#e3eaf3] min-[1150px]:col-auto min-[1150px]:row-auto min-[1150px]:text-sm">
+                                        {{ progressPercent(topic) === 100 ? 'Powtórz dział' : progressPercent(topic) > 0 ? 'Kontynuuj naukę' : 'Rozpocznij naukę' }} <span aria-hidden="true">→</span>
                                     </span>
                                 </button>
                             </div>
@@ -775,6 +782,8 @@ function topicArtworkFor(topic: TopicOption): string | null {
                         <p v-else class="py-12 text-center text-sm text-[#65727d]">
                             Dla tego zakresu nie znaleziono działów pytań.
                         </p>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
@@ -938,29 +947,13 @@ function topicArtworkFor(topic: TopicOption): string | null {
                 <div class="mt-3 grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
                     <div>
                         <h2 class="max-w-3xl text-2xl font-semibold leading-tight text-[#101820]">{{ learningPathLead }}</h2>
-                        <div v-if="isExamPath" class="mt-5 flex flex-wrap gap-3">
-                            <span v-for="fact in examFacts" :key="fact.label" class="border border-[#dfe4e8] bg-[#fbfcfd] px-3 py-2 text-sm text-[#64717d]">
-                                {{ fact.label }}: <strong class="font-semibold text-[#101820]">{{ fact.value }}</strong>
-                            </span>
-                        </div>
                     </div>
-                    <button
-                        v-if="isExamPath"
-                        type="button"
-                        class="inline-flex min-h-11 items-center gap-3 rounded-[5px] bg-[#ef3b26] px-5 text-sm font-semibold text-white transition hover:bg-[#d93220] disabled:cursor-not-allowed disabled:opacity-55"
-                        :disabled="sessionProcessing || (canUseFullProduct && !canStartLearning)"
-                        @click="emit('startLearning')"
-                    >
-                        {{ sessionProcessing ? 'Uruchamianie...' : startButtonLabel }} <span aria-hidden="true">→</span>
-                    </button>
-                    <Link v-else-if="selectedPath === 'memory'" :href="memoryTrainerHref" class="inline-flex min-h-11 items-center gap-3 rounded-[5px] bg-[#101820] px-5 text-sm font-semibold text-white transition hover:bg-[#29353e]">Otwórz trenera <span aria-hidden="true">→</span></Link>
+                    <Link v-if="selectedPath === 'memory'" :href="memoryTrainerHref" class="inline-flex min-h-11 items-center gap-3 rounded-[5px] bg-[#101820] px-5 text-sm font-semibold text-white transition hover:bg-[#29353e]">Otwórz trenera <span aria-hidden="true">→</span></Link>
                     <Link v-else-if="selectedPath === 'traffic-signs'" :href="trafficSignLearningHref" class="inline-flex min-h-11 items-center gap-3 rounded-[5px] bg-[#101820] px-5 text-sm font-semibold text-white transition hover:bg-[#29353e]">Trenuj znaki <span aria-hidden="true">→</span></Link>
                     <Link v-else-if="selectedPath === 'ranking'" :href="rankingModeHref" class="inline-flex min-h-11 items-center gap-3 rounded-[5px] bg-[#101820] px-5 text-sm font-semibold text-white transition hover:bg-[#29353e]">Wejdź do rankingu <span aria-hidden="true">→</span></Link>
                     <Link v-else-if="isPjmPath" :href="pjmHref" class="inline-flex min-h-11 items-center gap-3 rounded-[5px] bg-[#101820] px-5 text-sm font-semibold text-white transition hover:bg-[#29353e]">Otwórz moduł PJM <span aria-hidden="true">→</span></Link>
                 </div>
             </section>
-                </main>
-            </div>
-        </div>
+        </main>
     </section>
 </template>

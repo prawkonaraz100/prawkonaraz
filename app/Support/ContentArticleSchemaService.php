@@ -104,7 +104,6 @@ final class ContentArticleSchemaService
                 'publisher' => [
                     '@id' => $this->schemaIds->organization(),
                 ],
-                'publishingPrinciples' => route('about.editorial-principles'),
                 'isPartOf' => [
                     '@id' => $this->schemaIds->website(),
                 ],

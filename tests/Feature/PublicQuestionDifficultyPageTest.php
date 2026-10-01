@@ -100,6 +100,8 @@ test('public hardest questions hub renders raw seo html and aggregated ranking',
             false,
         )
         ->assertSee('<h1', false)
+        ->assertSee('class="rankomat-guide__shell"', false)
+        ->assertSee('class="hardest-guide__categories"', false)
         ->assertSeeText('Najtrudniejsze pytania na prawo jazdy')
         ->assertSeeText('Publiczny ranking pytań, które realnie sprawiają kursantom największą trudność.')
         ->assertSeeText('Czy przed przejsciem dla pieszych musisz zachowac szczegolna ostroznosc?')
@@ -155,6 +157,7 @@ test('public hardest questions category page renders raw seo html for selected r
         ->assertSee('<link rel="canonical" href="'.$canonical.'">', false)
         ->assertSeeText('Najtrudniejsze pytania na prawo jazdy kategorii C')
         ->assertSeeText('Najczęściej mylone na starcie')
+        ->assertSee('class="hardest-guide__modes"', false)
         ->assertSeeText('Czy kierowca pojazdu ciezarowego powinien utrzymac bezpieczny odstep?')
         ->assertSee(
             'href="/najtrudniejsze-pytania-na-prawo-jazdy/kategoria/c?ranking=repeat_fail"',

@@ -91,11 +91,26 @@ flowchart LR
 
 Desktopowe primary menu jest celowo takie samo w Vue i Blade. To jest uklad przejety z dawnego wariantu `/nauka` i stosowany globalnie.
 
+### Menu strony glownej
+
+Strona glowna korzysta z osobnego renderera Blade `resources/views/components/site/home-header.blade.php`. W top menu, bezposrednio po `Portal`, sa dwa katalogowe dropdowny:
+
+- `Testy na prawo jazdy`: hub testow, dedykowane strony kategorii A, B, C, D, T, A1, AM oraz Najtrudniejsze pytania,
+- `Znaki drogowe`: hub znakow oraz opublikowane kategorie znakow.
+
+Kategorie testow nie prowadza do stron bazy pytan. Maja osobne, indeksowalne landing pages pod `/testy-na-prawo-jazdy/kategoria-{slug}` (`public.tests.category`). Renderer to `resources/views/tests/category.blade.php`, kontroler `PublicTestCategoryController`, a source of truth dla listy kategorii i ich tresci stanowi `PublicTestCategoryCatalog`. Strony zawieraja parametry egzaminu, opis uprawnien, minimalny wiek, zakres nauki, przykladowe pytania z naszej bazy, FAQ i link do osobnej strony pelnej bazy pytan danej kategorii.
+
+Dane dropdownow pochodza z `PublicNavigation::data()` przez pola `test_menu` i `traffic_sign_menu`. `test_menu` korzysta z `PublicTestCategoryCatalog::menuItems()`, dlatego top menu i landing pages maja wspolna liste kategorii. Dropdown konta w `home-header.blade.php` korzysta z tych samych `learning_href`, `header_actions` i `logout_href` co `PublicTopNavigation.vue` na `/nauka`; etykieta linku profilu jest prezentowana jako `Moje konto`. Interakcja korzysta z mechanizmu `data-home-header-menu`: otwarcie jednego menu zamyka pozostale, klik poza menu zamyka dropdown, a Escape zamyka aktywny panel.
+
+Aktualny top menu nie renderuje pozycji `Dlaczego my?`, `Aplikacje`, `Przepisy` ani dropdownu `Kursy`. Strona `/przepisy` pozostaje dostepna przez inne linki w serwisie.
+
+Na mobile nie sa rozwijane pelne listy kategorii; dostepne sa bezposrednie wejscia `Testy na prawo jazdy` i `Znaki drogowe`, bez linkow z dawnego dropdownu `Kursy`.
+
 ### Mobile i footer
 
 Backendowe `navigation.primary` nadal zawiera pojedyncze kanoniczne wpisy `Aktualnosci` (`/aktualnosci`) i `Poradniki` (`/poradniki`) z poprawnymi prefixami active-state. N4-005 nie dodalo drugich wpisow do headerow ani nie zmienilo tych prefixow.
 
-Aktualne renderery headera Vue i Blade maja wlasne kuratorowane listy mobile/desktop i nie nalezy zakladac, ze renderuja cale `navigation.primary`. Compact footer nie renderuje `navigation.primary`; oba aktualne renderery footera (`SiteFooter.vue` i `public-footer.blade.php`) konsumują wspolne `PublicFooter::service_links`.
+Aktualne renderery headera Vue i Blade maja wlasne kuratorowane listy mobile/desktop i nie nalezy zakladac, ze renderuja cale `navigation.primary`. Footer rowniez nie renderuje `navigation.primary`; oba renderery (`SiteFooter.vue` i `public-footer.blade.php`) konsumują wspolne grupy zwracane przez `PublicFooter`, a grupa kategorii testow korzysta z `navigation.test_menu`.
 
 ### Dostep do nauki
 
@@ -228,51 +243,27 @@ Panel ma `max-h-[calc(100svh-72px)]` i `overflow-y-auto`, wiec przy dlugiej lisc
 
 ## 10. Footer
 
-Footer ma wspolne dane z `PublicFooter` i renderery Vue/Blade. Po NEWSROOM-N4-005 `PublicFooter::service_links` jest wspolnym source of truth dla compact footera w obu rendererach i zawiera dokladnie po jednym wejściu do `/aktualnosci` i `/poradniki`.
+Footer ma wspolne dane z `App\Support\PublicFooter` i dwa zgodne renderery: Vue `resources/js/Components/SiteFooter.vue` oraz Blade `resources/views/components/site/public-footer.blade.php`.
 
-Aktualne `service_links`:
+Aktualny publiczny footer jest katalogiem linkow w ukladzie: blok marki + cztery grupy. Renderuje opis serwisu, adres e-mail z `config('content.organization.email')`, grupy katalogowe oraz dolny pasek prawny. Nie renderuje osobnego pasa social media ani badge'y aplikacji mobilnych.
 
-| Label | Href |
+Source of truth dla katalogu stanowi `PublicFooter::directoryGroups()`:
+
+| Grupa | Zakres |
 | --- | --- |
-| Baza pytan | `/oficjalna-baza-pytan-na-prawo-jazdy` |
-| Testy na prawo jazdy | `/testy-na-prawo-jazdy` |
-| Aktualnosci | `/aktualnosci` |
-| Poradniki | `/poradniki` |
-| Kurs | `/kurs` |
-| Cennik | `/cennik` |
+| Testy na prawo jazdy | kategorie A, B, C, D, T, A1, AM, najtrudniejsze pytania i baza pytan |
+| Testy i nauka | testy online, przepisy, poradniki, kurs teorii, wyklady, Kod 95 |
+| Znaki drogowe | hub znakow oraz opublikowane kategorie znakow |
+| Pomoc | opinie, kontakt, aktualnosci, cennik, jak to dziala oraz linki konta |
 
-`footer_groups` nadal istnieje w danych `PublicNavigation`, ale aktualny compact `SiteFooter.vue` i `public-footer.blade.php` renderuja `legal_links`, `service_links` i `social_links`, a nie `footer_groups`.
+Dla goscia grupa `Pomoc` zawiera `Zaloguj sie` i `Zaloz konto`. Dla zalogowanego uzytkownika zawiera `Profil` i `Nauka`. Linki kategorii prawa jazdy prowadza do dedykowanych landingow `public.tests.category`, a osobne linki w tych landingach prowadza do bazy pytan `public.questions.category`. Linki kategorii znakow prowadza do `traffic-signs.categories.show`.
 
-CTA:
+Dolny pasek renderuje `copyright` i `legal_links`. Footer jest nadal ukrywany na mobile dla wybranych prywatnych shelli przez `AuthenticatedLayout`, zgodnie z `footerVisibilityClass`.
 
-| Label | Href |
-| --- | --- |
-| Rozpocznij nauke | `navigation.learning_href` |
-| Przejdz do bazy pytan | `/oficjalna-baza-pytan-na-prawo-jazdy` |
-
-Grupy:
-
-| Grupa | Linki guest/auth |
-| --- | --- |
-| Nauka | Rozpocznij nauke, Baza pytan, Kurs, Wyklady |
-| Serwis | Znaki drogowe, Statystyki, Najtrudniejsze pytania, Cennik |
-| Informacje | O serwisie, Kontakt, Metodologia |
-| Konto | Guest: Logowanie, Rejestracja, Testy. Auth: Profil, ewentualnie Admin, ewentualnie Panel moderatora, Nauka. |
-
-Footer jest ukrywany na mobile dla niektorych prywatnych shelli przez `AuthenticatedLayout`: review queue, `/nauka` i ranking maja wrapper `hidden md:block`.
-
-Guest auth w footerze:
-
-- Vue nie renderuje juz `learning_href=/login`, `Logowanie` ani `Rejestracja` jako zwyklych linkow.
-- Te pozycje sa przyciskami i wysylaja event `prawko:open-auth-drawer`, ktory obsluguje `SiteHeader.vue`.
-- Dzieki temu klik w stopce nie przenosi na bezposrednie `/login` lub `/register` i nie pokazuje osobnej strony auth z przyciemnionym/glassy tlem.
-- Blade nadal uzywa zwyklych linkow, ale `public-content.ts` przechwytuje lokalne `/login` i `/register`.
-
-Wyjatek bez headera:
-
-- publiczne demo w `StudySessions/Show.vue` nie korzysta z `SiteHeader.vue`,
-- CTA `Zaloz konto i kontynuuj` renderuje lokalny `RegisterDrawer`/`LoginDrawer`,
-- dzieki temu rowniez po demo nie ma przejscia na bezposrednie `/register`.
+Responsywnosc potwierdzona dla aktualnego layoutu:
+- desktop: marka + 4 kolumny,
+- srednie szerokosci: 2 kolumny z marka na cala szerokosc,
+- do 520 px: jedna kolumna oraz pionowy zestaw linkow prawnych.
 
 ## 11. Link routing: `<a>` vs Inertia `Link`
 

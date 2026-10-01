@@ -124,14 +124,10 @@ test('author and trust pages render schema-backed trust layer', function () {
         ->assertSee('"@type":"Organization"', false);
 
     $this->get(route('about.contact'))
-        ->assertOk()
-        ->assertSee('"@type":"ContactPage"', false)
-        ->assertSee('kontakt@example.test');
+        ->assertRedirect(route('home', absolute: false).'#kontakt');
 
     $this->get(route('about.methodology'))
-        ->assertOk()
-        ->assertSee('"@type":"WebPage"', false)
-        ->assertSeeText('Jak uczymy teorii i pytań na prawo jazdy?');
+        ->assertRedirect(route('about.organization', absolute: false));
 });
 
 test('supporting comparison page renders article schema and canonical meta', function () {
@@ -247,8 +243,8 @@ test('robots and sitemaps expose crawlable seo infrastructure', function () {
         ->assertSee('<loc>'.route('legal.terms').'</loc>', false)
         ->assertSee('<loc>'.route('legal.privacy').'</loc>', false)
         ->assertSee('<loc>'.route('about.organization').'</loc>', false)
-        ->assertSee('<loc>'.route('about.methodology').'</loc>', false)
-        ->assertSee('<loc>'.route('about.contact').'</loc>', false)
+        ->assertDontSee('<loc>'.route('about.methodology').'</loc>', false)
+        ->assertDontSee('<loc>'.route('about.contact').'</loc>', false)
         ->assertSee('<loc>'.route('reviews.index').'</loc>', false);
 
     $this->get(route('sitemap.signs'))

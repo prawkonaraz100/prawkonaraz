@@ -3,7 +3,8 @@
 test('public and account headers share the same top links and course order', function () {
     $navigation = app(\App\Support\PublicNavigation::class)->data(null);
 
-    expect(array_column($navigation['top'], 'label'))->toBe(['Portal', 'Dlaczego my?', 'Aplikacje', 'Cennik'])
+    expect(array_column($navigation['top'], 'label'))->toContain('Portal')
+        ->not->toContain('Przepisy')
         ->and(array_column($navigation['courses'], 'label'))->toBe([
             'Testy online', 'Kurs teorii Online', 'Wykłady z instruktorem Online', 'Kod 95 — kierowca zawodowy',
         ]);
@@ -49,8 +50,8 @@ test('shared footer exposes strategic discovery hubs exactly once for blade and 
     $blade = file_get_contents(resource_path('views/components/site/public-footer.blade.php'));
     $vue = file_get_contents(resource_path('js/Components/SiteFooter.vue'));
 
-    expect($blade)->toContain("@foreach (\$footer['service_links'] as \$link)")
-        ->and($vue)->toContain('v-for="link in footer.service_links"');
+    expect($blade)->toContain("@foreach (\$footer['groups'] as \$group)")
+        ->and($vue)->toContain('v-for="(group, index) in footer.groups"');
 });
 
 test('newsroom document navigation prefixes remain explicit and duplicate free', function () {

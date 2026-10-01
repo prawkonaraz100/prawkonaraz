@@ -127,6 +127,57 @@ const setupHomeHeaderMenus = () => {
     };
 
     menus.forEach((menu) => {
+        const mega = menu.querySelector<HTMLElement>('[data-home-header-mega]');
+
+        if (mega) {
+            let openedByHover = false;
+            const tabs = Array.from(mega.querySelectorAll<HTMLButtonElement>('[data-mega-tab]'));
+            const contents = Array.from(mega.querySelectorAll<HTMLElement>('[data-mega-content]'));
+            const promos = Array.from(mega.querySelectorAll<HTMLElement>('[data-mega-promo]'));
+            const activate = (key: string) => {
+                tabs.forEach((tab) => {
+                    const active = tab.dataset.megaTab === key;
+                    tab.classList.toggle('is-active', active);
+                    tab.setAttribute('aria-pressed', String(active));
+                });
+                contents.forEach((content) => {
+                    content.hidden = content.dataset.megaContent !== key;
+                });
+                promos.forEach((promo) => {
+                    promo.hidden = promo.dataset.megaPromo !== key;
+                });
+            };
+
+            tabs.forEach((tab) => {
+                const key = tab.dataset.megaTab ?? '0';
+                tab.addEventListener('pointerenter', () => activate(key));
+                tab.addEventListener('focus', () => activate(key));
+                tab.addEventListener('click', () => activate(key));
+            });
+
+            menu.addEventListener('pointerenter', () => {
+                if (window.matchMedia('(min-width: 1051px) and (hover: hover) and (pointer: fine)').matches) {
+                    openedByHover = !menu.open;
+                    menu.open = true;
+                }
+            });
+            menu.querySelector<HTMLElement>(':scope > summary')?.addEventListener('click', (event) => {
+                if (openedByHover && menu.open) {
+                    event.preventDefault();
+                    openedByHover = false;
+                }
+            });
+            menu.addEventListener('pointerleave', () => {
+                openedByHover = false;
+                closeMenu(menu);
+            });
+            menu.addEventListener('focusout', (event) => {
+                if (!(event.relatedTarget instanceof Node) || !menu.contains(event.relatedTarget)) {
+                    closeMenu(menu);
+                }
+            });
+        }
+
         menu.addEventListener('toggle', () => {
             if (!menu.open) {
                 return;

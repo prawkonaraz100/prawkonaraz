@@ -147,7 +147,7 @@ const faqs = [
                             Ćwicz testy online
                         </Link>
                         <Link
-                            href="/kontakt"
+                            href="/#kontakt"
                             class="inline-flex items-center justify-center border border-[#dbe2e8] px-5 py-3 text-sm font-semibold text-[#171717]"
                         >
                             Zapytaj o naukę

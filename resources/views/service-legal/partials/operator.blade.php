@@ -18,7 +18,7 @@
                 {{ $legalDocuments['privacy_email'] }}
             </a>
             <br>
-            <a class="text-blue-700 hover:underline" href="{{ route('about.contact', absolute: false) }}">Formularz i dane kontaktowe</a>
+            <a class="text-blue-700 hover:underline" href="{{ route('home', absolute: false) }}#kontakt">Formularz kontaktowy</a>
         </dd>
     </div>
 </dl>

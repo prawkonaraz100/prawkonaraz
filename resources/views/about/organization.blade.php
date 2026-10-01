@@ -20,7 +20,7 @@
             'name' => 'Redakcja PrawkoNaRaz',
             'role' => 'Opracowanie pytań i materiałów',
             'image' => asset('images/site-header-logo-20260728.png'),
-            'url' => route('about.methodology'),
+            'url' => route('about.organization'),
             'is_logo' => true,
         ],
     ];
@@ -342,16 +342,6 @@
                     <span class="font-black">• Przepisy</span>
                     <a href="{{ route('public.regulations') }}" class="ml-1 underline decoration-[#d01921] decoration-2 underline-offset-4">/przepisy</a>
                     <span>- podstawy prawne tłumaczone prostym językiem.</span>
-                </li>
-                <li>
-                    <span class="font-black">• Metodologia</span>
-                    <a href="{{ route('about.methodology') }}" class="ml-1 underline decoration-[#d01921] decoration-2 underline-offset-4">/metodologia</a>
-                    <span>- jak uczymy teorii, wyjaśniamy pytania i aktualizujemy materiały edukacyjne.</span>
-                </li>
-                <li>
-                    <span class="font-black">• Zasady redakcyjne</span>
-                    <a href="{{ route('about.editorial-principles') }}" class="ml-1 underline decoration-[#d01921] decoration-2 underline-offset-4">/zasady-redakcyjne</a>
-                    <span>- autorstwo, źródła, weryfikacja, korekty i zasady transparentności.</span>
                 </li>
             </ul>
         </div>

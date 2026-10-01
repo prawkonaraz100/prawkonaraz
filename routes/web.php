@@ -35,17 +35,14 @@ use App\Http\Controllers\ContactPageController;
 use App\Http\Controllers\ContentArticleController;
 use App\Http\Controllers\ContentAuthorController;
 use App\Http\Controllers\DashboardApiController;
-use App\Http\Controllers\EditorialPrinciplesPageController;
 use App\Http\Controllers\FriendInvitationClaimController;
 use App\Http\Controllers\FriendInvitationOwnerController;
 use App\Http\Controllers\HealthApiController;
 use App\Http\Controllers\HomePageController;
-use App\Http\Controllers\HowItWorksPageController;
 use App\Http\Controllers\IncorrectQuestionController;
 use App\Http\Controllers\LegalContentController;
 use App\Http\Controllers\LlmsTextController;
 use App\Http\Controllers\MeProfileController;
-use App\Http\Controllers\MethodologyPageController;
 use App\Http\Controllers\ModeratorAccountsController;
 use App\Http\Controllers\NewsroomCategoryController;
 use App\Http\Controllers\NewsroomFeedController;
@@ -62,6 +59,7 @@ use App\Http\Controllers\PublicDemoStudyController;
 use App\Http\Controllers\PublicQuestionDatabaseController;
 use App\Http\Controllers\PublicQuestionDifficultyController;
 use App\Http\Controllers\PublicQuestionTopicController;
+use App\Http\Controllers\PublicTestCategoryController;
 use App\Http\Controllers\QuestionCollectionLearningController;
 use App\Http\Controllers\RankedSessionPageController;
 use App\Http\Controllers\ReviewPageController;
@@ -162,6 +160,9 @@ Route::get('/zaproszenie/{token}', [FriendInvitationClaimController::class, 'sho
 
 Route::get('/testy-na-prawo-jazdy', [PublicDemoStudyController::class, 'landing'])
     ->name('public.tests');
+Route::get('/testy-na-prawo-jazdy/kategoria-{categorySlug}', PublicTestCategoryController::class)
+    ->whereIn('categorySlug', ['a', 'b', 'c', 'd', 't', 'a1', 'am'])
+    ->name('public.tests.category');
 Route::get('/testy-na-prawo-jazdy/demo', [PublicDemoStudyController::class, 'show'])
     ->name('public.tests.demo.show');
 Route::post('/testy-na-prawo-jazdy/demo/answers', [PublicDemoStudyController::class, 'answer'])
@@ -314,16 +315,16 @@ Route::get('/autorzy/{authorSlug}', ContentAuthorController::class)
 Route::redirect('/o-serwisie', '/o-nas', 301);
 Route::get('/o-nas', AboutOrganizationController::class)
     ->name('about.organization');
-Route::get('/jak-to-dziala', HowItWorksPageController::class)
+Route::redirect('/jak-to-dziala', '/testy-na-prawo-jazdy', 301)
     ->name('about.how-it-works');
-Route::get('/kontakt', ContactPageController::class)
+Route::redirect('/kontakt', '/#kontakt', 301)
     ->name('about.contact');
 Route::post('/kontakt', [ContactPageController::class, 'store'])
     ->middleware('throttle:contact')
     ->name('about.contact.store');
-Route::get('/metodologia', MethodologyPageController::class)
+Route::redirect('/metodologia', '/o-nas', 301)
     ->name('about.methodology');
-Route::get('/zasady-redakcyjne', EditorialPrinciplesPageController::class)
+Route::redirect('/zasady-redakcyjne', '/o-nas', 301)
     ->name('about.editorial-principles');
 
 Route::middleware('auth')->group(function () {

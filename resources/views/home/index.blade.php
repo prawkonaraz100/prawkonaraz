@@ -3,7 +3,6 @@
 @php
     $heroScene = \Illuminate\Support\Facades\Vite::asset('resources/images/home/hero-composite-v3.webp');
     $mobileAppScreen = \Illuminate\Support\Facades\Vite::asset('resources/images/home/hero-mobile-optimized.webp');
-    $mobileAppBanner = \Illuminate\Support\Facades\Vite::asset('resources/images/home/mobile-app-banner-optimized.webp');
     $proofDashboard = \Illuminate\Support\Facades\Vite::asset('resources/images/home/proof/dashboard-optimized.webp');
     $proofExplanation = \Illuminate\Support\Facades\Vite::asset('resources/images/home/proof/explanation-optimized.webp');
     $proofExam = \Illuminate\Support\Facades\Vite::asset('resources/images/home/proof/exam-optimized.webp');

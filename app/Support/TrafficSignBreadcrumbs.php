@@ -66,50 +66,6 @@ class TrafficSignBreadcrumbs
     /**
      * @return list<array{label: string, url: string}>
      */
-    public function howItWorks(): array
-    {
-        return [
-            ['label' => 'Strona główna', 'url' => route('home')],
-            ['label' => 'Jak to działa', 'url' => route('about.how-it-works')],
-        ];
-    }
-
-    /**
-     * @return list<array{label: string, url: string}>
-     */
-    public function contact(): array
-    {
-        return [
-            ['label' => 'Strona główna', 'url' => route('home')],
-            ['label' => 'Kontakt', 'url' => route('about.contact')],
-        ];
-    }
-
-    /**
-     * @return list<array{label: string, url: string}>
-     */
-    public function methodology(): array
-    {
-        return [
-            ['label' => 'Strona główna', 'url' => route('home')],
-            ['label' => 'Metodologia', 'url' => route('about.methodology')],
-        ];
-    }
-
-    /**
-     * @return list<array{label: string, url: string}>
-     */
-    public function editorialPrinciples(): array
-    {
-        return [
-            ['label' => 'Strona główna', 'url' => route('home')],
-            ['label' => 'Zasady redakcyjne', 'url' => route('about.editorial-principles')],
-        ];
-    }
-
-    /**
-     * @return list<array{label: string, url: string}>
-     */
     public function supportingPage(string $title, string $slug): array
     {
         return [

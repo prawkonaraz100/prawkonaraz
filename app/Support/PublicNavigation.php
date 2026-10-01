@@ -8,6 +8,7 @@ class PublicNavigation
 {
     public function __construct(
         protected PaymentRequirementService $paymentRequirementService,
+        protected PublicTestCategoryCatalog $publicTestCategoryCatalog,
     ) {}
 
     /**
@@ -41,8 +42,6 @@ class PublicNavigation
                 ...($isAuthed ? [
                     $this->link('Nauka', $learningHref, ['/nauka', '/study-sessions', '/trener-pamieci']),
                 ] : []),
-                $this->link('Dlaczego my?', '/#home-learning-title', []),
-                $this->link('Aplikacje', '/#aplikacje', []),
                 ...($paymentRequired ? [
                     $this->link('Cennik', route('public.pricing', absolute: false), ['/cennik'], icon: 'cennik'),
                 ] : []),
@@ -53,12 +52,28 @@ class PublicNavigation
                 ['label' => 'Wykłady z instruktorem Online', 'href' => route('public.lectures', absolute: false), 'description' => 'Poznaj przepisy i zasady ruchu drogowego.'],
                 ['label' => 'Kod 95 — kierowca zawodowy', 'href' => route('public.code95', absolute: false), 'description' => 'Kurs dla kierowców zawodowych.'],
             ],
+            'test_menu' => [
+                ['label' => 'Wszystkie testy na prawo jazdy', 'href' => route('public.tests', absolute: false)],
+                ...$this->publicTestCategoryCatalog->menuItems(),
+                ['label' => 'Najtrudniejsze pytania', 'href' => route('public.hardest-questions.index', absolute: false)],
+            ],
+            'traffic_sign_menu' => [
+                ['label' => 'Wszystkie znaki drogowe', 'href' => route('traffic-signs.index', absolute: false)],
+                ['label' => 'Znaki informacyjne', 'href' => route('traffic-signs.categories.show', ['categorySlug' => 'znaki-informacyjne'], absolute: false)],
+                ['label' => 'Znaki ostrzegawcze', 'href' => route('traffic-signs.categories.show', ['categorySlug' => 'znaki-ostrzegawcze'], absolute: false)],
+                ['label' => 'Znaki nakazu', 'href' => route('traffic-signs.categories.show', ['categorySlug' => 'znaki-nakazu'], absolute: false)],
+                ['label' => 'Znaki zakazu', 'href' => route('traffic-signs.categories.show', ['categorySlug' => 'znaki-zakazu'], absolute: false)],
+                ['label' => 'Znaki poziome', 'href' => route('traffic-signs.categories.show', ['categorySlug' => 'znaki-drogowe-poziome'], absolute: false)],
+                ['label' => 'Znaki uzupełniające', 'href' => route('traffic-signs.categories.show', ['categorySlug' => 'znaki-uzupelniajace'], absolute: false)],
+                ['label' => 'Sygnały świetlne', 'href' => route('traffic-signs.categories.show', ['categorySlug' => 'sygnaly-swietlne'], absolute: false)],
+                ['label' => 'Osoba kierująca ruchem', 'href' => route('traffic-signs.categories.show', ['categorySlug' => 'osoba-kierujaca-ruchem'], absolute: false)],
+                ['label' => 'Kontrolki pojazdu', 'href' => route('traffic-signs.categories.show', ['categorySlug' => 'kontrolki-w-samochodzie'], absolute: false)],
+            ],
             'utility' => [
                 $this->link('O nas', route('about.organization', absolute: false), ['/o-nas', '/autorzy']),
-                $this->link('Jak to działa', route('about.how-it-works', absolute: false), ['/jak-to-dziala']),
                 $this->link('Dla instruktorów', route('public.instructor-training', absolute: false), ['/szkolenia-z-instruktorem']),
                 $this->link('Reklama', route('public.advertising', absolute: false), ['/reklama']),
-                $this->link('Kontakt', route('about.contact', absolute: false), ['/kontakt']),
+                $this->link('Kontakt', route('home', absolute: false).'#kontakt', []),
             ],
             'primary' => $primaryLinks,
             'header_actions' => $isAuthed
@@ -93,7 +108,6 @@ class PublicNavigation
                     'title' => 'Serwis',
                     'links' => [
                         $this->link('Strefa OSK', route('public.osk', absolute: false), ['/strefa-osk']),
-                        $this->link('Aplikacje', '/#aplikacje', []),
                         $this->link('Znaki drogowe', route('traffic-signs.index', absolute: false), ['/znaki-drogowe']),
                         $this->link('Statystyki', route('public.statistics', absolute: false), ['/statystyki']),
                         $this->link(
@@ -109,9 +123,7 @@ class PublicNavigation
                     'links' => [
                         $this->link('Dlaczego my?', '/#home-learning-title', []),
                         $this->link('O nas', route('about.organization', absolute: false), ['/o-nas', '/autorzy']),
-                        $this->link('Jak to działa', route('about.how-it-works', absolute: false), ['/jak-to-dziala']),
-                        $this->link('Kontakt', route('about.contact', absolute: false), ['/kontakt']),
-                        $this->link('Metodologia', route('about.methodology', absolute: false), ['/metodologia']),
+                        $this->link('Kontakt', route('home', absolute: false).'#kontakt', []),
                     ],
                 ],
                 [

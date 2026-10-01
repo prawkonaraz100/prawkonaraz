@@ -51,6 +51,13 @@ class PublicQuestionDifficultyController extends Controller
 
         return view('hardest-questions.index', [
             ...$payload,
+            'breadcrumbs' => array_values(array_filter([
+                ['label' => 'Strona główna', 'url' => route('home')],
+                ['label' => 'Najtrudniejsze pytania', 'url' => route('public.hardest-questions.index')],
+                isset($payload['selected_category']) && $payload['selected_category']
+                    ? ['label' => 'Kategoria '.$payload['selected_category']['code'], 'url' => url($page['canonical_path'])]
+                    : null,
+            ])),
             'meta' => [
                 'title' => $page['title'],
                 'description' => $page['description'],

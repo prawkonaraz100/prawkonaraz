@@ -50,7 +50,7 @@ const rootBackgroundClass = computed(() =>
         : isModeratorAccountsPage.value || isProfilePage.value
           ? 'bg-white'
         : isSessionIndexPage.value
-          ? 'bg-white'
+          ? 'learning-dashboard-shell'
         : isAnalyticsCategoryPage.value
           ? 'bg-white'
           : 'bg-[#fcfcfa]',

@@ -1,7 +1,6 @@
 import '../images/home/hero-composite-v3.webp';
 import.meta.glob('../images/home/**/*-optimized.webp', { eager: true, query: '?url', import: 'default' });
 import '../images/home/hero-mobile.png';
-import '../images/home/mobile-app-banner.webp';
 import '../images/home/learning/classic-mode.png';
 import '../images/home/learning/focus-mode.png';
 import '../images/home/learning/explanation-focus.png';
@@ -109,6 +108,8 @@ const setupHomeContactDialog = () => {
     const dialog = document.querySelector<HTMLDialogElement>('[data-home-contact-dialog]');
     const triggers = document.querySelectorAll<HTMLButtonElement>('[data-home-contact-trigger]');
     const closeButtons = dialog?.querySelectorAll<HTMLButtonElement>('[data-home-contact-close]');
+    const message = dialog?.querySelector<HTMLTextAreaElement>('[name="contact_message"]');
+    const messageCount = dialog?.querySelector<HTMLElement>('[data-home-contact-count]');
 
     if (!dialog || triggers.length === 0 || !closeButtons) {
         return;
@@ -129,13 +130,28 @@ const setupHomeContactDialog = () => {
     triggers.forEach((trigger) => trigger.addEventListener('click', open));
     closeButtons.forEach((button) => button.addEventListener('click', close));
 
+    if (message && messageCount) {
+        const updateMessageCount = () => {
+            messageCount.textContent = `${message.value.length} / ${message.maxLength}`;
+        };
+
+        message.addEventListener('input', updateMessageCount);
+        updateMessageCount();
+    }
+
     dialog.addEventListener('click', (event) => {
         if (event.target === dialog) {
             close();
         }
     });
 
-    if (dialog.dataset.homeContactAutoOpen === 'true') {
+    window.addEventListener('hashchange', () => {
+        if (window.location.hash === '#kontakt') {
+            open();
+        }
+    });
+
+    if (dialog.dataset.homeContactAutoOpen === 'true' || window.location.hash === '#kontakt') {
         open();
     }
 };
@@ -356,146 +372,6 @@ const setupHomeVideoLibrary = () => {
     }
 };
 
-const setupHomeExpertCarousel = () => {
-    const carousel = document.querySelector<HTMLElement>('[data-home-expert-carousel]');
-    const rail = carousel?.querySelector<HTMLElement>('[data-home-expert-rail]');
-    const slides = Array.from(
-        carousel?.querySelectorAll<HTMLElement>('.home-learning__expert-slide') ?? [],
-    );
-    const controls = Array.from(
-        carousel?.querySelectorAll<HTMLButtonElement>('[data-home-expert-scroll]') ?? [],
-    );
-    const position = carousel?.querySelector<HTMLElement>('[data-home-expert-position]');
-
-    if (!carousel || !rail || slides.length === 0 || controls.length === 0) {
-        return;
-    }
-
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let pointerId: number | null = null;
-    let pointerStartX = 0;
-    let pointerStartScrollLeft = 0;
-    let isDragging = false;
-    let suppressClick = false;
-
-    const activeIndex = () => Math.max(
-        0,
-        Math.min(slides.length - 1, Math.round(rail.scrollLeft / Math.max(rail.clientWidth, 1))),
-    );
-
-    const syncState = () => {
-        const index = activeIndex();
-
-        controls.forEach((control) => {
-            const direction = control.dataset.homeExpertScroll;
-            control.disabled = direction === 'previous'
-                ? index === 0
-                : index === slides.length - 1;
-        });
-
-        if (position) {
-            position.textContent = `${index + 1} / ${slides.length}`;
-        }
-    };
-
-    const showSlide = (index: number) => {
-        const nextIndex = Math.max(0, Math.min(slides.length - 1, index));
-
-        rail.scrollTo({
-            left: nextIndex * rail.clientWidth,
-            behavior: reducedMotion ? 'auto' : 'smooth',
-        });
-    };
-
-    controls.forEach((control) => {
-        control.addEventListener('click', () => {
-            const direction = control.dataset.homeExpertScroll === 'previous' ? -1 : 1;
-            showSlide(activeIndex() + direction);
-        });
-    });
-
-    rail.addEventListener('keydown', (event) => {
-        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') {
-            return;
-        }
-
-        event.preventDefault();
-        showSlide(activeIndex() + (event.key === 'ArrowRight' ? 1 : -1));
-    });
-
-    const finishDrag = (event: PointerEvent) => {
-        if (pointerId !== event.pointerId) {
-            return;
-        }
-
-        if (rail.hasPointerCapture(event.pointerId)) {
-            rail.releasePointerCapture(event.pointerId);
-        }
-
-        pointerId = null;
-        rail.classList.remove('is-dragging');
-
-        if (isDragging) {
-            showSlide(activeIndex());
-            window.setTimeout(() => {
-                suppressClick = false;
-            }, 0);
-        }
-
-        isDragging = false;
-        syncState();
-    };
-
-    rail.addEventListener('pointerdown', (event) => {
-        if (event.pointerType !== 'mouse' || event.button !== 0) {
-            return;
-        }
-
-        pointerId = event.pointerId;
-        pointerStartX = event.clientX;
-        pointerStartScrollLeft = rail.scrollLeft;
-        isDragging = false;
-        suppressClick = false;
-    });
-
-    rail.addEventListener('pointermove', (event) => {
-        if (pointerId !== event.pointerId) {
-            return;
-        }
-
-        const distance = event.clientX - pointerStartX;
-
-        if (!isDragging && Math.abs(distance) < 5) {
-            return;
-        }
-
-        if (!isDragging) {
-            rail.setPointerCapture(event.pointerId);
-            rail.classList.add('is-dragging');
-            isDragging = true;
-            suppressClick = true;
-        }
-
-        event.preventDefault();
-        rail.scrollLeft = pointerStartScrollLeft - distance;
-    });
-
-    rail.addEventListener('pointerup', finishDrag);
-    rail.addEventListener('pointercancel', finishDrag);
-    rail.addEventListener('click', (event) => {
-        if (!suppressClick) {
-            return;
-        }
-
-        event.preventDefault();
-        event.stopPropagation();
-        suppressClick = false;
-    }, { capture: true });
-    rail.addEventListener('scroll', syncState, { passive: true });
-    window.addEventListener('resize', syncState, { passive: true });
-    syncState();
-};
-
 const setupHomeReviewsCarousel = () => {
     const rail = document.querySelector<HTMLElement>('[data-home-reviews-rail]');
     const controls = Array.from(
@@ -610,14 +486,62 @@ const setupHomeReviewsCarousel = () => {
     syncControls();
 };
 
+const setupHomeLearningVideos = () => {
+    const section = document.querySelector<HTMLElement>('[data-home-learning-videos]');
+    const dialog = section?.querySelector<HTMLDialogElement>('[data-home-learning-video-dialog]');
+    const player = dialog?.querySelector<HTMLElement>('[data-home-learning-video-player]');
+    const caption = dialog?.querySelector<HTMLElement>('[data-home-learning-video-caption]');
+
+    if (!section || !dialog || !player || !caption) {
+        return;
+    }
+
+    section.addEventListener('click', (event) => {
+        const target = event.target;
+
+        if (!(target instanceof Element)) {
+            return;
+        }
+
+        const card = target.closest<HTMLButtonElement>('[data-home-learning-video-id]');
+        const id = card?.dataset.homeLearningVideoId;
+
+        if (!id || !/^[a-zA-Z0-9_-]{11}$/.test(id)) {
+            return;
+        }
+
+        const title = card.dataset.homeLearningVideoTitle || 'Film o nauce do egzaminu';
+        const iframe = document.createElement('iframe');
+        iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+        iframe.title = title;
+        iframe.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share';
+        iframe.allowFullscreen = true;
+        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+
+        player.replaceChildren(iframe);
+        caption.textContent = title;
+        dialog.showModal();
+    });
+
+    dialog.querySelector('[data-home-learning-video-close]')?.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (event) => {
+        if (event.target === dialog) {
+            dialog.close();
+        }
+    });
+    dialog.addEventListener('close', () => {
+        player.replaceChildren();
+    });
+};
+
 const setupHome = () => {
     setupHomeOpsReveals();
     setupHomeOpsVideos();
     setupHomeContactDialog();
     setupHomeLearningImageDialog();
     setupHomeVideoLibrary();
-    setupHomeExpertCarousel();
     setupHomeReviewsCarousel();
+    setupHomeLearningVideos();
 };
 
 if (document.readyState === 'loading') {

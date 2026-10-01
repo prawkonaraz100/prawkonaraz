@@ -1279,7 +1279,7 @@ const startDesktopHeroLearning = () => {
     <Head title="Panel nauki" />
 
     <AuthenticatedLayout>
-        <div class="min-h-[calc(100vh-4rem)] bg-white">
+        <div class="min-h-[calc(100vh-4rem)] bg-transparent">
             <section
                 v-if="category"
                 class="pb-3 pt-0 sm:px-0 sm:pb-0 sm:pt-0"
@@ -1578,7 +1578,7 @@ const startDesktopHeroLearning = () => {
                                         Regularna nauka przynosi najlepsze efekty.
                                     </p>
                                     <Link
-                                        href="/jak-to-dziala"
+                                        href="/testy-na-prawo-jazdy"
                                         class="mt-3 inline-flex items-center gap-2 text-[0.78rem] font-bold text-[#0b5cff] transition hover:text-[#083fba]"
                                     >
                                         <span>Dowiedz się więcej</span>
@@ -2341,8 +2341,8 @@ const startDesktopHeroLearning = () => {
                                     </p>
                                 </div>
                             </div>
-                            <Link href="/metodologia" class="inline-flex min-h-10 w-48 shrink-0 items-center justify-center rounded-[4px] border border-[#dfe7f1] bg-white px-5 text-[0.84rem] font-bold text-[#10172f] transition hover:bg-[#f8fafc]">
-                                Sprawdź aktualizacje
+                            <Link href="/oficjalna-baza-pytan-na-prawo-jazdy" class="inline-flex min-h-10 w-48 shrink-0 items-center justify-center rounded-[4px] border border-[#dfe7f1] bg-white px-5 text-[0.84rem] font-bold text-[#10172f] transition hover:bg-[#f8fafc]">
+                                Zobacz bazę pytań
                             </Link>
                         </section>
                     </div>

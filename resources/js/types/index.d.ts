@@ -29,6 +29,8 @@ export interface NavigationGroup {
 
 export interface NavigationData {
     courses: { label: string; href: string; description: string }[];
+    test_menu: { label: string; href: string }[];
+    traffic_sign_menu: { label: string; href: string }[];
     top: NavigationLink[];
     utility: NavigationLink[];
     primary: NavigationLink[];
@@ -61,10 +63,16 @@ export interface FooterMobileAppData {
     status: string;
 }
 
+export interface FooterGroupData {
+    title: string;
+    links: FooterLinkData[];
+}
+
 export interface FooterData {
     home_href: string;
     brand: FooterBrandData;
     description: string;
+    email: string;
     primary_action: FooterActionData;
     secondary_action: FooterActionData;
     legal_links: FooterLinkData[];
@@ -72,7 +80,7 @@ export interface FooterData {
     social_links: FooterLinkData[];
     mobile_apps: FooterMobileAppData[];
     language: string;
-    groups: NavigationGroup[];
+    groups: FooterGroupData[];
     copyright: string;
 }
 

@@ -25,7 +25,7 @@ class AccessActivationController extends Controller
                 'source' => $decision->source,
             ],
             'pricingUrl' => route('public.pricing', absolute: false),
-            'contactUrl' => route('about.contact', absolute: false),
+            'contactUrl' => route('home', absolute: false).'#kontakt',
         ]);
     }
 }

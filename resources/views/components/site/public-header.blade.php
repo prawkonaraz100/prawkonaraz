@@ -57,12 +57,6 @@
             'icon' => 'signs',
         ],
         [
-            'label' => 'Przepisy',
-            'href' => route('public.regulations', absolute: false),
-            'match' => ['/przepisy'],
-            'icon' => 'book',
-        ],
-        [
             'label' => 'Testy online',
             'href' => route('public.tests', absolute: false),
             'match' => ['/testy-na-prawo-jazdy'],
@@ -93,12 +87,6 @@
             'href' => route('traffic-signs.index', absolute: false),
             'match' => ['/znaki-drogowe'],
             'icon' => 'signs',
-        ],
-        [
-            'label' => 'Przepisy',
-            'href' => route('public.regulations', absolute: false),
-            'match' => ['/przepisy'],
-            'icon' => 'book',
         ],
         [
             'label' => 'Cennik',

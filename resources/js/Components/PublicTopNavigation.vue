@@ -2,6 +2,7 @@
 import { useSafeLogout } from '@/composables/useSafeLogout';
 import { useCompactSiteHeader } from '@/composables/useCompactSiteHeader';
 import type { NavigationLink, PageProps } from '@/types';
+import { ChevronDown } from '@lucide/vue';
 import { usePage } from '@inertiajs/vue3';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 
@@ -10,9 +11,12 @@ const header = ref<HTMLElement | null>(null);
 const launcherMenu = ref<HTMLDetailsElement | null>(null);
 const mobileMenu = ref<HTMLDetailsElement | null>(null);
 const coursesMenu = ref<HTMLDetailsElement | null>(null);
+const accountAvatarFailed = ref(false);
 const navigation = computed(() => page.props.navigation);
+const currentPath = computed(() => page.url.split(/[?#]/)[0].replace(/\/$/, ''));
+const isLearningHome = computed(() => currentPath.value === '/nauka');
 const isLearningNavigation = computed(() => {
-    const path = page.url.split(/[?#]/)[0].replace(/\/$/, '');
+    const path = currentPath.value;
 
     return path === '/nauka'
         || path === '/nauka/bledne-pytania'
@@ -25,12 +29,29 @@ const mobileLinks = computed(() => [
     navigation.value.top[0],
     ...navigation.value.courses,
     ...navigation.value.top.slice(1),
-    ...(!isLearningNavigation.value ? [{ label: 'Strefa OSK', href: '/strefa-osk' }] : []),
 ].filter(Boolean));
 const user = computed(() => page.props.auth.user);
 const isAuthed = computed(() => Boolean(user.value));
 const accountHref = computed(() => isAuthed.value ? '/profile' : '/login');
-const accountLabel = computed(() => isAuthed.value ? 'Moje konto' : 'Logowanie');
+const accountAvatarUrl = computed(() => {
+    if (accountAvatarFailed.value) {
+        return null;
+    }
+
+    return user.value?.avatar_url ?? null;
+});
+const accountLabel = computed(() => {
+    if (!isAuthed.value) {
+        return 'Logowanie';
+    }
+
+    const firstName = user.value?.name?.trim().split(/\s+/)[0];
+
+    return firstName || 'Moje konto';
+});
+const isCurrentLink = (link: NavigationLink) => link.match.some((path) =>
+    currentPath.value === path || currentPath.value.startsWith(`${path}/`),
+);
 const { logout, logoutPreparing } = useSafeLogout();
 const { isCompact } = useCompactSiteHeader();
 
@@ -102,7 +123,7 @@ onUnmounted(() => {
     <header
         ref="header"
         class="home-site-header home-site-header--public-page home-site-header--reference"
-        :class="{ 'is-compact': isCompact, 'home-site-header--learning-navigation': isLearningNavigation }"
+        :class="{ 'is-compact': isCompact, 'home-site-header--learning-navigation': isLearningNavigation, 'home-site-header--learning-home': isLearningHome, 'home-site-header--floating': !isLearningHome }"
     >
         <div class="home-site-header__shell">
             <div class="home-site-header__identity">
@@ -126,7 +147,13 @@ onUnmounted(() => {
 
             <nav class="home-site-header__nav home-site-header__nav--reference" aria-label="Nawigacja główna">
                 <template v-for="(link, index) in navigationLinks" :key="link.href + link.label">
-                    <a :href="link.href"><span>{{ link.label }}</span></a>
+                    <a
+                        :href="link.href"
+                        :class="{ 'home-site-header__learning-current': isLearningHome && link.label === 'Nauka', 'home-site-header__home-current': !isLearningHome && isCurrentLink(link) }"
+                        :aria-current="isCurrentLink(link) ? 'page' : undefined"
+                    >
+                        <span>{{ link.label }}</span>
+                    </a>
                     <details v-if="index === 0 && !isLearningNavigation" :ref="(el) => coursesMenu = el as HTMLDetailsElement | null" class="home-site-header__courses" @toggle="keepSingleMenuOpen($event.target as HTMLDetailsElement)">
                         <summary>Kursy <svg class="home-site-header__chevron" aria-hidden="true" viewBox="0 0 20 20" fill="none"><path d="m5 7.5 5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg></summary>
                         <div>
@@ -140,13 +167,21 @@ onUnmounted(() => {
             </nav>
 
             <div class="home-site-header__desktop-actions">
-                <a v-if="!isLearningNavigation" class="home-site-header__osk" href="/strefa-osk">Strefa OSK</a>
                 <a v-if="!isAuthed" class="home-site-header__google" :href="page.props.authDrawers.enabledSocialProviders.includes('google') ? '/auth/google/redirect' : '/login'">
                     <svg aria-hidden="true" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.2 0 6.1 1.1 8.4 3.2l6.3-6.3C34.8 2.8 29.7.8 24 .8 14.8.8 6.9 6 3 13.6l7.3 5.7C12.1 13.6 17.5 9.5 24 9.5Z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.5 2.8-2.2 5.2-4.7 6.8l7.2 5.6c4.2-3.9 7.3-9.6 7.3-16.4Z"/><path fill="#FBBC05" d="M10.3 28.7A14.6 14.6 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7L3 13.6A23.1 23.1 0 0 0 .5 24c0 3.7.9 7.3 2.5 10.4l7.3-5.7Z"/><path fill="#34A853" d="M24 47.2c5.7 0 10.6-1.9 14.1-5.1l-6.1-6.8c-1.7 1.1-4 1.9-8 1.9-6.5 0-11.9-4.1-13.7-9.8L3 33.1c3.9 7.8 11.8 14.1 21 14.1Z"/></svg>
                     <span>Kontynuuj z Google</span>
                 </a>
                 <a class="home-site-header__account" :href="accountHref">
-                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                    <img
+                        v-if="accountAvatarUrl"
+                        class="home-site-header__account-avatar"
+                        :src="accountAvatarUrl"
+                        alt=""
+                        aria-hidden="true"
+                        referrerpolicy="no-referrer"
+                        @error="accountAvatarFailed = true"
+                    >
+                    <svg v-else aria-hidden="true" viewBox="0 0 24 24" fill="none">
                         <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" />
                         <circle cx="12" cy="9" r="3" stroke="currentColor" stroke-width="1.6" />
                         <path d="M6.7 19.15c.85-3.05 2.62-4.55 5.3-4.55s4.45 1.5 5.3 4.55" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
@@ -160,9 +195,7 @@ onUnmounted(() => {
                     @toggle="keepSingleMenuOpen(launcherMenu)"
                 >
                     <summary aria-label="Otwórz menu serwisu">
-                        <span class="home-site-header__launcher-icon" aria-hidden="true">
-                            <i v-for="dot in 9" :key="dot"></i>
-                        </span>
+                        <ChevronDown class="home-site-header__learning-chevron" aria-hidden="true" />
                     </summary>
 
                     <div class="home-site-header__launcher-panel">

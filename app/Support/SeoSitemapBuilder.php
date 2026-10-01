@@ -153,6 +153,14 @@ class SeoSitemapBuilder
         return [
             ['loc' => route('home'), 'lastmod' => null, 'images' => []],
             ['loc' => route('public.tests'), 'lastmod' => null, 'images' => []],
+            ...array_map(
+                fn (string $slug): array => [
+                    'loc' => route('public.tests.category', ['categorySlug' => $slug]),
+                    'lastmod' => $this->publicQuestionCatalogService->latestQuestionLastModified(),
+                    'images' => [],
+                ],
+                ['a', 'b', 'c', 'd', 't', 'a1', 'am'],
+            ),
             ['loc' => route('public.pricing'), 'lastmod' => null, 'images' => []],
             ['loc' => route('reviews.index'), 'lastmod' => $this->maxLastModified(UserReview::query()->publiclyVisible()->max('updated_at')), 'images' => []],
             ['loc' => route('legal.terms'), 'lastmod' => null, 'images' => []],
@@ -163,9 +171,6 @@ class SeoSitemapBuilder
             ['loc' => route('public.regulations.methodology'), 'lastmod' => $this->legalContentCatalogService->latestPublishedPageLastModified(), 'images' => []],
             ['loc' => route('public.partners'), 'lastmod' => null, 'images' => []],
             ['loc' => route('about.organization'), 'lastmod' => null, 'images' => []],
-            ['loc' => route('about.how-it-works'), 'lastmod' => null, 'images' => []],
-            ['loc' => route('about.methodology'), 'lastmod' => null, 'images' => []],
-            ['loc' => route('about.contact'), 'lastmod' => null, 'images' => []],
             ...$this->newsroomHubUrls(),
         ];
     }

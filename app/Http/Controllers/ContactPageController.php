@@ -4,35 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ContactMessageRequest;
 use App\Mail\ContactMessageMail;
-use App\Support\PublicUrlResolver;
-use App\Support\TrafficSignBreadcrumbs;
-use App\Support\TrafficSignSchemaService;
-use App\Support\TrafficSignSeoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\View\View;
 use Throwable;
 
 class ContactPageController extends Controller
 {
-    public function __invoke(
-        TrafficSignSeoService $trafficSignSeoService,
-        TrafficSignSchemaService $trafficSignSchemaService,
-        TrafficSignBreadcrumbs $trafficSignBreadcrumbs,
-        PublicUrlResolver $publicUrlResolver,
-    ): View {
-        $breadcrumbs = $trafficSignBreadcrumbs->contact();
-        $organization = (array) config('content.organization');
-        $organization['public_url'] = $publicUrlResolver->currentRoot();
-
-        return view('about.contact', [
-            'meta' => $trafficSignSeoService->contactPage(),
-            'breadcrumbs' => $breadcrumbs,
-            'structuredData' => $trafficSignSchemaService->contactPage($breadcrumbs),
-            'organization' => $organization,
-        ]);
-    }
-
     public function store(ContactMessageRequest $request): RedirectResponse
     {
         $messageData = [

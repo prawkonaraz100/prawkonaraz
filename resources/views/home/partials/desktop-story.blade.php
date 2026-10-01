@@ -35,7 +35,6 @@
 
         <div class="home-entry__shell">
             <div class="home-entry__showcase-meta" data-home-reveal>
-                <strong>Oficjalna baza pytań WORD {{ $seoYear }} <svg class="home-entry__source-arrow" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M3 5C24 3 37 18 36 40m-9-10 9 12 6-14" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></strong>
                 <nav aria-label="Media społecznościowe PrawkoNaRaz">
                     <span>Znajdź nas</span>
                     <a href="https://www.youtube.com/channel/UCSrCDt_Aj1yslMY8sfXFBkg" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="5" fill="currentColor"/><path d="m10 8 6 4-6 4Z" fill="white"/></svg></a>
@@ -43,129 +42,68 @@
                     <a href="https://www.tiktok.com/@prawkonaraz" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M14.8 3v11.3a4.7 4.7 0 1 1-4-4.6v3.1a1.7 1.7 0 1 0 1 1.5V3h3Zm0 0c.5 2.5 1.9 4 4.5 4.5v3.1a8.4 8.4 0 0 1-4.5-1.7"/></svg></a>
                 </nav>
             </div>
-            <section class="home-showcase" aria-labelledby="home-showcase-title" data-home-reveal>
-                <h2 id="home-showcase-title" class="sr-only">Najważniejsze możliwości PrawkoNaRaz</h2>
-
-                <div class="home-showcase__track" role="list">
-                    <div class="home-showcase__card home-showcase__card--blue" role="listitem">
-                        <div class="home-showcase__copy">
-                            <h3>Cała nauka<br>w jednym miejscu</h3>
-                            <p>Pytania · wyjaśnienia · postęp</p>
-                        </div>
-                        <div class="home-showcase__phone home-showcase__phone--upright">
-                            <span aria-hidden="true"></span>
-                            <img src="{{ $mobileAppScreen }}" alt="Pytanie egzaminacyjne w aplikacji PrawkoNaRaz" loading="lazy" decoding="async">
-                        </div>
-                    </div>
-
-                    <div class="home-showcase__card home-showcase__card--violet" role="listitem">
-                        <div class="home-showcase__copy">
-                            <h3>Oficjalne pytania.<br>Zawsze pod ręką.</h3>
-                            <p>Uczysz się z aktualnej bazy.</p>
-                        </div>
-                        <div class="home-showcase__browser home-showcase__browser--receipt">
-                            <i aria-hidden="true"></i>
-                            <img src="{{ $proofDashboard }}" alt="Panel nauki z oficjalną bazą pytań" loading="lazy" decoding="async">
-                        </div>
-                    </div>
-
-                    <div class="home-showcase__card home-showcase__card--focus" role="listitem">
-                        <div class="home-showcase__badge">Egzamin próbny</div>
-                        <div class="home-showcase__phone home-showcase__phone--focus">
-                            <span aria-hidden="true"></span>
-                            <img src="{{ $mobileAppScreen }}" alt="Mobilny egzamin próbny PrawkoNaRaz" loading="eager" fetchpriority="high" decoding="async">
-                        </div>
-                    </div>
-
-                    <div class="home-showcase__card home-showcase__card--light" role="listitem">
-                        <div class="home-showcase__copy">
-                            <h3>Uczysz się mądrzej,<br>nie dłużej.</h3>
-                            <p>Plan powtórek dopasowany do Ciebie.</p>
-                        </div>
-                        <div class="home-showcase__browser home-showcase__browser--memory">
-                            <i aria-hidden="true"></i>
-                            <img src="{{ $proofMemoryTrainer }}" alt="Trener pamięci z planem dziennym" loading="lazy" decoding="async">
-                        </div>
-                    </div>
-
-                    <div class="home-showcase__card home-showcase__card--deep" role="listitem">
-                        <div class="home-showcase__copy">
-                            <h3>Każdy błąd<br>zamieniasz w postęp.</h3>
-                            <p>Wracasz dokładnie do tego, co sprawia trudność.</p>
-                        </div>
-                        <div class="home-showcase__browser home-showcase__browser--mistakes">
-                            <i aria-hidden="true"></i>
-                            <img src="{{ $proofIncorrectQuestions }}" alt="Lista pytań wymagających powtórki" loading="lazy" decoding="async">
-                        </div>
-                    </div>
+            @php
+                // Add IDs and titles of PrawkoNaRaz YouTube videos here when they are ready.
+                // Empty IDs keep the moving layout without loading or opening third-party videos.
+                $learningVideoExamples = [
+                    ['id' => '', 'title' => ''],
+                    ['id' => '', 'title' => ''],
+                    ['id' => '', 'title' => ''],
+                    ['id' => '', 'title' => ''],
+                ];
+            @endphp
+            <section class="home-showcase home-showcase--videos" aria-labelledby="home-showcase-title" data-home-reveal data-home-learning-videos>
+                <div class="home-showcase-videos__heading">
+                    <h2 id="home-showcase-title">
+                        Zobacz jak się uczyć szybko!
+                        <svg class="home-showcase-videos__arrow" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                            <path d="M3 5C24 3 37 18 36 40m-9-10 9 12 6-14" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </h2>
+                    <p>Własne filmy PrawkoNaRaz pojawią się tutaj wkrótce.</p>
                 </div>
+
+                @for ($row = 0; $row < 3; $row++)
+                    <div class="home-showcase-videos__viewport" aria-label="Miejsca na filmy o nauce do egzaminu">
+                        <div class="home-showcase-videos__marquee home-showcase-videos__marquee--row-{{ $row + 1 }}">
+                            @for ($copy = 0; $copy < 2; $copy++)
+                                <div class="home-showcase-videos__group" @if ($copy === 1) aria-hidden="true" @endif>
+                                    @foreach (array_merge(array_slice($learningVideoExamples, $row), array_slice($learningVideoExamples, 0, $row)) as $video)
+                                        @if ($video['id'] !== '')
+                                            <button class="home-showcase-videos__card" type="button" data-home-learning-video-id="{{ $video['id'] }}" data-home-learning-video-title="{{ $video['title'] ?: 'Film PrawkoNaRaz' }}" @if ($copy === 1) tabindex="-1" @endif aria-label="Odtwórz film: {{ $video['title'] ?: 'Film PrawkoNaRaz' }}">
+                                                <span class="home-showcase-videos__thumbnail">
+                                                    <img src="https://i.ytimg.com/vi/{{ $video['id'] }}/hqdefault.jpg" alt="" loading="lazy" decoding="async" width="480" height="360">
+                                                    <span class="home-showcase-videos__play" aria-hidden="true">▶</span>
+                                                </span>
+                                                <span class="home-showcase-videos__card-copy">
+                                                    <strong>{{ $video['title'] ?: 'Film PrawkoNaRaz' }}</strong>
+                                                    <span>YouTube · PrawkoNaRaz</span>
+                                                </span>
+                                            </button>
+                                        @else
+                                            <div class="home-showcase-videos__card home-showcase-videos__card--empty" aria-label="Miejsce na przyszły film PrawkoNaRaz">
+                                                <span class="home-showcase-videos__thumbnail home-showcase-videos__thumbnail--empty" aria-hidden="true"></span>
+                                                <span class="home-showcase-videos__card-copy">
+                                                    <strong>Materiał w przygotowaniu</strong>
+                                                    <span>PrawkoNaRaz · wkrótce</span>
+                                                </span>
+                                            </div>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            @endfor
+                        </div>
+                    </div>
+                @endfor
+
+                <dialog class="home-showcase-videos__dialog" aria-label="Odtwarzacz filmu o nauce do egzaminu" data-home-learning-video-dialog>
+                    <button type="button" class="home-showcase-videos__close" data-home-learning-video-close aria-label="Zamknij film">×</button>
+                    <div class="home-showcase-videos__player" data-home-learning-video-player></div>
+                    <p data-home-learning-video-caption></p>
+                </dialog>
             </section>
         </div>
 
-        <section id="aplikacje" class="home-mobile-app-banner" aria-label="Aplikacja mobilna PrawkoNaRaz" data-home-reveal>
-            <img
-                class="home-mobile-app-banner__image"
-                src="{{ $mobileAppBanner }}"
-                alt="Aplikacja mobilna PrawkoNaRaz dostępna w Google Play, App Store i AppGallery"
-                width="1920"
-                height="480"
-                loading="lazy"
-                decoding="async"
-            >
-            <div class="home-mobile-app-banner__copy">
-                <div class="home-mobile-app-banner__brand">
-                    <img
-                        src="{{ asset('images/site-brand-mark-shield-v2-optimized.webp') }}"
-                        width="256"
-                        height="256"
-                        alt=""
-                        width="1200"
-                        height="1200"
-                        loading="lazy"
-                        decoding="async"
-                        aria-hidden="true"
-                    >
-                    <div class="home-mobile-app-banner__brand-text">
-                        <strong><span>prawko</span>naraz<em>.pl</em></strong>
-                        <small>Ucz się szybko i zdaj prawko na raz!</small>
-                    </div>
-                </div>
-                <h2>Pobierz aplikację mobilną<br>i ucz się teorii <span>gdzie chcesz</span></h2>
-                <p>Setki pytań, realne testy i pełna wygoda.<br>Ucz się w domu, w podróży, wszędzie!</p>
-            </div>
-        </section>
-
-        <div class="home-entry__shell">
-            <section class="home-trust" aria-labelledby="home-trust-title" data-home-reveal>
-                <h2 id="home-trust-title" class="home-trust__caption">
-                    Oficjalne źródła
-                </h2>
-                <ul class="home-trust__logos">
-                    <li>
-                        <a href="https://www.gov.pl" class="home-trust__logo home-trust__logo--rp" rel="noopener noreferrer" target="_blank">
-                            <img src="{{ asset('images/partners/herb-polski.svg') }}" alt="Herb Rzeczypospolitej Polskiej" width="3158" height="3716" loading="lazy" decoding="async">
-                            <span>gov.pl</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="https://www.gov.pl/web/infrastruktura" class="home-trust__logo home-trust__logo--ministry" rel="noopener noreferrer" target="_blank">
-                            <img src="{{ asset('images/partners/ministerstwo-infrastruktury-optimized.webp') }}" alt="Ministerstwo Infrastruktury" width="903" height="328" loading="lazy" decoding="async">
-                        </a>
-                    </li>
-                    <li>
-                        <a href="https://www.gov.pl/web/cepik" class="home-trust__logo home-trust__logo--cepik" rel="noopener noreferrer" target="_blank">
-                            <img src="{{ asset('images/partners/cepik-gov-optimized.webp') }}" alt="CEPiK — Centralna Ewidencja Pojazdów i Kierowców" width="564" height="147" loading="lazy" decoding="async">
-                        </a>
-                    </li>
-                    <li>
-                        <a href="https://eli.gov.pl" class="home-trust__logo home-trust__logo--eli" rel="noopener noreferrer" target="_blank">
-                            <img src="{{ asset('images/partners/eli.png') }}" alt="ELI — Europejski Identyfikator Prawodawstwa" width="177" height="58" loading="lazy" decoding="async">
-                        </a>
-                    </li>
-                </ul>
-            </section>
-
-        </div>
     </section>
 
     @include('home.partials.learning-story')
@@ -558,25 +496,58 @@
             aria-labelledby="home-contact-dialog-title"
         >
             <div class="home-contact__dialog-panel">
-                <header class="home-contact__dialog-header">
-                    <div>
-                        <p>Napisz do PrawkoNaRaz</p>
-                        <h3 id="home-contact-dialog-title">W czym możemy pomóc?</h3>
+                <button type="button" class="home-contact__dialog-close" data-home-contact-close aria-label="Zamknij formularz">×</button>
+
+                <div class="home-contact__dialog-grid">
+                    <div class="home-contact__dialog-aside">
+                        <img
+                            class="home-contact__dialog-art"
+                            src="{{ asset('images/home/contact/contact-dialog-desk-v1.png') }}"
+                            alt=""
+                            aria-hidden="true"
+                            width="1024"
+                            height="1536"
+                            decoding="async"
+                        >
+                        <div class="home-contact__dialog-aside-content">
+                            <header class="home-contact__dialog-header">
+                                <p>Napisz do PrawkoNaRaz</p>
+                                <h3 id="home-contact-dialog-title">W czym możemy<br>pomóc?</h3>
+                            </header>
+                            <p class="home-contact__dialog-intro">
+                                Uzupełnij krótki formularz. Odpowiemy na podany przez Ciebie adres e-mail zazwyczaj w ciągu 24 godzin.
+                            </p>
+                            <ul class="home-contact__benefits" aria-label="Dlaczego warto do nas napisać">
+                                <li>
+                                    <span class="home-contact__benefit-icon home-contact__benefit-icon--blue" aria-hidden="true">
+                                        <svg viewBox="0 0 24 24" fill="none"><path d="M5 5.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9l-4.5 3v-3A2 2 0 0 1 3 15.5v-8a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 11.5h.01m4 0h.01m4 0h.01" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg>
+                                    </span>
+                                    <span><strong>Szybka odpowiedź</strong><small>Zazwyczaj w ciągu 24 godzin</small></span>
+                                </li>
+                                <li>
+                                    <span class="home-contact__benefit-icon home-contact__benefit-icon--yellow" aria-hidden="true">
+                                        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="7.5" r="3.5" stroke="currentColor" stroke-width="1.8"/><path d="M5 20v-1.5a7 7 0 0 1 14 0V20H5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+                                    </span>
+                                    <span><strong>Pomoc ekspertów</strong><small>Odpowiada nasz zespół</small></span>
+                                </li>
+                                <li>
+                                    <span class="home-contact__benefit-icon home-contact__benefit-icon--green" aria-hidden="true">
+                                        <svg viewBox="0 0 24 24" fill="none"><path d="m12 2.5 8 3v6.1c0 5-3.4 8.1-8 9.9-4.6-1.8-8-4.9-8-9.9V5.5l8-3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+                                    </span>
+                                    <span><strong>Twoje dane są bezpieczne</strong><small>Nie udostępniamy ich osobom trzecim</small></span>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
-                    <button type="button" class="home-contact__dialog-close" data-home-contact-close aria-label="Zamknij formularz">×</button>
-                </header>
 
-                <p class="home-contact__dialog-intro">
-                    Uzupełnij krótki formularz. Odpowiemy na podany przez Ciebie adres e-mail.
-                </p>
+                    <div class="home-contact__dialog-main">
+                        @if (session('contact_error'))
+                            <p class="home-contact__form-alert" role="alert">{{ session('contact_error') }}</p>
+                        @elseif ($contactErrors->any())
+                            <p class="home-contact__form-alert" role="alert">Sprawdź zaznaczone pola i spróbuj ponownie.</p>
+                        @endif
 
-                @if (session('contact_error'))
-                    <p class="home-contact__form-alert" role="alert">{{ session('contact_error') }}</p>
-                @elseif ($contactErrors->any())
-                    <p class="home-contact__form-alert" role="alert">Sprawdź zaznaczone pola i spróbuj ponownie.</p>
-                @endif
-
-                <form method="POST" action="{{ route('about.contact.store', absolute: false) }}" class="home-contact__form" data-home-contact-form>
+                        <form method="POST" action="{{ route('about.contact.store', absolute: false) }}" class="home-contact__form" data-home-contact-form>
                     @csrf
 
                     <div class="home-contact__honeypot" aria-hidden="true">
@@ -587,15 +558,19 @@
                     <div class="home-contact__field-grid">
                         <label class="home-contact__field">
                             <span>Imię</span>
-                            <input
-                                type="text"
-                                name="contact_name"
-                                value="{{ old('contact_name') }}"
-                                maxlength="100"
-                                autocomplete="name"
-                                required
-                                @class(['is-invalid' => $contactErrors->has('contact_name')])
-                            >
+                            <span class="home-contact__input-wrap">
+                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="7.5" r="3.2" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 20v-1.2a6.5 6.5 0 0 1 13 0V20h-13Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+                                <input
+                                    type="text"
+                                    name="contact_name"
+                                    value="{{ old('contact_name') }}"
+                                    maxlength="100"
+                                    autocomplete="name"
+                                    placeholder="Twoje imię"
+                                    required
+                                    @class(['is-invalid' => $contactErrors->has('contact_name')])
+                                >
+                            </span>
                             @error('contact_name', 'contact')
                                 <small>{{ $message }}</small>
                             @enderror
@@ -603,15 +578,19 @@
 
                         <label class="home-contact__field">
                             <span>Adres e-mail</span>
-                            <input
-                                type="email"
-                                name="contact_email"
-                                value="{{ old('contact_email') }}"
-                                maxlength="254"
-                                autocomplete="email"
-                                required
-                                @class(['is-invalid' => $contactErrors->has('contact_email')])
-                            >
+                            <span class="home-contact__input-wrap">
+                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <input
+                                    type="email"
+                                    name="contact_email"
+                                    value="{{ old('contact_email') }}"
+                                    maxlength="254"
+                                    autocomplete="email"
+                                    placeholder="np. jan@przyklad.pl"
+                                    required
+                                    @class(['is-invalid' => $contactErrors->has('contact_email')])
+                                >
+                            </span>
                             @error('contact_email', 'contact')
                                 <small>{{ $message }}</small>
                             @enderror
@@ -620,12 +599,15 @@
 
                     <label class="home-contact__field">
                         <span>Temat</span>
-                        <select name="contact_topic" required @class(['is-invalid' => $contactErrors->has('contact_topic')])>
-                            <option value="">Wybierz temat</option>
-                            @foreach ($contactTopics as $topicValue => $topicLabel)
-                                <option value="{{ $topicValue }}" @selected(old('contact_topic') === $topicValue)>{{ $topicLabel }}</option>
-                            @endforeach
-                        </select>
+                        <span class="home-contact__input-wrap">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6h12M9 12h12M9 18h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="4.5" cy="6" r="1" fill="currentColor"/><circle cx="4.5" cy="12" r="1" fill="currentColor"/><circle cx="4.5" cy="18" r="1" fill="currentColor"/></svg>
+                            <select name="contact_topic" required @class(['is-invalid' => $contactErrors->has('contact_topic')])>
+                                <option value="">Wybierz temat</option>
+                                @foreach ($contactTopics as $topicValue => $topicLabel)
+                                    <option value="{{ $topicValue }}" @selected(old('contact_topic') === $topicValue)>{{ $topicLabel }}</option>
+                                @endforeach
+                            </select>
+                        </span>
                         @error('contact_topic', 'contact')
                             <small>{{ $message }}</small>
                         @enderror
@@ -633,19 +615,28 @@
 
                     <label class="home-contact__field">
                         <span>Wiadomość</span>
-                        <textarea
-                            name="contact_message"
-                            rows="6"
-                            minlength="10"
-                            maxlength="5000"
-                            placeholder="Napisz krótko, czego dotyczy sprawa..."
-                            required
-                            @class(['is-invalid' => $contactErrors->has('contact_message')])
-                        >{{ old('contact_message') }}</textarea>
+                        <span class="home-contact__input-wrap home-contact__input-wrap--message">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m4 20 4.5-.8L20 7.7a2.1 2.1 0 0 0-3-3L5.5 16.2 4 20Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="m14.5 7.2 2.3 2.3M5.5 16.2l2.3 2.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                            <textarea
+                                name="contact_message"
+                                rows="6"
+                                minlength="10"
+                                maxlength="5000"
+                                placeholder="Napisz krótko, czego dotyczy sprawa..."
+                                required
+                                @class(['is-invalid' => $contactErrors->has('contact_message')])
+                            >{{ old('contact_message') }}</textarea>
+                        </span>
+                        <span class="home-contact__character-count" data-home-contact-count>{{ mb_strlen((string) old('contact_message', '')) }} / 5000</span>
                         @error('contact_message', 'contact')
                             <small>{{ $message }}</small>
                         @enderror
                     </label>
+
+                    <p class="home-contact__form-hint">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 10.5v5M12 7.5h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                        Im więcej szczegółów podasz, tym szybciej będziemy mogli Ci pomóc.
+                    </p>
 
                     <label class="home-contact__consent">
                         <input type="checkbox" name="contact_consent" value="1" required @checked(old('contact_consent'))>
@@ -665,7 +656,9 @@
                             <span aria-hidden="true">→</span>
                         </button>
                     </div>
-                </form>
+                        </form>
+                    </div>
+                </div>
             </div>
         </dialog>
     </aside>

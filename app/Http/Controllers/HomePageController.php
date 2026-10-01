@@ -3,14 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ContactMessageRequest;
-use App\Models\ContentAuthor;
 use App\Models\HomepageVideo;
 use App\Models\Question;
 use App\Models\UserReview;
 use App\SEO\Schema\SchemaIds;
 use App\SEO\Schema\SchemaRenderer;
 use App\SEO\Schema\SiteIdentitySchema;
-use App\Support\TrafficSignAuthorProfile;
 use App\Support\UserReviewPresenter;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Cache;
@@ -71,14 +69,6 @@ class HomePageController extends Controller
                 ? number_format((float) $reviewStatsRow->average, 1, ',', ' ')
                 : null,
         ];
-        $learningQuoteAuthors = ContentAuthor::query()
-            ->published()
-            ->whereIn('slug', [
-                ContentAuthor::DEFAULT_LEGAL_REFERENCE_VERIFIER_SLUG,
-                TrafficSignAuthorProfile::SLUG,
-            ])
-            ->get(['name', 'slug', 'job_title', 'photo_path'])
-            ->keyBy('slug');
         $homepageVideos = HomepageVideo::query()
             ->published()
             ->orderBy('sort_order')
@@ -227,7 +217,6 @@ class HomePageController extends Controller
             'publishedReviews' => $publishedReviews,
             'currentReview' => $currentReview,
             'reviewStats' => $reviewStats,
-            'learningQuoteAuthors' => $learningQuoteAuthors,
             'homepageVideos' => $homepageVideos,
         ]);
     }

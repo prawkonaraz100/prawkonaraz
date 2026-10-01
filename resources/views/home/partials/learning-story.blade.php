@@ -1,157 +1,22 @@
 <section class="home-learning" aria-labelledby="home-learning-title">
     <div class="home-entry__shell">
-        @php
-            $jakubQuoteAuthor = $learningQuoteAuthors->get('jakub-wisniewski');
-            $katarzynaQuoteAuthor = $learningQuoteAuthors->get('katarzyna-wisniewska');
-        @endphp
-
-        @include('home.partials.learning-paths')
-
-        <section
-            class="home-learning__quote"
-            aria-labelledby="home-expert-opinions-title"
-            data-home-expert-carousel
-            data-home-reveal
-        >
-            <p class="home-learning__quote-lead" id="home-expert-opinions-title">
-                Eksperci o nauce z PrawkoNaRaz.pl
-            </p>
-
-            <div class="home-learning__quote-divider" aria-hidden="true">
-                <span></span>
-                <strong>”</strong>
-                <span></span>
-            </div>
-
-            <div class="home-learning__expert-carousel">
-                <button
-                    type="button"
-                    class="home-learning__expert-control home-learning__expert-control--previous"
-                    data-home-expert-scroll="previous"
-                    aria-label="Pokaż poprzednią opinię eksperta"
-                >
-                    <span aria-hidden="true">←</span>
-                </button>
-
-                <div
-                    class="home-learning__expert-rail"
-                    data-home-expert-rail
-                    tabindex="0"
-                    aria-label="Opinie ekspertów o PrawkoNaRaz"
-                >
-                    <article class="home-learning__expert-slide">
-                        <div class="home-learning__quote-content">
-                            <div class="home-learning__quote-author">
-                                @if ($jakubQuoteAuthor)
-                                    <a href="{{ route('content-authors.show', $jakubQuoteAuthor->slug, absolute: false) }}">
-                                        <img src="{{ asset($jakubQuoteAuthor->photo_path === 'images/authors/jakub-wisniewski.png' ? 'images/authors/jakub-wisniewski-optimized.webp' : $jakubQuoteAuthor->photo_path) }}" alt="{{ $jakubQuoteAuthor->name }}" width="64" height="64" loading="lazy" decoding="async">
-                                        <strong>{{ $jakubQuoteAuthor->name }}</strong>
-                                    </a>
-                                    <span>{{ $jakubQuoteAuthor->job_title }}</span>
-                                @endif
-                            </div>
-
-                            <blockquote>
-                                <h3>Jak zdać egzamin państwowy na prawo jazdy? Oceniamy platformę PrawkoNaRaz.pl</h3>
-                                <p>
-                                    „Jako były egzaminator WORD doskonale wiem, że o negatywnym wyniku testu teoretycznego
-                                    najczęściej decydują błędy wynikające ze stresu oraz zaskoczenie formą pytań. Kluczem do
-                                    sukcesu na egzaminie państwowym jest trening na materiałach, które w skali 1:1 odwzorowują
-                                    system egzaminacyjny.
-                                </p>
-                                <p>
-                                    Platforma <strong>PrawkoNaRaz.pl</strong> zawiera aktualną i pełną bazę pytań WORD
-                                    obowiązującą we wszystkich ośrodkach w kraju. Wysoki poziom szczegółowości multimediów
-                                    — zdjęć i filmów — pozwala kursantowi bezbłędnie ocenić pierwszeństwo przejazdu czy
-                                    właściwy manewr na drodze.
-                                </p>
-                                <p><strong>Zakres bazy egzaminacyjnej według kategorii:</strong></p>
-                                <ul>
-                                    <li><strong>Kategorie A, AM, A1, A2</strong> — motocykle</li>
-                                    <li><strong>Kategorie B, B1</strong> — samochody osobowe</li>
-                                    <li><strong>Kategorie C, C1, D, D1</strong> — transport zawodowy i autobusy</li>
-                                    <li><strong>Kategoria T</strong> — ciągniki rolnicze</li>
-                                </ul>
-                                <p>
-                                    <strong>Rekomendacja eksperta:</strong> Aby bezstresowo zaliczyć oficjalny test
-                                    teoretyczny, unikaj nauki „na pamięć” w ostatnią noc. Zamiast tego poświęć 15 minut
-                                    dziennie na systematyczne powtórki na PrawkoNaRaz.pl. Pozwoli Ci to opanować zarówno
-                                    proste, jak i trudniejsze zagadnienia.”
-                                </p>
-                            </blockquote>
-                        </div>
-                    </article>
-
-                    <article class="home-learning__expert-slide">
-                        <div class="home-learning__quote-content">
-                            <div class="home-learning__quote-author">
-                                @if ($katarzynaQuoteAuthor)
-                                    <a href="{{ route('content-authors.show', $katarzynaQuoteAuthor->slug, absolute: false) }}">
-                                        <img src="{{ asset($katarzynaQuoteAuthor->photo_path === 'images/authors/katarzyna-wisniewska.png' ? 'images/authors/katarzyna-wisniewska-optimized.webp' : $katarzynaQuoteAuthor->photo_path) }}" alt="{{ $katarzynaQuoteAuthor->name }}" width="64" height="64" loading="lazy" decoding="async">
-                                        <strong>{{ $katarzynaQuoteAuthor->name }}</strong>
-                                    </a>
-                                    <span>{{ $katarzynaQuoteAuthor->job_title }}</span>
-                                @endif
-                            </div>
-
-                            <blockquote>
-                                <h3>Szybka i skuteczna nauka teorii na prawo jazdy z PrawkoNaRaz.pl</h3>
-                                <p>
-                                    „Prawidłowe przygotowanie do testu teoretycznego to nie tylko krok do zdobycia dokumentu,
-                                    ale przede wszystkim fundament bezpiecznego poruszania się po drogach. Z perspektywy
-                                    organizacji ruchu kluczowa jest nauka na zweryfikowanym i aktualnym materiale.
-                                </p>
-                                <p>
-                                    Dostępna na <strong>PrawkoNaRaz.pl</strong> baza testów na prawo jazdy jest w pełni
-                                    zgodna z oficjalnymi wytycznymi państwowymi. Oznacza to, że arkusz w serwisie zawiera
-                                    identyczny zestaw pytań, zdjęć i multimediów, jaki otrzymasz w swoim lokalnym WORD-zie.
-                                    Wysoka rozdzielczość materiałów wizualnych ułatwia szybką analizę oznakowania i manewrów.
-                                </p>
-                                <p><strong>System wspiera kandydatów na kierowców wszystkich grup:</strong></p>
-                                <ul>
-                                    <li><strong>Kategorie AM, A1, A2, A</strong> — dla miłośników jednośladów</li>
-                                    <li><strong>Kategorie B1, B</strong> — dla kierowców pojazdów osobowych</li>
-                                    <li><strong>Kategorie C1, C, D1, D</strong> — dla przyszłych kierowców zawodowych</li>
-                                    <li><strong>Kategoria T</strong> — dla operatorów sprzętu rolniczego</li>
-                                </ul>
-                                <p>
-                                    Regularne rozwiązywanie arkuszy w dedykowanym trybie nauki PrawkoNaRaz.pl skutecznie
-                                    utrwala przepisy i pozwala podejść do egzaminu teoretycznego z pełnym spokojem.”
-                                </p>
-                            </blockquote>
-                        </div>
-                    </article>
-                </div>
-
-                <button
-                    type="button"
-                    class="home-learning__expert-control home-learning__expert-control--next"
-                    data-home-expert-scroll="next"
-                    aria-label="Pokaż następną opinię eksperta"
-                >
-                    <span aria-hidden="true">→</span>
-                </button>
-            </div>
-
-            <p class="home-learning__expert-position" aria-live="polite">
-                <span data-home-expert-position>1 / 2</span>
-            </p>
-        </section>
-
         <header class="home-learning__intro home-learning__intro--centered" data-home-reveal>
-            <p class="home-learning__eyebrow">Darmowe testy na prawo jazdy</p>
             <h2 id="home-learning-title">Pełne przygotowanie do egzaminu teoretycznego</h2>
+            <p class="home-learning__intro-description">Poznaj pytania, zrozum odpowiedzi i wybierz sposób nauki, który pasuje do Ciebie.</p>
         </header>
 
         <section class="home-learning__personalization" aria-labelledby="home-learning-modes-title">
             <div class="home-learning__feature-list">
                 <article class="home-learning__feature home-learning__feature--explanations-overview" data-home-reveal>
                     <div class="home-learning__feature-copy home-learning__feature-copy--explanations-overview">
-                        <p><strong>Wyjaśniamy, dlaczego odpowiedź jest poprawna.</strong> Pokazujemy najważniejszą zasadę i element sytuacji, który naprawdę decyduje o odpowiedzi.</p>
-                        <p><strong>Znaki i grafiki pomagają zrozumieć.</strong> Ważne znaki drogowe pokazujemy bezpośrednio przy wyjaśnieniu, żeby łatwiej połączyć obraz z przepisem.</p>
-                        <p><strong>Pokazujemy haczyki i typowe błędy.</strong> Wiesz, co może zmylić Cię na egzaminie i na co zwrócić uwagę przy podobnych pytaniach.</p>
-                        <p><strong>Sprawdzisz też statystyki i poziom trudności.</strong> Zobaczysz, jak z pytaniem radzili sobie inni kursanci.</p>
-                        <p><strong>Podstawa prawna jest zawsze pod ręką.</strong> Jeśli chcesz, możesz sprawdzić konkretny przepis, na którym opiera się wyjaśnienie.</p>
+                        <h3>Wyjaśnienia, które pomagają zrozumieć</h3>
+                        <ul class="home-learning__benefit-list">
+                            <li><strong>Wiesz, dlaczego odpowiedź jest poprawna.</strong> Pokazujemy zasadę i element sytuacji, który o tym decyduje.</li>
+                            <li><strong>Łączysz znaki z przepisami.</strong> Grafiki pojawiają się bezpośrednio przy wyjaśnieniu.</li>
+                            <li><strong>Rozpoznajesz egzaminacyjne haczyki.</strong> Pokazujemy typowe błędy i to, na co zwrócić uwagę.</li>
+                            <li><strong>Sprawdzasz trudność pytania.</strong> Widzisz, jak poradzili sobie inni kursanci.</li>
+                            <li><strong>Masz podstawę prawną pod ręką.</strong> W razie potrzeby możesz sprawdzić konkretny przepis.</li>
+                        </ul>
                     </div>
                     <figure class="home-learning__feature-screen home-learning__feature-screen--sticky">
                         <button
@@ -173,23 +38,18 @@
                                 decoding="async"
                             >
                         </button>
+                        <figcaption>Kliknij, aby zobaczyć pełny ekran wyjaśnienia</figcaption>
                     </figure>
                 </article>
 
                 <article class="home-learning__feature home-learning__feature--methodology" data-home-reveal>
                     <div class="home-learning__feature-copy">
-                        <p class="home-learning__methodology-lead">
-                            <strong class="home-learning__methodology-heading">Nie każdy uczy się tak samo.</strong>
-                            Jedni chcą widzieć postęp i mieć pełną kontrolę nad sesją.
-                            Inni wolą prosty ekran i maksymalne skupienie na pytaniu.
-                        </p>
-                        <p>
-                            Dlatego w PrawkoNaRaz możesz dopasować zarówno widok nauki, jak i sposób działania pytań,
-                            filmów, audio i wyjaśnień.
-                        </p>
-                        <h3 id="home-learning-modes-title">Dwa tryby widoku</h3>
-                        <h4>Tryb klasyczny</h4>
-                        <p>Postęp, poprawne odpowiedzi, pozostałe pytania, skuteczność i aktualne ustawienia zawsze pod ręką.</p>
+                        <h3 id="home-learning-modes-title">Wybierz swój sposób nauki</h3>
+                        <ul class="home-learning__benefit-list">
+                            <li>W <strong>trybie klasycznym</strong> widzisz postęp, poprawne odpowiedzi i pozostałe pytania.</li>
+                            <li>Skuteczność i ustawienia sesji masz zawsze pod ręką.</li>
+                            <li>Możesz zmieniać sposób pracy z pytaniami, filmami, audio i wyjaśnieniami.</li>
+                        </ul>
                     </div>
                     <figure class="home-learning__feature-screen home-learning__feature-screen--methodology">
                         <button
@@ -211,13 +71,18 @@
                                 decoding="async"
                             >
                         </button>
+                        <figcaption>Kliknij, aby zobaczyć tryb klasyczny</figcaption>
                     </figure>
                 </article>
 
                 <article class="home-learning__feature home-learning__feature--focus" data-home-reveal>
                     <div class="home-learning__feature-copy">
                         <h3>Tryb skupienia</h3>
-                        <p>Minimum elementów na ekranie. Zostają pytanie, materiał, odpowiedzi i podstawowy postęp. Mniej rozpraszaczy, więcej koncentracji.</p>
+                        <ul class="home-learning__benefit-list">
+                            <li>Na ekranie zostają pytanie, materiał i odpowiedzi.</li>
+                            <li>Podstawowy postęp nadal jest widoczny.</li>
+                            <li>Mniej elementów interfejsu pomaga skupić się na zadaniu.</li>
+                        </ul>
                     </div>
                     <figure class="home-learning__feature-screen home-learning__feature-screen--sticky">
                         <button
@@ -239,14 +104,18 @@
                                 decoding="async"
                             >
                         </button>
+                        <figcaption>Kliknij, aby zobaczyć tryb skupienia</figcaption>
                     </figure>
                 </article>
 
                 <article class="home-learning__feature home-learning__feature--explanation" data-home-reveal>
                     <div class="home-learning__feature-copy">
                         <h3>Po odpowiedzi od razu wiesz, dlaczego</h3>
-                        <p>Możesz zobaczyć wyjaśnienie, prostą zasadę do zapamiętania oraz — gdy to potrzebne — graficznie pokazany znak drogowy.</p>
-                        <p>Dzięki temu szybciej utrwalasz skojarzenia i łatwiej zapamiętujesz poprawną odpowiedź.</p>
+                        <ul class="home-learning__benefit-list">
+                            <li>Otrzymujesz wyjaśnienie poprawnej odpowiedzi.</li>
+                            <li>Prosta zasada pomaga zapamiętać najważniejszy wniosek.</li>
+                            <li>Gdy to potrzebne, widzisz również znak drogowy przy wyjaśnieniu.</li>
+                        </ul>
                     </div>
                     <figure class="home-learning__feature-screen home-learning__feature-screen--sticky">
                         <button
@@ -268,15 +137,18 @@
                                 decoding="async"
                             >
                         </button>
+                        <figcaption>Kliknij, aby zobaczyć przykład wyjaśnienia</figcaption>
                     </figure>
                 </article>
 
                 <article class="home-learning__feature home-learning__feature--session" data-home-reveal>
                     <div class="home-learning__feature-copy">
-                        <h3>Ty decydujesz, jak przebiega sesja.</h3>
-                        <p><strong>Automatyczne przejście.</strong> Kolejne pytanie może pojawiać się samo — bez ciągłego klikania „Dalej”.</p>
-                        <p><strong>Audio pytania.</strong> Czytaj sam, gdy zależy Ci na szybkości, albo włącz lektora przy długich pytaniach lub wtedy, gdy jesteś zmęczony.</p>
-                        <p><strong>Wskazówki i filmy.</strong> Pogrubienia, kolory i strzałki pomagają wychwycić ważne elementy. Możesz też ustawić odtwarzanie i prędkość filmu.</p>
+                        <h3>Ty decydujesz, jak przebiega sesja</h3>
+                        <ul class="home-learning__benefit-list">
+                            <li><strong>Automatyczne przejście:</strong> kolejne pytanie może pojawiać się bez klikania „Dalej”.</li>
+                            <li><strong>Audio pytań:</strong> możesz włączyć lektora przy dłuższych treściach.</li>
+                            <li><strong>Wskazówki i filmy:</strong> ustawiasz odtwarzanie i tempo filmu, a wyróżnienia pomagają dostrzec ważne elementy.</li>
+                        </ul>
 
                         <h4>Skróty klawiaturowe</h4>
                         <p>Przechodź przez pytania bez ciągłego sięgania po mysz:</p>
