@@ -385,7 +385,7 @@ trait InteractsWithQuestionExplanationAsset
                 $errors["{$path}.annotation_type"] = 'Wybierz poprawny typ adnotacji.';
             }
 
-            if (! in_array($tone, [null, 'info', 'warning', 'danger'], true)) {
+            if (! in_array($tone, [null, 'info', 'success', 'warning', 'danger'], true)) {
                 $errors["{$path}.tone"] = 'Wybierz poprawny ton adnotacji.';
             }
 

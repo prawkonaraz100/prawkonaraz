@@ -69,6 +69,15 @@ const renderableAnnotations = computed(() =>
 
 const toneClasses = (tone: string | null | undefined) => {
     switch (tone) {
+        case 'success':
+            return {
+                circle: 'border-[#16a34a] bg-[#22c55e]/10',
+                dot: 'bg-[#16a34a]',
+                pill: 'bg-[#15803d] text-white',
+                arrowStroke: 'stroke-[#16a34a]',
+                arrowFill: 'fill-[#16a34a]',
+                text: 'text-[#15803d]',
+            };
         case 'warning':
             return {
                 circle: 'border-[#d97706] bg-[#f59e0b]/12',

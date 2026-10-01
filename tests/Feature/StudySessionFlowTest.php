@@ -24,6 +24,65 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 
+test('starting a configured topic replaces the active session only when valid', function (bool $hasQuestions) {
+    $user = User::factory()->withPurchasedAccess()->create();
+    $category = LicenseCategory::factory()->create(['code' => 'B', 'name' => 'Kategoria B']);
+    $topic = QuestionTopic::query()->create([
+        'key' => 'session_replacement_topic',
+        'name' => 'Nowy dział',
+        'sort_order' => 100,
+    ]);
+    $oldQuestions = Question::factory()->count(2)->for($category, 'licenseCategory')->create();
+    $oldPayload = [
+        'question_ids' => $oldQuestions->modelKeys(),
+        'current_index' => 1,
+        'answered_count' => 1,
+    ];
+    $oldSession = StudySession::factory()->for($user)->for($category, 'licenseCategory')->create([
+        'mode' => 'learn',
+        'status' => 'in_progress',
+        'completed_at' => null,
+        'total_questions_count' => 2,
+        'payload' => $oldPayload,
+    ]);
+
+    $newQuestions = $hasQuestions
+        ? Question::factory()->count(2)->for($category, 'licenseCategory')->create([
+            'question_topic_id' => $topic->getKey(),
+        ])
+        : collect();
+
+    $response = $this->actingAs($user)->post(route('study-sessions.store'), [
+        'license_category_id' => $category->getKey(),
+        'mode' => 'learn',
+        'question_count' => 2,
+        'question_topic_id' => $topic->getKey(),
+        'question_scope' => 'all',
+        'question_status' => 'all',
+        'randomize_order' => false,
+    ]);
+
+    if (! $hasQuestions) {
+        $response->assertSessionHasErrors('license_category_id');
+        expect($oldSession->fresh()->status)->toBe('in_progress')
+            ->and($oldSession->fresh()->completed_at)->toBeNull()
+            ->and($oldSession->fresh()->payload)->toBe($oldPayload)
+            ->and(StudySession::query()->where('user_id', $user->getKey())->count())->toBe(1);
+
+        return;
+    }
+
+    $response->assertSessionHasNoErrors()->assertRedirect(route('study-sessions.current'));
+    $newSession = StudySession::query()->where('user_id', $user->getKey())->where('status', 'in_progress')->sole();
+
+    expect($oldSession->fresh()->status)->toBe('completed')
+        ->and($oldSession->fresh()->completed_at)->not->toBeNull()
+        ->and($oldSession->fresh()->payload)->toBe($oldPayload)
+        ->and($newSession->getKey())->not->toBe($oldSession->getKey())
+        ->and($newSession->payload['filters']['question_topic_id'])->toBe($topic->getKey())
+        ->and($newSession->questionIds()->all())->toEqualCanonicalizing($newQuestions->modelKeys());
+})->with(['available questions' => true, 'empty topic' => false]);
+
 test('users can complete a study session end to end', function () {
     config([
         'media.public_disk' => 'public',

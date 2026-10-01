@@ -601,6 +601,67 @@ test('admin users can access the question edit page with video frame timeline he
         ->assertSee('V-000321', false);
 });
 
+test('admin users can save and reload green markers of every type', function (string $targetKind) {
+    config([
+        'media.public_disk' => 'public',
+        'media.public_base_url' => 'https://media.example.test',
+    ]);
+
+    $question = Question::factory()->create();
+    $isVideo = $targetKind === 'video_frame';
+    QuestionMedia::factory()->for($question)->create([
+        'kind' => $isVideo ? 'video' : 'image',
+        'disk' => 'public',
+        'path' => $isVideo ? 'questions/video/green.mp4' : 'questions/image/green.webp',
+        'mime_type' => $isVideo ? 'video/mp4' : 'image/webp',
+        'variant' => 'full',
+        'duration_seconds' => $isVideo ? 15 : null,
+        'width' => 1280,
+        'height' => 720,
+    ]);
+
+    $rows = collect(['label', 'text', 'circle', 'arrow'])->map(fn (string $type, int $index) => [
+        'target_kind' => $targetKind,
+        'frame_time_seconds' => $isVideo ? 6 : null,
+        'annotation_type' => $type,
+        'tone' => 'success',
+        'label' => in_array($type, ['label', 'text'], true) ? 'Zielony marker' : null,
+        'x_percent' => 40.0,
+        'y_percent' => 30.0,
+        'width_percent' => $type === 'circle' ? 12.0 : null,
+        'height_percent' => $type === 'circle' ? 12.0 : null,
+        'arrow_length_percent' => $type === 'arrow' ? 24.0 : null,
+        'arrow_angle_degrees' => $type === 'arrow' ? 315 : null,
+        'arrow_stroke_percent' => $type === 'arrow' ? 1.4 : null,
+        'arrow_head_percent' => $type === 'arrow' ? 4.2 : null,
+        'position' => $index + 1,
+        'is_active' => true,
+    ])->all();
+
+    $this->actingAs(User::factory()->admin()->create());
+
+    Livewire::test(EditQuestion::class, ['record' => $question->getRouteKey()])
+        ->set('data.explanation_annotations_apply_scope', 'single')
+        ->set('data.explanation_annotations', $rows)
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $saved = $question->fresh()->explanationAnnotations()->get();
+    $payload = app(\App\Support\QuestionExplanationAnnotationPayloadBuilder::class)->forRuntime($saved);
+
+    expect($saved)->toHaveCount(4)
+        ->and($saved->pluck('tone')->all())->toBe(array_fill(0, 4, 'success'))
+        ->and(array_column($payload, 'tone'))->toBe(array_fill(0, 4, 'success'))
+        ->and(array_column($payload, 'annotation_type'))->toBe(['label', 'text', 'circle', 'arrow'])
+        ->and($saved[3]->arrow_length_percent)->toBe(24.0)
+        ->and($saved[3]->arrow_angle_degrees)->toBe(315);
+
+    Livewire::test(EditQuestion::class, ['record' => $question->getRouteKey()])
+        ->assertSet('data.explanation_annotations', fn (array $annotations): bool =>
+            array_column(array_values($annotations), 'tone') === array_fill(0, 4, 'success')
+        );
+})->with(['question_image', 'video_frame']);
+
 test('admin users can persist image and video frame markers from question edit form', function () {
     config([
         'media.public_disk' => 'public',

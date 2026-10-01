@@ -325,6 +325,11 @@
         fill: rgba(59, 130, 246, 0.16);
     }
 
+    .qe-editor__circle-ellipse--success {
+        stroke: #16a34a;
+        fill: rgba(34, 197, 94, 0.16);
+    }
+
     .qe-editor__circle-ellipse--warning {
         stroke: #d97706;
         fill: rgba(245, 158, 11, 0.18);
@@ -357,6 +362,12 @@
         fill: #2563eb;
     }
 
+    .qe-editor__arrow-line--success,
+    .qe-editor__arrow-head--success {
+        stroke: #16a34a;
+        fill: #16a34a;
+    }
+
     .qe-editor__arrow-line--warning,
     .qe-editor__arrow-head--warning {
         stroke: #d97706;
@@ -380,6 +391,7 @@
     }
 
     .qe-editor__dot--info { background: #2563eb; }
+    .qe-editor__dot--success { background: #16a34a; }
     .qe-editor__dot--warning { background: #d97706; }
     .qe-editor__dot--danger { background: #dc2626; }
 
@@ -398,6 +410,7 @@
     }
 
     .qe-editor__label--info { background: #1d4ed8; }
+    .qe-editor__label--success { background: #15803d; }
     .qe-editor__label--warning { background: #b45309; }
     .qe-editor__label--danger { background: #991b1b; }
 
@@ -414,10 +427,12 @@
     }
 
     .qe-editor__text-marker--info { color: #1d4ed8; }
+    .qe-editor__text-marker--success { color: #15803d; }
     .qe-editor__text-marker--warning { color: #b45309; }
     .qe-editor__text-marker--danger { color: #b91c1c; }
 
     .qe-editor__tone-btn--info-active { border-color: #93c5fd; background: #eff6ff; color: #1d4ed8; }
+    .qe-editor__tone-btn--success-active { border-color: #86efac; background: #f0fdf4; color: #15803d; }
     .qe-editor__tone-btn--warning-active { border-color: #fcd34d; background: #fffbeb; color: #b45309; }
     .qe-editor__tone-btn--danger-active { border-color: #fca5a5; background: #fef2f2; color: #b91c1c; }
 
@@ -898,7 +913,7 @@
 
                             <div class="space-y-2">
                                 <p class="qe-editor__section-label">Kolor</p>
-                                <div class="grid grid-cols-3 gap-2">
+                                <div class="grid grid-cols-2 gap-2">
                                     <button
                                         type="button"
                                         class="qe-editor__seg-btn"
@@ -906,6 +921,14 @@
                                         x-on:click="setSelectedTone('info')"
                                     >
                                         Info
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="qe-editor__seg-btn"
+                                        x-bind:class="toneChipClass('success', selectedAnnotation().tone)"
+                                        x-on:click="setSelectedTone('success')"
+                                    >
+                                        Zielony
                                     </button>
                                     <button
                                         type="button"
@@ -2185,6 +2208,8 @@
             },
             toneCircleClass(annotation) {
                 switch (annotation.tone) {
+                    case 'success':
+                        return 'qe-editor__circle-ellipse--success'
                     case 'warning':
                         return 'qe-editor__circle-ellipse--warning'
                     case 'danger':
@@ -2195,6 +2220,8 @@
             },
             toneDotClass(annotation) {
                 switch (annotation.tone) {
+                    case 'success':
+                        return 'qe-editor__dot--success'
                     case 'warning':
                         return 'qe-editor__dot--warning'
                     case 'danger':
@@ -2205,6 +2232,8 @@
             },
             tonePillClass(annotation) {
                 switch (annotation.tone) {
+                    case 'success':
+                        return 'qe-editor__label--success'
                     case 'warning':
                         return 'qe-editor__label--warning'
                     case 'danger':
@@ -2215,6 +2244,8 @@
             },
             toneTextClass(annotation) {
                 switch (annotation.tone) {
+                    case 'success':
+                        return 'qe-editor__text-marker--success'
                     case 'warning':
                         return 'qe-editor__text-marker--warning'
                     case 'danger':
@@ -2225,6 +2256,8 @@
             },
             toneArrowStrokeClass(annotation) {
                 switch (annotation.tone) {
+                    case 'success':
+                        return 'qe-editor__arrow-line--success'
                     case 'warning':
                         return 'qe-editor__arrow-line--warning'
                     case 'danger':
@@ -2235,6 +2268,8 @@
             },
             toneArrowFillClass(annotation) {
                 switch (annotation.tone) {
+                    case 'success':
+                        return 'qe-editor__arrow-head--success'
                     case 'warning':
                         return 'qe-editor__arrow-head--warning'
                     case 'danger':
@@ -2249,6 +2284,8 @@
                 }
 
                 switch (tone) {
+                    case 'success':
+                        return 'qe-editor__tone-btn--success-active'
                     case 'warning':
                         return 'qe-editor__tone-btn--warning-active'
                     case 'danger':

@@ -311,20 +311,10 @@ async function startSmokeSession(pageHandle) {
         .first();
 
     await startButton.waitFor();
-    await startButton.click();
-
-    const replaceSessionDialog = pageHandle.getByRole('dialog');
-
-    if (await replaceSessionDialog.isVisible()) {
-        await Promise.all([
-            waitForPathname(pageHandle, '/nauka/teraz'),
-            replaceSessionDialog.getByRole('button', { name: 'Rozpocznij nową' }).click(),
-        ]);
-
-        return;
-    }
-
-    await waitForPathname(pageHandle, '/nauka/teraz');
+    await Promise.all([
+        waitForPathname(pageHandle, '/nauka/teraz'),
+        startButton.click(),
+    ]);
 }
 
 async function runMobilePwaChecks(pageHandle) {
@@ -553,11 +543,10 @@ async function runMobilePwaChecks(pageHandle) {
                 .getByRole('button', { name: 'Rozpocznij naukę', exact: true });
 
             await setupCta.scrollIntoViewIfNeeded();
-            await setupCta.click();
-            await pageHandle
-                .getByRole('dialog')
-                .getByRole('heading', { name: 'Masz aktywną sesję', exact: true })
-                .waitFor();
+            await Promise.all([
+                waitForPathname(pageHandle, '/nauka/teraz'),
+                setupCta.click(),
+            ]);
 
             const screenshotPath = report.artifacts.mobile_screenshots[viewport.name];
 

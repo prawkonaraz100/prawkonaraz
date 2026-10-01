@@ -393,6 +393,7 @@ class QuestionForm
                                                 ->label('Ton')
                                                 ->options([
                                                     'info' => 'Info',
+                                                    'success' => 'Zielony',
                                                     'warning' => 'Warning',
                                                     'danger' => 'Danger',
                                                 ])

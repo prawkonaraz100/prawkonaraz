@@ -189,7 +189,6 @@ type StudyUiShell = 'exam' | 'exam_like' | 'zen';
 type QuestionScope = 'all' | 'basic' | 'specialist';
 type LearningPath = 'pjm' | 'traffic-signs' | 'classic' | 'zen' | 'exam' | 'memory' | 'ranking';
 type RecommendedStepAction = 'activate' | 'pjm' | 'traffic-signs' | 'memory' | 'classic' | 'exam';
-type PendingStartAction = 'session' | 'global-incorrect';
 
 interface RecommendedStep {
     action: RecommendedStepAction;
@@ -540,8 +539,6 @@ const canStartLearning = computed(() =>
     ),
 );
 const topicDropdownOpen = ref(false);
-const replaceActiveSessionDialogOpen = ref(false);
-const pendingStartAction = ref<PendingStartAction | null>(null);
 const categoryForm = useForm<{
     target_category_id: number | null;
     return_to: string;
@@ -653,16 +650,6 @@ watch(
     { immediate: true },
 );
 
-const openReplaceActiveSessionDialog = (action: PendingStartAction) => {
-    pendingStartAction.value = action;
-    replaceActiveSessionDialogOpen.value = true;
-};
-
-const closeReplaceActiveSessionDialog = () => {
-    replaceActiveSessionDialogOpen.value = false;
-    pendingStartAction.value = null;
-};
-
 const submitSessionForm = () => {
     sessionForm.post(route('study-sessions.store'));
 };
@@ -676,21 +663,6 @@ const submitGlobalIncorrectForm = () => {
     globalIncorrectForm.post(route('study-sessions.store'));
 };
 
-const confirmReplaceActiveSession = () => {
-    const action = pendingStartAction.value;
-
-    closeReplaceActiveSessionDialog();
-
-    if (action === 'global-incorrect') {
-        submitGlobalIncorrectForm();
-        return;
-    }
-
-    if (action === 'session') {
-        submitSessionForm();
-    }
-};
-
 const startLearning = () => {
     if (!canUseFullProduct.value) {
         activateFullLearning();
@@ -698,11 +670,6 @@ const startLearning = () => {
     }
 
     if (!sessionForm.license_category_id) {
-        return;
-    }
-
-    if (activeLearningSession.value) {
-        openReplaceActiveSessionDialog('session');
         return;
     }
 
@@ -716,11 +683,6 @@ const startGlobalIncorrectLearning = () => {
     }
 
     if (!globalIncorrectForm.license_category_id || totalIncorrectQuestions.value <= 0) {
-        return;
-    }
-
-    if (activeLearningSession.value) {
-        openReplaceActiveSessionDialog('global-incorrect');
         return;
     }
 
@@ -1389,66 +1351,6 @@ const startDesktopHeroLearning = () => {
                         @choose-status="chooseStatus"
                         @start-global-incorrect-learning="startGlobalIncorrectLearning"
                     />
-
-                    <div
-                        v-if="replaceActiveSessionDialogOpen && activeLearningSession"
-                        class="fixed inset-0 z-50 flex items-end justify-center bg-[#020617]/62 px-4 pb-4 pt-10 backdrop-blur-[1px] md:items-center md:pb-10"
-                        role="dialog"
-                        aria-modal="true"
-                        aria-labelledby="replace-active-session-title"
-                    >
-                        <button
-                            type="button"
-                            class="absolute inset-0"
-                            aria-label="Anuluj rozpoczęcie nowej sesji"
-                            @click="closeReplaceActiveSessionDialog"
-                        />
-
-                        <section class="relative w-full max-w-md rounded-[1rem] bg-white p-4 shadow-[0_24px_80px_rgba(15,23,42,0.28)]">
-                            <p class="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#0b5cff]">
-                                Aktywna sesja
-                            </p>
-                            <h2 id="replace-active-session-title" class="mt-1 text-xl font-semibold leading-tight tracking-[0] text-[#050b2e]">
-                                Masz aktywną sesję
-                            </h2>
-                            <p class="mt-2 text-sm leading-5 text-[#475569]">
-                                Rozpoczęcie nowej sesji zakończy obecną. Możesz też wrócić do aktualnej nauki.
-                            </p>
-
-                            <div class="mt-3 rounded-[0.8rem] border border-[#e2e8f0] bg-[#f8fbff] px-3 py-2.5">
-                                <p class="text-sm font-semibold text-[#050b2e]">
-                                    {{ activeLearningSession.title }}
-                                </p>
-                                <p class="mt-0.5 text-xs text-[#475569]">
-                                    {{ activeLearningSession.subtitle }} · {{ activeLearningSession.progress.answered }}/{{ activeLearningSession.progress.total }} pytań
-                                </p>
-                            </div>
-
-                            <div class="mt-4 grid gap-2">
-                                <button
-                                    type="button"
-                                    class="inline-flex min-h-[3rem] w-full items-center justify-center rounded-[0.75rem] bg-[#0b5cff] px-4 text-sm font-semibold text-white transition hover:bg-[#023ea4] disabled:cursor-not-allowed disabled:opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] focus-visible:ring-offset-2"
-                                    :disabled="sessionForm.processing || globalIncorrectForm.processing"
-                                    @click="confirmReplaceActiveSession"
-                                >
-                                    Rozpocznij nową
-                                </button>
-                                <Link
-                                    :href="activeLearningSession.resume_url"
-                                    class="inline-flex min-h-[3rem] w-full items-center justify-center rounded-[0.75rem] border border-[#cbd5e1] bg-white px-4 text-sm font-semibold text-[#0f172a] transition hover:bg-[#f8fafc] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] focus-visible:ring-offset-2"
-                                >
-                                    Wróć do sesji
-                                </Link>
-                                <button
-                                    type="button"
-                                    class="inline-flex min-h-[2.75rem] w-full items-center justify-center rounded-[0.75rem] px-4 text-sm font-semibold text-[#475569] transition hover:bg-[#f8fafc] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] focus-visible:ring-offset-2"
-                                    @click="closeReplaceActiveSessionDialog"
-                                >
-                                    Anuluj
-                                </button>
-                            </div>
-                        </section>
-                    </div>
 
                     <section
                         v-if="friendInvitationCtaVisible"
