@@ -5,6 +5,7 @@ use App\Models\ProductAccessGrant;
 use App\Models\ProductPlan;
 use App\Models\PurchaseOrder;
 use App\Models\Question;
+use App\Models\QuestionCollection;
 use App\Models\QuestionTopic;
 use App\Models\QuestionTopicCategoryHero;
 use App\Models\QuestionTopicCategoryLabel;
@@ -16,6 +17,46 @@ use App\Models\UserProfile;
 use App\Models\UserQuestionProgress;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Inertia\Testing\AssertableInertia as Assert;
+
+test('professional courses on the learning page match the selected professional category', function () {
+    $user = User::factory()->withPurchasedAccess()->create();
+    $categories = collect(['AM', 'A1', 'A2', 'A', 'B1', 'B', 'C1', 'C', 'D1', 'D', 'T'])->mapWithKeys(function (string $code): array {
+        $category = LicenseCategory::factory()->create(['code' => $code, 'name' => "Kategoria {$code}"]);
+        Question::factory()->for($category, 'licenseCategory')->create();
+
+        return [$code => $category];
+    });
+    $profile = UserProfile::factory()->for($user, 'user')->create([
+        'target_category_id' => $categories['C']->getKey(),
+    ]);
+    $courses = collect(['A', 'C', 'D'])->mapWithKeys(function (string $code) use ($categories): array {
+        $course = QuestionCollection::query()->create([
+            'license_category_id' => $categories[$code]->getKey(),
+            'code' => "qualification-{$code}",
+            'slug' => "qualification-{$code}",
+            'name' => "Kurs zawodowy {$code}",
+            'kind' => 'professional_qualification',
+            'is_active' => true,
+            'is_available_to_learners' => true,
+            'sort_order' => 1,
+        ]);
+
+        return [$code => $course];
+    });
+
+    foreach ($categories as $code => $category) {
+        $profile->update(['target_category_id' => $category->getKey()]);
+        $expectedCourse = in_array($code, ['C', 'D'], true) ? $courses[$code] : null;
+        $this->actingAs($user->fresh())->get(route('session.index', ['kurs' => $courses['C']->slug]))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Session/Index')
+                ->has('professional_courses', $expectedCourse ? 1 : 0)
+                ->where('professional_courses', fn ($items): bool => collect($items)->pluck('code')->all()
+                    === ($expectedCourse ? [$expectedCourse->code] : []))
+                ->where('initial_professional_course_code', $code === 'C' ? $courses['C']->code : null));
+    }
+})->group('professional-course-visibility');
 
 test('session page shows topic groups for the users selected category', function () {
     $user = User::factory()->withPurchasedAccess()->create();

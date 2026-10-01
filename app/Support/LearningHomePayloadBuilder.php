@@ -159,7 +159,7 @@ class LearningHomePayloadBuilder
                 'coverage' => $coverage,
             ],
             'professional_courses' => $includeProfessionalCourses
-                ? $this->professionalCoursesForUser($user)
+                ? $this->professionalCoursesForUser($user, $category)
                 : [],
             'friend_invitation_cta' => $this->friendInvitationCta($friendInvitationState),
         ];
@@ -307,10 +307,15 @@ class LearningHomePayloadBuilder
     /**
      * @return array<int, array<string, mixed>>
      */
-    protected function professionalCoursesForUser(User $user): array
+    protected function professionalCoursesForUser(User $user, ?LicenseCategory $category): array
     {
+        if (! $category || ! in_array($category->code, ['C1', 'C', 'D1', 'D'], true)) {
+            return [];
+        }
+
         $collections = QuestionCollection::query()
             ->where('kind', 'professional_qualification')
+            ->where('license_category_id', $category->getKey())
             ->where('is_active', true)
             ->where('is_available_to_learners', true)
             ->with([
