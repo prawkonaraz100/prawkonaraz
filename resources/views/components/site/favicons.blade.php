@@ -1,6 +1,6 @@
-<link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
-<link rel="icon" type="image/png" sizes="256x256" href="/favicon.png?v=2">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2">
+<link rel="icon" type="image/x-icon" href="/favicon.ico?v=20261002-shield-white">
+<link rel="icon" type="image/png" sizes="256x256" href="/favicon.png?v=20261002-shield-white">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=20261002-shield-white">
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#ffffff">
 <meta name="application-name" content="PrawkoNaRaz">
