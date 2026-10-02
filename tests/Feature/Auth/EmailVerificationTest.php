@@ -7,6 +7,7 @@ use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
+use Inertia\Testing\AssertableInertia as Assert;
 
 beforeEach(function () {
     $this->withoutMiddleware(ThrottleRequests::class);
@@ -17,7 +18,15 @@ test('email verification screen can be rendered', function () {
 
     $response = $this->actingAs($user)->get('/verify-email');
 
-    $response->assertStatus(200);
+    $response->assertStatus(200)->assertInertia(fn (Assert $page) => $page
+        ->component('Auth/VerifyEmail')
+        ->where('auth.user.email', $user->email)
+        ->where('status', null));
+    foreach (['verification-link-sent', 'email-change-confirmed', 'verification-link-failed'] as $status) {
+        $this->actingAs($user)->withSession(['status' => $status])->get('/verify-email')
+            ->assertOk()->assertInertia(fn (Assert $page) => $page
+            ->component('Auth/VerifyEmail')->where('status', $status));
+    }
 });
 
 test('email can be verified', function () {

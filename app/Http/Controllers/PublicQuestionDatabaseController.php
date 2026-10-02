@@ -10,6 +10,7 @@ use App\Support\NewsroomSemanticLinkService;
 use App\Support\PublicQuestionAnswerStatsService;
 use App\Support\PublicQuestionBreadcrumbs;
 use App\Support\PublicQuestionCatalogService;
+use App\Support\PublicQuestionCategoryContentBuilder;
 use App\Support\PublicQuestionExplanationService;
 use App\Support\PublicQuestionRelationsService;
 use App\Support\PublicQuestionSchemaService;
@@ -128,6 +129,12 @@ class PublicQuestionDatabaseController extends Controller
         $questions = $this->paginateItems($questionItems, 10, $request);
         $breadcrumbs = $publicQuestionBreadcrumbs->category($category);
         $categoryMarketingCopy = $publicQuestionCatalogService->categoryMarketingCopy($category);
+        $hasActiveSearch = $filters['q'] !== '' || $filters['gov_id'] !== '';
+        $categoryContent = app(PublicQuestionCategoryContentBuilder::class)->build(
+            $category,
+            $representativeQuestions,
+            ! $hasActiveSearch && $questions->currentPage() === 1,
+        );
         $latestQuestionDate = $representativeQuestions
             ->pluck('updated_at')
             ->filter()
@@ -142,9 +149,10 @@ class PublicQuestionDatabaseController extends Controller
             'questionTypeSummary' => 'Test jednokrotnego wyboru',
             'latestQuestionDate' => $latestQuestionDate,
             'filters' => $filters,
-            'meta' => $publicQuestionSeoService->category($category, $questions),
+            'categoryContent' => $categoryContent,
+            'meta' => $publicQuestionSeoService->category($category, $questions, $categoryContent['total'], $hasActiveSearch, $categoryMarketingCopy['vehicle_label']),
             'breadcrumbs' => $breadcrumbs,
-            'structuredData' => $publicQuestionSchemaService->category($category, $breadcrumbs, $questions->items()),
+            'structuredData' => $publicQuestionSchemaService->category($category, $breadcrumbs, $questions->items(), $questions->currentPage()),
         ]);
     }
 

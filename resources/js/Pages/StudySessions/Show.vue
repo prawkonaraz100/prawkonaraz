@@ -8,6 +8,21 @@ import PjmVideoBlock from '@/Components/PjmVideoBlock.vue';
 import QuestionAudioControl from '@/Components/QuestionAudioControl.vue';
 import QuestionImageWithAnnotations from '@/Components/QuestionImageWithAnnotations.vue';
 import QuestionExplanationRuntimeBlock from '@/Components/QuestionExplanationRuntimeBlock.vue';
+import CourseExplanationFlashcard from '@/Components/CourseExplanationFlashcard.vue';
+import CourseFlashcardSettings from '@/Components/CourseFlashcardSettings.vue';
+import CourseKeyboardHelp from '@/Components/CourseKeyboardHelp.vue';
+import {
+    usesCourseExplanationFlashcard,
+    COURSE_FLASHCARD_PREFERENCES_KEY,
+    readCourseFlashcardPreferences,
+    shouldAutomaticallyTurnCourseFlashcard,
+    shouldAdvanceCourseWithKeyboard,
+    shouldAdvanceCourseExplanationWithArrow,
+    courseNextShortcutKey,
+    resolveCourseAdvanceDelay,
+    type CourseExplanationMode,
+    type CourseAdvanceMode,
+} from '@/utils/courseFlashcard';
 import QuestionResultMediaFallback from '@/Components/QuestionResultMediaFallback.vue';
 import QuestionVideoFrameWithAnnotations from '@/Components/QuestionVideoFrameWithAnnotations.vue';
 import RegisterDrawer from '@/Components/Auth/RegisterDrawer.vue';
@@ -63,6 +78,7 @@ import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { ArrowLeft, ArrowRight, ArrowUpRight, Bold, Check, CircleCheck, CirclePlay, ExternalLink, FastForward, Gauge, Info, Keyboard, LibraryBig, Lightbulb, MessageSquareText, Palette, Repeat2, Settings, Speech, SquarePlay, SquareX, Trophy, Volume2, X } from '@lucide/vue';
 
 interface SessionContext {
+    explanation_flashcard?: boolean;
     type: string;
     label: string;
     title: string | null;
@@ -809,7 +825,8 @@ const FIRST_VISIT_SESSION_PREFERENCES: SessionPreferences = {
 };
 const viewportWidth = ref(0);
 const viewportHeight = ref(0);
-const reservesExplanationSpace = computed(() => feedbackMode.value === 'instant_explanation');
+const reservesExplanationSpace = computed(() => usesCourseFlashcard.value
+    ? courseExplanationMode.value !== 'never' : feedbackMode.value === 'instant_explanation');
 const globalVisualExplanationsMode = computed<VisualExplanationsMode>(() =>
     page.props.studyContext?.visualExplanationsMode ?? 'after_incorrect',
 );
@@ -1042,6 +1059,15 @@ const isReviewTrainerMode = computed(() => props.session.mode === 'sr_review' ||
 const isCourseModuleSession = computed(() => sessionState.value.scope === 'course_module');
 const isCourseReviewSession = computed(() => sessionState.value.scope === 'course_review');
 const isCourseSession = computed(() => isCourseModuleSession.value || isCourseReviewSession.value);
+const usesCourseFlashcard = computed(() => usesCourseExplanationFlashcard(sessionState.value));
+const courseFlashcardBackVisible = ref(false);
+const isCourseKeyboardHelpOpen = ref(false);
+const courseExplanationMode = ref<CourseExplanationMode>('incorrect');
+const courseAdvanceMode = ref<CourseAdvanceMode>('automatic');
+const courseQuestionAnsweredAt = ref<number | null>(null);
+const effectiveAutoAdvance = computed(() => usesCourseFlashcard.value
+    ? courseAdvanceMode.value === 'automatic' : autoAdvance.value);
+const pendingCourseCompletionQuestionId = ref<number | null>(null);
 const isLocalLearningMode = computed(() => props.session.mode === 'learn' || isPjmMode.value || isReviewTrainerMode.value);
 const sessionContextLabel = computed(() => sessionState.value.context?.label ?? null);
 const currentQuestionContextLabel = computed(() =>
@@ -1111,7 +1137,9 @@ const isCompactExamLikeDesktopViewport = computed(
 );
 
 const workspaceHeightClass = computed(() =>
-    !usePinnedDesktopShell.value
+    usesCourseFlashcard.value
+        ? 'course-session-workspace'
+        : !usePinnedDesktopShell.value
         ? ''
         : isCompactSessionViewport.value
         ? 'xl:h-[calc(100dvh-5.75rem)]'
@@ -1119,6 +1147,9 @@ const workspaceHeightClass = computed(() =>
 );
 
 const contentColumnClass = computed(() => {
+    if (usesCourseFlashcard.value) {
+        return 'course-session-content';
+    }
     if (isExamLikeShell.value) {
         return usePinnedDesktopShell.value
             ? 'xl:grid xl:h-full xl:min-h-0 xl:grid-rows-[auto_minmax(0,1fr)_auto_auto] xl:gap-0'
@@ -1199,7 +1230,9 @@ const sessionOptionsButtonClass = computed(() =>
 );
 
 const workspaceShellClass = computed(() =>
-    isExamLikeShell.value
+    usesCourseFlashcard.value
+        ? 'relative h-full min-h-0 overflow-hidden bg-white/60 shadow-[0_12px_30px_rgba(15,23,42,0.04)]'
+        : isExamLikeShell.value
         ? useFlatPhoneExamWorkspace.value
             ? 'relative bg-white'
             : usePinnedDesktopShell.value
@@ -1237,7 +1270,9 @@ const examLikeScopeValueClass = computed(() =>
 );
 
 const mediaFrameClass = computed(() =>
-    isExamLikeShell.value && isPhoneViewport.value && shouldShowExplanationCard.value
+    usesCourseFlashcard.value
+        ? 'h-full min-h-0'
+        : isExamLikeShell.value && isPhoneViewport.value && shouldShowExplanationCard.value
         ? usePinnedDesktopShell.value
             ? 'min-h-[10.75rem] sm:min-h-[19rem] xl:h-full xl:min-h-0'
             : 'min-h-[10.75rem] sm:min-h-[19rem]'
@@ -1271,7 +1306,9 @@ const mediaFrameClass = computed(() =>
 );
 
 const mediaViewportClass = computed(() =>
-    isExamLikeShell.value && isPhoneViewport.value && shouldShowExplanationCard.value
+    usesCourseFlashcard.value
+        ? 'flex h-full min-h-0 items-center justify-center'
+        : isExamLikeShell.value && isPhoneViewport.value && shouldShowExplanationCard.value
         ? usePinnedDesktopShell.value
             ? 'min-h-[10rem] sm:min-h-[18rem] xl:flex xl:h-full xl:min-h-0 xl:items-start xl:justify-center'
             : 'min-h-[10rem] sm:min-h-[18rem] xl:flex xl:items-center xl:justify-center'
@@ -1339,7 +1376,9 @@ const mediaWorkspacePaneClass = computed(() =>
 );
 
 const mediaStageSectionClass = computed(() =>
-    useEdgeToEdgeSessionMedia.value
+    usesCourseFlashcard.value
+        ? 'flex h-full min-h-0 flex-col'
+        : useEdgeToEdgeSessionMedia.value
         ? 'flex min-h-0 flex-col -mx-3'
         : usePinnedDesktopShell.value
         ? 'flex h-full min-h-0 flex-col'
@@ -1347,7 +1386,9 @@ const mediaStageSectionClass = computed(() =>
 );
 
 const sessionMediaChromeClass = computed(() =>
-    isExamLikeShell.value
+    usesCourseFlashcard.value
+        ? 'flex h-full min-h-0 flex-col p-2'
+        : isExamLikeShell.value
         ? examLikeMediaChromePaddingClass.value
         : useEdgeToEdgeSessionMedia.value
         ? 'p-0'
@@ -1407,6 +1448,9 @@ const createResponsiveMediaFrameStyle = (
 };
 
 const mediaFrameStyle = computed<Record<string, string>>(() => {
+    if (usesCourseFlashcard.value) {
+        return { width: '100%', height: '100%', maxWidth: '100%', maxHeight: '100%' };
+    }
     if (viewportHeight.value <= 0) {
         return {
             width: '100%',
@@ -1471,7 +1515,9 @@ const videoAssetClass = computed(() =>
 );
 
 const promptContainerClass = computed(() =>
-    isExamLikeShell.value
+    usesCourseFlashcard.value
+        ? 'relative min-h-0 bg-white px-3 py-2'
+        : isExamLikeShell.value
         ? isPhoneViewport.value && shouldShowExplanationCard.value
             ? 'relative min-h-0 border-t border-[#eceff3] bg-white px-3 py-2 xl:px-4 xl:py-4'
             : isPhoneViewport.value
@@ -1496,9 +1542,14 @@ const promptContainerClass = computed(() =>
         : 'relative flex min-h-0 items-start overflow-hidden bg-white/56 px-3 py-2 shadow-[0_12px_28px_rgba(36,33,28,0.032)] backdrop-blur-[3px] transition-[background-color,box-shadow,transform] duration-300 ease-out h-[8rem] max-h-[8rem] sm:h-[8.25rem] sm:max-h-[8.25rem] xl:h-[8rem] xl:max-h-[8rem]',
 );
 
-const promptStackClass = computed(() => 'flex h-full min-h-0 flex-col justify-start');
+const promptStackClass = computed(() => usesCourseFlashcard.value
+    ? 'flex min-h-0 flex-col justify-start'
+    : 'flex h-full min-h-0 flex-col justify-start');
 
 const promptFrameStyle = computed<Record<string, string>>(() => {
+    if (usesCourseFlashcard.value) {
+        return { width: '100%', maxWidth: '885px' };
+    }
     if (!isExamLikeShell.value && !isPhoneViewport.value && hasQuestionMedia.value) {
         return {
             width: mediaFrameStyle.value.width ?? '100%',
@@ -1576,6 +1627,9 @@ const promptFrameStyle = computed<Record<string, string>>(() => {
 });
 
 const promptScrollClass = computed(() => {
+    if (usesCourseFlashcard.value) {
+        return 'mx-auto min-h-0 w-full overflow-visible';
+    }
     if (isPhoneViewport.value) {
         return 'mx-auto w-full overflow-visible pr-1';
     }
@@ -1619,7 +1673,7 @@ const examLikeBooleanAnswerTextClass = computed(() =>
 );
 
 const shouldPinMobileAnswerPanel = computed(
-    () => isPhoneViewport.value && !localSessionCompleted.value,
+    () => isPhoneViewport.value && !localSessionCompleted.value && !usesCourseFlashcard.value,
 );
 
 const useCompactMobileDockActions = computed(
@@ -1630,6 +1684,9 @@ const useCompactMobileDockActions = computed(
 );
 
 const mobileAnswerDockWrapperClass = computed(() => {
+    if (usesCourseFlashcard.value) {
+        return 'course-session-answer-dock';
+    }
     if (shouldPinMobileAnswerPanel.value) {
         if (isExamLikeShell.value) {
             return useCompactMobileDockActions.value
@@ -1660,6 +1717,9 @@ const mobileAnswerDockWrapperStyle = computed<Record<string, string>>((): Record
 });
 
 const answerSectionClass = computed(() => {
+    if (usesCourseFlashcard.value) {
+        return 'relative z-10 min-h-0 space-y-2 bg-white px-2 py-2';
+    }
     if (shouldPinMobileAnswerPanel.value) {
         return useCompactMobileDockActions.value
             ? 'mx-auto max-w-[30rem] min-h-0 space-y-2'
@@ -1680,13 +1740,17 @@ const activeQuestionSectionClass = computed(() =>
 );
 
 const activeQuestionShellClass = computed(() =>
-    isExamLikeShell.value
+    usesCourseFlashcard.value
+        ? 'course-session-shell max-w-[78rem]'
+        : isExamLikeShell.value
         ? 'max-w-[79rem] min-[1024px]:grid min-[1024px]:grid-cols-[minmax(0,1fr)_16rem] min-[1024px]:items-start min-[1024px]:gap-4 xl:grid-cols-[minmax(0,1fr)_18rem] xl:gap-5'
         : 'max-w-[78rem] space-y-3 xl:space-y-2.5',
 );
 
 const activeQuestionInnerClass = computed(() =>
-    isExamLikeShell.value
+    usesCourseFlashcard.value
+        ? 'course-session-inner'
+        : isExamLikeShell.value
         ? 'space-y-3 min-[1024px]:space-y-2 xl:space-y-2'
         : '',
 );
@@ -2580,7 +2644,9 @@ const shouldShowQuestionMediaTextPlaceholder = computed(() =>
     Boolean(pjmQuestionAsset.value) && !hasQuestionMedia.value,
 );
 const questionMediaLayoutClass = computed(() =>
-    pjmQuestionAsset.value
+    usesCourseFlashcard.value
+        ? 'flex h-full min-h-0 w-full items-center justify-center'
+        : pjmQuestionAsset.value
         ? 'grid w-full max-w-[92rem] gap-3 md:grid-cols-[minmax(0,1fr)_minmax(18rem,0.56fr)] md:items-stretch xl:gap-4'
         : 'flex w-full items-center justify-center',
 );
@@ -3658,7 +3724,8 @@ const roadmapLead = computed(() => {
     return `W dziale ${currentTopic.label} masz opanowane ${topicMasteredQuestionCount(currentTopic)} z ${questionCountForTopicStatus(currentTopic, 'all')} pytań.`;
 });
 const isAnySidePanelOpen = computed(
-    () => isSettingsOpen.value || isTopicPickerOpen.value || isMobileSessionMenuOpen.value,
+    () => isSettingsOpen.value || isTopicPickerOpen.value || isMobileSessionMenuOpen.value
+        || (usesCourseFlashcard.value && isCourseKeyboardHelpOpen.value),
 );
 const canSwitchTopics = computed(() =>
     canUseTopicPicker.value
@@ -3668,13 +3735,14 @@ const canSwitchTopics = computed(() =>
     && !answerForm.processing,
 );
 const usesReviewAtEndMode = computed(() =>
-    isLocalLearningMode.value && feedbackMode.value === 'review',
+    !usesCourseFlashcard.value && isLocalLearningMode.value && feedbackMode.value === 'review',
 );
 const usesExplanationFeedbackMode = computed(() =>
-    isLocalLearningMode.value && feedbackMode.value === 'instant_explanation',
+    isLocalLearningMode.value && (usesCourseFlashcard.value
+        ? courseExplanationMode.value !== 'never' : feedbackMode.value === 'instant_explanation'),
 );
 const usesInstantFeedbackMode = computed(() =>
-    isLocalLearningMode.value && feedbackMode.value !== 'review',
+    isLocalLearningMode.value && (usesCourseFlashcard.value || feedbackMode.value !== 'review'),
 );
 const displaySessionStatus = computed(() =>
     localSessionCompleted.value
@@ -3861,6 +3929,12 @@ const hasOnDemandExplanationAvailable = computed(() =>
         explanationAssetImageUrl: currentQuestionExplanationAsset.value?.image_url ?? null,
     }),
 );
+const automaticCourseFlashcardVisible = computed(() => shouldAutomaticallyTurnCourseFlashcard(
+    sessionState.value,
+    courseExplanationMode.value,
+    currentAnswerResult.value?.is_correct ?? null,
+    hasOnDemandExplanationAvailable.value,
+));
 const shouldShowExplanationCard = computed(() =>
     shouldShowStudySessionExplanationCard({
         showExplanation: showExplanation.value,
@@ -4222,6 +4296,7 @@ const previousActionDisabled = computed(() => {
     const hasBlockingAnswerSyncError = answerSyncFailedQuestionId.value === activeQuestion.value.id;
 
     return !previousQuestionMeta
+        || pendingCourseCompletionQuestionId.value !== null
         || questionTransitionInFlight.value
         || hasBlockingAnswerSyncError;
 });
@@ -4380,6 +4455,10 @@ const closeTopicPicker = () => {
 };
 
 const closeSidePanels = () => {
+    if (isCourseKeyboardHelpOpen.value) {
+        isCourseKeyboardHelpOpen.value = false;
+        return;
+    }
     if (isMobileSessionMenuOpen.value) {
         closeMobileSessionMenu();
         return;
@@ -4416,6 +4495,57 @@ const handleSessionKeydown = (event: KeyboardEvent) => {
         }
 
         return;
+    }
+
+    if (usesCourseFlashcard.value) {
+        if ((event.key === 'ArrowRight' || event.key.toLowerCase() === 'd') && currentAnswerResult.value) {
+            const target = event.target instanceof HTMLElement ? event.target : null;
+            const blocked = Boolean(target && (target.isContentEditable
+                || target.closest('input, textarea, select, a, summary, details, [contenteditable="true"]')
+                || (target.closest('button') && !target.closest('[data-course-answer], [data-course-next]'))));
+            if (shouldAdvanceCourseExplanationWithArrow(sessionState.value, event, {
+                answered: true,
+                explanationVisible: courseFlashcardBackVisible.value,
+                ready: questionStage.value === 'answer' && !primaryActionDisabled.value,
+                blocked,
+            })) {
+                event.preventDefault();
+                handlePrimaryAction();
+            }
+            // Never fall through and select an answer with the same keydown.
+            return;
+        }
+        if (courseNextShortcutKey(event)) {
+            const target = event.target instanceof HTMLElement ? event.target : null;
+            const blocked = Boolean(target && (target.isContentEditable
+                || target.closest('input, textarea, select, a, summary, details, [contenteditable="true"]')
+                || (target.closest('button') && !target.closest('[data-course-answer], [data-course-next]'))));
+            if (shouldAdvanceCourseWithKeyboard(sessionState.value, event, {
+                answered: currentAnswerResult.value !== null,
+                ready: questionStage.value === 'answer' && !primaryActionDisabled.value,
+                blocked,
+            })) {
+                event.preventDefault();
+                handlePrimaryAction();
+            }
+            return;
+        }
+        if (event.isComposing || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
+        if (event.repeat) {
+            if (event.key === 'Enter') event.preventDefault();
+            return;
+        }
+        if (event.key === 'Enter') {
+            const target = event.target instanceof HTMLElement ? event.target : null;
+            const blocked = Boolean(target && (target.isContentEditable
+                || target.closest('input, textarea, select, a, summary, details, [contenteditable="true"]')
+                || (target.closest('button') && !target.closest('[data-course-answer], [data-course-next]'))));
+            if (blocked) return;
+            event.preventDefault();
+            return;
+        }
+        // On the front arrows and D still answer; on the answered back → and D advance.
+        if (currentAnswerResult.value) return;
     }
 
     if (isTypingInInteractiveElement(event.target)) {
@@ -5719,6 +5849,31 @@ const loadPreferences = () => {
     }
 };
 
+const loadCourseFlashcardPreferences = () => {
+    if (!usesCourseFlashcard.value || typeof window === 'undefined') return;
+    try {
+        const preferences = readCourseFlashcardPreferences(window.localStorage.getItem(COURSE_FLASHCARD_PREFERENCES_KEY));
+        courseExplanationMode.value = preferences.explanationMode;
+        courseAdvanceMode.value = preferences.advanceMode;
+    } catch {
+        // Storage restrictions must never prevent studying.
+    }
+};
+
+const completePendingCourseSession = () => {
+    if (!usesCourseFlashcard.value || pendingCourseCompletionQuestionId.value === null) return false;
+    pendingCourseCompletionQuestionId.value = null;
+    clearAutoAdvanceTimeout();
+    preparedNextQuestion.value = null;
+    preparedNextQuestionNumber.value = null;
+    activeQuestionState.value = null;
+    currentQuestionNumberState.value = null;
+    localSessionCompleted.value = true;
+    showCompletionResults.value = true;
+    showCorrectCompletionResults.value = true;
+    return true;
+};
+
 const persistVisualExplanationsPreference = () => {
     if (typeof window === 'undefined') {
         return;
@@ -6039,7 +6194,10 @@ const hasResultExplanationContent = (result: ResultItem) =>
     });
 
 const shouldShowAutomaticExplanationForResult = (result: ResultItem) =>
-    Boolean(
+    usesCourseFlashcard.value
+    ? shouldAutomaticallyTurnCourseFlashcard(sessionState.value, courseExplanationMode.value,
+        result.is_correct, hasResultExplanationContent(result))
+    : Boolean(
         usesExplanationFeedbackMode.value
         && result.is_correct === false
         && (!isReviewTrainerMode.value || hasResultExplanationContent(result))
@@ -6084,9 +6242,12 @@ const persistLocalAnswer = (
         : null;
 
     const advanceToNextQuestion = () => {
-        if (!autoAdvance.value || localSessionCompleted.value) {
+        if (!effectiveAutoAdvance.value || localSessionCompleted.value) {
             return;
         }
+
+        if (usesCourseFlashcard.value && activeQuestion.value?.id !== question.id) return;
+        if (completePendingCourseSession()) return;
 
         clearAutoAdvanceTimeout();
 
@@ -6099,7 +6260,7 @@ const persistLocalAnswer = (
     };
 
     const resolveAutoAdvanceDelay = () => Math.max(
-        showExplanation.value
+        (showExplanation.value || automaticCourseFlashcardVisible.value)
             ? instructorHintGlanceMs.value
             : shouldShowInstantAnswerFeedback.value
             ? INSTANT_FEEDBACK_GLANCE_MS
@@ -6107,6 +6268,7 @@ const persistLocalAnswer = (
         correctAnswerAudioDelayMs(result),
     );
     const answeredAt = Date.now();
+    if (usesCourseFlashcard.value) courseQuestionAnsweredAt.value = answeredAt;
 
     if (usesFrozenPublicDemo.value) {
         syncError.value = null;
@@ -6274,6 +6436,11 @@ const persistLocalAnswer = (
         }
 
         if (payload.completed) {
+            // Keep the final course explanation readable; the answer is already saved.
+            if (usesCourseFlashcard.value && activeQuestion.value?.id === question.id) {
+                pendingCourseCompletionQuestionId.value = question.id;
+                return;
+            }
             preparedNextQuestion.value = null;
             preparedNextQuestionNumber.value = null;
             activeQuestionState.value = null;
@@ -6285,6 +6452,10 @@ const persistLocalAnswer = (
     });
 
     syncRequest.then(() => {
+        if (usesCourseFlashcard.value) {
+            scheduleCourseAutoAdvance(question.id, answeredAt);
+            return;
+        }
         if (!autoAdvance.value) {
             return;
         }
@@ -6319,7 +6490,7 @@ const persistLocalAnswer = (
         showCorrectCompletionResults.value = false;
     });
 
-    if (!autoAdvance.value && typeof window !== 'undefined') {
+    if (!effectiveAutoAdvance.value && typeof window !== 'undefined') {
         clearAutoAdvanceTimeout();
     }
 
@@ -6340,6 +6511,52 @@ const toggleExplanationOnDemand = () => {
 
     showExplanationOnDemand.value = true;
     showExplanation.value = true;
+};
+
+// Presentation state only: never changes the saved answer or shared feedback flags.
+watch([usesCourseFlashcard, () => activeQuestion.value?.id, shouldShowExplanationCard, automaticCourseFlashcardVisible], () => {
+    courseFlashcardBackVisible.value = usesCourseFlashcard.value
+        && (isManualExplanationVisible.value || automaticCourseFlashcardVisible.value);
+}, { immediate: true });
+watch(courseFlashcardBackVisible, (visible) => {
+    if (visible && usesCourseFlashcard.value) {
+        videoElements.forEach((video) => video.pause());
+        questionAudioControlRef.value?.pause();
+    }
+});
+const canTurnCourseFlashcard = computed(() => usesCourseFlashcard.value
+    && (canToggleExplanationOnDemand.value || isAutomaticExplanationVisible.value || automaticCourseFlashcardVisible.value || courseFlashcardBackVisible.value));
+const toggleCourseFlashcard = () => {
+    if (canTurnCourseFlashcard.value) {
+        courseFlashcardBackVisible.value = !courseFlashcardBackVisible.value;
+    }
+};
+const courseFlashcardCorrectAnswer = computed(() => {
+    const key = currentAnswerResult.value?.correct_answer ?? activeQuestion.value?.correct_answer;
+    const option = activeQuestion.value?.options.find((item) => item.key.toUpperCase() === key?.toUpperCase());
+    const text = currentAnswerResult.value?.correct_answer_text ?? option?.text;
+    return key ? `${key.toUpperCase()}${text ? `. ${text}` : ''}` : null;
+});
+
+const scheduleCourseAutoAdvance = (questionId: number, answeredAt: number = Date.now()) => {
+    if (!usesCourseFlashcard.value || activeQuestion.value?.id !== questionId) return;
+    clearAutoAdvanceTimeout();
+    if (!effectiveAutoAdvance.value || isAnySidePanelOpen.value || localSessionCompleted.value
+        || !currentAnswerResult.value || primaryActionDisabled.value || learningSyncInFlight.value
+        || typeof window === 'undefined') return;
+    const delay = resolveCourseAdvanceDelay(
+        sessionState.value, courseAdvanceMode.value,
+        courseFlashcardBackVisible.value || automaticCourseFlashcardVisible.value,
+        instructorHintGlanceMs.value, INSTANT_FEEDBACK_GLANCE_MS,
+        correctAnswerAudioDelayMs(currentAnswerResult.value),
+    );
+    if (delay === null) return;
+    autoAdvanceTimeoutId = window.setTimeout(() => {
+        autoAdvanceTimeoutId = null;
+        if (!usesCourseFlashcard.value || !effectiveAutoAdvance.value || isAnySidePanelOpen.value
+            || activeQuestion.value?.id !== questionId || primaryActionDisabled.value) return;
+        if (!completePendingCourseSession()) void moveToNextQuestion(questionId);
+    }, Math.max(delay - Math.max(Date.now() - answeredAt, 0), 0));
 };
 
 const beginPreviewStage = () => {
@@ -6532,6 +6749,8 @@ const handlePrimaryAction = () => {
         if (!currentAnswerResult.value) {
             return;
         }
+
+        if (completePendingCourseSession()) return;
 
         void moveToNextQuestion();
         return;
@@ -7024,6 +7243,7 @@ const bindMobileAnswerDockObserver = () => {
 
 onMounted(() => {
     loadPreferences();
+    loadCourseFlashcardPreferences();
     restoreVisualExplanationsPreference();
     syncViewport();
 
@@ -7067,6 +7287,35 @@ onMounted(() => {
         void autoFocusCompletionProgressPanel();
         syncSessionRoadmapScrollState();
     });
+});
+
+watch([courseExplanationMode, courseAdvanceMode], () => {
+    if (!usesCourseFlashcard.value || typeof window === 'undefined') return;
+    try {
+        window.localStorage.setItem(COURSE_FLASHCARD_PREFERENCES_KEY, JSON.stringify({
+            explanationMode: courseExplanationMode.value,
+            advanceMode: courseAdvanceMode.value,
+        }));
+    } catch {
+        // Preferences remain usable for this session without local storage.
+    }
+});
+
+watch([courseExplanationMode, courseAdvanceMode, hintTimingPreference, isAnySidePanelOpen, courseFlashcardBackVisible], () => {
+    if (!usesCourseFlashcard.value) return;
+    clearAutoAdvanceTimeout();
+    if (activeQuestion.value && currentAnswerResult.value) {
+        // Reopening settings or manually opening an explanation grants fresh reading time.
+        void nextTick(() => {
+            if (activeQuestion.value) scheduleCourseAutoAdvance(activeQuestion.value.id);
+        });
+    }
+});
+
+watch(learningSyncInFlight, (inFlight) => {
+    if (!inFlight && usesCourseFlashcard.value && activeQuestion.value && currentAnswerResult.value) {
+        scheduleCourseAutoAdvance(activeQuestion.value.id, courseQuestionAnsweredAt.value ?? Date.now());
+    }
 });
 
 onBeforeUnmount(() => {
@@ -7125,6 +7374,7 @@ watch([() => videoPlaybackRate.value, () => autoJumpToVideoEnding.value], () => 
 watch(
     () => feedbackMode.value,
     (mode) => {
+        if (usesCourseFlashcard.value) return;
         if (mode !== 'instant_explanation') {
             showExplanation.value = false;
             showExplanationOnDemand.value = false;
@@ -7157,6 +7407,7 @@ watch(
             ? localResults.value[question.id]?.selected_answer ?? null
             : null;
         keyboardSelectedOptionKey.value = null;
+        courseQuestionAnsweredAt.value = null;
         answerSyncFailedQuestionId.value = null;
         showExplanation.value = false;
         showExplanationOnDemand.value = false;
@@ -7678,7 +7929,15 @@ watch(
                     </div>
 
                     <div :class="sidePanelBodyClass">
-                        <section class="space-y-3">
+                        <CourseFlashcardSettings
+                            v-if="usesCourseFlashcard"
+                            v-model:explanation-mode="courseExplanationMode"
+                            v-model:advance-mode="courseAdvanceMode"
+                            :timing-index="hintTimingSliderIndex"
+                            :timing-options="hintTimingOptions"
+                            @update:timing-index="setHintTimingPreferenceByIndex"
+                        />
+                        <section v-else class="space-y-3">
                             <div class="space-y-2">
                                 <p :class="sidePanelSectionTitleClass">
                                     Po odpowiedzi
@@ -7861,7 +8120,7 @@ watch(
                         </section>
 
                         <section
-                            v-if="canUseQuestionAudio"
+                            v-if="!usesCourseFlashcard && canUseQuestionAudio"
                             :class="settingsSectionDividerClass"
                         >
                             <div class="space-y-2">
@@ -7962,7 +8221,7 @@ watch(
                             </label>
                         </section>
 
-                        <section :class="settingsSectionDividerClass">
+                        <section v-if="!usesCourseFlashcard" :class="settingsSectionDividerClass">
                             <div class="space-y-2">
                                 <div class="flex items-center gap-2">
                                     <img
@@ -8047,7 +8306,7 @@ watch(
                             </label>
                         </section>
 
-                        <section :class="settingsSectionDividerClass">
+                        <section v-if="!usesCourseFlashcard" :class="settingsSectionDividerClass">
                             <div class="space-y-2">
                                 <div class="flex items-center gap-2">
                                     <SquarePlay
@@ -8271,6 +8530,11 @@ watch(
                             </div>
 
                             <div class="ml-auto flex shrink-0 items-start gap-2 text-xs sm:text-sm">
+                                <CourseKeyboardHelp
+                                    v-if="usesCourseFlashcard"
+                                    v-model:open="isCourseKeyboardHelpOpen"
+                                    :answer-count="answerOptions.length"
+                                />
                                 <button
                                     v-if="showMobileSessionMenuTrigger"
                                     type="button"
@@ -8297,6 +8561,33 @@ watch(
                         <div :class="workspaceShellClass">
                             <div aria-hidden="true" :class="workspaceBackdropClass" />
                             <div class="relative" :class="contentColumnClass">
+                        <CourseExplanationFlashcard
+                            :enabled="usesCourseFlashcard"
+                            :show-back="courseFlashcardBackVisible"
+                            :compact="isCompactSessionViewport"
+                            :correct-answer="courseFlashcardCorrectAnswer"
+                            :question="activeQuestion?.prompt ?? ''"
+                            @return-to-question="courseFlashcardBackVisible = false"
+                        >
+                            <template #explanation>
+                                <div v-if="canShowInlineEditControls && activeQuestion" class="mb-4 flex flex-wrap gap-3 text-sm">
+                                    <button type="button" class="text-blue-800 underline" @click="openQuestionEditor(activeQuestion)">Edytuj pytanie</button>
+                                    <button type="button" class="text-blue-800 underline" @click="openExplanationEditor(activeQuestion)">Edytuj wyjaśnienie</button>
+                                    <a :href="`/admin/questions/${activeQuestion.id}/edit`" target="_blank" rel="noopener noreferrer" class="text-blue-800 underline">Edytuj grafikę</a>
+                                </div>
+                                <QuestionExplanationRuntimeBlock
+                                    :explanation-html="currentExplanationHtml"
+                                    :fallback-text="currentQuestionExplanationAsset?.body ?? null"
+                                    :asset="currentQuestionExplanationAsset"
+                                    :sign-references="currentQuestionExplanationSignReferences"
+                                    :show-image="visualExplanationsMode !== 'off' && Boolean(currentQuestionExplanationAsset?.image_url)"
+                                    :show-sign-references="visualExplanationsMode !== 'off'"
+                                    :palette="inlineFormattingPalette"
+                                    :enable-bold-formatting="enableInlineBold"
+                                    :enable-color-formatting="enableInlineColors"
+                                />
+                                <a v-if="publicExplanationUrl" :href="publicExplanationUrl" target="_blank" rel="noopener noreferrer" class="mt-5 inline-flex text-sm font-semibold text-blue-800 underline">Zobacz pełne wyjaśnienie</a>
+                            </template>
                         <div :class="mediaWorkspacePaneClass">
                             <div
                                 v-if="questionStage === 'preview' && isExamMode"
@@ -8551,7 +8842,7 @@ watch(
                             <div class="w-full min-w-0" :class="promptStackClass">
                                 <Transition name="focus-copy" mode="out-in">
                                     <div
-                                        v-if="shouldShowExplanationCard"
+                                        v-if="shouldShowExplanationCard && !usesCourseFlashcard"
                                         key="hint"
                                         class="overflow-hidden"
                                         :class="explanationCalloutClass"
@@ -8642,7 +8933,7 @@ watch(
                                                 />
                                             </div>
                                             <div
-                                                v-if="canShowInlineEditControls && activeQuestion && !shouldShowExplanationCard"
+                                                v-if="canShowInlineEditControls && activeQuestion && (!shouldShowExplanationCard || usesCourseFlashcard)"
                                                 class="ml-auto flex flex-wrap items-center gap-2"
                                             >
                                                 <button
@@ -8704,6 +8995,7 @@ watch(
                         </div>
                         </div>
 
+                        </CourseExplanationFlashcard>
                         <div
                             ref="mobileAnswerDockRef"
                             :class="mobileAnswerDockWrapperClass"
@@ -8712,6 +9004,7 @@ watch(
                         <div :class="answerSectionClass">
                             <div
                                 v-if="questionStage !== 'preview' || !isExamMode"
+                                :class="usesCourseFlashcard ? 'course-session-answer-options' : undefined"
                             >
                                 <div
                                     v-if="isExamLikeShell"
@@ -8722,6 +9015,7 @@ watch(
                                         :key="option.key"
                                         type="button"
                                         :data-testid="`answer-option-${option.key}`"
+                                        :data-course-answer="usesCourseFlashcard ? '' : undefined"
                                         :data-answer-state="answerOptionVisualState(option.key)"
                                         class="transition disabled:cursor-not-allowed"
                                         :class="activeQuestion.question_type === 'boolean'
@@ -8770,6 +9064,7 @@ watch(
                                         :key="option.key"
                                         type="button"
                                         :data-testid="`answer-option-${option.key}`"
+                                        :data-course-answer="usesCourseFlashcard ? '' : undefined"
                                         :data-answer-state="answerOptionVisualState(option.key)"
                                         class="text-center font-semibold tracking-tight text-neutral-900 transition-[background-color,box-shadow,transform,color] duration-200 ease-out disabled:cursor-not-allowed"
                                         :class="[
@@ -8836,15 +9131,43 @@ watch(
                                             ? 'rounded-none border border-[#d1d5db] bg-white px-2 py-1.5 text-[0.78rem] font-medium leading-5 text-[#374151] transition hover:border-[#9ca3af] hover:bg-[#fafafa] hover:text-[#111827] disabled:cursor-not-allowed disabled:opacity-35'
                                             : 'rounded-none border border-[#d1d5db] bg-white px-3 py-2 text-[0.84rem] font-medium text-[#374151] transition hover:border-[#9ca3af] hover:bg-[#fafafa] hover:text-[#111827] disabled:cursor-not-allowed disabled:opacity-35'
                                         : 'px-3 py-1.5 text-[0.84rem] font-medium text-neutral-500 transition-[background-color,color] duration-200 ease-out hover:bg-white/34 hover:text-neutral-800 disabled:cursor-not-allowed disabled:opacity-35'"
-                                    :disabled="!canToggleExplanationOnDemand"
-                                    @click="toggleExplanationOnDemand"
+                                    :disabled="usesCourseFlashcard ? !canTurnCourseFlashcard : !canToggleExplanationOnDemand"
+                                    @click="usesCourseFlashcard ? toggleCourseFlashcard() : toggleExplanationOnDemand()"
                                 >
-                                    {{ explanationToggleDisplayLabel }}
+                                    {{ usesCourseFlashcard ? (courseFlashcardBackVisible ? 'Pokaż pytanie' : 'Pokaż wyjaśnienie') : explanationToggleDisplayLabel }}
                                 </button>
 
+                                <div v-if="usesCourseFlashcard" class="flex items-center justify-center gap-1">
+                                    <button
+                                        type="button"
+                                        :aria-label="primaryActionLabel"
+                                        data-course-next
+                                        title="Po odpowiedzi: lewy Ctrl, Alt/Option lub Fn — dalej. Na wyjaśnieniu także → lub D."
+                                        class="inline-flex items-center justify-center px-3 py-1.5 text-[0.84rem] font-medium text-neutral-600 transition-[background-color,color] duration-200 ease-out hover:bg-white/38 hover:text-neutral-900 disabled:cursor-not-allowed disabled:opacity-35"
+                                        :disabled="primaryActionDisabled"
+                                        @click="handlePrimaryAction"
+                                    >
+                                        <span>Dalej</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        data-testid="course-keyboard-help-footer-trigger"
+                                        aria-label="Informacje o sterowaniu klawiaturą"
+                                        aria-haspopup="dialog"
+                                        :aria-expanded="isCourseKeyboardHelpOpen"
+                                        title="Jak sterować klawiaturą?"
+                                        class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-neutral-500 transition hover:bg-white/60 hover:text-neutral-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                                        @click="isCourseKeyboardHelpOpen = true"
+                                    >
+                                        <Info :size="15" :stroke-width="1.8" aria-hidden="true" />
+                                    </button>
+                                </div>
                                 <button
+                                    v-else
                                     type="button"
                                     :aria-label="primaryActionLabel === 'Następne pytanie' ? primaryActionLabel : undefined"
+                                    :data-course-next="usesCourseFlashcard ? '' : undefined"
+                                    :title="usesCourseFlashcard ? 'Po odpowiedzi: lewy Ctrl, Alt/Option lub Fn — dalej. Na wyjaśnieniu także → lub D.' : undefined"
                                     :class="isExamLikeShell
                                         ? useCompactAnswerActions
                                             ? 'inline-flex items-center justify-center rounded-none border border-[#0071ce] bg-[#0071ce] px-2 py-1.5 text-[0.78rem] font-semibold leading-5 text-white transition hover:border-[#005fae] hover:bg-[#005fae] disabled:cursor-not-allowed disabled:border-[#d1d5db] disabled:bg-[#f3f4f6] disabled:text-[#9ca3af]'
@@ -10087,13 +10410,13 @@ watch(
                             {{ publicDemoPrimaryLabel }}
                         </Link>
 
-                        <Link
+                        <a
                             v-if="isPublicDemoMode"
                             href="/"
                             :class="completionQuickNavButtonClass"
                         >
                             Wróć na stronę główną
-                        </Link>
+                        </a>
 
                         <button
                             v-if="isCourseModuleSession && sessionState.context?.restart_url"
@@ -11325,6 +11648,21 @@ watch(
 
 <style scoped>
 @import url('https://fonts.bunny.net/css?family=inter:400,500,600&display=swap');
+
+.course-session-shell { height: calc(100dvh - 1.25rem); min-height: 0; }
+.course-session-inner { display: grid; height: 100%; min-width: 0; min-height: 0; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+.course-session-workspace { height: 100%; min-width: 0; min-height: 0; }
+.course-session-content { display: grid; height: 100%; min-width: 0; min-height: 0; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; gap: 8px; }
+.course-session-answer-dock { min-width: 0; min-height: 0; }
+.course-session-answer-options { max-height: min(42dvh, 22rem); overflow-y: auto; overscroll-behavior: contain; }
+/* Keep feedback rings inside each tile so the scroll container cannot clip them. */
+.course-session-answer-options [data-course-answer] { --tw-ring-inset: inset; }
+@media (min-width: 1024px) {
+    .course-session-shell { height: calc(100dvh - .5rem); }
+}
+@media (max-width: 639px) {
+    .course-session-answer-dock [data-course-answer] { min-height: 44px; padding: 8px 12px; font-size: 14px; line-height: 20px; }
+}
 
 .question-copy,
 .hint-copy,

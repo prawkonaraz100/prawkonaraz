@@ -861,6 +861,13 @@ class StudySessionController extends Controller
             'label' => $isCollectionReview ? 'Powtórka kursu' : 'Moduł '.($module?->code ?? $context['module_code'] ?? ''),
             'title' => $isCollectionReview ? 'Pytania do poprawy' : ($module?->name ?? $context['module_name'] ?? null),
             'collection_name' => $collection?->name ?? $context['collection_name'] ?? null,
+            // Explicitly opt in one course; ordinary category sessions have no course context.
+            'explanation_flashcard' => $collection instanceof QuestionCollection
+                && $collection->code === 'qualification-c-accelerated'
+                && $collection->slug === 'kwalifikacja-wstepna-przyspieszona-c'
+                && in_array($collection->kind, ['professional_qualification', 'qualification'], true)
+                && $studySession->mode === StudySessionManager::MODE_LEARN
+                && data_get($studySession->payload, 'ui_shell') === StudySessionManager::UI_SHELL_ZEN,
             'return_url' => $isCollectionReview ? ($incorrectQuestionsUrl ?? $courseUrl) : $courseUrl,
             'course_url' => $courseUrl,
             'restart_url' => ! $isCollectionReview && $moduleBelongsToCollection

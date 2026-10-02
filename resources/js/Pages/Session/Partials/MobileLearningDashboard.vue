@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
+import type { LearningProgressMessage } from '@/types/learningProgress';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import MobileLearningAppBar from '@/Pages/Session/Partials/MobileLearningAppBar.vue';
+import LearningProgressIcon from './LearningProgressIcon.vue';
 import mobileLearningHeroRoadCar from '../../../../images/session/mobile-learning-hero-road-car.webp';
 import mobileRankingPodium from '../../../../images/session/mobile-ranking-podium.png';
 
 type LearningPath = 'pjm' | 'traffic-signs' | 'classic' | 'zen' | 'exam' | 'memory' | 'ranking';
-type RecommendedStepAction = 'activate' | 'pjm' | 'traffic-signs' | 'memory' | 'classic' | 'exam';
+type RecommendedStepAction = 'none' | 'activate' | 'pjm' | 'traffic-signs' | 'memory' | 'classic' | 'exam';
 type ClassicPracticeMode = 'all' | 'incorrect' | 'global-incorrect';
 
 interface LearningPathTab {
@@ -79,6 +81,7 @@ interface ActiveLearningSession {
 interface LearningDashboard {
     schema_version: number;
     active_session: ActiveLearningSession | null;
+    progress_message: LearningProgressMessage;
     course_progress: {
         category_id: number | null;
         answered_questions: number;
@@ -87,6 +90,9 @@ interface LearningDashboard {
         correct_questions: number;
         total_questions: number;
         percent: number;
+        completed_topic_ids: number[];
+        completed_topics: number;
+        total_topics: number;
     };
     review: {
         due_count: number;
@@ -184,33 +190,6 @@ const quickStartTabs = computed(() =>
         && tab.value !== 'zen',
     ),
 );
-const recommendedTopicQuestionCount = computed(() => {
-    const topic = props.recommendedTopic;
-
-    if (!topic) {
-        return 0;
-    }
-
-    if ((topic.counts.unanswered ?? 0) > 0) {
-        return topic.counts.unanswered;
-    }
-
-    if ((topic.counts.incorrect ?? 0) > 0) {
-        return topic.counts.incorrect;
-    }
-
-    return topic.questions_count;
-});
-const recommendedTopicSummary = computed(() => {
-    if (!props.recommendedTopic) {
-        return 'Wybierz dział i rozpocznij pierwszą serię.';
-    }
-
-    const questionCount = recommendedTopicQuestionCount.value;
-    const unit = questionCount === 1 ? 'pytanie' : 'pytań';
-
-    return `${props.recommendedTopic.label} · ${questionCount} ${unit}`;
-});
 const selectedTopic = computed(() =>
     props.filteredGroupOptions
         .flatMap((group) => group.options)
@@ -263,17 +242,9 @@ const courseProgressPercent = computed(() => courseProgress.value.percent);
 const courseCorrectCount = computed(() => courseProgress.value.correct_questions);
 const courseIncorrectCount = computed(() => courseProgress.value.incorrect_questions);
 const courseUnansweredCount = computed(() => courseProgress.value.unanswered_questions);
-const courseProgressWidth = computed(() => `${Math.max(courseProgressPercent.value, 3)}%`);
-const homePrimaryTitle = computed(() => {
-    if (courseProgressPercent.value === 0) {
-        return 'Zacznij naukę';
-    }
-
-    return courseUnansweredCount.value > 0 ? 'Wróć do nauki' : 'Utrwal wiedzę';
-});
-const homePrimaryActionLabel = computed(() =>
-    courseProgressPercent.value === 0 ? 'Rozpocznij' : 'Kontynuuj',
-);
+const courseProgressWidth = computed(() => `${courseProgressPercent.value}%`);
+const homePrimaryTitle = computed(() => props.recommendedStep.title);
+const homePrimaryActionLabel = computed(() => props.recommendedStep.primaryLabel);
 const activeSessionPositionLabel = computed(() => {
     if (!activeSession.value) {
         return '';
@@ -422,7 +393,7 @@ const topicProgressPercent = (option: GroupOption) => {
         return 0;
     }
 
-    return Math.min(Math.round((topicAnsweredCount(option) / option.questions_count) * 100), 100);
+    return Math.min(Math.round((topicAnsweredCount(option) / option.questions_count) * 100), (option.counts.unanswered ?? 0) > 0 ? 99 : 100);
 };
 
 const topicPathStateLabel = (option: GroupOption) => {
@@ -434,13 +405,16 @@ const topicPathStateLabel = (option: GroupOption) => {
         return 'Wybrany';
     }
 
+    if (courseProgress.value.completed_topic_ids.includes(option.id)) {
+        return (option.counts.incorrect ?? 0) > 0 ? 'Zaliczony · do poprawy' : 'Zaliczony';
+    }
     const progress = topicProgressPercent(option);
 
     if (progress === 0) {
         return 'Nowy';
     }
 
-    return progress === 100 ? 'Przerobiony' : `${progress}% przerobione`;
+    return topicAnsweredCount(option) >= option.questions_count ? 'Przerobiony · niezaliczony' : `${progress}% przerobione`;
 };
 
 const topicPathStateClass = (option: GroupOption) => {
@@ -737,14 +711,20 @@ onUnmounted(() => {
                         {{ homePrimaryTitle }}
                     </h2>
                     <p class="mt-2 text-sm leading-5 text-white/88">
-                        {{ recommendedTopicSummary }}
+                        {{ recommendedStep.description }}
                     </p>
 
+                    <Link
+                        v-if="isRecommendedStepLink"
+                        :href="recommendedStep.href ?? '/'"
+                        class="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-md bg-white px-4 text-sm font-semibold text-[#064f9e]"
+                    >{{ homePrimaryActionLabel }} <span class="ml-2" aria-hidden="true">→</span></Link>
                     <button
+                        v-else
                         type="button"
                         class="mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-white px-4 text-sm font-semibold text-[#064f9e] shadow-[0_10px_20px_rgba(5,11,46,0.2)] transition hover:bg-[#eef6ff] disabled:cursor-not-allowed disabled:opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#064f9e]"
-                        :disabled="sessionProcessing || !recommendedTopic"
-                        @click="emit('start-recommended-learning')"
+                        :disabled="sessionProcessing || recommendedStep.action === 'none'"
+                        @click="emit('run-recommended-step')"
                     >
                         <span>{{ homePrimaryActionLabel }}</span>
                         <span aria-hidden="true">→</span>
@@ -1304,7 +1284,7 @@ onUnmounted(() => {
             >
                 <div class="flex items-start justify-between gap-4">
                     <span class="min-w-0">
-                        <span id="mobile-incorrect-questions-title" class="block text-sm font-semibold text-[#071b33]">Pytania do poprawy</span>
+                        <span id="mobile-incorrect-questions-title" class="block text-sm font-semibold text-[#071b33]">Moja lista pytań</span>
                         <span class="mt-0.5 block text-xs leading-4 text-[#667085]">Zostają na liście, dopóki sam ich nie usuniesz.</span>
                     </span>
                     <strong class="shrink-0 text-lg text-[#c53d32]">{{ totalIncorrectQuestions }}</strong>
@@ -1328,15 +1308,15 @@ onUnmounted(() => {
                 </div>
             </section>
 
-            <section class="border-y border-[#e7edf4] py-5" aria-label="Postęp kursu">
+            <section class="border-y border-[#e7edf4] py-5" aria-label="Przerobione pytania">
                 <Link
                     :href="categoryStatsHref"
                     class="flex items-end justify-between gap-3 rounded-[0.5rem] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] focus-visible:ring-offset-2"
-                    aria-label="Zobacz szczegółowy postęp kursu"
+                    aria-label="Zobacz szczegółowy postęp pytań"
                 >
                     <div>
                         <h2 class="text-base font-semibold leading-tight text-[#050b2e]">
-                            Postęp kursu
+                            Przerobione pytania
                         </h2>
                         <p class="mt-1 text-xs leading-4 text-[#64748b]">
                             Wszystkie działy kategorii {{ categoryShortName }}.
@@ -1388,7 +1368,7 @@ onUnmounted(() => {
                                         {{ courseIncorrectCount }}
                                     </span>
                                     <span class="block text-[0.64rem] leading-3 text-[#475569]">
-                                        błędnych
+                                        do poprawy
                                     </span>
                                 </span>
                             </div>
@@ -1409,6 +1389,16 @@ onUnmounted(() => {
                                     </span>
                                 </span>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 border-t border-[#e7edf4] pt-3 text-sm text-[#475569]">
+                    <p class="font-semibold text-[#071b33]">Działy zaliczone: {{ courseProgress.completed_topics }} / {{ courseProgress.total_topics }}</p>
+                    <div class="mt-2 flex items-start gap-2">
+                        <LearningProgressIcon :icon="learningDashboard.progress_message.icon" />
+                        <div aria-live="polite">
+                            <p class="font-semibold text-[#071b33]">{{ learningDashboard.progress_message.title }}</p>
+                            <p class="mt-1">{{ learningDashboard.progress_message.message }}</p>
                         </div>
                     </div>
                 </div>

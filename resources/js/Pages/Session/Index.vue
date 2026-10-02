@@ -3,6 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import DesktopLearningMap from '@/Pages/Session/Partials/DesktopLearningMap.vue';
 import MobileLearningDashboard from '@/Pages/Session/Partials/MobileLearningDashboard.vue';
 import type { PageProps } from '@/types';
+import type { LearningProgressMessage } from '@/types/learningProgress';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import learningCardClassicIcon from '../../../images/session/learning-card-classic.png';
@@ -84,6 +85,7 @@ interface ActiveLearningSession {
 interface LearningDashboard {
     schema_version: number;
     active_session: ActiveLearningSession | null;
+    progress_message: LearningProgressMessage;
     course_progress: {
         category_id: number | null;
         answered_questions: number;
@@ -93,9 +95,14 @@ interface LearningDashboard {
         correct_questions: number;
         total_questions: number;
         percent: number;
+        completed_topic_ids: number[];
+        completed_topics: number;
+        total_topics: number;
     };
     review: {
         due_count: number;
+        recommended_count: number;
+        pending_count: number;
     };
     recent_learning_activity: unknown | null;
     weekly_activity: unknown | null;
@@ -155,6 +162,7 @@ interface ProfessionalCourse {
     name: string;
     description: string | null;
     category_name: string | null;
+    progress_message: LearningProgressMessage;
     progress: {
         answered_count: number;
         total_questions: number;
@@ -188,7 +196,7 @@ type StudyPreset = 'learn' | 'zen' | 'exam';
 type StudyUiShell = 'exam' | 'exam_like' | 'zen';
 type QuestionScope = 'all' | 'basic' | 'specialist';
 type LearningPath = 'pjm' | 'traffic-signs' | 'classic' | 'zen' | 'exam' | 'memory' | 'ranking';
-type RecommendedStepAction = 'activate' | 'pjm' | 'traffic-signs' | 'memory' | 'classic' | 'exam';
+type RecommendedStepAction = 'none' | 'activate' | 'pjm' | 'traffic-signs' | 'memory' | 'classic' | 'exam';
 
 interface RecommendedStep {
     action: RecommendedStepAction;
@@ -931,7 +939,7 @@ const desktopHeroProgressPercent = computed(() => {
         return 0;
     }
 
-    return Math.min(Math.round((desktopHeroAnsweredCount.value / topic.questions_count) * 100), 100);
+    return Math.min(Math.round((desktopHeroAnsweredCount.value / topic.questions_count) * 100), desktopHeroRemainingCount.value > 0 ? 99 : 100);
 });
 const desktopHeroProgressWidth = computed(() =>
     `${desktopHeroProgressPercent.value > 0 ? Math.max(desktopHeroProgressPercent.value, 4) : 0}%`,
@@ -941,20 +949,11 @@ const desktopHeroSecondaryText = computed(() =>
         ? `${desktopHeroRemainingCount.value} pytań do końca`
         : 'Dział przerobiony',
 );
-const courseQuestionTotal = computed(() => totalAnsweredQuestions.value + totalUnansweredQuestions.value);
-const courseProgressPercent = computed(() => {
-    if (courseQuestionTotal.value <= 0) {
-        return 0;
-    }
-
-    return Math.min(Math.round((totalAnsweredQuestions.value / courseQuestionTotal.value) * 100), 100);
-});
+const courseProgressPercent = computed(() => props.learning_dashboard.course_progress.percent);
 const courseProgressStyle = computed(() => ({
     background: `conic-gradient(#e11d2e 0deg ${courseProgressPercent.value * 3.6}deg, #eef2f7 ${courseProgressPercent.value * 3.6}deg 360deg)`,
 }));
-const courseCorrectCount = computed(() =>
-    Math.max(totalAnsweredQuestions.value - totalIncorrectQuestions.value, 0),
-);
+const courseCorrectCount = computed(() => props.learning_dashboard.course_progress.correct_questions);
 const desktopStatusOptions = computed(() =>
     props.status_options.map((option) => {
         const count = selectedTopic.value
@@ -1117,68 +1116,29 @@ const recommendedStep = computed<RecommendedStep>(() => {
         };
     }
 
-    if (totalAnsweredQuestions.value === 0) {
-        return {
-            action: 'classic',
-            eyebrow: 'Rekomendowany start',
-            title: 'Zacznij od pierwszego działu',
-            description: 'Wybierz dział i przejdź przez pierwszą krótką serię pytań w swojej kategorii.',
-            metricLabel: 'Postęp pytań',
-            metricValue: '0 przerobionych',
-            primaryLabel: 'Wybierz dział',
-            topic: firstUnansweredTopic.value ?? undefined,
-            status: 'unanswered',
-        };
-    }
-
-    if (props.learning_overview.due_review_count > 0) {
-        return {
-            action: 'memory',
-            eyebrow: 'Następny krok',
-            title: 'Wróć do trenera pamięci',
-            description: 'Masz materiał, który warto odzyskać zanim dołożysz kolejne pytania.',
-            metricLabel: 'Do powtórki',
-            metricValue: String(props.learning_overview.due_review_count),
-            primaryLabel: 'Otwórz trenera',
-            href: '/trener-pamieci',
-        };
-    }
-
-    if (firstUnansweredTopic.value) {
-        return {
-            action: 'classic',
-            eyebrow: 'Kontynuuj naukę',
-            title: firstUnansweredTopic.value.label,
-            description: 'Przerób kolejną partię nieprzerobionych pytań w aktualnej kategorii.',
-            metricLabel: 'Zostało',
-            metricValue: String(firstUnansweredTopic.value.counts.unanswered ?? 0),
-            primaryLabel: 'Kontynuuj dział',
-            topic: firstUnansweredTopic.value,
-            status: 'unanswered',
-        };
-    }
-
-    if (firstIncorrectTopic.value) {
-        return {
-            action: 'classic',
-            eyebrow: 'Do poprawy',
-            title: 'Powtórz błędy ze wszystkich działów',
-            description: 'Najlepiej domknąć błędne odpowiedzi z całej kategorii zanim przejdziesz do egzaminu próbnego.',
-            metricLabel: 'Błędne',
-            metricValue: String(totalIncorrectQuestions.value),
-            primaryLabel: 'Powtórz błędy',
-            status: 'incorrect',
-        };
-    }
-
+    const message = props.learning_dashboard.progress_message;
+    const progress = props.learning_dashboard.course_progress;
+    const topic = message.state === 'errors'
+        ? firstIncorrectTopic.value
+        : message.state === 'topics_pending' || message.state === 'topic_completed'
+            ? (message.state === 'topic_completed' ? firstUnansweredTopic.value : null)
+                ?? allTopicOptions.value.find((option) => !progress.completed_topic_ids.includes(option.id))
+            : firstUnansweredTopic.value;
     return {
-        action: 'exam',
+        action: message.action,
         eyebrow: 'Następny krok',
-        title: 'Sprawdź gotowość w egzaminie',
-        description: 'Najważniejsze działy są przerobione. Teraz warto sprawdzić wynik w warunkach egzaminacyjnych.',
-        metricLabel: 'Tryb',
-        metricValue: '32 pytania',
-        primaryLabel: 'Rozpocznij egzamin',
+        title: message.title,
+        description: message.message,
+        metricLabel: 'Przerobione pytania',
+        metricValue: `${progress.answered_questions} / ${progress.total_questions}`,
+        primaryLabel: message.action === 'exam' ? 'Rozpocznij egzamin'
+            : message.action === 'memory' ? 'Otwórz trenera pamięci'
+                : message.action === 'none' ? 'Brak pytań'
+                    : message.state === 'errors' ? 'Powtórz pytania do poprawy'
+                        : message.state === 'topics_pending' ? 'Zalicz dział' : 'Kontynuuj naukę',
+        href: message.action === 'memory' ? '/trener-pamieci' : undefined,
+        topic: topic ?? undefined,
+        status: message.state === 'errors' ? 'incorrect' : ['topics_pending', 'topic_completed'].includes(message.state) ? 'all' : 'unanswered',
     };
 });
 
@@ -1418,6 +1378,9 @@ const startDesktopHeroLearning = () => {
                         :incorrect-questions-url="incorrect_question_list.index_url"
                         :active-session="activeLearningSession"
                         :course-progress-percent="courseProgressPercent"
+                        :progress-message="learning_dashboard.progress_message"
+                        :completed-topic-ids="learning_dashboard.course_progress.completed_topic_ids"
+                        :total-topic-count="learning_dashboard.course_progress.total_topics"
                         :traffic-sign-learning-href="trafficSignLearningHref"
                         :memory-trainer-href="memoryTrainerHref"
                         :ranking-mode-href="rankingModeHref"

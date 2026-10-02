@@ -18,6 +18,8 @@ use App\Observers\ContentTopicObserver;
 use App\Observers\QuestionPublicExplanationObserver;
 use App\Support\SharedAuthorTrafficSignSchemaService;
 use App\Support\TrafficSignSchemaService;
+use App\Support\VerificationEmailMessage;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
@@ -39,6 +41,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        VerifyEmail::toMailUsing(fn ($user, string $url) => app(VerificationEmailMessage::class)->build($url));
+
         ContentAuthor::observe(ContentAuthorObserver::class);
         ContentCategory::observe(ContentCategoryObserver::class);
         ContentTopic::observe(ContentTopicObserver::class);
@@ -62,5 +66,23 @@ class AppServiceProvider extends ServiceProvider
 
             return Limit::perMinute(5)->by('contact:'.$identity);
         });
+
+        $rateLimitResponse = static function (Request $request, array $headers) {
+            $seconds = max(1, (int) ($headers['Retry-After'] ?? 60));
+            $message = "Zbyt wiele prób. Spróbuj ponownie za {$seconds} sekund.";
+
+            if ($request->expectsJson()) {
+                return response()->json(['message' => $message, 'errors' => ['email' => [$message]]], 429, $headers);
+            }
+
+            return back()->withErrors(['email' => $message])
+                ->withInput($request->except('password', 'password_confirmation'))
+                ->withHeaders($headers);
+        };
+
+        RateLimiter::for('registration', fn (Request $request) => Limit::perMinute(5)
+            ->by('registration:'.$request->ip())->response($rateLimitResponse));
+        RateLimiter::for('verification-email', fn (Request $request) => Limit::perMinute(6)
+            ->by('verification-email:'.$request->user()->getAuthIdentifier())->response($rateLimitResponse));
     }
 }

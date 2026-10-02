@@ -1,5 +1,10 @@
 @import './home-reference.css';
 
+/* Enlarge the complete homepage, including its shared header and footer. */
+html.home-page-scaled {
+    zoom: 1.1;
+}
+
 /* Homepage product story */
 .home-learning,
 .home-video-library,

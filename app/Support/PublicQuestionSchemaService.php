@@ -84,16 +84,19 @@ class PublicQuestionSchemaService
      * @param  list<array<string, mixed>>  $questions
      * @return array<string, mixed>
      */
-    public function category(LicenseCategory $category, array $breadcrumbs, array $questions): array
+    public function category(LicenseCategory $category, array $breadcrumbs, array $questions, int $page = 1): array
     {
         $canonicalUrl = route('public.questions.category', $category->slug);
+        if ($page > 1) {
+            $canonicalUrl .= '?page='.$page;
+        }
         $organizationId = $this->schemaIds->organization();
         $websiteId = $this->schemaIds->website();
         $breadcrumbId = $this->schemaIds->fragment($canonicalUrl, 'breadcrumb');
         $webPageId = $this->schemaIds->fragment($canonicalUrl, 'webpage');
         $datasetId = $this->schemaIds->publicQuestionDataset();
         $categoryId = $this->schemaIds->publicQuestionCategoryEntity($category);
-        $questionListId = $this->schemaIds->publicQuestionCategoryQuestionList($category);
+        $questionListId = $this->schemaIds->fragment($canonicalUrl, 'questions');
         $questionReferences = $this->questionReferencesFromListItems($questions);
 
         return $this->schemaRenderer->graph([

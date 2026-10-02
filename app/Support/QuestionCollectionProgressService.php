@@ -30,7 +30,7 @@ class QuestionCollectionProgressService
             'answered_count' => $answeredCount,
             'total_questions' => $totalQuestions,
             'percent' => $totalQuestions > 0
-                ? (int) round(($answeredCount / $totalQuestions) * 100)
+                ? min((int) round(($answeredCount / $totalQuestions) * 100), $answeredCount < $totalQuestions ? 99 : 100)
                 : 0,
         ];
     }
@@ -89,7 +89,7 @@ class QuestionCollectionProgressService
                         'answered_count' => $answeredCount,
                         'total_questions' => $totalQuestions,
                         'percent' => $totalQuestions > 0
-                            ? (int) round(($answeredCount / $totalQuestions) * 100)
+                            ? min((int) round(($answeredCount / $totalQuestions) * 100), $answeredCount < $totalQuestions ? 99 : 100)
                             : 0,
                     ],
                 ];

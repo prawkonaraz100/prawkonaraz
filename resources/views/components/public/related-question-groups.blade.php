@@ -4,11 +4,13 @@
     'categoryUrl',
     'topic' => null,
     'preview' => false,
+    'mobileLimit' => null,
+    'desktopLimit' => null,
 ])
 
 @php
-    $mobileVisible = max(1, (int) config('question_relations.mobile_visible_links', 8));
-    $desktopVisible = max($mobileVisible, (int) config('question_relations.desktop_visible_links', 15));
+    $mobileVisible = max(1, (int) ($mobileLimit ?? config('question_relations.mobile_visible_links', 8)));
+    $desktopVisible = max($mobileVisible, (int) ($desktopLimit ?? config('question_relations.desktop_visible_links', 15)));
     $entries = collect($groups)->flatMap(function (array $group): array {
         return $group['items']->map(fn (array $item): array => [
             'group_key' => $group['key'],

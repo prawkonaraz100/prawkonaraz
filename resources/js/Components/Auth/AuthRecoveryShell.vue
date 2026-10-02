@@ -4,10 +4,14 @@ import AuthTrustPanel from '@/Components/Auth/AuthTrustPanel.vue';
 import { Link } from '@inertiajs/vue3';
 import { ArrowLeft } from '@lucide/vue';
 
-defineProps<{
+withDefaults(defineProps<{
     title: string;
     lead: string;
-}>();
+    backHref?: string;
+    backLabel?: string;
+}>(), {
+    backLabel: 'Wróć do logowania',
+});
 </script>
 
 <template>
@@ -19,11 +23,11 @@ defineProps<{
                 <div class="auth-recovery-shell__content">
                     <AuthBrand />
                     <Link
-                        :href="route('login')"
+                        :href="backHref ?? route('login')"
                         class="auth-recovery-shell__back"
                     >
                         <ArrowLeft :size="17" :stroke-width="1.9" aria-hidden="true" />
-                        <span>Wróć do logowania</span>
+                        <span>{{ backLabel }}</span>
                     </Link>
 
                     <header class="auth-recovery-shell__header">

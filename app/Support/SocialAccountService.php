@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Exceptions\SocialAccountNeedsCategoryException;
+use App\Exceptions\VerificationEmailDeliveryFailed;
 use App\Models\LicenseCategory;
 use App\Models\User;
 use App\Models\UserSocialAccount;
@@ -93,8 +94,8 @@ class SocialAccountService
             return $user;
         });
 
-        if (! $emailTrusted) {
-            $user->sendEmailVerificationNotification();
+        if (! $emailTrusted && ! app(VerificationEmailDelivery::class)->send($user)) {
+            throw new VerificationEmailDeliveryFailed($user);
         }
 
         return $user;

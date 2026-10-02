@@ -163,10 +163,13 @@
                     type="button"
                     class="site-header__mobile-button"
                     aria-expanded="false"
+                    aria-label="Otwórz menu"
                     aria-controls="public-mobile-site-menu"
                     data-public-mobile-menu-button
                 >
-                    Menu
+                    <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <path d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
                 </button>
             </div>
         </div>

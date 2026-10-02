@@ -226,11 +226,9 @@
 
         <details class="home-site-header__mobile-menu" data-home-header-menu>
             <summary aria-label="Otwórz menu">
-                <span class="home-site-header__launcher-icon" aria-hidden="true">
-                    @for ($dot = 0; $dot < 9; $dot++)
-                        <i></i>
-                    @endfor
-                </span>
+                <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
             </summary>
             <div class="home-site-header__mobile-panel">
                 <nav aria-label="Nawigacja mobilna strony głównej">

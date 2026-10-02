@@ -82,7 +82,7 @@ const questionCountLabel = (count: number): string => {
     return `${count} ${suffix}`;
 };
 
-const compactActionLabel = (module: CourseModule): string => module.progress.percent === 100
+const compactActionLabel = (module: CourseModule): string => module.progress.total_questions > 0 && module.progress.answered_count >= module.progress.total_questions
     ? 'Powtórz moduł'
     : module.progress.answered_count > 0
         ? 'Kontynuuj naukę'

@@ -1,11 +1,13 @@
 @extends('layouts.public-content')
 
-@section('breadcrumb_shell_class', 'site-shell')
+@section('breadcrumb_shell_class', 'traffic-sign-guide__breadcrumb-shell')
 
 @php
     $displayExternalId = (string) ($questionMeta['display_external_id'] ?? $questionMeta['external_id']);
     $primaryCategoryCode = $primaryCategory?->code;
     $answerLabel = (string) ($questionMeta['correct_option_label'] ?? '');
+    $correctOption = collect($question['options'] ?? [])->firstWhere('is_correct', true);
+    $correctAnswerText = (string) ($correctOption['text_plain'] ?? '');
     $points = filled($questionMeta['points'] ?? null) ? (int) $questionMeta['points'] : null;
     $updatedLabel = $questionMeta['updated_at']?->format('d.m.Y') ?? '-';
     $sourceLabel = (string) ($questionMeta['source_label'] ?? 'gov.pl');
@@ -100,43 +102,28 @@
 @endphp
 
 @section('content')
-    <section class="bg-white">
-        <div class="site-shell pb-7 pt-5">
-            <div class="border-b border-[#e9edf2] pb-5 md:pb-6">
+    <section class="question-detail bg-white">
+        <div class="traffic-sign-guide__shell">
+            <header class="question-detail__header">
                 <div class="min-w-0">
-                    <p class="text-[0.72rem] font-bold uppercase tracking-[0.02em] text-[#d01921]">
+                    <p class="question-detail__eyebrow">
                         @if ($primaryCategoryCode)
                             Kategoria {{ $primaryCategoryCode }}
                         @else
                             Oficjalne pytanie egzaminacyjne
                         @endif
+                        <span aria-hidden="true"> · </span> Numer {{ $displayExternalId }}
+                        @if ($points !== null)
+                            <span aria-hidden="true"> · </span> {{ $points }} pkt
+                        @endif
                     </p>
-                    <h1 class="mt-3 max-w-6xl text-[1.75rem] font-bold leading-tight text-[#111827] md:text-[2rem]">
+                    <h1 class="question-detail__prompt">
                         {{ $prompt }}
                     </h1>
 
-                    <div class="mt-4 flex flex-wrap items-center gap-y-1 text-[0.92rem] leading-6 text-[#64748b]">
-                        <span>
-                            Numer <strong class="font-bold text-[#111827]">{{ $displayExternalId }}</strong>
-                        </span>
-                        <span aria-hidden="true" class="text-[#94a3b8]">&nbsp;•&nbsp;</span>
-                        <span>
-                            Typ: <strong class="font-bold text-[#111827]">{{ $questionMeta['type_label'] }}</strong>
-                        </span>
-                        <span aria-hidden="true" class="text-[#94a3b8]">&nbsp;•&nbsp;</span>
-                        <span>
-                            Źródło: <strong class="font-bold text-[#111827]">{{ $sourceLabel }}</strong>
-                        </span>
-                        <span aria-hidden="true" class="text-[#94a3b8]">&nbsp;•&nbsp;</span>
-                        <span>
-                            Aktualizacja pytania: <strong class="font-semibold text-[#64748b]">{{ $updatedLabel }}</strong>
-                        </span>
-                    </div>
-
                     @if (is_array($questionPromptAudio) && filled($questionPromptAudio['url'] ?? null))
                         <section
-                            class="mt-5 max-w-3xl border border-[#dce3eb] bg-white px-4 py-3"
-                            style="box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);"
+                            class="question-detail__audio"
                             data-question-audio
                             data-audio-url="{{ $questionPromptAudio['url'] }}"
                             data-audio-type="{{ $questionPromptAudio['encoding_format'] ?? 'audio/mpeg' }}"
@@ -163,7 +150,7 @@
                                 </button>
                                 <div class="min-w-0 flex-1">
                                     <div class="flex items-center justify-between gap-3">
-                                        <p class="text-[0.72rem] font-bold uppercase tracking-[0.02em] text-[#d01921]">Audio pytania</p>
+                                        <p class="question-detail__audio-caption">Posłuchaj pytania</p>
                                         <span class="shrink-0 text-[0.78rem] font-semibold tabular-nums text-[#64748b]" data-question-audio-time>{{ $questionPromptAudioTimeLabel }}</span>
                                     </div>
                                     <p class="mt-0.5 truncate text-[0.92rem] font-semibold leading-5 text-[#111827]" data-question-audio-state>
@@ -180,7 +167,7 @@
                                 preload="metadata"
                                 aria-label="Odsłuchaj treść pytania {{ $displayExternalId }}"
                             ></audio>
-                            <div class="mt-3" style="padding-left: 52px;" data-question-audio-controls>
+                            <div class="question-detail__audio-seek" data-question-audio-controls>
                                 <div class="relative h-4" data-question-audio-track>
                                     <div class="absolute left-0 top-1/2 h-1 w-full -translate-y-1/2 rounded-full bg-[#e2e8f0]" aria-hidden="true">
                                         <div
@@ -217,10 +204,10 @@
                     @endif
 
                 </div>
-            </div>
+            </header>
 
-            <div class="mt-6 grid gap-6 min-[1180px]:grid-cols-[minmax(0,1.08fr)_minmax(420px,0.92fr)]">
-                <section aria-label="Materiał z pytania">
+            <div class="question-detail__layout">
+                <section class="question-detail__media" aria-label="Materiał z pytania">
                     @if ($canEditPublicExplanation && $questionEditUrl !== '')
                         <div class="mb-3 flex justify-end">
                             <a
@@ -291,82 +278,12 @@
                         @endif
                     </div>
 
-                    @if ($hasQuestionAnswerStats)
-                        <section
-                            id="answer-statistics"
-                            class="mt-4 border border-[#dce3eb] bg-white p-5"
-                            style="box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);"
-                            aria-label="Statystyki odpowiedzi kursantów"
-                        >
-                            <div class="flex flex-wrap items-start justify-between gap-4">
-                                <div class="flex min-w-0 items-start gap-3">
-                                    <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#f8fafc] text-[#d01921]">
-                                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                            <path d="M4 19V5" />
-                                            <path d="M4 19h16" />
-                                            <path d="M8 16v-5" />
-                                            <path d="M12 16V8" />
-                                            <path d="M16 16v-3" />
-                                        </svg>
-                                    </span>
-                                    <div class="min-w-0">
-                                        <h2 class="text-[1rem] font-bold leading-6 text-[#111827]">Jak odpowiadali kursanci?</h2>
-                                        <p class="mt-1 text-[0.86rem] leading-5 text-[#64748b]">
-                                            Na podstawie {{ number_format((int) ($questionAnswerStats['sample_count'] ?? 0), 0, ',', ' ') }} odpowiedzi. {{ $questionAnswerStats['window_label'] ?? 'Ostatnie dane' }}.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <p class="shrink-0 text-[0.78rem] font-semibold leading-5 text-[#64748b]">
-                                    {{ $questionAnswerStats['updated_label'] ?? '' }}
-                                </p>
-                            </div>
-
-                            <div class="mt-5 space-y-4">
-                                @foreach ($questionAnswerStatsItems as $statsItem)
-                                    @php
-                                        $statsPercent = max(0, min(100, (int) ($statsItem['percent'] ?? 0)));
-                                        $statsIsCorrect = (bool) ($statsItem['is_correct'] ?? false);
-                                    @endphp
-                                    <div>
-                                        <div class="flex items-center justify-between gap-3">
-                                            <div class="flex min-w-0 items-center gap-2">
-                                                <span class="text-[0.88rem] font-bold uppercase text-[#111827]">{{ $statsItem['label'] ?? '' }}</span>
-                                                @if ($statsIsCorrect)
-                                                    <span class="rounded-full px-2 py-0.5 text-[0.68rem] font-semibold" style="background-color: #eaf7ee; color: #1f7a3b;">poprawna odpowiedź</span>
-                                                @endif
-                                            </div>
-                                            <span class="text-[1rem] font-bold tabular-nums text-[#111827]">{{ $statsPercent }}%</span>
-                                        </div>
-                                        <div class="mt-2 h-2 overflow-hidden rounded-full bg-[#edf1f5]">
-                                            <div
-                                                class="h-full rounded-full"
-                                                style="width: {{ $statsPercent }}%; background-color: {{ $statsIsCorrect ? '#1f9d45' : '#d01921' }};"
-                                            ></div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-
-                            <div class="mt-5 border-t border-[#e9edf2] pt-4">
-                                <p class="text-[0.86rem] leading-5 text-[#64748b]">
-                                    Poziom trudności:
-                                    <strong class="font-bold" style="color: {{ $questionAnswerStatsToneColor }};">{{ $questionAnswerStats['difficulty_label'] ?? 'Niski' }}</strong>
-                                </p>
-                            </div>
-                        </section>
-                    @endif
                 </section>
 
-                <aside class="space-y-4">
-                    <section class="border border-[#dce3eb] bg-white p-6">
+                <div class="question-detail__answer-contents">
+                    <section class="question-detail__correct" aria-labelledby="correct-answer-heading">
                         <div class="flex items-start justify-between gap-4">
-                            <h2 class="text-[0.9rem] font-bold uppercase tracking-[0.02em] text-[#111827]">Poprawna odpowiedź</h2>
-                            @if ($points !== null)
-                                <p class="text-right text-[0.86rem] font-semibold leading-5 text-[#111827]">
-                                    Wartość na egzaminie: <span class="text-[#d01921]">{{ $points }} pkt</span>
-                                </p>
-                            @endif
+                            <h2 id="correct-answer-heading">Poprawna odpowiedź</h2>
                         </div>
 
                         <div class="mt-6 flex items-center gap-3">
@@ -379,11 +296,14 @@
                                 <p class="text-[1.85rem] font-bold uppercase leading-none text-[#1f9d45]">{{ $answerLabel }}</p>
                             @endif
                         </div>
+                        @if (($questionMeta['question_type'] ?? '') !== 'boolean' && ! in_array($answerLabel, ['TAK', 'NIE'], true) && $correctAnswerText !== '')
+                            <p class="question-detail__correct-text">{{ $correctAnswerText }}</p>
+                        @endif
                     </section>
 
                     <section
                         id="answer"
-                        class="border border-[#dce3eb] bg-white p-6"
+                        class="question-detail__answer-contents"
                         @if ($hasReadableAnswerAudio)
                             data-lesson-audio-root
                         @endif
@@ -392,8 +312,9 @@
                             data-update-url="{{ $publicExplanationUpdateUrl }}"
                         @endif
                     >
+                        <div class="question-detail__explanation">
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                            <h2 class="text-[1rem] font-bold uppercase tracking-[0.02em] text-[#111827]">Wyjaśnienie</h2>
+                            <h2 class="question-detail__section-heading">Dlaczego? <span>Wyjaśnienie odpowiedzi</span></h2>
                             <div class="flex flex-wrap items-center gap-2">
                                 @if ($hasReadableAnswerAudio)
                                     <button
@@ -427,7 +348,7 @@
                         </div>
 
                         @if ($hasReadableAnswerAudio)
-                            <p data-lesson-audio-status class="mt-3 min-h-5 text-[0.82rem] font-semibold text-[#64748b]" role="status" aria-live="polite"></p>
+                            <p data-lesson-audio-status class="question-detail__audio-status text-[0.82rem] font-semibold text-[#64748b]" role="status" aria-live="polite"></p>
                         @endif
 
                         @if ($answerExplanationBodyHtml !== '' || $canEditPublicExplanation)
@@ -439,7 +360,7 @@
                                 class="@if ($answerExplanationBodyHtml !== '') mt-4 @endif"
                             >
                                 @if ($answerExplanationBodyHtml !== '')
-                                    <div class="mb-3 flex justify-end">
+                                    <div class="question-detail__read-section">
                                         <button
                                             type="button"
                                             data-lesson-audio-section-button
@@ -481,29 +402,15 @@
                                 To pytanie nie ma jeszcze osobnego rozwinięcia. Poprawna odpowiedź została zaznaczona wyżej, a pełne wyjaśnienia sukcesywnie rozbudowujemy w całej bazie.
                             </p>
                         @endif
+                        </div>
 
-                        <p
-                            data-public-explanation-reviewed
-                            class="mt-3 text-[0.78rem] leading-5 text-[#64748b] @if (! ($answerExplanationIsPublic && $answerExplanationReviewedAt)) hidden @endif"
-                        >
-                            @if ($answerExplanationIsPublic && $answerExplanationReviewedAt)
-                                <span data-public-explanation-reviewed-text>Aktualizacja wyjaśnienia: {{ $answerExplanationReviewedAt->format('d.m.Y') }}</span>
-                                @if ($answerExplanationAuthorName !== '')
-                                    <span data-public-explanation-author>
-                                        <span aria-hidden="true"> · </span>
-                                        @if ($answerExplanationAuthorIsPublic && $answerExplanationAuthorSlug !== '')
-                                            <a
-                                                href="{{ route('content-authors.show', $answerExplanationAuthorSlug) }}"
-                                                class="font-semibold text-[#4b5563] underline decoration-[#cbd5e1] underline-offset-2 transition hover:text-[#d01921] hover:decoration-[#d01921]"
-                                            >{{ $answerExplanationAuthorName }}</a>
-                                        @else
-                                            <span>{{ $answerExplanationAuthorName }}</span>
-                                        @endif
-                                    </span>
-                                @endif
-                            @endif
-                        </p>
+                        @if (! empty($referenceSign) || $hasQuestionAnswerStats)
+                            @include('questions-database.partials.question-media-context')
+                        @endif
 
+
+                        @if ($dontConfuseWithHtml !== '' || $examTrapHtml !== '' || $canEditPublicExplanation)
+                        <div class="question-detail__pitfalls">
                         @if ($dontConfuseWithHtml !== '' || $canEditPublicExplanation)
                             <section
                                 data-public-explanation-dont-confuse
@@ -511,7 +418,7 @@
                                     data-lesson-audio-section
                                     data-lesson-audio-title="Nie pomyl z"
                                 @endif
-                                class="mt-5 border border-[#dce3eb] bg-[#f8fafc] p-4 @if ($dontConfuseWithHtml === '') hidden @endif"
+                                class="question-detail__dont-confuse @if ($dontConfuseWithHtml === '') hidden @endif"
                                 aria-labelledby="dont-confuse-heading"
                             >
                                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -566,12 +473,12 @@
                                     data-lesson-audio-section
                                     data-lesson-audio-title="Haczyk egzaminacyjny"
                                 @endif
-                                class="mt-5 border-l-4 border-[#d01921] bg-[#fff7f7] px-4 py-3 @if ($examTrapHtml === '') hidden @endif"
+                                class="question-detail__trap @if ($examTrapHtml === '') hidden @endif"
                             >
                                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                    <p class="text-[0.82rem] font-bold uppercase tracking-[0.02em] text-[#d01921]">
+                                    <h3 class="question-detail__section-heading">
                                         Haczyk egzaminacyjny
-                                    </p>
+                                    </h3>
                                     @if ($examTrapHtml !== '')
                                         <button
                                             type="button"
@@ -604,6 +511,8 @@
                                     {!! $examTrapHtml !!}
                                 </div>
                             </div>
+                        @endif
+                        </div>
                         @endif
 
                         @if ($canEditPublicExplanation)
@@ -740,7 +649,7 @@
 
                         @if ($commonMistakes !== [])
                             <section
-                                class="mt-7 border-t border-[#e9edf2] pt-6"
+                                class="question-detail__mistakes"
                                 aria-labelledby="common-mistakes-heading"
                                 data-lesson-audio-section
                                 data-lesson-audio-title="Najczęstsze błędy"
@@ -770,7 +679,7 @@
                                     </button>
                                 </div>
 
-                                <ol class="mt-4 divide-y divide-[#e9edf2] border-y border-[#e9edf2]" data-lesson-audio-content>
+                                <ol class="question-detail__mistake-list" data-lesson-audio-content>
                                     @foreach ($commonMistakes as $commonMistake)
                                         <li class="flex items-start gap-3 py-4">
                                             <span class="flex h-8 w-8 items-center justify-center rounded-full bg-[#fff1f2] text-[0.8rem] font-bold text-[#d01921]" aria-hidden="true">
@@ -792,7 +701,7 @@
 
                         @if ($legalReferences->isNotEmpty() || $canEditLegalReferences)
                             <div
-                                class="mt-7 border-t border-[#e9edf2] pt-6"
+                                class="question-detail__legal"
                                 @if ($canEditLegalReferences)
                                     data-legal-reference-editor
                                     data-update-url="{{ $legalReferenceUpdateUrl }}"
@@ -827,10 +736,10 @@
                                                     </p>
                                                     <p class="mt-1 text-[0.88rem] leading-6 text-[#4b5563]">{{ $legalReference->legalUnit->title }}</p>
                                                     @if ($legalReference->legalUnit->official_excerpt)
-                                                        <div class="mt-3 border-t border-[#e2e8f0] pt-3">
-                                                            <p class="text-[0.76rem] font-bold uppercase tracking-[0.02em] text-[#64748b]">Treść przepisu</p>
+                                                        <details class="question-detail__legal-excerpt mt-3 border-t border-[#e2e8f0] pt-3">
+                                                            <summary>Treść przepisu — rozwiń</summary>
                                                             <p class="mt-2 text-[0.88rem] leading-6 text-[#111827]">{{ $legalReference->legalUnit->official_excerpt }}</p>
-                                                        </div>
+                                                        </details>
                                                     @endif
                                                     @if ($legalReference->contentPage?->isPubliclyVisible())
                                                         <a href="{{ route('public.regulations.show', $legalReference->contentPage->slug) }}" class="mt-3 inline-flex items-center gap-2 text-[0.88rem] font-bold text-[#d01921] transition hover:text-[#a91118]">
@@ -943,43 +852,35 @@
                             </div>
                         @endif
 
-                        @if (! empty($referenceSign))
-                            <div class="mt-7 border-t border-[#e9edf2] pt-6">
-                                <h3 class="text-[1rem] font-bold uppercase tracking-[0.02em] text-[#111827]">Znak drogowy widoczny w pytaniu</h3>
-                                <div class="mt-4 flex flex-col gap-4 sm:flex-row sm:items-start">
-                                    @if (! empty($referenceSign['code']))
-                                        <x-public.sign-badge :sign="$referenceSign" variant="detail" />
-                                    @elseif (! empty($referenceSign['image_url']))
-                                        <div class="flex h-24 w-24 shrink-0 items-center justify-center">
-                                            <img
-                                                src="{{ $referenceSign['image_url'] }}"
-                                                alt="{{ $referenceSign['alt_text'] ?? 'Znak drogowy' }}"
-                                                class="h-full w-full object-contain"
-                                            >
-                                        </div>
-                                    @else
-                                        <div class="flex h-24 w-24 shrink-0 items-center justify-center border border-dashed border-[#dce3eb] text-center">
-                                            <span class="text-center text-[0.72rem] text-[#64748b]">Brak podglądu znaku.</span>
-                                        </div>
-                                    @endif
-                                    <div class="min-w-0">
-                                        <p class="text-[1rem] font-bold leading-6 text-[#111827]">{{ $referenceSign['title'] }}</p>
-                                        @if (! empty($referenceSign['intro']))
-                                            <p class="mt-2 text-[0.9rem] leading-6 text-[#4b5563]">{{ $referenceSign['intro'] }}</p>
+                        <div class="question-detail__metadata">
+                            <span>Typ: {{ $questionMeta['type_label'] }}</span>
+                            <span>Źródło: {{ $sourceLabel }}</span>
+                            <span>Aktualizacja pytania: {{ $updatedLabel }}</span>
+                        </div>
+                        <p
+                            data-public-explanation-reviewed
+                            class="question-detail__reviewed text-[0.78rem] leading-5 text-[#64748b] @if (! ($answerExplanationIsPublic && $answerExplanationReviewedAt)) hidden @endif"
+                        >
+                            @if ($answerExplanationIsPublic && $answerExplanationReviewedAt)
+                                <span data-public-explanation-reviewed-text>Aktualizacja wyjaśnienia: {{ $answerExplanationReviewedAt->format('d.m.Y') }}</span>
+                                @if ($answerExplanationAuthorName !== '')
+                                    <span data-public-explanation-author>
+                                        <span aria-hidden="true"> · </span>
+                                        @if ($answerExplanationAuthorIsPublic && $answerExplanationAuthorSlug !== '')
+                                            <a
+                                                href="{{ route('content-authors.show', $answerExplanationAuthorSlug) }}"
+                                                class="font-semibold text-[#4b5563] underline decoration-[#cbd5e1] underline-offset-2 transition hover:text-[#d01921] hover:decoration-[#d01921]"
+                                            >{{ $answerExplanationAuthorName }}</a>
+                                        @else
+                                            <span>{{ $answerExplanationAuthorName }}</span>
                                         @endif
-                                        @if (! empty($referenceSign['url']))
-                                            <a href="{{ $referenceSign['url'] }}" class="mt-3 inline-flex items-center gap-2 text-[0.88rem] font-bold text-[#d01921] transition hover:text-[#a91118]">
-                                                {{ $referenceSign['link_label'] ?? 'Zobacz opis znaku' }} <span aria-hidden="true">→</span>
-                                            </a>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-
+                                    </span>
+                                @endif
+                            @endif
+                        </p>
                         @if ($categories->isNotEmpty())
-                            <div class="mt-7">
-                                <h3 class="text-[1rem] font-bold uppercase tracking-[0.02em] text-[#111827]">Zakres kategorii</h3>
+                            <details class="question-detail__categories">
+                                <summary>Zakres kategorii</summary>
                                 <p class="mt-4 text-[0.95rem] leading-7 text-[#111827]">
                                     @if ($categories->count() === 1)
                                         To pytanie występuje wyłącznie w kategorii {{ $categories->first()->code }}. Zakres wynika z przypisania w oficjalnej bazie pytań egzaminacyjnych.
@@ -994,11 +895,13 @@
                                         </a>
                                     @endforeach
                                 </div>
-                            </div>
+                            </details>
                         @endif
                     </section>
-                </aside>
+                </div>
             </div>
+
+            @include('questions-database.partials.question-navigation')
 
             <x-public.related-question-groups
                 :groups="$relatedQuestionGroups"
@@ -1006,6 +909,8 @@
                 :category-url="$categoryUrl"
                 :topic="$relatedQuestionTopic"
                 :preview="$relatedQuestionPreview"
+                :mobile-limit="3"
+                :desktop-limit="6"
             />
 
             <x-public.newsroom-reverse-links
@@ -1014,29 +919,6 @@
                 heading="Materiały powiązane z tym pytaniem"
             />
 
-            <nav
-                class="mt-5 grid gap-4 pb-7 sm:grid-cols-[220px_minmax(0,1fr)_280px] sm:items-center"
-                aria-label="Nawigacja po pytaniach"
-                data-public-question-keyboard-navigation
-                data-previous-url="{{ $hasPreviousQuestion ? $previousQuestionUrl : '' }}"
-                data-next-url="{{ $hasNextQuestion ? $nextQuestionUrl : '' }}"
-            >
-                <a href="{{ $previousQuestionUrl }}" class="inline-flex min-h-12 items-center justify-center gap-3 border border-[#dce3eb] bg-white px-6 text-[0.95rem] font-bold text-[#111827] transition hover:border-[#c4cfdb] hover:bg-[#f8fafc]">
-                    <span aria-hidden="true">←</span>
-                    Wróć do bazy
-                </a>
-
-                <div class="text-center text-[1.05rem] font-bold text-[#111827]">
-                    @if ($currentPosition !== null && $navigationTotal > 0)
-                        {{ number_format($currentPosition, 0, ',', ' ') }} / {{ number_format($navigationTotal, 0, ',', ' ') }}
-                    @endif
-                </div>
-
-                <a href="{{ $nextQuestionUrl }}" class="inline-flex min-h-12 items-center justify-center gap-4 rounded-[4px] bg-[#d01921] px-7 text-[0.95rem] font-bold text-white transition hover:bg-[#b9151c]">
-                    Następne pytanie
-                    <span aria-hidden="true">→</span>
-                </a>
-            </nav>
         </div>
     </section>
 
@@ -1046,6 +928,20 @@
 @push('scripts')
     <script>
         (() => {
+            // Highlight only an explicitly written takeaway; never generate or truncate text.
+            const explanationDisplay = document.querySelector('[data-public-explanation-display]');
+            const highlightTakeaways = () => {
+                explanationDisplay?.querySelectorAll('p').forEach((paragraph) => {
+                    const text = (paragraph.textContent || '').replace(/\s+/g, ' ').trim();
+                    const isTakeaway = /^(?:Prosta )?zasada do zapamiętania\s*:/i.test(text);
+                    paragraph.classList.toggle('question-detail__takeaway', isTakeaway);
+                });
+            };
+            highlightTakeaways();
+            if (explanationDisplay) {
+                new MutationObserver(highlightTakeaways).observe(explanationDisplay, { childList: true, subtree: true, characterData: true });
+            }
+
             const navigation = document.querySelector('[data-public-question-keyboard-navigation]');
 
             if (!navigation) {

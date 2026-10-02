@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Exceptions\VerificationEmailDeliveryFailed;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\UserProfile;
@@ -13,11 +14,13 @@ use App\Support\SocialProviderUser;
 use App\Support\StudyContextService;
 use App\Support\UserIpHistoryService;
 use App\Support\UserProfileService;
-use Illuminate\Auth\Events\Registered;
+use App\Support\VerificationEmailDelivery;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
@@ -58,6 +61,7 @@ class RegisteredUserController extends Controller
         ReturningUserCookie $returningUserCookie,
         GoogleIdentityRegistrationSession $googleIdentityRegistrationSession,
         SocialAccountService $socialAccountService,
+        VerificationEmailDelivery $verificationEmailDelivery,
     ): RedirectResponse {
         $googleProviderUser = $googleIdentityRegistrationSession->providerUser($request);
 
@@ -70,6 +74,10 @@ class RegisteredUserController extends Controller
                 $googleIdentityRegistrationSession,
                 $googleProviderUser,
             );
+        }
+
+        if (is_string($request->input('email'))) {
+            $request->merge(['email' => Str::lower(trim($request->input('email')))]);
         }
 
         $validated = $request->validate([
@@ -89,20 +97,22 @@ class RegisteredUserController extends Controller
             ]);
         }
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'password_login_enabled' => true,
-        ]);
+        $user = DB::transaction(function () use ($validated, $targetCategory, $userProfileService): User {
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+                'password_login_enabled' => true,
+            ]);
 
-        $userProfileService->update($user, [
-            'target_category_id' => $targetCategory->getKey(),
-            'preferred_learning_track' => $validated['preferred_learning_track'] ?? null,
-            'onboarding_step' => 'target_category_locked',
-        ]);
+            $userProfileService->update($user, [
+                'target_category_id' => $targetCategory->getKey(),
+                'preferred_learning_track' => $validated['preferred_learning_track'] ?? null,
+                'onboarding_step' => 'target_category_locked',
+            ]);
 
-        event(new Registered($user));
+            return $user;
+        });
 
         Auth::login($user);
         $request->session()->regenerate();
@@ -110,7 +120,10 @@ class RegisteredUserController extends Controller
         $userIpHistoryService->record($user, $request, 'rejestracja', force: true);
         $returningUserCookie->queue($request);
 
-        return redirect()->route('verification.notice');
+        $sent = $verificationEmailDelivery->registered($user);
+
+        return redirect()->route('verification.notice')
+            ->with('status', $sent ? 'verification-link-sent' : 'verification-link-failed');
     }
 
     protected function storeGoogleIdentityRegistration(
@@ -126,12 +139,18 @@ class RegisteredUserController extends Controller
             'preferred_learning_track' => ['nullable', 'string', Rule::in($this->availableLearningTracks())],
         ]);
 
-        $user = $socialAccountService->resolveForLogin(
-            UserSocialAccount::PROVIDER_GOOGLE,
-            $providerUser,
-            (int) $validated['target_category_id'],
-            $validated['preferred_learning_track'] ?? null,
-        );
+        $deliveryFailed = false;
+        try {
+            $user = $socialAccountService->resolveForLogin(
+                UserSocialAccount::PROVIDER_GOOGLE,
+                $providerUser,
+                (int) $validated['target_category_id'],
+                $validated['preferred_learning_track'] ?? null,
+            );
+        } catch (VerificationEmailDeliveryFailed $exception) {
+            $user = $exception->user;
+            $deliveryFailed = true;
+        }
 
         Auth::login($user);
         $request->session()->regenerate();
@@ -140,7 +159,9 @@ class RegisteredUserController extends Controller
         $returningUserCookie->queue($request);
         $googleIdentityRegistrationSession->forget($request);
 
-        return redirect(route('dashboard', absolute: false));
+        return $deliveryFailed
+            ? to_route('verification.notice')->with('status', 'verification-link-failed')
+            : redirect(route('dashboard', absolute: false));
     }
 
     /**

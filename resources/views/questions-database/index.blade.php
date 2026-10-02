@@ -1,6 +1,6 @@
 @extends('layouts.public-content')
 
-@section('breadcrumb_shell_class', 'site-shell')
+@section('breadcrumb_shell_class', 'traffic-sign-guide__breadcrumb-shell')
 
 @php
     $categoriesByCode = $categories->keyBy(fn (array $category): string => \Illuminate\Support\Str::upper((string) $category['code']));
@@ -18,41 +18,15 @@
         [
             'title' => 'Samochody',
             'codes' => ['B1', 'C1', 'D', 'D1'],
-            'accent' => '#0b56bf',
-            'icon' => 'car',
         ],
         [
             'title' => 'Motocykle',
             'codes' => ['AM', 'A1', 'A2', 'A'],
-            'accent' => '#14843a',
-            'icon' => 'bike',
         ],
         [
             'title' => 'Pozostałe',
             'codes' => ['T'],
-            'accent' => '#f08a00',
-            'icon' => 'tractor',
         ],
-    ];
-
-    $categoryThemes = [
-        'A' => ['accent' => '#16813a', 'soft' => '#e7f5ec'],
-        'A1' => ['accent' => '#16813a', 'soft' => '#e7f5ec'],
-        'A2' => ['accent' => '#16813a', 'soft' => '#e7f5ec'],
-        'AM' => ['accent' => '#16813a', 'soft' => '#e7f5ec'],
-        'B' => ['accent' => '#0b56bf', 'soft' => '#e8f1ff'],
-        'B1' => ['accent' => '#0b56bf', 'soft' => '#e8f1ff'],
-        'C' => ['accent' => '#f0a000', 'soft' => '#fff3d8'],
-        'C1' => ['accent' => '#0b56bf', 'soft' => '#e8f1ff'],
-        'D' => ['accent' => '#0b56bf', 'soft' => '#e8f1ff'],
-        'D1' => ['accent' => '#0b56bf', 'soft' => '#e8f1ff'],
-        'T' => ['accent' => '#f08a00', 'soft' => '#fff1dc'],
-    ];
-
-    $featuredIllustrations = [
-        'A' => 'resources/images/questions/featured-category-icons/a.png',
-        'B' => 'resources/images/questions/featured-category-icons/b.png',
-        'C' => 'resources/images/questions/featured-category-icons/c.png',
     ];
 
     $shortLabels = [
@@ -69,7 +43,6 @@
         'T' => 'Ciągniki rolnicze',
     ];
 
-    $themeFor = fn (array $category): array => $categoryThemes[\Illuminate\Support\Str::upper((string) $category['code'])] ?? ['accent' => '#0b56bf', 'soft' => '#e8f1ff'];
     $labelFor = fn (array $category): string => $shortLabels[\Illuminate\Support\Str::upper((string) $category['code'])] ?? (string) $category['vehicle_label'];
     $currentYear = now()->year;
     $hasActiveSearch = (bool) ($hasActiveSearch ?? false);
@@ -82,37 +55,25 @@
 @endphp
 
 @section('content')
-    <section class="content-band overflow-hidden">
-        <div class="content-shell grid gap-7 pb-8 pt-7 md:pb-10 md:pt-9 lg:grid-cols-[minmax(0,0.88fr)_minmax(440px,0.96fr)] lg:items-start lg:gap-10 lg:py-0">
-            <div class="relative z-10 max-w-2xl py-2 lg:pb-16 lg:pt-16 xl:pb-20 xl:pt-[4.5rem]">
-                <h1 class="max-w-2xl text-[2.45rem] font-bold leading-[1.08] text-[#06122b] sm:text-[3rem] lg:text-[3.35rem]">
-                    Oficjalna baza pytań
-                    <span class="block text-[#d01921]">na prawo jazdy {{ $currentYear }}</span>
-                </h1>
+    <section class="rankomat-guide question-database-guide">
+        <div class="traffic-sign-guide__shell">
+            <header class="question-database-guide__hero">
+                <div class="traffic-sign-guide__hero-copy">
+                    <h1>Oficjalna baza pytań na prawo jazdy {{ $currentYear }}</h1>
+                    <p class="rankomat-guide__lead">
+                        Wybierz swoją kategorię, sprawdzaj poprawne odpowiedzi i ucz się, dlaczego są właściwe.
+                    </p>
+                    <p class="question-database-guide__meta">
+                        <span>{{ number_format($canonicalQuestionsCount, 0, ',', ' ') }} oficjalnych pytań</span>
+                        <span>{{ $categories->count() }} kategorii prawa jazdy</span>
+                    </p>
+                </div>
+                <a href="{{ route('public.tests', absolute: false) }}" class="rankomat-guide__main-cta">Przejdź do testów online →</a>
+            </header>
 
-                <p class="mt-7 max-w-[37rem] text-[1.05rem] font-medium leading-8 text-[#06122b]">
-                    Ćwicz z oficjalnymi pytaniami egzaminacyjnymi i zdaj egzamin za pierwszym razem.
-                </p>
-            </div>
-
-            <div class="-mr-4 overflow-hidden sm:-mr-6 lg:-mr-6 xl:-mr-8">
-                <img
-                    src="{{ asset('images/questions/question-database-hero.png') }}"
-                    alt="Samochód nauki jazdy i ekran z przykładowym pytaniem egzaminacyjnym"
-                    width="576"
-                    height="383"
-                    class="block h-auto w-full select-none"
-                    fetchpriority="high"
-                    decoding="async"
-                >
-            </div>
-        </div>
-    </section>
-
-    <section class="bg-white pb-12 pt-8 md:pt-10 lg:pt-12">
-        <div class="site-shell">
+            <div class="question-database-guide__content">
             @if ($hasActiveSearch)
-                <section class="mx-auto max-w-[1120px]" aria-labelledby="question-search-results-heading">
+                <section class="question-database-guide__search" aria-labelledby="question-search-results-heading">
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                         <div>
                             <h2 id="question-search-results-heading" class="text-[1.7rem] font-bold leading-tight text-[#06122b]">
@@ -161,7 +122,7 @@
                                             @endforelse
                                         </div>
 
-                                        <h3 class="mt-3 max-w-4xl text-[1.05rem] font-bold leading-7 text-[#111827] transition group-hover:text-[#d01921] md:text-[1.08rem]">
+                                        <h3 class="mt-3 max-w-4xl text-[1.05rem] font-bold leading-7 text-[#111827] transition group-hover:text-[#07358c] md:text-[1.08rem]">
                                             {{ $question['prompt_plain'] }}
                                         </h3>
 
@@ -183,7 +144,7 @@
                                         </div>
                                     </div>
 
-                                    <span class="hidden h-11 w-11 items-center justify-center justify-self-end text-[2rem] leading-none text-[#111827] transition group-hover:translate-x-1 group-hover:text-[#d01921] md:flex" aria-hidden="true">
+                                    <span class="hidden h-11 w-11 items-center justify-center justify-self-end text-[2rem] leading-none text-[#111827] transition group-hover:translate-x-1 group-hover:text-[#07358c] md:flex" aria-hidden="true">
                                         →
                                     </span>
                                 </a>
@@ -199,7 +160,7 @@
                                 <nav class="flex flex-wrap items-center gap-2" aria-label="Paginacja wyników wyszukiwania">
                                     @foreach ($searchEarlyPages as $pageNumber)
                                         @if ($pageNumber === $searchCurrentPage)
-                                            <span class="flex h-10 min-w-10 items-center justify-center rounded-[4px] bg-[#ffe6e8] px-3 text-sm font-bold text-[#d01921]">{{ $pageNumber }}</span>
+                                            <span class="flex h-10 min-w-10 items-center justify-center rounded-[4px] bg-[#e8f2ff] px-3 text-sm font-bold text-[#07358c]">{{ $pageNumber }}</span>
                                         @else
                                             <a href="{{ $searchPaginator->url($pageNumber) }}" class="flex h-10 min-w-10 items-center justify-center rounded-[4px] border border-[#dce3eb] px-3 text-sm font-semibold text-[#334155] transition hover:border-[#c4cfdb] hover:bg-[#f8fafc]">{{ $pageNumber }}</a>
                                         @endif
@@ -209,7 +170,7 @@
                                         <span class="px-2 text-sm text-[#64748b]">...</span>
                                         @foreach ($searchTailPages as $pageNumber)
                                             @if ($pageNumber === $searchCurrentPage)
-                                                <span class="flex h-10 min-w-10 items-center justify-center rounded-[4px] bg-[#ffe6e8] px-3 text-sm font-bold text-[#d01921]">{{ $pageNumber }}</span>
+                                                <span class="flex h-10 min-w-10 items-center justify-center rounded-[4px] bg-[#e8f2ff] px-3 text-sm font-bold text-[#07358c]">{{ $pageNumber }}</span>
                                             @else
                                                 <a href="{{ $searchPaginator->url($pageNumber) }}" class="flex h-10 min-w-10 items-center justify-center rounded-[4px] border border-[#dce3eb] px-3 text-sm font-semibold text-[#334155] transition hover:border-[#c4cfdb] hover:bg-[#f8fafc]">{{ $pageNumber }}</a>
                                             @endif
@@ -225,145 +186,47 @@
                     @else
                         <div class="mt-6 rounded-[8px] border border-dashed border-[#dce3eb] bg-[#f8fafc] px-5 py-10 text-center text-[0.95rem] text-[#64748b]">
                             Nie znaleziono pytań dla tego wyszukiwania.
-                            <a href="{{ route('public.questions.hub') }}" class="ml-2 font-semibold text-[#d01921] transition hover:text-[#a91118]">Wyczyść</a>
+                            <a href="{{ route('public.questions.hub') }}" class="ml-2 font-semibold text-[#07358c] transition hover:text-[#052a71]">Wyczyść</a>
                         </div>
                     @endif
                 </section>
             @endif
 
-            <div class="mx-auto max-w-4xl text-center">
-                <h2 class="text-[1.7rem] font-bold leading-tight text-[#06122b]">
+            <div class="rankomat-guide__section question-database-guide__categories-heading">
+                <h2>
                     Kategorie prawa jazdy
                 </h2>
-                <p class="mt-2 text-[1rem] font-medium text-[#06122b]">
+                <p>
                     Wybierz kategorię i przejdź do oficjalnych pytań
                 </p>
             </div>
 
             @if ($popularCategories->isNotEmpty())
-                <div class="mx-auto mt-10 max-w-[1120px]">
-                    <div class="flex items-center gap-3 text-[#d01921]">
-                        <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                            <path d="M12.6 2.3c.2 2.2-.7 3.9-2 5.2-1.2 1.2-2.8 2.2-4 3.8-1.1 1.4-1.7 3.1-1.4 5.1.4 3.1 3 5.3 6.7 5.3 4.2 0 7-2.7 7-6.6 0-2.8-1.6-5.1-3.2-6.9-.3 1.7-1.1 2.8-2.2 3.5.4-3.7-1.2-6.7-4.9-9.4Z" />
-                        </svg>
-                        <h3 class="text-[1.04rem] font-bold">Najczęściej wybierane</h3>
-                    </div>
-
-                    <div class="mt-5 grid gap-5 lg:grid-cols-3">
+                <section class="question-database-guide__group" aria-labelledby="question-popular-categories">
+                    <h3 id="question-popular-categories">Najczęściej wybierane</h3>
+                    <div class="question-database-guide__tiles question-database-guide__tiles--popular">
                         @foreach ($popularCategories as $category)
-                            @php($theme = $themeFor($category))
-                            <a
-                                href="{{ $category['url'] }}"
-                                class="group flex min-h-[250px] flex-col justify-between rounded-[8px] border border-[#dce3eb] bg-white p-5 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition hover:-translate-y-0.5 hover:border-[#c4cfdb] hover:shadow-[0_14px_28px_rgba(15,23,42,0.08)]"
-                                aria-label="Przejdź do pytań kategorii {{ $category['code'] }}"
-                            >
-                                <div class="grid grid-cols-[8.25rem_minmax(0,1fr)] items-start gap-3">
-                                    @php($featuredIllustration = $featuredIllustrations[\Illuminate\Support\Str::upper((string) $category['code'])] ?? null)
-                                    @if ($featuredIllustration)
-                                        <img
-                                            src="{{ \Illuminate\Support\Facades\Vite::asset($featuredIllustration) }}"
-                                            alt=""
-                                            aria-hidden="true"
-                                            loading="lazy"
-                                            class="h-32 w-40 max-w-none object-contain object-left"
-                                        >
-                                    @else
-                                        <div class="flex h-28 w-28 items-center justify-center rounded-full" style="background-color: {{ $theme['soft'] }}">
-                                            <x-questions.vehicle-icon :code="$category['code']" class="h-[6.4rem] w-[6.4rem]" />
-                                        </div>
-                                    @endif
-                                    <div class="min-w-0 pt-1">
-                                        <span class="block text-[3.5rem] font-bold leading-none" style="color: {{ $theme['accent'] }}">
-                                            {{ $category['code'] }}
-                                        </span>
-                                        <h4 class="mt-2 text-[1.05rem] font-bold leading-6 text-[#06122b]">{{ $category['title'] }}</h4>
-                                        <p class="mt-1 text-[0.95rem] leading-6 text-[#06122b]">{{ $labelFor($category) }}</p>
-                                    </div>
-                                </div>
-
-                                <div class="mt-5 flex items-center justify-between gap-4">
-                                    <span class="inline-flex items-center gap-3 text-[0.95rem] font-semibold text-[#06122b]">
-                                        <svg class="h-6 w-6 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: {{ $theme['accent'] }}" aria-hidden="true">
-                                            <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" stroke-linecap="round" stroke-linejoin="round" />
-                                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" stroke-linecap="round" stroke-linejoin="round" />
-                                            <path d="M12 17h.01" stroke-linecap="round" />
-                                        </svg>
-                                        {{ number_format($category['questions_count'], 0, ',', ' ') }} pytań
-                                    </span>
-
-                                    <span class="inline-flex min-h-10 items-center justify-center rounded-[5px] bg-[#0b56bf] px-5 text-[0.86rem] font-bold text-white transition group-hover:bg-[#084899]">
-                                        Sprawdź <span class="ml-2" aria-hidden="true">→</span>
-                                    </span>
-                                </div>
-                            </a>
+                            <x-public.question-category-tile :category="$category" :description="$labelFor($category)" />
                         @endforeach
                     </div>
-                </div>
+                </section>
             @endif
 
-            <div class="mx-auto mt-10 max-w-[1120px] space-y-8">
-                @foreach ($categorySections as $section)
-                    @php($sectionCategories = $categorySet($section['codes']))
-                    @if ($sectionCategories->isNotEmpty())
-                        <section aria-labelledby="question-category-section-{{ \Illuminate\Support\Str::slug($section['title']) }}">
-                            <div class="flex items-center gap-3" style="color: {{ $section['accent'] }}">
-                                @if ($section['icon'] === 'car')
-                                    <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                        <path d="M5.4 7.2 7 4h10l1.6 3.2A3.2 3.2 0 0 1 21 10.3V17h-2a2.5 2.5 0 0 1-5 0H10a2.5 2.5 0 0 1-5 0H3v-6.7a3.2 3.2 0 0 1 2.4-3.1ZM8.2 6 7.1 8.2h9.8L15.8 6H8.2ZM7.5 18a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm9 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" />
-                                    </svg>
-                                @elseif ($section['icon'] === 'bike')
-                                    <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                        <path d="M6 18a4 4 0 1 1 2.6-7.1L10 8H8V6h4.8l2.1 3.8H17a4 4 0 1 1-3.8 5.2H10a4 4 0 0 1-4 3Zm0-2a2 2 0 0 0 1.8-1.1H6.2l1.5-2.5A2 2 0 1 0 6 16Zm6.2-3h1.1l-1.1-2-1 2H12.2Zm5.8 3a2 2 0 0 0 0-4h-1.9l1 1.9-1.8.9A2 2 0 0 0 18 16Z" />
-                                    </svg>
-                                @else
-                                    <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                        <path d="M4 7h5l2 4h4l1.6-3H20v5h-1.1A3.5 3.5 0 1 1 12 14H9.9A3.5 3.5 0 1 1 3 14H2v-3h2V7Zm2.5 9A1.5 1.5 0 1 0 5 14.5 1.5 1.5 0 0 0 6.5 16Zm9 0A1.5 1.5 0 1 0 14 14.5a1.5 1.5 0 0 0 1.5 1.5Z" />
-                                    </svg>
-                                @endif
-                                <h3 id="question-category-section-{{ \Illuminate\Support\Str::slug($section['title']) }}" class="text-[1.04rem] font-bold">
-                                    {{ $section['title'] }}
-                                </h3>
-                            </div>
+            @foreach ($categorySections as $section)
+                @php($sectionCategories = $categorySet($section['codes']))
+                @if ($sectionCategories->isNotEmpty())
+                    <section class="question-database-guide__group" aria-labelledby="question-category-section-{{ \Illuminate\Support\Str::slug($section['title']) }}">
+                        <h3 id="question-category-section-{{ \Illuminate\Support\Str::slug($section['title']) }}">{{ $section['title'] }}</h3>
+                        <div class="question-database-guide__tiles {{ $sectionCategories->count() === 1 ? 'question-database-guide__tiles--single' : '' }}">
+                            @foreach ($sectionCategories as $category)
+                                <x-public.question-category-tile :category="$category" :description="$labelFor($category)" />
+                            @endforeach
+                        </div>
+                    </section>
+                @endif
+            @endforeach
 
-                            <div class="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                                @foreach ($sectionCategories as $category)
-                                    @php($theme = $themeFor($category))
-                                    <a
-                                        href="{{ $category['url'] }}"
-                                        class="group flex min-h-[215px] flex-col justify-between rounded-[8px] border border-[#dce3eb] bg-white p-5 shadow-[0_1px_2px_rgba(15,23,42,0.03)] transition hover:-translate-y-0.5 hover:border-[#c4cfdb] hover:shadow-[0_12px_24px_rgba(15,23,42,0.07)]"
-                                        aria-label="Przejdź do pytań kategorii {{ $category['code'] }}"
-                                    >
-                                        <div class="grid min-h-16 grid-cols-[minmax(0,1fr)_96px] items-center gap-3">
-                                            <span class="flex h-16 items-center text-[2.65rem] font-bold leading-none" style="color: {{ $theme['accent'] }}">
-                                                {{ $category['code'] }}
-                                            </span>
-                                            <x-questions.vehicle-icon :code="$category['code']" class="h-16 w-full object-contain object-right" />
-                                        </div>
-
-                                        <div class="mt-4 min-w-0">
-                                            <h4 class="text-[0.96rem] font-bold leading-6 text-[#06122b]">{{ $category['title'] }}</h4>
-                                            <p class="mt-1 text-[0.92rem] leading-6 text-[#06122b]">{{ $labelFor($category) }}</p>
-                                        </div>
-
-                                        <div class="mt-5 flex items-center justify-between gap-3">
-                                            <span class="inline-flex items-center gap-2 text-[0.88rem] text-[#06122b]">
-                                                <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: {{ $theme['accent'] }}" aria-hidden="true">
-                                                    <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" stroke-linecap="round" stroke-linejoin="round" />
-                                                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" stroke-linecap="round" stroke-linejoin="round" />
-                                                    <path d="M12 17h.01" stroke-linecap="round" />
-                                                </svg>
-                                                {{ number_format($category['questions_count'], 0, ',', ' ') }} pytań
-                                            </span>
-                                            <span class="text-[1.4rem] font-semibold leading-none transition group-hover:translate-x-1" style="color: {{ $theme['accent'] }}" aria-hidden="true">
-                                                →
-                                            </span>
-                                        </div>
-                                    </a>
-                                @endforeach
-                            </div>
-                        </section>
-                    @endif
-                @endforeach
+            @include('questions-database.partials.hub-guide')
             </div>
         </div>
     </section>

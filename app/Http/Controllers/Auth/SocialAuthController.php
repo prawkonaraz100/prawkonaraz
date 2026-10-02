@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Exceptions\SocialAccountNeedsCategoryException;
+use App\Exceptions\VerificationEmailDeliveryFailed;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\UserProfile;
@@ -63,6 +64,7 @@ class SocialAuthController extends Controller
     ): RedirectResponse {
         $providerClient->assertSupported($provider);
         $pending = null;
+        $deliveryFailed = false;
 
         try {
             $pending = $this->pullPendingState($request, $provider);
@@ -78,6 +80,9 @@ class SocialAuthController extends Controller
                 $pending['target_category_id'] ?? null,
                 is_string($pending['preferred_learning_track'] ?? null) ? $pending['preferred_learning_track'] : null,
             );
+        } catch (VerificationEmailDeliveryFailed $exception) {
+            $user = $exception->user;
+            $deliveryFailed = true;
         } catch (SocialAccountNeedsCategoryException) {
             return to_route('register')
                 ->withErrors([
@@ -102,7 +107,9 @@ class SocialAuthController extends Controller
         $userIpHistoryService->record($user, $request, 'social_login', force: true);
         $returningUserCookie->queue($request);
 
-        return redirect(route('dashboard', absolute: false));
+        return $deliveryFailed
+            ? to_route('verification.notice')->with('status', 'verification-link-failed')
+            : redirect(route('dashboard', absolute: false));
     }
 
     /**

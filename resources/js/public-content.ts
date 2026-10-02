@@ -25,7 +25,7 @@ const setupPublicMobileMenu = () => {
 
     const setOpen = (open: boolean) => {
         button.setAttribute('aria-expanded', String(open));
-        button.textContent = open ? 'Zamknij' : 'Menu';
+        button.setAttribute('aria-label', open ? 'Zamknij menu' : 'Otwórz menu');
         panel.hidden = !open;
     };
 

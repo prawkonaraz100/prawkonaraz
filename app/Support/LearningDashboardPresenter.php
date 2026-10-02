@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Models\LicenseCategory;
 use App\Models\StudySession;
 use App\Models\User;
+use App\Models\UserTopicCompletionRecord;
 use Illuminate\Support\Collection;
 
 class LearningDashboardPresenter
@@ -30,15 +31,24 @@ class LearningDashboardPresenter
         array $rankingPreview,
         int $incorrectListCount,
         bool $includeCourseSessions = true,
+        int $pendingReviewCount = 0,
     ): array {
         $purchaseMode = (string) config('pwa.purchase_mode', 'web');
+        $progress = $this->courseProgress($user, $category, $topicGroups, $incorrectListCount);
 
         return [
             'schema_version' => 1,
             'active_session' => $this->activeSession($user, $includeCourseSessions),
-            'course_progress' => $this->courseProgress($category, $topicGroups, $incorrectListCount),
+            'course_progress' => $progress,
+            'progress_message' => app(LearningProgressMessageService::class)->forCategory(
+                $progress,
+                $pendingReviewCount,
+                $this->recentTopicCompletion($user, $category, $topicGroups, $progress['completed_topic_ids']),
+            ),
             'review' => [
                 'due_count' => $dueReviewCount,
+                'recommended_count' => $dueReviewCount,
+                'pending_count' => $pendingReviewCount,
             ],
             'ranking' => $rankingPreview,
             'recent_learning_activity' => null,
@@ -127,6 +137,7 @@ class LearningDashboardPresenter
      * @return array<string, mixed>
      */
     protected function courseProgress(
+        User $user,
         ?LicenseCategory $category,
         Collection $topicGroups,
         int $incorrectListCount,
@@ -151,7 +162,23 @@ class LearningDashboardPresenter
 
         $answered = max($totals['all'] - $totals['unanswered'], 0);
         $correct = max($answered - $totals['incorrect'], 0);
-        $percent = $totals['all'] > 0 ? min((int) round(($answered / $totals['all']) * 100), 100) : 0;
+        $percent = $totals['all'] > 0 ? min((int) round(($answered / $totals['all']) * 100), $totals['unanswered'] > 0 ? 99 : 100) : 0;
+        $topicIds = $topicGroups->flatMap(fn (array $group): array => $group['options'] ?? [])
+            ->pluck('id')->map(fn (mixed $id): int => (int) $id)->unique()->values();
+        // Full, perfect sessions are achievements, independent of later
+        // mistakes and scheduled question reviews.
+        $completedTopicIds = $category && $topicIds->isNotEmpty()
+            ? UserTopicCompletionRecord::query()
+                ->where('user_id', $user->getKey())
+                ->where('license_category_id', $category->getKey())
+                ->where('question_scope', 'all')
+                ->where('perfect_completion_count', '>', 0)
+                ->whereIn('question_topic_id', $topicIds->all())
+                ->orderBy('question_topic_id')
+                ->pluck('question_topic_id')
+                ->map(fn (mixed $id): int => (int) $id)
+                ->values()->all()
+            : [];
 
         return [
             'category_id' => $category?->getKey(),
@@ -162,7 +189,42 @@ class LearningDashboardPresenter
             'correct_questions' => $correct,
             'total_questions' => $totals['all'],
             'percent' => $percent,
+            'completed_topic_ids' => $completedTopicIds,
+            'completed_topics' => count($completedTopicIds),
+            'total_topics' => $topicIds->count(),
         ];
+    }
+
+    /** @return array{name:string}|null */
+    protected function recentTopicCompletion(User $user, ?LicenseCategory $category, Collection $topicGroups, array $completedTopicIds): ?array
+    {
+        if (! $category || $completedTopicIds === []) {
+            return null;
+        }
+
+        // Inspect the latest session, not the latest successful learning session:
+        // starting another session must stop showing the old congratulations.
+        $session = StudySession::query()->regularCategory()
+            ->where('user_id', $user->getKey())
+            ->where('license_category_id', $category->getKey())
+            ->orderByDesc('id')
+            ->first(['id', 'mode', 'status', 'total_questions_count', 'correct_answers_count', 'payload']);
+        $result = data_get($session?->payload, 'topic_completion_record');
+
+        if (! $session || $session->mode !== StudySessionManager::MODE_LEARN || $session->status !== 'completed'
+            || $session->total_questions_count <= 0
+            || $session->correct_answers_count !== $session->total_questions_count
+            || ! is_array($result) || ! ($result['qualified'] ?? false)
+            || (int) ($result['study_session_id'] ?? 0) !== (int) $session->getKey()
+            || ($result['question_scope'] ?? null) !== 'all'
+            || ! in_array((int) ($result['question_topic_id'] ?? 0), $completedTopicIds, true)) {
+            return null;
+        }
+
+        $topic = $topicGroups->flatMap(fn (array $group): array => $group['options'] ?? [])
+            ->first(fn (array $option): bool => (int) $option['id'] === (int) $result['question_topic_id']);
+
+        return $topic ? ['name' => (string) $topic['label']] : null;
     }
 
     protected function sessionUiShell(StudySession $studySession): ?string

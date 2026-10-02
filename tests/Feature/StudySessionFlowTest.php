@@ -13,6 +13,7 @@ use App\Models\StudySession;
 use App\Models\StudySessionAnswer;
 use App\Models\TrafficSign;
 use App\Models\User;
+use App\Models\UserProfile;
 use App\Models\UserQuestionProgress;
 use App\Models\UserTopicCompletionRecord;
 use App\Support\QuestionAudioExportManifestBuilder;
@@ -23,6 +24,85 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
+
+test('learning home keeps full perfect topic achievements separate from mistakes and reviews', function () {
+    Carbon::setTestNow('2026-10-01 10:00:00');
+    try {
+        $user = User::factory()->withPurchasedAccess()->create();
+        $category = LicenseCategory::factory()->categoryB()->create();
+        UserProfile::factory()->for($user)->create(['target_category_id' => $category->getKey()]);
+        $topics = collect(['warning_signs', 'road_markings', 'driving_technique'])->map(function (string $key) use ($category) {
+            $topic = QuestionTopic::query()->create(['key' => $key, 'name' => $key, 'sort_order' => 10]);
+            Question::factory()->count(2)->for($category, 'licenseCategory')->sequence(
+                ['metadata' => ['structure_scope' => 'PODSTAWOWY']],
+                ['metadata' => ['structure_scope' => 'SPECJALISTYCZNY']],
+            )->create(['question_topic_id' => $topic->getKey(), 'correct_answer' => 'a']);
+
+            return $topic;
+        });
+        $oldErrorQuestion = Question::query()->where('question_topic_id', $topics[0]->getKey())->firstOrFail();
+        UserQuestionProgress::factory()->for($user)->for($oldErrorQuestion, 'question')->create([
+            'total_attempts' => 1, 'correct_count' => 0, 'incorrect_count' => 1,
+            'repetitions' => 0, 'correct_streak' => 0, 'last_quality' => 1, 'next_review_at' => today(),
+        ]);
+
+        $complete = function (QuestionTopic $topic, string $shell, int $count = 2, bool $wrong = false, string $scope = 'all') use ($user, $category): void {
+            $this->actingAs($user)->post(route('study-sessions.store'), [
+                'license_category_id' => $category->getKey(), 'mode' => 'learn', 'ui_shell' => $shell,
+                'question_count' => $count, 'question_topic_id' => $topic->getKey(),
+                'question_status' => 'all', 'question_scope' => $scope,
+            ])->assertRedirect();
+            $this->actingAs($user)->get(route('session.index'))->assertOk()
+                ->assertInertia(fn (Assert $page) => $page
+                    ->where('learning_dashboard.progress_message.state', fn ($state) => $state !== 'topic_completed'));
+            $session = StudySession::query()->latest('id')->firstOrFail();
+            foreach ($session->questionIds()->values()->take($count) as $index => $questionId) {
+                Carbon::setTestNow(now()->addSeconds(20));
+                $this->actingAs($user)->post(route('study-sessions.answers.store', $session), [
+                    'question_id' => $questionId,
+                    'selected_answer' => $wrong && $index === 0 ? 'b' : 'a',
+                    'response_time_ms' => 20000,
+                ])->assertRedirect();
+            }
+            if ($session->questionIds()->count() > $count) {
+                $this->actingAs($user)->post(route('study-sessions.complete', $session))->assertRedirect();
+            }
+        };
+        $assertCounter = function (array $ids, string $scope = 'all', bool $congratulations = false) use ($user): void {
+            $this->actingAs($user)->get(route('session.index', ['question_scope' => $scope]))
+                ->assertOk()->assertInertia(fn (Assert $page) => $page
+                ->where('learning_dashboard.course_progress.completed_topic_ids', $ids)
+                ->where('learning_dashboard.course_progress.completed_topics', count($ids))
+                ->where('learning_dashboard.course_progress.total_topics', 3)
+                ->where('learning_dashboard.progress_message.state', fn ($state) => ($state === 'topic_completed') === $congratulations));
+        };
+
+        $assertCounter([]);
+        $complete($topics[2], 'exam_like', 1); // Perfect, but only part of the topic.
+        $assertCounter([]);
+        $complete($topics[2], 'zen', 2, true); // Whole topic, but with a mistake.
+        $assertCounter([]);
+        $complete($topics[2], 'exam_like', 1, false, 'basic'); // Only the basic subset.
+        $assertCounter([]);
+
+        $complete($topics[0], 'exam_like');
+        expect(UserQuestionProgress::query()->where('question_id', $oldErrorQuestion->getKey())
+            ->where('user_id', $user->getKey())->value('incorrect_count'))->toBe(1);
+        $assertCounter([$topics[0]->getKey()], 'all', true);
+        $complete($topics[1], 'zen');
+        $ids = [$topics[0]->getKey(), $topics[1]->getKey()];
+        $assertCounter($ids, 'all', true);
+
+        $complete($topics[0], 'zen', 2, true); // A later error must not revoke an achievement.
+        $assertCounter($ids);
+        Carbon::setTestNow(now()->addDays(30));
+        $assertCounter($ids);
+        $assertCounter($ids, 'basic');
+        $assertCounter($ids, 'specialist');
+    } finally {
+        Carbon::setTestNow();
+    }
+});
 
 test('starting a configured topic replaces the active session only when valid', function (bool $hasQuestions) {
     $user = User::factory()->withPurchasedAccess()->create();

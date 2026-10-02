@@ -1,4 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap');
+@import './question-database.css';
+@import './question-detail.css';
 
 @tailwind base;
 @tailwind components;

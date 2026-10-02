@@ -247,9 +247,9 @@ onUnmounted(() => {
                 @toggle="keepSingleMenuOpen(mobileMenu)"
             >
                 <summary aria-label="Otwórz menu">
-                    <span class="home-site-header__launcher-icon" aria-hidden="true">
-                        <i v-for="dot in 9" :key="dot"></i>
-                    </span>
+                    <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <path d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
                 </summary>
 
                 <div class="home-site-header__mobile-panel">

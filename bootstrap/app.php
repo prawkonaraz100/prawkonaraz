@@ -20,9 +20,12 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Exceptions\InvalidSignatureException;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -61,6 +64,27 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        $verificationLinkError = static fn (Request $request, string $problem) => Inertia::render(
+            'Auth/VerificationLinkProblem', ['problem' => $problem],
+        )->toResponse($request)->setStatusCode(403);
+
+        $exceptions->render(function (InvalidSignatureException $exception, Request $request) use ($verificationLinkError) {
+            return $request->routeIs('verification.verify')
+                ? $verificationLinkError($request, 'invalid-link')
+                : null;
+        });
+
+        $exceptions->render(function (AccessDeniedHttpException $exception, Request $request) use ($verificationLinkError) {
+            if (! $request->routeIs('verification.verify') || ! $request->user()
+                || ! $exception->getPrevious() instanceof AuthorizationException) {
+                return null;
+            }
+
+            $wrongAccount = ! hash_equals((string) $request->user()->getAuthIdentifier(), (string) $request->route('id'));
+
+            return $verificationLinkError($request, $wrongAccount ? 'wrong-account' : 'invalid-link');
+        });
+
         $apiError = static function (
             Request $request,
             string $code,

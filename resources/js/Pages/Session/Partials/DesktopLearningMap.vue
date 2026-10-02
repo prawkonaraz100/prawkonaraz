@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import CourseModules from '@/Pages/QuestionCollections/Partials/CourseModules.vue';
+import LearningProgressIcon from './LearningProgressIcon.vue';
 import { topicArtworkForKey } from '@/lib/topicArtwork';
 import type { PageProps } from '@/types';
+import type { LearningProgressMessage } from '@/types/learningProgress';
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, Brain, BriefcaseBusiness, ClipboardCheck, GraduationCap, List, Map, RotateCcw, Trophy } from '@lucide/vue';
+import { BookOpen, Brain, BriefcaseBusiness, ClipboardCheck, GraduationCap, List, Map, RotateCcw } from '@lucide/vue';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import learningPathLandscape from '../../../../images/session/learning-path-landscape-v1.png';
 import rocketButtonIcon from '../../../../images/session/rocket-button.png';
@@ -76,6 +78,7 @@ interface ProfessionalCourse {
     name: string;
     description: string | null;
     category_name: string | null;
+    progress_message: LearningProgressMessage;
     progress: {
         answered_count: number;
         total_questions: number;
@@ -121,6 +124,9 @@ const props = defineProps<{
     incorrectQuestionsUrl: string;
     activeSession: ActiveLearningSession | null;
     courseProgressPercent: number;
+    progressMessage: LearningProgressMessage;
+    completedTopicIds: number[];
+    totalTopicCount: number;
     trafficSignLearningHref: string;
     memoryTrainerHref: string;
     rankingModeHref: string;
@@ -206,9 +212,9 @@ const mapRows = computed(() => {
 
     return rows;
 });
-const completedTopicCount = computed(() =>
-    mapTopics.value.filter((topic) => topicState(topic) === 'complete').length,
-);
+const completedTopicIds = computed(() => new Set(props.completedTopicIds));
+const completedTopicCount = computed(() => completedTopicIds.value.size);
+const learningMessage = computed(() => selectedProfessionalCourse.value?.progress_message ?? props.progressMessage);
 const mapRouteHeight = computed(() => Math.max(132 * mapRows.value.length, 132));
 const mapRoutePath = computed(() => {
     const left = 38;
@@ -348,7 +354,7 @@ function progressPercent(topic: TopicOption): number {
         return 0;
     }
 
-    return Math.min(Math.round((answeredCount(topic) / topic.questions_count) * 100), 100);
+    return Math.min(Math.round((answeredCount(topic) / topic.questions_count) * 100), (topic.counts.unanswered ?? 0) > 0 ? 99 : 100);
 }
 
 function questionCountLabel(count: number): string {
@@ -363,16 +369,16 @@ function questionCountLabel(count: number): string {
 }
 
 function topicState(topic: TopicOption): 'next' | 'attention' | 'complete' | 'progress' | 'pending' {
+    if (completedTopicIds.value.has(topic.id)) {
+        return 'complete';
+    }
+
     if (topic.id === firstUnansweredTopicId.value) {
         return 'next';
     }
 
     if ((topic.counts.incorrect ?? 0) > 0) {
         return 'attention';
-    }
-
-    if (topic.questions_count > 0 && answeredCount(topic) >= topic.questions_count) {
-        return 'complete';
     }
 
     if (answeredCount(topic) > 0) {
@@ -394,7 +400,7 @@ function topicStateLabel(topic: TopicOption): string {
     }
 
     if (state === 'complete') {
-        return 'Przerobiony';
+        return (topic.counts.incorrect ?? 0) > 0 ? `Zaliczony. ${topic.counts.incorrect} do poprawy` : 'Zaliczony';
     }
 
     if (state === 'progress') {
@@ -534,27 +540,27 @@ function topicArtworkFor(topic: TopicOption): string | null {
 
                                     <div class="grid w-full max-w-[26rem] grid-cols-[minmax(0,1fr)_8.75rem] gap-x-4 rounded-2xl border border-white/80 bg-white/95 px-5 py-4 shadow-[0_14px_38px_rgba(32,65,105,0.12)] backdrop-blur-sm">
                                         <div>
-                                            <p class="text-sm font-semibold text-[#0b1d42]">{{ selectedProfessionalCourse ? 'Postęp kursu' : 'Twój postęp' }}</p>
+                                            <p class="text-sm font-semibold text-[#0b1d42]">Przerobione pytania</p>
                                             <p class="mt-0.5 text-[2rem] font-bold leading-none text-[#071b45]">{{ selectedProfessionalCourse?.progress.percent ?? courseProgressPercent }}%</p>
-                                            <div class="mt-2 h-2 overflow-hidden rounded-full bg-[#e7edf2]" role="progressbar" :aria-label="selectedProfessionalCourse ? 'Postęp kursu' : 'Twój postęp'" :aria-valuenow="selectedProfessionalCourse?.progress.percent ?? courseProgressPercent" aria-valuemin="0" aria-valuemax="100">
+                                            <div class="mt-2 h-2 overflow-hidden rounded-full bg-[#e7edf2]" role="progressbar" aria-label="Przerobione pytania" :aria-valuenow="selectedProfessionalCourse?.progress.percent ?? courseProgressPercent" aria-valuemin="0" aria-valuemax="100">
                                                 <span class="block h-full rounded-full bg-[#00cf85] transition-[width] duration-300" :style="{ width: `${selectedProfessionalCourse?.progress.percent ?? courseProgressPercent}%` }" />
                                             </div>
                                         </div>
                                         <div class="group relative border-l border-[#e1e9f0] pl-4">
                                             <p class="flex items-center gap-1 text-xs text-[#53698b]">
-                                                {{ selectedProfessionalCourse ? 'Moduły' : 'Działy zaliczone' }}
+                                                {{ selectedProfessionalCourse ? 'Liczba modułów' : 'Działy zaliczone' }}
                                                 <button v-if="!selectedProfessionalCourse" type="button" class="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[#53698b] hover:text-[#071b45] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0876f8]" aria-label="Kiedy dział jest zaliczony?" aria-describedby="completed-topics-tooltip">
                                                     <svg class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 9v5m0-8h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
                                                 </button>
                                             </p>
-                                            <p class="mt-1 text-lg font-bold leading-5 text-[#071b45]">{{ selectedProfessionalCourse ? selectedProfessionalCourse.modules.length : `${completedTopicCount} / ${mapTopics.length}` }}</p>
+                                            <p class="mt-1 text-lg font-bold leading-5 text-[#071b45]">{{ selectedProfessionalCourse ? selectedProfessionalCourse.modules.length : `${completedTopicCount} / ${totalTopicCount}` }}</p>
                                             <span v-if="!selectedProfessionalCourse" id="completed-topics-tooltip" role="tooltip" class="pointer-events-none invisible absolute right-0 top-full z-30 mt-2 w-72 max-w-[80vw] rounded-lg border border-[#d8e0e7] bg-white p-3 text-left text-xs font-normal leading-5 text-[#40505e] opacity-0 shadow-md transition-opacity group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
-                                                Dział jest zaliczony, gdy przerobisz wszystkie pytania i żadne nie pozostaje w statusie „do poprawy”. Pytania po błędzie powtarzaj, aż uzyskają status „zapamiętane” — samo 100% przerobienia nie wystarczy.
+                                                Dział zaliczasz, gdy w jednej sesji nauki klasycznej lub Zen odpowiesz poprawnie na wszystkie pytania z działu, wybierając zakres „Wszystkie”. Późniejsze błędy i terminy powtórek nie odbierają zaliczenia.
                                             </span>
                                         </div>
                                         <div class="col-span-2 mt-3 flex items-center gap-2 border-t border-[#edf1f5] pt-3">
-                                            <Trophy :size="22" class="shrink-0 text-[#f3ad2c]" aria-hidden="true" />
-                                            <p class="text-[0.72rem] leading-tight text-[#53698b]"><strong class="block text-xs text-[#0b1d42]">{{ selectedProfessionalCourse ? 'Ucz się moduł po module' : courseProgressPercent >= 90 ? 'Świetna robota!' : 'Tak trzymaj!' }}</strong>{{ selectedProfessionalCourse ? 'Postęp kursu aktualizuje się po odpowiedziach.' : courseProgressPercent >= 90 ? 'Jesteś bardzo blisko zakończenia nauki.' : 'Każde pytanie przybliża Cię do celu.' }}</p>
+                                            <LearningProgressIcon :icon="learningMessage.icon" />
+                                            <p class="text-[0.72rem] leading-tight text-[#53698b]" aria-live="polite"><strong class="block text-xs text-[#0b1d42]">{{ learningMessage.title }}</strong>{{ learningMessage.message }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -773,7 +779,7 @@ function topicArtworkFor(topic: TopicOption): string | null {
                                         <span class="w-9 shrink-0 text-xs font-semibold text-[#00bd78]">{{ progressPercent(topic) }}%</span>
                                     </span>
                                     <span class="col-start-4 row-start-2 inline-flex min-h-8 items-center justify-center gap-2 rounded-lg bg-[#f1f4f8] px-2 text-center text-xs font-semibold leading-4 text-[#071b45] transition group-hover:bg-[#e3eaf3] min-[1150px]:col-auto min-[1150px]:row-auto min-[1150px]:text-sm">
-                                        {{ progressPercent(topic) === 100 ? 'Powtórz dział' : progressPercent(topic) > 0 ? 'Kontynuuj naukę' : 'Rozpocznij naukę' }} <span aria-hidden="true">→</span>
+                                        {{ answeredCount(topic) >= topic.questions_count && topic.questions_count > 0 ? 'Powtórz dział' : answeredCount(topic) > 0 ? 'Kontynuuj naukę' : 'Rozpocznij naukę' }} <span aria-hidden="true">→</span>
                                     </span>
                                 </button>
                             </div>
@@ -927,7 +933,7 @@ function topicArtworkFor(topic: TopicOption): string | null {
                                             @click="emit('startGlobalIncorrectLearning')"
                                         >
                                             <span class="grid h-8 w-8 place-items-center" aria-hidden="true"><RotateCcw :size="22" :stroke-width="1.9" /></span>
-                                            <span class="truncate text-center">{{ globalIncorrectProcessing ? 'Uruchamianie...' : 'Błędy z całego kursu' }}</span>
+                                            <span class="truncate text-center">{{ globalIncorrectProcessing ? 'Uruchamianie...' : managedIncorrectListEnabled ? 'Moja lista z całej kategorii' : 'Pytania do poprawy z całej kategorii' }}</span>
                                             <span class="grid h-8 min-w-8 place-items-center rounded-full bg-[#dff9ec] px-1 text-center text-xs">{{ totalIncorrectQuestions }}</span>
                                         </button>
                                     </div>

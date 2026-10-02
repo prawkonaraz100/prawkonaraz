@@ -17,7 +17,7 @@ test('auth mail notifications use polish copy', function () {
     expect($verifyMail->subject)
         ->toBe('Potwierdź adres e-mail')
         ->and($verifyMail->introLines)
-        ->toContain('Kliknij przycisk poniżej, aby potwierdzić adres e-mail.')
+        ->toContain('Dziękujemy za rejestrację w PrawkoNaRaz.')
         ->and($verifyMail->actionText)
         ->toBe('Potwierdź adres e-mail')
         ->and($resetMail->subject)

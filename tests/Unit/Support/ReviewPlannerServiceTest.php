@@ -675,3 +675,27 @@ test('review planner does not repeat verified recovery already answered today', 
         ->and($plan['recommended_question_count'])->toBe(0)
         ->and($plan['ordered_question_ids'])->toBe([]);
 });
+test('pending review counts exclude boosters and new questions in the suggested session', function () {
+    $user = User::factory()->create();
+    $category = LicenseCategory::factory()->categoryB()->create();
+    $future = Question::factory()->for($category, 'licenseCategory')->create();
+    $due = Question::factory()->for($category, 'licenseCategory')->create();
+    Question::factory()->for($category, 'licenseCategory')->create();
+    UserQuestionProgress::factory()->for($user)->for($future, 'question')->create([
+        'total_attempts' => 1, 'correct_count' => 1, 'incorrect_count' => 0,
+        'repetitions' => 1, 'correct_streak' => 1, 'last_quality' => 4,
+        'next_review_at' => today()->addDays(4),
+    ]);
+    $service = app(ReviewPlannerService::class);
+    $plan = $service->plan($user, $category->getKey());
+    expect($plan['pending_review_count'])->toBe(0)
+        ->and($plan['recommended_question_count'])->toBeGreaterThan(0);
+    UserQuestionProgress::factory()->for($user)->for($due, 'question')->create([
+        'total_attempts' => 1, 'correct_count' => 1, 'incorrect_count' => 0,
+        'repetitions' => 1, 'correct_streak' => 1, 'last_quality' => 4,
+        'next_review_at' => today()->subDay(),
+    ]);
+    $plan = $service->plan($user, $category->getKey());
+    expect($plan['pending_review_count'])->toBe(1)
+        ->and($plan['recommended_question_count'])->toBeGreaterThan(1);
+});

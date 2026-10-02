@@ -62,6 +62,7 @@ test('course module keeps its scope through answer result and restart', function
         ->assertInertia(fn (Assert $page) => $page
             ->component('StudySessions/Show')
             ->where('session.scope', 'course_module')
+            ->where('session.context.explanation_flashcard', true)
             ->where('session.context.restart_url', route('learning.question-collections.modules.start', [
                 'questionCollection' => $collection->slug,
                 'module' => $module->slug,
@@ -152,6 +153,7 @@ test('course incorrect review keeps its own scope and ordinary category C remain
         ->assertInertia(fn (Assert $page) => $page
             ->component('StudySessions/Show')
             ->where('session.scope', 'course_review')
+            ->where('session.context.explanation_flashcard', true)
             ->where('session.context.restart_url', null)
             ->where('session.context.incorrect_questions_url', route('learning.question-collections.incorrect-questions.index', [
                 'questionCollection' => $collection->slug,

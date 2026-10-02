@@ -44,6 +44,12 @@ class ReviewPlannerService
             (int) $dailyContext['daily_remaining_count'],
         );
         $orderedProgressPool = $this->orderedProgress($user, $categoryId, $allowedCategoryIds);
+        // Exclude optional boosters/new questions, and do not hide pending
+        // reviews just because today's session limit has already been used.
+        $pendingReviewCount = $orderedProgressPool->filter(fn (UserQuestionProgress $progress): bool => $this->hasVerifiedMemoryProgress($progress)
+                ? $this->hasVerifiedActionableProgress($progress, $today)
+                : $this->isClassicDueProgress($progress, $today)
+        )->count();
         $selectedProgress = $this->selectedProgressForSession($orderedProgressPool, $sessionTarget, $today);
         $orderedProgress = $selectedProgress['progress'];
         $progressQuestionIds = $orderedProgress
@@ -90,6 +96,7 @@ class ReviewPlannerService
             'memory_signal_version' => ReviewMemorySignalService::VERSION,
             'verified_memory_signal_version' => ReviewMemoryVerifiedSignalService::VERSION,
             'due_count' => $dueCount,
+            'pending_review_count' => $pendingReviewCount,
             'candidate_count' => $candidateCount,
             'booster_count' => $boosterCount,
             'actionable_count' => $actionableCount,

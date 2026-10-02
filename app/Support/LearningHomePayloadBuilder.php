@@ -82,7 +82,8 @@ class LearningHomePayloadBuilder
         $isPjmPreferred = $user->profile?->preferred_learning_track === UserProfile::LEARNING_TRACK_PJM;
         $showPjmEntryTile = $pjmDecision->allowed && $isPjmPreferred;
         $friendInvitationState = $this->friendInvitationProfilePresenter->forOwner($user);
-        $dueReviewCount = $this->studyContextService->dueReviewCount($user);
+        $reviewCounts = $this->studyContextService->reviewCounts($user);
+        $dueReviewCount = $reviewCounts['recommended_count'];
         $rankingPreview = $this->rankingPreview($user);
         $questionScope = $this->stringInput($input, 'question_scope', 'all');
         $filteredTopicGroups = $this->filterTopicGroupsByScope($topicGroups, $questionScope);
@@ -147,6 +148,7 @@ class LearningHomePayloadBuilder
                 $rankingPreview,
                 $incorrectListCount,
                 $includeCourseSessions,
+                $reviewCounts['pending_count'],
             ),
             'ranking_preview' => $rankingPreview,
             'pjm_module' => [
@@ -334,36 +336,39 @@ class LearningHomePayloadBuilder
         $progressByModule = $this->questionCollectionProgressService->moduleProgressFor($user, $collections);
 
         return $collections
-            ->map(fn (QuestionCollection $collection): array => [
-                'id' => $collection->getKey(),
-                'code' => $collection->code,
-                'slug' => $collection->slug,
-                'name' => $collection->name,
-                'description' => $collection->description,
-                'category_name' => $collection->licenseCategory?->name,
-                'progress' => $this->questionCollectionProgressService->collectionProgressFor(
-                    $collection,
-                    $progressByModule,
-                ),
-                'incorrect_questions' => [
-                    'count' => $this->questionCollectionIncorrectQuestionService->activeCountFor($user, $collection),
-                    'url' => route('learning.question-collections.incorrect-questions.index', $collection, absolute: false),
-                ],
-                'modules' => $collection->modules
-                    ->map(fn (QuestionModule $module): array => [
-                        'id' => $module->getKey(),
-                        'code' => $module->code,
-                        'name' => $module->name,
-                        'description' => $module->description,
-                        'questions_count' => $module->questions_count,
-                        'progress' => $progressByModule->get($module->getKey()),
-                        'start_url' => route('learning.question-collections.modules.start', [
-                            'questionCollection' => $collection,
-                            'module' => $module,
-                        ], absolute: false),
-                    ])
-                    ->values(),
-            ])
+            ->map(function (QuestionCollection $collection) use ($user, $progressByModule): array {
+                $progress = $this->questionCollectionProgressService->collectionProgressFor($collection, $progressByModule);
+                $incorrectCount = $this->questionCollectionIncorrectQuestionService->activeCountFor($user, $collection);
+
+                return [
+                    'id' => $collection->getKey(),
+                    'code' => $collection->code,
+                    'slug' => $collection->slug,
+                    'name' => $collection->name,
+                    'description' => $collection->description,
+                    'category_name' => $collection->licenseCategory?->name,
+                    'progress' => $progress,
+                    'progress_message' => app(LearningProgressMessageService::class)->forProfessionalCourse($progress, $incorrectCount),
+                    'incorrect_questions' => [
+                        'count' => $incorrectCount,
+                        'url' => route('learning.question-collections.incorrect-questions.index', $collection, absolute: false),
+                    ],
+                    'modules' => $collection->modules
+                        ->map(fn (QuestionModule $module): array => [
+                            'id' => $module->getKey(),
+                            'code' => $module->code,
+                            'name' => $module->name,
+                            'description' => $module->description,
+                            'questions_count' => $module->questions_count,
+                            'progress' => $progressByModule->get($module->getKey()),
+                            'start_url' => route('learning.question-collections.modules.start', [
+                                'questionCollection' => $collection,
+                                'module' => $module,
+                            ], absolute: false),
+                        ])
+                        ->values(),
+                ];
+            })
             ->values()
             ->all();
     }

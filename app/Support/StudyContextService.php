@@ -196,8 +196,14 @@ class StudyContextService
 
     public function dueReviewCount(?User $user): int
     {
+        return $this->reviewCounts($user)['recommended_count'];
+    }
+
+    /** @return array{recommended_count:int,pending_count:int} */
+    public function reviewCounts(?User $user): array
+    {
         if (! $user) {
-            return 0;
+            return ['recommended_count' => 0, 'pending_count' => 0];
         }
 
         $activeCategoryIds = $this->activeCategories($user)
@@ -207,7 +213,7 @@ class StudyContextService
             ->all();
 
         if ($activeCategoryIds === []) {
-            return 0;
+            return ['recommended_count' => 0, 'pending_count' => 0];
         }
 
         $plan = app(ReviewPlannerService::class)->plan(
@@ -216,6 +222,9 @@ class StudyContextService
             $activeCategoryIds,
         );
 
-        return (int) ($plan['recommended_question_count'] ?? 0);
+        return [
+            'recommended_count' => (int) ($plan['recommended_question_count'] ?? 0),
+            'pending_count' => (int) ($plan['pending_review_count'] ?? 0),
+        ];
     }
 }

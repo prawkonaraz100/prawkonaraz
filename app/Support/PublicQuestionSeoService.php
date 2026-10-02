@@ -38,21 +38,25 @@ class PublicQuestionSeoService
     /**
      * @return array<string, mixed>
      */
-    public function category(LicenseCategory $category, LengthAwarePaginator $questions): array
+    public function category(LicenseCategory $category, LengthAwarePaginator $questions, ?int $total = null, bool $hasActiveSearch = false, string $vehicleLabel = ''): array
     {
         $currentYear = now()->year;
         $canonical = route('public.questions.category', $category->slug);
         $pageSuffix = '';
 
-        if ($questions->currentPage() > 1) {
+        if (! $hasActiveSearch && $questions->currentPage() > 1) {
             $canonical .= '?page='.$questions->currentPage();
             $pageSuffix = ' - strona '.$questions->currentPage();
         }
 
+        $total ??= $questions->total();
+        $vehicleDescription = $vehicleLabel !== '' ? " ({$vehicleLabel})" : '';
+
         return [
             'title' => "Pytania na prawo jazdy kat. {$category->code} {$currentYear} - oficjalna baza{$pageSuffix}",
-            'description' => "Oficjalne pytania egzaminacyjne kategorii {$category->code}. {$questions->total()} pytań z poprawnymi odpowiedziami i wyjaśnieniami{$pageSuffix}.",
+            'description' => Str::limit("Pytania kat. {$category->code}{$vehicleDescription}. Liczba pytań: {$total}. Sprawdź poprawne odpowiedzi, zagadnienia i dostępne wyjaśnienia{$pageSuffix}.", 160, ''),
             'canonical' => $canonical,
+            'robots' => $hasActiveSearch ? 'noindex,follow' : 'index,follow,max-image-preview:large',
             'og_type' => 'website',
         ];
     }

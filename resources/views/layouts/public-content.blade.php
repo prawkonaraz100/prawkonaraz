@@ -35,7 +35,7 @@
         && request()->routeIs('public.news', 'public.news.*', 'public.guides', 'public.guides.*');
 @endphp
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="pl" @class(['home-page-scaled' => request()->routeIs('home')])>
     <head>
         <meta charset="utf-8">
         <link rel="preconnect" href="https://fonts.googleapis.com">
