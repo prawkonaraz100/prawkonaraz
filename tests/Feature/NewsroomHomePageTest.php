@@ -85,6 +85,21 @@ test('newsroom home renders the public blade from the gated read model when enab
         ->assertDontSee('data-newsroom-analytics-body=', false)
         ->assertDontSee('Tu pojawią się aktualności dla kandydatów, kursantów i instruktorów prawa jazdy.')
         ->assertDontSee('MarketingPlaceholder');
+
+    $response->assertViewHas('structuredData', function (mixed $schema): bool {
+        if (! is_array($schema) || ! is_array($schema['@graph'] ?? null)) {
+            return false;
+        }
+
+        $graph = collect($schema['@graph']);
+        $types = $graph->pluck('@type');
+        $collectionPage = $graph->firstWhere('@type', 'CollectionPage');
+
+        return $types->contains('CollectionPage')
+            && $types->contains('BreadcrumbList')
+            && is_array($collectionPage)
+            && ($collectionPage['url'] ?? null) === route('public.news');
+    });
 });
 
 test('newsroom home omits empty editorial sections instead of rendering fake cards', function () {

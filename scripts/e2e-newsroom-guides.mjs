@@ -122,8 +122,8 @@ try {
         const footerNews = footer.locator('a[href="/aktualnosci"]');
         const footerGuides = footer.locator('a[href="/poradniki"]');
 
-        if (await footerNews.count() !== 1 || (await footerNews.innerText()).trim() !== 'Aktualności') {
-            throw new Error(`Shared footer Aktualności link contract failed at ${viewport.name}px.`);
+        if (await footerNews.count() !== 1 || (await footerNews.innerText()).trim() !== 'Portal — aktualności') {
+            throw new Error(`Shared footer Portal — aktualności link contract failed at ${viewport.name}px.`);
         }
 
         if (await footerGuides.count() !== 1 || (await footerGuides.innerText()).trim() !== 'Poradniki') {
