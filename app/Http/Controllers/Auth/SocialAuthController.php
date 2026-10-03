@@ -40,6 +40,7 @@ class SocialAuthController extends Controller
             'preferred_learning_track' => $request->query('preferred_learning_track') === UserProfile::LEARNING_TRACK_CLASSIC
                 ? UserProfile::LEARNING_TRACK_CLASSIC
                 : null,
+            'surface' => $request->query('surface') === 'app' ? 'app' : 'web',
         ]);
 
         try {
@@ -84,7 +85,7 @@ class SocialAuthController extends Controller
             $user = $exception->user;
             $deliveryFailed = true;
         } catch (SocialAccountNeedsCategoryException) {
-            return to_route('register')
+            return to_route(($pending['surface'] ?? null) === 'app' ? 'app.register' : 'register')
                 ->withErrors([
                     'target_category_id' => 'Wybierz kategorię prawa jazdy przed rejestracją przez Google lub Facebook.',
                 ]);
@@ -173,10 +174,12 @@ class SocialAuthController extends Controller
             return route('profile.edit', absolute: false);
         }
 
+        $surface = ($pending['surface'] ?? null) === 'app' ? 'app.' : '';
+
         if (($pending['target_category_id'] ?? null) !== null) {
-            return route('register', absolute: false);
+            return route($surface.'register', absolute: false);
         }
 
-        return route('login', absolute: false);
+        return route($surface.'login', absolute: false);
     }
 }

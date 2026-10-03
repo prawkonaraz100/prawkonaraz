@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AboutOrganizationController;
 use App\Http\Controllers\AccessActivationController;
+use App\Http\Controllers\AppEntryController;
+use App\Http\Controllers\AppAuthController;
 use App\Http\Controllers\AdminBackupFileController;
 use App\Http\Controllers\AdminContentArticlePreviewController;
 use App\Http\Controllers\AdminLegalContentQuestionReferenceController;
@@ -69,6 +71,7 @@ use App\Http\Controllers\ServiceLegalDocumentController;
 use App\Http\Controllers\SessionPageController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SitemapQuestionsController;
+use App\Http\Controllers\StreakChallengeController;
 use App\Http\Controllers\StudySessionAnswerController;
 use App\Http\Controllers\StudySessionController;
 use App\Http\Controllers\TrafficSignCategoryController;
@@ -93,6 +96,14 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Inertia\Inertia;
 
 Route::get('/', HomePageController::class)->name('home');
+Route::get('/app', [AppEntryController::class, 'show'])->name('app.entry');
+Route::middleware('guest')->group(function () {
+    Route::get('/app/login', [AppAuthController::class, 'login'])->name('app.login');
+    Route::get('/app/register', [AppAuthController::class, 'register'])->name('app.register');
+});
+Route::post('/app/onboarding', [AppEntryController::class, 'complete'])
+    ->middleware('throttle:20,1')
+    ->name('app.onboarding.complete');
 Route::get('/opinie-o-prawkonaraz', ReviewPageController::class)
     ->name('reviews.index');
 Route::get('/opinie-o-prawkonaraz/{review}/zdjecie', UserReviewPhotoController::class)
@@ -409,6 +420,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('learning.question-collections.incorrect-questions.preference.update');
         Route::get('/nauka/ranking', [RankedSessionPageController::class, 'lobby'])
             ->name('session.ranking');
+        Route::get('/nauka/seria/stan', [StreakChallengeController::class, 'state'])
+            ->name('streak-challenge.state');
+        Route::post('/nauka/seria/start', [StreakChallengeController::class, 'start'])
+            ->middleware('throttle:20,1')
+            ->name('streak-challenge.start');
+        Route::post('/nauka/seria/{streakRun}/odpowiedz', [StreakChallengeController::class, 'answer'])
+            ->middleware('throttle:180,1')
+            ->name('streak-challenge.answer');
         Route::get('/nauka/ranking/oczekiwanie', [RankedSessionPageController::class, 'waiting'])
             ->name('session.ranking.waiting');
         Route::get('/nauka/ranking/mecz', [RankedSessionPageController::class, 'match'])

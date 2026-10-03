@@ -2,6 +2,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import DesktopLearningMap from '@/Pages/Session/Partials/DesktopLearningMap.vue';
 import MobileLearningDashboard from '@/Pages/Session/Partials/MobileLearningDashboard.vue';
+import MobileTopicIndex from '@/Pages/Session/Partials/MobileTopicIndex.vue';
 import type { PageProps } from '@/types';
 import type { LearningProgressMessage } from '@/types/learningProgress';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
@@ -237,6 +238,7 @@ const props = defineProps<{
 }>();
 
 const page = usePage<PageProps>();
+const isMobileTopicsView = computed(() => new URL(page.url, 'https://prawkonaraz.pl').searchParams.get('widok') === 'dzialy');
 const sharedStudyContext = computed(() => (page.props.studyContext ?? {
     targetCategoryId: null,
     categories: [],
@@ -497,12 +499,6 @@ const firstUnansweredTopic = computed(() =>
 );
 const firstIncorrectTopic = computed(() =>
     allTopicOptions.value.find((option) => (option.counts.incorrect ?? 0) > 0) ?? null,
-);
-const mobileRecommendedTopic = computed(() =>
-    firstUnansweredTopic.value
-    ?? firstIncorrectTopic.value
-    ?? allTopicOptions.value[0]
-    ?? null,
 );
 const globalIncorrectForm = useForm<{
     license_category_id: number | null;
@@ -857,10 +853,37 @@ const selectLearningPath = (path: LearningPath) => {
     }
 };
 
-const startMobileRecommendedLearning = () => {
-    const topic = mobileRecommendedTopic.value;
+const startMobileQuickLearning = () => {
+    if (!canUseFullProduct.value) {
+        if (showPjmEntryTile.value) {
+            window.location.href = props.pjm_module.href;
+        } else {
+            activateFullLearning();
+        }
+        return;
+    }
 
-    if (!topic) {
+    if (
+        sessionForm.processing
+        || !sessionForm.license_category_id
+        || props.learning_dashboard.course_progress.total_questions <= 0
+    ) {
+        return;
+    }
+
+    selectLearningPath('classic');
+    sessionForm.question_topic_id = null;
+    sessionForm.question_scope = 'all';
+    sessionForm.question_status = 'all';
+    sessionForm.randomize_order = true;
+    sessionForm.question_count = Math.min(20, props.learning_dashboard.course_progress.total_questions);
+    startLearning();
+};
+
+const startMobileTopicLearning = (topicId: number, scope: QuestionScope = 'all') => {
+    const topic = props.group_options.flatMap((group) => group.options).find((option) => option.id === topicId);
+
+    if (!topic || topic.questions_count <= 0 || sessionForm.processing) {
         return;
     }
 
@@ -871,8 +894,8 @@ const startMobileRecommendedLearning = () => {
             : 'all';
 
     selectLearningPath('classic');
+    sessionForm.question_scope = scope;
     sessionForm.question_topic_id = topic.id;
-    sessionForm.question_scope = 'all';
     sessionForm.question_status = status;
     sessionForm.randomize_order = false;
     sessionForm.question_count = topic.counts[status] ?? topic.questions_count;
@@ -1264,21 +1287,27 @@ const startDesktopHeroLearning = () => {
                         </div>
                     </section>
 
+                    <MobileTopicIndex
+                        v-if="isMobileTopicsView"
+                        :groups="group_options"
+                        :processing="sessionForm.processing"
+                        @start-topic="startMobileTopicLearning"
+                    />
+
                     <MobileLearningDashboard
+                        v-else
                         :learning-path-tabs="learningPathTabs"
                         :selected-path="selectedPath"
-                        :recommended-step="recommendedStep"
-                        :is-recommended-step-link="isRecommendedStepLink"
-                        :recommended-hero-style="recommendedHeroStyle"
                         :learning-dashboard="learning_dashboard"
                         :category-short-name="category.short_name"
-                        :recommended-topic="mobileRecommendedTopic"
                         :can-use-full-product="canUseFullProduct"
                         :show-pjm-entry-tile="showPjmEntryTile"
                         :pjm-module-href="pjm_module.href"
                         :pjm-symbol-src="pjmSignLanguageSymbol"
                         :selected-question-count="selectedQuestionCount"
+                        :all-group-options="group_options"
                         :filtered-group-options="filteredGroupOptions"
+                        :session-question-scope="sessionForm.question_scope"
                         :mobile-classic-status-options="mobileClassicStatusOptions"
                         :session-question-topic-id="sessionForm.question_topic_id"
                         :session-question-status="sessionForm.question_status"
@@ -1303,11 +1332,12 @@ const startDesktopHeroLearning = () => {
                             question_status: sessionForm.errors.question_status,
                         }"
                         @select-path="selectLearningPath"
-                        @start-recommended-learning="startMobileRecommendedLearning"
-                        @run-recommended-step="runRecommendedStep"
                         @activate-full-learning="activateFullLearning"
                         @start-learning="startLearning"
+                        @start-quick-learning="startMobileQuickLearning"
+                        @start-topic-learning="startMobileTopicLearning"
                         @choose-topic="chooseTopic"
+                        @choose-scope="chooseQuestionScope"
                         @choose-status="chooseStatus"
                         @start-global-incorrect-learning="startGlobalIncorrectLearning"
                     />
@@ -1315,6 +1345,7 @@ const startDesktopHeroLearning = () => {
                     <section
                         v-if="friendInvitationCtaVisible"
                         class="border-b border-[#e5eaf3] bg-[#fbfcff] px-4 py-3 md:px-6 xl:px-8"
+                        :class="isMobileTopicsView ? 'hidden md:block' : ''"
                         aria-label="Panel zaproszenia znajomego"
                     >
                         <div class="mx-auto flex max-w-[90rem] flex-col gap-3 md:flex-row md:items-center md:justify-between">

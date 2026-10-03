@@ -5,7 +5,7 @@
     "description": "Aplikacja do nauki testow na prawo jazdy.",
     "lang": "pl-PL",
     "dir": "ltr",
-    "start_url": "/nauka?utm_source=pwa",
+    "start_url": "/app?utm_source=pwa",
     "scope": "/",
     "display": "standalone",
     "orientation": "portrait-primary",

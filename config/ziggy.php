@@ -4,6 +4,10 @@ return [
     'groups' => [
         'app' => [
             'home',
+            'app.entry',
+            'app.login',
+            'app.register',
+            'app.onboarding.complete',
             'dashboard',
             'public.tests',
             'public.tests.demo.show',
@@ -54,6 +58,9 @@ return [
             'session.ranking.waiting',
             'session.ranking.match',
             'session.ranking.result',
+            'streak-challenge.state',
+            'streak-challenge.start',
+            'streak-challenge.answer',
             'questions.index',
             'study-sessions.store',
             'study-sessions.current',
@@ -67,6 +74,7 @@ return [
             'study-sessions.questions.show',
             'study-sessions.answers.store',
             'study-sessions.complete',
+            'profile.edit',
             'profile.update',
             'profile.product.update',
             'profile.social.destroy',

@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
+import { Link, router, usePage } from '@inertiajs/vue3';
+import type { PageProps } from '@/types';
 import type { LearningProgressMessage } from '@/types/learningProgress';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import MobileLearningAppBar from '@/Pages/Session/Partials/MobileLearningAppBar.vue';
-import LearningProgressIcon from './LearningProgressIcon.vue';
-import mobileLearningHeroRoadCar from '../../../../images/session/mobile-learning-hero-road-car.webp';
+import { topicArtworkForKey } from '@/lib/topicArtwork';
+import mobileDashboardHero from '../../../../images/session/mobile-dashboard-hero.png';
 import mobileRankingPodium from '../../../../images/session/mobile-ranking-podium.png';
 
 type LearningPath = 'pjm' | 'traffic-signs' | 'classic' | 'zen' | 'exam' | 'memory' | 'ranking';
-type RecommendedStepAction = 'none' | 'activate' | 'pjm' | 'traffic-signs' | 'memory' | 'classic' | 'exam';
 type ClassicPracticeMode = 'all' | 'incorrect' | 'global-incorrect';
 
 interface LearningPathTab {
@@ -24,6 +24,8 @@ interface GroupOption {
     label: string;
     questions_count: number;
     counts: Record<string, number>;
+    hero_image_url?: string | null;
+    hero_image_position?: string | null;
 }
 
 interface GroupBucket {
@@ -34,17 +36,6 @@ interface GroupBucket {
 interface StatusOption {
     value: string;
     label: string;
-}
-
-interface RecommendedStep {
-    action: RecommendedStepAction;
-    eyebrow: string;
-    title: string;
-    description: string;
-    metricLabel: string;
-    metricValue: string;
-    primaryLabel: string;
-    href?: string;
 }
 
 interface ExamFact {
@@ -113,18 +104,16 @@ interface LearningDashboard {
 const props = defineProps<{
     learningPathTabs: LearningPathTab[];
     selectedPath: LearningPath;
-    recommendedStep: RecommendedStep;
-    isRecommendedStepLink: boolean;
-    recommendedHeroStyle: Record<string, string>;
     learningDashboard: LearningDashboard;
     categoryShortName: string;
-    recommendedTopic: GroupOption | null;
     canUseFullProduct: boolean;
     showPjmEntryTile: boolean;
     pjmModuleHref: string;
     pjmSymbolSrc: string;
     selectedQuestionCount: number;
+    allGroupOptions: GroupBucket[];
     filteredGroupOptions: GroupBucket[];
+    sessionQuestionScope: 'all' | 'basic' | 'specialist';
     mobileClassicStatusOptions: StatusOption[];
     sessionQuestionTopicId: number | null;
     sessionQuestionStatus: string;
@@ -150,26 +139,27 @@ const props = defineProps<{
     };
 }>();
 
-const mobileAppBarCategory = computed(() => ({
-    id: props.learningDashboard.course_progress.category_id ?? 0,
-    code: props.categoryShortName,
-    name: `Kategoria ${props.categoryShortName}`,
-    short_name: props.categoryShortName,
-    questions_count: props.learningDashboard.course_progress.total_questions,
-}));
+const page = usePage<PageProps>();
+const firstName = computed(() => page.props.auth.user?.name?.trim().split(/\s+/)[0] || 'Kursancie');
 
 const emit = defineEmits<{
     (event: 'select-path', path: LearningPath): void;
-    (event: 'start-recommended-learning'): void;
-    (event: 'run-recommended-step'): void;
     (event: 'activate-full-learning'): void;
     (event: 'start-learning'): void;
+    (event: 'start-quick-learning'): void;
+    (event: 'start-topic-learning', topicId: number): void;
     (event: 'choose-topic', topicId: number): void;
+    (event: 'choose-scope', scope: 'all' | 'basic' | 'specialist'): void;
     (event: 'choose-status', status: string): void;
     (event: 'start-global-incorrect-learning'): void;
 }>();
 
 const isClassicPath = computed(() => props.selectedPath === 'classic');
+const questionScopeTabs = [
+    { value: 'all', label: 'Wszystkie' },
+    { value: 'basic', label: 'Podstawowe' },
+    { value: 'specialist', label: 'Specjalistyczne' },
+] as const;
 const isZenPath = computed(() => props.selectedPath === 'zen');
 const isExamPath = computed(() => props.selectedPath === 'exam');
 const isPjmPath = computed(() => props.selectedPath === 'pjm');
@@ -178,57 +168,34 @@ const isRankingPath = computed(() => props.selectedPath === 'ranking');
 const activeSession = computed(() => props.learningDashboard.active_session);
 const showLearningSetup = ref(false);
 const showTopicPathPicker = ref(false);
-const topicSearchQuery = ref('');
-const pendingTopicId = ref<number | null>(null);
+const topicPickerFromSetup = ref(false);
 const selectedClassicPracticeMode = ref<ClassicPracticeMode>(
     props.sessionQuestionStatus === 'incorrect' ? 'incorrect' : 'all',
 );
 const quickStartTabs = computed(() =>
     props.learningPathTabs.filter((tab) =>
         tab.value !== 'classic'
+        && tab.value !== 'exam'
         && tab.value !== 'memory'
         && tab.value !== 'zen',
     ),
 );
+const canOpenClassic = computed(() => !props.learningPathTabs.find((tab) => tab.value === 'classic')?.disabled);
+const canOpenExam = computed(() => !props.learningPathTabs.find((tab) => tab.value === 'exam')?.disabled);
+const reviewShortcutCount = computed(() => props.managedIncorrectListEnabled
+    ? props.totalIncorrectQuestions
+    : props.learningDashboard.review.due_count);
+const reviewShortcutHref = computed(() => props.managedIncorrectListEnabled
+    ? props.incorrectQuestionsUrl
+    : route('review-queue.index'));
 const selectedTopic = computed(() =>
     props.filteredGroupOptions
         .flatMap((group) => group.options)
         .find((option) => option.id === props.sessionQuestionTopicId) ?? null,
 );
-const pendingTopic = computed(() =>
-    props.filteredGroupOptions
-        .flatMap((group) => group.options)
-        .find((option) => option.id === pendingTopicId.value) ?? null,
+const topicPathGroups = computed(() =>
+    props.filteredGroupOptions.filter((group) => group.options.length > 0),
 );
-
-const normalizedTopicSearchQuery = computed(() =>
-    topicSearchQuery.value
-        .trim()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLocaleLowerCase('pl-PL'),
-);
-
-const topicPathGroups = computed(() => {
-    const query = normalizedTopicSearchQuery.value;
-
-    return props.filteredGroupOptions
-        .map((group) => ({
-            ...group,
-            options: group.options.filter((option) => {
-                if (!query) {
-                    return true;
-                }
-
-                return `${option.label} ${option.key}`
-                    .normalize('NFD')
-                    .replace(/[\u0300-\u036f]/g, '')
-                    .toLocaleLowerCase('pl-PL')
-                    .includes(query);
-            }),
-        }))
-        .filter((group) => group.options.length > 0);
-});
 
 const fieldError = computed(() =>
     props.errors.license_category_id
@@ -239,12 +206,20 @@ const fieldError = computed(() =>
 
 const courseProgress = computed(() => props.learningDashboard.course_progress);
 const courseProgressPercent = computed(() => courseProgress.value.percent);
-const courseCorrectCount = computed(() => courseProgress.value.correct_questions);
-const courseIncorrectCount = computed(() => courseProgress.value.incorrect_questions);
-const courseUnansweredCount = computed(() => courseProgress.value.unanswered_questions);
-const courseProgressWidth = computed(() => `${courseProgressPercent.value}%`);
-const homePrimaryTitle = computed(() => props.recommendedStep.title);
-const homePrimaryActionLabel = computed(() => props.recommendedStep.primaryLabel);
+const featuredTopicKeys = [
+    'warning_signs',
+    'prohibition_and_mandatory_signs',
+    'informational_direction_and_supplementary_signs',
+    'traffic_lights_and_controller_signals',
+];
+const popularTopics = computed(() => {
+    const topics = props.allGroupOptions.flatMap((group) => group.options);
+    const featured = featuredTopicKeys
+        .map((key) => topics.find((topic) => topic.key === key))
+        .filter((topic): topic is GroupOption => Boolean(topic));
+
+    return [...featured, ...topics.filter((topic) => !featured.some((item) => item.id === topic.id))].slice(0, 4);
+});
 const activeSessionPositionLabel = computed(() => {
     if (!activeSession.value) {
         return '';
@@ -255,11 +230,6 @@ const activeSessionPositionLabel = computed(() => {
     return questionNumber
         ? `Pytanie ${questionNumber} z ${activeSession.value.progress.total}`
         : `${activeSession.value.progress.answered} z ${activeSession.value.progress.total} pytań`;
-});
-const activeSessionProgressWidth = computed(() => {
-    const percent = activeSession.value?.progress.percent ?? 0;
-
-    return `${percent > 0 ? Math.max(percent, 4) : 0}%`;
 });
 const rankingPositionLabel = computed(() =>
     props.rankingPreview.position !== null ? String(props.rankingPreview.position) : '—',
@@ -279,43 +249,87 @@ const openLearningSetup = (path: LearningPath = 'classic') => {
     }
 
     showTopicPathPicker.value = false;
-    topicSearchQuery.value = '';
     showLearningSetup.value = true;
 };
 
 const closeLearningSetup = () => {
     showTopicPathPicker.value = false;
-    topicSearchQuery.value = '';
     showLearningSetup.value = false;
 };
 
+const leaveLearningSetup = () => {
+    closeLearningSetup();
+
+    if (new URL(page.url, 'https://prawkonaraz.pl').searchParams.has('widok')) {
+        router.visit(route('session.index'), { replace: true });
+    }
+};
+
 const openTopicPathPicker = () => {
-    pendingTopicId.value = props.sessionQuestionTopicId;
+    topicPickerFromSetup.value = true;
     showTopicPathPicker.value = true;
-    topicSearchQuery.value = '';
+};
+
+const openTopicsShortcut = () => {
+    if (canOpenClassic.value) {
+        router.visit(`${route('session.index')}?widok=dzialy`);
+    } else if (props.showPjmEntryTile) {
+        openLearningSetup('pjm');
+    } else {
+        emit('activate-full-learning');
+    }
+};
+
+const openExamShortcut = () => {
+    if (canOpenExam.value) {
+        router.visit(`${route('session.index')}?widok=testy`);
+    } else {
+        emit('activate-full-learning');
+    }
 };
 
 const closeTopicPathPicker = () => {
     showTopicPathPicker.value = false;
-    topicSearchQuery.value = '';
 };
 
 const chooseTopicFromSheet = (topicId: number) => {
-    pendingTopicId.value = topicId;
+    if (topicPickerFromSetup.value) {
+        emit('choose-topic', topicId);
+        if (isZenPath.value) {
+            emit('choose-status', 'all');
+        } else if (selectedClassicPracticeMode.value !== 'global-incorrect') {
+            emit('choose-status', selectedClassicPracticeMode.value);
+        }
+        closeTopicPathPicker();
+        return;
+    }
+
+    if (props.sessionProcessing || !confirmReplacingActiveSession()) {
+        return;
+    }
+
+    closeLearningSetup();
+    emit('start-topic-learning', topicId);
 };
 
-const confirmTopicFromSheet = () => {
-    if (pendingTopicId.value !== null) {
-        emit('choose-topic', pendingTopicId.value);
+const confirmReplacingActiveSession = () =>
+    !activeSession.value || window.confirm('Masz rozpoczętą sesję. Nowa seria zakończy ją przed rozpoczęciem kolejnej. Kontynuować?');
+
+const startReviewShortcut = () => {
+    if (confirmReplacingActiveSession()) {
+        emit('start-global-incorrect-learning');
+    }
+};
+
+const startFeaturedTopic = (topicId: number) => {
+    if (!props.canUseFullProduct) {
+        openTopicsShortcut();
+        return;
     }
 
-    if (isZenPath.value) {
-        emit('choose-status', 'all');
-    } else if (selectedClassicPracticeMode.value !== 'global-incorrect') {
-        emit('choose-status', selectedClassicPracticeMode.value);
+    if (!props.sessionProcessing && confirmReplacingActiveSession()) {
+        emit('start-topic-learning', topicId);
     }
-
-    closeTopicPathPicker();
 };
 
 const selectStudyPresentation = (path: 'classic' | 'zen') => {
@@ -335,6 +349,10 @@ const chooseClassicPracticeMode = (mode: ClassicPracticeMode) => {
 };
 
 const startFromSetup = () => {
+    if (!confirmReplacingActiveSession()) {
+        return;
+    }
+
     closeLearningSetup();
 
     if (isClassicPath.value && selectedClassicPracticeMode.value === 'global-incorrect') {
@@ -394,63 +412,6 @@ const topicProgressPercent = (option: GroupOption) => {
     }
 
     return Math.min(Math.round((topicAnsweredCount(option) / option.questions_count) * 100), (option.counts.unanswered ?? 0) > 0 ? 99 : 100);
-};
-
-const topicPathStateLabel = (option: GroupOption) => {
-    const selectedTopicId = showTopicPathPicker.value
-        ? pendingTopicId.value
-        : props.sessionQuestionTopicId;
-
-    if (option.id === selectedTopicId) {
-        return 'Wybrany';
-    }
-
-    if (courseProgress.value.completed_topic_ids.includes(option.id)) {
-        return (option.counts.incorrect ?? 0) > 0 ? 'Zaliczony · do poprawy' : 'Zaliczony';
-    }
-    const progress = topicProgressPercent(option);
-
-    if (progress === 0) {
-        return 'Nowy';
-    }
-
-    return topicAnsweredCount(option) >= option.questions_count ? 'Przerobiony · niezaliczony' : `${progress}% przerobione`;
-};
-
-const topicPathStateClass = (option: GroupOption) => {
-    const selectedTopicId = showTopicPathPicker.value
-        ? pendingTopicId.value
-        : props.sessionQuestionTopicId;
-
-    if (option.id === selectedTopicId) {
-        return 'bg-[#eaf1ff] text-[#023ea4]';
-    }
-
-    return topicProgressPercent(option) === 0
-        ? 'bg-[#f1f5f9] text-[#475569]'
-        : 'bg-[#e8f8ee] text-[#15803d]';
-};
-
-const topicIconKind = (option: GroupOption) => {
-    const value = `${option.key} ${option.label}`.toLocaleLowerCase('pl-PL');
-
-    if (/znak|sign/.test(value)) {
-        return 'sign';
-    }
-
-    if (/skrzyż|skrzyz|rondo|intersection/.test(value)) {
-        return 'intersection';
-    }
-
-    if (/pies|rower|pedestrian|cycl/.test(value)) {
-        return 'pedestrian';
-    }
-
-    if (/pierwsz|wypad|pomoc|accident/.test(value)) {
-        return 'safety';
-    }
-
-    return 'road';
 };
 
 const countForStatus = (status: ClassicPracticeMode) => {
@@ -595,12 +556,16 @@ const closeOnEscape = (event: KeyboardEvent) => {
     }
 
     if (showTopicPathPicker.value) {
-        closeTopicPathPicker();
+        if (topicPickerFromSetup.value) {
+            closeTopicPathPicker();
+        } else {
+            leaveLearningSetup();
+        }
         return;
     }
 
     if (showLearningSetup.value) {
-        closeLearningSetup();
+        leaveLearningSetup();
     }
 };
 
@@ -632,123 +597,166 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <section class="mobile-learning-dashboard bg-white px-4 pb-3 pt-1.5 md:hidden" aria-label="Mobilny panel nauki">
-        <MobileLearningAppBar
-            class="-mx-4 mb-1"
-            :category="mobileAppBarCategory"
-        />
-
-        <div class="space-y-6">
-            <section
-                v-if="activeSession"
-                class="relative overflow-hidden rounded-lg bg-[#064f9e] px-5 py-5 text-white shadow-[0_14px_30px_rgba(15,23,42,0.14)]"
-                aria-label="Aktywna sesja"
-            >
-                <img
-                    :src="mobileLearningHeroRoadCar"
-                    alt=""
-                    aria-hidden="true"
-                    class="pointer-events-none absolute bottom-0 right-0 h-[96%] w-[56%] object-contain object-right-bottom opacity-80"
-                >
-                <div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,#064f9e_0%,#0752d5_50%,rgba(7,82,213,0.28)_72%,rgba(7,82,213,0)_100%)]" />
-
-                <div class="relative max-w-[13.5rem]">
-                    <div class="min-w-0">
-                        <p class="text-[0.65rem] font-semibold uppercase tracking-[0.1em] text-white/82">
-                            Aktywna sesja
-                        </p>
-                        <h2 class="mt-1 text-[1.6rem] font-semibold leading-tight tracking-[0] text-white">
-                            {{ activeSession.title }}
-                        </h2>
-                        <p class="mt-1 text-sm leading-5 text-white/88">
-                            {{ activeSessionPositionLabel }}
-                        </p>
-                    </div>
-
-                    <div class="mt-4 h-1.5 overflow-hidden rounded-full bg-white/22">
-                        <div
-                            class="h-full rounded-full bg-[#b7ff20]"
-                            :style="{ width: activeSessionProgressWidth }"
-                        />
-                    </div>
-
-                    <Link
-                        :href="activeSession.resume_url"
-                        class="mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-white px-4 text-sm font-semibold text-[#064f9e] shadow-[0_10px_20px_rgba(5,11,46,0.2)] transition hover:bg-[#eef6ff] focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#064f9e]"
-                    >
-                        Wróć do sesji
-                        <span aria-hidden="true">→</span>
-                    </Link>
+    <section class="mobile-learning-dashboard mx-auto min-h-screen max-w-[30rem] bg-[#faf9f7] px-4 pb-5 md:hidden" aria-label="Mobilny panel nauki">
+        <div>
+            <header class="relative -mx-4 h-[13.7rem] overflow-hidden bg-[#faf9f7]" aria-label="Powitanie">
+                <img :src="mobileDashboardHero" alt="" aria-hidden="true" class="absolute bottom-0 right-0 h-auto w-[75%] max-w-none">
+                <div class="pointer-events-none absolute inset-0" style="background: linear-gradient(90deg, #faf9f7 0%, rgba(250, 249, 247, .92) 30%, rgba(250, 249, 247, 0) 64%)" />
+                <MobileLearningAppBar />
+                <div class="absolute bottom-[1.85rem] left-5 z-10 max-w-[58%]">
+                    <h1 class="break-words text-[clamp(1.9rem,7.9vw,2.3rem)] font-extrabold leading-[1.03] tracking-[-0.052em] text-[#070d19]">
+                        Cześć<br>{{ firstName }}!
+                    </h1>
+                    <p class="mt-2.5 text-[0.8rem] leading-[1.35rem] text-[#657081]">
+                        Gotowy na kolejną serię pytań?<br>Wybierz tryb nauki i działaj!
+                    </p>
                 </div>
+            </header>
 
+            <Link
+                v-if="activeSession"
+                :href="activeSession.resume_url"
+                class="flex min-h-[5.65rem] items-center gap-3 rounded-[1.1rem] bg-gradient-to-br from-[#ffe59a] via-[#ffdf72] to-[#ffcd4a] px-4 py-3 text-[#101827] shadow-[0_10px_28px_rgba(202,148,31,0.10)] transition hover:brightness-[1.02] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#aa7114]"
+            >
+                <span class="grid h-14 w-14 shrink-0 place-items-center rounded-[0.95rem] bg-white/75" aria-hidden="true">
+                    <span class="grid h-8 w-8 place-items-center rounded-full bg-[#ffc532] text-lg text-white">▶</span>
+                </span>
+                <span class="min-w-0 flex-1">
+                    <span class="block text-[0.65rem] font-bold uppercase tracking-[0.12em] text-[#855414]">Szybki start</span>
+                    <span class="mt-0.5 block text-[1.15rem] font-bold leading-6">Kontynuuj naukę</span>
+                    <span class="mt-1 block truncate text-xs text-[#665c49]">{{ activeSession.title }} · {{ activeSessionPositionLabel }}</span>
+                </span>
+                <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-xl" aria-hidden="true">→</span>
+            </Link>
+            <button
+                v-else
+                type="button"
+                class="flex min-h-[5.65rem] w-full items-center gap-3 rounded-[1.1rem] bg-gradient-to-br from-[#ffe59a] via-[#ffdf72] to-[#ffcd4a] px-4 py-3 text-left text-[#101827] shadow-[0_10px_28px_rgba(202,148,31,0.10)] transition hover:brightness-[1.02] disabled:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#aa7114]"
+                :disabled="sessionProcessing || (canUseFullProduct && courseProgress.total_questions === 0)"
+                @click="emit('start-quick-learning')"
+            >
+                <span class="grid h-14 w-14 shrink-0 place-items-center rounded-[0.95rem] bg-white/75" aria-hidden="true">
+                    <span class="grid h-8 w-8 place-items-center rounded-full bg-[#ffc532] text-lg text-white">▶</span>
+                </span>
+                <span class="min-w-0 flex-1">
+                    <span class="block text-[0.65rem] font-bold uppercase tracking-[0.12em] text-[#855414]">Szybki start</span>
+                    <span class="mt-0.5 block text-[1.15rem] font-bold leading-6">{{ canUseFullProduct ? 'Rozpocznij naukę' : 'Otwórz naukę' }}</span>
+                    <span class="mt-1 block text-xs text-[#665c49]">{{ canUseFullProduct ? 'Losowe pytania z całej bazy' : 'Sprawdź dostępne możliwości' }}</span>
+                </span>
+                <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-xl" aria-hidden="true">→</span>
+            </button>
+
+            <section class="mt-2.5 grid grid-cols-2 gap-2" aria-label="Główne tryby">
                 <button
                     type="button"
-                    class="relative mt-3 inline-flex min-h-9 items-center text-xs font-semibold text-white/90 underline decoration-white/45 underline-offset-4 transition hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#064f9e]"
-                    @click="openLearningSetup('classic')"
+                    class="flex min-h-[4.1rem] items-center gap-2 rounded-[1.05rem] bg-white px-3 py-2 text-left text-[#121826] shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_26px_rgba(15,23,42,0.08)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#aa7114]"
+                    @click="openTopicsShortcut"
                 >
-                    Ustaw nową serię
+                    <span class="grid h-10 w-10 shrink-0 place-items-center rounded-[0.85rem] bg-[#fff5df] text-[#a35a15]" aria-hidden="true">
+                        <svg class="h-6 w-6" viewBox="0 0 32 32" fill="none"><path d="M16 8c-3.6-2.3-7.6-2.6-12-1.5v19c4.4-1.1 8.4-.8 12 1.5 3.6-2.3 7.6-2.6 12-1.5v-19C23.6 5.4 19.6 5.7 16 8Z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M16 8v19" stroke="currentColor" stroke-width="2.2"/></svg>
+                    </span>
+                    <span class="min-w-0 flex-1">
+                        <span class="block text-[0.8rem] font-bold leading-4">Wybierz dział</span>
+                        <span class="mt-0.5 block text-[0.6rem] leading-3 text-[#687385]">Ucz się według kategorii</span>
+                    </span>
+                    <span class="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-[#fff5df] text-base" aria-hidden="true">›</span>
+                </button>
+                <button
+                    type="button"
+                    class="flex min-h-[4.1rem] items-center gap-2 rounded-[1.05rem] bg-white px-3 py-2 text-left text-[#121826] shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_26px_rgba(15,23,42,0.08)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#aa7114]"
+                    @click="openExamShortcut"
+                >
+                    <span class="grid h-10 w-10 shrink-0 place-items-center rounded-[0.85rem] bg-[#fff5df] text-[#a35a15]" aria-hidden="true">
+                        <svg class="h-6 w-6" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="11" stroke="currentColor" stroke-width="2.4"/><circle cx="16" cy="16" r="5" stroke="currentColor" stroke-width="2.4"/><path d="m16 16 9-9M22 7h4v4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    <span class="min-w-0 flex-1">
+                        <span class="block text-[0.8rem] font-bold leading-4">Egzamin próbny</span>
+                        <span class="mt-0.5 block text-[0.6rem] leading-3 text-[#687385]">Sprawdź swoją wiedzę</span>
+                    </span>
+                    <span class="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-[#fff5df] text-base" aria-hidden="true">›</span>
                 </button>
             </section>
 
-            <section
-                v-else
-                class="relative min-h-[14.5rem] overflow-hidden rounded-lg bg-[#064f9e] px-5 py-5 text-white shadow-[0_14px_30px_rgba(15,23,42,0.14)]"
-                aria-label="Rozpocznij naukę"
-            >
-                <img
-                    :src="mobileLearningHeroRoadCar"
-                    alt=""
-                    aria-hidden="true"
-                    class="pointer-events-none absolute bottom-0 right-0 h-[96%] w-[56%] object-contain object-right-bottom opacity-80"
-                >
-                <div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,#064f9e_0%,#0752d5_50%,rgba(7,82,213,0.28)_72%,rgba(7,82,213,0)_100%)]" />
-
-                <div class="relative max-w-[13.5rem]">
-                    <p class="text-[0.65rem] font-semibold uppercase tracking-[0.1em] text-white/82">
-                        Następna seria · Kategoria {{ categoryShortName }}
-                    </p>
-                    <h2 class="mt-1 text-[1.6rem] font-semibold leading-tight tracking-[0] text-white">
-                        {{ homePrimaryTitle }}
-                    </h2>
-                    <p class="mt-2 text-sm leading-5 text-white/88">
-                        {{ recommendedStep.description }}
-                    </p>
-
-                    <Link
-                        v-if="isRecommendedStepLink"
-                        :href="recommendedStep.href ?? '/'"
-                        class="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-md bg-white px-4 text-sm font-semibold text-[#064f9e]"
-                    >{{ homePrimaryActionLabel }} <span class="ml-2" aria-hidden="true">→</span></Link>
-                    <button
-                        v-else
-                        type="button"
-                        class="mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-white px-4 text-sm font-semibold text-[#064f9e] shadow-[0_10px_20px_rgba(5,11,46,0.2)] transition hover:bg-[#eef6ff] disabled:cursor-not-allowed disabled:opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#064f9e]"
-                        :disabled="sessionProcessing || recommendedStep.action === 'none'"
-                        @click="emit('run-recommended-step')"
-                    >
-                        <span>{{ homePrimaryActionLabel }}</span>
-                        <span aria-hidden="true">→</span>
+            <section id="postep" class="mt-2.5 scroll-mt-5 rounded-[1.1rem] bg-white p-2.5 shadow-[0_8px_28px_rgba(15,23,42,0.035)]" aria-labelledby="mobile-progress-title">
+                <div class="flex min-h-7 items-center justify-between gap-2 px-0.5">
+                    <h2 id="mobile-progress-title" class="text-[0.92rem] font-bold text-[#121826]">Twój postęp</h2>
+                    <Link :href="categoryStatsHref" class="inline-flex min-h-7 items-center gap-1 text-[0.62rem] font-medium text-[#647083] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff]">
+                        Zobacz szczegóły <span aria-hidden="true">→</span>
+                    </Link>
+                </div>
+                <div class="mt-1.5 grid grid-cols-3 gap-1.5">
+                    <div class="relative min-w-0 rounded-[0.85rem] bg-[#f7f8fa] p-2.5 pb-4">
+                        <div class="flex items-center gap-1.5 max-[390px]:flex-col max-[390px]:items-start max-[390px]:gap-1">
+                            <span class="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-[#e9f9f1] text-[#17b781]" aria-hidden="true">◕</span>
+                            <span class="min-w-0">
+                                <span class="block text-[0.53rem] leading-3 text-[#687385]">Ukończono</span>
+                                <strong class="block text-[0.95rem] leading-5 text-[#101827]">{{ courseProgressPercent }}%</strong>
+                            </span>
+                        </div>
+                        <span class="absolute bottom-2 left-2.5 right-2.5 block h-1.5 overflow-hidden rounded-full bg-[#e5e9ed]" aria-hidden="true"><span class="block h-full rounded-full bg-[#21bc89]" :style="{ width: courseProgressPercent + '%' }" /></span>
+                    </div>
+                    <div class="min-w-0 rounded-[0.85rem] bg-[#f7f8fa] p-2.5">
+                        <div class="flex items-center gap-1.5 max-[390px]:flex-col max-[390px]:items-start max-[390px]:gap-1">
+                            <span class="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-[#edf4ff] text-[#2c72e8]" aria-hidden="true">
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none"><path d="M9 7h11M9 12h11M9 17h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="4" cy="7" r="1.3" fill="currentColor"/><circle cx="4" cy="12" r="1.3" fill="currentColor"/><circle cx="4" cy="17" r="1.3" fill="currentColor"/></svg>
+                            </span>
+                            <span class="min-w-0">
+                                <span class="block text-[0.53rem] leading-3 text-[#687385]">Rozwiązane</span>
+                                <strong class="block whitespace-nowrap text-[0.62rem] leading-5 text-[#101827]">{{ totalAnsweredQuestions }} / {{ courseProgress.total_questions }}</strong>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="min-w-0 rounded-[0.85rem] bg-[#f7f8fa] p-2.5">
+                        <div class="flex items-center gap-1.5 max-[390px]:flex-col max-[390px]:items-start max-[390px]:gap-1">
+                            <span class="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-[#fff7df] text-[#e4a700]" aria-hidden="true">★</span>
+                            <span class="min-w-0">
+                                <span class="block text-[0.53rem] leading-3 text-[#687385]">Zaliczone działy</span>
+                                <strong class="block text-[0.9rem] leading-5 text-[#101827]">{{ courseProgress.completed_topics }} / {{ courseProgress.total_topics }}</strong>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section v-if="popularTopics.length" class="mt-4" aria-labelledby="mobile-popular-title">
+                <div class="flex items-center justify-between gap-3 px-1">
+                    <h2 id="mobile-popular-title" class="text-[0.92rem] font-bold text-[#121826]">Popularne działy</h2>
+                    <button type="button" class="inline-flex min-h-8 items-center gap-1 text-[0.62rem] font-medium text-[#647083] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff]" @click="openTopicsShortcut">
+                        Zobacz wszystkie <span aria-hidden="true">→</span>
                     </button>
-
+                </div>
+                <div class="mt-1.5 grid grid-cols-4 gap-1.5">
                     <button
+                        v-for="topic in popularTopics"
+                        :key="topic.id"
                         type="button"
-                        class="mt-2 inline-flex min-h-10 w-full items-center justify-center text-xs font-semibold text-white/90 underline decoration-white/45 underline-offset-4 transition hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#064f9e]"
-                        @click="openLearningSetup('classic')"
+                        class="flex min-h-[7rem] min-w-0 flex-col rounded-[1rem] bg-white p-2.5 text-left shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff]"
+                        @click="startFeaturedTopic(topic.id)"
                     >
-                        Zmień dział lub tryb
+                        <img v-if="topicArtworkForKey(topic.key) || topic.hero_image_url" :src="topicArtworkForKey(topic.key) || topic.hero_image_url || ''" alt="" loading="lazy" class="mx-auto h-10 w-10 object-contain">
+                        <span v-else class="mx-auto grid h-10 w-10 place-items-center rounded-xl bg-[#eef4fc] text-lg font-bold text-[#0b5cff]" aria-hidden="true">{{ topicIconLabel(topic) }}</span>
+                        <span class="mt-1.5 line-clamp-2 min-h-[2rem] w-full text-[0.61rem] font-bold leading-4 text-[#121826]">{{ topic.label }}</span>
+                        <span class="mt-auto flex w-full items-center justify-between gap-0.5 text-[0.53rem] text-[#687385]">
+                            {{ topic.questions_count }} pytań
+                            <span class="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-[#fff4da] text-sm text-[#352313]" aria-hidden="true">›</span>
+                        </span>
                     </button>
                 </div>
             </section>
 
-            <section v-if="quickStartTabs.length" aria-labelledby="mobile-learning-modes-title">
-                <div>
-                    <h2 id="mobile-learning-modes-title" class="text-base font-semibold leading-tight text-[#050b2e]">
-                        Inne tryby
-                    </h2>
-                    <p class="mt-1 text-xs leading-4 text-[#64748b]">
-                        Sprawdź wiedzę w innym formacie.
-                    </p>
-                </div>
+            <section v-if="canUseFullProduct && reviewShortcutCount > 0" class="mt-4 flex items-center justify-between gap-3 rounded-[1.1rem] bg-white px-4 py-3" aria-label="Powtórki">
+                <span class="min-w-0">
+                    <strong class="block text-sm text-[#121826]">Powtórki</strong>
+                    <span class="block text-xs text-[#687385]">{{ reviewShortcutCount }} pytań do utrwalenia</span>
+                </span>
+                <button v-if="managedIncorrectListEnabled" type="button" class="min-h-11 shrink-0 rounded-full bg-[#fff2dd] px-4 text-xs font-semibold text-[#774b11] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#aa7114]" :disabled="globalIncorrectProcessing || sessionProcessing" @click="startReviewShortcut">Rozpocznij →</button>
+                <Link v-else :href="reviewShortcutHref" class="inline-flex min-h-11 shrink-0 items-center rounded-full bg-[#fff2dd] px-4 text-xs font-semibold text-[#774b11] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#aa7114]">Rozpocznij →</Link>
+            </section>
+
+            <details v-if="quickStartTabs.length" class="group mt-3 rounded-xl border border-[#e7ebf0] bg-white p-4">
+                <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-[#071b33] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] [&::-webkit-details-marker]:hidden">
+                    Inne tryby nauki
+                    <span class="text-lg text-[#64748b] transition-transform group-open:rotate-90" aria-hidden="true">›</span>
+                </summary>
 
                 <div
                     class="mt-3 grid gap-2"
@@ -788,7 +796,7 @@ onUnmounted(() => {
                         </span>
                     </button>
                 </div>
-            </section>
+            </details>
 
             <Teleport to="body">
             <Transition name="mobile-learning-sheet">
@@ -809,7 +817,7 @@ onUnmounted(() => {
                                     type="button"
                                     class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-[#023ea4] transition hover:bg-[#f1f5f9] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#023ea4] focus-visible:ring-offset-2"
                                     aria-label="Wróć do panelu nauki"
-                                    @click="closeLearningSetup"
+                                    @click="leaveLearningSetup"
                                 >
                                     <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                                         <path d="m14.5 5.5-6.5 6.5 6.5 6.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
@@ -847,7 +855,7 @@ onUnmounted(() => {
                                                 {{ selectedTopic?.label ?? 'Wybierz dział' }}
                                             </span>
                                             <span class="mt-0.5 block text-xs leading-4 text-[#64708b]">
-                                                {{ selectedTopic ? `${selectedTopic.questions_count} pytań · Zmień na ścieżce działów` : 'Wybierz materiał do nauki' }}
+                                                {{ selectedTopic ? `${selectedTopic.questions_count} pytań · Zmień dział` : 'Wybierz materiał do nauki' }}
                                             </span>
                                         </span>
                                         <svg class="h-5 w-5 shrink-0 text-[#667085]" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -1136,8 +1144,8 @@ onUnmounted(() => {
                                     <button
                                         type="button"
                                         class="inline-flex min-h-11 items-center gap-1 rounded-lg px-1.5 text-sm font-semibold text-[#023ea4] transition hover:bg-[#f1f5f9] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#023ea4] focus-visible:ring-offset-2"
-                                        aria-label="Wróć do ustawień nauki"
-                                        @click="closeTopicPathPicker"
+                                        :aria-label="topicPickerFromSetup ? 'Wróć do ustawień nauki' : 'Wróć do ekranu startowego'"
+                                        @click="topicPickerFromSetup ? closeTopicPathPicker() : leaveLearningSetup()"
                                     >
                                         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                                             <path d="m14.5 5.5-6.5 6.5 6.5 6.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
@@ -1145,27 +1153,28 @@ onUnmounted(() => {
                                         Wróć
                                     </button>
                                     <h2 id="mobile-topic-path-title" class="min-w-0 flex-1 text-lg font-semibold leading-tight text-[#050b2e]">
-                                        Ścieżka działów
+                                        Wybierz dział
                                     </h2>
                                 </div>
 
-                                <label class="relative mt-2 block">
-                                    <span class="sr-only">Szukaj działu</span>
-                                    <svg class="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[#64748b]" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                        <circle cx="10.8" cy="10.8" r="5.8" stroke="currentColor" stroke-width="2" />
-                                        <path d="m15.2 15.2 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                                    </svg>
-                                    <input
-                                        v-model="topicSearchQuery"
-                                        type="search"
-                                        class="h-11 w-full rounded-lg border border-[#cbd9ea] bg-[#f8fafc] py-2 pl-10 pr-3 text-sm text-[#050b2e] placeholder:text-[#7c8798] focus:border-[#0b5cff] focus:outline-none focus:ring-2 focus:ring-[#0b5cff]/20"
-                                        placeholder="Szukaj działu"
+                                <div class="mt-3 grid grid-cols-3 gap-1 rounded-lg bg-[#eef2f7] p-1" role="group" aria-label="Rodzaj pytań">
+                                    <button
+                                        v-for="scope in questionScopeTabs"
+                                        :key="scope.value"
+                                        type="button"
+                                        class="min-h-11 rounded-md px-1 text-[0.7rem] font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff]"
+                                        :class="sessionQuestionScope === scope.value ? 'bg-[#ffd84d] text-[#071b33]' : 'text-[#475569] hover:bg-white'"
+                                        :aria-pressed="sessionQuestionScope === scope.value"
+                                        @click="emit('choose-scope', scope.value)"
                                     >
-                                </label>
+                                        {{ scope.label }}
+                                    </button>
+                                </div>
+
                             </header>
 
                             <div class="min-h-0 flex-1 overflow-y-auto px-4 pb-4 pt-4">
-                                <div v-if="topicPathGroups.length" class="space-y-6">
+                                <div v-if="topicPathGroups.length" class="space-y-5">
                                     <section v-for="group in topicPathGroups" :key="group.label" :aria-label="group.label">
                                         <h3 class="text-xs font-semibold uppercase tracking-[0.08em] text-[#64748b]">
                                             {{ group.label }}
@@ -1173,71 +1182,48 @@ onUnmounted(() => {
 
                                         <ol class="mt-3 space-y-2">
                                             <li
-                                                v-for="(option, index) in group.options"
+                                                v-for="option in group.options"
                                                 :key="option.id"
-                                                class="relative pl-12"
+                                                class="relative"
                                             >
-                                                <span
-                                                    v-if="index < group.options.length - 1"
-                                                    class="absolute bottom-[-0.5rem] left-[1.28rem] top-10 w-px bg-[#cddbf0]"
-                                                    aria-hidden="true"
-                                                />
-                                                <span
-                                                    class="absolute left-0 top-3 flex h-10 w-10 items-center justify-center rounded-full border"
-                                                    :class="option.id === pendingTopicId
-                                                        ? 'border-[#0b5cff] bg-[#eaf1ff] text-[#023ea4]'
-                                                        : 'border-[#d7e0eb] bg-white text-[#475569]'"
-                                                    aria-hidden="true"
-                                                >
-                                                    <svg v-if="topicIconKind(option) === 'sign'" class="h-5 w-5" viewBox="0 0 24 24" fill="none">
-                                                        <path d="M12 4 21 20H3L12 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
-                                                        <path d="M12 9v4.5M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                                                    </svg>
-                                                    <svg v-else-if="topicIconKind(option) === 'intersection'" class="h-5 w-5" viewBox="0 0 24 24" fill="none">
-                                                        <path d="M12 3v18M4 8h16M7 8v5a2 2 0 0 0 2 2h6a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                                    </svg>
-                                                    <svg v-else-if="topicIconKind(option) === 'pedestrian'" class="h-5 w-5" viewBox="0 0 24 24" fill="none">
-                                                        <circle cx="12" cy="5.5" r="2" stroke="currentColor" stroke-width="2" />
-                                                        <path d="m10 21 1-6-3-3 2-3 2 2 3-1.5M14 14l2 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                                    </svg>
-                                                    <svg v-else-if="topicIconKind(option) === 'safety'" class="h-5 w-5" viewBox="0 0 24 24" fill="none">
-                                                        <path d="M12 3.5 19 6v5.8c0 4.2-2.9 7.8-7 8.7-4.1-.9-7-4.5-7-8.7V6l7-2.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
-                                                        <path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                                    </svg>
-                                                    <svg v-else class="h-5 w-5" viewBox="0 0 24 24" fill="none">
-                                                        <path d="M8 21V3M16 21V3M12 5v3M12 11v3M12 17v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                                                    </svg>
-                                                </span>
-
                                                 <button
                                                     type="button"
-                                                    class="w-full rounded-lg border bg-white px-3 py-3 text-left shadow-[0_5px_12px_rgba(15,23,42,0.04)] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#023ea4] focus-visible:ring-offset-2"
-                                                    :class="option.id === pendingTopicId
-                                                        ? 'border-[#0b5cff] bg-[#f8fbff]'
-                                                        : 'border-[#e0e7ef] hover:border-[#a9bed9]'"
-                                                    :aria-pressed="option.id === pendingTopicId"
+                                                    class="flex min-h-[5.5rem] w-full items-center gap-3 rounded-xl border bg-white p-2.5 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] focus-visible:ring-offset-2"
+                                                    :class="option.id === sessionQuestionTopicId && topicPickerFromSetup
+                                                        ? 'border-[#f0c33a] bg-[#fff9df]'
+                                                        : 'border-[#e7ebf0] hover:border-[#a9bed9]'"
+                                                    :aria-label="topicPickerFromSetup ? `Wybierz dział ${option.label}` : `Rozpocznij naukę działu ${option.label}`"
+                                                    :disabled="sessionProcessing || option.questions_count === 0"
                                                     @click="chooseTopicFromSheet(option.id)"
                                                 >
-                                                    <span class="flex items-start justify-between gap-3">
-                                                        <span class="min-w-0">
-                                                            <span class="block text-sm font-semibold leading-5 text-[#050b2e]">
-                                                                {{ option.label }}
-                                                            </span>
-                                                            <span class="mt-0.5 block text-xs leading-4 text-[#64708b]">
-                                                                {{ option.questions_count }} pytań
-                                                            </span>
+                                                    <img
+                                                        v-if="option.hero_image_url"
+                                                        :src="option.hero_image_url"
+                                                        alt=""
+                                                        loading="lazy"
+                                                        class="h-16 w-16 shrink-0 rounded-lg object-cover"
+                                                        :style="{ objectPosition: option.hero_image_position || 'center' }"
+                                                    >
+                                                    <span v-else class="grid h-16 w-16 shrink-0 place-items-center rounded-lg bg-[#eaf2fa] text-xl font-bold text-[#0b5cff]" aria-hidden="true">
+                                                        {{ topicIconLabel(option) }}
+                                                    </span>
+                                                    <span class="min-w-0 flex-1">
+                                                        <span class="block text-sm font-semibold leading-5 text-[#050b2e]">
+                                                            {{ option.label }}
                                                         </span>
-                                                        <span class="shrink-0 rounded-full px-2 py-1 text-[0.68rem] font-semibold leading-none" :class="topicPathStateClass(option)">
-                                                            {{ topicPathStateLabel(option) }}
+                                                        <span class="mt-0.5 block text-xs leading-4 text-[#64708b]">
+                                                            {{ topicAnsweredCount(option) }} / {{ option.questions_count }} pytań
+                                                        </span>
+                                                        <span class="mt-2.5 block h-1.5 overflow-hidden rounded-full bg-[#e7edf5]" aria-hidden="true">
+                                                            <span
+                                                                class="block h-full rounded-full bg-[#10b981]"
+                                                                :style="{ width: `${topicProgressPercent(option)}%` }"
+                                                            />
                                                         </span>
                                                     </span>
-
-                                                    <span class="mt-3 block h-1.5 overflow-hidden rounded-full bg-[#e7edf5]" aria-hidden="true">
-                                                        <span
-                                                            class="block h-full rounded-full bg-[#0b5cff]"
-                                                            :style="{ width: `${topicProgressPercent(option)}%` }"
-                                                        />
-                                                    </span>
+                                                    <svg class="h-4 w-4 shrink-0 text-[#64748b]" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                                        <path d="m9 5 7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                                    </svg>
                                                 </button>
                                             </li>
                                         </ol>
@@ -1245,30 +1231,20 @@ onUnmounted(() => {
                                 </div>
 
                                 <div v-else class="px-3 py-14 text-center">
-                                    <p class="text-sm font-semibold text-[#050b2e]">Nie znaleziono działu</p>
-                                    <p class="mt-1 text-xs leading-5 text-[#64748b]">Spróbuj innej nazwy lub wyczyść wyszukiwanie.</p>
+                                    <p class="text-sm font-semibold text-[#050b2e]">Brak działów</p>
+                                    <p class="mt-1 text-xs leading-5 text-[#64748b]">Dla wybranego rodzaju pytań nie ma dostępnych działów.</p>
                                 </div>
                             </div>
 
-                            <footer class="border-t border-[#e2e8f0] bg-white px-4 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-3">
-                                <div class="flex items-center justify-between gap-3">
-                                    <span class="min-w-0">
-                                        <span class="block truncate text-sm font-semibold leading-5 text-[#050b2e]">
-                                            {{ pendingTopic?.label ?? 'Wybierz dział' }}
-                                        </span>
-                                        <span class="block text-xs leading-4 text-[#64708b]">
-                                            {{ pendingTopic ? `${pendingTopic.questions_count} pytań` : 'Materiał do nauki' }}
-                                        </span>
-                                    </span>
-                                    <button
-                                        type="button"
-                                        class="inline-flex min-h-11 shrink-0 items-center justify-center rounded-lg bg-[#0b5cff] px-4 text-sm font-semibold text-white shadow-[0_7px_14px_rgba(11,92,255,0.18)] transition hover:bg-[#023ea4] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#023ea4] focus-visible:ring-offset-2"
-                                        :disabled="pendingTopicId === null"
-                                        @click="confirmTopicFromSheet"
-                                    >
-                                        Wybierz dział
-                                    </button>
-                                </div>
+                            <footer v-if="!topicPickerFromSetup" class="border-t border-[#e2e8f0] bg-white px-4 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-3">
+                                <p class="text-xs text-[#64748b]">Dotknij działu, aby rozpocząć naukę.</p>
+                                <button
+                                    type="button"
+                                    class="mt-2 inline-flex min-h-11 items-center text-sm font-semibold text-[#0b5cff] underline-offset-4 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff]"
+                                    @click="closeTopicPathPicker"
+                                >
+                                    Zmień ustawienia serii →
+                                </button>
                             </footer>
                             </section>
                         </Transition>
@@ -1276,133 +1252,6 @@ onUnmounted(() => {
                 </div>
             </Transition>
             </Teleport>
-
-            <section
-                v-if="managedIncorrectListEnabled && hasGlobalIncorrectQuestions"
-                class="rounded-lg border border-[#f1b8b2] bg-white px-4 py-3 shadow-[0_8px_22px_rgba(15,23,42,0.05)]"
-                aria-labelledby="mobile-incorrect-questions-title"
-            >
-                <div class="flex items-start justify-between gap-4">
-                    <span class="min-w-0">
-                        <span id="mobile-incorrect-questions-title" class="block text-sm font-semibold text-[#071b33]">Moja lista pytań</span>
-                        <span class="mt-0.5 block text-xs leading-4 text-[#667085]">Zostają na liście, dopóki sam ich nie usuniesz.</span>
-                    </span>
-                    <strong class="shrink-0 text-lg text-[#c53d32]">{{ totalIncorrectQuestions }}</strong>
-                </div>
-
-                <div class="mt-3 grid grid-cols-2 gap-2">
-                    <Link
-                        :href="incorrectQuestionsUrl"
-                        class="inline-flex min-h-11 items-center justify-center rounded-md border border-[#df8f86] bg-white px-3 text-sm font-semibold text-[#b9382f] transition hover:bg-[#fff7f6] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] focus-visible:ring-offset-2"
-                    >
-                        Przejrzyj listę
-                    </Link>
-                    <button
-                        type="button"
-                        class="inline-flex min-h-11 items-center justify-center rounded-md border border-[#c53d32] bg-[#c53d32] px-3 text-sm font-semibold text-white transition hover:bg-[#a92f28] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        :disabled="globalIncorrectProcessing || sessionProcessing"
-                        @click="emit('start-global-incorrect-learning')"
-                    >
-                        {{ globalIncorrectProcessing ? 'Uruchamianie…' : 'Powtórz pytania' }}
-                    </button>
-                </div>
-            </section>
-
-            <section class="border-y border-[#e7edf4] py-5" aria-label="Przerobione pytania">
-                <Link
-                    :href="categoryStatsHref"
-                    class="flex items-end justify-between gap-3 rounded-[0.5rem] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] focus-visible:ring-offset-2"
-                    aria-label="Zobacz szczegółowy postęp pytań"
-                >
-                    <div>
-                        <h2 class="text-base font-semibold leading-tight text-[#050b2e]">
-                            Przerobione pytania
-                        </h2>
-                        <p class="mt-1 text-xs leading-4 text-[#64748b]">
-                            Wszystkie działy kategorii {{ categoryShortName }}.
-                        </p>
-                    </div>
-                    <span class="flex shrink-0 items-center gap-1.5 text-[#050b2e]">
-                        <span class="text-2xl font-semibold leading-none">{{ courseProgressPercent }}%</span>
-                        <svg aria-hidden="true" class="h-4 w-4 text-[#64748b]" viewBox="0 0 24 24" fill="none">
-                            <path d="m9 5 7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                    </span>
-                </Link>
-
-                <div class="mt-4 h-2 overflow-hidden rounded-full bg-[#e8eef6]" aria-hidden="true">
-                    <div
-                        class="h-full rounded-full bg-[#0b5cff] transition-[width] duration-300"
-                        :style="{ width: courseProgressWidth }"
-                    />
-                </div>
-
-                <div class="mt-4">
-
-                    <div class="border-l border-[#e5eaf1] pl-2.5">
-                        <div class="space-y-1.5">
-                            <div class="flex items-center gap-2">
-                                <span class="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#22c55e] text-[#16a34a]" aria-hidden="true">
-                                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
-                                        <path d="m6 12 4 4 8-8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                </span>
-                                <span class="min-w-0">
-                                    <span class="block text-[0.85rem] font-semibold leading-4 text-[#050b2e]">
-                                        {{ courseCorrectCount }}
-                                    </span>
-                                    <span class="block text-[0.64rem] leading-3 text-[#475569]">
-                                        poprawnych
-                                    </span>
-                                </span>
-                            </div>
-
-                            <div class="flex items-center gap-2">
-                                <span class="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#ef4444] text-[#ef4444]" aria-hidden="true">
-                                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
-                                        <path d="M8 8l8 8M16 8l-8 8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
-                                    </svg>
-                                </span>
-                                <span class="min-w-0">
-                                    <span class="block text-[0.85rem] font-semibold leading-4 text-[#050b2e]">
-                                        {{ courseIncorrectCount }}
-                                    </span>
-                                    <span class="block text-[0.64rem] leading-3 text-[#475569]">
-                                        do poprawy
-                                    </span>
-                                </span>
-                            </div>
-
-                            <div class="flex items-center gap-2">
-                                <span class="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#0b5cff] text-[#0b5cff]" aria-hidden="true">
-                                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
-                                        <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-                                        <path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="currentColor" stroke-width="2" />
-                                    </svg>
-                                </span>
-                                <span class="min-w-0">
-                                    <span class="block text-[0.85rem] font-semibold leading-4 text-[#050b2e]">
-                                        {{ courseUnansweredCount }}
-                                    </span>
-                                    <span class="block text-[0.64rem] leading-3 text-[#475569]">
-                                        do przerobienia
-                                    </span>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-4 border-t border-[#e7edf4] pt-3 text-sm text-[#475569]">
-                    <p class="font-semibold text-[#071b33]">Działy zaliczone: {{ courseProgress.completed_topics }} / {{ courseProgress.total_topics }}</p>
-                    <div class="mt-2 flex items-start gap-2">
-                        <LearningProgressIcon :icon="learningDashboard.progress_message.icon" />
-                        <div aria-live="polite">
-                            <p class="font-semibold text-[#071b33]">{{ learningDashboard.progress_message.title }}</p>
-                            <p class="mt-1">{{ learningDashboard.progress_message.message }}</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
 
         </div>
     </section>

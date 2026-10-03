@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
+import type { PageProps } from '@/types';
 import { computed } from 'vue';
 
-type NavIcon = 'home' | 'training' | 'learning' | 'signs' | 'ranking' | 'profile';
+type NavIcon = 'home' | 'training' | 'learn' | 'exam' | 'profile';
 
 type NavItem = {
     key: string;
@@ -12,48 +13,50 @@ type NavItem = {
     active: boolean;
 };
 
+const page = usePage<PageProps>();
+const dashboardView = computed(() => new URL(page.url, 'https://prawkonaraz.pl').searchParams.get('widok'));
+const isExamSession = computed(() => {
+    const session = (page.props as PageProps & { session?: { mode?: string } }).session;
+
+    return session?.mode === 'exam';
+});
+
 const items = computed<NavItem[]>(() => [
     {
         key: 'home',
         label: 'Główna',
         href: route('session.index'),
         icon: 'home',
-        active: route().current('session.index') || route().current('analytics.categories.*'),
+        active: route().current('session.index') && !dashboardView.value,
     },
     {
         key: 'training',
         label: 'Trening',
-        href: route('review-queue.index'),
+        href: `${route('session.index')}?widok=trening`,
         icon: 'training',
-        active: route().current('review-queue.*'),
+        active: (route().current('session.index') && dashboardView.value === 'trening')
+            || (route().current('study-sessions.*') && !isExamSession.value),
     },
     {
-        key: 'learning',
+        key: 'learn',
         label: 'Nauka',
-        href: route('study-sessions.current'),
-        icon: 'learning',
-        active:
-            route().current('study-sessions.*') ||
-            route().current('session.pjm*'),
+        href: `${route('session.index')}?widok=dzialy`,
+        icon: 'learn',
+        active: (route().current('session.index') && dashboardView.value === 'dzialy')
+            || route().current('session.pjm*'),
     },
     {
-        key: 'signs',
-        label: 'Znaki',
-        href: route('session.traffic-signs'),
-        icon: 'signs',
-        active: route().current('session.traffic-signs') || route().current('traffic-sign-learning.*'),
-    },
-    {
-        key: 'ranking',
-        label: 'Ranking',
-        href: route('session.ranking'),
-        icon: 'ranking',
-        active: route().current('session.ranking*'),
+        key: 'exam',
+        label: 'Egzamin',
+        href: `${route('session.index')}?widok=testy`,
+        icon: 'exam',
+        active: (route().current('session.index') && dashboardView.value === 'testy')
+            || (route().current('study-sessions.*') && isExamSession.value),
     },
     {
         key: 'profile',
         label: 'Profil',
-        href: '/profile',
+        href: route('profile.edit'),
         icon: 'profile',
         active: route().current('profile.*'),
     },
@@ -63,10 +66,10 @@ const items = computed<NavItem[]>(() => [
 <template>
     <nav
         aria-label="Nawigacja aplikacji"
-        class="mobile-bottom-navigation fixed inset-x-0 bottom-0 z-40 border-t border-[#eceff2] bg-white/95 shadow-[0_-12px_30px_rgba(15,23,42,0.08)] backdrop-blur md:hidden"
+        class="mobile-bottom-navigation fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(env(safe-area-inset-bottom),0.7rem)] md:hidden"
     >
         <div
-            class="mx-auto grid max-w-[34rem] grid-cols-6 px-1 pb-[max(env(safe-area-inset-bottom),0.25rem)] pt-1"
+            class="mx-auto grid max-w-[30rem] grid-cols-5 rounded-[1.45rem] bg-white/95 px-1.5 pb-1 pt-1.5 shadow-[0_8px_30px_rgba(15,23,42,0.09)] backdrop-blur"
         >
             <component
                 :is="Link"
@@ -75,7 +78,7 @@ const items = computed<NavItem[]>(() => [
                 :href="item.href"
                 :aria-current="item.active ? 'page' : null"
                 class="mobile-bottom-navigation__item flex h-14 min-w-0 flex-col items-center justify-center gap-0.5 text-center leading-none transition-colors duration-150"
-                :class="item.active ? 'text-[#ff6a35]' : 'text-[#6f737a]'"
+                :class="item.active ? 'text-[#f1b000]' : 'text-[#687386]'"
             >
                 <span class="grid h-7 w-7 place-items-center">
                     <svg
@@ -101,94 +104,24 @@ const items = computed<NavItem[]>(() => [
                         />
                     </svg>
 
-                    <svg
-                        v-else-if="item.icon === 'training'"
-                        aria-hidden="true"
-                        class="h-6 w-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            d="M13.3 2.8 5.75 13h5.5l-1.05 8.2 8.05-11.45h-5.6l.65-6.95Z"
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                        />
+                    <svg v-else-if="item.icon === 'training'" aria-hidden="true" class="h-6 w-6" fill="none" viewBox="0 0 24 24">
+                        <path d="m13.5 2.5-9 11.3h6.4l-.6 7.7 9.2-11.3h-6.4l.4-7.7Z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" />
+                    </svg>
+
+                    <svg v-else-if="item.icon === 'learn'" aria-hidden="true" class="h-6 w-6" fill="none" viewBox="0 0 24 24">
+                        <path d="M12 5.2C9.4 3.5 6.3 3.3 3 4v14.5c3.3-.7 6.4-.5 9 1.2 2.6-1.7 5.7-1.9 9-1.2V4c-3.3-.7-6.4-.5-9 1.2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                        <path d="M12 5.2v14.5" stroke="currentColor" stroke-width="1.8" />
                     </svg>
 
                     <svg
-                        v-else-if="item.icon === 'learning'"
+                        v-else-if="item.icon === 'exam'"
                         aria-hidden="true"
                         class="h-6 w-6"
                         fill="none"
                         viewBox="0 0 24 24"
                     >
-                        <path
-                            d="m3.7 8.65 8.3-4.1 8.3 4.1-8.3 4.1-8.3-4.1Z"
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="1.9"
-                        />
-                        <path
-                            d="M6.85 10.35v4.55c1.55 1.45 3.25 2.15 5.15 2.15s3.6-.7 5.15-2.15v-4.55"
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="1.9"
-                        />
-                        <path
-                            d="M20.3 8.85v5.45"
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="1.9"
-                        />
-                    </svg>
-
-                    <svg
-                        v-else-if="item.icon === 'signs'"
-                        aria-hidden="true"
-                        class="h-6 w-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            d="M12 3.25 18.6 7v7.4L12 18.15 5.4 14.4V7L12 3.25Z"
-                            stroke="currentColor"
-                            stroke-linejoin="round"
-                            stroke-width="1.9"
-                        />
-                        <path
-                            d="M12 7.25v6.9M8.95 9l6.1 3.45"
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="1.9"
-                        />
-                    </svg>
-
-                    <svg
-                        v-else-if="item.icon === 'ranking'"
-                        aria-hidden="true"
-                        class="h-6 w-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            d="M8.1 4.3v3.45c0 2.15 1.75 3.9 3.9 3.9s3.9-1.75 3.9-3.9V4.3H8.1Z"
-                            stroke="currentColor"
-                            stroke-linejoin="round"
-                            stroke-width="1.9"
-                        />
-                        <path
-                            d="M8.1 6.1H5.35v.95c0 2.25 1.7 4.1 3.88 4.32M15.9 6.1h2.75v.95c0 2.25-1.7 4.1-3.88 4.32M12 11.7v3.45M8.7 19.7h6.6M10 15.15h4l.95 4.55h-5.9l.95-4.55Z"
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="1.9"
-                        />
+                        <path d="M2.6 9.2 12 4l9.4 5.2L12 14.4 2.6 9.2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                        <path d="M6 11.1v5.2c3.6 2.8 8.4 2.8 12 0v-5.2M21.4 9.2V16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
 
                     <svg
@@ -215,7 +148,7 @@ const items = computed<NavItem[]>(() => [
                     </svg>
                 </span>
 
-                <span class="max-w-full whitespace-nowrap text-[0.62rem] font-medium tracking-[0]">
+                <span class="max-w-full whitespace-nowrap text-[0.65rem] font-medium tracking-[0]">
                     {{ item.label }}
                 </span>
             </component>

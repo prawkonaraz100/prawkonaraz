@@ -16,6 +16,7 @@ const PRECACHE_URLS = [
 
 const PRIVATE_PATH_PREFIXES = [
     '/api/',
+    '/app',
     '/auth/',
     '/sanctum/',
     '/login',

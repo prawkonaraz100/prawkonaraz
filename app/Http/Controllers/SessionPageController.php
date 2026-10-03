@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LicenseCategory;
 use App\Support\LearningHomePayloadBuilder;
+use App\Support\StreakChallengeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -13,6 +15,7 @@ class SessionPageController extends Controller
     public function __invoke(
         Request $request,
         LearningHomePayloadBuilder $learningHomePayloadBuilder,
+        StreakChallengeService $streakChallengeService,
     ): Response|RedirectResponse {
         $validated = $request->validate(LearningHomePayloadBuilder::validationRules());
         $accessDecisions = $learningHomePayloadBuilder->accessDecisions($request->user());
@@ -29,6 +32,43 @@ class SessionPageController extends Controller
             $accessDecisions['product'],
             $accessDecisions['pjm'],
         );
+
+        if ($request->query('widok') === 'trening') {
+            if (! $accessDecisions['product']->allowed) {
+                return $this->redirectForDeniedAccess($accessDecisions['product']->reason);
+            }
+
+            $categoryId = $payload['category']['id'] ?? null;
+
+            if (! $categoryId) {
+                return to_route('session.index');
+            }
+
+            $category = LicenseCategory::query()->findOrFail($categoryId);
+
+            return Inertia::render('Session/StreakChallenge', [
+                'category' => $payload['category'],
+                'courseProgress' => $payload['learning_dashboard']['course_progress'],
+                'initialStreak' => $streakChallengeService->overview($request->user(), $category),
+            ]);
+        }
+
+        if ($request->query('widok') === 'testy') {
+            if (! $accessDecisions['product']->allowed) {
+                return $this->redirectForDeniedAccess($accessDecisions['product']->reason);
+            }
+
+            if (! ($payload['category']['id'] ?? null)) {
+                return to_route('session.index');
+            }
+
+            return Inertia::render('Session/ExamStart', [
+                'category' => $payload['category'],
+                'courseProgress' => $payload['learning_dashboard']['course_progress'],
+                'activeSession' => $payload['learning_dashboard']['active_session'],
+            ]);
+        }
+
         $requestedCourseSlug = trim((string) $request->query('kurs', ''));
         $requestedCourse = collect($payload['professional_courses'] ?? [])
             ->first(fn (array $course): bool => ($course['slug'] ?? null) === $requestedCourseSlug);

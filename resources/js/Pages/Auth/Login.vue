@@ -3,7 +3,7 @@ import LoginDrawer from '@/Components/Auth/LoginDrawer.vue';
 import RegisterDrawer from '@/Components/Auth/RegisterDrawer.vue';
 import type { PageProps } from '@/types';
 import { Head, router, usePage } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 defineProps<{
     canResetPassword?: boolean;
@@ -16,6 +16,12 @@ const visualHostPanel = ref<'login' | 'register'>('login');
 const registrationCategories = computed(
     () => page.props.authDrawers.registrationCategories,
 );
+
+onMounted(() => {
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        window.location.replace(`${route('app.login')}${window.location.search}`);
+    }
+});
 
 const closePanel = () => {
     if (window.history.length > 1) {

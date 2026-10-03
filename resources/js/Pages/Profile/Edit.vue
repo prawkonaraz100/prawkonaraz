@@ -116,17 +116,9 @@ const compactTierLabel = computed(() => ({
 })[props.productProfile.tier] ?? tierLabel.value);
 
 const hasActiveAccess = computed(() => props.productProfile.tier !== 'free');
-const connectedProviderCount = computed(
-    () => props.socialConnections.providers.filter((provider) => provider.connected).length,
-);
 const passwordStatusLabel = computed(
     () => props.socialConnections.password_login_enabled ? 'Ustawione' : 'Nie ustawiono',
 );
-const socialStatusLabel = computed(() => {
-    const providerCount = props.socialConnections.providers.length;
-
-    return providerCount > 0 ? `${connectedProviderCount.value}/${providerCount}` : null;
-});
 const invitationStatusLabel = computed(() => {
     if (props.friendInvitations.active_guest) {
         return 'Aktywne';
@@ -285,76 +277,54 @@ onUnmounted(() => {
             </div>
         </template>
 
-        <section class="-mx-4 -my-10 min-h-[calc(100svh-4.75rem)] bg-[#f2f4f7] pb-[calc(1.5rem+env(safe-area-inset-bottom))] text-[#101828] md:hidden" aria-label="Profil i ustawienia">
-            <header class="bg-white pt-[max(env(safe-area-inset-top),0.75rem)]">
-                <div class="px-5 pt-2">
-                    <h1 class="text-[1.8rem] font-semibold leading-9 text-[#101828]">Profil</h1>
-                </div>
-
-                <div class="flex items-center gap-3 px-5 pb-5 pt-4">
-                    <button
-                        type="button"
-                        class="relative h-[4.25rem] w-[4.25rem] shrink-0 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] focus-visible:ring-offset-2"
-                        aria-label="Zmień zdjęcie profilowe"
-                        @click="openProfileSheet = 'avatar'"
-                    >
-                        <span class="grid h-full w-full place-items-center overflow-hidden rounded-full bg-[#eaf1ff] text-xl font-semibold text-[#174ea6]">
-                            <img
-                                v-if="profileUser?.avatar_url"
-                                :src="profileUser.avatar_url"
-                                alt=""
-                                class="h-full w-full object-cover"
-                                referrerpolicy="no-referrer"
-                            >
-                            <span v-else>{{ profileUser?.avatar_initials ?? 'U' }}</span>
-                        </span>
-                        <span class="absolute -bottom-0.5 -right-0.5 grid h-7 w-7 place-items-center rounded-full border-2 border-white bg-[#344054] text-white" aria-hidden="true">
-                            <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
-                                <path d="M4 8.5h3l1.5-2h7l1.5 2h3v10H4v-10Z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" />
-                                <circle cx="12" cy="13.5" r="3" stroke="currentColor" stroke-width="1.9" />
-                            </svg>
-                        </span>
-                    </button>
-
-                    <button
-                        type="button"
-                        class="flex min-h-14 min-w-0 flex-1 items-center gap-3 rounded-lg px-1 text-left transition-colors hover:bg-[#f9fafb] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff]"
-                        aria-label="Edytuj dane konta"
-                        @click="openProfileSheet = 'account'"
-                    >
-                        <span class="min-w-0 flex-1">
-                            <span class="block truncate text-[1.2rem] font-semibold leading-6 text-[#101828]">{{ profileUser?.name ?? 'Twoje konto' }}</span>
-                            <span class="mt-1 block truncate text-[0.8rem] text-[#667085]">{{ profileUser?.email }}</span>
-                        </span>
-                        <svg class="h-5 w-5 shrink-0 text-[#98a2b3]" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
+        <section class="-mx-4 -my-10 min-h-[calc(100svh-4.75rem)] bg-[#faf9f6] pb-[calc(5.5rem+env(safe-area-inset-bottom))] text-[#0a0c13] md:hidden" aria-label="Profil i ustawienia">
+            <header class="mx-auto max-w-[30rem] px-4 pt-[max(env(safe-area-inset-top),0.75rem)]">
+                <div class="flex items-center justify-between gap-3 px-1">
+                    <h1 class="text-[2.15rem] font-extrabold leading-tight tracking-[-0.055em]">Profil</h1>
+                    <button type="button" class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white text-[#0a0c13] shadow-[0_8px_22px_rgba(32,30,26,0.04)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#eeb230]" aria-label="Otwórz ustawienia konta" @click="openProfileSheet = 'account'">
+                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.7h4l.7 2.1 1.8.8 2-.9 2.8 2.8-.9 2 .8 1.8 2.1.7v4l-2.1.7-.8 1.8.9 2-2.8 2.8-2-.9-1.8.8-.7 2.1h-4l-.7-2.1-1.8-.8-2 .9-2.8-2.8.9-2-.8-1.8-2.1-.7v-4l2.1-.7.8-1.8-.9-2 2.8-2.8 2 .9 1.8-.8.7-2.1Z" transform="translate(0 -1.3) scale(.94)"/><circle cx="12" cy="12" r="3.1"/></svg>
                     </button>
                 </div>
 
-                <div class="grid grid-cols-3 divide-x divide-[#eaecf0] border-t border-[#eaecf0]" aria-label="Podsumowanie konta">
-                    <div class="min-w-0 px-2 py-3.5 text-center">
-                        <p class="text-[0.66rem] font-medium text-[#667085]">Kategoria</p>
-                        <p class="mt-1 truncate text-[0.95rem] font-semibold text-[#101828]">{{ targetCategoryLabel }}</p>
+                <div class="profile-mobile-hero relative mt-2.5 overflow-hidden rounded-[1.35rem] bg-white p-3.5 shadow-[0_14px_35px_rgba(48,38,20,0.045)]">
+                    <div class="relative z-10 flex min-h-[4.5rem] items-center gap-3.5">
+                        <button type="button" class="relative h-[4.5rem] w-[4.5rem] shrink-0 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#eeb230] focus-visible:ring-offset-2" aria-label="Zmień zdjęcie profilowe" @click="openProfileSheet = 'avatar'">
+                            <span class="grid h-full w-full place-items-center overflow-hidden rounded-full bg-[#e9edf2] text-xl font-bold text-[#28394e]">
+                                <img v-if="profileUser?.avatar_url" :src="profileUser.avatar_url" alt="" class="h-full w-full object-cover" referrerpolicy="no-referrer">
+                                <span v-else>{{ profileUser?.avatar_initials ?? 'U' }}</span>
+                            </span>
+                            <span class="absolute -bottom-0.5 -right-0.5 grid h-6 w-6 place-items-center rounded-full border-2 border-white text-white" :class="hasActiveAccess || profileUser?.is_admin ? 'bg-[#ffba20]' : 'bg-[#667085]'" aria-hidden="true">
+                                <svg v-if="hasActiveAccess || profileUser?.is_admin" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="m2 6 5 4 5-7 5 7 5-4-2 13H4L2 6Z"/></svg>
+                                <svg v-else class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h3l1.5-2h7L17 8h3v11H4V8Z"/><circle cx="12" cy="13" r="3"/></svg>
+                            </span>
+                        </button>
+                        <button type="button" class="min-w-0 flex-1 text-left focus:outline-none focus-visible:rounded-lg focus-visible:ring-2 focus-visible:ring-[#eeb230]" aria-label="Edytuj dane konta" @click="openProfileSheet = 'account'">
+                            <span class="block truncate text-[1.25rem] font-bold leading-tight tracking-[-0.03em]">{{ profileUser?.name ?? 'Twoje konto' }}</span>
+                            <span class="mt-0.5 block truncate text-[0.82rem] text-[#747a85]">{{ profileUser?.email }}</span>
+                        </button>
                     </div>
-                    <div class="min-w-0 px-2 py-3.5 text-center">
-                        <p class="text-[0.66rem] font-medium text-[#667085]">Seria</p>
-                        <p class="mt-1 truncate text-[0.95rem] font-semibold tabular-nums text-[#101828]">{{ studyStreakLabel }}</p>
-                    </div>
-                    <div class="min-w-0 px-2 py-3.5 text-center">
-                        <p class="text-[0.66rem] font-medium text-[#667085]">Dostęp</p>
-                        <p class="mt-1 flex items-center justify-center gap-1.5 truncate text-[0.82rem] font-semibold text-[#101828]">
-                            <span class="h-2 w-2 shrink-0 rounded-full" :class="hasActiveAccess ? 'bg-[#12b76a]' : 'bg-[#98a2b3]'" aria-hidden="true" />
-                            <span class="truncate">{{ compactTierLabel }}</span>
-                        </p>
+
+                    <div class="relative z-10 mt-3 grid grid-cols-3 gap-1.5" aria-label="Podsumowanie konta">
+                        <div class="profile-mobile-stat">
+                            <span class="profile-mobile-stat__icon" aria-hidden="true"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h2l2-5h8l2 5h2M6 14h12v4H6z"/><circle cx="8" cy="18" r="1.5"/><circle cx="16" cy="18" r="1.5"/></svg></span>
+                            <span class="min-w-0"><span class="block truncate text-[0.68rem] text-[#6f7480]">Kategoria</span><strong class="block truncate text-[1rem] leading-tight">{{ targetCategoryLabel }}</strong></span>
+                        </div>
+                        <div class="profile-mobile-stat">
+                            <span class="profile-mobile-stat__icon" aria-hidden="true"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 2.5v5M16 2.5v5M4 10h16"/></svg></span>
+                            <span class="min-w-0"><span class="block truncate text-[0.68rem] text-[#6f7480]">Seria</span><strong class="block truncate text-[1rem] leading-tight tabular-nums">{{ studyStreakLabel }}</strong></span>
+                        </div>
+                        <div class="profile-mobile-stat">
+                            <span class="profile-mobile-stat__icon" aria-hidden="true"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 5 4 5-7 5 7 5-4-1.5 12h-17L2 7Z"/></svg></span>
+                            <span class="min-w-0"><span class="block truncate text-[0.68rem] text-[#6f7480]">Dostęp</span><strong class="block truncate text-[1rem] leading-tight">{{ compactTierLabel }}</strong></span>
+                        </div>
                     </div>
                 </div>
             </header>
 
-            <div class="space-y-6 px-4 py-5">
+            <div class="mx-auto max-w-[30rem] space-y-3 px-4 pb-4 pt-3">
                 <section aria-labelledby="profile-account-title">
-                    <h2 id="profile-account-title" class="mb-2 px-1 text-[0.78rem] font-medium text-[#667085]">Konto</h2>
-                    <div class="profile-mobile-group divide-y divide-[#eaecf0]">
+                    <h2 id="profile-account-title" class="mb-1.5 px-1 text-sm font-medium text-[#6f7480]">Konto</h2>
+                    <div class="profile-mobile-group">
                         <button type="button" class="profile-mobile-row" @click="openProfileSheet = 'account'">
                             <span class="profile-mobile-row__icon" aria-hidden="true">
                                 <svg class="h-[1.15rem] w-[1.15rem]" viewBox="0 0 24 24" fill="none">
@@ -363,8 +333,8 @@ onUnmounted(() => {
                                 </svg>
                             </span>
                             <span class="min-w-0 flex-1">
-                                <span class="block text-[0.88rem] font-medium text-[#101828]">Dane konta</span>
-                                <span class="mt-0.5 block truncate text-[0.7rem] text-[#667085]">Imię i adres e-mail</span>
+                                <span class="block text-[0.9rem] font-semibold text-[#101828]">Dane konta</span>
+                                <span class="mt-0.5 block truncate text-[0.76rem] text-[#747a85]">Imię i adres e-mail</span>
                             </span>
                             <span class="profile-mobile-row__trailing">
                                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -376,12 +346,12 @@ onUnmounted(() => {
                         <a class="profile-mobile-row" :href="review.edit_url">
                             <span class="profile-mobile-row__icon" aria-hidden="true">
                                 <svg class="h-[1.15rem] w-[1.15rem]" viewBox="0 0 24 24" fill="none">
-                                    <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.8 1-6.1-4.4-4.3 6.1-.9L12 3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                                    <path d="M4 5.5h16v11H9l-5 4v-15Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
                                 </svg>
                             </span>
                             <span class="min-w-0 flex-1">
-                                <span class="block text-[0.88rem] font-medium text-[#101828]">{{ reviewActionLabel }}</span>
-                                <span class="mt-0.5 block truncate text-[0.7rem] text-[#667085]">{{ reviewStatusLabel }}</span>
+                                <span class="block text-[0.9rem] font-semibold text-[#101828]">{{ reviewActionLabel }}</span>
+                                <span class="mt-0.5 block truncate text-[0.76rem] text-[#747a85]">{{ reviewStatusLabel }}</span>
                             </span>
                             <span class="profile-mobile-row__trailing">
                                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -398,8 +368,8 @@ onUnmounted(() => {
                                 </svg>
                             </span>
                             <span class="min-w-0 flex-1">
-                                <span class="block text-[0.88rem] font-medium text-[#101828]">Zaproszenia</span>
-                                <span class="mt-0.5 block truncate text-[0.7rem] text-[#667085]">Udostępnij dostęp znajomej osobie</span>
+                                <span class="block text-[0.9rem] font-semibold text-[#101828]">Zaproszenia</span>
+                                <span class="mt-0.5 block truncate text-[0.76rem] text-[#747a85]">Udostępnij dostęp znajomej osobie</span>
                             </span>
                             <span class="profile-mobile-row__trailing">
                                 <span v-if="invitationStatusLabel" class="max-w-20 truncate text-[0.7rem] text-[#667085]">{{ invitationStatusLabel }}</span>
@@ -412,8 +382,8 @@ onUnmounted(() => {
                 </section>
 
                 <section aria-labelledby="profile-security-title">
-                    <h2 id="profile-security-title" class="mb-2 px-1 text-[0.78rem] font-medium text-[#667085]">Bezpieczeństwo</h2>
-                    <div class="profile-mobile-group divide-y divide-[#eaecf0]">
+                    <h2 id="profile-security-title" class="mb-1.5 px-1 text-sm font-medium text-[#6f7480]">Bezpieczeństwo</h2>
+                    <div class="profile-mobile-group">
                         <button type="button" class="profile-mobile-row" @click="openProfileSheet = 'password'">
                             <span class="profile-mobile-row__icon" aria-hidden="true">
                                 <svg class="h-[1.15rem] w-[1.15rem]" viewBox="0 0 24 24" fill="none">
@@ -422,11 +392,11 @@ onUnmounted(() => {
                                 </svg>
                             </span>
                             <span class="min-w-0 flex-1">
-                                <span class="block text-[0.88rem] font-medium text-[#101828]">Hasło</span>
-                                <span class="mt-0.5 block truncate text-[0.7rem] text-[#667085]">Zmień lub ustaw hasło</span>
+                                <span class="block text-[0.9rem] font-semibold text-[#101828]">Hasło</span>
+                                <span class="mt-0.5 block truncate text-[0.76rem] text-[#747a85]">Zmień lub ustaw hasło</span>
                             </span>
                             <span class="profile-mobile-row__trailing">
-                                <span class="max-w-24 truncate text-[0.7rem] text-[#667085]">{{ passwordStatusLabel }}</span>
+                                <span class="max-w-24 truncate rounded-full px-2.5 py-1 text-[0.68rem] font-medium" :class="socialConnections.password_login_enabled ? 'bg-[#eaf7ee] text-[#176840]' : 'bg-[#fff5e4] text-[#9b6410]'">{{ passwordStatusLabel }}</span>
                                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                                     <path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                 </svg>
@@ -436,15 +406,14 @@ onUnmounted(() => {
                         <button type="button" class="profile-mobile-row" @click="openProfileSheet = 'social'">
                             <span class="profile-mobile-row__icon" aria-hidden="true">
                                 <svg class="h-[1.15rem] w-[1.15rem]" viewBox="0 0 24 24" fill="none">
-                                    <path d="M9.5 14.5 14.5 9.5M8 17H6.5a4.5 4.5 0 0 1 0-9H9M16 7h1.5a4.5 4.5 0 0 1 0 9H15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                                    <path d="M12 2.5 19 5v6.3c0 4.3-2.7 7.8-7 10.2-4.3-2.4-7-5.9-7-10.2V5l7-2.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
                                 </svg>
                             </span>
                             <span class="min-w-0 flex-1">
-                                <span class="block text-[0.88rem] font-medium text-[#101828]">Metody logowania</span>
-                                <span class="mt-0.5 block truncate text-[0.7rem] text-[#667085]">Google i Facebook</span>
+                                <span class="block text-[0.9rem] font-semibold text-[#101828]">Metody logowania</span>
+                                <span class="mt-0.5 block truncate text-[0.76rem] text-[#747a85]">Google i Facebook</span>
                             </span>
                             <span class="profile-mobile-row__trailing">
-                                <span v-if="socialStatusLabel" class="text-[0.7rem] text-[#667085]">{{ socialStatusLabel }}</span>
                                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                                     <path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                 </svg>
@@ -454,7 +423,7 @@ onUnmounted(() => {
                 </section>
 
                 <section v-if="navigation.logout_href" aria-labelledby="profile-session-title">
-                    <h2 id="profile-session-title" class="mb-2 px-1 text-[0.78rem] font-medium text-[#667085]">Sesja</h2>
+                    <h2 id="profile-session-title" class="mb-1.5 px-1 text-sm font-medium text-[#6f7480]">Sesja</h2>
                     <div class="profile-mobile-group">
                         <button
                             type="button"
@@ -468,16 +437,17 @@ onUnmounted(() => {
                                 </svg>
                             </span>
                             <span class="min-w-0 flex-1">
-                                <span class="block text-[0.88rem] font-medium text-[#b42318]">
+                                <span class="block text-[0.9rem] font-semibold text-[#101828]">
                                     {{ logoutPreparing ? 'Wylogowywanie...' : 'Wyloguj' }}
                                 </span>
-                                <span class="mt-0.5 block truncate text-[0.7rem] text-[#667085]">Zakończ sesję na tym urządzeniu</span>
+                                <span class="mt-0.5 block truncate text-[0.76rem] text-[#747a85]">Zakończ sesję na tym urządzeniu</span>
                             </span>
-                            <span class="profile-mobile-row__trailing text-[#d92d20]" aria-hidden="true">
+                            <span class="profile-mobile-row__trailing" aria-hidden="true">
                                 <svg v-if="logoutPreparing" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
                                     <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2" opacity="0.25" />
                                     <path d="M20 12a8 8 0 0 0-8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                                 </svg>
+                                <svg v-else class="h-4 w-4" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
                             </span>
                         </button>
                     </div>
@@ -487,7 +457,7 @@ onUnmounted(() => {
                 </section>
 
                 <section aria-labelledby="profile-danger-title">
-                    <h2 id="profile-danger-title" class="mb-2 px-1 text-[0.78rem] font-medium text-[#667085]">Konto i dane</h2>
+                    <h2 id="profile-danger-title" class="mb-1.5 px-1 text-sm font-medium text-[#6f7480]">Konto i dane</h2>
                     <div class="profile-mobile-group">
                         <button type="button" class="profile-mobile-row" @click="openProfileSheet = 'delete'">
                             <span class="profile-mobile-row__icon profile-mobile-row__icon--danger" aria-hidden="true">
@@ -496,10 +466,10 @@ onUnmounted(() => {
                                 </svg>
                             </span>
                             <span class="min-w-0 flex-1">
-                                <span class="block text-[0.88rem] font-medium text-[#b42318]">Usuń konto</span>
-                                <span class="mt-0.5 block truncate text-[0.7rem] text-[#667085]">Usuń dane i historię nauki</span>
+                                <span class="block text-[0.9rem] font-semibold text-[#101828]">Usuń konto</span>
+                                <span class="mt-0.5 block truncate text-[0.76rem] text-[#747a85]">Usuń dane i historię nauki</span>
                             </span>
-                            <span class="profile-mobile-row__trailing text-[#d92d20]">
+                            <span class="profile-mobile-row__trailing">
                                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                                     <path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                 </svg>
@@ -673,23 +643,79 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.profile-mobile-hero::before,
+.profile-mobile-hero::after {
+    position: absolute;
+    right: -2.5rem;
+    width: 12rem;
+    height: 7rem;
+    border-radius: 50%;
+    background: rgba(245, 239, 226, 0.46);
+    content: '';
+    pointer-events: none;
+}
+
+.profile-mobile-hero::before {
+    top: -3.4rem;
+    transform: rotate(-16deg);
+}
+
+.profile-mobile-hero::after {
+    top: 2.6rem;
+    right: -5rem;
+    background: rgba(249, 246, 239, 0.65);
+    transform: rotate(21deg);
+}
+
+.profile-mobile-stat {
+    display: flex;
+    min-width: 0;
+    min-height: 4rem;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem;
+    border-radius: 1rem;
+    background: #f8f6f1;
+}
+
+.profile-mobile-stat__icon {
+    display: grid;
+    width: 2.15rem;
+    height: 2.15rem;
+    flex: none;
+    place-items: center;
+    border-radius: 0.75rem;
+    background: #f1eee7;
+    color: #111827;
+}
+
 .profile-mobile-group {
     overflow: hidden;
-    border-radius: 0.5rem;
+    border-radius: 1.25rem;
     background: #ffffff;
-    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
-    outline: 1px solid rgba(16, 24, 40, 0.05);
+    box-shadow: 0 12px 30px rgba(48, 38, 20, 0.045);
 }
 
 .profile-mobile-row {
+    position: relative;
     display: flex;
-    min-height: 4.35rem;
+    min-height: 3.75rem;
     width: 100%;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem 0.875rem;
+    gap: 0.8rem;
+    padding: 0.55rem 0.9rem;
     text-align: left;
     transition: background-color 150ms ease;
+}
+
+.profile-mobile-row + .profile-mobile-row::before {
+    position: absolute;
+    top: 0;
+    right: 0.9rem;
+    left: 0.9rem;
+    height: 1px;
+    background: #eceef0;
+    content: '';
 }
 
 .profile-mobile-row:hover {
@@ -702,18 +728,18 @@ onUnmounted(() => {
 
 .profile-mobile-row__icon {
     display: grid;
-    height: 2rem;
-    width: 2rem;
+    height: 2.35rem;
+    width: 2.35rem;
     flex: none;
     place-items: center;
-    border-radius: 0.45rem;
-    background: #f2f4f7;
-    color: #475467;
+    border-radius: 0.85rem;
+    background: #f8f5ef;
+    color: #101828;
 }
 
 .profile-mobile-row__icon--danger {
-    background: #fef3f2;
-    color: #d92d20;
+    background: #fff0ed;
+    color: #ef472a;
 }
 
 .profile-mobile-row__trailing {
@@ -723,7 +749,19 @@ onUnmounted(() => {
     align-items: center;
     justify-content: flex-end;
     gap: 0.25rem;
-    color: #667085;
+    color: #626b7c;
+}
+
+@media (max-width: 390px) {
+    .profile-mobile-stat {
+        gap: 0.3rem;
+        padding: 0.4rem;
+    }
+
+    .profile-mobile-stat__icon {
+        width: 1.9rem;
+        height: 1.9rem;
+    }
 }
 
 .profile-mobile-sheet-enter-active,
