@@ -9107,6 +9107,7 @@ watch(
                         <div
                             v-if="isExamLikeShell"
                             data-classic-session-header
+                            data-study-header
                             class="mx-0 border-b border-[#e5e7eb] bg-white px-4 min-[1024px]:rounded-none min-[1024px]:border min-[1024px]:border-[#e5e7eb] min-[1024px]:px-0 min-[1024px]:shadow-[0_16px_32px_rgba(15,23,42,0.04)]"
                         >
                             <div data-session-header-row class="flex items-center justify-between gap-3 py-3 min-[1024px]:items-start min-[1024px]:px-3 min-[1024px]:py-2.5">
@@ -9174,7 +9175,7 @@ watch(
                             </div>
                         </div>
 
-                        <div v-else :class="questionHeaderBarClass">
+                        <div v-else data-study-header :class="questionHeaderBarClass">
                             <div class="flex min-w-0 flex-1 items-center gap-3">
                                 <span class="shrink-0 font-semibold text-[#1f1d18]">
                                     {{ currentQuestionNumber ?? displayProgress.answered + 1 }} / {{ displayProgress.total }}
@@ -9227,7 +9228,7 @@ watch(
                             class="xl:min-h-0"
                             :class="workspaceHeightClass"
                         >
-                        <div :class="workspaceShellClass">
+                        <div data-study-workspace :class="workspaceShellClass">
                             <div aria-hidden="true" :class="workspaceBackdropClass" />
                             <div class="relative" :class="contentColumnClass">
                         <CourseExplanationFlashcard
@@ -9520,7 +9521,7 @@ watch(
                         <div
                             :class="promptOuterClass"
                         >
-                        <div :class="promptContainerClass">
+                        <div data-study-prompt :class="promptContainerClass">
                             <div class="w-full min-w-0" :class="promptStackClass">
                                 <Transition name="focus-copy" mode="out-in">
                                     <div

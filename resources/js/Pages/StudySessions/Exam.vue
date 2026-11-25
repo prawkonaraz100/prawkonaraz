@@ -1154,6 +1154,7 @@ onBeforeUnmount(() => {
                                 :key="option.key"
                                 type="button"
                                 class="border text-[0.95rem] font-semibold transition"
+                                :data-answer-state="selectedAnswer === option.key ? 'selected' : 'idle'"
                                 :class="[
                                     answerOptionClass(option.key),
                                     activeQuestion?.question_type === 'boolean'
@@ -1168,7 +1169,7 @@ onBeforeUnmount(() => {
                                 </template>
                                 <template v-else>
                                     <span class="flex items-start gap-3">
-                                        <span class="inline-flex h-6 w-6 shrink-0 items-center justify-center border border-[#d1d8df] bg-[#334155] text-xs font-semibold text-white">
+                                        <span data-answer-badge class="inline-flex h-6 w-6 shrink-0 items-center justify-center border border-[#d1d8df] bg-[#334155] text-xs font-semibold text-white">
                                             {{ option.label }}
                                         </span>
                                         <span>{{ option.text }}</span>
