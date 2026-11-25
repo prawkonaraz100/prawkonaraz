@@ -32,11 +32,12 @@ const summary = computed(() => streakResultSummary(props.score, props.previousBe
 </template>
 
 <style scoped>
+/* Mobile-only component (StreakChallenge result), styled for the dark mobile theme. */
 .streak-result-hero {
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: #0a1020;
+    color: rgb(255 255 255 / 85%);
     font-family: Inter, Arial, sans-serif;
     text-align: center;
 }
@@ -48,14 +49,14 @@ const summary = computed(() => streakResultSummary(props.score, props.previousBe
 }
 .streak-result-hero__art img { display: block; max-width: 100%; object-fit: contain; }
 .streak-result-hero__heading { margin: 8px 0 0; font-size: 26px; font-weight: 800; line-height: 1.2; letter-spacing: -0.045em; }
-.streak-result-hero__subtitle { margin: 5px 0 0; color: #71809b; font-size: 13px; line-height: 19px; }
-.streak-result-hero__score { display: block; margin-top: 7px; font-size: 64px; font-weight: 800; line-height: 1.1; letter-spacing: -0.055em; font-variant-numeric: tabular-nums; }
+.streak-result-hero__subtitle { margin: 5px 0 0; color: rgb(255 255 255 / 55%); font-size: 13px; line-height: 19px; }
+.streak-result-hero__score { display: block; margin-top: 7px; color: #fff; font-size: 64px; font-weight: 800; line-height: 1.1; letter-spacing: -0.055em; font-variant-numeric: tabular-nums; }
 .streak-result-hero__score-row { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
-.streak-result-hero__time { display: inline-flex; align-items: center; gap: 4px; color: #71809b; font-size: 13px; line-height: 18px; font-variant-numeric: tabular-nums; }
-.streak-result-hero__record { margin: 5px 0 0; color: #71809b; font-size: 12px; line-height: 18px; }
-.streak-result-hero__badge { display: inline-flex; min-height: 30px; max-width: 100%; margin-top: 9px; align-items: center; justify-content: center; gap: 10px; border-radius: 999px; padding: 6px 16px; background: #fff3df; color: #0a1020; font-size: 11px; font-weight: 700; line-height: 16px; }
+.streak-result-hero__time { display: inline-flex; align-items: center; gap: 4px; color: rgb(255 255 255 / 55%); font-size: 13px; line-height: 18px; font-variant-numeric: tabular-nums; }
+.streak-result-hero__record { margin: 5px 0 0; color: rgb(255 255 255 / 55%); font-size: 12px; line-height: 18px; }
+.streak-result-hero__badge { display: inline-flex; min-height: 30px; max-width: 100%; margin-top: 9px; align-items: center; justify-content: center; gap: 10px; border-radius: 999px; padding: 6px 16px; background: rgb(255 201 74 / 12%); color: #ffc94a; font-size: 11px; font-weight: 700; line-height: 16px; }
 .streak-result-hero__badge svg { flex-shrink: 0; }
-.streak-result-hero__badge--record { background: #e3fbea; color: #198c48; }
+.streak-result-hero__badge--record { background: rgb(129 182 76 / 15%); color: #81b64c; }
 @media (max-width: 359px) {
     .streak-result-hero__heading { font-size: 24px; }
 }

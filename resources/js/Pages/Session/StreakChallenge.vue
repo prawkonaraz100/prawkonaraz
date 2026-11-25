@@ -12,7 +12,7 @@ import { streakResultExplanationBody } from '@/utils/streakResultExplanation';
 import { useMediaQuery } from '@/composables/useMediaQuery';
 import { readStreakAudioPreferences, streakAudioPreferencesKey } from '@/utils/streakAudioPreferences';
 import { readStreakVideoPreferences, streakVideoPreferencesKey, effectiveStreakVideoRate, streakVideoEndingTime } from '@/utils/streakVideoPreferences';
-import { ArrowLeft, ArrowRight, ListChecks, Settings, Trophy } from '@lucide/vue';
+import { ArrowLeft, ArrowRight, ListChecks, Settings, Trophy, Zap } from '@lucide/vue';
 import { apiClient, isApiClientError } from '@/lib/apiClient';
 import StreakAnswerRecoveryNotice from '@/Components/StreakAnswerRecoveryNotice.vue';
 import { isUncertainStreakAnswerFailure, postRecoverableStreakAnswer } from '@/lib/recoverableStreakAnswer';
@@ -189,6 +189,31 @@ const recordDelta = computed(() => lastResult.value ? Math.max(lastResult.value.
 const streakProgressGoal = computed(() => Math.max(overview.value.personal_best, 1));
 const streakProgressPercent = computed(() => Math.min(100, ((activeRun.value?.score ?? 0) / streakProgressGoal.value) * 100));
 const mobileVideoKey = (index: number) => `${currentQuestion.value?.id ?? 'inactive'}-${index}`;
+// Mobile dark answer tiles: neutral tile, calm green/red tint once the answer is checked (same as study sessions).
+const mobileAnswerClass = (key: string) => {
+    if (selectedAnswer.value === key && answerFeedback.value === 'correct') {
+        return 'rounded-[5px] border-transparent bg-[rgba(129,182,76,0.16)] text-white shadow-[inset_0_0_0_1px_rgba(129,182,76,0.3)]';
+    }
+
+    if (selectedAnswer.value === key && answerFeedback.value === 'incorrect') {
+        return 'rounded-[5px] border-transparent bg-[rgba(224,40,40,0.14)] text-white shadow-[inset_0_0_0_1px_rgba(255,138,138,0.26)]';
+    }
+
+    return 'pk-tile border-transparent';
+};
+
+const mobileAnswerLabelClass = (key: string) => {
+    if (selectedAnswer.value === key && answerFeedback.value === 'correct') {
+        return 'bg-[#5d9948] text-white';
+    }
+
+    if (selectedAnswer.value === key && answerFeedback.value === 'incorrect') {
+        return 'bg-[#b0423a] text-white';
+    }
+
+    return 'bg-[#ffffff1a] text-[#ffffffd9]';
+};
+
 const selectedAnswerClass = (key: string) => {
     if (selectedAnswer.value !== key) {
         return null;
@@ -422,8 +447,8 @@ const submitPendingAnswer = async () => {
 <template>
     <Head title="Trening bez błędu" />
 
-    <AuthenticatedLayout :hide-mobile-navigation="screen === 'play'" :class="screen === 'play' ? '' : 'max-md:bg-[#302e2b]'">
-        <section class="mx-auto min-h-[100svh] w-full max-w-[34rem] bg-[#faf9f7] px-4 pb-5 pt-5 text-[#0a1020] md:min-h-0 md:max-w-[76rem] md:bg-transparent md:px-6 md:py-8 md:text-[#071b45]" :class="screen === 'play' ? 'max-md:max-w-none max-md:bg-white max-md:px-0 max-md:pt-0' : 'streak-dark max-md:bg-[#302e2b] max-md:pt-[max(env(safe-area-inset-top),1rem)] max-md:text-[#ffffffd9]'" aria-label="Trening bez błędu">
+    <AuthenticatedLayout :hide-mobile-navigation="screen === 'play'" class="max-md:bg-[#302e2b]">
+        <section class="mx-auto min-h-[100svh] w-full max-w-[34rem] bg-[#faf9f7] px-4 pb-5 pt-5 text-[#0a1020] md:min-h-0 md:max-w-[76rem] md:bg-transparent md:px-6 md:py-8 md:text-[#071b45]" :class="screen === 'play' ? 'streak-dark max-md:max-w-none max-md:bg-[#302e2b] max-md:px-0 max-md:pt-0 max-md:text-[#ffffffd9]' : 'streak-dark max-md:bg-[#302e2b] max-md:pt-[max(env(safe-area-inset-top),1rem)] max-md:text-[#ffffffd9]'" aria-label="Trening bez błędu">
             <header class="flex items-center gap-3 md:hidden" :class="screen === 'play' ? 'max-md:hidden' : ''">
                 <MobileBackButton :href="route('session.index')" label="Wróć do strony głównej" />
                 <div class="min-w-0">
@@ -547,48 +572,26 @@ const submitPendingAnswer = async () => {
 
             <template v-else-if="screen === 'play' && currentQuestion">
                 <section v-if="mobileViewport" class="md:hidden" aria-labelledby="streak-question-title-mobile">
-                    <div class="bg-white px-4 pb-5 pt-[max(env(safe-area-inset-top),1.25rem)] text-[#182743]">
-                        <div class="flex items-start justify-between gap-3">
-                            <div class="min-w-0">
-                                <p class="text-[0.65rem] font-semibold uppercase tracking-[0.075em] text-[#929bad]">Seria bez błędu</p>
-                                <p class="mt-0.5 text-[clamp(0.95rem,4.15vw,1.15rem)] font-semibold leading-tight">Testy na prawo jazdy – kategoria {{ category.code }}</p>
-                            </div>
-                            <div class="flex shrink-0 items-center gap-2">
-                                <button type="button" class="grid h-11 w-11 place-items-center rounded border border-[#cbd2df] bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#182743]" aria-label="Ustawienia treningu" aria-haspopup="dialog" :aria-expanded="audioSettingsOpen" @click="openAudioSettings"><Settings :size="20" aria-hidden="true" /></button>
-                                <button type="button" class="min-h-11 shrink-0 rounded border border-[#cbd2df] bg-white px-3 text-sm font-medium text-[#182743] transition hover:bg-[#f5f7fa] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e7ac22]" @click="screen = 'landing'">Wyjdź</button>
-                            </div>
+                    <!-- One compact bar: current streak, record, settings, exit; progress towards the record underneath. -->
+                    <div class="sticky top-0 z-40 border-b border-[#ffffff1a] bg-[#302e2b] px-3 pb-2.5 pt-[max(env(safe-area-inset-top),0.625rem)]">
+                        <div class="flex items-center gap-2">
+                            <p class="flex min-w-0 flex-1 items-center gap-2" aria-live="polite">
+                                <Zap :size="18" class="shrink-0 text-[#ffc94a]" aria-hidden="true" />
+                                <span class="text-[1.375rem] font-bold leading-none tabular-nums text-white" :aria-label="`Seria: ${activeRun?.score ?? 0} poprawnych z rzędu`">{{ activeRun?.score ?? 0 }}</span>
+                                <span class="truncate text-xs text-[#ffffff80]">z rzędu · rekord {{ overview.personal_best }}</span>
+                            </p>
+                            <button type="button" class="pk-btn-secondary grid h-10 w-10 shrink-0 place-items-center" aria-label="Ustawienia treningu" aria-haspopup="dialog" :aria-expanded="audioSettingsOpen" @click="openAudioSettings"><Settings :size="18" aria-hidden="true" /></button>
+                            <button type="button" class="pk-btn-secondary min-h-10 shrink-0 px-3.5 text-sm font-semibold" @click="screen = 'landing'">Wyjdź</button>
                         </div>
-                        <div class="mt-6 grid grid-cols-4 text-center">
-                            <div class="flex min-w-0 flex-col items-center border-r border-[#dfe3eb] px-1">
-                                <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-7 w-7" aria-hidden="true"><path d="M8 3.5h11l5 5V28H8z"/><path d="M19 3.5V9h5M12 14h8M12 18h8M12 22h6"/></svg>
-                                <p class="mt-3 text-[0.58rem] font-semibold uppercase tracking-[0.035em] text-[#929bad]">Pytanie</p>
-                                <p class="mt-1 text-[1.15rem] font-semibold tabular-nums">{{ (activeRun?.score ?? 0) + 1 }}</p>
-                            </div>
-                            <div class="flex min-w-0 flex-col items-center border-r border-[#dfe3eb] px-1">
-                                <LicenseCategoryVehicle :code="category.code" class="h-7 w-10" />
-                                <p class="mt-3 text-[0.58rem] font-semibold uppercase tracking-[0.035em] text-[#929bad]">Kategoria</p>
-                                <p class="mt-1 text-[1.15rem] font-semibold">{{ category.code }}</p>
-                            </div>
-                            <div class="flex min-w-0 flex-col items-center border-r border-[#dfe3eb] px-1">
-                                <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-7 w-7" aria-hidden="true"><path d="M9 5h14v9a7 7 0 0 1-14 0zM9 8H5v4a5 5 0 0 0 4 5m14-9h4v4a5 5 0 0 1-4 5M16 21v5m-6 2h12"/></svg>
-                                <p class="mt-3 text-[0.58rem] font-semibold uppercase tracking-[0.035em] text-[#929bad]">Wynik</p>
-                                <p class="mt-1 text-[1.15rem] font-semibold tabular-nums">{{ activeRun?.score ?? 0 }}</p>
-                            </div>
-                            <div class="flex min-w-0 flex-col items-center px-1">
-                                <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-7 w-7" aria-hidden="true"><path d="M4 28h5V19H4zM13 28h5V13h-5zM22 28h5V5h-5z"/></svg>
-                                <p class="mt-3 text-[0.58rem] font-semibold uppercase tracking-[0.035em] text-[#929bad]">Rekord</p>
-                                <p class="mt-1 text-[1.15rem] font-semibold tabular-nums">{{ overview.personal_best }}</p>
-                            </div>
-                        </div>
-                        <div class="mt-5 h-2 overflow-hidden rounded-full bg-[#e3e6eb]" role="progressbar" :aria-valuenow="Math.min(activeRun?.score ?? 0, streakProgressGoal)" aria-valuemin="0" :aria-valuemax="streakProgressGoal" aria-label="Postęp serii względem rekordu">
-                            <span class="block h-full rounded-full bg-[#1bd899] transition-all" :style="{ width: `${streakProgressPercent}%` }" />
+                        <div class="mt-2.5 h-1 overflow-hidden rounded-full bg-[#ffffff1a]" role="progressbar" :aria-valuenow="Math.min(activeRun?.score ?? 0, streakProgressGoal)" aria-valuemin="0" :aria-valuemax="streakProgressGoal" aria-label="Postęp serii względem rekordu">
+                            <span class="block h-full rounded-full bg-[#81b64c] transition-all" :style="{ width: `${streakProgressPercent}%` }" />
                         </div>
                     </div>
 
-                    <div v-if="currentQuestion.media.length" ref="mobileVideoRoot" class="space-y-3 bg-white px-2.5">
+                    <div v-if="currentQuestion.media.length" ref="mobileVideoRoot" class="space-y-3 px-3 pt-3">
                         <template v-for="(media, index) in currentQuestion.media" :key="`${currentQuestion.id}-${index}`">
-                            <img v-if="media.kind === 'image' && media.url" :src="media.url" alt="Ilustracja do pytania" class="block aspect-video w-full rounded-lg bg-[#f5f7fa] object-contain">
-                            <figure v-else-if="media.kind === 'video' && media.url" class="relative aspect-video w-full overflow-hidden rounded-lg bg-black">
+                            <img v-if="media.kind === 'image' && media.url" :src="media.url" alt="Ilustracja do pytania" class="block aspect-video w-full rounded-[5px] bg-[#00000033] object-contain">
+                            <figure v-else-if="media.kind === 'video' && media.url" class="relative aspect-video w-full overflow-hidden rounded-[5px] bg-black">
                                 <video
                                     :src="media.url"
                                     :data-video-key="mobileVideoKey(index)"
@@ -612,9 +615,9 @@ const submitPendingAnswer = async () => {
                         </template>
                     </div>
 
-                    <div class="min-h-[32svh] bg-white px-5 pb-5 pt-8">
-                        <div class="flex items-center gap-1.5">
-                            <p class="shrink-0 text-[0.65rem] font-semibold uppercase tracking-[0.075em] text-[#929bad]">Treść pytania</p>
+                    <div class="min-h-[32svh] px-4 pb-5 pt-5">
+                        <div class="flex min-h-11 items-center gap-1.5">
+                            <p class="shrink-0 text-xs font-semibold text-[#ffffff80]">Pytanie {{ (activeRun?.score ?? 0) + 1 }}</p>
                             <QuestionAudioControl
                                 v-if="mobileViewport && audioPreferences.showQuestionAudioControl && currentQuestionAudio?.url"
                                 ref="questionAudioControl"
@@ -626,30 +629,29 @@ const submitPendingAnswer = async () => {
                                 :autoplay-key="currentQuestion.id"
                                 @play="onQuestionAudioPlay"
                             />
-                            <span class="ml-1.5 h-px flex-1 bg-[#dfe3eb]" aria-hidden="true" />
                         </div>
-                        <h1 id="streak-question-title-mobile" class="mt-4 text-[clamp(1.15rem,5vw,1.45rem)] font-normal leading-[1.42] tracking-tight text-[#182743]" v-html="currentQuestionPromptHtml" />
+                        <h1 id="streak-question-title-mobile" class="mt-1 text-[clamp(1.15rem,5vw,1.4rem)] font-medium leading-[1.42] tracking-tight text-[#ffffffd9]" v-html="currentQuestionPromptHtml" />
                     </div>
 
                     <div :class="currentQuestion.options.length > 2 ? 'h-56' : 'h-36'" aria-hidden="true" />
-                    <div class="fixed inset-x-0 bottom-0 z-50 border-t border-[#dfe4ea] bg-white px-3 pt-2 pb-[calc(env(safe-area-inset-bottom,0px)+0.5rem)] shadow-[0_-12px_28px_rgba(15,23,42,0.07)]">
+                    <div class="fixed inset-x-0 bottom-0 z-50 border-t border-[#ffffff1a] bg-[#302e2b] px-3 pt-2.5 pb-[calc(env(safe-area-inset-bottom,0px)+0.625rem)]">
                         <div class="mx-auto max-w-[30rem] space-y-2">
                             <StreakAnswerRecoveryNotice :message="errorMessage" :can-retry="!!pendingAnswer" :busy="submitting" @retry="submitPendingAnswer" />
                             <button
                                 v-for="option in currentQuestion.options"
                                 :key="option.key"
                                 type="button"
-                                class="w-full rounded-none border font-semibold text-[#111827] transition disabled:cursor-wait focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8b97a8] [-webkit-tap-highlight-color:transparent]"
+                                class="w-full overflow-hidden border font-semibold transition disabled:cursor-wait focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80 [-webkit-tap-highlight-color:transparent]"
                                 :class="[
-                                    currentQuestion.question_type === 'boolean' ? 'min-h-[3.75rem] text-center text-[0.96rem] uppercase tracking-[0.05em]' : 'flex min-h-14 items-stretch text-left text-[0.95rem]',
-                                    selectedAnswerClass(option.key) ?? 'border-[#d1d5db] bg-white',
+                                    currentQuestion.question_type === 'boolean' ? 'min-h-[3.5rem] text-center text-[0.96rem] uppercase tracking-[0.05em]' : 'flex min-h-14 items-stretch text-left text-[0.95rem]',
+                                    mobileAnswerClass(option.key),
                                 ]"
                                 :disabled="submitting || !!pendingAnswer"
                                 @click="answer(option)"
                             >
                                 <template v-if="currentQuestion.question_type === 'boolean'">{{ normalizeExplanationPlainText(option.text) }}</template>
                                 <template v-else>
-                                    <span class="grid min-w-10 place-items-center border-r border-[#d1d5db] bg-[#f4f5f6] px-2 text-xs">{{ option.label }}</span>
+                                    <span class="grid min-w-10 place-items-center px-2 text-xs font-semibold" :class="mobileAnswerLabelClass(option.key)">{{ option.label }}</span>
                                     <span class="self-center px-3 py-3 font-normal leading-6">{{ normalizeExplanationPlainText(option.text) }}</span>
                                 </template>
                             </button>
@@ -700,7 +702,7 @@ const submitPendingAnswer = async () => {
             </section>
             </template>
 
-            <section v-else-if="screen === 'result' && lastResult" class="mt-7 rounded-[1.5rem] bg-white px-5 py-7 text-center max-md:text-[#0a1020] shadow-[0_12px_30px_rgba(16,24,40,0.05)] md:mx-auto md:mt-0 md:max-w-[48rem] md:border md:border-[#dfe5ec] md:p-8 md:shadow-[0_12px_32px_rgba(7,27,69,0.035)]" aria-labelledby="streak-result-title">
+            <section v-else-if="screen === 'result' && lastResult" class="mt-7 rounded-[1.5rem] bg-white px-5 py-7 text-center shadow-[0_12px_30px_rgba(16,24,40,0.05)] max-md:mt-4 max-md:rounded-[5px] max-md:bg-transparent max-md:px-0 max-md:text-[#ffffffd9] max-md:shadow-none md:mx-auto md:mt-0 md:max-w-[48rem] md:border md:border-[#dfe5ec] md:p-8 md:shadow-[0_12px_32px_rgba(7,27,69,0.035)]" aria-labelledby="streak-result-title">
                 <StreakResultHero v-if="mobileViewport" :score="lastResult.score" :previous-best="recordBeforeRun" :duration-seconds="lastResult.run.duration_seconds" />
                 <template v-else>
                 <div class="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#fff1d4] text-3xl" aria-hidden="true">★</div>
@@ -710,8 +712,8 @@ const submitPendingAnswer = async () => {
                 <p v-if="recordDelta > 0" class="mt-3 text-sm font-bold text-[#159b6b]">Nowy rekord osobisty!</p>
                 <p v-else class="mt-3 text-sm text-[#6b7280]">Twój rekord: {{ overview.personal_best }}</p>
                 </template>
-                <div v-if="!lastResult.is_correct" class="mt-6 rounded-xl bg-[#f8f9fa] p-4 text-left text-sm">
-                    <p v-if="mobileViewport && mobileResultExplanation" class="mb-2 font-semibold text-[#374151]">Zasada do zapamiętania:</p>
+                <div v-if="!lastResult.is_correct" class="pk-dark-scope mt-6 rounded-xl bg-[#f8f9fa] p-4 text-left text-sm max-md:rounded-[5px] max-md:bg-[#00000033]">
+                    <p v-if="mobileViewport && mobileResultExplanation" class="mb-2 font-semibold text-[#374151] max-md:text-[#ffffffd9]">Zasada do zapamiętania:</p>
                     <QuestionExplanationRuntimeBlock
                         v-if="mobileViewport"
                         :fallback-text="mobileResultExplanation"
@@ -724,10 +726,10 @@ const submitPendingAnswer = async () => {
                         <p v-if="lastResult.explanation" class="mt-2 leading-6 text-[#4b5563]">{{ normalizeExplanationPlainText(lastResult.explanation) }}</p>
                     </template>
                 </div>
-                <button type="button" class="mt-6 min-h-12 w-full rounded-xl bg-[#ffc644] px-5 font-bold disabled:opacity-60 md:max-w-[22rem] md:bg-[linear-gradient(135deg,#ffdb77,#ffc644)] md:focus-visible:outline md:focus-visible:outline-2 md:focus-visible:outline-offset-4 md:focus-visible:outline-[#a87412]" :disabled="submitting" @click="startRun">
+                <button type="button" class="mt-6 min-h-12 w-full rounded-xl bg-[#ffc644] px-5 font-bold disabled:opacity-60 max-md:rounded-[10px] max-md:bg-[linear-gradient(#81b64c,#5d9948)] max-md:text-white max-md:shadow-[inset_0_1px_0_rgba(178,224,104,0.4),inset_0_-1px_0_#45753c,0_2px_4px_rgba(0,0,0,0.2)] md:max-w-[22rem] md:bg-[linear-gradient(135deg,#ffdb77,#ffc644)] md:focus-visible:outline md:focus-visible:outline-2 md:focus-visible:outline-offset-4 md:focus-visible:outline-[#a87412]" :disabled="submitting" @click="startRun">
                     {{ submitting ? 'Uruchamianie...' : 'Spróbuj ponownie →' }}
                 </button>
-                <button type="button" class="mt-2 min-h-11 w-full text-sm font-semibold text-[#5f6876]" @click="screen = 'landing'">Zobacz ranking</button>
+                <button type="button" class="mt-2 min-h-11 w-full text-sm font-semibold text-[#5f6876] max-md:text-[#ffffffb8]" @click="screen = 'landing'">Zobacz ranking</button>
             </section>
 
             <p v-if="answerFeedback" role="status" class="sr-only">{{ answerFeedback === 'correct' ? 'Poprawna odpowiedź' : 'Błędna odpowiedź' }}</p>
@@ -750,8 +752,8 @@ const submitPendingAnswer = async () => {
 @media (max-width: 767px) {
     .streak-dark { font-family: Barlow, Figtree, ui-sans-serif, system-ui, sans-serif; }
     .streak-dark :is(h1, h2) { font-family: inherit; }
-    .streak-question-audio :deep(button) { width: 44px; height: 44px; background: transparent; color: #596475; }
-    .streak-question-audio :deep(button:hover) { background: #f5f6f8; }
+    .streak-question-audio :deep(button) { width: 44px; height: 44px; border-radius: 10px; background: transparent; color: rgb(255 255 255 / 72%); }
+    .streak-question-audio :deep(button:hover) { background: rgb(255 255 255 / 10%); }
     .streak-question-audio :deep(svg) { width: 18px; height: 18px; }
     .streak-start-button {
         height: auto;
