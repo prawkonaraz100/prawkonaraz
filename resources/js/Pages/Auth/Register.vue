@@ -2,8 +2,8 @@
 import LoginDrawer from '@/Components/Auth/LoginDrawer.vue';
 import RegisterDrawer from '@/Components/Auth/RegisterDrawer.vue';
 import type { PageProps, StudyContextCategory } from '@/types';
-import { Head, router, usePage } from '@inertiajs/vue3';
-import { computed, onMounted, ref } from 'vue';
+import { Head, usePage } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
 
 const props = defineProps<{
     categories: StudyContextCategory[];
@@ -18,19 +18,13 @@ const registrationCategories = computed(() =>
         : page.props.authDrawers.registrationCategories,
 );
 
-onMounted(() => {
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-        window.location.replace(`${route('app.register')}${window.location.search}`);
-    }
-});
-
 const closePanel = () => {
     if (window.history.length > 1) {
         window.history.back();
         return;
     }
 
-    router.visit('/');
+    window.location.assign(route('home'));
 };
 
 const openLoginPanel = () => {

@@ -3,10 +3,13 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import DesktopLearningMap from '@/Pages/Session/Partials/DesktopLearningMap.vue';
 import MobileLearningDashboard from '@/Pages/Session/Partials/MobileLearningDashboard.vue';
 import MobileTopicIndex from '@/Pages/Session/Partials/MobileTopicIndex.vue';
+import MobileProfessionalCourses from '@/Pages/Session/Partials/MobileProfessionalCourses.vue';
+import SessionReplacementDialog from '@/Components/SessionReplacementDialog.vue';
 import type { PageProps } from '@/types';
 import type { LearningProgressMessage } from '@/types/learningProgress';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { useMediaQuery } from '@/composables/useMediaQuery';
 import learningCardClassicIcon from '../../../images/session/learning-card-classic.png';
 import learningCardExamIcon from '../../../images/session/learning-card-exam.png';
 import learningCardMemoryIcon from '../../../images/session/learning-card-memory.png';
@@ -67,6 +70,7 @@ interface IncorrectQuestionListState {
 interface ActiveLearningSession {
     id: number;
     mode: string;
+    collection_code?: string | null;
     ui_shell: StudyUiShell | null;
     status: string;
     title: string;
@@ -85,7 +89,9 @@ interface ActiveLearningSession {
 
 interface LearningDashboard {
     schema_version: number;
+    last_topic_id?: number | null;
     active_session: ActiveLearningSession | null;
+    adr_session_to_replace?: { id: number; title: string } | null;
     progress_message: LearningProgressMessage;
     course_progress: {
         category_id: number | null;
@@ -157,9 +163,13 @@ interface ProfessionalCourseModule {
 }
 
 interface ProfessionalCourse {
+    progress_reset?: { url: string; revision: number } | null;
+    learning_parts_enabled?: boolean;
+    learning_parts_error?: string | null;
     id: number;
     code: string;
     slug: string;
+    is_adr?: boolean;
     name: string;
     description: string | null;
     category_name: string | null;
@@ -234,11 +244,19 @@ const props = defineProps<{
     pjm_module: PjmModule;
     professional_courses: ProfessionalCourse[];
     initial_professional_course_code: string | null;
+    tachograph_styles_url: string;
     friend_invitation_cta: FriendInvitationCta;
 }>();
 
 const page = usePage<PageProps>();
 const isMobileTopicsView = computed(() => new URL(page.url, 'https://prawkonaraz.pl').searchParams.get('widok') === 'dzialy');
+// Match Tailwind's md breakpoint; only artwork changes, not panel/form state.
+const isDesktopViewport = useMediaQuery('(min-width: 768px)');
+// Keep the old templates for now, but do not instantiate their hidden media.
+const legacyLayoutsEnabled = ref(false);
+const mobileProfessionalCourseSelected = ref(props.initial_professional_course_code !== null);
+const mobileProfessionalCoursesRef = ref<{ selectCourseByCode: (code: string) => void } | null>(null);
+const mobileDarkHome = computed(() => !isMobileTopicsView.value);
 const sharedStudyContext = computed(() => (page.props.studyContext ?? {
     targetCategoryId: null,
     categories: [],
@@ -251,6 +269,8 @@ const canUseFullProduct = computed(() => props.access.full_product.allowed);
 const fullAccessUrl = computed(() => props.access.full_product.activation_url || route('access.activate'));
 const canShowPricingLink = computed(() => props.learning_dashboard.access_ui.can_show_pricing_link);
 const activeLearningSession = computed(() => props.learning_dashboard.active_session);
+const adrSessionToReplace = computed(() => props.learning_dashboard.adr_session_to_replace ?? null);
+const pendingAdrReplacement = ref<{ id: number; title: string; confirm: () => void } | null>(null);
 const showPjmEntryTile = computed(() => props.pjm_module.show_entry_tile);
 const isPjmStarterMode = computed(() => props.pjm_module.starter_mode);
 const friendInvitationCtaTitle = computed(() => {
@@ -311,6 +331,7 @@ const sessionForm = useForm<{
     question_status: string;
     randomize_order: boolean;
     question_count: number;
+    replace_active_session_id?: number | null;
 }>( {
     license_category_id: props.category?.id ?? null,
     mode: 'learn',
@@ -320,6 +341,7 @@ const sessionForm = useForm<{
     question_status: props.filters.question_status,
     randomize_order: props.filters.randomize_order,
     question_count: props.filters.question_count,
+    replace_active_session_id: null,
 });
 
 const initialLearningShell = props.filters.ui_shell === 'zen' ? 'zen' : 'exam_like';
@@ -509,6 +531,7 @@ const globalIncorrectForm = useForm<{
     question_status: 'incorrect' | 'mistake_list';
     randomize_order: boolean;
     question_count: number;
+    replace_active_session_id?: number | null;
 }>({
     license_category_id: props.category?.id ?? null,
     mode: 'learn',
@@ -518,6 +541,7 @@ const globalIncorrectForm = useForm<{
     question_status: managedIncorrectListEnabled.value ? 'mistake_list' : 'incorrect',
     randomize_order: false,
     question_count: Math.max(totalIncorrectQuestions.value, 1),
+    replace_active_session_id: null,
 });
 
 const selectedQuestionCount = computed(() => {
@@ -654,8 +678,25 @@ watch(
     { immediate: true },
 );
 
+const confirmAdrReplacementBefore = (submit: (sessionId: number | null) => void) => {
+    const session = adrSessionToReplace.value;
+    if (!session) {
+        submit(null);
+        return;
+    }
+
+    pendingAdrReplacement.value = {
+        id: session.id,
+        title: session.title,
+        confirm: () => submit(session.id),
+    };
+};
+
 const submitSessionForm = () => {
-    sessionForm.post(route('study-sessions.store'));
+    confirmAdrReplacementBefore((sessionId) => {
+        sessionForm.replace_active_session_id = sessionId;
+        sessionForm.post(route('study-sessions.store'));
+    });
 };
 
 const submitGlobalIncorrectForm = () => {
@@ -664,7 +705,10 @@ const submitGlobalIncorrectForm = () => {
     globalIncorrectForm.question_status = managedIncorrectListEnabled.value ? 'mistake_list' : 'incorrect';
     globalIncorrectForm.randomize_order = false;
     globalIncorrectForm.question_count = totalIncorrectQuestions.value;
-    globalIncorrectForm.post(route('study-sessions.store'));
+    confirmAdrReplacementBefore((sessionId) => {
+        globalIncorrectForm.replace_active_session_id = sessionId;
+        globalIncorrectForm.post(route('study-sessions.store'));
+    });
 };
 
 const startLearning = () => {
@@ -887,18 +931,12 @@ const startMobileTopicLearning = (topicId: number, scope: QuestionScope = 'all')
         return;
     }
 
-    const status = (topic.counts.unanswered ?? 0) > 0
-        ? 'unanswered'
-        : (topic.counts.incorrect ?? 0) > 0
-            ? 'incorrect'
-            : 'all';
-
     selectLearningPath('classic');
     sessionForm.question_scope = scope;
     sessionForm.question_topic_id = topic.id;
-    sessionForm.question_status = status;
+    sessionForm.question_status = 'all';
     sessionForm.randomize_order = false;
-    sessionForm.question_count = topic.counts[status] ?? topic.questions_count;
+    sessionForm.question_count = topic.questions_count;
     startLearning();
 };
 
@@ -1223,7 +1261,24 @@ const startDesktopHeroLearning = () => {
 <template>
     <Head title="Panel nauki" />
 
-    <AuthenticatedLayout>
+    <!-- Home, the topic list and an open professional course share the dark mobile shell. -->
+    <AuthenticatedLayout class="max-md:bg-[#302e2b]">
+        <SessionReplacementDialog
+            v-if="pendingAdrReplacement"
+            :show="true"
+            :session-id="pendingAdrReplacement.id"
+            :session-title="pendingAdrReplacement.title"
+            session-progress="Testy ADR w toku"
+            :busy="sessionForm.processing || globalIncorrectForm.processing"
+            @cancel="pendingAdrReplacement = null"
+            @confirm="pendingAdrReplacement.confirm(); pendingAdrReplacement = null"
+        />
+        <p v-if="$page.props.errors.resume_session" role="alert" class="mx-auto my-3 max-w-4xl rounded-xl bg-red-50 p-3 text-sm text-red-800">
+            {{ $page.props.errors.resume_session }}
+        </p>
+        <p v-if="sessionForm.errors.replace_active_session_id || globalIncorrectForm.errors.replace_active_session_id || $page.props.errors.replace_active_session" role="alert" class="mx-auto my-3 max-w-4xl rounded-xl bg-red-50 p-3 text-sm text-red-800">
+            {{ sessionForm.errors.replace_active_session_id ?? globalIncorrectForm.errors.replace_active_session_id ?? $page.props.errors.replace_active_session }}
+        </p>
         <div class="min-h-[calc(100vh-4rem)] bg-transparent">
             <section
                 v-if="category"
@@ -1287,15 +1342,29 @@ const startDesktopHeroLearning = () => {
                         </div>
                     </section>
 
+                    <MobileProfessionalCourses
+                        ref="mobileProfessionalCoursesRef"
+                        hide-list
+                        dark
+                        :courses="professional_courses"
+                        :initial-code="initial_professional_course_code"
+                        :active-session="activeLearningSession"
+                        :adr-session-to-replace="adrSessionToReplace"
+                        @select-course="mobileProfessionalCourseSelected = $event"
+                    />
+
                     <MobileTopicIndex
-                        v-if="isMobileTopicsView"
+                        v-if="isMobileTopicsView && !mobileProfessionalCourseSelected"
                         :groups="group_options"
                         :processing="sessionForm.processing"
+                        :professional-courses="professional_courses"
                         @start-topic="startMobileTopicLearning"
+                        @select-professional-course="mobileProfessionalCoursesRef?.selectCourseByCode($event)"
                     />
 
                     <MobileLearningDashboard
-                        v-else
+                        v-else-if="!mobileProfessionalCourseSelected"
+                        :load-artwork="!isDesktopViewport"
                         :learning-path-tabs="learningPathTabs"
                         :selected-path="selectedPath"
                         :learning-dashboard="learning_dashboard"
@@ -1319,13 +1388,12 @@ const startDesktopHeroLearning = () => {
                         :total-unanswered-questions="totalUnansweredQuestions"
                         :total-incorrect-questions="totalIncorrectQuestions"
                         :has-global-incorrect-questions="hasGlobalIncorrectQuestions"
-                        :managed-incorrect-list-enabled="managedIncorrectListEnabled"
-                        :incorrect-questions-url="incorrect_question_list.index_url"
                         :exam-facts="examFacts"
                         :traffic-sign-learning-href="trafficSignLearningHref"
                         :category-stats-href="categoryStatsHref"
                         :ranking-mode-href="rankingModeHref"
                         :ranking-preview="ranking_preview"
+                        :professional-courses="professional_courses"
                         :errors="{
                             license_category_id: sessionForm.errors.license_category_id,
                             question_topic_id: sessionForm.errors.question_topic_id,
@@ -1340,24 +1408,25 @@ const startDesktopHeroLearning = () => {
                         @choose-scope="chooseQuestionScope"
                         @choose-status="chooseStatus"
                         @start-global-incorrect-learning="startGlobalIncorrectLearning"
+                        @select-professional-course="mobileProfessionalCoursesRef?.selectCourseByCode($event)"
                     />
 
                     <section
                         v-if="friendInvitationCtaVisible"
                         class="border-b border-[#e5eaf3] bg-[#fbfcff] px-4 py-3 md:px-6 xl:px-8"
-                        :class="isMobileTopicsView ? 'hidden md:block' : ''"
+                        :class="isMobileTopicsView ? 'hidden md:block' : (mobileDarkHome ? 'max-md:border-[#ffffff1a] max-md:bg-[#302e2b]' : '')"
                         aria-label="Panel zaproszenia znajomego"
                     >
                         <div class="mx-auto flex max-w-[90rem] flex-col gap-3 md:flex-row md:items-center md:justify-between">
                             <div class="min-w-0 md:flex md:items-center md:gap-4">
-                                <p class="shrink-0 text-[0.72rem] font-bold uppercase tracking-[0] text-[#e11d2e]">
+                                <p class="shrink-0 text-[0.72rem] font-bold uppercase tracking-[0] text-[#e11d2e]" :class="mobileDarkHome ? 'max-md:text-[#ff8a8a]' : ''">
                                     Zaproszenie
                                 </p>
                                 <div class="min-w-0 md:flex md:items-center md:gap-3">
-                                    <h2 class="mt-1 text-[0.95rem] font-bold leading-tight tracking-[0] text-[#10172f] md:mt-0">
+                                    <h2 class="mt-1 text-[0.95rem] font-bold leading-tight tracking-[0] text-[#10172f] md:mt-0" :class="mobileDarkHome ? 'max-md:text-[#ffffffd9]' : ''">
                                         {{ friendInvitationCtaTitle }}
                                     </h2>
-                                    <p class="mt-1 max-w-[48rem] text-[0.84rem] font-medium leading-5 text-[#516071] md:mt-0">
+                                    <p class="mt-1 max-w-[48rem] text-[0.84rem] font-medium leading-5 text-[#516071] md:mt-0" :class="mobileDarkHome ? 'max-md:text-[#ffffffb8]' : ''">
                                         {{ friendInvitationCtaDescription }}
                                     </p>
                                 </div>
@@ -1367,12 +1436,14 @@ const startDesktopHeroLearning = () => {
                                 <Link
                                     :href="friend_invitation_cta.profile_url"
                                     class="inline-flex min-h-10 items-center justify-center rounded-[6px] border border-[#e11d2e] bg-white px-3.5 text-[0.83rem] font-bold text-[#e11d2e] transition hover:bg-[#fff5f6] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e11d2e] focus-visible:ring-offset-2"
+                                    :class="mobileDarkHome ? 'max-md:border-[#ff8a8a] max-md:bg-transparent max-md:text-[#ff8a8a] max-md:hover:bg-[#ffffff14]' : ''"
                                 >
                                     {{ friend_invitation_cta.can_issue ? 'Przejdź do zaproszeń' : 'Zarządzaj zaproszeniami' }}
                                 </Link>
                                 <button
                                     type="button"
                                     class="inline-flex min-h-10 items-center justify-center rounded-[6px] border border-transparent px-3 text-[0.83rem] font-bold text-[#516071] transition hover:bg-white hover:text-[#10172f] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#10172f] focus-visible:ring-offset-2"
+                                    :class="mobileDarkHome ? 'max-md:text-[#ffffffb8] max-md:hover:bg-[#ffffff14] max-md:hover:text-[#ffffffd9]' : ''"
                                     @click="dismissFriendInvitationCta"
                                 >
                                     Ukryj
@@ -1382,6 +1453,7 @@ const startDesktopHeroLearning = () => {
                     </section>
 
                     <DesktopLearningMap
+                        :load-artwork="isDesktopViewport"
                         :category-short-name="category.short_name"
                         :learning-path-tabs="learningPathTabs"
                         :selected-path="selectedPath"
@@ -1408,8 +1480,8 @@ const startDesktopHeroLearning = () => {
                         :managed-incorrect-list-enabled="managedIncorrectListEnabled"
                         :incorrect-questions-url="incorrect_question_list.index_url"
                         :active-session="activeLearningSession"
+                        :adr-session-to-replace="adrSessionToReplace"
                         :course-progress-percent="courseProgressPercent"
-                        :progress-message="learning_dashboard.progress_message"
                         :completed-topic-ids="learning_dashboard.course_progress.completed_topic_ids"
                         :total-topic-count="learning_dashboard.course_progress.total_topics"
                         :traffic-sign-learning-href="trafficSignLearningHref"
@@ -1418,6 +1490,7 @@ const startDesktopHeroLearning = () => {
                         :pjm-href="pjm_module.href"
                         :professional-courses="professional_courses"
                         :initial-professional-course-code="initial_professional_course_code"
+                        :tachograph-styles-url="tachograph_styles_url"
                         :exam-facts="examFacts"
                         :start-button-label="startButtonLabel"
                         :errors="{
@@ -1434,7 +1507,8 @@ const startDesktopHeroLearning = () => {
                         @start-global-incorrect-learning="startGlobalIncorrectLearning"
                     />
 
-                    <div class="hidden overflow-hidden bg-white md:!hidden md:min-h-[calc(100vh-8.5rem)] md:grid-cols-[13.25rem_minmax(0,1fr)] xl:grid-cols-[14.5rem_minmax(0,1fr)]">
+                    <!-- Retained legacy layouts must not mount their hidden media. -->
+                    <div v-if="legacyLayoutsEnabled" class="hidden overflow-hidden bg-white md:!hidden md:min-h-[calc(100vh-8.5rem)] md:grid-cols-[13.25rem_minmax(0,1fr)] xl:grid-cols-[14.5rem_minmax(0,1fr)]">
                         <aside class="flex min-h-full flex-col border-r border-[#e4eaf3] bg-white px-3 py-5">
                             <nav class="space-y-1.5" aria-label="Panel nauki">
                                 <button
@@ -1815,7 +1889,7 @@ const startDesktopHeroLearning = () => {
                         </main>
                     </div>
 
-                    <div class="hidden">
+                    <div v-if="legacyLayoutsEnabled" class="hidden">
                         <section
                             class="relative min-h-[17.4rem] overflow-hidden rounded-[12px] border border-[#e5eaf3] bg-[#f7fbff] px-10 py-8 shadow-[0_18px_46px_rgba(15,23,42,0.06)]"
                             aria-label="Kontynuuj naukę"

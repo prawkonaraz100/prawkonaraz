@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import SiteFooter from '@/Components/SiteFooter.vue';
 import PublicTopNavigation from '@/Components/PublicTopNavigation.vue';
+import ScrollToTop from '@/Components/ScrollToTop.vue';
 
 withDefaults(
     defineProps<{
@@ -37,5 +38,6 @@ withDefaults(
         </main>
 
         <SiteFooter v-if="showFooter" />
+        <ScrollToTop />
     </div>
 </template>
