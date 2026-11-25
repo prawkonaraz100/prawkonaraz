@@ -345,6 +345,7 @@ class RankedMatchService
                 ->with($this->defaultMatchRelations())
                 ->whereKey($rankedMatch->getKey())
                 ->whereHas('players', fn ($query) => $query->where('user_id', $user->getKey())->where('is_replay', false))
+                ->lockForUpdate()
                 ->firstOrFail();
 
             $match = $this->applyPresenceTransitions($match, now());
