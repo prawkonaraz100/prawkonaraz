@@ -8050,11 +8050,13 @@ body:has([data-auth-dialog-open='true'], [data-auth-login-open='true'], [data-au
     }
 
     /* Green and red hints inside questions and explanations ([green]/[red] markup, inline colour). */
-    .pk-dark-scope [data-inline-color='success'] {
+    .pk-dark-scope [data-inline-color='success'],
+    .pk-dark-scope .full-explanation-prose span[style='color:#163222;'] {
         color: #81b64c !important;
     }
 
-    .pk-dark-scope [data-inline-color='danger'] {
+    .pk-dark-scope [data-inline-color='danger'],
+    .pk-dark-scope .full-explanation-prose span[style='color:#612d2d;'] {
         color: #ff8a8a !important;
     }
 
