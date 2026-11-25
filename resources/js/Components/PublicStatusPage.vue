@@ -2,6 +2,9 @@
 import PublicTopNavigation from '@/Components/PublicTopNavigation.vue';
 import SiteFooter from '@/Components/SiteFooter.vue';
 import { Head } from '@inertiajs/vue3';
+import { useMobileDarkScope } from '@/composables/useMobileDarkScope';
+
+useMobileDarkScope();
 
 defineProps<{
     title: string;

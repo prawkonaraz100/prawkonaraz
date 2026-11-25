@@ -82,7 +82,7 @@ defineExpose({ selectCourseByCode });
             <CourseModules :key="selected.id" compact :dark="dark" :modules="selected.modules" :chapters="selected.learning_parts_enabled" :active-session="activeSession ?? adrSessionToReplace" :review-count="selected.incorrect_questions.count" :review-url="selected.incorrect_questions.url">
                 <template #actions><QualificationProgressReset :key="selected.id" :reset="selected.progress_reset ?? null" :answered="selected.progress.answered_count" /></template>
             </CourseModules>
-            <p v-if="selected.learning_parts_error" role="alert" class="mt-3 rounded-xl bg-red-50 p-3 text-sm text-red-800">{{ selected.learning_parts_error }}</p>
+            <p v-if="selected.learning_parts_error" role="alert" class="mt-3 rounded-xl p-3 text-sm" :class="dark ? 'bg-[#3a1f22] text-[#ff8a8a]' : 'bg-red-50 text-red-800'">{{ selected.learning_parts_error }}</p>
         </template>
     </section>
 </template>

@@ -3,6 +3,9 @@ import AuthBrand from '@/Components/Auth/AuthBrand.vue';
 import AuthTrustPanel from '@/Components/Auth/AuthTrustPanel.vue';
 import { Link } from '@inertiajs/vue3';
 import { ArrowLeft } from '@lucide/vue';
+import { useMobileDarkScope } from '@/composables/useMobileDarkScope';
+
+useMobileDarkScope();
 
 withDefaults(defineProps<{
     title: string;

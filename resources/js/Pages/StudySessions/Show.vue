@@ -9198,7 +9198,7 @@ watch(
 
                             <div class="ml-auto flex shrink-0 items-start gap-2 text-xs sm:text-sm">
                                 <CourseKeyboardHelp
-                                    v-if="usesCourseFlashcard"
+                                    v-if="usesCourseFlashcard && !isPhoneViewport"
                                     v-model:open="isCourseKeyboardHelpOpen"
                                     :answer-count="answerOptions.length"
                                 />
@@ -9269,7 +9269,7 @@ watch(
                                     :enable-bold-formatting="enableInlineBold"
                                     :enable-color-formatting="enableInlineColors"
                                 />
-                                <a v-if="publicExplanationUrl" :href="publicExplanationUrl" target="_blank" rel="noopener noreferrer" class="mt-5 inline-flex text-sm font-semibold text-blue-800 underline">Zobacz pełne wyjaśnienie</a>
+                                <a v-if="publicExplanationUrl" :href="publicExplanationUrl" target="_blank" rel="noopener noreferrer" class="mt-5 inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-[10px] border border-[#d1d5db] bg-white px-4 py-2 text-sm font-semibold text-[#374151] hover:bg-[#fafafa] sm:w-auto">Zobacz pełne wyjaśnienie<ExternalLink class="shrink-0" :size="15" :stroke-width="1.8" aria-hidden="true" /></a>
                             </template>
                         <div :class="mediaWorkspacePaneClass">
                             <div
@@ -9593,7 +9593,7 @@ watch(
                                             v-if="shouldShowExplanationCard && publicExplanationUrl"
                                             data-full-explanation-action
                                             :class="isPhoneViewport
-                                                ? 'mt-2 flex shrink-0 justify-end'
+                                                ? 'mt-3 flex shrink-0'
                                                 : 'absolute right-0 bottom-0 z-10'"
                                         >
                                             <a
@@ -9602,11 +9602,11 @@ watch(
                                                 rel="noopener noreferrer"
                                                 class="inline-flex max-w-full items-center justify-center transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#374151]"
                                                 :class="isPhoneViewport
-                                                    ? 'min-h-[44px] gap-1.5 py-2 text-xs font-normal leading-5 text-[#64748b] underline-offset-4 hover:text-[#334155] hover:underline'
+                                                    ? 'min-h-[44px] w-full gap-2 rounded-[10px] border border-[#d1d5db] bg-white px-4 py-2 text-sm font-semibold leading-5 text-[#374151] hover:bg-[#fafafa]'
                                                     : 'gap-2 bg-white/95 px-2 py-1 text-xs font-semibold text-[#374151] shadow-[-6px_-6px_14px_rgba(255,255,255,0.96)] hover:text-[#d9251b]'"
                                             >
                                                 <span>Zobacz pełne wyjaśnienie</span>
-                                                <ExternalLink class="shrink-0" :size="isPhoneViewport ? 13 : 14" :stroke-width="1.8" aria-hidden="true" />
+                                                <ExternalLink class="shrink-0" :size="isPhoneViewport ? 15 : 14" :stroke-width="1.8" aria-hidden="true" />
                                             </a>
                                         </div>
                                     </div>

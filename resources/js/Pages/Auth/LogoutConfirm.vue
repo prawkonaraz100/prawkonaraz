@@ -3,6 +3,9 @@ import SiteFooter from '@/Components/SiteFooter.vue';
 import PublicTopNavigation from '@/Components/PublicTopNavigation.vue';
 import { useSafeLogout } from '@/composables/useSafeLogout';
 import { Head, Link } from '@inertiajs/vue3';
+import { useMobileDarkScope } from '@/composables/useMobileDarkScope';
+
+useMobileDarkScope();
 
 const safetyNotes = [
     'Chronimy Cię przed przypadkowym wylogowaniem.',
@@ -47,7 +50,7 @@ const {
                     </div>
                 </div>
 
-                <div class="mt-8 grid gap-6 lg:grid-cols-2">
+                <div class="mt-8 grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-2">
                     <article class="rounded-[10px] border border-[#dbe4f0] bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.05)] sm:p-7">
                         <div class="flex items-start gap-4">
                             <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#2563eb] text-lg font-bold text-white">

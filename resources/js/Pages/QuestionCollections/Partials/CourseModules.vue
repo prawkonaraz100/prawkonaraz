@@ -116,7 +116,7 @@ const learningListActionLabel = (module: CourseModule) =>
 
 <template>
     <section :class="flush ? '' : 'mt-7'" :aria-label="chapters ? 'Rozdziały Kod 95' : 'Moduły kursu'">
-        <p v-if="startError" role="alert" class="mb-4 rounded-xl bg-red-50 p-3 text-sm text-red-800">{{ startError }}</p>
+        <p v-if="startError" role="alert" class="mb-4 rounded-xl p-3 text-sm" :class="dark ? 'bg-[#3a1f22] text-[#ff8a8a]' : 'bg-red-50 text-red-800'">{{ startError }}</p>
         <div v-if="usesLearningList" class="flex min-h-11 flex-wrap items-center justify-between gap-x-5 gap-y-2 pb-3">
             <h2 :class="dark ? 'px-1 text-[0.95rem] font-semibold text-[#ffffffb8]' : 'text-base font-semibold text-[#071b45]'">Działy do nauki</h2>
             <div class="flex flex-wrap items-center gap-x-4 gap-y-1 [&>div]:mt-0">

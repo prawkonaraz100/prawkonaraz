@@ -1273,10 +1273,10 @@ const startDesktopHeroLearning = () => {
             @cancel="pendingAdrReplacement = null"
             @confirm="pendingAdrReplacement.confirm(); pendingAdrReplacement = null"
         />
-        <p v-if="$page.props.errors.resume_session" role="alert" class="mx-auto my-3 max-w-4xl rounded-xl bg-red-50 p-3 text-sm text-red-800">
+        <p v-if="$page.props.errors.resume_session" role="alert" class="mx-auto my-3 max-w-4xl rounded-xl bg-red-50 p-3 text-sm text-red-800 max-md:mx-3 max-md:rounded-[5px] max-md:bg-[#3a1f22] max-md:text-[#ff8a8a]">
             {{ $page.props.errors.resume_session }}
         </p>
-        <p v-if="sessionForm.errors.replace_active_session_id || globalIncorrectForm.errors.replace_active_session_id || $page.props.errors.replace_active_session" role="alert" class="mx-auto my-3 max-w-4xl rounded-xl bg-red-50 p-3 text-sm text-red-800">
+        <p v-if="sessionForm.errors.replace_active_session_id || globalIncorrectForm.errors.replace_active_session_id || $page.props.errors.replace_active_session" role="alert" class="mx-auto my-3 max-w-4xl rounded-xl bg-red-50 p-3 text-sm text-red-800 max-md:mx-3 max-md:rounded-[5px] max-md:bg-[#3a1f22] max-md:text-[#ff8a8a]">
             {{ sessionForm.errors.replace_active_session_id ?? globalIncorrectForm.errors.replace_active_session_id ?? $page.props.errors.replace_active_session }}
         </p>
         <div class="min-h-[calc(100vh-4rem)] bg-transparent">

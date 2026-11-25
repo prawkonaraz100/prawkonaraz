@@ -2,6 +2,9 @@
 import Login from '@/Pages/Auth/Login.vue';
 import Register from '@/Pages/Auth/Register.vue';
 import type { StudyContextCategory } from '@/types';
+import { useMobileDarkScope } from '@/composables/useMobileDarkScope';
+
+useMobileDarkScope();
 
 withDefaults(defineProps<{
     mode: 'login' | 'register';
