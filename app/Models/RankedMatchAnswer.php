@@ -15,6 +15,7 @@ class RankedMatchAnswer extends Model
         'selected_answer',
         'is_correct',
         'response_time_ms',
+        'elapsed_ms',
         'answered_at',
     ];
 
@@ -27,6 +28,7 @@ class RankedMatchAnswer extends Model
             'question_number' => 'integer',
             'is_correct' => 'boolean',
             'response_time_ms' => 'integer',
+            'elapsed_ms' => 'integer',
             'answered_at' => 'datetime',
         ];
     }

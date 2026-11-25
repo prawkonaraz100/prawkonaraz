@@ -619,8 +619,9 @@ test('events endpoint returns queue and opponent progress events for the current
     expect($opponentAnsweredEvent['data']['last_answer'])->toMatchArray([
         'question_id' => $questions[0]->getKey(),
         'answer_correct' => true,
-        'response_time_ms' => 1100,
     ]);
+    // Czas odpowiedzi liczy serwer; wartość response_time_ms z przeglądarki (1100) jest ignorowana.
+    expect($opponentAnsweredEvent['data']['last_answer']['response_time_ms'])->toBeInt()->toBeGreaterThanOrEqual(0);
     expect($opponentAnsweredEvent['data']['answered_at'])->not->toBeNull();
 });
 
@@ -765,6 +766,114 @@ test('realtime stream emits overview sync and match events for authenticated pla
 /**
  * @return array{0: User, 1: User, 2: RankedMatch, 3: Collection<int, Question>}
  */
+test('ranked answer time is measured by the server and ignores the client response time', function () {
+    [$firstUser, $secondUser, $match] = createRankedMatchFixture($this);
+    startRankedMatchFixture($this, $match, $firstUser, $secondUser);
+    $match->refresh();
+
+    $questionIds = collect($match->payload['question_ids'] ?? [])->values();
+
+    $this->travel(2)->seconds();
+
+    $this->actingAs($firstUser)
+        ->postJson(route('api.v1.ranked.matches.answers.store', $match->public_id), [
+            'question_id' => $questionIds[0],
+            'user_answer' => 'a',
+            'response_time_ms' => 1,
+        ])
+        ->assertOk();
+
+    $this->travel(1)->seconds();
+
+    $this->actingAs($firstUser)
+        ->postJson(route('api.v1.ranked.matches.answers.store', $match->public_id), [
+            'question_id' => $questionIds[1],
+            'user_answer' => 'a',
+            'response_time_ms' => 1,
+        ])
+        ->assertOk();
+
+    $answers = $match->answers()->where('user_id', $firstUser->getKey())->orderBy('elapsed_ms')->get();
+
+    expect($answers)->toHaveCount(2);
+    // Start meczu to pełna sekunda; od startu do pierwszej odpowiedzi minęło ok. 3 s.
+    expect($answers[0]->elapsed_ms)->toBeGreaterThanOrEqual(3000)->toBeLessThan(4000);
+    expect($answers[0]->response_time_ms)->toBe($answers[0]->elapsed_ms);
+    expect($answers[1]->response_time_ms)->toBe(1000);
+    expect($answers[1]->elapsed_ms)->toBe($answers[0]->elapsed_ms + 1000);
+
+    $player = $match->players()->where('user_id', $firstUser->getKey())->firstOrFail();
+
+    expect($player->sum_response_time_ms)->toBe($answers[1]->elapsed_ms);
+});
+
+test('a points tie is won by the player who scored the last point earlier, regardless of client timings', function () {
+    [$firstUser, $secondUser, $match, $questions] = createRankedMatchFixture($this);
+    startRankedMatchFixture($this, $match, $firstUser, $secondUser);
+    $match->refresh();
+
+    $questionsById = $questions->keyBy('id');
+    $questionIds = collect($match->payload['question_ids'] ?? [])->values();
+    $wrongAnswer = fn (int $questionId): string => $questionsById->get($questionId)->correct_answer === 'a' ? 'b' : 'a';
+    $answer = function (User $user, int $questionId, string $choice, int $claimedTimeMs) use ($match): void {
+        $this->actingAs($user)
+            ->postJson(route('api.v1.ranked.matches.answers.store', $match->public_id), [
+                'question_id' => $questionId,
+                'user_answer' => $choice,
+                'response_time_ms' => $claimedTimeMs,
+            ])
+            ->assertOk();
+    };
+
+    // Gracz 2 zdobywa punkt wcześniej, ale przeglądarka „twierdzi”, że był bardzo wolny.
+    $this->travel(1)->seconds();
+    $answer($secondUser, $questionIds[0], $questionsById->get($questionIds[0])->correct_answer, 99000);
+
+    // Gracz 1 zdobywa punkt sekundę później, a przeglądarka „twierdzi”, że odpowiedział błyskawicznie.
+    $this->travel(1)->seconds();
+    $answer($firstUser, $questionIds[0], $questionsById->get($questionIds[0])->correct_answer, 1);
+
+    foreach ([$questionIds[1], $questionIds[2]] as $questionId) {
+        $answer($firstUser, $questionId, $wrongAnswer($questionId), 1);
+        $answer($secondUser, $questionId, $wrongAnswer($questionId), 99000);
+    }
+
+    $match->refresh();
+
+    expect($match->status)->toBe('finished');
+    expect($match->reason)->toBe('faster_time');
+    expect((int) data_get($match->payload, 'winner_user_id'))->toBe($secondUser->getKey());
+    expect((int) data_get($match->payload, 'loser_user_id'))->toBe($firstUser->getKey());
+});
+
+test('a match where neither player scored a point ends in a draw', function () {
+    [$firstUser, $secondUser, $match, $questions] = createRankedMatchFixture($this);
+    startRankedMatchFixture($this, $match, $firstUser, $secondUser);
+    $match->refresh();
+
+    $questionsById = $questions->keyBy('id');
+
+    foreach (collect($match->payload['question_ids'] ?? [])->values() as $questionId) {
+        $wrong = $questionsById->get($questionId)->correct_answer === 'a' ? 'b' : 'a';
+
+        foreach ([$firstUser, $secondUser] as $user) {
+            $this->travel(1)->seconds();
+            $this->actingAs($user)
+                ->postJson(route('api.v1.ranked.matches.answers.store', $match->public_id), [
+                    'question_id' => $questionId,
+                    'user_answer' => $wrong,
+                ])
+                ->assertOk();
+        }
+    }
+
+    $match->refresh();
+
+    expect($match->status)->toBe('finished');
+    expect($match->reason)->toBe('draw');
+    expect(data_get($match->payload, 'winner_user_id'))->toBeNull();
+});
+
 function createRankedMatchFixture(TestCase $testCase): array
 {
     $category = LicenseCategory::factory()->create([

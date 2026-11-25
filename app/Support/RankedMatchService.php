@@ -12,6 +12,7 @@ use App\Models\RankedPlayerRating;
 use App\Models\RankedQueueEntry;
 use App\Models\User;
 use Illuminate\Database\QueryException;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -87,7 +88,7 @@ class RankedMatchService
         $joined = false;
         $state = 'queued';
 
-        $result = $this->runWithSqliteBusyRetry(function () use ($category, &$joined, &$state, $user): array {
+        $attemptJoin = function () use ($category, &$joined, &$state, $user): array {
             $this->expireTimedOutQueuedEntries();
             $rating = $this->ensureRating($user);
             $activeMatch = $this->findActiveMatchForUser($user);
@@ -170,7 +171,17 @@ class RankedMatchService
                     : null,
                 'capacity' => $this->capacitySnapshot(),
             ];
-        });
+        };
+
+        try {
+            $result = $this->runWithSqliteBusyRetry($attemptJoin);
+        } catch (UniqueConstraintViolationException) {
+            // Równoległe dołączenie tego samego użytkownika (np. podwójne kliknięcie):
+            // drugi wpis odrzuca indeks, więc odczytujemy stan zapisany przez pierwsze żądanie.
+            $joined = false;
+            $state = 'queued';
+            $result = $this->runWithSqliteBusyRetry($attemptJoin);
+        }
 
         return [
             ...$result,
@@ -413,14 +424,52 @@ class RankedMatchService
             ->values();
     }
 
+    /**
+     * Czas odpowiedzi liczy serwer (od startu meczu albo od poprzedniej odpowiedzi gracza).
+     * Wartość response_time_ms wysyłana przez przeglądarkę nie wpływa na wynik.
+     */
     public function recordAnswer(
         RankedMatch $rankedMatch,
         User $user,
         Question $question,
         string $selectedAnswer,
-        ?int $responseTimeMs = null,
     ): RankedMatchAnswer {
-        [$answer] = $this->runWithSqliteBusyRetry(function () use ($question, $rankedMatch, $responseTimeMs, $selectedAnswer, $user): array {
+        try {
+            [$answer] = $this->storeAnswer($rankedMatch, $user, $question, $selectedAnswer);
+        } catch (UniqueConstraintViolationException) {
+            // Równoległe wysłanie tej samej odpowiedzi: zapisała ją inna transakcja.
+            $answer = RankedMatchAnswer::query()
+                ->where('ranked_match_id', $rankedMatch->getKey())
+                ->where('user_id', $user->getKey())
+                ->where('question_id', $question->getKey())
+                ->first();
+        }
+
+        if (! $answer instanceof RankedMatchAnswer) {
+            throw ValidationException::withMessages([
+                'match' => 'Ten mecz rankingowy został już zakończony albo porzucony.',
+            ]);
+        }
+
+        return $answer;
+    }
+
+    /**
+     * @return array{0: RankedMatchAnswer|null, 1: RankedMatch}
+     */
+    protected function storeAnswer(
+        RankedMatch $rankedMatch,
+        User $user,
+        Question $question,
+        string $selectedAnswer,
+    ): array {
+        return $this->runWithSqliteBusyRetry(function () use ($question, $rankedMatch, $selectedAnswer, $user): array {
+            // Blokada wiersza meczu szereguje odpowiedzi obu graczy i chroni liczniki przed wyścigiem.
+            RankedMatch::query()
+                ->whereKey($rankedMatch->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
+
             /** @var RankedMatch $match */
             $match = RankedMatch::query()
                 ->with(['players', 'players.user', 'answers', 'queueEntries'])
@@ -467,6 +516,13 @@ class RankedMatchService
                 return [$existingAnswer, $match];
             }
 
+            $answeredAt = now();
+            $elapsedMs = $this->elapsedMsSinceMatchStart($match, $answeredAt);
+            $previousElapsedMs = (int) (RankedMatchAnswer::query()
+                ->where('ranked_match_id', $match->getKey())
+                ->where('user_id', $user->getKey())
+                ->max('elapsed_ms') ?? 0);
+
             $answer = RankedMatchAnswer::create([
                 'ranked_match_id' => $match->getKey(),
                 'user_id' => $user->getKey(),
@@ -474,8 +530,9 @@ class RankedMatchService
                 'question_number' => $questionIndex + 1,
                 'selected_answer' => strtolower($selectedAnswer),
                 'is_correct' => strtolower($selectedAnswer) === strtolower((string) $question->correct_answer),
-                'response_time_ms' => $responseTimeMs,
-                'answered_at' => now(),
+                'response_time_ms' => max($elapsedMs - $previousElapsedMs, 0),
+                'elapsed_ms' => $elapsedMs,
+                'answered_at' => $answeredAt,
             ]);
 
             $this->appendMatchEvent(
@@ -496,14 +553,29 @@ class RankedMatchService
 
             return [$answer, $this->freshMatch($match) ?? $match];
         });
+    }
 
-        if (! $answer instanceof RankedMatchAnswer) {
-            throw ValidationException::withMessages([
-                'match' => 'Ten mecz rankingowy został już zakończony albo porzucony.',
-            ]);
-        }
+    protected function elapsedMsSinceMatchStart(RankedMatch $match, Carbon $answeredAt): int
+    {
+        $startedAt = $match->started_at ?? $match->matched_at ?? $answeredAt;
 
-        return $answer;
+        return max((int) round($startedAt->diffInMilliseconds($answeredAt, false)), 0);
+    }
+
+    /**
+     * Moment zdobycia ostatniego punktu (ms od startu meczu). Null, gdy gracz nie ma poprawnych odpowiedzi.
+     */
+    protected function lastCorrectAnswerElapsedMs(RankedMatch $match, RankedMatchPlayer $player): ?int
+    {
+        $value = $match->answers
+            ->where('user_id', $player->user_id)
+            ->where('is_correct', true)
+            ->max(fn (RankedMatchAnswer $answer) => $answer->elapsed_ms ?? $this->elapsedMsSinceMatchStart(
+                $match,
+                $answer->answered_at ?? now(),
+            ));
+
+        return $value === null ? null : (int) $value;
     }
 
     /**
@@ -604,12 +676,18 @@ class RankedMatchService
             $loser = $winner->is($playerOne) ? $playerTwo : $playerOne;
             $scoreOne = $winner->is($playerOne) ? 1.0 : 0.0;
             $scoreTwo = $winner->is($playerTwo) ? 1.0 : 0.0;
-        } elseif ($playerOne->sum_response_time_ms !== $playerTwo->sum_response_time_ms) {
-            $reason = 'faster_time';
-            $winner = $playerOne->sum_response_time_ms < $playerTwo->sum_response_time_ms ? $playerOne : $playerTwo;
-            $loser = $winner->is($playerOne) ? $playerTwo : $playerOne;
-            $scoreOne = $winner->is($playerOne) ? 1.0 : 0.0;
-            $scoreTwo = $winner->is($playerTwo) ? 1.0 : 0.0;
+        } else {
+            // Remis punktowy: wygrywa ten, kto zdobył ostatni punkt wcześniej (czas mierzony na serwerze).
+            $lastPointOne = $this->lastCorrectAnswerElapsedMs($match, $playerOne);
+            $lastPointTwo = $this->lastCorrectAnswerElapsedMs($match, $playerTwo);
+
+            if ($lastPointOne !== null && $lastPointTwo !== null && $lastPointOne !== $lastPointTwo) {
+                $reason = 'faster_time';
+                $winner = $lastPointOne < $lastPointTwo ? $playerOne : $playerTwo;
+                $loser = $winner->is($playerOne) ? $playerTwo : $playerOne;
+                $scoreOne = $winner->is($playerOne) ? 1.0 : 0.0;
+                $scoreTwo = $winner->is($playerTwo) ? 1.0 : 0.0;
+            }
         }
 
         $ratingOne = $this->ensureRating($playerOne->user);
@@ -730,11 +808,20 @@ class RankedMatchService
             $this->expireTimedOutQueuedEntries();
             $queueEntry = $this->activeQueueEntry($user);
 
-            if (! $queueEntry || $queueEntry->status !== 'server_full') {
+            if (! $queueEntry) {
                 return;
             }
 
-            $this->refreshServerFullQueueEntry($queueEntry);
+            if ($queueEntry->status === 'queued') {
+                // Dwa równoczesne dołączenia mogą się minąć; ponowna próba przy odświeżeniu stanu łączy je w mecz.
+                $this->matchQueueEntryIfPossible($queueEntry);
+
+                return;
+            }
+
+            if ($queueEntry->status === 'server_full') {
+                $this->refreshServerFullQueueEntry($queueEntry);
+            }
         });
     }
 
@@ -790,7 +877,7 @@ class RankedMatchService
                 ...($queueEntry->payload ?? []),
                 'error_code' => 'SERVER_FULL',
                 'message' => sprintf(
-                    'Server full (%d/%d). Waiting for space...',
+                    'Brak wolnych miejsc (%d/%d). Czekasz na wolne miejsce…',
                     $normalizedCapacity,
                     self::MAX_CONCURRENT_PLAYERS,
                 ),
@@ -831,18 +918,28 @@ class RankedMatchService
     protected function matchQueueEntryIfPossible(RankedQueueEntry $queueEntry): RankedQueueEntry
     {
         $this->expireTimedOutQueuedEntries();
-        $queueEntry = $queueEntry->fresh(['licenseCategory', 'match']) ?? $queueEntry;
 
-        if ($queueEntry->status !== 'queued') {
-            return $queueEntry;
+        // Blokada własnego wpisu i pominięcie wpisów zablokowanych przez równoległe dobieranie:
+        // dwa jednoczesne dołączenia nie mogą wybrać tego samego przeciwnika.
+        $lockedEntry = RankedQueueEntry::query()
+            ->whereKey($queueEntry->getKey())
+            ->lockForUpdate()
+            ->first();
+
+        if (! $lockedEntry || $lockedEntry->status !== 'queued') {
+            return $queueEntry->fresh(['licenseCategory', 'match']) ?? $queueEntry;
         }
 
+        $queueEntry = $lockedEntry;
+
+        // Separacja kategorii: przeciwnik zawsze z tej samej kategorii prawa jazdy.
         $opponentQueueEntry = RankedQueueEntry::query()
             ->where('license_category_id', $queueEntry->license_category_id)
             ->where('status', 'queued')
             ->where('user_id', '!=', $queueEntry->user_id)
             ->orderBy('joined_at')
             ->orderBy('id')
+            ->lock($this->skipLockedClause())
             ->first();
 
         if (! $opponentQueueEntry) {
@@ -1404,6 +1501,20 @@ class RankedMatchService
         );
     }
 
+    /**
+     * PostgreSQL: FOR UPDATE SKIP LOCKED. SQLite ignoruje blokady wierszy (cała baza jest blokowana zapisem).
+     */
+    protected function skipLockedClause(): string|bool
+    {
+        return in_array(DB::connection()->getDriverName(), ['pgsql', 'mysql', 'mariadb'], true)
+            ? 'for update skip locked'
+            : true;
+    }
+
+    /**
+     * Ponawia transakcję przy chwilowych konfliktach: SQLite „database is locked”,
+     * PostgreSQL deadlock (40P01) i błąd serializacji (40001).
+     */
     protected function runWithSqliteBusyRetry(callable $callback): mixed
     {
         $attempts = 5;
@@ -1412,9 +1523,7 @@ class RankedMatchService
             try {
                 return DB::transaction($callback);
             } catch (QueryException $exception) {
-                $message = strtolower($exception->getMessage());
-
-                if (! str_contains($message, 'database is locked') || $attempt === $attempts) {
+                if (! $this->isRetryableTransactionConflict($exception) || $attempt === $attempts) {
                     throw $exception;
                 }
 
@@ -1422,6 +1531,19 @@ class RankedMatchService
             }
         }
 
-        throw new \RuntimeException('Unexpected SQLite retry flow exit.');
+        throw new \RuntimeException('Unexpected transaction retry flow exit.');
+    }
+
+    protected function isRetryableTransactionConflict(QueryException $exception): bool
+    {
+        if ($exception instanceof UniqueConstraintViolationException) {
+            return false;
+        }
+
+        if (in_array((string) $exception->getCode(), ['40001', '40P01'], true)) {
+            return true;
+        }
+
+        return str_contains(strtolower($exception->getMessage()), 'database is locked');
     }
 }

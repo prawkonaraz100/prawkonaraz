@@ -559,6 +559,9 @@ test('ranking mode page renders with the users preferred category and transport 
             ->where('leaderboard.0.position', 1)
             ->where('leaderboard.1.username', 'Ranking Two')
             ->where('leaderboard.1.position', 2)
+            ->where('currentUserRanking.position', 3)
+            ->where('currentUserRanking.rating', 1490)
+            ->where('currentUserRanking.total_players', 3)
         );
 });
 
@@ -777,6 +780,47 @@ test('ranking mode page ignores stale category query values in the url', functio
             ->component('Session/Ranking')
             ->where('selectedCategory.code', 'B')
             ->where('selectedCategory.short_name', 'B')
+        );
+});
+
+test('ranking mode page uses the category from the link for users who can study every category', function () {
+    $user = User::factory()->testAccount()->create();
+    $categoryB = LicenseCategory::factory()->create(['code' => 'B', 'name' => 'Kategoria B', 'sort_order' => 10]);
+    $categoryC = LicenseCategory::factory()->create(['code' => 'C', 'name' => 'Kategoria C', 'sort_order' => 20]);
+
+    foreach ([$categoryB, $categoryC] as $category) {
+        Question::factory()->for($category, 'licenseCategory')->create();
+    }
+
+    $this->actingAs($user)
+        ->get(route('session.ranking', ['category' => $categoryC->getKey()]))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Session/Ranking')
+            ->where('selectedCategory.code', 'C')
+            ->where('currentUserRanking', null)
+        );
+});
+
+test('ranking mode page without a category link uses the learning category from the profile', function () {
+    $user = User::factory()->testAccount()->create();
+    $categoryB = LicenseCategory::factory()->create(['code' => 'B', 'name' => 'Kategoria B', 'sort_order' => 10]);
+    $categoryC = LicenseCategory::factory()->create(['code' => 'C', 'name' => 'Kategoria C', 'sort_order' => 20]);
+
+    foreach ([$categoryB, $categoryC] as $category) {
+        Question::factory()->for($category, 'licenseCategory')->create();
+    }
+
+    UserProfile::factory()
+        ->for($user, 'user')
+        ->create(['target_category_id' => $categoryC->getKey()]);
+
+    $this->actingAs($user)
+        ->get(route('session.ranking'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Session/Ranking')
+            ->where('selectedCategory.code', 'C')
         );
 });
 

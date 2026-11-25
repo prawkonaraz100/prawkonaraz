@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LicenseCategory;
 use App\Models\RankedPlayerRating;
 use App\Support\RankedMatchService;
 use App\Support\RankedWebSocketTicketService;
@@ -57,11 +58,7 @@ class RankedSessionPageController extends Controller
             ? 'websocket'
             : ($sseEnabled ? 'sse' : 'polling');
 
-        $categories = $studyContextService->activeCategories($request->user());
-        $rankedCategory = $request->user()?->canUseAllStudyCategories()
-            ? $categories->firstWhere('code', 'B')
-            : null;
-        $selectedCategory = $rankedCategory ?? $categories->first();
+        $selectedCategory = $this->resolveRankedCategory($request, $studyContextService);
         $leaderboard = RankedPlayerRating::query()
             ->with(['user:id,name'])
             ->whereHas('user')
@@ -76,23 +73,9 @@ class RankedSessionPageController extends Controller
             ->limit(10)
             ->get()
             ->values()
-            ->map(fn (RankedPlayerRating $rating, int $index) => [
-                'position' => $index + 1,
-                'user_id' => $rating->user_id,
-                'username' => $rating->user?->name ?? 'Gracz',
-                'rating' => $rating->rating,
-                'peak_rating' => $rating->peak_rating,
-                'matches_played' => $rating->matches_played,
-                'wins' => $rating->wins,
-                'losses' => $rating->losses,
-                'draws' => $rating->draws,
-                'current_streak' => $rating->current_streak,
-                'best_streak' => $rating->best_streak,
-                'win_rate' => $rating->matches_played > 0
-                    ? (int) round(($rating->wins / $rating->matches_played) * 100)
-                    : null,
-            ])
+            ->map(fn (RankedPlayerRating $rating, int $index) => $this->leaderboardEntry($rating, $index + 1))
             ->all();
+        $currentUserRanking = $this->currentUserRanking($request);
 
         return Inertia::render('Session/Ranking', [
             'selectedCategory' => $selectedCategory ? [
@@ -106,6 +89,7 @@ class RankedSessionPageController extends Controller
                 ? 'lobby'
                 : null,
             'leaderboard' => $leaderboard,
+            'currentUserRanking' => $currentUserRanking,
             'specSummary' => [
                 'api_version' => '1.0',
                 'match_channel_pattern' => 'match:{match_id}',
@@ -138,5 +122,99 @@ class RankedSessionPageController extends Controller
                 ],
             ],
         ]);
+    }
+
+    /**
+     * Kategoria kolejki: z linku (?category=), jeśli gracz może jej używać; potem kategoria nauki
+     * z profilu; na końcu B albo pierwsza dostępna. Kursy samodzielne (ADR, Kod 95) nie mają rankingu.
+     */
+    private function resolveRankedCategory(Request $request, StudyContextService $studyContextService): ?LicenseCategory
+    {
+        $user = $request->user();
+        $candidates = $studyContextService->activeCategories($user);
+
+        if ($candidates->isEmpty()) {
+            return null;
+        }
+
+        $requestedId = $request->integer('category') ?: null;
+        $user?->loadMissing('profile:user_id,target_category_id');
+        $profileCategoryId = $user?->profile?->target_category_id;
+
+        foreach ([$requestedId, $profileCategoryId] as $categoryId) {
+            if (! $categoryId) {
+                continue;
+            }
+
+            $match = $candidates->first(fn (LicenseCategory $category): bool => (int) $category->getKey() === (int) $categoryId);
+
+            if ($match) {
+                return $match;
+            }
+        }
+
+        return $candidates->firstWhere('code', 'B') ?? $candidates->first();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function leaderboardEntry(RankedPlayerRating $rating, int $position): array
+    {
+        return [
+            'position' => $position,
+            'user_id' => $rating->user_id,
+            'username' => $rating->user?->name ?? 'Gracz',
+            'rating' => $rating->rating,
+            'peak_rating' => $rating->peak_rating,
+            'matches_played' => $rating->matches_played,
+            'wins' => $rating->wins,
+            'losses' => $rating->losses,
+            'draws' => $rating->draws,
+            'current_streak' => $rating->current_streak,
+            'best_streak' => $rating->best_streak,
+            'win_rate' => $rating->matches_played > 0
+                ? (int) round(($rating->wins / $rating->matches_played) * 100)
+                : null,
+        ];
+    }
+
+    /**
+     * Własne miejsce w rankingu (ta sama kolejność co lista „Najlepsi gracze”). Null przed pierwszym meczem.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function currentUserRanking(Request $request): ?array
+    {
+        $user = $request->user();
+
+        if (! $user) {
+            return null;
+        }
+
+        $rating = RankedPlayerRating::query()
+            ->with(['user:id,name'])
+            ->where('user_id', $user->getKey())
+            ->first();
+
+        if (! $rating || $rating->matches_played < 1) {
+            return null;
+        }
+
+        $playersAhead = RankedPlayerRating::query()
+            ->whereHas('user')
+            ->where('user_id', '!=', $user->getKey())
+            ->where(function ($query) use ($rating): void {
+                $query->where('rating', '>', $rating->rating)
+                    ->orWhere(fn ($tie) => $tie->where('rating', $rating->rating)->where('peak_rating', '>', $rating->peak_rating))
+                    ->orWhere(fn ($tie) => $tie->where('rating', $rating->rating)->where('peak_rating', $rating->peak_rating)->where('wins', '>', $rating->wins))
+                    ->orWhere(fn ($tie) => $tie->where('rating', $rating->rating)->where('peak_rating', $rating->peak_rating)->where('wins', $rating->wins)->where('matches_played', '>', $rating->matches_played));
+            })
+            ->count();
+
+        return [
+            ...$this->leaderboardEntry($rating, $playersAhead + 1),
+            'total_players' => RankedPlayerRating::query()->whereHas('user')->count(),
+        ];
     }
 }

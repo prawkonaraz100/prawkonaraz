@@ -257,7 +257,8 @@ class RankedMatchPayloadBuilder
                     $answer = $answerMap->get($question->getKey());
 
                     return [
-                        ...$this->studySessionApiPayloadBuilder->question($question, null, $isCompleted),
+                        // Wyjaśnienia (także obrazkowe) dopiero po meczu, żeby nie podpowiadały odpowiedzi w trakcie.
+                        ...$this->studySessionApiPayloadBuilder->question($question, null, $isCompleted, $isCompleted),
                         'question_number' => $index + 1,
                         'selected_answer' => $answer?->selected_answer ? Str::upper($answer->selected_answer) : null,
                         'is_answered' => $answer !== null,
