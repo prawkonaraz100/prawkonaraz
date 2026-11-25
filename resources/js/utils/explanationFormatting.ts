@@ -19,7 +19,7 @@ export type ExplanationSignReference = {
     image_url: string;
     alt_text?: string | null;
     match_text?: string | null;
-    placement?: 'replace' | 'after';
+    placement?: 'replace' | 'after' | 'after_each';
     reference_key?: string;
 };
 
@@ -219,7 +219,9 @@ export const injectExplanationSignImages = (
                 ? part.replace(replacementMatcher, (match, prefix: string, code: string) => {
                     const reference = replacementReferencesByCode.get(signReferenceKey(code));
 
-                    return reference ? `${prefix}${signImageMarkup(reference)}` : match;
+                    if (!reference) return match;
+                    const label = reference.placement === 'after_each' ? code : '';
+                    return prefix + label + signImageMarkup(reference);
                 })
                 : part;
 

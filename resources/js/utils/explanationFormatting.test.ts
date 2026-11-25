@@ -25,6 +25,11 @@ describe('explanationFormatting', () => {
         expect(rendered).toBe('<span style="color:#163222;"><strong>tekst</strong></span>');
     });
 
+    it('renders a training question without leaking markers or applying their colors and bold text', () => {
+        expect(renderExamPromptHtml('Czy w tym miejscu [red]**wolno** Ci[/red] **skręcić w lewo** i **wjechać** na **stację paliw**?'))
+            .toBe('Czy w tym miejscu wolno Ci skręcić w lewo i wjechać na stację paliw?');
+    });
+
     it('keeps bold and strips color markers when colors are disabled', () => {
         const rendered = renderInlineFormattedHtml('[green]**tekst**[/green]', {
             palette: 'classic',
