@@ -47,8 +47,14 @@ class RankedMatchService
     public function overview(User $user): array
     {
         $rating = $this->ensureRating($user);
-        $this->reconcileQueueAvailability($user);
         $activeMatch = $this->activeMatch($user);
+
+        // Kolejkę porządkujemy tylko poza meczem: w trakcie meczu każdy tick streamu
+        // robiłby niepotrzebny UPDATE wygaszania i zapytania o wpis w kolejce.
+        if (! $activeMatch) {
+            $this->reconcileQueueAvailability($user);
+            $activeMatch = $this->activeMatch($user);
+        }
 
         return [
             'rating' => $rating,
@@ -330,7 +336,8 @@ class RankedMatchService
 
     public function activeMatch(User $user): ?RankedMatch
     {
-        $match = $this->findActiveMatchForUser($user);
+        // Bez eager loadingu: syncMatchPresence i tak ładuje mecz ponownie w transakcji.
+        $match = $this->findActiveMatchForUser($user, withRelations: false);
 
         if (! $match) {
             return null;
@@ -341,7 +348,10 @@ class RankedMatchService
         return $this->isActiveMatch($match) ? $match : null;
     }
 
-    public function matchForUser(User $user, string $publicId): RankedMatch
+    /**
+     * @param  bool  $sync  false, gdy wywołujący przed chwilą wykonał przejścia stanu (np. zapis odpowiedzi)
+     */
+    public function matchForUser(User $user, string $publicId, bool $sync = true): RankedMatch
     {
         $match = RankedMatch::query()
             ->with($this->defaultMatchRelations())
@@ -349,7 +359,7 @@ class RankedMatchService
             ->whereHas('players', fn ($query) => $query->where('user_id', $user->getKey())->where('is_replay', false))
             ->firstOrFail();
 
-        return $this->syncMatchPresence($match);
+        return $sync ? $this->syncMatchPresence($match) : $match;
     }
 
     public function recordPong(RankedMatch $rankedMatch, User $user): RankedMatch
@@ -510,15 +520,11 @@ class RankedMatchService
     ): array {
         return $this->runWithSqliteBusyRetry(function () use ($question, $rankedMatch, $selectedAnswer, $user): array {
             // Blokada wiersza meczu szereguje odpowiedzi obu graczy i chroni liczniki przed wyścigiem.
-            RankedMatch::query()
-                ->whereKey($rankedMatch->getKey())
-                ->lockForUpdate()
-                ->firstOrFail();
-
             /** @var RankedMatch $match */
             $match = RankedMatch::query()
-                ->with(['players', 'players.user', 'answers', 'queueEntries'])
+                ->with($this->defaultMatchRelations())
                 ->whereKey($rankedMatch->getKey())
+                ->lockForUpdate()
                 ->firstOrFail();
 
             $match = $this->applyPresenceTransitions($match, now());
@@ -532,7 +538,6 @@ class RankedMatchService
             abort_unless($player !== null, 403);
 
             $this->markPlayerOnline($match, $player, now());
-            $match = $this->freshMatch($match) ?? $match;
 
             if ($match->status === 'matched') {
                 throw ValidationException::withMessages([
@@ -596,7 +601,8 @@ class RankedMatchService
             $this->refreshPlayerAggregates($match);
             $this->maybeFinishMatch($match);
 
-            return [$answer, $this->freshMatch($match) ?? $match];
+            // Kontroler i tak odczytuje mecz ponownie (matchForUser), więc bez przeładowania tutaj.
+            return [$answer, $match];
         });
     }
 
@@ -642,23 +648,37 @@ class RankedMatchService
 
     protected function refreshPlayerAggregates(RankedMatch $match): void
     {
-        $match->load('players', 'answers');
+        $match->loadMissing('players');
+
+        // Jedno zapytanie z agregatami zamiast ładowania wszystkich odpowiedzi meczu.
+        $totals = RankedMatchAnswer::query()
+            ->where('ranked_match_id', $match->getKey())
+            ->groupBy('user_id')
+            ->selectRaw('user_id, COUNT(*) AS total_answered, SUM(CASE WHEN is_correct THEN 1 ELSE 0 END) AS correct_answers, COALESCE(SUM(response_time_ms), 0) AS sum_response_time_ms')
+            ->get()
+            ->keyBy('user_id');
 
         foreach ($match->players as $player) {
-            $answers = $match->answers->where('user_id', $player->user_id)->values();
+            $row = $totals->get($player->user_id);
+            $correct = (int) ($row->correct_answers ?? 0);
 
+            // save() bez zmian nie wysyła zapytania, więc aktualizujemy tylko gracza, który odpowiedział.
             $player->forceFill([
-                'correct_answers' => $answers->where('is_correct', true)->count(),
-                'total_answered' => $answers->count(),
-                'points' => $answers->where('is_correct', true)->count(),
-                'sum_response_time_ms' => (int) $answers->sum('response_time_ms'),
+                'correct_answers' => $correct,
+                'total_answered' => (int) ($row->total_answered ?? 0),
+                'points' => $correct,
+                'sum_response_time_ms' => (int) ($row->sum_response_time_ms ?? 0),
             ])->save();
         }
+
+        $match->unsetRelation('answers');
     }
 
     protected function maybeFinishMatch(RankedMatch $match): void
     {
-        $match->load('players', 'players.user', 'answers');
+        // Liczniki graczy są już aktualne w pamięci (refreshPlayerAggregates); odpowiedzi i użytkowników
+        // doładowuje dopiero finishMatch, gdy mecz faktycznie się kończy.
+        $match->loadMissing('players');
 
         $allPlayersFinished = $match->players->every(
             fn (RankedMatchPlayer $player) => $player->is_replay
@@ -1088,10 +1108,10 @@ class RankedMatchService
         ];
     }
 
-    protected function findActiveMatchForUser(User $user): ?RankedMatch
+    protected function findActiveMatchForUser(User $user, bool $withRelations = true): ?RankedMatch
     {
         return RankedMatch::query()
-            ->with($this->defaultMatchRelations())
+            ->when($withRelations, fn ($query) => $query->with($this->defaultMatchRelations()))
             ->whereIn('status', ['matched', 'in_progress'])
             ->whereHas('players', fn ($query) => $query->where('user_id', $user->getKey())->where('is_replay', false))
             ->latest('id')
