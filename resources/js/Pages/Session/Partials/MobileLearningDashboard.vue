@@ -1,11 +1,16 @@
 <script setup lang="ts">
+import MobileStreakLeaderboard from './MobileStreakLeaderboard.vue';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import type { PageProps } from '@/types';
 import type { LearningProgressMessage } from '@/types/learningProgress';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
-import MobileLearningAppBar from '@/Pages/Session/Partials/MobileLearningAppBar.vue';
+import { apiClient } from '@/lib/apiClient';
+import type { StreakLeader } from '@/utils/streakDuration';
+import '../../../../css/barlow.css';
+import MobileTopicCarousel from '@/Pages/Session/Partials/MobileTopicCarousel.vue';
+import SessionReplacementDialog from '@/Components/SessionReplacementDialog.vue';
+import LicenseCategoryVehicle from '@/Components/LicenseCategoryVehicle.vue';
 import { topicArtworkForKey } from '@/lib/topicArtwork';
-import mobileDashboardHero from '../../../../images/session/mobile-dashboard-hero.png';
 import mobileRankingPodium from '../../../../images/session/mobile-ranking-podium.png';
 
 type LearningPath = 'pjm' | 'traffic-signs' | 'classic' | 'zen' | 'exam' | 'memory' | 'ranking';
@@ -50,6 +55,13 @@ interface RankingPreview {
     message: string;
 }
 
+interface ProfessionalCourseTile {
+    id: number;
+    code: string;
+    name: string;
+    progress: { percent: number };
+}
+
 interface ActiveLearningSession {
     id: number;
     mode: string;
@@ -71,6 +83,7 @@ interface ActiveLearningSession {
 
 interface LearningDashboard {
     schema_version: number;
+    last_topic_id?: number | null;
     active_session: ActiveLearningSession | null;
     progress_message: LearningProgressMessage;
     course_progress: {
@@ -102,6 +115,7 @@ interface LearningDashboard {
 }
 
 const props = defineProps<{
+    loadArtwork: boolean;
     learningPathTabs: LearningPathTab[];
     selectedPath: LearningPath;
     learningDashboard: LearningDashboard;
@@ -125,13 +139,12 @@ const props = defineProps<{
     totalUnansweredQuestions: number;
     totalIncorrectQuestions: number;
     hasGlobalIncorrectQuestions: boolean;
-    managedIncorrectListEnabled: boolean;
-    incorrectQuestionsUrl: string;
     examFacts: ExamFact[];
     trafficSignLearningHref: string;
     categoryStatsHref: string;
     rankingModeHref: string;
     rankingPreview: RankingPreview;
+    professionalCourses?: ProfessionalCourseTile[];
     errors: {
         license_category_id?: string;
         question_topic_id?: string;
@@ -141,6 +154,18 @@ const props = defineProps<{
 
 const page = usePage<PageProps>();
 const firstName = computed(() => page.props.auth.user?.name?.trim().split(/\s+/)[0] || 'Kursancie');
+const avatarUrl = computed(() => page.props.auth.user?.avatar_url ?? null);
+const avatarInitials = computed(() => {
+    const user = page.props.auth.user;
+    if (user?.avatar_initials) return user.avatar_initials;
+
+    return (user?.name?.trim() || 'Kursant')
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part.charAt(0).toLocaleUpperCase('pl-PL'))
+        .join('') || 'K';
+});
 
 const emit = defineEmits<{
     (event: 'select-path', path: LearningPath): void;
@@ -152,6 +177,7 @@ const emit = defineEmits<{
     (event: 'choose-scope', scope: 'all' | 'basic' | 'specialist'): void;
     (event: 'choose-status', status: string): void;
     (event: 'start-global-incorrect-learning'): void;
+    (event: 'select-professional-course', code: string): void;
 }>();
 
 const isClassicPath = computed(() => props.selectedPath === 'classic');
@@ -166,28 +192,30 @@ const isPjmPath = computed(() => props.selectedPath === 'pjm');
 const isTrafficSignsPath = computed(() => props.selectedPath === 'traffic-signs');
 const isRankingPath = computed(() => props.selectedPath === 'ranking');
 const activeSession = computed(() => props.learningDashboard.active_session);
+const pendingSessionStart = ref<(() => void) | null>(null);
+const sessionStartBusy = computed(() => props.sessionProcessing || props.globalIncorrectProcessing);
+const requestSessionStart = (start: () => void) => {
+    if (sessionStartBusy.value || pendingSessionStart.value) return;
+    if (activeSession.value) pendingSessionStart.value = start;
+    else start();
+};
+const cancelSessionReplacement = () => { pendingSessionStart.value = null; };
+const confirmSessionReplacement = () => {
+    if (sessionStartBusy.value) return;
+    const start = pendingSessionStart.value;
+    // Clear synchronously so repeated clicks cannot start the action twice.
+    pendingSessionStart.value = null;
+    start?.();
+};
+watch(() => activeSession.value?.id, cancelSessionReplacement);
 const showLearningSetup = ref(false);
 const showTopicPathPicker = ref(false);
 const topicPickerFromSetup = ref(false);
 const selectedClassicPracticeMode = ref<ClassicPracticeMode>(
     props.sessionQuestionStatus === 'incorrect' ? 'incorrect' : 'all',
 );
-const quickStartTabs = computed(() =>
-    props.learningPathTabs.filter((tab) =>
-        tab.value !== 'classic'
-        && tab.value !== 'exam'
-        && tab.value !== 'memory'
-        && tab.value !== 'zen',
-    ),
-);
 const canOpenClassic = computed(() => !props.learningPathTabs.find((tab) => tab.value === 'classic')?.disabled);
 const canOpenExam = computed(() => !props.learningPathTabs.find((tab) => tab.value === 'exam')?.disabled);
-const reviewShortcutCount = computed(() => props.managedIncorrectListEnabled
-    ? props.totalIncorrectQuestions
-    : props.learningDashboard.review.due_count);
-const reviewShortcutHref = computed(() => props.managedIncorrectListEnabled
-    ? props.incorrectQuestionsUrl
-    : route('review-queue.index'));
 const selectedTopic = computed(() =>
     props.filteredGroupOptions
         .flatMap((group) => group.options)
@@ -206,20 +234,7 @@ const fieldError = computed(() =>
 
 const courseProgress = computed(() => props.learningDashboard.course_progress);
 const courseProgressPercent = computed(() => courseProgress.value.percent);
-const featuredTopicKeys = [
-    'warning_signs',
-    'prohibition_and_mandatory_signs',
-    'informational_direction_and_supplementary_signs',
-    'traffic_lights_and_controller_signals',
-];
-const popularTopics = computed(() => {
-    const topics = props.allGroupOptions.flatMap((group) => group.options);
-    const featured = featuredTopicKeys
-        .map((key) => topics.find((topic) => topic.key === key))
-        .filter((topic): topic is GroupOption => Boolean(topic));
-
-    return [...featured, ...topics.filter((topic) => !featured.some((item) => item.id === topic.id))].slice(0, 4);
-});
+const carouselTopics = computed(() => props.allGroupOptions.flatMap((group) => group.options));
 const activeSessionPositionLabel = computed(() => {
     if (!activeSession.value) {
         return '';
@@ -240,6 +255,77 @@ const rankingRatingLabel = computed(() =>
 const rankingMessage = computed(() =>
     props.rankingPreview.message || 'Zobacz swoją pozycję wśród najlepszych.',
 );
+
+interface ModeTile {
+    key: string;
+    title: string;
+    href: string;
+    locked: boolean;
+    statLabel: string;
+    statValue: string | number | null;
+    iconPaths: string[];
+    iconColor: string;
+    iconBackground: string;
+}
+
+const streakBest = ref<number | null>(null);
+const streakLeaders = ref<StreakLeader[]>([]);
+let streakOverviewRequested = false;
+const streakOverviewLoading = ref(false);
+const topStreakLeaders = computed(() => streakLeaders.value.slice(0, 3));
+const trainingHref = computed(() => `${route('session.index')}?widok=trening`);
+const professionalCourseTiles = computed(() => props.professionalCourses ?? []);
+const professionalCourseAccent = (index: number) => ['#ffc94a', '#7ab8ff', '#ff9f6b', '#81b64c'][index % 4];
+
+const loadStreakOverview = async () => {
+    if (!props.canUseFullProduct || desktopViewport?.matches || streakOverviewRequested) return;
+
+    streakOverviewRequested = true;
+    streakOverviewLoading.value = true;
+    try {
+        const overview = await apiClient.get<{ personal_best?: number; leaderboard?: StreakLeader[] }>(
+            route('streak-challenge.state'),
+            { timeoutMs: 8000 },
+        );
+        streakBest.value = typeof overview.personal_best === 'number' ? overview.personal_best : null;
+        streakLeaders.value = Array.isArray(overview.leaderboard) ? overview.leaderboard : [];
+    } catch {
+        // The home screen stays usable without the optional streak summary.
+        streakOverviewRequested = false;
+    } finally {
+        streakOverviewLoading.value = false;
+    }
+};
+
+const modeTiles = computed<ModeTile[]>(() => {
+    const locked = !props.canUseFullProduct;
+    const tiles: ModeTile[] = [
+        {
+            key: 'streak',
+            title: 'Seria bez błędu',
+            href: trainingHref.value,
+            locked,
+            statLabel: streakBest.value !== null || streakOverviewLoading.value ? 'Rekord' : 'Pobij swój rekord',
+            statValue: streakOverviewLoading.value ? '–' : streakBest.value,
+            iconPaths: ['M13 2L3 14h9l-1 8 10-12h-9l1-8z'],
+            iconColor: '#ffc94a',
+            iconBackground: '#3a2f1c',
+        },
+        {
+            key: 'ranking',
+            title: 'Ranking 1 na 1',
+            href: props.rankingModeHref,
+            locked,
+            statLabel: props.rankingPreview.rating !== null ? 'Punkty' : 'Zagraj z innymi',
+            statValue: props.rankingPreview.rating,
+            iconPaths: ['M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2', 'M9 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z', 'M23 21v-2a4 4 0 0 0-3-3.87', 'M16 3.13a4 4 0 0 1 0 7.75'],
+            iconColor: '#7ab8ff',
+            iconBackground: '#1c2c3d',
+        },
+    ];
+
+    return tiles;
+});
 
 const openLearningSetup = (path: LearningPath = 'classic') => {
     if (path === 'classic' || path === 'zen') {
@@ -304,21 +390,10 @@ const chooseTopicFromSheet = (topicId: number) => {
         return;
     }
 
-    if (props.sessionProcessing || !confirmReplacingActiveSession()) {
-        return;
-    }
-
-    closeLearningSetup();
-    emit('start-topic-learning', topicId);
-};
-
-const confirmReplacingActiveSession = () =>
-    !activeSession.value || window.confirm('Masz rozpoczętą sesję. Nowa seria zakończy ją przed rozpoczęciem kolejnej. Kontynuować?');
-
-const startReviewShortcut = () => {
-    if (confirmReplacingActiveSession()) {
-        emit('start-global-incorrect-learning');
-    }
+    requestSessionStart(() => {
+        closeLearningSetup();
+        emit('start-topic-learning', topicId);
+    });
 };
 
 const startFeaturedTopic = (topicId: number) => {
@@ -327,9 +402,9 @@ const startFeaturedTopic = (topicId: number) => {
         return;
     }
 
-    if (!props.sessionProcessing && confirmReplacingActiveSession()) {
+    requestSessionStart(() => {
         emit('start-topic-learning', topicId);
-    }
+    });
 };
 
 const selectStudyPresentation = (path: 'classic' | 'zen') => {
@@ -349,42 +424,12 @@ const chooseClassicPracticeMode = (mode: ClassicPracticeMode) => {
 };
 
 const startFromSetup = () => {
-    if (!confirmReplacingActiveSession()) {
-        return;
-    }
-
-    closeLearningSetup();
-
-    if (isClassicPath.value && selectedClassicPracticeMode.value === 'global-incorrect') {
-        emit('start-global-incorrect-learning');
-        return;
-    }
-
-    emit('start-learning');
-};
-
-const quickStartAccentClass = (path: LearningPath) => {
-    if (path === 'exam') {
-        return 'bg-[#f59e0b]';
-    }
-
-    if (path === 'traffic-signs') {
-        return 'bg-[#2563eb]';
-    }
-
-    if (path === 'ranking') {
-        return 'bg-[#6d5bd0]';
-    }
-
-    if (path === 'zen') {
-        return 'bg-[#111827]';
-    }
-
-    if (path === 'pjm') {
-        return 'bg-[#0ea5e9]';
-    }
-
-    return 'bg-[#023ea4]';
+    if (setupStartDisabled.value) return;
+    requestSessionStart(() => {
+        closeLearningSetup();
+        if (isClassicPath.value && selectedClassicPracticeMode.value === 'global-incorrect') emit('start-global-incorrect-learning');
+        else emit('start-learning');
+    });
 };
 
 const topicIconLabel = (option: GroupOption) =>
@@ -555,6 +600,9 @@ const closeOnEscape = (event: KeyboardEvent) => {
         return;
     }
 
+    // The top-layer confirmation handles Escape, not the underlying setup.
+    if (pendingSessionStart.value) return;
+
     if (showTopicPathPicker.value) {
         if (topicPickerFromSetup.value) {
             closeTopicPathPicker();
@@ -578,225 +626,220 @@ watch(
     },
 );
 
-watch(showLearningSetup, (isOpen) => {
+let previousBodyOverflow: string | null = null;
+watch([showLearningSetup, pendingSessionStart], ([isOpen, pending]) => {
     if (!isOpen) {
         closeTopicPathPicker();
     }
 
-    document.body.style.overflow = isOpen ? 'hidden' : '';
+    if (isOpen || pending) {
+        previousBodyOverflow ??= document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+    } else if (previousBodyOverflow !== null) {
+        document.body.style.overflow = previousBodyOverflow;
+        previousBodyOverflow = null;
+    }
 });
 
+const desktopViewport = typeof window !== 'undefined' ? window.matchMedia('(min-width: 768px)') : null;
+const syncMobileViewport = () => {
+    if (desktopViewport?.matches) {
+        cancelSessionReplacement();
+    } else {
+        void loadStreakOverview();
+    }
+};
 onMounted(() => {
+    syncMobileViewport();
     document.addEventListener('keydown', closeOnEscape);
+    desktopViewport?.addEventListener('change', syncMobileViewport);
 });
 
 onUnmounted(() => {
     document.removeEventListener('keydown', closeOnEscape);
-    document.body.style.overflow = '';
+    desktopViewport?.removeEventListener('change', syncMobileViewport);
+    if (previousBodyOverflow !== null) document.body.style.overflow = previousBodyOverflow;
 });
 </script>
 
 <template>
-    <section class="mobile-learning-dashboard mx-auto min-h-screen max-w-[30rem] bg-[#faf9f7] px-4 pb-5 md:hidden" aria-label="Mobilny panel nauki">
-        <div>
-            <header class="relative -mx-4 h-[13.7rem] overflow-hidden bg-[#faf9f7]" aria-label="Powitanie">
-                <img :src="mobileDashboardHero" alt="" aria-hidden="true" class="absolute bottom-0 right-0 h-auto w-[75%] max-w-none">
-                <div class="pointer-events-none absolute inset-0" style="background: linear-gradient(90deg, #faf9f7 0%, rgba(250, 249, 247, .92) 30%, rgba(250, 249, 247, 0) 64%)" />
-                <MobileLearningAppBar />
-                <div class="absolute bottom-[1.85rem] left-5 z-10 max-w-[58%]">
-                    <h1 class="break-words text-[clamp(1.9rem,7.9vw,2.3rem)] font-extrabold leading-[1.03] tracking-[-0.052em] text-[#070d19]">
-                        Cześć<br>{{ firstName }}!
-                    </h1>
-                    <p class="mt-2.5 text-[0.8rem] leading-[1.35rem] text-[#657081]">
-                        Gotowy na kolejną serię pytań?<br>Wybierz tryb nauki i działaj!
-                    </p>
-                </div>
+    <SessionReplacementDialog
+        :show="pendingSessionStart !== null"
+        :session-id="activeSession?.id"
+        :session-title="activeSession?.title ?? 'Rozpoczęta sesja'"
+        :session-progress="activeSessionPositionLabel"
+        :busy="sessionStartBusy"
+        @cancel="cancelSessionReplacement"
+        @confirm="confirmSessionReplacement"
+    />
+    <section class="mobile-learning-dashboard mobile-home-dark min-h-screen bg-[#302e2b] px-3 pb-8 text-[#ffffffd9] md:hidden" aria-label="Mobilny panel nauki">
+        <div class="mx-auto max-w-[30rem]">
+            <header class="flex min-h-14 items-center justify-between gap-3 pt-[max(env(safe-area-inset-top),0.5rem)]" aria-label="Powitanie">
+                <Link
+                    href="/profile"
+                    class="flex min-h-11 min-w-0 items-center gap-3 rounded-[5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffffffd9]"
+                    aria-label="Przejdź do profilu"
+                >
+                    <span class="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-[3px] bg-[#8a6a5c] text-sm font-bold text-white">
+                        <img v-if="avatarUrl" :src="avatarUrl" alt="" class="h-full w-full object-cover" referrerpolicy="no-referrer">
+                        <span v-else>{{ avatarInitials }}</span>
+                    </span>
+                    <span class="min-w-0 truncate text-[1.0625rem] font-extrabold leading-tight text-white">Cześć, {{ firstName }}!</span>
+                </Link>
+                <span class="flex shrink-0 items-center gap-1.5" :aria-label="`Kategoria ${categoryShortName}`">
+                    <LicenseCategoryVehicle :code="categoryShortName" class="h-6 w-10 shrink-0 brightness-0 invert opacity-[0.72]" />
+                    <span class="text-[1.375rem] font-extrabold leading-none text-white">{{ categoryShortName }}</span>
+                </span>
             </header>
 
-            <Link
-                v-if="activeSession"
-                :href="activeSession.resume_url"
-                class="flex min-h-[5.65rem] items-center gap-3 rounded-[1.1rem] bg-gradient-to-br from-[#ffe59a] via-[#ffdf72] to-[#ffcd4a] px-4 py-3 text-[#101827] shadow-[0_10px_28px_rgba(202,148,31,0.10)] transition hover:brightness-[1.02] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#aa7114]"
-            >
-                <span class="grid h-14 w-14 shrink-0 place-items-center rounded-[0.95rem] bg-white/75" aria-hidden="true">
-                    <span class="grid h-8 w-8 place-items-center rounded-full bg-[#ffc532] text-lg text-white">▶</span>
-                </span>
-                <span class="min-w-0 flex-1">
-                    <span class="block text-[0.65rem] font-bold uppercase tracking-[0.12em] text-[#855414]">Szybki start</span>
-                    <span class="mt-0.5 block text-[1.15rem] font-bold leading-6">Kontynuuj naukę</span>
-                    <span class="mt-1 block truncate text-xs text-[#665c49]">{{ activeSession.title }} · {{ activeSessionPositionLabel }}</span>
-                </span>
-                <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-xl" aria-hidden="true">→</span>
-            </Link>
-            <button
-                v-else
-                type="button"
-                class="flex min-h-[5.65rem] w-full items-center gap-3 rounded-[1.1rem] bg-gradient-to-br from-[#ffe59a] via-[#ffdf72] to-[#ffcd4a] px-4 py-3 text-left text-[#101827] shadow-[0_10px_28px_rgba(202,148,31,0.10)] transition hover:brightness-[1.02] disabled:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#aa7114]"
-                :disabled="sessionProcessing || (canUseFullProduct && courseProgress.total_questions === 0)"
-                @click="emit('start-quick-learning')"
-            >
-                <span class="grid h-14 w-14 shrink-0 place-items-center rounded-[0.95rem] bg-white/75" aria-hidden="true">
-                    <span class="grid h-8 w-8 place-items-center rounded-full bg-[#ffc532] text-lg text-white">▶</span>
-                </span>
-                <span class="min-w-0 flex-1">
-                    <span class="block text-[0.65rem] font-bold uppercase tracking-[0.12em] text-[#855414]">Szybki start</span>
-                    <span class="mt-0.5 block text-[1.15rem] font-bold leading-6">{{ canUseFullProduct ? 'Rozpocznij naukę' : 'Otwórz naukę' }}</span>
-                    <span class="mt-1 block text-xs text-[#665c49]">{{ canUseFullProduct ? 'Losowe pytania z całej bazy' : 'Sprawdź dostępne możliwości' }}</span>
-                </span>
-                <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-xl" aria-hidden="true">→</span>
-            </button>
+            <section class="pk-panel mt-2 p-3" aria-labelledby="mobile-learn-title">
+                <h2 id="mobile-learn-title" class="text-[1.0625rem] font-bold leading-5 text-[#ffffffd9]">Ucz się</h2>
 
-            <section class="mt-2.5 grid grid-cols-2 gap-2" aria-label="Główne tryby">
-                <button
-                    type="button"
-                    class="flex min-h-[4.1rem] items-center gap-2 rounded-[1.05rem] bg-white px-3 py-2 text-left text-[#121826] shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_26px_rgba(15,23,42,0.08)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#aa7114]"
-                    @click="openTopicsShortcut"
+                <Link
+                    v-if="activeSession"
+                    :href="activeSession.resume_url"
+                    class="pk-btn-primary mt-3 flex min-h-12 items-center justify-center gap-2.5 px-4 py-1.5"
                 >
-                    <span class="grid h-10 w-10 shrink-0 place-items-center rounded-[0.85rem] bg-[#fff5df] text-[#a35a15]" aria-hidden="true">
-                        <svg class="h-6 w-6" viewBox="0 0 32 32" fill="none"><path d="M16 8c-3.6-2.3-7.6-2.6-12-1.5v19c4.4-1.1 8.4-.8 12 1.5 3.6-2.3 7.6-2.6 12-1.5v-19C23.6 5.4 19.6 5.7 16 8Z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M16 8v19" stroke="currentColor" stroke-width="2.2"/></svg>
+                    <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z" /></svg>
+                    <span class="min-w-0 text-center">
+                        <span class="block text-[1.0625rem] font-semibold leading-5">Kontynuuj naukę</span>
+                        <span class="block truncate text-xs font-medium leading-4 text-[#ffffffd9]">{{ activeSessionPositionLabel }}</span>
                     </span>
-                    <span class="min-w-0 flex-1">
-                        <span class="block text-[0.8rem] font-bold leading-4">Wybierz dział</span>
-                        <span class="mt-0.5 block text-[0.6rem] leading-3 text-[#687385]">Ucz się według kategorii</span>
-                    </span>
-                    <span class="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-[#fff5df] text-base" aria-hidden="true">›</span>
-                </button>
+                </Link>
                 <button
+                    v-else
                     type="button"
-                    class="flex min-h-[4.1rem] items-center gap-2 rounded-[1.05rem] bg-white px-3 py-2 text-left text-[#121826] shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_26px_rgba(15,23,42,0.08)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#aa7114]"
-                    @click="openExamShortcut"
+                    class="pk-btn-primary mt-3 flex min-h-12 w-full items-center justify-center gap-2.5 px-4 disabled:opacity-60"
+                    :disabled="sessionProcessing || (canUseFullProduct && courseProgress.total_questions === 0)"
+                    @click="emit('start-quick-learning')"
                 >
-                    <span class="grid h-10 w-10 shrink-0 place-items-center rounded-[0.85rem] bg-[#fff5df] text-[#a35a15]" aria-hidden="true">
-                        <svg class="h-6 w-6" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="11" stroke="currentColor" stroke-width="2.4"/><circle cx="16" cy="16" r="5" stroke="currentColor" stroke-width="2.4"/><path d="m16 16 9-9M22 7h4v4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    </span>
-                    <span class="min-w-0 flex-1">
-                        <span class="block text-[0.8rem] font-bold leading-4">Egzamin próbny</span>
-                        <span class="mt-0.5 block text-[0.6rem] leading-3 text-[#687385]">Sprawdź swoją wiedzę</span>
-                    </span>
-                    <span class="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-[#fff5df] text-base" aria-hidden="true">›</span>
+                    <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z" /></svg>
+                    <span class="text-[1.0625rem] font-semibold">{{ canUseFullProduct ? 'Ucz się' : 'Otwórz naukę' }}</span>
+                    <span class="sr-only">{{ canUseFullProduct ? '— losowe pytania z całej bazy' : '— sprawdź dostępne możliwości' }}</span>
                 </button>
+
+                <div class="mt-5 flex flex-col gap-2" aria-label="Tryby nauki">
+                    <button type="button" class="pk-btn-secondary flex min-h-12 w-full items-center justify-center gap-2.5 px-4 text-[1.0625rem] font-semibold" @click="openExamShortcut">
+                        <svg class="h-[22px] w-[22px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="#7ab8ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
+                        Egzamin próbny
+                    </button>
+                    <button type="button" class="pk-btn-secondary flex min-h-12 w-full items-center justify-center gap-2.5 px-4 text-[1.0625rem] font-semibold" @click="openTopicsShortcut">
+                        <svg class="h-[22px] w-[22px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="#ff9f6b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg>
+                        Wybierz dział
+                    </button>
+                    <component
+                        :is="mode.locked ? 'button' : Link"
+                        v-for="mode in modeTiles"
+                        :key="mode.key"
+                        v-bind="mode.locked ? { type: 'button' } : { href: mode.href }"
+                        class="pk-btn-secondary flex min-h-12 w-full items-center justify-center gap-2.5 px-4 text-[1.0625rem] font-semibold"
+                        :class="mode.locked ? 'opacity-70' : ''"
+                        @click="mode.locked ? emit('activate-full-learning') : undefined"
+                    >
+                        <svg class="h-[22px] w-[22px] shrink-0" viewBox="0 0 24 24" fill="none" :stroke="mode.iconColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path v-for="(d, index) in mode.iconPaths" :key="index" :d="d" />
+                        </svg>
+                        <span class="min-w-0 truncate">{{ mode.title }}</span>
+                        <span v-if="mode.statValue !== null" class="shrink-0 text-sm font-semibold tabular-nums text-[#ffffff80]">{{ mode.statLabel }} {{ mode.statValue }}</span>
+                    </component>
+                </div>
             </section>
 
-            <section id="postep" class="mt-2.5 scroll-mt-5 rounded-[1.1rem] bg-white p-2.5 shadow-[0_8px_28px_rgba(15,23,42,0.035)]" aria-labelledby="mobile-progress-title">
-                <div class="flex min-h-7 items-center justify-between gap-2 px-0.5">
-                    <h2 id="mobile-progress-title" class="text-[0.92rem] font-bold text-[#121826]">Twój postęp</h2>
-                    <Link :href="categoryStatsHref" class="inline-flex min-h-7 items-center gap-1 text-[0.62rem] font-medium text-[#647083] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff]">
-                        Zobacz szczegóły <span aria-hidden="true">→</span>
+            <section class="pk-tile mt-3 flex items-center gap-3 p-3" aria-labelledby="mobile-progress-title">
+                <div class="relative h-[5.5rem] w-[5.5rem] shrink-0">
+                    <svg class="h-full w-full" viewBox="0 0 84 84" aria-hidden="true">
+                        <circle cx="42" cy="42" r="35" fill="none" stroke="rgb(255 255 255 / 10%)" stroke-width="9" />
+                        <circle
+                            v-if="courseProgressPercent > 0"
+                            cx="42"
+                            cy="42"
+                            r="35"
+                            pathLength="100"
+                            fill="none"
+                            stroke="#81b64c"
+                            stroke-width="9"
+                            stroke-linecap="round"
+                            stroke-dasharray="100"
+                            :stroke-dashoffset="100 - courseProgressPercent"
+                            transform="rotate(-90 42 42)"
+                        />
+                    </svg>
+                    <span class="absolute inset-0 grid place-items-center text-[1.375rem] font-extrabold tabular-nums text-white">{{ courseProgressPercent }}%</span>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <h2 id="mobile-progress-title" class="text-[1.0625rem] font-bold leading-5 text-[#ffffffd9]">Twój postęp</h2>
+                    <p class="mt-1 text-sm leading-snug text-[#ffffffb8]">
+                        {{ totalAnsweredQuestions }} z {{ courseProgress.total_questions }} pytań · {{ courseProgress.completed_topics }} z {{ courseProgress.total_topics }} działów
+                    </p>
+                    <div role="progressbar" class="sr-only" aria-label="Postęp przerabiania pytań" aria-valuemin="0" aria-valuemax="100" :aria-valuenow="courseProgressPercent" />
+                    <Link :href="categoryStatsHref" class="pk-btn-secondary mt-2 flex min-h-11 w-full items-center justify-center px-3 text-[0.9375rem] font-semibold">
+                        Szczegóły postępu
                     </Link>
                 </div>
-                <div class="mt-1.5 grid grid-cols-3 gap-1.5">
-                    <div class="relative min-w-0 rounded-[0.85rem] bg-[#f7f8fa] p-2.5 pb-4">
-                        <div class="flex items-center gap-1.5 max-[390px]:flex-col max-[390px]:items-start max-[390px]:gap-1">
-                            <span class="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-[#e9f9f1] text-[#17b781]" aria-hidden="true">◕</span>
-                            <span class="min-w-0">
-                                <span class="block text-[0.53rem] leading-3 text-[#687385]">Ukończono</span>
-                                <strong class="block text-[0.95rem] leading-5 text-[#101827]">{{ courseProgressPercent }}%</strong>
-                            </span>
-                        </div>
-                        <span class="absolute bottom-2 left-2.5 right-2.5 block h-1.5 overflow-hidden rounded-full bg-[#e5e9ed]" aria-hidden="true"><span class="block h-full rounded-full bg-[#21bc89]" :style="{ width: courseProgressPercent + '%' }" /></span>
-                    </div>
-                    <div class="min-w-0 rounded-[0.85rem] bg-[#f7f8fa] p-2.5">
-                        <div class="flex items-center gap-1.5 max-[390px]:flex-col max-[390px]:items-start max-[390px]:gap-1">
-                            <span class="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-[#edf4ff] text-[#2c72e8]" aria-hidden="true">
-                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none"><path d="M9 7h11M9 12h11M9 17h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="4" cy="7" r="1.3" fill="currentColor"/><circle cx="4" cy="12" r="1.3" fill="currentColor"/><circle cx="4" cy="17" r="1.3" fill="currentColor"/></svg>
-                            </span>
-                            <span class="min-w-0">
-                                <span class="block text-[0.53rem] leading-3 text-[#687385]">Rozwiązane</span>
-                                <strong class="block whitespace-nowrap text-[0.62rem] leading-5 text-[#101827]">{{ totalAnsweredQuestions }} / {{ courseProgress.total_questions }}</strong>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="min-w-0 rounded-[0.85rem] bg-[#f7f8fa] p-2.5">
-                        <div class="flex items-center gap-1.5 max-[390px]:flex-col max-[390px]:items-start max-[390px]:gap-1">
-                            <span class="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-[#fff7df] text-[#e4a700]" aria-hidden="true">★</span>
-                            <span class="min-w-0">
-                                <span class="block text-[0.53rem] leading-3 text-[#687385]">Zaliczone działy</span>
-                                <strong class="block text-[0.9rem] leading-5 text-[#101827]">{{ courseProgress.completed_topics }} / {{ courseProgress.total_topics }}</strong>
-                            </span>
-                        </div>
-                    </div>
-                </div>
             </section>
-            <section v-if="popularTopics.length" class="mt-4" aria-labelledby="mobile-popular-title">
-                <div class="flex items-center justify-between gap-3 px-1">
-                    <h2 id="mobile-popular-title" class="text-[0.92rem] font-bold text-[#121826]">Popularne działy</h2>
-                    <button type="button" class="inline-flex min-h-8 items-center gap-1 text-[0.62rem] font-medium text-[#647083] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff]" @click="openTopicsShortcut">
-                        Zobacz wszystkie <span aria-hidden="true">→</span>
+
+            <section v-if="carouselTopics.length" class="mt-6" aria-labelledby="mobile-popular-title">
+                <div class="flex items-center justify-between gap-3">
+                    <h2 id="mobile-popular-title" class="text-[1.0625rem] font-bold text-[#ffffffd9]">Kontynuuj działy</h2>
+                    <button type="button" class="inline-flex min-h-11 items-center text-sm font-semibold text-[#ffffffb8] hover:text-[#ffffffd9] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffffffd9]" @click="openTopicsShortcut">
+                        Wszystkie {{ carouselTopics.length }} <span class="ml-1" aria-hidden="true">›</span>
                     </button>
                 </div>
-                <div class="mt-1.5 grid grid-cols-4 gap-1.5">
+                <MobileTopicCarousel
+                    :topics="carouselTopics"
+                    :last-topic-id="learningDashboard.last_topic_id ?? null"
+                    :processing="sessionProcessing"
+                    dark
+                    @start-topic="startFeaturedTopic"
+                />
+            </section>
+
+            <section v-if="professionalCourseTiles.length" class="mt-6" aria-labelledby="mobile-professional-title">
+                <h2 id="mobile-professional-title" class="text-[1.0625rem] font-bold text-[#ffffffd9]">Kursy zawodowe</h2>
+                <div class="-mx-3 mt-2.5 flex gap-2 overflow-x-auto px-3 pb-2 [scrollbar-width:none]">
                     <button
-                        v-for="topic in popularTopics"
-                        :key="topic.id"
+                        v-for="(course, index) in professionalCourseTiles"
+                        :key="course.id"
                         type="button"
-                        class="flex min-h-[7rem] min-w-0 flex-col rounded-[1rem] bg-white p-2.5 text-left shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff]"
-                        @click="startFeaturedTopic(topic.id)"
+                        class="pk-tile flex w-[11rem] shrink-0 flex-col items-start gap-2 p-3 text-left"
+                        @click="emit('select-professional-course', course.code)"
                     >
-                        <img v-if="topicArtworkForKey(topic.key) || topic.hero_image_url" :src="topicArtworkForKey(topic.key) || topic.hero_image_url || ''" alt="" loading="lazy" class="mx-auto h-10 w-10 object-contain">
-                        <span v-else class="mx-auto grid h-10 w-10 place-items-center rounded-xl bg-[#eef4fc] text-lg font-bold text-[#0b5cff]" aria-hidden="true">{{ topicIconLabel(topic) }}</span>
-                        <span class="mt-1.5 line-clamp-2 min-h-[2rem] w-full text-[0.61rem] font-bold leading-4 text-[#121826]">{{ topic.label }}</span>
-                        <span class="mt-auto flex w-full items-center justify-between gap-0.5 text-[0.53rem] text-[#687385]">
-                            {{ topic.questions_count }} pytań
-                            <span class="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-[#fff4da] text-sm text-[#352313]" aria-hidden="true">›</span>
+                        <span class="line-clamp-3 min-h-[3.75rem] text-[0.95rem] font-bold leading-tight" :style="{ color: professionalCourseAccent(index) }">{{ course.name }}</span>
+                        <span class="mt-auto w-full">
+                            <span class="block text-xs text-[#ffffffb8]">Postęp {{ course.progress.percent }}%</span>
+                            <span class="mt-1 block h-2 w-full overflow-hidden rounded-[10px] bg-[#ffffff1a]" aria-hidden="true">
+                                <span class="block h-full rounded-[10px] bg-[#81b64c]" :style="{ width: `${Math.min(100, Math.max(0, course.progress.percent))}%` }" />
+                            </span>
                         </span>
                     </button>
                 </div>
             </section>
 
-            <section v-if="canUseFullProduct && reviewShortcutCount > 0" class="mt-4 flex items-center justify-between gap-3 rounded-[1.1rem] bg-white px-4 py-3" aria-label="Powtórki">
-                <span class="min-w-0">
-                    <strong class="block text-sm text-[#121826]">Powtórki</strong>
-                    <span class="block text-xs text-[#687385]">{{ reviewShortcutCount }} pytań do utrwalenia</span>
-                </span>
-                <button v-if="managedIncorrectListEnabled" type="button" class="min-h-11 shrink-0 rounded-full bg-[#fff2dd] px-4 text-xs font-semibold text-[#774b11] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#aa7114]" :disabled="globalIncorrectProcessing || sessionProcessing" @click="startReviewShortcut">Rozpocznij →</button>
-                <Link v-else :href="reviewShortcutHref" class="inline-flex min-h-11 shrink-0 items-center rounded-full bg-[#fff2dd] px-4 text-xs font-semibold text-[#774b11] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#aa7114]">Rozpocznij →</Link>
+            <section v-if="streakOverviewLoading && !topStreakLeaders.length" class="mt-6" aria-hidden="true">
+                <div class="h-5 w-40 rounded-[3px] bg-[#ffffff1a]" />
+                <div class="pk-panel mt-3 flex flex-col gap-1 p-3">
+                    <div v-for="row in 3" :key="row" class="flex items-center gap-3 py-1.5">
+                        <span class="h-8 w-8 rounded-[3px] bg-[#ffffff1a]" />
+                        <span class="h-3.5 flex-1 rounded-[3px] bg-[#ffffff1a]" />
+                        <span class="h-3.5 w-6 rounded-[3px] bg-[#ffffff1a]" />
+                    </div>
+                </div>
             </section>
 
-            <details v-if="quickStartTabs.length" class="group mt-3 rounded-xl border border-[#e7ebf0] bg-white p-4">
-                <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-[#071b33] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] [&::-webkit-details-marker]:hidden">
-                    Inne tryby nauki
-                    <span class="text-lg text-[#64748b] transition-transform group-open:rotate-90" aria-hidden="true">›</span>
-                </summary>
-
-                <div
-                    class="mt-3 grid gap-2"
-                    :class="quickStartTabs.length === 1 ? 'grid-cols-1' : 'grid-cols-2'"
-                >
-                    <button
-                        v-for="tab in quickStartTabs"
-                        :key="tab.value"
-                        type="button"
-                        class="group min-h-[5.65rem] rounded-lg border bg-white p-2.5 text-left shadow-[0_8px_18px_rgba(15,23,42,0.045)] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#023ea4] focus-visible:ring-offset-2"
-                        :class="tab.disabled
-                            ? 'cursor-not-allowed border-[#e0e7ef] opacity-45'
-                            : 'border-[#e0e7ef] hover:-translate-y-0.5 hover:border-[#9fb6d8] hover:shadow-[0_18px_34px_rgba(15,23,42,0.09)]'"
-                        :disabled="tab.disabled"
-                        @click="openLearningSetup(tab.value)"
-                    >
-                        <span class="flex items-start justify-between gap-3">
-                            <span
-                                class="flex h-8 w-8 items-center justify-center rounded-full text-white shadow-[0_8px_14px_rgba(15,23,42,0.1)]"
-                                :class="quickStartAccentClass(tab.value)"
-                                aria-hidden="true"
-                            >
-                                <span class="text-xs font-semibold">
-                                    {{ tab.label.slice(0, 1) }}
-                                </span>
-                            </span>
-                            <span class="text-lg font-light leading-none text-[#64748b] transition group-hover:translate-x-0.5">
-                                →
-                            </span>
-                        </span>
-
-                        <span class="mt-2 block text-[0.82rem] font-semibold leading-4 text-[#0f172a]">
-                            {{ tab.label }}
-                        </span>
-                        <span class="mt-0.5 block text-[0.68rem] leading-3.5 text-[#64748b]">
-                            {{ tab.summary }}
-                        </span>
-                    </button>
+            <section v-else-if="topStreakLeaders.length" class="mt-6" aria-labelledby="mobile-leaders-title">
+                <div class="flex items-center justify-between gap-3">
+                    <h2 id="mobile-leaders-title" class="text-[1.0625rem] font-bold text-[#ffffffd9]">Najlepsi w serii</h2>
+                    <Link :href="trainingHref" class="inline-flex min-h-11 items-center text-sm font-semibold text-[#ffffffb8] hover:text-[#ffffffd9] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffffffd9]">
+                        Pełny ranking <span class="ml-1" aria-hidden="true">›</span>
+                    </Link>
                 </div>
-            </details>
+                <MobileStreakLeaderboard
+                    class="mt-1"
+                    :leaders="topStreakLeaders"
+                    :caption="`Kategoria ${categoryShortName}`"
+                    label="Najlepsze serie"
+                />
+            </section>
 
             <Teleport to="body">
             <Transition name="mobile-learning-sheet">
@@ -1085,7 +1128,7 @@ onUnmounted(() => {
                                     class="inline-flex min-h-[3.45rem] w-full items-center justify-center gap-2.5 rounded-[1rem] bg-[#0b5cff] px-4 text-white shadow-[0_12px_24px_rgba(11,92,255,0.24)] transition hover:bg-[#023ea4] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#023ea4] focus-visible:ring-offset-2"
                                 >
                                     <span class="flex items-center justify-center" aria-hidden="true">
-                                        <svg class="h-5 w-5 text-white/90" viewBox="0 0 24 24" fill="none">
+                                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none">
                                             <path d="M8 21h8M12 17v4M7 4h10v3.5a5 5 0 0 1-10 0V4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                             <path d="M7 6H4.5A1.5 1.5 0 0 0 3 7.5v.75A3.75 3.75 0 0 0 6.75 12H8M17 6h2.5A1.5 1.5 0 0 1 21 7.5v.75A3.75 3.75 0 0 1 17.25 12H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                         </svg>
@@ -1197,7 +1240,15 @@ onUnmounted(() => {
                                                     @click="chooseTopicFromSheet(option.id)"
                                                 >
                                                     <img
-                                                        v-if="option.hero_image_url"
+                                                        v-if="topicArtworkForKey(option.key)"
+                                                        :src="topicArtworkForKey(option.key) ?? ''"
+                                                        alt=""
+                                                        loading="lazy"
+                                                        decoding="async"
+                                                        class="h-16 w-16 shrink-0 object-contain"
+                                                    >
+                                                    <img
+                                                        v-else-if="option.hero_image_url"
                                                         :src="option.hero_image_url"
                                                         alt=""
                                                         loading="lazy"
@@ -1258,6 +1309,15 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.mobile-home-dark {
+    font-family: Barlow, Figtree, ui-sans-serif, system-ui, sans-serif;
+}
+
+.mobile-home-dark :is(h1, h2, h3) {
+    font-family: inherit;
+    letter-spacing: -0.01em;
+}
+
 .mobile-learning-dashboard {
     animation: mobile-learning-dashboard-in 160ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
@@ -1308,6 +1368,14 @@ onUnmounted(() => {
     .mobile-learning-dashboard * {
         animation: none !important;
         transition: none !important;
+    }
+}
+</style>
+
+<style>
+@media (max-width: 767px) {
+    body:has(.mobile-home-dark) {
+        background-color: #302e2b;
     }
 }
 </style>
