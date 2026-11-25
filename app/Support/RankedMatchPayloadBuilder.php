@@ -114,7 +114,6 @@ class RankedMatchPayloadBuilder
         $match->loadMissing([
             'licenseCategory',
             'players',
-            'players.user',
         ]);
 
         $players = $match->players
@@ -204,7 +203,6 @@ class RankedMatchPayloadBuilder
         $match->loadMissing([
             'licenseCategory',
             'players',
-            'players.user',
         ]);
 
         $player = $match->players->firstWhere('user_id', $currentUser->getKey());

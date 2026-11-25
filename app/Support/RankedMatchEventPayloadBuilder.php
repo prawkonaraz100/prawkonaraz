@@ -21,24 +21,33 @@ class RankedMatchEventPayloadBuilder
      */
     public function eventsForUser(RankedMatch $match, User $currentUser, ?string $afterEventId = null): array
     {
-        $match->loadMissing([
-            'licenseCategory',
-            'players',
-            'players.user',
-            'answers',
-            'events',
-        ]);
+        $match->loadMissing(['licenseCategory', 'players']);
 
-        $events = $match->events;
+        // Kursor w SQL: pobieramy tylko zdarzenia nowsze od ostatnio wysłanego, w kolejności zapisu (id).
+        // Nieznany kursor (np. po restarcie) oznacza pełną listę, jak dotychczas.
+        $cursorId = $afterEventId
+            ? RankedMatchEvent::query()
+                ->where('ranked_match_id', $match->getKey())
+                ->where('event_id', $afterEventId)
+                ->value('id')
+            : null;
 
-        if ($afterEventId) {
-            $afterIndex = $events->search(
-                fn (RankedMatchEvent $event) => $event->event_id === $afterEventId
-            );
+        $events = RankedMatchEvent::query()
+            ->where('ranked_match_id', $match->getKey())
+            ->when($cursorId !== null, fn ($query) => $query->where('id', '>', $cursorId))
+            ->orderBy('id')
+            ->get();
 
-            if ($afterIndex !== false) {
-                $events = $events->slice($afterIndex + 1)->values();
-            }
+        if ($events->isEmpty()) {
+            return [];
+        }
+
+        if ($events->contains(fn (RankedMatchEvent $event) => in_array($event->event_name, [
+            'match.opponent_answered',
+            'match.finished',
+            'match.abandoned',
+        ], true))) {
+            $match->loadMissing('answers');
         }
 
         return $events
@@ -50,18 +59,20 @@ class RankedMatchEventPayloadBuilder
 
     public function firstEventForUser(RankedMatch $match, User $currentUser, string $eventName): ?array
     {
-        $match->loadMissing([
-            'licenseCategory',
-            'players',
-            'players.user',
-            'answers',
-            'events',
-        ]);
+        $match->loadMissing(['licenseCategory', 'players']);
 
-        $event = $match->events->firstWhere('event_name', $eventName);
+        $event = RankedMatchEvent::query()
+            ->where('ranked_match_id', $match->getKey())
+            ->where('event_name', $eventName)
+            ->orderBy('id')
+            ->first();
 
         if (! $event instanceof RankedMatchEvent) {
             return null;
+        }
+
+        if (in_array($eventName, ['match.opponent_answered', 'match.finished', 'match.abandoned'], true)) {
+            $match->loadMissing('answers');
         }
 
         return $this->transformEvent($match, $event, $currentUser);

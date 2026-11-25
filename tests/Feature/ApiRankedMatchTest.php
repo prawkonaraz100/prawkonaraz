@@ -874,6 +874,32 @@ test('a match where neither player scored a point ends in a draw', function () {
     expect(data_get($match->payload, 'winner_user_id'))->toBeNull();
 });
 
+test('ranked sweep finishes matches that nobody refreshes anymore', function () {
+    [$firstUser, $secondUser, $match, $questions] = createRankedMatchFixture($this);
+    startRankedMatchFixture($this, $match, $firstUser, $secondUser);
+
+    $this->actingAs($firstUser)
+        ->postJson(route('api.v1.ranked.matches.answers.store', $match->public_id), [
+            'question_id' => $questions[0]->getKey(),
+            'user_answer' => $questions[0]->correct_answer,
+        ])
+        ->assertOk();
+
+    // Obaj gracze zamknęli kartę: nikt nie odpytuje serwera, czas meczu mija.
+    $this->travel(120)->seconds();
+
+    expect($match->fresh()->status)->toBe('in_progress');
+
+    $this->artisan('ranked:sweep')->assertExitCode(0);
+
+    $match->refresh();
+
+    expect($match->status)->toBeIn(['finished', 'abandoned']);
+    expect(
+        RankedQueueEntry::query()->where('ranked_match_id', $match->getKey())->where('status', 'completed')->count()
+    )->toBe(2);
+});
+
 function createRankedMatchFixture(TestCase $testCase): array
 {
     $category = LicenseCategory::factory()->create([

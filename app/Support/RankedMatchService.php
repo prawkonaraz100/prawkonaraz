@@ -58,10 +58,50 @@ class RankedMatchService
         ];
     }
 
+    /**
+     * Przebieg sprzątający (scheduler co minutę): te same przejścia co przy odczycie,
+     * ale dla wszystkich aktywnych meczów, także gdy obaj gracze zamknęli kartę.
+     *
+     * @return array{checked:int, resolved:int}
+     */
+    public function sweepActiveMatches(int $limit = 200): array
+    {
+        $this->runWithSqliteBusyRetry(fn () => $this->expireTimedOutQueuedEntries());
+
+        $matchIds = RankedMatch::query()
+            ->whereIn('status', ['matched', 'in_progress'])
+            ->orderBy('id')
+            ->limit($limit)
+            ->pluck('id');
+
+        $resolved = 0;
+
+        foreach ($matchIds as $matchId) {
+            $match = RankedMatch::query()->find($matchId);
+
+            if (! $match) {
+                continue;
+            }
+
+            $match = $this->syncMatchPresence($match);
+
+            if (! $this->isActiveMatch($match)) {
+                $resolved++;
+            }
+        }
+
+        return [
+            'checked' => $matchIds->count(),
+            'resolved' => $resolved,
+        ];
+    }
+
+    /**
+     * Ostatni zakończony mecz. Bez ponownej synchronizacji aktywnego meczu: wywołujący
+     * (overview, join, leave, stream) synchronizuje go wcześniej w tym samym żądaniu.
+     */
     public function recentMatch(User $user): ?RankedMatch
     {
-        $this->syncLatestActiveMatchForUser($user);
-
         return $this->recentMatchesBaseQuery($user)->first();
     }
 
@@ -792,7 +832,7 @@ class RankedMatchService
     protected function recentMatchesBaseQuery(User $user)
     {
         return RankedMatch::query()
-            ->with(['licenseCategory', 'players', 'players.user'])
+            ->with(['licenseCategory', 'players'])
             ->whereIn('status', ['finished', 'abandoned'])
             ->whereHas('players', fn ($query) => $query->where('user_id', $user->getKey())->where('is_replay', false))
             ->orderByRaw('COALESCE(finished_at, abandoned_at, updated_at, created_at) DESC')
@@ -1040,15 +1080,11 @@ class RankedMatchService
 
     protected function defaultMatchRelations(): array
     {
+        // Lekki zestaw dla gorących ścieżek (overview, stream co sekundę, pong).
+        // Odpowiedzi, eventy i wpisy kolejki doładowują tylko miejsca, które ich potrzebują (loadMissing/load).
         return [
             'licenseCategory',
             'players',
-            'players.user',
-            'answers',
-            'answers.question',
-            'answers.user',
-            'queueEntries',
-            'events',
         ];
     }
 
@@ -1081,9 +1117,8 @@ class RankedMatchService
                 ->whereKey($rankedMatch->getKey())
                 ->firstOrFail();
 
-            $match = $this->applyPresenceTransitions($match, now());
-
-            return $this->freshMatch($match) ?? $match;
+            // applyPresenceTransitions przeładowuje mecz tylko wtedy, gdy coś zmieniło.
+            return $this->applyPresenceTransitions($match, now());
         });
     }
 
@@ -1113,6 +1148,8 @@ class RankedMatchService
             return $match;
         }
 
+        $presenceChanged = false;
+
         foreach ($match->players as $player) {
             // Nagranie nie wysyła sygnałów obecności, więc nigdy nie jest „rozłączone”.
             if ($player->is_replay || $player->presence_state === 'disconnected') {
@@ -1140,10 +1177,14 @@ class RankedMatchService
                     $player->user_id,
                     'match.opponent_disconnected.user_'.$player->user_id.'.'.$disconnectThreshold->getTimestamp(),
                 );
+
+                $presenceChanged = true;
             }
         }
 
-        $match = $this->freshMatch($match) ?? $match;
+        if ($presenceChanged) {
+            $match = $this->freshMatch($match) ?? $match;
+        }
 
         if (! $this->isActiveMatch($match)) {
             return $match;

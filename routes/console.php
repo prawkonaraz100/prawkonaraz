@@ -2375,6 +2375,12 @@ Schedule::command('newsroom:publish-due')
     ->environments(['production'])
     ->withoutOverlapping();
 
+// Tryb rankingowy: rozstrzyga mecze, których nikt już nie odświeża (koniec czasu, walkower, kolejka).
+Schedule::command('ranked:sweep')
+    ->everyMinute()
+    ->environments(['production'])
+    ->withoutOverlapping();
+
 Schedule::command('ops:prune-user-ip-history')
     ->dailyAt((string) env('USER_IP_HISTORY_PRUNE_AT', '03:05'))
     ->environments(['production'])
