@@ -90,6 +90,9 @@ class RankedSessionPageController extends Controller
                 : null,
             'leaderboard' => $leaderboard,
             'currentUserRanking' => $currentUserRanking,
+            'replayAvailable' => $selectedCategory && $request->user()
+                ? app(RankedMatchService::class)->hasReplayAvailable($request->user(), $selectedCategory)
+                : false,
             'specSummary' => [
                 'api_version' => '1.0',
                 'match_channel_pattern' => 'match:{match_id}',
@@ -101,6 +104,7 @@ class RankedSessionPageController extends Controller
                 'match_duration_seconds' => 90,
                 'total_questions' => 40,
                 'max_concurrent_players' => RankedMatchService::MAX_CONCURRENT_PLAYERS,
+                'replay_offer_after_seconds' => RankedMatchService::REPLAY_OFFER_AFTER_SECONDS,
                 'implementation_status' => 'transport_negotiation_with_websocket_ready_client',
             ],
             'realtimeTransport' => [

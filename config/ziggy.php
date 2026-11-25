@@ -92,6 +92,7 @@ return [
             'api.v1.ranked.history',
             'api.v1.ranked.queue.join',
             'api.v1.ranked.queue.leave',
+            'api.v1.ranked.replay',
             'api.v1.ranked.matches.show',
             'api.v1.ranked.matches.events',
             'api.v1.ranked.matches.ready',

@@ -32,6 +32,10 @@ class RankedMatchService
 
     public const MATCH_READY_COUNTDOWN_SECONDS = 3;
 
+    public const REPLAY_OFFER_AFTER_SECONDS = 20;
+
+    public const REPLAY_MIN_ANSWERS = 5;
+
     public function __construct(
         protected StudyContextService $studyContextService,
         protected RankedMatchPresenceStore $presenceStore,
@@ -302,7 +306,7 @@ class RankedMatchService
         $match = RankedMatch::query()
             ->with($this->defaultMatchRelations())
             ->where('public_id', $publicId)
-            ->whereHas('players', fn ($query) => $query->where('user_id', $user->getKey()))
+            ->whereHas('players', fn ($query) => $query->where('user_id', $user->getKey())->where('is_replay', false))
             ->firstOrFail();
 
         return $this->syncMatchPresence($match);
@@ -314,7 +318,7 @@ class RankedMatchService
             $match = RankedMatch::query()
                 ->with($this->defaultMatchRelations())
                 ->whereKey($rankedMatch->getKey())
-                ->whereHas('players', fn ($query) => $query->where('user_id', $user->getKey()))
+                ->whereHas('players', fn ($query) => $query->where('user_id', $user->getKey())->where('is_replay', false))
                 ->firstOrFail();
 
             $match = $this->applyPresenceTransitions($match, now());
@@ -340,7 +344,7 @@ class RankedMatchService
             $match = RankedMatch::query()
                 ->with($this->defaultMatchRelations())
                 ->whereKey($rankedMatch->getKey())
-                ->whereHas('players', fn ($query) => $query->where('user_id', $user->getKey()))
+                ->whereHas('players', fn ($query) => $query->where('user_id', $user->getKey())->where('is_replay', false))
                 ->firstOrFail();
 
             $match = $this->applyPresenceTransitions($match, now());
@@ -381,7 +385,7 @@ class RankedMatchService
             $match = RankedMatch::query()
                 ->with($this->defaultMatchRelations())
                 ->whereKey($rankedMatch->getKey())
-                ->whereHas('players', fn ($query) => $query->where('user_id', $user->getKey()))
+                ->whereHas('players', fn ($query) => $query->where('user_id', $user->getKey())->where('is_replay', false))
                 ->firstOrFail();
 
             $match = $this->applyPresenceTransitions($match, now());
@@ -616,7 +620,10 @@ class RankedMatchService
         $match->load('players', 'players.user', 'answers');
 
         $allPlayersFinished = $match->players->every(
-            fn (RankedMatchPlayer $player) => $player->total_answered >= $match->total_questions
+            fn (RankedMatchPlayer $player) => $player->is_replay
+                // Nagranie kończy się, gdy odtworzymy wszystkie odpowiedzi nagranego gracza.
+                ? $player->total_answered >= (int) data_get($match->payload, 'replay.answer_count', $match->total_questions)
+                : $player->total_answered >= $match->total_questions
         );
 
         if (! $allPlayersFinished || $match->status === 'finished') {
@@ -690,18 +697,7 @@ class RankedMatchService
             }
         }
 
-        $ratingOne = $this->ensureRating($playerOne->user);
-        $ratingTwo = $this->ensureRating($playerTwo->user);
-
-        [$newRatingOne, $newRatingTwo] = $this->calculateEloPair(
-            $ratingOne->rating,
-            $ratingTwo->rating,
-            $scoreOne,
-            $scoreTwo,
-        );
-
-        $this->applyRatingResult($ratingOne, $newRatingOne, $scoreOne);
-        $this->applyRatingResult($ratingTwo, $newRatingTwo, $scoreTwo);
+        [$newRatingOne, $newRatingTwo] = $this->applyMatchRatings($playerOne, $playerTwo, $scoreOne, $scoreTwo);
 
         $playerOne->forceFill([
             'elo_after' => $newRatingOne,
@@ -797,7 +793,7 @@ class RankedMatchService
         return RankedMatch::query()
             ->with(['licenseCategory', 'players', 'players.user'])
             ->whereIn('status', ['finished', 'abandoned'])
-            ->whereHas('players', fn ($query) => $query->where('user_id', $user->getKey()))
+            ->whereHas('players', fn ($query) => $query->where('user_id', $user->getKey())->where('is_replay', false))
             ->orderByRaw('COALESCE(finished_at, abandoned_at, updated_at, created_at) DESC')
             ->orderByDesc('id');
     }
@@ -1060,7 +1056,7 @@ class RankedMatchService
         return RankedMatch::query()
             ->with($this->defaultMatchRelations())
             ->whereIn('status', ['matched', 'in_progress'])
-            ->whereHas('players', fn ($query) => $query->where('user_id', $user->getKey()))
+            ->whereHas('players', fn ($query) => $query->where('user_id', $user->getKey())->where('is_replay', false))
             ->latest('id')
             ->first();
     }
@@ -1104,6 +1100,12 @@ class RankedMatchService
             return $match;
         }
 
+        $match = $this->releaseReplayAnswers($match, $now);
+
+        if (! $this->isActiveMatch($match)) {
+            return $match;
+        }
+
         $match = $this->finishExpiredMatchIfNeeded($match, $now);
 
         if (! $this->isActiveMatch($match)) {
@@ -1111,7 +1113,8 @@ class RankedMatchService
         }
 
         foreach ($match->players as $player) {
-            if ($player->presence_state === 'disconnected') {
+            // Nagranie nie wysyła sygnałów obecności, więc nigdy nie jest „rozłączone”.
+            if ($player->is_replay || $player->presence_state === 'disconnected') {
                 continue;
             }
 
@@ -1230,18 +1233,7 @@ class RankedMatchService
     ): void {
         $match->loadMissing('players', 'players.user', 'queueEntries');
 
-        $winnerRating = $this->ensureRating($winner->user);
-        $loserRating = $this->ensureRating($loser->user);
-
-        [$winnerNewRating, $loserNewRating] = $this->calculateEloPair(
-            $winnerRating->rating,
-            $loserRating->rating,
-            1.0,
-            0.0,
-        );
-
-        $this->applyRatingResult($winnerRating, $winnerNewRating, 1.0);
-        $this->applyRatingResult($loserRating, $loserNewRating, 0.0);
+        [$winnerNewRating, $loserNewRating] = $this->applyMatchRatings($winner, $loser, 1.0, 0.0);
 
         $winner->forceFill([
             'status' => 'finished',
@@ -1499,6 +1491,360 @@ class RankedMatchService
             ),
             self::DISCONNECT_TIMEOUT_SECONDS + self::RECONNECT_GRACE_SECONDS + 1,
         );
+    }
+
+    /**
+     * Liczy i zapisuje ELO po meczu. W meczu z nagraniem zmienia się tylko ELO żywego gracza
+     * (pełna zmiana, decyzja 2026-11-25); nagrany gracz zachowuje swoje ELO, a do wyliczenia
+     * używane jest ELO z chwili nagrania.
+     *
+     * @return array{0:int,1:int}
+     */
+    protected function applyMatchRatings(
+        RankedMatchPlayer $playerOne,
+        RankedMatchPlayer $playerTwo,
+        float $scoreOne,
+        float $scoreTwo,
+    ): array {
+        $ratingOne = $playerOne->is_replay ? null : $this->ensureRating($playerOne->user);
+        $ratingTwo = $playerTwo->is_replay ? null : $this->ensureRating($playerTwo->user);
+
+        [$newRatingOne, $newRatingTwo] = $this->calculateEloPair(
+            $ratingOne?->rating ?? (int) $playerOne->elo_before,
+            $ratingTwo?->rating ?? (int) $playerTwo->elo_before,
+            $scoreOne,
+            $scoreTwo,
+        );
+
+        if ($ratingOne) {
+            $this->applyRatingResult($ratingOne, $newRatingOne, $scoreOne);
+        } else {
+            $newRatingOne = (int) $playerOne->elo_before;
+        }
+
+        if ($ratingTwo) {
+            $this->applyRatingResult($ratingTwo, $newRatingTwo, $scoreTwo);
+        } else {
+            $newRatingTwo = (int) $playerTwo->elo_before;
+        }
+
+        return [$newRatingOne, $newRatingTwo];
+    }
+
+    /**
+     * Czy w tej kategorii jest nagranie, z którym gracz może zagrać.
+     */
+    public function hasReplayAvailable(User $user, LicenseCategory $category): bool
+    {
+        return $this->replayCandidatesQuery($user, $category)->exists();
+    }
+
+    /**
+     * Mecz z nagraniem: gracz dostaje pytania z wcześniejszego meczu prawdziwego gracza
+     * tej samej kategorii i ściga się z jego zapisanymi odpowiedziami.
+     *
+     * @return array{rating: RankedPlayerRating, queue: RankedQueueEntry|null, active_match: RankedMatch|null, capacity: array{current_players:int, max_players:int, available_slots:int, waiting_users:int, is_full:bool}, state: string, joined: bool}
+     */
+    public function startReplayMatch(User $user, LicenseCategory $category): array
+    {
+        $joined = false;
+
+        $result = $this->runWithSqliteBusyRetry(function () use ($category, &$joined, $user): array {
+            $this->expireTimedOutQueuedEntries();
+            $rating = $this->ensureRating($user);
+            $activeMatch = $this->findActiveMatchForUser($user);
+
+            if ($activeMatch) {
+                $activeMatch = $this->applyPresenceTransitions($activeMatch, now());
+
+                if ($this->isActiveMatch($activeMatch)) {
+                    return [
+                        'rating' => $rating,
+                        'queue' => $this->activeQueueEntry($user),
+                        'active_match' => $activeMatch,
+                        'capacity' => $this->capacitySnapshot(),
+                    ];
+                }
+            }
+
+            $source = $this->pickReplaySource($user, $category, $rating->rating);
+
+            if (! $source) {
+                throw ValidationException::withMessages([
+                    'replay' => 'W tej kategorii nie ma jeszcze nagrań do rozegrania. Spróbuj poczekać na żywego gracza.',
+                ]);
+            }
+
+            $currentQueueEntry = $this->activeQueueEntry($user);
+
+            if ($currentQueueEntry) {
+                $currentQueueEntry->forceFill([
+                    'status' => 'cancelled',
+                    'left_at' => now(),
+                ])->save();
+            }
+
+            $match = $this->createReplayMatch($user, $category, $rating, $source);
+            $joined = true;
+
+            return [
+                'rating' => $rating->fresh() ?? $rating,
+                'queue' => $this->activeQueueEntry($user),
+                'active_match' => $this->freshMatch($match) ?? $match,
+                'capacity' => $this->capacitySnapshot(),
+            ];
+        });
+
+        return [
+            ...$result,
+            'state' => 'matched',
+            'joined' => $joined,
+        ];
+    }
+
+    /**
+     * Nagrania: zakończone mecze na żywo w tej samej kategorii, gracze inni niż bieżący,
+     * bez kont testowych, z co najmniej kilkoma odpowiedziami, jeszcze nierozegrane przez tego gracza.
+     */
+    protected function replayCandidatesQuery(User $user, LicenseCategory $category)
+    {
+        return RankedMatchPlayer::query()
+            ->where('is_replay', false)
+            ->where('user_id', '!=', $user->getKey())
+            ->where('total_answered', '>=', self::REPLAY_MIN_ANSWERS)
+            ->whereHas('user', fn ($query) => $query->where('is_test_account', false))
+            ->whereHas('match', fn ($query) => $query
+                ->where('status', 'finished')
+                ->whereNull('replay_source_match_id')
+                ->where('license_category_id', $category->getKey())
+                ->whereNotNull('started_at'))
+            ->whereNotExists(function ($query) use ($user): void {
+                $query->selectRaw('1')
+                    ->from('ranked_matches as played_replays')
+                    ->join('ranked_match_players as replay_players', 'replay_players.ranked_match_id', '=', 'played_replays.id')
+                    ->whereColumn('played_replays.replay_source_match_id', 'ranked_match_players.ranked_match_id')
+                    ->whereColumn('played_replays.replay_source_user_id', 'ranked_match_players.user_id')
+                    ->where('replay_players.user_id', $user->getKey())
+                    ->where('replay_players.is_replay', false);
+            });
+    }
+
+    /**
+     * Spośród dostępnych nagrań wybiera losowo jedno z kilku o ELO najbliższym graczowi,
+     * żeby pełna zmiana ELO była uczciwa i nie dało się „farmić” słabych nagrań.
+     */
+    protected function pickReplaySource(User $user, LicenseCategory $category, int $rating): ?RankedMatchPlayer
+    {
+        return $this->replayCandidatesQuery($user, $category)
+            ->with(['match', 'user'])
+            ->get()
+            ->sortBy(fn (RankedMatchPlayer $player) => abs((int) $player->elo_before - $rating))
+            ->take(5)
+            ->shuffle()
+            ->first();
+    }
+
+    protected function createReplayMatch(
+        User $user,
+        LicenseCategory $category,
+        RankedPlayerRating $rating,
+        RankedMatchPlayer $source,
+    ): RankedMatch {
+        $sourceMatch = $source->match;
+        $questionIds = collect($sourceMatch->payload['question_ids'] ?? [])
+            ->map(fn ($questionId) => (int) $questionId)
+            ->filter()
+            ->values()
+            ->all();
+        $replayAnswerCount = RankedMatchAnswer::query()
+            ->where('ranked_match_id', $sourceMatch->getKey())
+            ->where('user_id', $source->user_id)
+            ->whereIn('question_id', $questionIds)
+            ->count();
+        $matchedAt = now();
+
+        $match = RankedMatch::create([
+            'public_id' => (string) Str::uuid(),
+            'license_category_id' => $category->getKey(),
+            'replay_source_match_id' => $sourceMatch->getKey(),
+            'replay_source_user_id' => $source->user_id,
+            'status' => 'matched',
+            'api_version' => '1.0',
+            'duration_seconds' => max((int) $sourceMatch->duration_seconds, 1),
+            'total_questions' => count($questionIds),
+            'matched_at' => $matchedAt,
+            'countdown_seconds' => self::MATCH_READY_COUNTDOWN_SECONDS,
+            'payload' => [
+                'queue_channel_pattern' => 'queue:{user_id}',
+                'match_channel_pattern' => 'match:{match_id}',
+                'question_ids' => $questionIds,
+                'heartbeat_seconds' => self::HEARTBEAT_SECONDS,
+                'disconnect_timeout_seconds' => self::DISCONNECT_TIMEOUT_SECONDS,
+                'reconnect_grace_seconds' => self::RECONNECT_GRACE_SECONDS,
+                'ready_countdown_seconds' => self::MATCH_READY_COUNTDOWN_SECONDS,
+                'replay' => [
+                    'source_match_public_id' => $sourceMatch->public_id,
+                    'source_username' => $source->username_snapshot,
+                    'source_elo' => (int) $source->elo_before,
+                    'answer_count' => $replayAnswerCount,
+                ],
+            ],
+        ]);
+
+        // Nagranie jest gotowe od razu; odliczanie startuje, gdy gotowość potwierdzi żywy gracz.
+        RankedMatchPlayer::create([
+            'ranked_match_id' => $match->getKey(),
+            'user_id' => $source->user_id,
+            'slot' => 'player1',
+            'is_replay' => true,
+            'status' => 'matched',
+            'presence_state' => 'online',
+            'username_snapshot' => sprintf('%s · nagranie', $source->username_snapshot ?: 'Gracz'),
+            'elo_before' => (int) $source->elo_before,
+            'last_seen_at' => $matchedAt,
+            'ready_at' => $matchedAt,
+        ]);
+
+        RankedMatchPlayer::create([
+            'ranked_match_id' => $match->getKey(),
+            'user_id' => $user->getKey(),
+            'slot' => 'player2',
+            'status' => 'matched',
+            'presence_state' => 'online',
+            'username_snapshot' => $user->name,
+            'elo_before' => $rating->rating,
+            'last_seen_at' => $matchedAt,
+        ]);
+
+        RankedQueueEntry::create([
+            'user_id' => $user->getKey(),
+            'license_category_id' => $category->getKey(),
+            'ranked_match_id' => $match->getKey(),
+            'status' => 'matched',
+            'joined_at' => $matchedAt,
+            'matched_at' => $matchedAt,
+            'payload' => [
+                'source' => 'replay',
+            ],
+        ]);
+
+        $this->presenceStore->touchMany($match, [$user->getKey()], $matchedAt, $this->presenceTtlSeconds());
+
+        $this->appendMatchEvent($match, 'queue.matched', ['starting_in_seconds' => 0], $matchedAt, null, 'queue.matched');
+
+        return $this->freshMatch($match) ?? $match;
+    }
+
+    /**
+     * Odtwarza odpowiedzi nagranego gracza, których czas od startu meczu już minął.
+     * Wywoływane przy każdym odświeżeniu stanu meczu (jak reszta leniwej maszyny stanów).
+     */
+    protected function releaseReplayAnswers(RankedMatch $match, Carbon $now): RankedMatch
+    {
+        if (! $match->isReplay() || $match->status !== 'in_progress' || ! $match->started_at) {
+            return $match;
+        }
+
+        $replayPlayer = $match->players->firstWhere('is_replay', true);
+
+        if (! $replayPlayer) {
+            return $match;
+        }
+
+        $limitMs = min(
+            $this->elapsedMsSinceMatchStart($match, $now),
+            max((int) $match->duration_seconds, 1) * 1000,
+        );
+
+        // Blokada wiersza meczu: dwa równoległe odświeżenia nie odtworzą tej samej odpowiedzi dwa razy.
+        RankedMatch::query()->whereKey($match->getKey())->lockForUpdate()->first();
+
+        $alreadyReleased = RankedMatchAnswer::query()
+            ->where('ranked_match_id', $match->getKey())
+            ->where('user_id', $replayPlayer->user_id)
+            ->pluck('question_id')
+            ->map(fn ($questionId) => (int) $questionId)
+            ->all();
+        $questionIds = collect($match->payload['question_ids'] ?? [])
+            ->map(fn ($questionId) => (int) $questionId)
+            ->values();
+        $sourceMatch = RankedMatch::query()->find($match->replay_source_match_id);
+
+        if (! $sourceMatch) {
+            return $match;
+        }
+
+        $dueAnswers = RankedMatchAnswer::query()
+            ->where('ranked_match_id', $sourceMatch->getKey())
+            ->where('user_id', $match->replay_source_user_id)
+            ->get()
+            ->map(fn (RankedMatchAnswer $answer) => [
+                'answer' => $answer,
+                'elapsed_ms' => $this->replayAnswerElapsedMs($sourceMatch, $answer),
+            ])
+            ->filter(fn (array $item) => $item['elapsed_ms'] <= $limitMs
+                && ! in_array((int) $item['answer']->question_id, $alreadyReleased, true)
+                && $questionIds->contains((int) $item['answer']->question_id))
+            ->sortBy('elapsed_ms')
+            ->values();
+
+        if ($dueAnswers->isEmpty()) {
+            return $match;
+        }
+
+        $previousElapsedMs = (int) (RankedMatchAnswer::query()
+            ->where('ranked_match_id', $match->getKey())
+            ->where('user_id', $replayPlayer->user_id)
+            ->max('elapsed_ms') ?? 0);
+
+        foreach ($dueAnswers as $item) {
+            /** @var RankedMatchAnswer $sourceAnswer */
+            $sourceAnswer = $item['answer'];
+            $elapsedMs = (int) $item['elapsed_ms'];
+            $questionIndex = $questionIds->search((int) $sourceAnswer->question_id);
+
+            $answer = RankedMatchAnswer::create([
+                'ranked_match_id' => $match->getKey(),
+                'user_id' => $replayPlayer->user_id,
+                'question_id' => $sourceAnswer->question_id,
+                'question_number' => $questionIndex + 1,
+                'selected_answer' => $sourceAnswer->selected_answer,
+                'is_correct' => $sourceAnswer->is_correct,
+                'response_time_ms' => max($elapsedMs - $previousElapsedMs, 0),
+                'elapsed_ms' => $elapsedMs,
+                'answered_at' => $match->started_at->copy()->addMilliseconds($elapsedMs),
+            ]);
+            $previousElapsedMs = $elapsedMs;
+
+            // Zdarzenie dostaje czas odtworzenia (teraz), żeby nie wpadło przed już wysłane zdarzenia.
+            $this->appendMatchEvent(
+                $match,
+                'match.opponent_answered',
+                [
+                    'question_id' => $sourceAnswer->question_id,
+                    'question_number' => $questionIndex + 1,
+                    'selected_answer' => $sourceAnswer->selected_answer,
+                ],
+                $now,
+                $replayPlayer->user_id,
+                'match.opponent_answered.answer_'.$answer->getKey(),
+            );
+        }
+
+        $this->refreshPlayerAggregates($match);
+        $this->maybeFinishMatch($match);
+
+        return $this->freshMatch($match) ?? $match;
+    }
+
+    protected function replayAnswerElapsedMs(RankedMatch $sourceMatch, RankedMatchAnswer $answer): int
+    {
+        if ($answer->elapsed_ms !== null) {
+            return (int) $answer->elapsed_ms;
+        }
+
+        // Starsze mecze (sprzed 2026-11-25) mają tylko czas odpowiedzi z dokładnością do sekundy.
+        return $this->elapsedMsSinceMatchStart($sourceMatch, $answer->answered_at ?? $sourceMatch->started_at ?? now());
     }
 
     /**

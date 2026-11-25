@@ -66,6 +66,7 @@ interface SpecSummary {
     match_duration_seconds: number;
     total_questions: number;
     max_concurrent_players: number;
+    replay_offer_after_seconds?: number;
     implementation_status: string;
 }
 
@@ -450,6 +451,7 @@ const props = defineProps<{
     selectedCategory: CategoryOption | null;
     leaderboard: LeaderboardEntry[];
     currentUserRanking?: CurrentUserRanking | null;
+    replayAvailable?: boolean;
     specSummary: SpecSummary;
     realtimeTransport: RealtimeTransportSummary;
 }>();
@@ -984,6 +986,51 @@ const joinRealQueue = async () => {
     try {
         const response = await apiClient.post<RankedJoinResponse>(
             route('api.v1.ranked.queue.join'),
+            {
+                category_id: selectedCategory.value.id,
+            },
+        );
+
+        await syncOverviewSnapshot(response.data);
+        navigateToRankingScreen('waiting');
+    } catch (error) {
+        backendError.value = normalizeBackendError(error);
+    } finally {
+        backendBusy.value = false;
+    }
+};
+
+// Mecz z nagraniem: przycisk w lobby od razu, a na ekranie oczekiwania propozycja po 20 s bez przeciwnika.
+const replayAvailable = computed(() => props.replayAvailable === true);
+const replayOfferAfterSeconds = computed(() => props.specSummary.replay_offer_after_seconds ?? 20);
+const replayLobbyActionVisible = computed(() =>
+    replayAvailable.value
+    && !backendActiveMatch.value
+    && !['queued', 'server_full', 'matched'].includes(rankedOverview.value?.queue?.status ?? ''),
+);
+const replayWaitingOfferVisible = computed(() => {
+    const queue = rankedOverview.value?.queue;
+
+    if (!replayAvailable.value || backendActiveMatch.value || queue?.status !== 'queued') {
+        return false;
+    }
+
+    const elapsedSeconds = getRankedElapsedSeconds(queue.joined_at, backendNowMs.value) ?? 0;
+
+    return elapsedSeconds >= replayOfferAfterSeconds.value;
+});
+
+const startReplayMatch = async () => {
+    if (!selectedCategory.value || sessionExpired.value) {
+        return;
+    }
+
+    backendBusy.value = true;
+    backendError.value = null;
+
+    try {
+        const response = await apiClient.post<RankedJoinResponse>(
+            route('api.v1.ranked.replay'),
             {
                 category_id: selectedCategory.value.id,
             },
@@ -2900,6 +2947,25 @@ const backendTransportChipClass = computed(() => {
                     <p class="mt-4 text-[0.8rem] font-medium text-[#98a2b3]">{{ waitingScreenMeta }}</p>
                 </main>
 
+                <section
+                    v-if="replayWaitingOfferVisible"
+                    class="mb-4 rounded-[8px] border border-[#dfe3e8] bg-white px-4 py-4 text-left"
+                    aria-labelledby="ranking-replay-offer-heading"
+                >
+                    <h2 id="ranking-replay-offer-heading" class="text-[0.98rem] font-bold text-[#17191d]">Nikogo teraz nie ma</h2>
+                    <p class="mt-1 text-[0.86rem] leading-5 text-[#667085]">
+                        Zagraj z nagraniem innego gracza z kategorii {{ selectedCategory?.short_name ?? selectedCategory?.code }}. Dostaniesz te same pytania i zobaczysz jego postęp w tym samym tempie.
+                    </p>
+                    <button
+                        type="button"
+                        class="mt-3 flex min-h-12 w-full items-center justify-center rounded-[8px] bg-[#0b63ce] px-4 text-[0.94rem] font-semibold text-white disabled:cursor-not-allowed disabled:opacity-55"
+                        :disabled="backendBusy"
+                        @click="startReplayMatch"
+                    >
+                        Zagraj z nagraniem
+                    </button>
+                </section>
+
                 <div class="border-t border-[#dfe3e8] pt-4">
                     <button
                         v-if="waitingScreenCanExit"
@@ -2981,6 +3047,15 @@ const backendTransportChipClass = computed(() => {
                                 @click="fetchRankedOverview()"
                             >
                                 Odśwież
+                            </button>
+                            <button
+                                v-if="replayWaitingOfferVisible"
+                                type="button"
+                                class="inline-flex min-h-[3.1rem] items-center justify-center border border-[#17161b] bg-[#17161b] px-6 text-[0.92rem] font-semibold text-white transition hover:bg-[#344054] disabled:cursor-not-allowed disabled:opacity-60"
+                                :disabled="backendBusy"
+                                @click="startReplayMatch"
+                            >
+                                Nikogo nie ma — zagraj z nagraniem
                             </button>
                             <button
                                 v-if="waitingScreenCanExit"
@@ -3527,6 +3602,18 @@ const backendTransportChipClass = computed(() => {
                 >
                     {{ primaryRankingActionLabel }}
                 </button>
+                <button
+                    v-if="replayLobbyActionVisible"
+                    type="button"
+                    class="mt-2 flex min-h-12 w-full items-center justify-center rounded-[8px] border border-[#dfe3e8] bg-white px-4 text-[0.92rem] font-semibold text-[#17191d] transition disabled:cursor-not-allowed disabled:opacity-55"
+                    :disabled="backendBusy || !selectedCategory"
+                    @click="startReplayMatch"
+                >
+                    Zagraj z nagraniem
+                </button>
+                <p v-if="replayLobbyActionVisible" class="mt-2 text-[0.78rem] leading-5 text-[#667085]">
+                    Ścigasz się z zapisanym meczem innego gracza z kategorii {{ selectedCategory?.short_name ?? selectedCategory?.code }}. Wynik liczy się do ELO.
+                </p>
                 <p v-if="inlineLobbyError" class="mt-3 text-[0.82rem] font-semibold leading-5 text-[#b42318]">{{ inlineLobbyError }}</p>
             </section>
 
@@ -3883,6 +3970,15 @@ const backendTransportChipClass = computed(() => {
                                                     aria-hidden="true"
                                                 ></span>
                                                 <span>{{ primaryRankingActionLabel }}</span>
+                                            </button>
+                                            <button
+                                                v-if="replayLobbyActionVisible"
+                                                type="button"
+                                                class="mt-3 inline-flex min-h-[3.1rem] w-full items-center justify-center border border-[#d8d8dd] bg-white px-6 text-[0.92rem] font-semibold text-[#17161b] transition hover:border-[#bfc3c9] disabled:cursor-not-allowed disabled:opacity-60"
+                                                :disabled="backendBusy || !selectedCategory"
+                                                @click="startReplayMatch"
+                                            >
+                                                Zagraj z nagraniem
                                             </button>
 
                                             <p

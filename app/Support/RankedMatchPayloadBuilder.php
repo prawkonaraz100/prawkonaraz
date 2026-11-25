@@ -123,6 +123,7 @@ class RankedMatchPayloadBuilder
                     'user_id' => $player->user_id,
                     'username' => $player->username_snapshot,
                     'slot' => $player->slot,
+                    'is_replay' => (bool) $player->is_replay,
                     'status' => $player->status,
                     'ready_at' => $player->ready_at?->toIso8601String(),
                     'is_ready' => $player->ready_at !== null,
@@ -148,6 +149,11 @@ class RankedMatchPayloadBuilder
             'public_id' => $match->public_id,
             'status' => $match->status,
             'state' => $this->matchState($match, $currentUser),
+            'is_replay' => $match->isReplay(),
+            'replay' => $match->isReplay() ? [
+                'source_username' => data_get($match->payload, 'replay.source_username'),
+                'source_elo' => data_get($match->payload, 'replay.source_elo'),
+            ] : null,
             'api_version' => $match->api_version,
             'duration_seconds' => $match->duration_seconds,
             'total_questions' => $match->total_questions,
@@ -334,7 +340,8 @@ class RankedMatchPayloadBuilder
     protected function playerPresence(RankedMatch $match, RankedMatchPlayer $player, User $currentUser): array
     {
         $now = now();
-        $lastSeenAt = $this->presenceStore->lastSeenAt($match, $player->user_id)
+        // Nagranie nie wysyła sygnałów obecności; zawsze pokazujemy je jako połączone.
+        $lastSeenAt = $player->is_replay ? $now : $this->presenceStore->lastSeenAt($match, $player->user_id)
             ?? $player->last_seen_at
             ?? $match->started_at
             ?? $match->matched_at
