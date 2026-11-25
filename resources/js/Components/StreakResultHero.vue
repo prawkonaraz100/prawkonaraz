@@ -3,8 +3,8 @@ import { computed } from 'vue';
 import { Clock } from '@lucide/vue';
 import { formatStreakDuration } from '@/utils/streakDuration';
 import { streakResultSummary } from '@/utils/streakResultSummary';
-import recordArt from '../../images/session/streak-result-record.png';
-import medalArt from '../../images/session/streak-result-medal.png';
+import recordArt from '../../images/session/streak-result-record-dark.png';
+import medalArt from '../../images/session/streak-result-medal-dark.png';
 
 const props = defineProps<{ score: number; previousBest: number; durationSeconds?: number | null }>();
 const summary = computed(() => streakResultSummary(props.score, props.previousBest));

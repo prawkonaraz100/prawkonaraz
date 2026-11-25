@@ -273,6 +273,7 @@ const streakLeaders = ref<StreakLeader[]>([]);
 let streakOverviewRequested = false;
 const streakOverviewLoading = ref(false);
 const topStreakLeaders = computed(() => streakLeaders.value.slice(0, 3));
+const myStreakLeader = ref<StreakLeader | null>(null);
 const trainingHref = computed(() => `${route('session.index')}?widok=trening`);
 const professionalCourseTiles = computed(() => props.professionalCourses ?? []);
 const professionalCourseAccent = (index: number) => ['#ffc94a', '#7ab8ff', '#ff9f6b', '#81b64c'][index % 4];
@@ -283,12 +284,30 @@ const loadStreakOverview = async () => {
     streakOverviewRequested = true;
     streakOverviewLoading.value = true;
     try {
-        const overview = await apiClient.get<{ personal_best?: number; leaderboard?: StreakLeader[] }>(
+        const overview = await apiClient.get<{
+            personal_best?: number;
+            personal_best_duration_seconds?: number | null;
+            personal_rank?: number | null;
+            leaderboard?: StreakLeader[];
+        }>(
             route('streak-challenge.state'),
             { timeoutMs: 8000 },
         );
         streakBest.value = typeof overview.personal_best === 'number' ? overview.personal_best : null;
         streakLeaders.value = Array.isArray(overview.leaderboard) ? overview.leaderboard : [];
+        const user = page.props.auth.user;
+        myStreakLeader.value = null;
+        if (user && overview.personal_rank && streakBest.value !== null) {
+            myStreakLeader.value = streakLeaders.value.find((leader) => leader.is_me) ?? {
+                position: overview.personal_rank,
+                name: user.name,
+                score: streakBest.value,
+                duration_seconds: overview.personal_best_duration_seconds ?? null,
+                avatar_url: avatarUrl.value,
+                initials: avatarInitials.value,
+                is_me: true,
+            };
+        }
     } catch {
         // The home screen stays usable without the optional streak summary.
         streakOverviewRequested = false;
@@ -827,18 +846,16 @@ onUnmounted(() => {
             </section>
 
             <section v-else-if="topStreakLeaders.length" class="mt-6" aria-labelledby="mobile-leaders-title">
-                <div class="flex items-center justify-between gap-3">
-                    <h2 id="mobile-leaders-title" class="text-[1.0625rem] font-bold text-[#ffffffd9]">Najlepsi w serii</h2>
-                    <Link :href="trainingHref" class="inline-flex min-h-11 items-center text-sm font-semibold text-[#ffffffb8] hover:text-[#ffffffd9] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffffffd9]">
-                        Pełny ranking <span class="ml-1" aria-hidden="true">›</span>
-                    </Link>
-                </div>
                 <MobileStreakLeaderboard
-                    class="mt-1"
+                    title-id="mobile-leaders-title"
                     :leaders="topStreakLeaders"
                     :caption="`Kategoria ${categoryShortName}`"
+                    :me="myStreakLeader"
                     label="Najlepsze serie"
                 />
+                <Link :href="trainingHref" class="pk-btn-secondary mt-2.5 flex min-h-11 items-center justify-center text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffffffd9]">
+                    Pełny ranking <span class="ml-1" aria-hidden="true">›</span>
+                </Link>
             </section>
 
             <Teleport to="body">

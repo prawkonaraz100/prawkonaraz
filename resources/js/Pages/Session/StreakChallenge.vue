@@ -7,7 +7,7 @@ import QuestionAudioControl from '@/Components/QuestionAudioControl.vue';
 import QuestionExplanationRuntimeBlock from '@/Components/QuestionExplanationRuntimeBlock.vue';
 import StreakAudioSettings from '@/Components/StreakAudioSettings.vue';
 import StreakResultHero from '@/Components/StreakResultHero.vue';
-import { formatStreakDuration } from '@/utils/streakDuration';
+import { formatStreakDuration, type StreakLeader } from '@/utils/streakDuration';
 import { streakResultExplanationBody } from '@/utils/streakResultExplanation';
 import { useMediaQuery } from '@/composables/useMediaQuery';
 import { readStreakAudioPreferences, streakAudioPreferencesKey } from '@/utils/streakAudioPreferences';
@@ -186,6 +186,22 @@ watch([screen, () => currentQuestion.value?.id, mobileViewport], () => {
 const currentQuestionPromptHtml = computed(() => renderExamPromptHtml(currentQuestion.value?.prompt));
 const canResume = computed(() => activeRun.value?.status === 'in_progress' && Boolean(currentQuestion.value));
 const recordDelta = computed(() => lastResult.value ? Math.max(lastResult.value.score - recordBeforeRun.value, 0) : 0);
+// The player's own row pinned under the leaderboard when the record is outside the top 20.
+const myStreakStanding = computed<StreakLeader | null>(() => {
+    const user = page.props.auth?.user;
+    if (!overview.value.personal_rank || !user) return null;
+
+    return {
+        position: overview.value.personal_rank,
+        name: user.name,
+        score: overview.value.personal_best,
+        duration_seconds: overview.value.personal_best_duration_seconds ?? null,
+        avatar_url: user.avatar_url ?? null,
+        initials: user.avatar_initials ?? user.name.slice(0, 1).toUpperCase(),
+        is_me: true,
+    };
+});
+
 const streakProgressGoal = computed(() => Math.max(overview.value.personal_best, 1));
 const streakProgressPercent = computed(() => Math.min(100, ((activeRun.value?.score ?? 0) / streakProgressGoal.value) * 100));
 const mobileVideoKey = (index: number) => `${currentQuestion.value?.id ?? 'inactive'}-${index}`;
@@ -547,14 +563,17 @@ const submitPendingAnswer = async () => {
                 <p v-else-if="overview.question_count === 0" class="mt-2.5 text-center text-sm text-[#ffffffb8]">W tej kategorii nie ma teraz pytań do treningu.</p>
 
                 <section class="mt-6" aria-labelledby="streak-mobile-ranking-title">
-                    <h2 id="streak-mobile-ranking-title" class="text-[1.0625rem] font-bold">Najlepsi w serii</h2>
                     <MobileStreakLeaderboard
                         v-if="overview.leaderboard.length"
-                        class="mt-2.5"
+                        title-id="streak-mobile-ranking-title"
                         :leaders="overview.leaderboard"
                         :caption="`Kategoria ${category.code}`"
+                        :me="myStreakStanding"
                     />
-                    <p v-else class="pk-panel mt-2.5 px-5 py-8 text-center text-sm leading-6 text-[#ffffffb8]">Nie ma jeszcze wyników. Rozpocznij serię i wyznacz pierwszy rekord.</p>
+                    <template v-else>
+                        <h2 id="streak-mobile-ranking-title" class="text-[1.0625rem] font-bold">Najlepsi w serii</h2>
+                        <p class="pk-panel mt-2.5 px-5 py-8 text-center text-sm leading-6 text-[#ffffffb8]">Nie ma jeszcze wyników. Rozpocznij serię i wyznacz pierwszy rekord.</p>
+                    </template>
                     <p class="mt-3 text-center text-[0.75rem] leading-5 text-[#ffffffb8]">Przy remisie wygrywa krótszy czas. Rozpoczęte serie: {{ overview.attempts_count }}.</p>
                 </section>
 
