@@ -482,3 +482,121 @@ test('realtime stream emits queue.matched for users who already have an active r
     expect($content)->toContain('"starting_in_seconds"');
     expect($content)->not->toContain('event: queue.queued');
 });
+
+test('players queued in different license categories are never matched with each other', function () {
+    $categoryB = LicenseCategory::factory()->create(['code' => 'B', 'name' => 'Kategoria B']);
+    $categoryC = LicenseCategory::factory()->create(['code' => 'C', 'name' => 'Kategoria C']);
+
+    Question::factory()->for($categoryB, 'licenseCategory')->create();
+    Question::factory()->for($categoryC, 'licenseCategory')->create();
+
+    $playerB = User::factory()->testAccount()->withPurchasedAccess()->create(['name' => 'Gracz B']);
+    $playerC = User::factory()->testAccount()->withPurchasedAccess()->create(['name' => 'Gracz C']);
+    $secondPlayerB = User::factory()->testAccount()->withPurchasedAccess()->create(['name' => 'Drugi gracz B']);
+
+    $this->actingAs($playerB)
+        ->postJson(route('api.v1.ranked.queue.join'), ['category_id' => $categoryB->getKey()])
+        ->assertOk()
+        ->assertJsonPath('data.state', 'queued');
+
+    $this->actingAs($playerC)
+        ->postJson(route('api.v1.ranked.queue.join'), ['category_id' => $categoryC->getKey()])
+        ->assertOk()
+        ->assertJsonPath('data.state', 'queued')
+        ->assertJsonPath('data.active_match', null);
+
+    // Odświeżenie stanu też nie może połączyć graczy z różnych kategorii.
+    $this->actingAs($playerC)
+        ->getJson(route('api.v1.ranked.overview'))
+        ->assertOk()
+        ->assertJsonPath('data.state', 'queued');
+
+    expect(RankedMatch::query()->count())->toBe(0);
+
+    $this->actingAs($secondPlayerB)
+        ->postJson(route('api.v1.ranked.queue.join'), ['category_id' => $categoryB->getKey()])
+        ->assertOk()
+        ->assertJsonPath('data.state', 'matched')
+        ->assertJsonPath('data.active_match.category.code', 'B');
+
+    $match = RankedMatch::query()->with('players')->sole();
+
+    expect($match->license_category_id)->toBe($categoryB->getKey());
+    expect($match->players->pluck('user_id')->sort()->values()->all())
+        ->toEqual(collect([$playerB->getKey(), $secondPlayerB->getKey()])->sort()->values()->all());
+    expect(RankedQueueEntry::query()->where('user_id', $playerC->getKey())->value('status'))->toBe('queued');
+});
+
+test('queued players who missed each other are matched on the next overview refresh', function () {
+    $category = LicenseCategory::factory()->create(['code' => 'B', 'name' => 'Kategoria B']);
+    Question::factory()->for($category, 'licenseCategory')->create();
+
+    $firstUser = User::factory()->withPurchasedAccess()->create();
+    $secondUser = User::factory()->withPurchasedAccess()->create();
+
+    // Symulacja wyścigu: oba wpisy powstały, ale żadne dołączenie nie zobaczyło drugiego gracza.
+    foreach ([$firstUser, $secondUser] as $user) {
+        RankedQueueEntry::query()->create([
+            'user_id' => $user->getKey(),
+            'license_category_id' => $category->getKey(),
+            'status' => 'queued',
+            'joined_at' => now(),
+            'payload' => ['source' => 'api'],
+        ]);
+    }
+
+    $this->actingAs($secondUser)
+        ->getJson(route('api.v1.ranked.overview'))
+        ->assertOk()
+        ->assertJsonPath('data.state', 'matched')
+        ->assertJsonPath('data.active_match.category.code', 'B');
+
+    expect(RankedMatch::query()->count())->toBe(1);
+    expect(RankedQueueEntry::query()->where('status', 'matched')->count())->toBe(2);
+});
+
+test('the database allows only one active ranked queue entry per user', function () {
+    $category = LicenseCategory::factory()->create(['code' => 'B', 'name' => 'Kategoria B']);
+    $user = User::factory()->withPurchasedAccess()->create();
+
+    $entry = fn () => RankedQueueEntry::query()->create([
+        'user_id' => $user->getKey(),
+        'license_category_id' => $category->getKey(),
+        'status' => 'queued',
+        'joined_at' => now(),
+    ]);
+
+    $entry();
+
+    expect($entry)->toThrow(\Illuminate\Database\UniqueConstraintViolationException::class);
+
+    // Zakończone wpisy nie blokują kolejnego dołączenia.
+    RankedQueueEntry::query()->where('user_id', $user->getKey())->update(['status' => 'cancelled']);
+    $entry();
+
+    expect(RankedQueueEntry::query()->where('user_id', $user->getKey())->count())->toBe(2);
+});
+
+test('joining the same queue twice keeps a single active entry', function () {
+    $category = LicenseCategory::factory()->create(['code' => 'B', 'name' => 'Kategoria B']);
+    Question::factory()->for($category, 'licenseCategory')->create();
+    $user = User::factory()->withPurchasedAccess()->create();
+
+    $this->actingAs($user)
+        ->postJson(route('api.v1.ranked.queue.join'), ['category_id' => $category->getKey()])
+        ->assertOk()
+        ->assertJsonPath('data.joined', true);
+
+    $this->actingAs($user)
+        ->postJson(route('api.v1.ranked.queue.join'), ['category_id' => $category->getKey()])
+        ->assertOk()
+        ->assertJsonPath('data.joined', false)
+        ->assertJsonPath('data.state', 'queued');
+
+    expect(
+        RankedQueueEntry::query()
+            ->where('user_id', $user->getKey())
+            ->whereIn('status', ['queued', 'matched', 'server_full'])
+            ->count()
+    )->toBe(1);
+});

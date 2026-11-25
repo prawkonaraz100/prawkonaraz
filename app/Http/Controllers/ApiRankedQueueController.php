@@ -60,6 +60,35 @@ class ApiRankedQueueController extends Controller
         ]);
     }
 
+    /**
+     * Mecz z nagraniem innego gracza tej samej kategorii (gdy nikt nie czeka w kolejce).
+     */
+    public function replay(
+        JoinRankedQueueRequest $request,
+        RankedMatchService $rankedMatchService,
+        RankedMatchPayloadBuilder $payloadBuilder,
+        StudyContextService $studyContextService,
+    ): JsonResponse {
+        $category = LicenseCategory::query()->findOrFail($request->integer('category_id'));
+        $studyContextService->assertUserCanUseCategory($request->user(), $category);
+        $result = $rankedMatchService->startReplayMatch($request->user(), $category);
+
+        return response()->json([
+            'data' => [
+                'joined' => $result['joined'],
+                'state' => $payloadBuilder->overviewState($result['active_match'], $result['queue'], $request->user()),
+                'rating' => $payloadBuilder->rating($result['rating']),
+                'queue' => $payloadBuilder->queueEntry($result['queue']),
+                'capacity' => $payloadBuilder->capacity($result['capacity']),
+                'active_match' => $payloadBuilder->match($result['active_match'], $request->user()),
+                'recent_match' => $payloadBuilder->historyEntry(
+                    $rankedMatchService->recentMatch($request->user()),
+                    $request->user(),
+                ),
+            ],
+        ]);
+    }
+
     public function leave(
         Request $request,
         RankedMatchService $rankedMatchService,

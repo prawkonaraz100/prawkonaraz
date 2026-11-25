@@ -11,6 +11,7 @@ class RankedMatchPlayer extends Model
         'ranked_match_id',
         'user_id',
         'slot',
+        'is_replay',
         'status',
         'presence_state',
         'username_snapshot',
@@ -33,6 +34,7 @@ class RankedMatchPlayer extends Model
         return [
             'ranked_match_id' => 'integer',
             'user_id' => 'integer',
+            'is_replay' => 'boolean',
             'elo_before' => 'integer',
             'elo_after' => 'integer',
             'elo_change' => 'integer',

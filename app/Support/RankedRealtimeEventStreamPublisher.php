@@ -435,7 +435,7 @@ class RankedRealtimeEventStreamPublisher
             'timestamp' => $queueServerFullEvent['timestamp'] ?? now()->toIso8601String(),
             'data' => [
                 'error_code' => data_get($queueServerFullEvent, 'data.error_code', 'SERVER_FULL'),
-                'message' => data_get($queueServerFullEvent, 'data.message', 'Server full (100/100). Waiting for space...'),
+                'message' => data_get($queueServerFullEvent, 'data.message', 'Brak wolnych miejsc (100/100). Czekasz na wolne miejsce…'),
                 'details' => [
                     'channel' => 'queue',
                     'user_id' => $user->getKey(),

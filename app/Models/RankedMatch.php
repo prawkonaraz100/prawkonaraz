@@ -11,6 +11,8 @@ class RankedMatch extends Model
     protected $fillable = [
         'public_id',
         'license_category_id',
+        'replay_source_match_id',
+        'replay_source_user_id',
         'status',
         'api_version',
         'duration_seconds',
@@ -29,6 +31,8 @@ class RankedMatch extends Model
     {
         return [
             'license_category_id' => 'integer',
+            'replay_source_match_id' => 'integer',
+            'replay_source_user_id' => 'integer',
             'duration_seconds' => 'integer',
             'total_questions' => 'integer',
             'matched_at' => 'datetime',
@@ -39,6 +43,11 @@ class RankedMatch extends Model
             'abandoned_at' => 'datetime',
             'payload' => 'array',
         ];
+    }
+
+    public function isReplay(): bool
+    {
+        return $this->replay_source_match_id !== null;
     }
 
     public function licenseCategory(): BelongsTo

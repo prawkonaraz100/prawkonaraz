@@ -643,6 +643,8 @@ Route::middleware(['auth', 'verified'])->prefix('/api/v1')->group(function () {
             ->name('api.v1.ranked.queue.join');
         Route::post('/ranked/queue/leave', [ApiRankedQueueController::class, 'leave'])
             ->name('api.v1.ranked.queue.leave');
+        Route::post('/ranked/replay', [ApiRankedQueueController::class, 'replay'])
+            ->name('api.v1.ranked.replay');
         Route::get('/ranked/matches/{rankedMatch:public_id}', [ApiRankedMatchController::class, 'show'])
             ->name('api.v1.ranked.matches.show');
         Route::get('/ranked/matches/{rankedMatch:public_id}/events', [ApiRankedMatchController::class, 'events'])

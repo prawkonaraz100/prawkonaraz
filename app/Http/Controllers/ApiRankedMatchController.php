@@ -93,10 +93,10 @@ class ApiRankedMatchController extends Controller
             $request->user(),
             $question,
             (string) $request->string('user_answer'),
-            $request->filled('response_time_ms') ? $request->integer('response_time_ms') : null,
         );
 
-        $match = $rankedMatchService->matchForUser($request->user(), $rankedMatch->public_id);
+        // Przejścia stanu wykonał już zapis odpowiedzi, więc tylko odczytujemy mecz.
+        $match = $rankedMatchService->matchForUser($request->user(), $rankedMatch->public_id, sync: false);
 
         return response()->json([
             'data' => [

@@ -114,7 +114,6 @@ class RankedMatchPayloadBuilder
         $match->loadMissing([
             'licenseCategory',
             'players',
-            'players.user',
         ]);
 
         $players = $match->players
@@ -123,6 +122,7 @@ class RankedMatchPayloadBuilder
                     'user_id' => $player->user_id,
                     'username' => $player->username_snapshot,
                     'slot' => $player->slot,
+                    'is_replay' => (bool) $player->is_replay,
                     'status' => $player->status,
                     'ready_at' => $player->ready_at?->toIso8601String(),
                     'is_ready' => $player->ready_at !== null,
@@ -148,6 +148,11 @@ class RankedMatchPayloadBuilder
             'public_id' => $match->public_id,
             'status' => $match->status,
             'state' => $this->matchState($match, $currentUser),
+            'is_replay' => $match->isReplay(),
+            'replay' => $match->isReplay() ? [
+                'source_username' => data_get($match->payload, 'replay.source_username'),
+                'source_elo' => data_get($match->payload, 'replay.source_elo'),
+            ] : null,
             'api_version' => $match->api_version,
             'duration_seconds' => $match->duration_seconds,
             'total_questions' => $match->total_questions,
@@ -198,7 +203,6 @@ class RankedMatchPayloadBuilder
         $match->loadMissing([
             'licenseCategory',
             'players',
-            'players.user',
         ]);
 
         $player = $match->players->firstWhere('user_id', $currentUser->getKey());
@@ -257,7 +261,8 @@ class RankedMatchPayloadBuilder
                     $answer = $answerMap->get($question->getKey());
 
                     return [
-                        ...$this->studySessionApiPayloadBuilder->question($question, null, $isCompleted),
+                        // Wyjaśnienia (także obrazkowe) dopiero po meczu, żeby nie podpowiadały odpowiedzi w trakcie.
+                        ...$this->studySessionApiPayloadBuilder->question($question, null, $isCompleted, $isCompleted),
                         'question_number' => $index + 1,
                         'selected_answer' => $answer?->selected_answer ? Str::upper($answer->selected_answer) : null,
                         'is_answered' => $answer !== null,
@@ -333,7 +338,8 @@ class RankedMatchPayloadBuilder
     protected function playerPresence(RankedMatch $match, RankedMatchPlayer $player, User $currentUser): array
     {
         $now = now();
-        $lastSeenAt = $this->presenceStore->lastSeenAt($match, $player->user_id)
+        // Nagranie nie wysyła sygnałów obecności; zawsze pokazujemy je jako połączone.
+        $lastSeenAt = $player->is_replay ? $now : $this->presenceStore->lastSeenAt($match, $player->user_id)
             ?? $player->last_seen_at
             ?? $match->started_at
             ?? $match->matched_at

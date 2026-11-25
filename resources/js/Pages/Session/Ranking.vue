@@ -66,6 +66,7 @@ interface SpecSummary {
     match_duration_seconds: number;
     total_questions: number;
     max_concurrent_players: number;
+    replay_offer_after_seconds?: number;
     implementation_status: string;
 }
 
@@ -101,6 +102,10 @@ interface LeaderboardEntry {
     current_streak: number;
     best_streak: number;
     win_rate: number | null;
+}
+
+interface CurrentUserRanking extends LeaderboardEntry {
+    total_players: number;
 }
 
 interface RankedApiRating {
@@ -445,18 +450,13 @@ const props = defineProps<{
     navigationLock: 'lobby' | null;
     selectedCategory: CategoryOption | null;
     leaderboard: LeaderboardEntry[];
+    currentUserRanking?: CurrentUserRanking | null;
+    replayAvailable?: boolean;
     specSummary: SpecSummary;
     realtimeTransport: RealtimeTransportSummary;
 }>();
 
 const page = usePage<PageProps>();
-
-const availableCategories = computed<CategoryOption[]>(() => {
-    const categories = (page.props.studyContext?.categories ?? []) as CategoryOption[];
-    const rankedCategories = categories.filter((category) => category.code === 'B');
-
-    return rankedCategories.length > 0 ? rankedCategories : categories;
-});
 
 const playerName = computed(() => {
     const fullName = String(page.props.auth?.user?.name ?? 'Ty');
@@ -464,23 +464,19 @@ const playerName = computed(() => {
     return fullName.split(' ')[0] || fullName;
 });
 
-const selectedCategoryId = ref<number | null>(
-    props.selectedCategory?.id ?? availableCategories.value[0]?.id ?? null,
-);
 const selectedScenario = ref<RankedScenarioKey>('happy_path');
 const isRunning = ref(false);
 const scheduledTimeouts: number[] = [];
 
-const selectedCategory = computed(() =>
-    availableCategories.value.find((category) => category.id === selectedCategoryId.value)
-    ?? availableCategories.value[0]
-    ?? props.selectedCategory
-    ?? null,
-);
+// Kategorię kolejki wybiera serwer (link ?category=, kategoria nauki z profilu). Gracze B i C nie trafiają do jednej kolejki.
+const selectedCategory = computed<CategoryOption | null>(() => props.selectedCategory ?? null);
 
 const currentScreen = computed<RankedScreen>(() => props.screen);
 const navigationLock = computed(() => props.navigationLock);
 const leaderboardEntries = computed<LeaderboardEntry[]>(() => props.leaderboard ?? []);
+
+// Własne miejsce pokazujemy pod listą, bo „Najlepsi gracze” nie zawierają bieżącego gracza.
+const currentUserRankingEntry = computed<CurrentUserRanking | null>(() => props.currentUserRanking ?? null);
 const leaderboardUpdatedLabel = computed(() =>
     new Intl.DateTimeFormat('pl-PL', {
         day: 'numeric',
@@ -990,6 +986,51 @@ const joinRealQueue = async () => {
     try {
         const response = await apiClient.post<RankedJoinResponse>(
             route('api.v1.ranked.queue.join'),
+            {
+                category_id: selectedCategory.value.id,
+            },
+        );
+
+        await syncOverviewSnapshot(response.data);
+        navigateToRankingScreen('waiting');
+    } catch (error) {
+        backendError.value = normalizeBackendError(error);
+    } finally {
+        backendBusy.value = false;
+    }
+};
+
+// Mecz z nagraniem: przycisk w lobby od razu, a na ekranie oczekiwania propozycja po 20 s bez przeciwnika.
+const replayAvailable = computed(() => props.replayAvailable === true);
+const replayOfferAfterSeconds = computed(() => props.specSummary.replay_offer_after_seconds ?? 20);
+const replayLobbyActionVisible = computed(() =>
+    replayAvailable.value
+    && !backendActiveMatch.value
+    && !['queued', 'server_full', 'matched'].includes(rankedOverview.value?.queue?.status ?? ''),
+);
+const replayWaitingOfferVisible = computed(() => {
+    const queue = rankedOverview.value?.queue;
+
+    if (!replayAvailable.value || backendActiveMatch.value || queue?.status !== 'queued') {
+        return false;
+    }
+
+    const elapsedSeconds = getRankedElapsedSeconds(queue.joined_at, backendNowMs.value) ?? 0;
+
+    return elapsedSeconds >= replayOfferAfterSeconds.value;
+});
+
+const startReplayMatch = async () => {
+    if (!selectedCategory.value || sessionExpired.value) {
+        return;
+    }
+
+    backendBusy.value = true;
+    backendError.value = null;
+
+    try {
+        const response = await apiClient.post<RankedJoinResponse>(
+            route('api.v1.ranked.replay'),
             {
                 category_id: selectedCategory.value.id,
             },
@@ -1537,7 +1578,7 @@ const syncBackendRealtimeTransport = () => {
     });
 };
 
-watch([selectedScenario, selectedCategoryId], () => {
+watch(selectedScenario, () => {
     resetSimulation();
 });
 
@@ -1657,13 +1698,13 @@ const selectedScenarioMeta = computed(() =>
 const phaseLabel = computed(() => {
     const labels: Record<string, string> = {
         idle: 'Gotowy',
-        queueing: 'Queue',
-        matched: 'Matched',
-        in_progress: 'Live',
-        opponent_disconnected: 'Reconnect window',
-        server_full: 'Server full',
-        finished: 'Finished',
-        abandoned: 'Abandoned',
+        queueing: 'W kolejce',
+        matched: 'Dopasowano',
+        in_progress: 'Na żywo',
+        opponent_disconnected: 'Czekamy na powrót',
+        server_full: 'Brak miejsc',
+        finished: 'Zakończony',
+        abandoned: 'Przerwany',
     };
 
     return labels[simulationState.value.phase] ?? simulationState.value.phase;
@@ -2652,7 +2693,7 @@ const primaryRankingActionLabel = computed(() => {
         return 'Wróć do meczu';
     }
 
-    return 'Start ranking';
+    return 'Szukaj przeciwnika';
 });
 
 const primaryRankingActionShowsSpinner = computed(() =>
@@ -2906,6 +2947,25 @@ const backendTransportChipClass = computed(() => {
                     <p class="mt-4 text-[0.8rem] font-medium text-[#98a2b3]">{{ waitingScreenMeta }}</p>
                 </main>
 
+                <section
+                    v-if="replayWaitingOfferVisible"
+                    class="mb-4 rounded-[8px] border border-[#dfe3e8] bg-white px-4 py-4 text-left"
+                    aria-labelledby="ranking-replay-offer-heading"
+                >
+                    <h2 id="ranking-replay-offer-heading" class="text-[0.98rem] font-bold text-[#17191d]">Nikogo teraz nie ma</h2>
+                    <p class="mt-1 text-[0.86rem] leading-5 text-[#667085]">
+                        Zagraj z nagraniem innego gracza z kategorii {{ selectedCategory?.short_name ?? selectedCategory?.code }}. Dostaniesz te same pytania i zobaczysz jego postęp w tym samym tempie.
+                    </p>
+                    <button
+                        type="button"
+                        class="mt-3 flex min-h-12 w-full items-center justify-center rounded-[8px] bg-[#0b63ce] px-4 text-[0.94rem] font-semibold text-white disabled:cursor-not-allowed disabled:opacity-55"
+                        :disabled="backendBusy"
+                        @click="startReplayMatch"
+                    >
+                        Zagraj z nagraniem
+                    </button>
+                </section>
+
                 <div class="border-t border-[#dfe3e8] pt-4">
                     <button
                         v-if="waitingScreenCanExit"
@@ -2987,6 +3047,15 @@ const backendTransportChipClass = computed(() => {
                                 @click="fetchRankedOverview()"
                             >
                                 Odśwież
+                            </button>
+                            <button
+                                v-if="replayWaitingOfferVisible"
+                                type="button"
+                                class="inline-flex min-h-[3.1rem] items-center justify-center border border-[#17161b] bg-[#17161b] px-6 text-[0.92rem] font-semibold text-white transition hover:bg-[#344054] disabled:cursor-not-allowed disabled:opacity-60"
+                                :disabled="backendBusy"
+                                @click="startReplayMatch"
+                            >
+                                Nikogo nie ma — zagraj z nagraniem
                             </button>
                             <button
                                 v-if="waitingScreenCanExit"
@@ -3506,10 +3575,10 @@ const backendTransportChipClass = computed(() => {
             <section class="border-y border-[#dfe3e8] bg-white px-4 py-5" aria-labelledby="ranking-play-heading">
                 <p class="text-[0.76rem] font-semibold text-[#667085]">Następny mecz</p>
                 <h2 id="ranking-play-heading" class="mt-1 text-[1.25rem] font-bold leading-6 text-[#17191d]">
-                    {{ selectedCategory?.short_name ?? selectedCategory?.code ?? 'B' }} · {{ specSummary.total_questions }} pytań
+                    Kategoria {{ selectedCategory?.short_name ?? selectedCategory?.code ?? '—' }} · {{ specSummary.total_questions }} pytań
                 </h2>
                 <p class="mt-2 text-[0.88rem] leading-5 text-[#667085]">
-                    System dobierze przeciwnika o zbliżonym poziomie.
+                    Zagrasz z pierwszym wolnym graczem z kategorii {{ selectedCategory?.short_name ?? selectedCategory?.code ?? '—' }}.
                 </p>
 
                 <div class="mt-5 divide-x divide-[#e3e7eb] border-y border-[#e3e7eb]">
@@ -3533,6 +3602,18 @@ const backendTransportChipClass = computed(() => {
                 >
                     {{ primaryRankingActionLabel }}
                 </button>
+                <button
+                    v-if="replayLobbyActionVisible"
+                    type="button"
+                    class="mt-2 flex min-h-12 w-full items-center justify-center rounded-[8px] border border-[#dfe3e8] bg-white px-4 text-[0.92rem] font-semibold text-[#17191d] transition disabled:cursor-not-allowed disabled:opacity-55"
+                    :disabled="backendBusy || !selectedCategory"
+                    @click="startReplayMatch"
+                >
+                    Zagraj z nagraniem
+                </button>
+                <p v-if="replayLobbyActionVisible" class="mt-2 text-[0.78rem] leading-5 text-[#667085]">
+                    Ścigasz się z zapisanym meczem innego gracza z kategorii {{ selectedCategory?.short_name ?? selectedCategory?.code }}. Wynik liczy się do ELO.
+                </p>
                 <p v-if="inlineLobbyError" class="mt-3 text-[0.82rem] font-semibold leading-5 text-[#b42318]">{{ inlineLobbyError }}</p>
             </section>
 
@@ -3569,194 +3650,24 @@ const backendTransportChipClass = computed(() => {
                         <span class="text-[0.88rem] font-semibold tabular-nums text-[#17191d]">{{ entry.rating }}</span>
                     </article>
                 </div>
+                <article
+                    v-if="currentUserRankingEntry"
+                    class="mt-2 flex min-h-[4.25rem] items-center gap-3 rounded-[8px] border border-[#dfe3e8] bg-white px-4 py-2"
+                    aria-label="Twoje miejsce w rankingu"
+                >
+                    <span class="min-w-5 text-[0.86rem] font-semibold tabular-nums text-[#667085]">{{ currentUserRankingEntry.position }}</span>
+                    <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#eef2f6] text-[0.74rem] font-semibold text-[#475467]">
+                        {{ leaderboardAvatarLabel(currentUserRankingEntry.username) }}
+                    </span>
+                    <p class="min-w-0 flex-1 truncate text-[0.9rem] font-semibold text-[#17191d]">
+                        Ty <span class="font-normal text-[#667085]">· miejsce {{ currentUserRankingEntry.position }} z {{ currentUserRankingEntry.total_players }}</span>
+                    </p>
+                    <span class="text-[0.88rem] font-semibold tabular-nums text-[#17191d]">{{ currentUserRankingEntry.rating }}</span>
+                </article>
                 <p v-else class="mt-2 rounded-[8px] border border-dashed border-[#cbd5e1] bg-white px-4 py-5 text-[0.86rem] leading-5 text-[#667085]">
                     Ranking pojawi się tutaj po pierwszych rozegranych meczach.
                 </p>
             </section>
-        </section>
-
-        <section class="hidden pb-3 md:hidden">
-            <div class="mx-auto w-full max-w-[26rem] rounded-[1.75rem] bg-white px-4 pb-4 pt-4 text-[#050b2e] shadow-[0_18px_45px_rgba(15,23,42,0.08)]">
-                <div class="flex items-center justify-between">
-                    <Link
-                        href="/nauka"
-                        class="inline-flex h-12 w-12 items-center justify-center rounded-[0.9rem] border border-[#e4ebf6] bg-white text-[#0b5cff] shadow-[0_8px_18px_rgba(15,23,42,0.08)] transition hover:border-[#0b5cff] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] focus-visible:ring-offset-2"
-                        aria-label="Wróć do panelu nauki"
-                    >
-                        <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="M19 12H5M11 6l-6 6 6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                    </Link>
-                </div>
-
-                <header class="mt-8">
-                    <h1 class="max-w-[19rem] text-[2rem] font-bold leading-[1.08] tracking-[-0.06em] text-[#050b2e]">
-                        Ranking najlepszych graczy prawa jazdy
-                    </h1>
-                    <p class="mt-4 text-[1rem] font-semibold leading-none text-[#64708b]">
-                        Aktualizacja:
-                        <span class="text-[#0b5cff]">{{ leaderboardUpdatedMobileLabel }}</span>
-                    </p>
-                </header>
-
-                <div class="mt-5 space-y-3">
-                    <article
-                        v-if="mobileFeaturedLeaderboardEntry"
-                        class="relative min-h-[10.15rem] overflow-hidden rounded-[1.1rem] border border-[#b7cffd] bg-[linear-gradient(105deg,#edf6ff_0%,#f8fbff_50%,#eaf3ff_100%)] px-3.5 py-4 shadow-[0_12px_26px_rgba(11,92,255,0.12)]"
-                    >
-                        <div class="pointer-events-none absolute inset-y-0 right-0 w-1/2 opacity-45">
-                            <div class="absolute right-8 top-3 h-[12rem] w-14 rotate-[26deg] rounded-full border-l-2 border-dashed border-white"></div>
-                            <div class="absolute right-1 top-0 h-[12rem] w-20 rotate-[26deg] rounded-full border-l-2 border-white/80"></div>
-                        </div>
-
-                        <div class="relative grid h-full grid-cols-[4.85rem_minmax(0,1fr)_4.15rem] items-center gap-2.5">
-                            <div class="flex flex-col items-center">
-                                <img
-                                    :src="mobileMemoryCoachImage"
-                                    alt=""
-                                    class="h-[4.15rem] w-[4.15rem] object-contain"
-                                    loading="eager"
-                                    decoding="async"
-                                >
-                                <span class="-mt-0.5 inline-flex h-8 min-w-14 items-center justify-center rounded-t-[0.75rem] bg-[#0b5cff] px-3 text-[1.2rem] font-bold leading-none text-white shadow-[0_8px_16px_rgba(11,92,255,0.24)]">
-                                    {{ mobileFeaturedLeaderboardEntry.position }}
-                                </span>
-                            </div>
-
-                            <div class="min-w-0">
-                                <div class="flex min-w-0 items-center gap-2">
-                                    <span class="inline-flex h-[3.25rem] w-[3.25rem] shrink-0 items-center justify-center overflow-hidden rounded-full border-[0.28rem] border-[#6ea2ff] bg-white shadow-[0_8px_18px_rgba(11,92,255,0.18)]">
-                                        <img
-                                            :src="rankingHeroDriverImage"
-                                            :alt="mobileFeaturedLeaderboardEntry.username"
-                                            class="h-full w-full object-cover object-[55%_38%]"
-                                            loading="lazy"
-                                            decoding="async"
-                                        >
-                                    </span>
-                                    <div class="min-w-0">
-                                        <h2 class="truncate text-[0.96rem] font-bold tracking-[-0.045em] text-[#050b2e]">
-                                            {{ mobileFeaturedLeaderboardEntry.username }}
-                                        </h2>
-                                        <span class="mt-1 inline-flex max-w-full items-center gap-1 rounded-full bg-white/78 px-2 py-1 text-[0.65rem] font-bold leading-none text-[#0b5cff] shadow-[0_5px_14px_rgba(11,92,255,0.1)]">
-                                            <span class="inline-flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-[#0b5cff] text-[0.5rem] text-white">★</span>
-                                            {{ leaderboardLevelLabel(mobileFeaturedLeaderboardEntry) }}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="relative text-right">
-                                <p class="text-[0.74rem] font-bold uppercase tracking-[0.08em] text-[#64708b]">
-                                    ELO
-                                </p>
-                                <p class="mt-1 text-[1.82rem] font-bold leading-none tracking-[-0.06em] text-[#0b5cff]">
-                                    {{ mobileFeaturedLeaderboardEntry.rating }}
-                                </p>
-                                <p class="mt-2 text-[0.84rem] font-bold text-[#16a34a]">
-                                    ↑ {{ leaderboardMomentumLabel(mobileFeaturedLeaderboardEntry) }}
-                                </p>
-                            </div>
-                        </div>
-                    </article>
-
-                    <div
-                        v-if="mobileSecondaryLeaderboardEntries.length > 0"
-                        class="space-y-2.5"
-                    >
-                        <article
-                            v-for="entry in mobileSecondaryLeaderboardEntries"
-                            :key="entry.user_id"
-                            class="grid min-h-[5.7rem] grid-cols-[3.25rem_4.25rem_minmax(0,1fr)_4.2rem] items-center gap-2.5 rounded-[1rem] border border-[#eef2f8] bg-white px-3 py-3 shadow-[0_8px_22px_rgba(15,23,42,0.045)]"
-                        >
-                            <span
-                                class="flex h-12 w-12 items-center justify-center rounded-full text-[1.85rem] font-bold leading-none tracking-[-0.06em]"
-                                :class="entry.position === 2 ? 'bg-[#f6f8fb] text-[#64708b]' : entry.position === 3 ? 'bg-[#fff0e6] text-[#bd5b14]' : 'bg-transparent text-[#64708b]'"
-                            >
-                                {{ entry.position }}
-                            </span>
-
-                            <span class="inline-flex h-[3.85rem] w-[3.85rem] items-center justify-center overflow-hidden rounded-full bg-[#f8fafc]">
-                                <img
-                                    :src="rankingHeroDriverImage"
-                                    :alt="entry.username"
-                                    class="h-full w-full object-cover"
-                                    :class="entry.position % 2 === 0 ? 'object-[58%_36%]' : 'object-[42%_34%]'"
-                                    loading="lazy"
-                                    decoding="async"
-                                >
-                            </span>
-
-                            <div class="min-w-0">
-                                <h2 class="truncate text-[1rem] font-bold tracking-[-0.04em] text-[#050b2e]">
-                                    {{ entry.username }}
-                                </h2>
-                                <span class="mt-1 inline-flex items-center gap-1 rounded-full bg-[#f4f8ff] px-2 py-1 text-[0.72rem] font-bold leading-none text-[#0b5cff]">
-                                    <span class="inline-flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#0b5cff] text-[0.52rem] text-white">★</span>
-                                    {{ leaderboardLevelLabel(entry) }}
-                                </span>
-                            </div>
-
-                            <div class="border-l border-[#eef2f8] pl-2 text-right">
-                                <p class="text-[0.68rem] font-bold uppercase tracking-[0.08em] text-[#64708b]">
-                                    ELO
-                                </p>
-                                <p class="mt-0.5 text-[1.6rem] font-bold leading-none tracking-[-0.055em] text-[#050b2e]">
-                                    {{ entry.rating }}
-                                </p>
-                                <p class="mt-1 text-[0.78rem] font-bold text-[#16a34a]">
-                                    ↑ {{ leaderboardMomentumLabel(entry) }}
-                                </p>
-                            </div>
-                        </article>
-                    </div>
-
-                    <div
-                        v-if="leaderboardEntries.length === 0"
-                        class="rounded-[1rem] border border-dashed border-[#cbd5e1] bg-[#f8fbff] px-4 py-5 text-center text-[0.92rem] leading-6 text-[#64708b]"
-                    >
-                        Ranking pojawi się tutaj po pierwszych rozegranych meczach.
-                    </div>
-                </div>
-
-                <article class="mt-4 grid min-h-[6.4rem] grid-cols-[5.3rem_minmax(0,1fr)_5.2rem] items-center gap-3 overflow-hidden rounded-[1rem] border border-[#dce9ff] bg-[linear-gradient(105deg,#edf6ff_0%,#f9fcff_54%,#eaf3ff_100%)] px-3 py-3 shadow-[0_10px_24px_rgba(11,92,255,0.08)]">
-                    <img
-                        :src="mobileMemoryCoachImage"
-                        alt=""
-                        class="h-[4.5rem] w-[4.5rem] object-contain"
-                        loading="lazy"
-                        decoding="async"
-                    >
-                    <div>
-                        <p class="text-[0.86rem] font-bold uppercase tracking-[0.08em] text-[#0b5cff]">
-                            Twoje ELO
-                        </p>
-                        <p class="mt-1 text-[2.5rem] font-bold leading-none tracking-[-0.07em] text-[#050b2e]">
-                            {{ mobilePlayerRatingLabel }}
-                        </p>
-                    </div>
-                    <div class="relative flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-[1.25rem] bg-[#0b5cff] text-white shadow-[0_12px_26px_rgba(11,92,255,0.24)]">
-                        <svg class="h-10 w-10" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="M12 3.5 18 6v4.5c0 4-2.5 7.4-6 9-3.5-1.6-6-5-6-9V6l6-2.5Z" fill="currentColor" opacity="0.28" />
-                            <path d="m9 12 2 2 4-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                    </div>
-                </article>
-
-                <button
-                    type="button"
-                    class="mt-4 inline-flex min-h-[3.55rem] w-full items-center justify-center gap-3 rounded-[1rem] bg-[#0b5cff] px-4 text-[1.08rem] font-bold text-white shadow-[0_14px_28px_rgba(11,92,255,0.25)] transition hover:bg-[#023ea4] disabled:cursor-not-allowed disabled:opacity-60"
-                    :disabled="backendBusy || !selectedCategory"
-                    @click="handlePrimaryRankingAction"
-                >
-                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <path d="M8 21h8M12 17v4M7 4h10v3.5a5 5 0 0 1-10 0V4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        <path d="M7 6H4.5A1.5 1.5 0 0 0 3 7.5v.75A3.75 3.75 0 0 0 6.75 12H8M17 6h2.5A1.5 1.5 0 0 1 21 7.5v.75A3.75 3.75 0 0 1 17.25 12H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    <span>{{ backendBusy ? 'Uruchamiamy...' : 'Popraw ranking' }}</span>
-                    <span class="text-2xl font-light leading-none" aria-hidden="true">›</span>
-                </button>
-            </div>
         </section>
 
         <section class="hidden px-4 pb-6 pt-3 sm:px-6 sm:pt-4 md:block lg:px-8 lg:pt-5">
@@ -3821,9 +3732,6 @@ const backendTransportChipClass = computed(() => {
                                                     <p class="truncate text-[1rem] font-semibold tracking-[-0.02em] text-[#020309] sm:text-[1.12rem]">
                                                         {{ entry.username }}
                                                     </p>
-                                                    <div class="mt-1.5 text-[0.8rem] leading-6 text-[#71717a]">
-                                                        <span>Firma: przykladowa nazwa firmy</span>
-                                                    </div>
                                                     <div class="mt-1.5 flex items-center gap-1.5 text-[#8b9098]">
                                                             <span
                                                                 v-for="platform in startSocialPlatforms"
@@ -3922,6 +3830,18 @@ const backendTransportChipClass = computed(() => {
                                                     {{ entry.rating }}
                                                 </p>
                                             </div>
+                                        </article>
+                                        <article
+                                            v-if="currentUserRankingEntry"
+                                            class="grid grid-cols-[4.9rem_minmax(0,1fr)_auto] items-center gap-5 bg-[#f7f8fa] px-3 py-4 sm:grid-cols-[8.9rem_minmax(0,1fr)_11.5rem] sm:gap-8 sm:px-6"
+                                            aria-label="Twoje miejsce w rankingu"
+                                        >
+                                            <span class="pl-2 text-[2rem] font-light leading-none tracking-[-0.06em] text-[#6b7280] sm:pl-5 sm:text-[3rem]">{{ currentUserRankingEntry.position }}</span>
+                                            <div class="min-w-0">
+                                                <p class="truncate text-[1rem] font-semibold tracking-[-0.02em] text-[#020309] sm:text-[1.12rem]">Ty</p>
+                                                <p class="mt-1 text-[0.8rem] text-[#71717a]">Miejsce {{ currentUserRankingEntry.position }} z {{ currentUserRankingEntry.total_players }}</p>
+                                            </div>
+                                            <span class="text-[1.4rem] font-semibold tabular-nums text-[#020309]">{{ currentUserRankingEntry.rating }}</span>
                                         </article>
                                     </div>
 
@@ -4050,6 +3970,15 @@ const backendTransportChipClass = computed(() => {
                                                     aria-hidden="true"
                                                 ></span>
                                                 <span>{{ primaryRankingActionLabel }}</span>
+                                            </button>
+                                            <button
+                                                v-if="replayLobbyActionVisible"
+                                                type="button"
+                                                class="mt-3 inline-flex min-h-[3.1rem] w-full items-center justify-center border border-[#d8d8dd] bg-white px-6 text-[0.92rem] font-semibold text-[#17161b] transition hover:border-[#bfc3c9] disabled:cursor-not-allowed disabled:opacity-60"
+                                                :disabled="backendBusy || !selectedCategory"
+                                                @click="startReplayMatch"
+                                            >
+                                                Zagraj z nagraniem
                                             </button>
 
                                             <p
