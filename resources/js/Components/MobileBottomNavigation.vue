@@ -11,10 +11,21 @@ type NavItem = {
     href: string;
     icon: NavIcon;
     active: boolean;
+    featured?: boolean;
 };
 
 const page = usePage<PageProps>();
-const dashboardView = computed(() => new URL(page.url, 'https://prawkonaraz.pl').searchParams.get('widok'));
+const pageUrl = computed(() => new URL(page.url, 'https://prawkonaraz.pl'));
+const dashboardView = computed(() => pageUrl.value.searchParams.get('widok'));
+// The five tab destinations, an open professional course and the screens reached from them
+// (incorrect questions, progress analytics, ranking) use the dark mobile shell.
+const darkHome = computed(() =>
+    route().current('session.index')
+    || route().current('profile.edit')
+    || route().current('analytics.categories.*')
+    || route().current('session.ranking*')
+    || /^\/nauka\/(?:kursy\/[^/]+\/)?bledne-pytania\/?$/.test(pageUrl.value.pathname),
+);
 const isExamSession = computed(() => {
     const session = (page.props as PageProps & { session?: { mode?: string } }).session;
 
@@ -30,20 +41,21 @@ const items = computed<NavItem[]>(() => [
         active: route().current('session.index') && !dashboardView.value,
     },
     {
-        key: 'training',
-        label: 'Trening',
-        href: `${route('session.index')}?widok=trening`,
-        icon: 'training',
-        active: (route().current('session.index') && dashboardView.value === 'trening')
-            || (route().current('study-sessions.*') && !isExamSession.value),
-    },
-    {
         key: 'learn',
         label: 'Nauka',
         href: `${route('session.index')}?widok=dzialy`,
         icon: 'learn',
         active: (route().current('session.index') && dashboardView.value === 'dzialy')
             || route().current('session.pjm*'),
+    },
+    {
+        key: 'training',
+        label: 'Graj',
+        href: `${route('session.index')}?widok=trening`,
+        icon: 'training',
+        featured: true,
+        active: (route().current('session.index') && dashboardView.value === 'trening')
+            || (route().current('study-sessions.*') && !isExamSession.value),
     },
     {
         key: 'exam',
@@ -66,10 +78,16 @@ const items = computed<NavItem[]>(() => [
 <template>
     <nav
         aria-label="Nawigacja aplikacji"
-        class="mobile-bottom-navigation fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(env(safe-area-inset-bottom),0.7rem)] md:hidden"
+        class="mobile-bottom-navigation fixed inset-x-0 bottom-0 z-40 md:hidden"
+        :class="darkHome
+            ? 'mobile-bottom-navigation--dark bg-[#262421] pb-[max(env(safe-area-inset-bottom),0.35rem)]'
+            : 'px-3 pb-[max(env(safe-area-inset-bottom),0.7rem)]'"
     >
         <div
-            class="mx-auto grid max-w-[30rem] grid-cols-5 rounded-[1.45rem] bg-white/95 px-1.5 pb-1 pt-1.5 shadow-[0_8px_30px_rgba(15,23,42,0.09)] backdrop-blur"
+            class="mx-auto grid max-w-[30rem] grid-cols-5 items-end"
+            :class="darkHome
+                ? 'px-1.5 pt-1'
+                : 'rounded-[1.45rem] bg-white/95 px-1.5 pb-1 pt-1.5 shadow-[0_8px_30px_rgba(15,23,42,0.09)] backdrop-blur'"
         >
             <component
                 :is="Link"
@@ -77,10 +95,19 @@ const items = computed<NavItem[]>(() => [
                 :key="item.key"
                 :href="item.href"
                 :aria-current="item.active ? 'page' : null"
-                class="mobile-bottom-navigation__item flex h-14 min-w-0 flex-col items-center justify-center gap-0.5 text-center leading-none transition-colors duration-150"
-                :class="item.active ? 'text-[#f1b000]' : 'text-[#687386]'"
+                class="mobile-bottom-navigation__item flex h-14 min-w-0 flex-col items-center justify-end gap-0.5 pb-1.5 text-center leading-none transition-colors duration-150"
+                :class="item.featured
+                    ? (darkHome ? 'text-[#ffffffd9]' : 'text-[#101827]')
+                    : item.active
+                      ? (darkHome ? 'text-white' : 'text-[#f1b000]')
+                      : (darkHome ? 'text-[#ffffff80] hover:text-[#ffffffb8]' : 'text-[#687386]')"
             >
-                <span class="grid h-7 w-7 place-items-center">
+                <span
+                    class="grid place-items-center"
+                    :class="item.featured
+                        ? 'pk-btn-primary mb-0.5 h-[3.25rem] w-[3.25rem]'
+                        : 'h-7 w-7'"
+                >
                     <svg
                         v-if="item.icon === 'home'"
                         aria-hidden="true"
@@ -105,7 +132,7 @@ const items = computed<NavItem[]>(() => [
                     </svg>
 
                     <svg v-else-if="item.icon === 'training'" aria-hidden="true" class="h-6 w-6" fill="none" viewBox="0 0 24 24">
-                        <path d="m13.5 2.5-9 11.3h6.4l-.6 7.7 9.2-11.3h-6.4l.4-7.7Z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" />
+                        <path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z" fill="currentColor" />
                     </svg>
 
                     <svg v-else-if="item.icon === 'learn'" aria-hidden="true" class="h-6 w-6" fill="none" viewBox="0 0 24 24">
@@ -148,7 +175,7 @@ const items = computed<NavItem[]>(() => [
                     </svg>
                 </span>
 
-                <span class="max-w-full whitespace-nowrap text-[0.65rem] font-medium tracking-[0]">
+                <span class="max-w-full whitespace-nowrap text-[0.65rem] tracking-[0]" :class="item.active || item.featured ? 'font-bold' : 'font-medium'">
                     {{ item.label }}
                 </span>
             </component>

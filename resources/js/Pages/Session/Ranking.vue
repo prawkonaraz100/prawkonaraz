@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import MobileBackButton from '@/Components/MobileBackButton.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import SessionExpiredNotice from '@/Components/SessionExpiredNotice.vue';
 import { useSessionExpiry } from '@/composables/useSessionExpiry';
@@ -837,6 +838,7 @@ const fetchActiveMatchEvents = async (
         incremental?: boolean;
     } = {},
 ) => {
+    if (sessionExpired.value) return;
     const matchPublicId = publicId
         ?? backendMatchDetails.value?.match.public_id
         ?? rankedOverview.value?.active_match?.public_id
@@ -953,6 +955,7 @@ const fetchRankedOverview = async (
         skipHistory?: boolean;
     } = {},
 ) => {
+    if (sessionExpired.value) return;
     if (!options.silent) {
         backendBusy.value = true;
     }
@@ -1246,13 +1249,23 @@ const submitBackendAnswer = async (questionId: number, userAnswer: string) => {
 
         applyBackendAnswerResponse(response.data);
         delete backendQuestionTimers[questionId];
-        await fetchRankedOverview({
-            silent: true,
-            skipHistory: true,
-        });
-        await fetchActiveMatchDetails(matchPublicId, {
-            silent: true,
-        });
+
+        // Odpowiedź API już aktualizuje lokalny stan meczu, a otwarty strumień dostarcza
+        // overview i zdarzenia co sekundę. Pełne odświeżenie (overview + szczegóły + zdarzenia)
+        // robimy tylko bez strumienia, po zmianie statusu meczu albo bez wczytanych szczegółów.
+        const streamKeepsMatchFresh = backendStreamState.value === 'open'
+            && response.data.match.status === 'in_progress'
+            && backendMatchDetails.value?.match.public_id === matchPublicId;
+
+        if (!streamKeepsMatchFresh) {
+            await fetchRankedOverview({
+                silent: true,
+                skipHistory: true,
+            });
+            await fetchActiveMatchDetails(matchPublicId, {
+                silent: true,
+            });
+        }
 
         if (nextQuestionId !== null && nextQuestionId !== questionId) {
             selectBackendQuestion(nextQuestionId);
@@ -1494,6 +1507,7 @@ const handleBackendStreamMatchEvents = (payload: unknown) => {
 };
 
 const connectBackendRealtimeStream = () => {
+    if (sessionExpired.value) return;
     backendStreamState.value = 'connecting';
     backendLiveTransportKind.value = 'none';
     backendStreamClient = new RankedRealtimeTransportClient({
@@ -2930,7 +2944,7 @@ const backendTransportChipClass = computed(() => {
 
     <AuthenticatedLayout>
         <template v-if="currentScreen === 'waiting'">
-            <section class="flex min-h-[100svh] flex-col bg-[#f7f8fa] px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-[calc(1.25rem+env(safe-area-inset-top))] text-[#17191d] md:hidden">
+            <section class="flex min-h-[100svh] flex-col bg-[#302e2b] px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-[calc(1.25rem+env(safe-area-inset-top))] text-[#ffffffd9] md:hidden">
                 <header>
                     <p class="text-[0.78rem] font-semibold text-[#667085]">Ranking 1 na 1</p>
                     <h1 class="mt-1 text-[1.72rem] font-bold leading-8">{{ waitingScreenBadge }}</h1>
@@ -3087,7 +3101,7 @@ const backendTransportChipClass = computed(() => {
         </template>
 
         <template v-else-if="currentScreen === 'match'">
-            <section class="min-h-[100svh] bg-[#f7f8fa] text-[#17191d] md:hidden">
+            <section class="min-h-[100svh] bg-[#302e2b] text-[#ffffffd9] md:hidden">
                 <header class="border-b border-[#dfe3e8] bg-white px-4 pb-4 pt-[calc(1rem+env(safe-area-inset-top))]">
                     <div class="flex items-center justify-between gap-4">
                         <div class="min-w-0">
@@ -3372,7 +3386,7 @@ const backendTransportChipClass = computed(() => {
         </template>
 
         <template v-else-if="currentScreen === 'result'">
-            <section class="min-h-screen bg-[#f7f8fa] pb-[calc(5.5rem+env(safe-area-inset-bottom))] text-[#17191d] md:hidden">
+            <section class="min-h-screen bg-[#302e2b] pb-[calc(5.5rem+env(safe-area-inset-bottom))] text-[#ffffffd9] md:hidden">
                 <header class="border-b border-[#dfe3e8] bg-white px-4 pb-5 pt-[calc(1.25rem+env(safe-area-inset-top))]">
                     <p class="text-[0.78rem] font-semibold text-[#667085]">Ranking 1 na 1</p>
                     <h1 class="mt-1 text-[1.72rem] font-bold leading-8">{{ backendLastResultCard?.resultLabel ?? 'Mecz zakończony' }}</h1>
@@ -3566,10 +3580,13 @@ const backendTransportChipClass = computed(() => {
         </template>
 
         <template v-else>
-        <section class="min-h-screen bg-[#f7f8fa] pb-[calc(5.5rem+env(safe-area-inset-bottom))] text-[#17191d] md:hidden">
-            <header class="px-4 pb-5 pt-[calc(1.25rem+env(safe-area-inset-top))]">
-                <p class="text-[0.78rem] font-semibold text-[#667085]">Pojedynek 1 na 1</p>
-                <h1 class="mt-1 text-[1.72rem] font-bold leading-8 text-[#17191d]">Ranking</h1>
+        <section class="min-h-screen bg-[#302e2b] pb-[calc(5.5rem+env(safe-area-inset-bottom))] text-[#ffffffd9] md:hidden">
+            <header class="flex items-center gap-3 px-4 pb-5 pt-[max(env(safe-area-inset-top),1rem)]">
+                <MobileBackButton :href="route('session.index')" label="Wróć do strony głównej" />
+                <div class="min-w-0">
+                    <p class="text-[0.78rem] font-semibold text-[#667085]">Pojedynek 1 na 1</p>
+                    <h1 class="mt-1 text-[1.72rem] font-bold leading-8 text-[#17191d]">Ranking</h1>
+                </div>
             </header>
 
             <section class="border-y border-[#dfe3e8] bg-white px-4 py-5" aria-labelledby="ranking-play-heading">

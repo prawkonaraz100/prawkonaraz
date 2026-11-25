@@ -6,10 +6,23 @@ import MobileBottomNavigation from '@/Components/MobileBottomNavigation.vue';
 import Modal from '@/Components/Modal.vue';
 import PjmVideoBlock from '@/Components/PjmVideoBlock.vue';
 import QuestionAudioControl from '@/Components/QuestionAudioControl.vue';
+import QuestionAudioSpeedSettings from '@/Components/QuestionAudioSpeedSettings.vue';
+import AdrLearningSettings from '@/Components/AdrLearningSettings.vue';
+import { readQuestionAudioRate, type QuestionAudioRate } from '@/utils/questionAudioPlayback';
+import CourseAudioControl from '@/Components/CourseAudioControl.vue';
+import CourseFeedbackAudioControl from '@/Components/CourseFeedbackAudioControl.vue';
+import CoursePartNavigation from '@/Components/CoursePartNavigation.vue';
+import type { CoursePartNavigation as CoursePartNavigationPayload } from '@/types/coursePartNavigation';
+import { COURSE_AUDIO_PREFERENCES_KEY, readCourseAudioPreferences, courseAudioBlocksAdvance,
+    type CourseAudioPlaybackState, type CourseAudioStateEvent } from '@/utils/courseAudioPreferences';
 import QuestionImageWithAnnotations from '@/Components/QuestionImageWithAnnotations.vue';
 import QuestionExplanationRuntimeBlock from '@/Components/QuestionExplanationRuntimeBlock.vue';
+import FullStudyExplanationPanel from '@/Components/FullStudyExplanationPanel.vue';
+import { useFullStudyExplanation } from '@/composables/useFullStudyExplanation';
+import { readFullExplanationSeconds, type FullExplanationSeconds } from '@/lib/fullExplanationReading';
 import CourseExplanationFlashcard from '@/Components/CourseExplanationFlashcard.vue';
 import CourseFlashcardSettings from '@/Components/CourseFlashcardSettings.vue';
+import QualificationPreliminaryLearning, { type PreliminaryLearningState } from '@/Components/QualificationPreliminaryLearning.vue';
 import CourseKeyboardHelp from '@/Components/CourseKeyboardHelp.vue';
 import {
     usesCourseExplanationFlashcard,
@@ -27,12 +40,23 @@ import QuestionResultMediaFallback from '@/Components/QuestionResultMediaFallbac
 import QuestionVideoFrameWithAnnotations from '@/Components/QuestionVideoFrameWithAnnotations.vue';
 import RegisterDrawer from '@/Components/Auth/RegisterDrawer.vue';
 import SessionExpiredNotice from '@/Components/SessionExpiredNotice.vue';
+import SessionCompletionPending from '@/Components/SessionCompletionPending.vue';
+import SessionCompletionButtonContent from '@/Components/SessionCompletionButtonContent.vue';
+import SessionResultDisclosure from '@/Components/SessionResultDisclosure.vue';
+import SessionResultMedia from '@/Components/SessionResultMedia.vue';
+import SessionResultAnswer from '@/Components/SessionResultAnswer.vue';
 import { useSessionExpiry } from '@/composables/useSessionExpiry';
+import { useDelayedBusy } from '@/composables/useDelayedBusy';
 import SessionExamLayout from '@/Layouts/SessionExamLayout.vue';
 import SessionZenLayout from '@/Layouts/SessionZenLayout.vue';
 import headThoughtIcon from '../../../images/session/head-thought.svg';
 import questionSourceEmblem from '../../../images/session/question-source-emblem-crop.png';
 import { apiClient, isApiClientError } from '@/lib/apiClient';
+import { createConfirmedAnswerQueue, createConfirmedCompletion, UnconfirmedAnswersError } from '@/lib/confirmedAnswerQueue';
+import { RequestTimeoutError } from '@/lib/requestTimeout';
+import { confirmedAnswerResponseTime } from '@/lib/studyAnswerTiming';
+import { selectStudyQuestionPrefetch } from '@/lib/studyQuestionPrefetch';
+import { navigateToStudyResult, StudyResultNavigationError } from '@/lib/studyResultNavigation';
 import { topicArtworkForKey } from '@/lib/topicArtwork';
 import type { PageProps } from '@/types';
 import {
@@ -64,6 +88,8 @@ import {
     resolveStudySessionExplanation,
     shouldShowStudySessionExplanationCard,
 } from '@/utils/studySessionExplanation';
+import { isExplanationSpaceKey, shouldToggleExplanationWithSpace, usesRegularExplanationKeyboard } from '@/utils/studySessionExplanationKeyboard';
+import { calculateStudyAccuracyPercent } from '@/utils/studyAccuracy';
 import {
     computed,
     nextTick,
@@ -74,18 +100,21 @@ import {
     type ComponentPublicInstance,
     type Ref,
 } from 'vue';
-import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import { ArrowLeft, ArrowRight, ArrowUpRight, Bold, Check, CircleCheck, CirclePlay, ExternalLink, FastForward, Gauge, Info, Keyboard, LibraryBig, Lightbulb, MessageSquareText, Palette, Repeat2, Settings, Speech, SquarePlay, SquareX, Trophy, Volume2, X } from '@lucide/vue';
 
 interface SessionContext {
+    preliminary_learning?: (PreliminaryLearningState & { url: string }) | null;
     explanation_flashcard?: boolean;
     type: string;
     label: string;
     title: string | null;
     collection_name: string | null;
+    is_adr?: boolean;
     return_url: string;
     course_url: string;
     restart_url: string | null;
+    part_navigation?: CoursePartNavigationPayload | null;
     incorrect_questions_url: string | null;
 }
 
@@ -152,6 +181,7 @@ interface QuestionAudioAsset {
 interface QuestionAudioPayload {
     question?: QuestionAudioAsset | null;
     correct_answer?: QuestionAudioAsset | null;
+    explanation?: QuestionAudioAsset | null;
 }
 
 interface ExplanationAnnotation {
@@ -231,6 +261,7 @@ type StudySessionAnswerKind = 'choice' | 'unknown' | 'timeout' | 'skipped';
 
 interface ResultItem {
     id: number;
+    question_type?: string | null;
     external_id?: string | null;
     shared_explanation_has_conflict?: boolean;
     sequence_number: number;
@@ -469,11 +500,16 @@ type HintTimingPreference = 'normal' | 'plus2' | 'plus4' | 'plus6';
 type FeedbackMode = 'instant' | 'instant_explanation' | 'review';
 type VisualExplanationsMode = 'before_answer' | 'after_incorrect' | 'off';
 type SessionPreferences = {
+    fullExplanations: boolean;
+    fullExplanationSeconds: FullExplanationSeconds;
     autoAdvance: boolean;
     autoPlayVideos: boolean;
     showQuestionAudioControl: boolean;
     autoPlayQuestionAudio: boolean;
+    questionAudioPlaybackRate: QuestionAudioRate;
     autoPlayCorrectAnswerAudio: boolean;
+    autoPlayAdrExplanationAfterIncorrect: boolean;
+    autoPlayAdrExplanationAfterCorrect: boolean;
     videoPlaybackRate: VideoPlaybackRate;
     autoJumpToVideoEnding: boolean;
     hintTimingPreference: HintTimingPreference;
@@ -523,6 +559,7 @@ const props = withDefaults(defineProps<{
     currentQuestion: CurrentQuestion | null;
     questionPool: CurrentQuestion[];
     questionPoolMode: 'full' | 'windowed';
+    adrSessionHasVideo?: boolean;
     questionBatchSize: number;
     prefetchedQuestions: CurrentQuestion[];
     sessionFilters?: SessionFilters;
@@ -636,14 +673,22 @@ const followUpSessionForm = useForm<{
 });
 const courseModuleRestartForm = useForm({ replace_active_session: true });
 const courseModuleRestartError = ref<string | null>(null);
+const nextCoursePartForm = useForm({ replace_active_session: false });
+const nextCoursePartError = ref<string | null>(null);
 const selectedAnswer = ref<string | null>(null);
 const presentedAt = ref<number | null>(null);
 const questionStage = ref<'preview' | 'answer'>('answer');
 const autoAdvance = ref(true);
+const fullExplanations = ref(false);
+const fullExplanationSeconds = ref<FullExplanationSeconds>(null);
+const pendingFullCompletionQuestionId = ref<number | null>(null);
 const autoPlayVideos = ref(true);
 const showQuestionAudioControl = ref(true);
 const autoPlayQuestionAudio = ref(false);
+const questionAudioPlaybackRate = ref<QuestionAudioRate>(1);
 const autoPlayCorrectAnswerAudio = ref(false);
+const autoPlayAdrExplanationAfterIncorrect = ref(false);
+const autoPlayAdrExplanationAfterCorrect = ref(false);
 const videoPlaybackRate = ref<VideoPlaybackRate>(2);
 const autoJumpToVideoEnding = ref(false);
 const hintTimingPreference = ref<HintTimingPreference>('plus2');
@@ -692,14 +737,40 @@ const questionCache = ref<Record<number, CurrentQuestion>>(
 );
 const progressState = ref<ProgressSummary>({ ...props.progress });
 const sessionState = ref<SessionSummary>({ ...props.session });
+const preliminaryState = computed(() => sessionState.value.context?.preliminary_learning ?? null);
+const preliminaryActive = computed(() => preliminaryState.value?.active === true);
+const preliminaryTransitionBusy = ref(false);
+const preliminaryTransitionError = ref<string | null>(null);
 const learningSyncInFlight = ref(false);
 const topicSwitchInFlight = ref(false);
 const followUpActionInFlight = ref(false);
 const pendingAnswerSyncCount = ref(0);
+const completionInFlight = ref(false);
+// The button reacts immediately; avoid an overlay flash for ~0.4–0.8 s completions.
+const showCompletionBusy = useDelayedBusy(completionInFlight, 1000);
+const completionConfirmed = ref(false);
+const courseProgressConflict = ref(false);
+const completionInteractionBlocked = computed(() => completionInFlight.value || completionConfirmed.value
+    || courseProgressConflict.value
+    || preliminaryActive.value || preliminaryTransitionBusy.value || Boolean(preliminaryTransitionError.value));
+const answerRetryInFlight = ref(false);
+const unconfirmedAnswerIds = ref<number[]>([]);
+const isAdrSession = computed(() => props.session.context?.is_adr === true);
+const usesConfirmedCompletion = computed(() => props.session.mode === 'learn'
+    && (props.session.scope === 'regular_category' || isAdrSession.value)
+    && !props.publicDemo?.enabled);
+const adrAnswerPending = computed(() => isAdrSession.value
+    && (learningSyncInFlight.value || unconfirmedAnswerIds.value.length > 0));
+const confirmedAnswerQueue = createConfirmedAnswerQueue((count) => {
+    pendingAnswerSyncCount.value = count;
+    learningSyncInFlight.value = count > 0;
+});
+const STUDY_WRITE_TIMEOUT_MS = 30000;
 const questionBatchFetchInFlight = ref(false);
 const answerInteractionLocked = ref(false);
 const questionTransitionInFlight = ref(false);
 const {
+    expireSession,
     handleSessionExpiryError,
     sessionExpired,
 } = useSessionExpiry(() => {
@@ -721,6 +792,7 @@ type QuestionAudioControlInstance = ComponentPublicInstance & {
     stop: () => void;
 };
 const questionAudioControlRef = ref<QuestionAudioControlInstance | null>(null);
+const courseExplanationAudioRef = ref<QuestionAudioControlInstance | null>(null);
 const correctAnswerAudioElement = ref<HTMLAudioElement | null>(null);
 const correctAnswerAudioSourceKey = ref<string | null>(null);
 const localResults = ref<Record<number, ResultItem>>(
@@ -810,11 +882,16 @@ const inlineEditorFormattingActions: Array<{
     },
 ];
 const FIRST_VISIT_SESSION_PREFERENCES: SessionPreferences = {
+    fullExplanations: false,
+    fullExplanationSeconds: null,
     autoAdvance: true,
     autoPlayVideos: true,
     showQuestionAudioControl: true,
     autoPlayQuestionAudio: false,
+    questionAudioPlaybackRate: 1,
     autoPlayCorrectAnswerAudio: false,
+    autoPlayAdrExplanationAfterIncorrect: false,
+    autoPlayAdrExplanationAfterCorrect: false,
     videoPlaybackRate: 2,
     autoJumpToVideoEnding: false,
     hintTimingPreference: 'plus2',
@@ -1064,7 +1141,12 @@ const courseFlashcardBackVisible = ref(false);
 const isCourseKeyboardHelpOpen = ref(false);
 const courseExplanationMode = ref<CourseExplanationMode>('incorrect');
 const courseAdvanceMode = ref<CourseAdvanceMode>('automatic');
+const courseAudioPreferences = ref(readCourseAudioPreferences(null));
+const courseQuestionAudioState = ref<CourseAudioPlaybackState>('idle');
+const courseExplanationAudioState = ref<CourseAudioPlaybackState>('idle');
+const courseAudioFinishing = ref(false);
 const courseQuestionAnsweredAt = ref<number | null>(null);
+const adrAutoplayQuestionId = ref<number | null>(null);
 const effectiveAutoAdvance = computed(() => usesCourseFlashcard.value
     ? courseAdvanceMode.value === 'automatic' : autoAdvance.value);
 const pendingCourseCompletionQuestionId = ref<number | null>(null);
@@ -1086,21 +1168,65 @@ const currentCorrectAnswerAudio = computed<QuestionAudioAsset | null>(() =>
         ? activeQuestion.value?.audio?.correct_answer ?? null
         : null,
 );
+const currentExplanationAudio = computed<QuestionAudioAsset | null>(() =>
+    (usesCourseFlashcard.value || (isAdrSession.value && canUseQuestionAudio.value))
+        ? activeQuestion.value?.audio?.explanation ?? null : null);
+const adrAutoplayEnabled = computed(() => isAdrSession.value
+    && feedbackMode.value === 'instant_explanation'
+    && (autoPlayAdrExplanationAfterIncorrect.value || autoPlayAdrExplanationAfterCorrect.value));
+const adrAutoplayAfterAnswer = computed(() => {
+    const answer = currentAnswerResult.value;
+    if (!adrAutoplayEnabled.value || adrAutoplayQuestionId.value === null
+        || adrAutoplayQuestionId.value !== activeQuestion.value?.id || !currentExplanationAudio.value?.url
+        || answer?.answer_kind !== ANSWER_KIND_CHOICE || answer.is_correct === null) return false;
+
+    return answer.is_correct ? autoPlayAdrExplanationAfterCorrect.value : autoPlayAdrExplanationAfterIncorrect.value;
+});
+const courseFeedbackAnswerAudio = computed(() => usesCourseFlashcard.value
+    && currentAnswerResult.value?.is_correct === false
+    && currentAnswerResult.value?.answer_kind === ANSWER_KIND_CHOICE ? currentCorrectAnswerAudio.value : null);
+const courseFeedbackHasAudio = computed(() => Boolean(courseFeedbackAnswerAudio.value?.url || currentExplanationAudio.value?.url));
+const courseQuestionAudioActive = computed(() => usesCourseFlashcard.value
+    && !preliminaryActive.value && !preliminaryTransitionBusy.value
+    && !courseFlashcardBackVisible.value && !courseAudioFinishing.value
+    && !isAnySidePanelOpen.value && !sessionExpired.value && !localSessionCompleted.value && !completionInFlight.value);
+const courseExplanationAudioActive = computed(() => usesCourseFlashcard.value && courseFlashcardBackVisible.value
+    && !preliminaryActive.value && !preliminaryTransitionBusy.value
+    && !courseAudioFinishing.value && !isAnySidePanelOpen.value && !sessionExpired.value
+    && !localSessionCompleted.value && !completionInFlight.value);
+const courseAudioAwaitingAdvance = computed(() => usesCourseFlashcard.value && courseAudioBlocksAdvance({
+    explanationVisible: courseFlashcardBackVisible.value,
+    autoplayExplanation: courseAudioPreferences.value.autoplayExplanations,
+    hasExplanationAudio: courseFeedbackHasAudio.value,
+    questionState: courseQuestionAudioState.value,
+    explanationState: courseExplanationAudioState.value,
+    stopOnError: Boolean(courseFeedbackAnswerAudio.value?.url),
+}));
 const shouldShowQuestionAudioControl = computed(() =>
-    Boolean(showQuestionAudioControl.value && currentQuestionAudio.value?.url),
+    Boolean(currentQuestionAudio.value?.url && (usesCourseFlashcard.value
+        ? courseAudioPreferences.value.showControls || courseAudioPreferences.value.autoplayQuestions
+        : showQuestionAudioControl.value)),
 );
 const shouldAutoPlayQuestionAudio = computed(() =>
-    Boolean(showQuestionAudioControl.value && autoPlayQuestionAudio.value && currentQuestionAudio.value?.url),
+    Boolean(currentQuestionAudio.value?.url && (usesCourseFlashcard.value
+        ? courseQuestionAudioActive.value && courseAudioPreferences.value.autoplayQuestions
+        : showQuestionAudioControl.value && autoPlayQuestionAudio.value)),
 );
 const questionAudioAutoplayKey = computed(() =>
     shouldAutoPlayQuestionAudio.value
         ? `${activeQuestion.value?.id ?? 'none'}:${currentQuestionAudio.value?.asset_key ?? currentQuestionAudio.value?.url ?? ''}`
         : null,
 );
+const autoPlayCorrectAnswerOnly = computed(() => !isAdrSession.value && autoPlayCorrectAnswerAudio.value);
 const shouldAutoPlayCorrectAnswerAudioAfterMistake = computed(() =>
-    Boolean(canUseQuestionAudio.value && autoPlayCorrectAnswerAudio.value && currentCorrectAnswerAudio.value?.url),
+    Boolean(!usesCourseFlashcard.value && canUseQuestionAudio.value
+        && autoPlayCorrectAnswerOnly.value && currentCorrectAnswerAudio.value?.url),
 );
 const isPublicDemoMode = computed(() => Boolean(props.publicDemo?.enabled));
+const usesRegularExplanationSpace = computed(() => usesRegularExplanationKeyboard(sessionState.value, isPublicDemoMode.value));
+const explanationKeyboardPausedQuestionId = ref<number | null>(null);
+const supportsFullExplanations = computed(() => usesRegularExplanationSpace.value);
+const usesFullExplanations = computed(() => supportsFullExplanations.value && fullExplanations.value && feedbackMode.value === 'instant_explanation');
 const usesFrozenPublicDemo = computed(() =>
     Boolean(isPublicDemoMode.value && props.publicDemo?.mode === 'frozen_packet'),
 );
@@ -2020,15 +2146,28 @@ const classicMediaModeLabel = computed(() => {
 });
 
 const classicQuestionAudioModeLabel = computed(() => {
+    if (usesCourseFlashcard.value) {
+        const preferences = courseAudioPreferences.value;
+        if (preferences.autoplayQuestions && preferences.autoplayExplanations) return 'Pytania + wyjaśnienia';
+        if (preferences.autoplayQuestions) return 'Pytania automatycznie';
+        if (preferences.autoplayExplanations) return 'Wyjaśnienia automatycznie';
+        return preferences.showControls ? 'Przyciski odsłuchu' : 'Wyłączone';
+    }
+    if (adrAutoplayEnabled.value) {
+        if (autoPlayAdrExplanationAfterIncorrect.value && autoPlayAdrExplanationAfterCorrect.value) {
+            return showQuestionAudioControl.value && autoPlayQuestionAudio.value ? 'Pytania + wyjaśnienia' : 'Wyjaśnienia po każdej odpowiedzi';
+        }
+        return autoPlayAdrExplanationAfterIncorrect.value ? 'Wyjaśnienia po błędzie' : 'Wyjaśnienia po poprawnej odpowiedzi';
+    }
     if (!showQuestionAudioControl.value) {
-        return autoPlayCorrectAnswerAudio.value ? 'Odpowiedź po błędzie' : 'Wyłączone';
+        return autoPlayCorrectAnswerOnly.value ? 'Odpowiedź po błędzie' : 'Wyłączone';
     }
 
-    if (autoPlayQuestionAudio.value && autoPlayCorrectAnswerAudio.value) {
+    if (autoPlayQuestionAudio.value && autoPlayCorrectAnswerOnly.value) {
         return 'Auto + odpowiedź';
     }
 
-    if (autoPlayCorrectAnswerAudio.value) {
+    if (autoPlayCorrectAnswerOnly.value) {
         return 'Odpowiedź po błędzie';
     }
 
@@ -2702,15 +2841,16 @@ const displayResults = computed<ResultItem[]>(() => {
         return props.results;
     }
 
-    return props.questionIds.map((questionId) => {
+    return props.questionIds.map((questionId, index) => {
         const answer = localResults.value[questionId];
 
         return {
             id: questionId,
             external_id: answer?.external_id ?? null,
             shared_explanation_has_conflict: answer?.shared_explanation_has_conflict ?? false,
-            sequence_number: answer?.sequence_number ?? props.questionIds.indexOf(questionId) + 1,
+            sequence_number: answer?.sequence_number ?? index + 1,
             prompt: answer?.prompt ?? null,
+            question_type: answer?.question_type ?? null,
             explanation: answer?.explanation ?? null,
             correct_answer: answer?.correct_answer ?? null,
             correct_answer_text: answer?.correct_answer_text ?? null,
@@ -2848,15 +2988,6 @@ const resultStatusLabel = (result: ResultItem) => {
 
     return result.is_correct ? 'Dobrze' : 'Do poprawki';
 };
-const resultStatusClass = (result: ResultItem) => {
-    if (isUnknownAnswerKind(result.answer_kind)) {
-        return 'border border-[#c7d7eb] bg-[#f2f6fb] text-[#2b486b]';
-    }
-
-    return result.is_correct
-        ? 'border border-[#e5e7eb] bg-[#f7f7f7] text-[#5f6368]'
-        : 'border border-[#efc9c5] bg-[#fdf1f0] text-[#9f3131]';
-};
 const resultUserAnswerCardClass = (result: ResultItem) => {
     if (isUnknownAnswerKind(result.answer_kind)) {
         return 'border-[#c7d7eb] bg-[#f2f6fb] text-neutral-950';
@@ -2865,22 +2996,6 @@ const resultUserAnswerCardClass = (result: ResultItem) => {
     return result.is_correct
         ? 'border-[#e5e7eb] bg-white text-neutral-950'
         : 'border-[#efc9c5] bg-[#fdf1f0] text-neutral-950';
-};
-const resultUserAnswerLabel = (result: ResultItem) => {
-    if (isUnknownAnswerKind(result.answer_kind)) {
-        return 'Nie wiem';
-    }
-
-    return result.selected_answer
-        ? `Odpowiedź ${result.selected_answer}`
-        : 'Brak odpowiedzi';
-};
-const resultUserAnswerText = (result: ResultItem) => {
-    if (isUnknownAnswerKind(result.answer_kind)) {
-        return 'Oznaczone świadomie jako materiał do odzyskania w Trenerze pamięci.';
-    }
-
-    return result.selected_answer_text ?? 'Nie udało się odczytać treści tej odpowiedzi.';
 };
 const currentPjmCompletion = computed(() => pjmCompletionState.value);
 const pjmCoverage = computed(() => currentPjmCompletion.value?.coverage ?? null);
@@ -3284,12 +3399,13 @@ const topicCompletionStatusClass = (item: TopicCompletionOverviewItem) => {
 
     return 'border-[#e5e7eb] bg-[#f8f8f8] text-[#6b7280]';
 };
-const displayScorePercent = computed(() => {
-    if (!isLocalLearningMode.value) {
-        return props.session.score_percent;
+const displayAccuracyPercent = computed(() => {
+    if (props.session.mode === 'learn' && props.session.scope === 'regular_category' && !props.publicDemo?.enabled) {
+        // Completion review rows are deliberately empty while a question is active.
+        return calculateStudyAccuracyPercent(displayCorrectAnswersCount.value, displayProgress.value.answered);
     }
 
-    return sessionState.value.score_percent;
+    return isLocalLearningMode.value ? sessionState.value.score_percent : props.session.score_percent;
 });
 const filteredTopicGroups = computed(() => {
     if (props.sessionFilters.question_scope === 'basic') {
@@ -3303,7 +3419,8 @@ const filteredTopicGroups = computed(() => {
     return props.topicGroups;
 });
 const canUseTopicPicker = computed(() =>
-    !isPjmMode.value && !isReviewTrainerMode.value && !isCourseSession.value && filteredTopicGroups.value.length > 0,
+    !completionInteractionBlocked.value
+    && !isPjmMode.value && !isReviewTrainerMode.value && !isCourseSession.value && filteredTopicGroups.value.length > 0,
 );
 const allSessionTopicOptions = computed<RoadmapTopicOption[]>(() =>
     props.topicGroups.flatMap((group) =>
@@ -3792,13 +3909,10 @@ const completionCorrectResultsToggleLabel = computed(() =>
         ? 'Ukryj dobrze rozwiązane pytania'
         : `Pokaż dobrze rozwiązane pytania (${correctAnsweredResults.value.length})`,
 );
-const completionAccuracyPercent = computed(() => {
-    if (displayAnsweredCount.value <= 0) {
-        return null;
-    }
-
-    return Math.round((displayCorrectAnswersCount.value / displayAnsweredCount.value) * 10000) / 100;
-});
+const completionAccuracyPercent = computed(() => calculateStudyAccuracyPercent(
+    displayCorrectAnswersCount.value,
+    displayAnsweredCount.value,
+));
 const mobileCompletionProgressWidth = computed(
     () => `${Math.min(Math.max(completionAccuracyPercent.value ?? 0, 0), 100)}%`,
 );
@@ -3923,7 +4037,7 @@ const autoFocusCompletionProgressPanel = async (behavior: ScrollBehavior = 'auto
     hasAutoFocusedCompletionProgressPanel.value = scrollCompletionProgressPanelToActiveTopic(behavior);
 };
 const hasOnDemandExplanationAvailable = computed(() =>
-    hasOnDemandExplanationContent({
+    usesFullExplanations.value || hasOnDemandExplanationContent({
         explanationText: explanationText.value,
         explanationAssetBody: currentQuestionExplanationAsset.value?.body ?? null,
         explanationAssetImageUrl: currentQuestionExplanationAsset.value?.image_url ?? null,
@@ -3933,10 +4047,10 @@ const automaticCourseFlashcardVisible = computed(() => shouldAutomaticallyTurnCo
     sessionState.value,
     courseExplanationMode.value,
     currentAnswerResult.value?.is_correct ?? null,
-    hasOnDemandExplanationAvailable.value,
+    hasOnDemandExplanationAvailable.value || Boolean(courseFeedbackAnswerAudio.value?.url),
 ));
 const shouldShowExplanationCard = computed(() =>
-    shouldShowStudySessionExplanationCard({
+    adrAutoplayAfterAnswer.value || shouldShowStudySessionExplanationCard({
         showExplanation: showExplanation.value,
         showExplanationOnDemand: showExplanationOnDemand.value,
         usesExplanationFeedbackMode: usesExplanationFeedbackMode.value,
@@ -3944,6 +4058,9 @@ const shouldShowExplanationCard = computed(() =>
         hasOnDemandExplanationContent: hasOnDemandExplanationAvailable.value,
     }),
 );
+const fullExplanationOpen = computed(() => usesFullExplanations.value && shouldShowExplanationCard.value
+    && Boolean(activeQuestion.value) && !localSessionCompleted.value && !completionConfirmed.value
+    && !sessionExpired.value && !courseProgressConflict.value);
 const isManualExplanationVisible = computed(() =>
     Boolean(showExplanationOnDemand.value && shouldShowExplanationCard.value),
 );
@@ -3956,17 +4073,19 @@ const isAutomaticExplanationVisible = computed(() =>
     ),
 );
 const canToggleExplanationOnDemand = computed(() =>
-    canToggleStudySessionExplanationOnDemand({
+    !adrAutoplayAfterAnswer.value && canToggleStudySessionExplanationOnDemand({
         isLocalLearningMode: isLocalLearningMode.value,
         questionStage: questionStage.value,
         localSessionCompleted: localSessionCompleted.value,
         hasOnDemandExplanationContent: hasOnDemandExplanationAvailable.value,
-        isManualExplanationVisible: isManualExplanationVisible.value,
-        isAutoExplanationVisible: isAutomaticExplanationVisible.value,
+        isManualExplanationVisible: isManualExplanationVisible.value
+            || (usesRegularExplanationSpace.value && shouldShowExplanationCard.value),
+        isAutoExplanationVisible: !usesRegularExplanationSpace.value && isAutomaticExplanationVisible.value,
     }),
 );
 const explanationToggleLabel = computed(() =>
-    isManualExplanationVisible.value ? 'Pokaż pytanie' : 'Pokaż wyjaśnienie',
+    isManualExplanationVisible.value || (usesRegularExplanationSpace.value && shouldShowExplanationCard.value)
+        ? 'Pokaż pytanie' : 'Pokaż wyjaśnienie',
 );
 const shouldShowCurrentImageAnnotations = computed(() =>
     Boolean(
@@ -4212,9 +4331,17 @@ const phaseDurationLabel = computed(() => {
 
 const finishSessionIdleLabel = computed(() => (isPublicDemoMode.value ? 'Zakończ demo' : 'Kończę naukę'));
 const finishSessionProcessingLabel = computed(() => (isPublicDemoMode.value ? 'Kończę demo...' : 'Kończę...'));
-const finishSessionButtonLabel = computed(() =>
-    completeForm.processing ? finishSessionProcessingLabel.value : finishSessionIdleLabel.value,
-);
+const finishSessionButtonLabel = computed(() => {
+    // Preserve button width while the spinner replaces its label.
+    if (usesConfirmedCompletion.value) {
+        return completionConfirmed.value && !completionInFlight.value ? 'Otwórz podsumowanie' : finishSessionIdleLabel.value;
+    }
+    return completionInFlight.value && pendingAnswerSyncCount.value > 0
+        ? 'Zapisuję odpowiedzi…'
+        : completeForm.processing || completionInFlight.value
+        ? finishSessionProcessingLabel.value
+        : completionConfirmed.value ? 'Otwórz podsumowanie' : finishSessionIdleLabel.value;
+});
 
 const primaryActionLabel = computed(() => {
     if (questionStage.value === 'preview') {
@@ -4243,7 +4370,8 @@ const explanationToggleDisplayLabel = computed(() => {
         return explanationToggleLabel.value;
     }
 
-    return isManualExplanationVisible.value ? 'Pytanie' : 'Wyjaśnienie';
+    return isManualExplanationVisible.value || (usesRegularExplanationSpace.value && shouldShowExplanationCard.value)
+        ? 'Pytanie' : 'Wyjaśnienie';
 });
 const primaryActionDisplayLabel = computed(() =>
     useCompactMobileDockActions.value ? 'Następne' : primaryActionLabel.value,
@@ -4254,6 +4382,7 @@ const canSelectAnswer = computed(() =>
     && questionStage.value === 'answer'
     && !answerForm.processing
     && !answerInteractionLocked.value
+    && !completionInteractionBlocked.value && !answerRetryInFlight.value
     && !questionTransitionInFlight.value
     && (!isLocalLearningMode.value || currentAnswerResult.value === null),
 );
@@ -4263,6 +4392,7 @@ const canMarkUnknownAnswer = computed(() =>
 );
 
 const primaryActionDisabled = computed(() => {
+    if (completionInteractionBlocked.value || answerRetryInFlight.value || adrAnswerPending.value) return true;
     if (!activeQuestion.value) {
         return true;
     }
@@ -4288,6 +4418,7 @@ const primaryActionDisabled = computed(() => {
     return answerForm.processing || selectedAnswer.value === null;
 });
 const previousActionDisabled = computed(() => {
+    if (completionInteractionBlocked.value || answerRetryInFlight.value || adrAnswerPending.value) return true;
     if (!isLocalLearningMode.value || !activeQuestion.value || localSessionCompleted.value) {
         return true;
     }
@@ -4326,6 +4457,19 @@ const isTypingInInteractiveElement = (target: EventTarget | null) => {
     }
 
     return Boolean(target.closest('input, textarea, select, button, a, summary, details'));
+};
+
+const isArrowOnAudioControl = (event: KeyboardEvent, control: QuestionAudioControlInstance | null): boolean => {
+    const root = control?.$el;
+
+    return canUseQuestionAudio.value && !isPublicDemoMode.value
+        && !isQuestionEditorOpen.value && !isExplanationEditorOpen.value
+        && root instanceof HTMLElement
+        && event.target instanceof HTMLElement
+        && root.contains(event.target)
+        && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)
+        && !event.defaultPrevented && !event.isComposing && !event.repeat
+        && !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey;
 };
 
 const moveKeyboardSelection = (direction: 'previous' | 'next') => {
@@ -4420,6 +4564,13 @@ const closeSettingsPopover = () => {
     }
 
     isSettingsOpen.value = false;
+    if (isAdrSession.value) {
+        void nextTick(() => {
+            const triggers = Array.from(document.querySelectorAll<HTMLElement>('[data-adr-settings-trigger]'));
+            const trigger = triggers.find(element => element.getClientRects().length > 0);
+            trigger?.focus({ preventScroll: true });
+        });
+    }
 };
 
 const openTopicPicker = ({ showGuide = false }: { showGuide?: boolean } = {}) => {
@@ -4480,13 +4631,49 @@ const applyFeedbackModePreset = (mode: FeedbackMode) => {
 };
 
 const handleSessionKeydown = (event: KeyboardEvent) => {
+    // Passive learning never routes A/S/D/arrows/Space through answer shortcuts.
+    if (preliminaryActive.value || preliminaryTransitionBusy.value || preliminaryTransitionError.value) return;
     if (
         sessionExpired.value
+        || completionInteractionBlocked.value
         || !activeQuestion.value
         || localSessionCompleted.value
     ) {
         return;
     }
+
+    if (fullExplanationOpen.value && event.target instanceof HTMLElement
+        && event.target.closest('[data-testid="full-study-explanation"]')) return;
+
+    // Own Space before answer shortcuts and native focused-button activation.
+    // Never fall through to answer/next, even when there is no explanation.
+    if ((usesRegularExplanationSpace.value || usesCourseFlashcard.value) && isExplanationSpaceKey(event)) {
+        const target = event.target instanceof HTMLElement ? event.target : null;
+        const blocked = isAnySidePanelOpen.value || isQuestionEditorOpen.value || isExplanationEditorOpen.value
+            || Boolean(target && (target.isContentEditable
+                || target.closest('input, textarea, select, a, summary, details, audio, video, [role="dialog"], [contenteditable="true"]')
+                || (target.closest('button') && !target.closest('[data-regular-explanation-space], [data-course-answer], [data-course-next], [data-course-explanation]'))));
+        if (blocked) return;
+        const toggle = shouldToggleExplanationWithSpace(event, {
+            ready: questionStage.value === 'answer' && !answerForm.processing
+                && !questionTransitionInFlight.value
+                && (!answerInteractionLocked.value || currentAnswerResult.value !== null),
+            available: usesCourseFlashcard.value ? canTurnCourseFlashcard.value : canToggleExplanationOnDemand.value,
+        });
+        event.preventDefault();
+        if (toggle) {
+            // Hold only this answered question; do not alter the user's auto-next preference.
+            if (currentAnswerResult.value) {
+                explanationKeyboardPausedQuestionId.value = activeQuestion.value.id;
+                clearAutoAdvanceTimeout();
+            }
+            if (usesCourseFlashcard.value) toggleCourseFlashcard();
+            else toggleExplanationOnDemand();
+        }
+        return;
+    }
+
+    if (fullExplanationOpen.value) return;
 
     if (isAnySidePanelOpen.value) {
         if (event.key === 'Escape') {
@@ -4500,9 +4687,10 @@ const handleSessionKeydown = (event: KeyboardEvent) => {
     if (usesCourseFlashcard.value) {
         if ((event.key === 'ArrowRight' || event.key.toLowerCase() === 'd') && currentAnswerResult.value) {
             const target = event.target instanceof HTMLElement ? event.target : null;
+            const audioArrow = isArrowOnAudioControl(event, courseExplanationAudioRef.value);
             const blocked = Boolean(target && (target.isContentEditable
                 || target.closest('input, textarea, select, a, summary, details, [contenteditable="true"]')
-                || (target.closest('button') && !target.closest('[data-course-answer], [data-course-next]'))));
+                || (target.closest('button') && !target.closest('[data-course-answer], [data-course-next]') && !audioArrow)));
             if (shouldAdvanceCourseExplanationWithArrow(sessionState.value, event, {
                 answered: true,
                 explanationVisible: courseFlashcardBackVisible.value,
@@ -4548,7 +4736,8 @@ const handleSessionKeydown = (event: KeyboardEvent) => {
         if (currentAnswerResult.value) return;
     }
 
-    if (isTypingInInteractiveElement(event.target)) {
+    // Keep the speaker focused so Enter and Space still control playback.
+    if (isTypingInInteractiveElement(event.target) && !isArrowOnAudioControl(event, questionAudioControlRef.value)) {
         return;
     }
 
@@ -4745,20 +4934,24 @@ const examLikeAnswerLabelClass = (optionKey: string) => {
 
 const sessionAnswersRoute = computed(() =>
     props.publicDemo?.routes.answer
-        ?? (isLocalLearningMode.value
+        ?? (isAdrSession.value || usesConfirmedCompletion.value || preliminaryState.value !== null || usesCourseFlashcard.value
+        ? route('study-sessions.answers.store', props.session.id)
+        : isLocalLearningMode.value
         ? route('study-sessions.current.answers.store')
         : route('study-sessions.answers.store', props.session.id)),
 );
 
 const sessionCompleteRoute = computed(() =>
     props.publicDemo?.routes.complete
-        ?? (isLocalLearningMode.value
+        ?? (isAdrSession.value || usesConfirmedCompletion.value || usesCourseFlashcard.value
+        ? route('study-sessions.complete', props.session.id)
+        : isLocalLearningMode.value
         ? route('study-sessions.current.complete')
         : route('study-sessions.complete', props.session.id)),
 );
 const sessionQuestionBatchRoute = computed(() =>
     props.publicDemo?.routes.questions
-        ?? (isLocalLearningMode.value
+        ?? (isLocalLearningMode.value && !isAdrSession.value && !usesCourseFlashcard.value
         ? route('study-sessions.current.questions.index')
         : route('study-sessions.questions.index', props.session.id)),
 );
@@ -4833,7 +5026,9 @@ watch([() => completionProgressPanelItems.value.length, activeSessionTopicId], a
 });
 const canUseCompletionActions = computed(() =>
     !followUpActionInFlight.value
+    && !completionInFlight.value && !answerRetryInFlight.value
     && !courseModuleRestartForm.processing
+    && !nextCoursePartForm.processing
     && !completeForm.processing
     && !pjmSessionForm.processing
     && !topicSwitchInFlight.value
@@ -4842,13 +5037,15 @@ const canUseCompletionActions = computed(() =>
 );
 const canRestartCourseModule = computed(() =>
     isCourseModuleSession.value
-    && localSessionCompleted.value
+    && (localSessionCompleted.value || (preliminaryActive.value && preliminaryState.value?.completed === true))
     && !courseModuleRestartForm.processing
+    && !nextCoursePartForm.processing
     && !completeForm.processing
     && !sessionExpired.value,
 );
 const showSaveAnswerErrorModal = computed(() =>
     Boolean(syncError.value)
+    && !completionConfirmed.value
     && answerSyncFailedQuestionId.value === activeQuestion.value?.id,
 );
 const showInlineSyncError = computed(() =>
@@ -5022,6 +5219,20 @@ const restartCourseModule = () => {
         onError: (errors) => {
             courseModuleRestartError.value = Object.values(errors)[0]
                 ?? 'Nie udało się ponownie uruchomić modułu. Spróbuj ponownie za chwilę.';
+        },
+    });
+};
+
+const startNextCoursePart = () => {
+    const next = sessionState.value.context?.part_navigation?.next;
+    if (!isCourseModuleSession.value || !localSessionCompleted.value || !next?.start_url || !canUseCompletionActions.value) return;
+    nextCoursePartError.value = null;
+    // Do not terminate another session opened in another tab since this result loaded.
+    nextCoursePartForm.post(next.start_url, {
+        preserveState: 'errors',
+        onError: errors => {
+            nextCoursePartError.value = Object.values(errors)[0]
+                ?? 'Nie udało się uruchomić następnego rozdziału. Odśwież podsumowanie i spróbuj ponownie.';
         },
     });
 };
@@ -5356,18 +5567,13 @@ const resolvePreviousQuestionMeta = (questionId: number | null = activeQuestion.
 };
 
 const nextQuestionIdsToFetch = (questionId: number | null = activeQuestion.value?.id ?? null) => {
-    const currentIndex = questionIndexFor(questionId);
-
-    if (currentIndex < 0) {
-        return [] as number[];
-    }
-
-    return props.questionIds
-        .slice(currentIndex + 1, currentIndex + 1 + props.questionBatchSize)
-        .filter((nextQuestionId) =>
-            !questionCache.value[nextQuestionId]
-            && !questionIdsBeingFetched.has(nextQuestionId),
-        );
+    return selectStudyQuestionPrefetch(
+        props.questionIds,
+        questionId,
+        props.questionBatchSize,
+        (id) => !!questionCache.value[id],
+        (id) => questionIdsBeingFetched.has(id),
+    );
 };
 
 const syncPreparedNextQuestion = (questionId: number | null = activeQuestion.value?.id ?? null) => {
@@ -5401,6 +5607,8 @@ const activateQuestion = (
     questionNumber: number | null,
     options: { clearPrepared?: boolean } = {},
 ) => {
+    // A batch GET started before finishing must not swap the underlying screen.
+    if (completionInteractionBlocked.value) return;
     activeQuestionState.value = question;
     currentQuestionNumberState.value = questionNumber;
     syncError.value = null;
@@ -5451,11 +5659,13 @@ const fetchQuestionBatch = async (questionIds: number[]) => {
 
             const payload = await apiClient.get<{
                 questions?: CurrentQuestion[];
-            }>(`${sessionQuestionBatchRoute.value}?${params.toString()}`);
+            }>(`${sessionQuestionBatchRoute.value}?${params.toString()}`, {
+                headers: { 'X-Study-Session-Id': String(props.session.id) },
+            });
 
-            cacheQuestions(payload.questions ?? []);
+            if (!courseProgressConflict.value) cacheQuestions(payload.questions ?? []);
         } catch (error) {
-            if (!handleSessionExpiryError(error)) {
+            if (!stopOnCourseProgressConflict(error) && !handleSessionExpiryError(error) && !completionInteractionBlocked.value) {
                 syncError.value = 'Nie udalo sie doladowac kolejnych pytan.';
             }
         } finally {
@@ -5474,6 +5684,7 @@ const fetchQuestionBatch = async (questionIds: number[]) => {
 };
 
 const prepareUpcomingQuestion = async (questionId: number | null = activeQuestion.value?.id ?? null) => {
+    if (sessionExpired.value || completionInteractionBlocked.value) return;
     syncPreparedNextQuestion(questionId);
 
     if (props.questionPoolMode === 'full' || isReviewTrainerMode.value) {
@@ -5526,6 +5737,7 @@ const registerVideoElement = (
 };
 
 const setVideoPlaybackState = (key: string, isPlaying: boolean) => {
+    if (isPlaying && usesCourseFlashcard.value) stopCourseAudio();
     videoPlaybackState.value = {
         ...videoPlaybackState.value,
         [key]: isPlaying,
@@ -5545,6 +5757,80 @@ const pauseQuestionAudio = () => {
 
 const stopQuestionAudio = () => {
     questionAudioControlRef.value?.stop();
+};
+
+const stopCourseAudio = () => {
+    if (!usesCourseFlashcard.value && !isAdrSession.value) return;
+    stopQuestionAudio();
+    courseExplanationAudioRef.value?.stop();
+    courseQuestionAudioState.value = 'stopped';
+    courseExplanationAudioState.value = 'stopped';
+};
+const preliminaryCanToggle = computed(() => Boolean(preliminaryState.value)
+    && sessionState.value.status === 'in_progress'
+    && !preliminaryTransitionBusy.value && !learningSyncInFlight.value && pendingAnswerSyncCount.value === 0
+    && !syncError.value && !preliminaryTransitionError.value && !answerRetryInFlight.value
+    && !questionTransitionInFlight.value && !completionInFlight.value && !courseAudioFinishing.value
+    && !localSessionCompleted.value && !sessionExpired.value);
+const applyPreliminaryState = (state: PreliminaryLearningState) => {
+    const context = sessionState.value.context;
+    if (!context?.preliminary_learning) return;
+    clearAutoAdvanceTimeout();
+    stopCourseAudio();
+    stopCorrectAnswerAudio();
+    sessionState.value = { ...sessionState.value, context: { ...context,
+        preliminary_learning: { ...context.preliminary_learning, ...state } } };
+};
+const togglePreliminaryLearning = async (enabled: boolean) => {
+    if (!preliminaryCanToggle.value || !preliminaryState.value) return;
+    const { url, revision } = preliminaryState.value;
+    clearAutoAdvanceTimeout(); stopCourseAudio(); stopCorrectAnswerAudio();
+    preliminaryTransitionBusy.value = true;
+    try {
+        const payload = await apiClient.patch<{ state: PreliminaryLearningState }>(url,
+            { action: enabled ? 'enable' : 'disable', revision }, { timeoutMs: STUDY_WRITE_TIMEOUT_MS });
+        applyPreliminaryState(payload.state);
+        preliminaryTransitionError.value = null;
+        closeSidePanels();
+    } catch {
+        preliminaryTransitionError.value = 'Nie potwierdzono zmiany trybu. Odśwież stan przed kontynuacją — nie wysyłamy odpowiedzi w niepewnym stanie.';
+    } finally { preliminaryTransitionBusy.value = false; }
+};
+const refreshPreliminaryLearning = async () => {
+    if (!preliminaryState.value || preliminaryTransitionBusy.value) return;
+    preliminaryTransitionBusy.value = true;
+    try {
+        const payload = await apiClient.get<{ state: PreliminaryLearningState }>(preliminaryState.value.url, { timeoutMs: 15000 });
+        applyPreliminaryState(payload.state);
+        preliminaryTransitionError.value = null;
+    } catch { preliminaryTransitionError.value = 'Nie udało się odświeżyć sesji. Sprawdź połączenie lub wróć do listy rozdziałów.'; }
+    finally { preliminaryTransitionBusy.value = false; }
+};
+const requestCourseAudio = (kind: 'question' | 'explanation') => {
+    clearAutoAdvanceTimeout();
+    if (kind === 'question') courseExplanationAudioRef.value?.stop();
+    else stopQuestionAudio();
+    stopCorrectAnswerAudio();
+    videoElements.forEach(video => video.pause());
+};
+const onAdrFeedbackAudioState = (event: CourseAudioStateEvent) => {
+    if (event.state !== 'ended' || !adrAutoplayAfterAnswer.value || !autoAdvance.value
+        || event.questionId !== activeQuestion.value?.id || primaryActionDisabled.value
+        || isAnySidePanelOpen.value || sessionExpired.value) return;
+
+    if (!completePendingCourseSession()) void moveToNextQuestion(event.questionId);
+};
+const onCourseAudioState = (kind: 'question' | 'explanation', event: CourseAudioStateEvent) => {
+    if (!usesCourseFlashcard.value || event.questionId !== activeQuestion.value?.id) return;
+    const asset = kind === 'question' ? currentQuestionAudio.value : currentExplanationAudio.value ?? courseFeedbackAnswerAudio.value;
+    if (event.assetKey !== undefined && event.assetKey !== (asset?.asset_key ?? asset?.url)) return;
+    if (kind === 'question') courseQuestionAudioState.value = event.state;
+    else courseExplanationAudioState.value = event.state;
+    clearAutoAdvanceTimeout();
+    if (currentAnswerResult.value && !courseAudioAwaitingAdvance.value) {
+        scheduleCourseAutoAdvance(event.questionId,
+            event.state === 'ended' ? courseQuestionAnsweredAt.value ?? Date.now() : Date.now());
+    }
 };
 
 const stopCorrectAnswerAudio = () => {
@@ -5613,6 +5899,7 @@ const playCorrectAnswerAudio = async () => {
 };
 
 const requestVideoPlayback = (video: HTMLVideoElement) => {
+    if (usesCourseFlashcard.value) stopCourseAudio();
     video.defaultPlaybackRate = effectiveVideoPlaybackRate.value;
     video.playbackRate = effectiveVideoPlaybackRate.value;
 
@@ -5747,10 +6034,15 @@ const persistPreferences = () => {
         SESSION_PREFERENCES_KEY,
         JSON.stringify({
             autoAdvance: autoAdvance.value,
+            fullExplanations: fullExplanations.value,
+            fullExplanationSeconds: fullExplanationSeconds.value,
             autoPlayVideos: autoPlayVideos.value,
             showQuestionAudioControl: showQuestionAudioControl.value,
             autoPlayQuestionAudio: autoPlayQuestionAudio.value,
+            questionAudioPlaybackRate: questionAudioPlaybackRate.value,
             autoPlayCorrectAnswerAudio: autoPlayCorrectAnswerAudio.value,
+            autoPlayAdrExplanationAfterIncorrect: autoPlayAdrExplanationAfterIncorrect.value,
+            autoPlayAdrExplanationAfterCorrect: autoPlayAdrExplanationAfterCorrect.value,
             videoPlaybackRate: videoPlaybackRate.value,
             autoJumpToVideoEnding: autoJumpToVideoEnding.value,
             hintTimingPreference: hintTimingPreference.value,
@@ -5763,12 +6055,17 @@ const persistPreferences = () => {
 };
 
 const applySessionPreferences = (preferences: SessionPreferences) => {
+    fullExplanations.value = preferences.fullExplanations;
+    fullExplanationSeconds.value = preferences.fullExplanationSeconds;
     feedbackMode.value = preferences.feedbackMode;
     autoAdvance.value = preferences.autoAdvance;
     autoPlayVideos.value = preferences.autoPlayVideos;
     showQuestionAudioControl.value = preferences.showQuestionAudioControl;
     autoPlayQuestionAudio.value = preferences.autoPlayQuestionAudio;
+    questionAudioPlaybackRate.value = preferences.questionAudioPlaybackRate;
     autoPlayCorrectAnswerAudio.value = preferences.autoPlayCorrectAnswerAudio;
+    autoPlayAdrExplanationAfterIncorrect.value = preferences.autoPlayAdrExplanationAfterIncorrect;
+    autoPlayAdrExplanationAfterCorrect.value = preferences.autoPlayAdrExplanationAfterCorrect;
     autoJumpToVideoEnding.value = preferences.autoJumpToVideoEnding;
     hintTimingPreference.value = preferences.hintTimingPreference;
     videoPlaybackRate.value = preferences.videoPlaybackRate;
@@ -5793,10 +6090,16 @@ const loadPreferences = () => {
     try {
         const parsedPreferences = JSON.parse(rawPreferences) as {
             autoAdvance?: boolean;
+            fullExplanations?: boolean;
+            fullExplanationSeconds?: unknown;
             autoPlayVideos?: boolean;
             showQuestionAudioControl?: boolean;
             autoPlayQuestionAudio?: boolean;
+            questionAudioPlaybackRate?: unknown;
             autoPlayCorrectAnswerAudio?: boolean;
+            autoPlayAdrExplanation?: boolean;
+            autoPlayAdrExplanationAfterIncorrect?: boolean;
+            autoPlayAdrExplanationAfterCorrect?: boolean;
             videoPlaybackRate?: number;
             autoJumpToVideoEnding?: boolean;
             hintTimingPreference?: HintTimingPreference;
@@ -5812,6 +6115,8 @@ const loadPreferences = () => {
 
         applySessionPreferences({
             feedbackMode: parsedMode,
+            fullExplanations: parsedPreferences.fullExplanations === true,
+            fullExplanationSeconds: readFullExplanationSeconds(parsedPreferences.fullExplanationSeconds),
             autoAdvance: parsedPreferences.autoAdvance === undefined
                 ? defaultAutoAdvanceForFeedbackMode(parsedMode)
                 : parsedPreferences.autoAdvance === true,
@@ -5825,6 +6130,11 @@ const loadPreferences = () => {
             autoPlayCorrectAnswerAudio: parsedPreferences.autoPlayCorrectAnswerAudio === undefined
                 ? FIRST_VISIT_SESSION_PREFERENCES.autoPlayCorrectAnswerAudio
                 : parsedPreferences.autoPlayCorrectAnswerAudio === true,
+            autoPlayAdrExplanationAfterIncorrect: (parsedPreferences.autoPlayAdrExplanationAfterIncorrect
+                ?? parsedPreferences.autoPlayAdrExplanation) === true,
+            autoPlayAdrExplanationAfterCorrect: (parsedPreferences.autoPlayAdrExplanationAfterCorrect
+                ?? parsedPreferences.autoPlayAdrExplanation) === true,
+            questionAudioPlaybackRate: readQuestionAudioRate(parsedPreferences.questionAudioPlaybackRate),
             autoJumpToVideoEnding: parsedPreferences.autoJumpToVideoEnding === true,
             hintTimingPreference: isHintTimingPreference(parsedPreferences.hintTimingPreference)
                 ? parsedPreferences.hintTimingPreference
@@ -5855,13 +6165,16 @@ const loadCourseFlashcardPreferences = () => {
         const preferences = readCourseFlashcardPreferences(window.localStorage.getItem(COURSE_FLASHCARD_PREFERENCES_KEY));
         courseExplanationMode.value = preferences.explanationMode;
         courseAdvanceMode.value = preferences.advanceMode;
+        courseAudioPreferences.value = readCourseAudioPreferences(window.localStorage.getItem(COURSE_AUDIO_PREFERENCES_KEY));
     } catch {
         // Storage restrictions must never prevent studying.
     }
 };
 
 const completePendingCourseSession = () => {
-    if (!usesCourseFlashcard.value || pendingCourseCompletionQuestionId.value === null) return false;
+    if (pendingCourseCompletionQuestionId.value === null) return false;
+    courseAudioFinishing.value = true;
+    stopCourseAudio();
     pendingCourseCompletionQuestionId.value = null;
     clearAutoAdvanceTimeout();
     preparedNextQuestion.value = null;
@@ -6004,12 +6317,47 @@ const scheduleVideoPlayback = (question: CurrentQuestion | null = activeQuestion
 const registerPendingSyncRequest = (promise: Promise<void>) => {
     pendingSyncRequests.add(promise);
 
-    promise.finally(() => {
+    const cleanup = () => {
         pendingSyncRequests.delete(promise);
-    });
+    };
+    void promise.then(cleanup, cleanup);
 };
 
-const enqueueAnswerSync = (task: () => Promise<void>) => {
+const stopOnCourseProgressConflict = (error: unknown): boolean => {
+    if (courseProgressConflict.value) return true;
+    const data = isApiClientError(error) ? error.data as { errors?: { course_progress?: string[] } } | null : null;
+    const message = data?.errors?.course_progress?.[0];
+    if (!message) return false;
+    courseProgressConflict.value = true;
+    courseAudioFinishing.value = true;
+    stopCourseAudio(); stopCorrectAnswerAudio(); clearAutoAdvanceTimeout();
+    videoElements.forEach(video => video.pause());
+    syncError.value = message;
+    return true;
+};
+
+const enqueueAnswerSync = (task: () => Promise<void>, questionId: number, onFailure: (error: unknown) => void) => {
+    const observedTask = async () => {
+        try {
+            if (sessionExpired.value || courseProgressConflict.value) throw new Error('session_unavailable');
+            await task();
+            if (usesConfirmedCompletion.value) {
+                unconfirmedAnswerIds.value = unconfirmedAnswerIds.value.filter((id) => id !== questionId);
+                answerSyncFailedQuestionId.value = unconfirmedAnswerIds.value[0] ?? null;
+                syncError.value = unconfirmedAnswerIds.value.length
+                    ? 'Nie wszystkie odpowiedzi zostały potwierdzone. Ponów zapis.' : null;
+            }
+        } catch (error) {
+            if (usesConfirmedCompletion.value && !unconfirmedAnswerIds.value.includes(questionId)) {
+                unconfirmedAnswerIds.value.push(questionId);
+            }
+            onFailure(error);
+            throw error;
+        }
+    };
+    if (usesConfirmedCompletion.value) {
+        return confirmedAnswerQueue.enqueue(questionId, observedTask);
+    }
     if (sessionExpired.value) {
         return Promise.reject(new Error('session_expired'));
     }
@@ -6024,7 +6372,7 @@ const enqueueAnswerSync = (task: () => Promise<void>) => {
                 throw new Error('session_expired');
             }
 
-            return task();
+            return observedTask();
         })
         .finally(() => {
             pendingAnswerSyncCount.value = Math.max(pendingAnswerSyncCount.value - 1, 0);
@@ -6087,6 +6435,10 @@ const applyOptimisticAnswerProgress = (result: ResultItem) => {
 };
 
 const syncCompletion = async () => {
+    if (usesConfirmedCompletion.value) {
+        await confirmedCompletion.run();
+        return;
+    }
     if (sessionExpired.value) {
         return;
     }
@@ -6108,6 +6460,7 @@ const syncCompletion = async () => {
             usesFrozenPublicDemo.value
                 ? { answers: publicDemoCompletionAnswers() }
                 : {},
+            { headers: { 'X-Study-Session-Id': String(props.session.id) } },
         );
 
         sessionState.value = {
@@ -6139,9 +6492,73 @@ const syncCompletion = async () => {
             );
         }
     } catch (error) {
-        if (!handleSessionExpiryError(error)) {
+        if (!stopOnCourseProgressConflict(error) && !handleSessionExpiryError(error)) {
             syncError.value = 'Nie udalo sie zsynchronizowac zakonczenia sesji.';
         }
+    }
+};
+
+const confirmedCompletion = createConfirmedCompletion({
+    onBusyChange: (busy) => { completionInFlight.value = busy; },
+    waitForAnswers: async () => {
+        if (sessionExpired.value) throw new Error('session_expired');
+        await confirmedAnswerQueue.waitForConfirmation();
+        if (sessionExpired.value) throw new Error('session_expired');
+    },
+    complete: async () => {
+        const payload = await apiClient.post<{
+            session: Partial<SessionSummary>;
+            redirect: string;
+        }>(sessionCompleteRoute.value, {
+            answer_question_ids: Object.values(localResults.value).filter(isAnsweredResult).map((result) => result.id),
+        }, {
+            headers: { 'X-Study-Completion-Response': 'redirect' },
+            timeoutMs: STUDY_WRITE_TIMEOUT_MS,
+        });
+        if (payload.session?.id !== props.session.id || payload.session.status !== 'completed' || !payload.redirect) {
+            throw new Error('invalid_completion_confirmation');
+        }
+        return payload;
+    },
+    onConfirmed: async (payload) => {
+        // Keep the question screen intact until fresh result props are mounted.
+        completionConfirmed.value = true;
+        answerSyncFailedQuestionId.value = null;
+        syncError.value = null;
+        await navigateToStudyResult(router, payload.redirect, props.session.id);
+    },
+    onError: (error) => {
+        if (error instanceof StudyResultNavigationError && [401, 419].includes(error.status)) {
+            expireSession();
+            return;
+        }
+        if (sessionExpired.value || handleSessionExpiryError(error)) return;
+        if (completionConfirmed.value) {
+            syncError.value = 'Sesja została zapisana, ale nie udało się otworzyć podsumowania. Spróbuj ponownie — otworzymy tylko zapisany wynik.';
+        } else if (error instanceof UnconfirmedAnswersError) {
+            answerSyncFailedQuestionId.value = error.questionIds[0] ?? null;
+            syncError.value = 'Nie wszystkie odpowiedzi zostały potwierdzone. Ponów zapis przed zakończeniem nauki.';
+        } else {
+            syncError.value = error instanceof RequestTimeoutError
+                ? 'Serwer nie potwierdził zakończenia w ciągu 30 sekund. Spróbuj ponownie — zapisane odpowiedzi nie zostaną powielone.'
+                : 'Nie udało się potwierdzić zakończenia sesji. Spróbuj ponownie.';
+        }
+    },
+});
+
+const retryFailedAnswerSync = async () => {
+    if (answerRetryInFlight.value || completionInFlight.value || sessionExpired.value) return;
+    answerRetryInFlight.value = true;
+    try {
+        await confirmedAnswerQueue.retryFailed();
+        syncError.value = null;
+        answerSyncFailedQuestionId.value = null;
+    } catch (error) {
+        if (!handleSessionExpiryError(error)) {
+            syncError.value = 'Zapis nadal nie został potwierdzony. Sprawdź połączenie i ponów próbę.';
+        }
+    } finally {
+        answerRetryInFlight.value = false;
     }
 };
 
@@ -6150,9 +6567,11 @@ const buildLocalResult = (
     answerKey: string | null,
     answerKind: StudySessionAnswerKind = ANSWER_KIND_CHOICE,
 ): ResultItem => {
-    const responseTimeMs = presentedAt.value
+    const elapsedTimeMs = presentedAt.value
         ? Math.max(Date.now() - presentedAt.value, 0)
         : null;
+    const responseTimeMs = usesConfirmedCompletion.value
+        ? confirmedAnswerResponseTime(elapsedTimeMs) : elapsedTimeMs;
 
     const normalizedAnswer = answerKey?.toUpperCase() ?? null;
     const normalizedCorrectAnswer = question.correct_answer?.toUpperCase() ?? null;
@@ -6165,6 +6584,7 @@ const buildLocalResult = (
         id: question.id,
         sequence_number: props.questionIds.indexOf(question.id) + 1,
         prompt: question.prompt,
+        question_type: question.question_type,
         explanation: question.explanation,
         correct_answer: normalizedCorrectAnswer,
         correct_answer_text: correctOption?.text ?? null,
@@ -6208,7 +6628,7 @@ const persistLocalAnswer = (
     answerKey: string | null,
     answerKind: StudySessionAnswerKind = ANSWER_KIND_CHOICE,
 ) => {
-    if (sessionExpired.value) {
+    if (sessionExpired.value || preliminaryActive.value || preliminaryTransitionBusy.value || preliminaryTransitionError.value) {
         return null;
     }
 
@@ -6224,6 +6644,9 @@ const persistLocalAnswer = (
 
     const result = buildLocalResult(question, answerKey, answerKind);
 
+    if (adrAutoplayEnabled.value && answerKind === ANSWER_KIND_CHOICE) {
+        adrAutoplayQuestionId.value = question.id;
+    }
     localResults.value[question.id] = result;
     applyOptimisticAnswerProgress(result);
     showExplanationOnDemand.value = false;
@@ -6242,12 +6665,14 @@ const persistLocalAnswer = (
         : null;
 
     const advanceToNextQuestion = () => {
-        if (!effectiveAutoAdvance.value || localSessionCompleted.value) {
+        if (!effectiveAutoAdvance.value || localSessionCompleted.value || completionInteractionBlocked.value) {
             return;
         }
+        if (usesRegularExplanationSpace.value && explanationKeyboardPausedQuestionId.value === question.id) return;
 
         if (usesCourseFlashcard.value && activeQuestion.value?.id !== question.id) return;
         if (completePendingCourseSession()) return;
+        if (usesFullExplanations.value && (showExplanation.value || result.is_correct === false)) return;
 
         clearAutoAdvanceTimeout();
 
@@ -6268,6 +6693,7 @@ const persistLocalAnswer = (
         correctAnswerAudioDelayMs(result),
     );
     const answeredAt = Date.now();
+    let restoringAdrProgress = false;
     if (usesCourseFlashcard.value) courseQuestionAnsweredAt.value = answeredAt;
 
     if (usesFrozenPublicDemo.value) {
@@ -6361,6 +6787,7 @@ const persistLocalAnswer = (
             };
             progress: ProgressSummary;
             completed: boolean;
+            partNavigation?: CoursePartNavigationPayload | null;
             nextQuestion?: CurrentQuestion | null;
             nextQuestionNumber?: number | null;
             topicCompletionOverview?: TopicCompletionOverview | null;
@@ -6373,8 +6800,25 @@ const persistLocalAnswer = (
                 selected_answer: answerKind === ANSWER_KIND_CHOICE ? answerKey : null,
                 answer_kind: answerKind,
                 response_time_ms: result.response_time_ms,
+                ...(preliminaryState.value ? { learning_revision: preliminaryState.value.revision } : {}),
+            },
+            {
+                headers: { 'X-Study-Session-Id': String(props.session.id),
+                    ...(usesConfirmedCompletion.value || preliminaryState.value ? { 'X-Study-Answer-Response': 'confirmed' } : {}) },
+                timeoutMs: STUDY_WRITE_TIMEOUT_MS,
             },
         );
+
+        if (isAdrSession.value && typeof window !== 'undefined'
+            && payload.progress.answered > Object.keys(localResults.value).length) {
+            // Another tab has saved answers that this one hasn't loaded.
+            restoringAdrProgress = true;
+            questionTransitionInFlight.value = true;
+            window.location.replace(payload.completed
+                ? route('study-sessions.show', props.session.id, false)
+                : route('study-sessions.current', {}, false));
+            return;
+        }
 
         syncError.value = null;
         answerSyncFailedQuestionId.value = null;
@@ -6404,9 +6848,12 @@ const persistLocalAnswer = (
                 ?? localResults.value[question.id]?.explanation_annotations
                 ?? result.explanation_annotations,
         };
-        showExplanation.value = localResults.value[question.id]
-            ? shouldShowAutomaticExplanationForResult(localResults.value[question.id])
-            : false;
+        // A late answer response must not undo the user's Space toggle.
+        if (!usesRegularExplanationSpace.value || explanationKeyboardPausedQuestionId.value !== question.id) {
+            showExplanation.value = localResults.value[question.id]
+                ? shouldShowAutomaticExplanationForResult(localResults.value[question.id])
+                : false;
+        }
         sessionState.value = {
             ...sessionState.value,
             status: payload.session.status,
@@ -6414,6 +6861,9 @@ const persistLocalAnswer = (
             total_questions_count: payload.session.total_questions_count,
             score_percent: payload.session.score_percent,
             completed_at: payload.session.completed_at,
+            ...(payload.partNavigation !== undefined && sessionState.value.context ? {
+                context: { ...sessionState.value.context, part_navigation: payload.partNavigation },
+            } : {}),
         };
         progressState.value = payload.progress;
         if (payload.pjmCompletion !== undefined) {
@@ -6435,9 +6885,21 @@ const persistLocalAnswer = (
             primeQuestionMedia(payload.nextQuestion);
         }
 
-        if (payload.completed) {
+        if (payload.completed && (!usesConfirmedCompletion.value
+            || (!completionInteractionBlocked.value && unconfirmedAnswerIds.value.every((id) => id === question.id)))) {
+            if (isAdrSession.value && typeof window !== 'undefined') {
+                window.history.replaceState(window.history.state, '', route('study-sessions.show', props.session.id, false));
+            }
+
+            if (usesFullExplanations.value && activeQuestion.value?.id === question.id
+                && shouldShowAutomaticExplanationForResult(localResults.value[question.id] ?? result)) {
+                // The DB is already complete. Hold only the presentation until reading ends.
+                pendingFullCompletionQuestionId.value = question.id;
+                clearAutoAdvanceTimeout();
+                return;
+            }
             // Keep the final course explanation readable; the answer is already saved.
-            if (usesCourseFlashcard.value && activeQuestion.value?.id === question.id) {
+            if ((usesCourseFlashcard.value || adrAutoplayAfterAnswer.value) && activeQuestion.value?.id === question.id) {
                 pendingCourseCompletionQuestionId.value = question.id;
                 return;
             }
@@ -6449,33 +6911,12 @@ const persistLocalAnswer = (
             showCompletionResults.value = true;
             showCorrectCompletionResults.value = true;
         }
-    });
-
-    syncRequest.then(() => {
-        if (usesCourseFlashcard.value) {
-            scheduleCourseAutoAdvance(question.id, answeredAt);
-            return;
-        }
-        if (!autoAdvance.value) {
-            return;
-        }
-
-        const elapsedMs = Math.max(Date.now() - answeredAt, 0);
-        const remainingDelay = Math.max(resolveAutoAdvanceDelay() - elapsedMs, 0);
-
-        if (typeof window !== 'undefined') {
-            clearAutoAdvanceTimeout();
-            autoAdvanceTimeoutId = window.setTimeout(() => {
-                advanceToNextQuestion();
-            }, remainingDelay);
-            return;
-        }
-
-        advanceToNextQuestion();
-    }).catch((error) => {
+    }, question.id, (error) => {
         answerSyncFailedQuestionId.value = question.id;
-        if (!handleSessionExpiryError(error)) {
-            syncError.value = SAVE_ANSWER_SYNC_ERROR_MESSAGE;
+        if (!stopOnCourseProgressConflict(error) && !handleSessionExpiryError(error)) {
+            syncError.value = usesConfirmedCompletion.value
+                ? 'Serwer nie potwierdził zapisu odpowiedzi. Pozostaje ona w tej karcie — ponów zapis bez odświeżania strony.'
+                : SAVE_ANSWER_SYNC_ERROR_MESSAGE;
         }
         clearAutoAdvanceTimeout();
         questionTransitionInFlight.value = false;
@@ -6490,6 +6931,32 @@ const persistLocalAnswer = (
         showCorrectCompletionResults.value = false;
     });
 
+    syncRequest.then(() => {
+        if (restoringAdrProgress || completionInteractionBlocked.value || unconfirmedAnswerIds.value.length) return;
+        if (usesCourseFlashcard.value) {
+            scheduleCourseAutoAdvance(question.id, answeredAt);
+            return;
+        }
+        if (adrAutoplayAfterAnswer.value) return;
+        if (!autoAdvance.value || (usesFullExplanations.value && (showExplanation.value || result.is_correct === false))) {
+            return;
+        }
+        if (usesRegularExplanationSpace.value && explanationKeyboardPausedQuestionId.value === question.id) return;
+
+        const elapsedMs = Math.max(Date.now() - answeredAt, 0);
+        const remainingDelay = Math.max(resolveAutoAdvanceDelay() - elapsedMs, 0);
+
+        if (typeof window !== 'undefined') {
+            clearAutoAdvanceTimeout();
+            autoAdvanceTimeoutId = window.setTimeout(() => {
+                advanceToNextQuestion();
+            }, remainingDelay);
+            return;
+        }
+
+        advanceToNextQuestion();
+    }).catch(() => {});
+
     if (!effectiveAutoAdvance.value && typeof window !== 'undefined') {
         clearAutoAdvanceTimeout();
     }
@@ -6502,7 +6969,7 @@ const toggleExplanationOnDemand = () => {
         return;
     }
 
-    if (isManualExplanationVisible.value) {
+    if (isManualExplanationVisible.value || (usesRegularExplanationSpace.value && shouldShowExplanationCard.value)) {
         showExplanationOnDemand.value = false;
         showExplanation.value = false;
 
@@ -6511,17 +6978,27 @@ const toggleExplanationOnDemand = () => {
 
     showExplanationOnDemand.value = true;
     showExplanation.value = true;
+    if (isAdrSession.value && currentAnswerResult.value && currentExplanationAudio.value?.url) {
+        clearAutoAdvanceTimeout();
+    }
 };
 
 // Presentation state only: never changes the saved answer or shared feedback flags.
 watch([usesCourseFlashcard, () => activeQuestion.value?.id, shouldShowExplanationCard, automaticCourseFlashcardVisible], () => {
+    // Keep a manual Space toggle intact when a late answer acknowledgement arrives.
+    if (usesCourseFlashcard.value && explanationKeyboardPausedQuestionId.value === activeQuestion.value?.id) return;
     courseFlashcardBackVisible.value = usesCourseFlashcard.value
         && (isManualExplanationVisible.value || automaticCourseFlashcardVisible.value);
 }, { immediate: true });
 watch(courseFlashcardBackVisible, (visible) => {
     if (visible && usesCourseFlashcard.value) {
         videoElements.forEach((video) => video.pause());
-        questionAudioControlRef.value?.pause();
+        stopQuestionAudio();
+        courseQuestionAudioState.value = 'stopped';
+        courseExplanationAudioState.value = 'idle';
+    } else if (usesCourseFlashcard.value) {
+        courseExplanationAudioRef.value?.stop();
+        courseExplanationAudioState.value = 'stopped';
     }
 });
 const canTurnCourseFlashcard = computed(() => usesCourseFlashcard.value
@@ -6539,9 +7016,12 @@ const courseFlashcardCorrectAnswer = computed(() => {
 });
 
 const scheduleCourseAutoAdvance = (questionId: number, answeredAt: number = Date.now()) => {
+    if (preliminaryActive.value || preliminaryTransitionBusy.value || preliminaryTransitionError.value) return;
     if (!usesCourseFlashcard.value || activeQuestion.value?.id !== questionId) return;
     clearAutoAdvanceTimeout();
+    if (explanationKeyboardPausedQuestionId.value === questionId) return;
     if (!effectiveAutoAdvance.value || isAnySidePanelOpen.value || localSessionCompleted.value
+        || courseAudioFinishing.value || courseAudioAwaitingAdvance.value
         || !currentAnswerResult.value || primaryActionDisabled.value || learningSyncInFlight.value
         || typeof window === 'undefined') return;
     const delay = resolveCourseAdvanceDelay(
@@ -6554,6 +7034,8 @@ const scheduleCourseAutoAdvance = (questionId: number, answeredAt: number = Date
     autoAdvanceTimeoutId = window.setTimeout(() => {
         autoAdvanceTimeoutId = null;
         if (!usesCourseFlashcard.value || !effectiveAutoAdvance.value || isAnySidePanelOpen.value
+            || explanationKeyboardPausedQuestionId.value === questionId
+            || courseAudioFinishing.value || courseAudioAwaitingAdvance.value
             || activeQuestion.value?.id !== questionId || primaryActionDisabled.value) return;
         if (!completePendingCourseSession()) void moveToNextQuestion(questionId);
     }, Math.max(delay - Math.max(Date.now() - answeredAt, 0), 0));
@@ -6636,7 +7118,11 @@ const markUnknownAnswer = () => {
 };
 
 const moveToNextQuestion = async (questionId: number | null = activeQuestion.value?.id ?? null) => {
-    if (!isLocalLearningMode.value || sessionExpired.value) {
+    if (!isLocalLearningMode.value || sessionExpired.value || completionInteractionBlocked.value || adrAnswerPending.value) {
+        return;
+    }
+    if (pendingFullCompletionQuestionId.value !== null && pendingFullCompletionQuestionId.value === questionId) {
+        finishSession();
         return;
     }
 
@@ -6647,6 +7133,8 @@ const moveToNextQuestion = async (questionId: number | null = activeQuestion.val
     }
 
     questionTransitionInFlight.value = true;
+
+    stopCourseAudio();
 
     showExplanation.value = false;
     showExplanationOnDemand.value = false;
@@ -6674,6 +7162,11 @@ const moveToNextQuestion = async (questionId: number | null = activeQuestion.val
 
     await prepareUpcomingQuestion(questionId);
 
+    if (completionInteractionBlocked.value) {
+        questionTransitionInFlight.value = false;
+        return;
+    }
+
     const refreshedNextQuestionMeta = resolveNextQuestionMeta(questionId);
     const refreshedNextQuestion = refreshedNextQuestionMeta
         ? questionCache.value[refreshedNextQuestionMeta.id] ?? null
@@ -6695,7 +7188,7 @@ const moveToNextQuestion = async (questionId: number | null = activeQuestion.val
 };
 
 const moveToPreviousQuestion = async (questionId: number | null = activeQuestion.value?.id ?? null) => {
-    if (!isLocalLearningMode.value || sessionExpired.value) {
+    if (!isLocalLearningMode.value || sessionExpired.value || completionInteractionBlocked.value || adrAnswerPending.value) {
         return;
     }
 
@@ -6712,6 +7205,7 @@ const moveToPreviousQuestion = async (questionId: number | null = activeQuestion
     }
 
     questionTransitionInFlight.value = true;
+    stopCourseAudio();
     showExplanation.value = false;
     showExplanationOnDemand.value = false;
 
@@ -6723,6 +7217,11 @@ const moveToPreviousQuestion = async (questionId: number | null = activeQuestion
     }
 
     await fetchQuestionBatch([previousQuestionMeta.id]);
+
+    if (completionInteractionBlocked.value) {
+        questionTransitionInFlight.value = false;
+        return;
+    }
 
     const fetchedPreviousQuestion = questionCache.value[previousQuestionMeta.id] ?? null;
 
@@ -6736,6 +7235,7 @@ const moveToPreviousQuestion = async (questionId: number | null = activeQuestion
 };
 
 const handlePrimaryAction = () => {
+    if (preliminaryActive.value || preliminaryTransitionBusy.value || preliminaryTransitionError.value) return;
     if (sessionExpired.value || !activeQuestion.value) {
         return;
     }
@@ -7174,10 +7674,18 @@ const saveExplanationEditor = async () => {
 };
 
 const finishSession = () => {
+    if (completionInFlight.value || answerRetryInFlight.value || sessionExpired.value || courseProgressConflict.value) return;
+    courseAudioFinishing.value = true;
+    stopCourseAudio();
     clearAutoAdvanceTimeout();
     closeSidePanels();
     isLearningGuideVisible.value = false;
     isTopicGuideVisible.value = false;
+
+    if (usesConfirmedCompletion.value) {
+        void syncCompletion();
+        return;
+    }
 
     if (isLocalLearningMode.value) {
         sessionState.value = {
@@ -7241,6 +7749,51 @@ const bindMobileAnswerDockObserver = () => {
     syncMobileAnswerDockHeight();
 };
 
+const fullExplanationEditing = ref(false);
+const fullExplanationCanAdvance = computed(() => !fullExplanationEditing.value && Boolean(currentAnswerResult.value)
+    && !learningSyncInFlight.value && unconfirmedAnswerIds.value.length === 0
+    && !answerRetryInFlight.value && !questionTransitionInFlight.value
+    && !sessionExpired.value && !completionInteractionBlocked.value
+    && answerSyncFailedQuestionId.value !== activeQuestion.value?.id);
+const closeFullExplanation = () => {
+    if (currentAnswerResult.value) explanationKeyboardPausedQuestionId.value = activeQuestion.value?.id ?? null;
+    clearAutoAdvanceTimeout();
+    showExplanation.value = false;
+    showExplanationOnDemand.value = false;
+};
+const advanceFullExplanation = (id: number | null = activeQuestion.value?.id ?? null) => {
+    if (id === null || id !== activeQuestion.value?.id || !fullExplanationCanAdvance.value) return;
+    explanationKeyboardPausedQuestionId.value = null;
+    void moveToNextQuestion(id);
+};
+const fullExplanation = useFullStudyExplanation({
+    questionId: computed(() => activeQuestion.value?.id ?? null),
+    enabled: usesFullExplanations,
+    visible: fullExplanationOpen,
+    seconds: fullExplanationSeconds,
+    autoAdvance,
+    answered: computed(() => Boolean(currentAnswerResult.value)),
+    blocked: computed(() => fullExplanationEditing.value || isAnySidePanelOpen.value || isQuestionEditorOpen.value || isExplanationEditorOpen.value
+        || sessionExpired.value || completionInteractionBlocked.value),
+    canAdvance: fullExplanationCanAdvance,
+    url: (id) => route('study-sessions.full-explanation', { studySession: props.session.id, question: id }),
+    advance: advanceFullExplanation,
+});
+const fullExplanationCorrectAnswer = computed(() => {
+    const key = correctAnswerKey.value;
+    if (!key) return null;
+    const text = currentAnswerResult.value?.correct_answer_text
+        ?? answerOptions.value.find(option => option.key.toLowerCase() === key)?.text;
+    return text ? (activeQuestion.value?.question_type === 'boolean' ? text : key.toUpperCase() + '. ' + text) : key.toUpperCase();
+});
+watch(fullExplanationOpen, (open) => {
+    if (!open) return;
+    if (currentAnswerResult.value) explanationKeyboardPausedQuestionId.value = activeQuestion.value?.id ?? null;
+    clearAutoAdvanceTimeout();
+    videoElements.forEach(video => video.pause());
+    stopQuestionAudio();
+});
+
 onMounted(() => {
     loadPreferences();
     loadCourseFlashcardPreferences();
@@ -7301,6 +7854,26 @@ watch([courseExplanationMode, courseAdvanceMode], () => {
     }
 });
 
+watch(courseAudioPreferences, (preferences) => {
+    if (!usesCourseFlashcard.value || typeof window === 'undefined') return;
+    try { window.localStorage.setItem(COURSE_AUDIO_PREFERENCES_KEY, JSON.stringify(preferences)); } catch { /* Session still works. */ }
+}, { deep: true });
+
+watch(currentAnswerResult, (answer) => {
+    if (usesCourseFlashcard.value && answer) {
+        stopQuestionAudio();
+        courseQuestionAudioState.value = 'stopped';
+    }
+});
+watch([isAnySidePanelOpen, sessionExpired, completionInFlight, localSessionCompleted], ([panel, expired, completing, completed]) => {
+    if (expired || completing || completed) stopCourseAudio();
+    else if (panel && usesCourseFlashcard.value) {
+        stopQuestionAudio();
+        courseQuestionAudioState.value = 'stopped';
+        courseExplanationAudioRef.value?.pause();
+    }
+});
+
 watch([courseExplanationMode, courseAdvanceMode, hintTimingPreference, isAnySidePanelOpen, courseFlashcardBackVisible], () => {
     if (!usesCourseFlashcard.value) return;
     clearAutoAdvanceTimeout();
@@ -7319,6 +7892,8 @@ watch(learningSyncInFlight, (inFlight) => {
 });
 
 onBeforeUnmount(() => {
+    courseAudioFinishing.value = true;
+    stopCourseAudio();
     clearAutoAdvanceTimeout();
     stopCorrectAnswerAudio();
     disconnectMobileAnswerDockObserver();
@@ -7331,7 +7906,12 @@ onBeforeUnmount(() => {
     }
 });
 
-watch([autoAdvance, autoPlayVideos, showQuestionAudioControl, autoPlayQuestionAudio, autoPlayCorrectAnswerAudio, videoPlaybackRate, autoJumpToVideoEnding, hintTimingPreference, feedbackMode, enableInlineBold, enableInlineColors, showVisualAnnotations], () => {
+watch([
+    fullExplanations, fullExplanationSeconds, autoAdvance, autoPlayVideos, showQuestionAudioControl,
+    autoPlayQuestionAudio, questionAudioPlaybackRate, autoPlayCorrectAnswerAudio,
+    autoPlayAdrExplanationAfterIncorrect, autoPlayAdrExplanationAfterCorrect, videoPlaybackRate,
+    autoJumpToVideoEnding, hintTimingPreference, feedbackMode, enableInlineBold, enableInlineColors, showVisualAnnotations,
+], () => {
     persistPreferences();
 
     if (isLearningGuideVisible.value) {
@@ -7391,7 +7971,13 @@ watch(
 watch(
     activeQuestion,
     async (question) => {
+        if (explanationKeyboardPausedQuestionId.value !== question?.id) explanationKeyboardPausedQuestionId.value = null;
+        if (adrAutoplayQuestionId.value !== question?.id) adrAutoplayQuestionId.value = null;
         stopQuestionAudio();
+        courseExplanationAudioRef.value?.stop();
+        courseQuestionAudioState.value = 'idle';
+        courseExplanationAudioState.value = 'idle';
+        courseAudioFinishing.value = false;
         stopCorrectAnswerAudio();
         correctAnswerAudioSourceKey.value = null;
         videoElements.clear();
@@ -7456,6 +8042,17 @@ watch(
 </script>
 
 <template>
+    <FullStudyExplanationPanel v-if="fullExplanationOpen"
+        :key="activeQuestion?.id" :question-id="activeQuestion!.id" :can-edit="fullExplanation.canEdit.value"
+        @editing="fullExplanationEditing = $event"
+        @saved="fullExplanation.replace(activeQuestion!.id, $event)"
+        :status="fullExplanation.status.value" :content="fullExplanation.content.value"
+        :correct-answer="fullExplanationCorrectAnswer" :action-error="syncError"
+        :seconds="fullExplanation.timed.value ? fullExplanation.remainingSeconds.value : null"
+        :paused="fullExplanation.paused.value" :can-next="fullExplanationCanAdvance"
+        :last-question="pendingFullCompletionQuestionId !== null && pendingFullCompletionQuestionId === activeQuestion?.id"
+        @ready="fullExplanation.markReady" @close="closeFullExplanation" @pause="fullExplanation.pause"
+        @retry="fullExplanation.retry" @next="advanceFullExplanation()" />
     <Head :title="pageTitle" />
 
     <audio
@@ -7474,6 +8071,12 @@ watch(
         :public-demo="isPublicDemoMode"
         :restart-href="props.publicDemo?.routes.landing ?? '/testy-na-prawo-jazdy'"
     />
+
+    <SessionCompletionPending :show="showCompletionBusy" />
+    <div v-if="courseProgressConflict" role="alert" class="fixed inset-x-3 top-3 z-[90] mx-auto max-w-xl rounded-xl border border-amber-200 bg-[#fff8e9] p-4 text-sm text-[#071b45] shadow-lg">
+        <p>{{ syncError }}</p>
+        <Link :href="sessionState.context?.course_url ?? '/nauka'" class="mt-2 inline-flex min-h-11 items-center font-semibold underline">Wróć do panelu nauki →</Link>
+    </div>
 
     <component :is="activeSessionLayout" :lock-viewport="Boolean(activeQuestion)">
         <div class="relative">
@@ -7495,6 +8098,7 @@ watch(
                     type="button"
                     class="learning-handle-trigger fixed right-0 top-[23%] sm:top-[27%] md:top-[32%] xl:top-[38%]"
                     :class="settingsHandleClass"
+                    :data-adr-settings-trigger="isAdrSession ? '' : undefined"
                     @click="openSettingsPopover()"
                 >
                     <span class="sm:hidden">Tryb</span>
@@ -7504,7 +8108,7 @@ watch(
 
             <Transition name="learning-backdrop">
                 <button
-                    v-if="isTopicPickerOpen || (!localSessionCompleted && isSettingsOpen) || isMobileSessionMenuOpen"
+                    v-if="isTopicPickerOpen || (!localSessionCompleted && isSettingsOpen && !isAdrSession) || isMobileSessionMenuOpen"
                     type="button"
                     class="fixed inset-0 z-40 bg-[rgba(15,23,42,0.22)] backdrop-blur-[3px]"
                     aria-label="Zamknij panel pomocniczy"
@@ -7827,9 +8431,31 @@ watch(
                 </aside>
             </Transition>
 
+            <AdrLearningSettings
+                v-if="isAdrSession && !localSessionCompleted && isSettingsOpen"
+                v-model:feedback-mode="feedbackMode"
+                v-model:auto-advance="autoAdvance"
+                v-model:auto-play-questions="autoPlayQuestionAudio"
+                v-model:show-question-audio="showQuestionAudioControl"
+                v-model:play-after-mistake="autoPlayAdrExplanationAfterIncorrect"
+                v-model:play-after-correct="autoPlayAdrExplanationAfterCorrect"
+                v-model:playback-rate="questionAudioPlaybackRate"
+                :extra-time-index="hintTimingSliderIndex"
+                :extra-time-labels="hintTimingOptions.map(option => option.label)"
+                v-model:bold="enableInlineBold"
+                v-model:colors="enableInlineColors"
+                v-model:arrows="showVisualAnnotations"
+                v-model:auto-play-videos="autoPlayVideos"
+                v-model:video-rate="videoPlaybackRate"
+                v-model:jump-to-video-end="autoJumpToVideoEnding"
+                :has-video="adrSessionHasVideo ?? false"
+                @update:extra-time-index="setHintTimingPreferenceByIndex"
+                @close="closeSettingsPopover"
+            />
+
             <Transition name="learning-panel">
                 <aside
-                    v-if="!localSessionCompleted && isSettingsOpen"
+                    v-if="!localSessionCompleted && isSettingsOpen && !isAdrSession"
                     :class="settingsPanelClass"
                 >
                     <div
@@ -7933,6 +8559,13 @@ watch(
                             v-if="usesCourseFlashcard"
                             v-model:explanation-mode="courseExplanationMode"
                             v-model:advance-mode="courseAdvanceMode"
+                            v-model:audio-preferences="courseAudioPreferences"
+                            :preliminary-available="Boolean(preliminaryState)"
+                            :preliminary-active="preliminaryActive"
+                            :preliminary-disabled="!preliminaryCanToggle"
+                            :preliminary-error="preliminaryTransitionError"
+                            @update:preliminary-active="togglePreliminaryLearning"
+                            @refresh:preliminary="refreshPreliminaryLearning"
                             :timing-index="hintTimingSliderIndex"
                             :timing-options="hintTimingOptions"
                             @update:timing-index="setHintTimingPreferenceByIndex"
@@ -8037,7 +8670,21 @@ watch(
                                     v-if="feedbackMode === 'instant_explanation'"
                                     :class="settingsInsetCardClass"
                                 >
-                                    <div class="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
+                                    <label v-if="supportsFullExplanations" class="mb-5 flex cursor-pointer items-start gap-3">
+                                        <input v-model="fullExplanations" type="checkbox" class="mt-1 rounded border-[#cbd5e1] text-[#102248]" />
+                                        <span><strong class="block text-sm">Pokaż pełne wyjaśnienia</strong>
+                                            <span class="mt-1 block text-sm leading-6 text-[#64748b]">Pełny opis ze znakami pojawi się nad zdjęciem lub filmem.</span></span>
+                                    </label>
+                                    <div v-if="usesFullExplanations" class="space-y-3">
+                                        <label for="full-explanation-seconds" :class="settingsCardTitleClass">Czas na przeczytanie</label>
+                                        <select id="full-explanation-seconds" v-model="fullExplanationSeconds" class="w-full rounded-lg border-[#dce2ea] text-sm">
+                                            <option :value="null">Sam przechodzę dalej</option>
+                                            <option v-for="seconds in [10, 20, 30, 40]" :key="seconds" :value="seconds">{{ seconds }} s</option>
+                                        </select>
+                                        <p :class="settingsCardDescriptionClass">Odliczanie zaczyna się po pokazaniu treści. Możesz je wstrzymać w panelu wyjaśnienia.</p>
+                                        <p v-if="!autoAdvance && fullExplanationSeconds !== null" :class="settingsCardDescriptionClass">Automatyczne przechodzenie jest wyłączone. Do następnego pytania przejdziesz samodzielnie.</p>
+                                    </div>
+                                    <div v-else class="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
                                         <div class="min-w-0 space-y-2">
                                             <p :class="settingsCardTitleClass">Jak długo pokazywać wyjaśnienie?</p>
                                             <p :class="settingsCardDescriptionClass">
@@ -8162,36 +8809,39 @@ watch(
                                 </span>
                             </label>
 
-                            <label
-                                :class="[
-                                    settingsStaticCardClass,
-                                    !showQuestionAudioControl ? 'opacity-60' : '',
-                                ]"
-                            >
-                                <input
-                                    v-model="autoPlayQuestionAudio"
-                                    type="checkbox"
-                                    class="-mt-[2px] -ml-[3px] mr-2 h-4 w-4 rounded-none border-[#9ca3af] text-[#161414] focus:ring-0 disabled:cursor-not-allowed"
-                                    :disabled="!showQuestionAudioControl"
-                                />
-                                <span class="flex min-w-0 flex-1 items-start gap-3">
-                                    <Repeat2
-                                        :size="settingsCardIconSize"
-                                        :stroke-width="1.9"
-                                        class="-mt-[3px] shrink-0 text-[#334155]"
-                                        aria-hidden="true"
+                            <div :class="settingsGroupedCardClass">
+                                <label class="flex items-start gap-3" :class="{ 'opacity-60': !showQuestionAudioControl }">
+                                    <input
+                                        v-model="autoPlayQuestionAudio"
+                                        type="checkbox"
+                                        class="-mt-[2px] -ml-[3px] mr-2 h-4 w-4 rounded-none border-[#9ca3af] text-[#161414] focus:ring-0 disabled:cursor-not-allowed"
+                                        :disabled="!showQuestionAudioControl"
                                     />
-                                    <span :class="settingsCardContentClass">
-                                        <span :class="settingsCardTitleClass">Czytaj kolejne pytania automatycznie</span>
-                                        <span :class="settingsCardDescriptionClass">
-                                            Po przejściu do następnego pytania jego treść zostanie przeczytana na głos.
-                                        </span>
-                                        <span :class="settingsCardDescriptionClass">
-                                            Jeśli dźwięk nie włączy się sam, kliknij ikonę głośnika.
+                                    <span class="flex min-w-0 flex-1 items-start gap-3">
+                                        <Repeat2
+                                            :size="settingsCardIconSize"
+                                            :stroke-width="1.9"
+                                            class="-mt-[3px] shrink-0 text-[#334155]"
+                                            aria-hidden="true"
+                                        />
+                                        <span :class="settingsCardContentClass">
+                                            <span :class="settingsCardTitleClass">Czytaj kolejne pytania automatycznie</span>
+                                            <span :class="settingsCardDescriptionClass">
+                                                Po przejściu do następnego pytania jego treść zostanie przeczytana na głos.
+                                            </span>
+                                            <span :class="settingsCardDescriptionClass">
+                                                Jeśli dźwięk nie włączy się sam, kliknij ikonę głośnika.
+                                            </span>
                                         </span>
                                     </span>
-                                </span>
-                            </label>
+                                </label>
+
+                                <QuestionAudioSpeedSettings
+                                    v-model="questionAudioPlaybackRate"
+                                    :disabled="!showQuestionAudioControl"
+                                    :variant="isExamLikeShell ? 'classic' : 'zen'"
+                                />
+                            </div>
 
                             <label :class="settingsStaticCardClass">
                                 <input
@@ -8432,8 +9082,20 @@ watch(
                 </aside>
             </Transition>
 
+            <QualificationPreliminaryLearning
+                v-if="preliminaryActive && preliminaryState"
+                :key="`preliminary-${sessionState.id}`"
+                :session-id="sessionState.id" :url="preliminaryState.url" :state="preliminaryState"
+                :question-ids="props.questionIds" :title="sessionState.context?.title ?? 'Rozdział Kod 95'"
+                :blocked="isAnySidePanelOpen || sessionExpired || Boolean(preliminaryTransitionError)"
+                :exiting="preliminaryTransitionBusy" :restart-busy="courseModuleRestartForm.processing"
+                :restart-error="courseModuleRestartError" @state="applyPreliminaryState"
+                :show-annotations="showVisualAnnotations" :enable-bold="enableInlineBold" :enable-colors="enableInlineColors"
+                :seed-questions="Object.values(questionCache)"
+                @exit="togglePreliminaryLearning(false)" @options="openSettingsPopover()" @solve="restartCourseModule"
+            />
             <section
-                v-if="activeQuestion"
+                v-else-if="activeQuestion"
                 data-testid="session-current-question"
                 :class="activeQuestionSectionClass"
             >
@@ -8444,11 +9106,12 @@ watch(
                     <div :class="activeQuestionInnerClass">
                         <div
                             v-if="isExamLikeShell"
+                            data-classic-session-header
                             class="mx-0 border-b border-[#e5e7eb] bg-white px-4 min-[1024px]:rounded-none min-[1024px]:border min-[1024px]:border-[#e5e7eb] min-[1024px]:px-0 min-[1024px]:shadow-[0_16px_32px_rgba(15,23,42,0.04)]"
                         >
-                            <div class="flex items-center justify-between gap-3 py-3 min-[1024px]:items-start min-[1024px]:px-3 min-[1024px]:py-2.5">
-                                <div class="grid min-w-0 flex-1 grid-cols-[auto_auto] items-center gap-x-5 gap-y-0 min-[1024px]:grid-cols-[6.5rem_6.5rem_8.75rem_minmax(0,13rem)] min-[1024px]:gap-2 xl:grid-cols-[6.25rem_6.25rem_8.5rem_minmax(0,14rem)]">
-                                    <div class="min-w-[2.8rem] px-0 py-0 text-sm min-[1024px]:min-w-0 min-[1024px]:rounded-none min-[1024px]:border min-[1024px]:border-[#eceff3] min-[1024px]:bg-[#fafafa] min-[1024px]:px-3 min-[1024px]:py-2">
+                            <div data-session-header-row class="flex items-center justify-between gap-3 py-3 min-[1024px]:items-start min-[1024px]:px-3 min-[1024px]:py-2.5">
+                                <div data-session-header-metrics class="grid min-w-0 flex-1 grid-cols-[auto_auto] items-center gap-x-5 gap-y-0 min-[1024px]:grid-cols-[6.5rem_6.5rem_8.75rem_minmax(0,13rem)] min-[1024px]:gap-2 xl:grid-cols-[6.25rem_6.25rem_8.5rem_minmax(0,14rem)]">
+                                    <div data-session-header-metric class="min-w-[2.8rem] px-0 py-0 text-sm min-[1024px]:min-w-0 min-[1024px]:rounded-none min-[1024px]:border min-[1024px]:border-[#eceff3] min-[1024px]:bg-[#fafafa] min-[1024px]:px-3 min-[1024px]:py-2">
                                         <p class="text-[0.58rem] font-medium uppercase tracking-[0.08em] text-[#6b7280] min-[1024px]:text-[0.62rem]">
                                             {{ mobileSessionQuestionLabel }}
                                         </p>
@@ -8457,7 +9120,7 @@ watch(
                                         </p>
                                     </div>
 
-                                    <div class="min-w-[2.2rem] px-0 py-0 text-sm min-[1024px]:min-w-0 min-[1024px]:rounded-none min-[1024px]:border min-[1024px]:border-[#eceff3] min-[1024px]:bg-[#fafafa] min-[1024px]:px-3 min-[1024px]:py-2">
+                                    <div data-session-header-metric class="min-w-[2.2rem] px-0 py-0 text-sm min-[1024px]:min-w-0 min-[1024px]:rounded-none min-[1024px]:border min-[1024px]:border-[#eceff3] min-[1024px]:bg-[#fafafa] min-[1024px]:px-3 min-[1024px]:py-2">
                                         <p class="text-[0.58rem] font-medium uppercase tracking-[0.08em] text-[#6b7280] min-[1024px]:text-[0.62rem]">
                                             {{ mobileSessionCategoryLabel }}
                                         </p>
@@ -8485,11 +9148,12 @@ watch(
                                     </div>
                                 </div>
 
-                                <div class="flex shrink-0 items-start gap-2.5">
+                                <div data-session-header-actions class="flex shrink-0 items-start gap-2.5">
                                     <button
                                         v-if="showMobileSessionMenuTrigger"
                                         type="button"
                                         :class="sessionOptionsButtonClass"
+                                        :data-adr-settings-trigger="isAdrSession ? '' : undefined"
                                         @click="openMobileSessionMenu"
                                     >
                                         Opcje
@@ -8498,10 +9162,12 @@ watch(
                                     <button
                                         type="button"
                                         class="shrink-0 self-start whitespace-nowrap rounded-none border border-[#d2b35b] bg-[#efc54f] px-3.5 py-2 text-sm font-semibold text-[#463309] transition hover:border-[#c8a949] hover:bg-[#e8bd4c] disabled:cursor-not-allowed disabled:opacity-60"
-                                        :disabled="completeForm.processing"
+                                        :disabled="completeForm.processing || completionInFlight || answerRetryInFlight"
+                                        :aria-busy="completionInFlight || undefined"
+                                        :aria-label="completionInFlight ? 'Przygotowujemy Twój wynik' : undefined"
                                         @click="finishSession"
                                     >
-                                        {{ finishSessionButtonLabel }}
+                                        <SessionCompletionButtonContent :pending="completionInFlight" :label="finishSessionButtonLabel" />
                                     </button>
                                 </div>
 
@@ -8539,6 +9205,7 @@ watch(
                                     v-if="showMobileSessionMenuTrigger"
                                     type="button"
                                     :class="sessionOptionsButtonClass"
+                                    :data-adr-settings-trigger="isAdrSession ? '' : undefined"
                                     @click="openMobileSessionMenu"
                                 >
                                     Opcje
@@ -8546,10 +9213,12 @@ watch(
                                 <button
                                     type="button"
                                     :class="finishSessionButtonClass"
-                                    :disabled="completeForm.processing"
+                                    :disabled="completeForm.processing || completionInFlight || answerRetryInFlight"
+                                    :aria-busy="completionInFlight || undefined"
+                                    :aria-label="completionInFlight ? 'Przygotowujemy Twój wynik' : undefined"
                                     @click="finishSession"
                                 >
-                                    {{ finishSessionButtonLabel }}
+                                    <SessionCompletionButtonContent :pending="completionInFlight" :label="finishSessionButtonLabel" />
                                 </button>
                             </div>
                         </div>
@@ -8567,8 +9236,21 @@ watch(
                             :compact="isCompactSessionViewport"
                             :correct-answer="courseFlashcardCorrectAnswer"
                             :question="activeQuestion?.prompt ?? ''"
+                            :has-audio-controls="Boolean(courseFeedbackHasAudio && (courseAudioPreferences.showControls || courseAudioPreferences.autoplayExplanations))"
                             @return-to-question="courseFlashcardBackVisible = false"
                         >
+                            <template #explanation-controls>
+                                <CourseFeedbackAudioControl
+                                    v-if="usesCourseFlashcard && activeQuestion && courseFeedbackHasAudio && (courseAudioPreferences.showControls || courseAudioPreferences.autoplayExplanations)"
+                                    :key="`course-feedback-audio-${activeQuestion.id}`"
+                                    ref="courseExplanationAudioRef"
+                                    :answer-asset="courseFeedbackAnswerAudio" :explanation-asset="currentExplanationAudio" :question-id="activeQuestion.id"
+                                    :active="courseExplanationAudioActive" :autoplay="courseAudioPreferences.autoplayExplanations"
+                                    :show-control="courseAudioPreferences.showControls" :playback-rate="courseAudioPreferences.playbackRate"
+                                    @request-play="requestCourseAudio('explanation')"
+                                    @state="onCourseAudioState('explanation', $event)"
+                                />
+                            </template>
                             <template #explanation>
                                 <div v-if="canShowInlineEditControls && activeQuestion" class="mb-4 flex flex-wrap gap-3 text-sm">
                                     <button type="button" class="text-blue-800 underline" @click="openQuestionEditor(activeQuestion)">Edytuj pytanie</button>
@@ -8842,7 +9524,7 @@ watch(
                             <div class="w-full min-w-0" :class="promptStackClass">
                                 <Transition name="focus-copy" mode="out-in">
                                     <div
-                                        v-if="shouldShowExplanationCard && !usesCourseFlashcard"
+                                        v-if="shouldShowExplanationCard && !usesCourseFlashcard && !usesFullExplanations"
                                         key="hint"
                                         class="overflow-hidden"
                                         :class="explanationCalloutClass"
@@ -8875,6 +9557,26 @@ watch(
                                                 Edytuj grafikę
                                             </a>
                                         </div>
+                                        <div
+                                            v-if="isAdrSession && !adrAnswerPending && activeQuestion && currentAnswerResult && (currentCorrectAnswerAudio?.url || currentExplanationAudio?.url)"
+                                            class="mb-2 flex items-center gap-2 text-sm"
+                                        >
+                                            <CourseFeedbackAudioControl
+                                                :key="activeQuestion.id"
+                                                ref="courseExplanationAudioRef"
+                                                :question-id="activeQuestion.id"
+                                                :answer-asset="currentCorrectAnswerAudio"
+                                                :explanation-asset="currentExplanationAudio"
+                                                :active="!isAnySidePanelOpen && !sessionExpired && !completionInFlight"
+                                                :autoplay="adrAutoplayAfterAnswer"
+                                                :playback-rate="questionAudioPlaybackRate"
+                                                @request-play="requestCourseAudio('explanation')"
+                                                @state="onAdrFeedbackAudioState"
+                                            />
+                                            <span>{{ currentCorrectAnswerAudio?.url && currentExplanationAudio?.url
+                                                ? 'Odsłuchaj odpowiedź i wyjaśnienie' : currentCorrectAnswerAudio?.url
+                                                    ? 'Odsłuchaj odpowiedź' : 'Odsłuchaj wyjaśnienie' }}</span>
+                                        </div>
                                         <QuestionExplanationRuntimeBlock
                                             :explanation-html="currentExplanationHtml"
                                             :fallback-text="currentQuestionExplanationAsset?.body ?? null"
@@ -8888,16 +9590,22 @@ watch(
                                         />
                                         <div
                                             v-if="shouldShowExplanationCard && publicExplanationUrl"
-                                            class="absolute right-0 bottom-0 z-10"
+                                            data-full-explanation-action
+                                            :class="isPhoneViewport
+                                                ? 'mt-2 flex shrink-0 justify-end'
+                                                : 'absolute right-0 bottom-0 z-10'"
                                         >
                                             <a
                                                 :href="publicExplanationUrl"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                class="inline-flex items-center gap-1.5 bg-white/95 px-2 py-1 text-xs font-semibold text-[#374151] shadow-[-6px_-6px_14px_rgba(255,255,255,0.96)] transition hover:text-[#d9251b]"
+                                                class="inline-flex max-w-full items-center justify-center transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#374151]"
+                                                :class="isPhoneViewport
+                                                    ? 'min-h-[44px] gap-1.5 py-2 text-xs font-normal leading-5 text-[#64748b] underline-offset-4 hover:text-[#334155] hover:underline'
+                                                    : 'gap-2 bg-white/95 px-2 py-1 text-xs font-semibold text-[#374151] shadow-[-6px_-6px_14px_rgba(255,255,255,0.96)] hover:text-[#d9251b]'"
                                             >
-                                                Zobacz pełne wyjaśnienie
-                                                <ExternalLink :size="14" :stroke-width="1.8" aria-hidden="true" />
+                                                <span>Zobacz pełne wyjaśnienie</span>
+                                                <ExternalLink class="shrink-0" :size="isPhoneViewport ? 13 : 14" :stroke-width="1.8" aria-hidden="true" />
                                             </a>
                                         </div>
                                     </div>
@@ -8921,12 +9629,13 @@ watch(
                                                     Treść pytania
                                                 </p>
                                                 <QuestionAudioControl
-                                                    v-if="shouldShowQuestionAudioControl"
+                                                    v-if="!usesCourseFlashcard && shouldShowQuestionAudioControl"
                                                     :key="`question-audio-classic-${activeQuestion.id}-${currentQuestionAudio?.asset_key ?? currentQuestionAudio?.url ?? 'audio'}`"
                                                     ref="questionAudioControlRef"
                                                     class="shrink-0"
                                                     :asset="currentQuestionAudio"
                                                     variant="classic"
+                                                    :playback-rate="questionAudioPlaybackRate"
                                                     :autoplay="shouldAutoPlayQuestionAudio"
                                                     :autoplay-key="questionAudioAutoplayKey"
                                                     @play="pauseAudibleQuestionVideos"
@@ -8966,14 +9675,26 @@ watch(
                                             :class="canShowInlineEditControls ? 'mt-2.5' : ''"
                                         >
                                             <QuestionAudioControl
+                                                v-if="!usesCourseFlashcard"
                                                 :key="`question-audio-zen-${activeQuestion.id}-${currentQuestionAudio?.asset_key ?? currentQuestionAudio?.url ?? 'audio'}`"
                                                 ref="questionAudioControlRef"
                                                 class="mt-[0.125rem] shrink-0"
                                                 :asset="currentQuestionAudio"
                                                 variant="zen"
+                                                :playback-rate="questionAudioPlaybackRate"
                                                 :autoplay="shouldAutoPlayQuestionAudio"
                                                 :autoplay-key="questionAudioAutoplayKey"
                                                 @play="pauseAudibleQuestionVideos"
+                                            />
+                                            <CourseAudioControl
+                                                v-else-if="currentQuestionAudio"
+                                                :key="`course-question-audio-${activeQuestion.id}-${currentQuestionAudio.asset_key ?? currentQuestionAudio.url}`"
+                                                ref="questionAudioControlRef" :asset="currentQuestionAudio"
+                                                :question-id="activeQuestion.id" kind="question" :active="courseQuestionAudioActive"
+                                                :autoplay="courseAudioPreferences.autoplayQuestions && !currentAnswerResult"
+                                                :show-control="courseAudioPreferences.showControls" :playback-rate="courseAudioPreferences.playbackRate"
+                                                @request-play="requestCourseAudio('question')"
+                                                @state="onCourseAudioState('question', $event)"
                                             />
                                             <h2
                                                 data-testid="session-question-prompt"
@@ -9016,6 +9737,7 @@ watch(
                                         type="button"
                                         :data-testid="`answer-option-${option.key}`"
                                         :data-course-answer="usesCourseFlashcard ? '' : undefined"
+                                        :data-regular-explanation-space="usesRegularExplanationSpace ? '' : undefined"
                                         :data-answer-state="answerOptionVisualState(option.key)"
                                         class="transition disabled:cursor-not-allowed"
                                         :class="activeQuestion.question_type === 'boolean'
@@ -9065,6 +9787,7 @@ watch(
                                         type="button"
                                         :data-testid="`answer-option-${option.key}`"
                                         :data-course-answer="usesCourseFlashcard ? '' : undefined"
+                                        :data-regular-explanation-space="usesRegularExplanationSpace ? '' : undefined"
                                         :data-answer-state="answerOptionVisualState(option.key)"
                                         class="text-center font-semibold tracking-tight text-neutral-900 transition-[background-color,box-shadow,transform,color] duration-200 ease-out disabled:cursor-not-allowed"
                                         :class="[
@@ -9132,6 +9855,10 @@ watch(
                                             : 'rounded-none border border-[#d1d5db] bg-white px-3 py-2 text-[0.84rem] font-medium text-[#374151] transition hover:border-[#9ca3af] hover:bg-[#fafafa] hover:text-[#111827] disabled:cursor-not-allowed disabled:opacity-35'
                                         : 'px-3 py-1.5 text-[0.84rem] font-medium text-neutral-500 transition-[background-color,color] duration-200 ease-out hover:bg-white/34 hover:text-neutral-800 disabled:cursor-not-allowed disabled:opacity-35'"
                                     :disabled="usesCourseFlashcard ? !canTurnCourseFlashcard : !canToggleExplanationOnDemand"
+                                    :data-course-explanation="usesCourseFlashcard ? '' : undefined"
+                                    :data-regular-explanation-space="usesRegularExplanationSpace ? '' : undefined"
+                                    :title="usesRegularExplanationSpace || usesCourseFlashcard ? 'Spacja — pokaż lub schowaj wyjaśnienie' : undefined"
+                                    :aria-expanded="usesCourseFlashcard ? courseFlashcardBackVisible : usesRegularExplanationSpace ? shouldShowExplanationCard : undefined"
                                     @click="usesCourseFlashcard ? toggleCourseFlashcard() : toggleExplanationOnDemand()"
                                 >
                                     {{ usesCourseFlashcard ? (courseFlashcardBackVisible ? 'Pokaż pytanie' : 'Pokaż wyjaśnienie') : explanationToggleDisplayLabel }}
@@ -9167,6 +9894,7 @@ watch(
                                     type="button"
                                     :aria-label="primaryActionLabel === 'Następne pytanie' ? primaryActionLabel : undefined"
                                     :data-course-next="usesCourseFlashcard ? '' : undefined"
+                                    :data-regular-explanation-space="usesRegularExplanationSpace ? '' : undefined"
                                     :title="usesCourseFlashcard ? 'Po odpowiedzi: lewy Ctrl, Alt/Option lub Fn — dalej. Na wyjaśnieniu także → lub D.' : undefined"
                                     :class="isExamLikeShell
                                         ? useCompactAnswerActions
@@ -9216,11 +9944,17 @@ watch(
                                 </span>
                                 <div class="min-w-0">
                                     <p class="text-sm font-semibold text-[#7a2f25]">
-                                        Problem z zapisem odpowiedzi
+                                        {{ completionConfirmed ? 'Sesja zapisana' : 'Nie udało się zapisać sesji' }}
                                     </p>
                                     <p class="mt-1 text-sm leading-6 text-[#7a2f25]/90">
                                         {{ syncError }}
                                     </p>
+                                    <button v-if="usesConfirmedCompletion && !sessionExpired" type="button"
+                                        class="mt-3 rounded-lg bg-[#0b254b] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                                        :disabled="answerRetryInFlight || completionInFlight"
+                                        @click="unconfirmedAnswerIds.length ? retryFailedAnswerSync() : finishSession()">
+                                        {{ answerRetryInFlight || completionInFlight ? 'Czekam na potwierdzenie…' : completionConfirmed ? 'Otwórz podsumowanie' : unconfirmedAnswerIds.length ? 'Ponów zapis odpowiedzi' : 'Ponów zakończenie' }}
+                                    </button>
                                 </div>
                             </div>
 
@@ -9245,7 +9979,7 @@ watch(
                                                 Zapis odpowiedzi jest chwilowo wstrzymany.
                                             </p>
                                             <p class="mt-3 text-sm leading-6 text-[#4b5563]">
-                                                To pytanie pozostaje otwarte, więc możesz bezpiecznie wrócić do niego po odświeżeniu.
+                                                {{ usesConfirmedCompletion ? 'Nie odświeżaj strony. Odpowiedź pozostaje w tej karcie i możesz ponowić jej zapis.' : 'To pytanie pozostaje otwarte, więc możesz bezpiecznie wrócić do niego po odświeżeniu.' }}
                                             </p>
                                         </div>
 
@@ -9254,7 +9988,7 @@ watch(
                                                 Problem z zapisem odpowiedzi
                                             </p>
                                             <h3 class="mt-2 text-[1.45rem] font-semibold leading-9 text-[#161414]">
-                                                Trwają prace na serwerze
+                                                {{ usesConfirmedCompletion ? 'Czekamy na potwierdzenie zapisu' : 'Trwają prace na serwerze' }}
                                             </h3>
                                             <p class="mt-3 text-sm leading-7 text-[#1f2937]">
                                                 {{ syncError }}
@@ -9271,13 +10005,19 @@ watch(
                                                     </p>
                                                     <p class="flex items-start gap-3">
                                                         <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#161414]" aria-hidden="true" />
-                                                        <span>Odśwież stronę, gdy serwer wróci do stabilnego zapisu.</span>
+                                                        <span>{{ usesConfirmedCompletion ? 'Sprawdź połączenie i kliknij „Ponów zapis odpowiedzi”.' : 'Odśwież stronę, gdy serwer wróci do stabilnego zapisu.' }}</span>
                                                     </p>
                                                 </div>
                                             </div>
 
                                             <div class="mt-6 flex justify-end">
+                                                <button v-if="usesConfirmedCompletion && !sessionExpired" type="button"
+                                                    class="rounded-lg bg-[#0b254b] px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+                                                    :disabled="answerRetryInFlight || completionInFlight" @click="retryFailedAnswerSync">
+                                                    {{ answerRetryInFlight ? 'Ponawiam zapis…' : 'Ponów zapis odpowiedzi' }}
+                                                </button>
                                                 <button
+                                                    v-else
                                                     type="button"
                                                     class="inline-flex min-w-[11.5rem] items-center justify-center border border-[#d1d5db] bg-[#161414] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0f172a]"
                                                     @click="reloadCurrentPage"
@@ -9616,6 +10356,7 @@ watch(
                                 <button
                                     type="button"
                                     class="inline-flex w-full items-center justify-center gap-2 rounded-none border border-[#d1d5db] bg-[#f3f4f6] px-3 py-2 text-sm font-semibold text-[#111827] transition hover:border-[#c7cfd8] hover:bg-[#e5e7eb]"
+                                    :data-adr-settings-trigger="isAdrSession ? '' : undefined"
                                     @click="openSettingsPopover({ markSeen: false })"
                                 >
                                     <Settings :size="16" :stroke-width="1.8" aria-hidden="true" />
@@ -9674,7 +10415,7 @@ watch(
                                     </div>
                                     <div class="flex items-center justify-between gap-3">
                                         <span class="text-[#6b7280]">Skuteczność</span>
-                                        <span class="inline-flex min-w-[4.4rem] items-center justify-center rounded-none border border-[#d1d5db] bg-white px-2.5 py-1 font-semibold text-[#111827]">{{ displayScorePercent !== null ? `${displayScorePercent.toFixed(0)}%` : '-' }}</span>
+                                        <span class="inline-flex min-w-[4.4rem] items-center justify-center rounded-none border border-[#d1d5db] bg-white px-2.5 py-1 font-semibold text-[#111827]">{{ displayAccuracyPercent !== null ? `${displayAccuracyPercent.toFixed(0)}%` : '-' }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -9721,6 +10462,7 @@ watch(
             <section
                 v-else
                 data-testid="session-complete"
+                :data-completion-reveal="usesConfirmedCompletion || undefined"
                 :class="completionShellClass"
             >
                 <div :class="completionLayoutClass">
@@ -9947,10 +10689,19 @@ watch(
                                     </div>
 
                                     <div v-if="isCourseSession" class="mx-auto mt-6 grid max-w-[21rem] gap-2.5">
+                                        <CoursePartNavigation
+                                            v-if="isCourseModuleSession && sessionState.context?.part_navigation"
+                                            :navigation="sessionState.context.part_navigation"
+                                            :course-url="sessionState.context.course_url"
+                                            :button-class="completionQuickNavPrimaryButtonClass"
+                                            :disabled="!canUseCompletionActions || !localSessionCompleted"
+                                            :processing="nextCoursePartForm.processing" :error="nextCoursePartError"
+                                            @start="startNextCoursePart"
+                                        />
                                         <button
                                             v-if="isCourseModuleSession && sessionState.context?.restart_url"
                                             type="button"
-                                            class="inline-flex min-h-12 items-center justify-center rounded-[0.5rem] bg-[#0b5cff] px-5 py-3 text-[0.9rem] font-semibold text-white transition-colors hover:bg-[#0646c8] disabled:cursor-not-allowed disabled:bg-[#d0d5dd]"
+                                            :class="sessionState.context.part_navigation ? completionQuickNavButtonClass : completionQuickNavPrimaryButtonClass"
                                             :disabled="!canRestartCourseModule"
                                             @click="restartCourseModule"
                                         >
@@ -9967,6 +10718,7 @@ watch(
                                             Pytania do poprawy w kursie
                                         </Link>
                                         <Link
+                                            v-if="!sessionState.context?.part_navigation?.is_last"
                                             :href="isCourseReviewSession ? (sessionState.context?.course_url ?? completionReturnHref) : completionReturnHref"
                                             class="inline-flex min-h-12 items-center justify-center rounded-[0.5rem] border border-[#d0d5dd] bg-white px-5 py-3 text-[0.9rem] font-semibold text-[#344054] transition-colors hover:bg-[#f9fafb]"
                                         >
@@ -10382,6 +11134,12 @@ watch(
                                             <p class="mt-1 text-sm leading-6 text-[#7a2f25]/90">
                                                 {{ syncError }}
                                             </p>
+                                            <button v-if="usesConfirmedCompletion && !sessionExpired" type="button"
+                                                class="mt-3 rounded-lg bg-[#0b254b] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                                                :disabled="completionInFlight || answerRetryInFlight"
+                                                @click="unconfirmedAnswerIds.length ? retryFailedAnswerSync() : finishSession()">
+                                                {{ unconfirmedAnswerIds.length ? 'Ponów zapis odpowiedzi' : 'Ponów zakończenie' }}
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -10418,10 +11176,19 @@ watch(
                             Wróć na stronę główną
                         </a>
 
+                        <CoursePartNavigation
+                            v-if="isCourseModuleSession && sessionState.context?.part_navigation"
+                            :navigation="sessionState.context.part_navigation"
+                            :course-url="sessionState.context.course_url"
+                            :button-class="completionQuickNavPrimaryButtonClass"
+                            :disabled="!canUseCompletionActions || !localSessionCompleted"
+                            :processing="nextCoursePartForm.processing" :error="nextCoursePartError"
+                            @start="startNextCoursePart"
+                        />
                         <button
                             v-if="isCourseModuleSession && sessionState.context?.restart_url"
                             type="button"
-                            :class="completionQuickNavPrimaryButtonClass"
+                            :class="sessionState.context.part_navigation ? completionQuickNavButtonClass : completionQuickNavPrimaryButtonClass"
                             :disabled="!canRestartCourseModule"
                             @click="restartCourseModule"
                         >
@@ -11010,12 +11777,14 @@ watch(
 
                 <div :class="completionReviewBodyClass">
                 <div :class="completionReviewListClass">
-                    <component
-                        :is="useNativeMobileSessionResult ? 'details' : 'article'"
+                    <SessionResultDisclosure
+                        :collapsible="useNativeMobileSessionResult"
+                        :layout-ready="viewportWidth > 0"
                         v-for="result in completionReviewResults"
                         :key="result.id"
                         :class="useNativeMobileSessionResult ? 'group border-t border-[#e4e7ec]' : 'pl-0'"
                     >
+                        <template #summary>
                         <summary
                             v-if="useNativeMobileSessionResult"
                             class="flex min-h-14 cursor-pointer list-none items-start gap-3 py-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0b5cff] [&::-webkit-details-marker]:hidden"
@@ -11023,7 +11792,7 @@ watch(
                             <span class="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-[#f04438]" aria-hidden="true" />
                             <span class="min-w-0 flex-1">
                                 <span class="block text-[0.64rem] font-semibold text-[#667085]">
-                                    Pytanie {{ result.sequence_number }} · {{ formatResponseTime(result.response_time_ms) }}
+                                    Pytanie {{ result.sequence_number }}
                                 </span>
                                 <span
                                     class="mt-1.5 block text-[0.82rem] font-medium leading-5 text-[#101828] [&_strong]:font-semibold"
@@ -11034,6 +11803,7 @@ watch(
                                 <path d="m7 10 5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
                         </summary>
+                        </template>
                         <div
                             :class="completionReviewArticleClass"
                         >
@@ -11041,13 +11811,13 @@ watch(
                                 <div :class="completionReviewMediaFrameClass">
                                     <div class="w-full">
                                         <template v-if="result.media.length > 0">
-                                            <p
-                                                v-if="result.media[0]?.kind === 'video'"
-                                                class="mb-2 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-[#6b7280]"
-                                            >
-                                                Kadr z 0.2 s przed końcem filmu
-                                            </p>
 
+                                            <SessionResultMedia
+                                                :defer="usesConfirmedCompletion && !isPhoneViewport && result.media[0]?.kind === 'video' && Boolean(result.media[0]?.url)"
+                                                :poster="result.media[0]?.poster_url"
+                                                :natural-width="result.media[0]?.width"
+                                                :natural-height="result.media[0]?.height"
+                                            >
                                             <QuestionVideoFrameWithAnnotations
                                                 v-if="hasResultVideoFrameAnnotations(result) && result.media[0]?.url"
                                                 :src="result.media[0].url"
@@ -11086,6 +11856,7 @@ watch(
                                                 :presentation-class="'w-full'"
                                                 :image-class="completionReviewMediaAssetClass"
                                             />
+                                            </SessionResultMedia>
                                         </template>
 
                                         <QuestionResultMediaFallback v-else />
@@ -11099,15 +11870,7 @@ watch(
                                         <p class="font-semibold uppercase tracking-[0.16em] text-[#6b7280]">
                                             Pytanie {{ result.sequence_number }}
                                         </p>
-                                        <span
-                                            class="inline-flex items-center rounded-full px-2 py-0.5"
-                                            :class="resultStatusClass(result)"
-                                        >
-                                            {{ resultStatusLabel(result) }}
-                                        </span>
-                                        <span class="text-[#6b7280]">
-                                            Czas: {{ formatResponseTime(result.response_time_ms) }}
-                                        </span>
+                                        <span class="sr-only">{{ resultStatusLabel(result) }}</span>
                                     </div>
                                     <h3 :class="completionReviewPromptClass">
                                         <span
@@ -11121,29 +11884,28 @@ watch(
                                     <div
                                         :class="[completionReviewAnswerCardBaseClass, resultUserAnswerCardClass(result)]"
                                     >
-                                        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.14em]">
-                                            Twoja odpowiedź
-                                        </p>
-                                        <p class="mt-2 text-base font-semibold text-neutral-900">
-                                            {{ resultUserAnswerLabel(result) }}
-                                        </p>
-                                        <p class="mt-1 text-sm leading-6">
-                                            {{ resultUserAnswerText(result) }}
-                                        </p>
+                                        <SessionResultAnswer
+                                            label="Twoja odpowiedź"
+                                            :answer="result.selected_answer"
+                                            :text="result.selected_answer_text"
+                                            :question-type="result.question_type"
+                                            :unknown="isUnknownAnswerKind(result.answer_kind)"
+                                            empty-label="Brak odpowiedzi"
+                                            missing-text="Nie udało się odczytać treści tej odpowiedzi."
+                                        />
                                     </div>
 
                                     <div
                                         :class="completionReviewNeutralAnswerCardClass"
                                     >
-                                        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.14em]">
-                                            Poprawna odpowiedź
-                                        </p>
-                                        <p class="mt-2 text-base font-semibold text-neutral-900">
-                                            {{ result.correct_answer ? `Odpowiedź ${result.correct_answer}` : 'Brak danych o poprawnej odpowiedzi' }}
-                                        </p>
-                                        <p class="mt-1 text-sm leading-6">
-                                            {{ result.correct_answer_text ?? 'Nie udało się odczytać treści poprawnej odpowiedzi.' }}
-                                        </p>
+                                        <SessionResultAnswer
+                                            label="Poprawna odpowiedź"
+                                            :answer="result.correct_answer"
+                                            :text="result.correct_answer_text"
+                                            :question-type="result.question_type"
+                                            empty-label="Brak danych o poprawnej odpowiedzi"
+                                            missing-text="Nie udało się odczytać treści poprawnej odpowiedzi."
+                                        />
                                     </div>
                                 </div>
 
@@ -11192,7 +11954,7 @@ watch(
                                 </div>
                             </div>
                         </div>
-                    </component>
+                    </SessionResultDisclosure>
                 </div>
 
                 <div
@@ -11221,12 +11983,14 @@ watch(
                         v-if="showCorrectCompletionResults"
                         class="mt-5 space-y-4"
                     >
-                        <component
-                            :is="useNativeMobileSessionResult ? 'details' : 'article'"
+                        <SessionResultDisclosure
+                            :collapsible="useNativeMobileSessionResult"
+                            :layout-ready="viewportWidth > 0"
                             v-for="result in correctAnsweredResults"
                             :key="`correct-${result.id}`"
                             :class="useNativeMobileSessionResult ? 'group border-t border-[#e4e7ec]' : 'pl-0'"
                         >
+                            <template #summary>
                             <summary
                                 v-if="useNativeMobileSessionResult"
                                 class="flex min-h-14 cursor-pointer list-none items-start gap-3 py-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0b5cff] [&::-webkit-details-marker]:hidden"
@@ -11234,7 +11998,7 @@ watch(
                                 <span class="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-[#12b76a]" aria-hidden="true" />
                                 <span class="min-w-0 flex-1">
                                     <span class="block text-[0.64rem] font-semibold text-[#667085]">
-                                        Pytanie {{ result.sequence_number }} · {{ formatResponseTime(result.response_time_ms) }}
+                                        Pytanie {{ result.sequence_number }}
                                     </span>
                                     <span
                                         class="mt-1.5 block text-[0.82rem] font-medium leading-5 text-[#101828] [&_strong]:font-semibold"
@@ -11245,18 +12009,19 @@ watch(
                                     <path d="m7 10 5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                 </svg>
                             </summary>
+                            </template>
                             <div :class="completionReviewArticleClass">
                                 <div class="overflow-hidden bg-white lg:order-2">
                                     <div :class="completionReviewMediaFrameClass">
                                         <div class="w-full">
                                             <template v-if="result.media.length > 0">
-                                                <p
-                                                    v-if="result.media[0]?.kind === 'video'"
-                                                    class="mb-2 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-[#6b7280]"
-                                                >
-                                                    Kadr z 0.2 s przed końcem filmu
-                                                </p>
 
+                                                <SessionResultMedia
+                                                    :defer="usesConfirmedCompletion && !isPhoneViewport && result.media[0]?.kind === 'video' && Boolean(result.media[0]?.url)"
+                                                    :poster="result.media[0]?.poster_url"
+                                                    :natural-width="result.media[0]?.width"
+                                                    :natural-height="result.media[0]?.height"
+                                                >
                                                 <QuestionVideoFrameWithAnnotations
                                                     v-if="hasResultVideoFrameAnnotations(result) && result.media[0]?.url"
                                                     :src="result.media[0].url"
@@ -11295,6 +12060,7 @@ watch(
                                                     :presentation-class="'w-full'"
                                                     :image-class="completionReviewMediaAssetClass"
                                                 />
+                                                </SessionResultMedia>
                                             </template>
 
                                             <img
@@ -11316,12 +12082,7 @@ watch(
                                             <p class="font-semibold uppercase tracking-[0.16em] text-[#6b7280]">
                                                 Pytanie {{ result.sequence_number }}
                                             </p>
-                                            <span class="inline-flex items-center rounded-full border border-[#e5e7eb] bg-[#f7f7f7] px-2 py-0.5 text-[#5f6368]">
-                                                Dobrze
-                                            </span>
-                                            <span class="text-[#6b7280]">
-                                                Czas: {{ formatResponseTime(result.response_time_ms) }}
-                                            </span>
+                                            <span class="sr-only">Dobrze</span>
                                         </div>
                                         <h3 :class="completionReviewPromptClass">
                                             <span
@@ -11333,32 +12094,31 @@ watch(
 
                                     <div :class="completionReviewAnswerGridClass">
                                         <div :class="completionReviewNeutralAnswerCardClass">
-                                            <p class="text-[0.72rem] font-semibold uppercase tracking-[0.14em]">
-                                                Twoja odpowiedź
-                                            </p>
-                                            <p class="mt-2 text-base font-semibold text-neutral-900">
-                                                {{ resultUserAnswerLabel(result) }}
-                                            </p>
-                                            <p class="mt-1 text-sm leading-6">
-                                                {{ resultUserAnswerText(result) }}
-                                            </p>
+                                            <SessionResultAnswer
+                                                label="Twoja odpowiedź"
+                                                :answer="result.selected_answer"
+                                                :text="result.selected_answer_text"
+                                                :question-type="result.question_type"
+                                                :unknown="isUnknownAnswerKind(result.answer_kind)"
+                                                empty-label="Brak odpowiedzi"
+                                                missing-text="Nie udało się odczytać treści tej odpowiedzi."
+                                            />
                                         </div>
 
                                         <div :class="completionReviewNeutralAnswerCardClass">
-                                            <p class="text-[0.72rem] font-semibold uppercase tracking-[0.14em]">
-                                                Poprawna odpowiedź
-                                            </p>
-                                            <p class="mt-2 text-base font-semibold text-neutral-900">
-                                                {{ result.correct_answer ? `Odpowiedź ${result.correct_answer}` : 'Brak danych o poprawnej odpowiedzi' }}
-                                            </p>
-                                            <p class="mt-1 text-sm leading-6">
-                                                {{ result.correct_answer_text ?? 'Nie udało się odczytać treści poprawnej odpowiedzi.' }}
-                                            </p>
+                                            <SessionResultAnswer
+                                                label="Poprawna odpowiedź"
+                                                :answer="result.correct_answer"
+                                                :text="result.correct_answer_text"
+                                                :question-type="result.question_type"
+                                                empty-label="Brak danych o poprawnej odpowiedzi"
+                                                missing-text="Nie udało się odczytać treści poprawnej odpowiedzi."
+                                            />
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </component>
+                        </SessionResultDisclosure>
                     </div>
                 </div>
                 </div>
@@ -11465,6 +12225,7 @@ watch(
                 >
                     <div
                         lang="pl"
+                        data-public-demo-gate-panel
                         class="relative max-h-[calc(100svh-2rem)] w-full max-w-[58rem] overflow-y-auto rounded-none border border-[#cbd6e4] bg-white px-5 py-5 text-left shadow-none sm:max-h-[calc(100svh-3rem)] sm:px-7 sm:py-5 lg:max-h-none lg:overflow-visible"
                     >
                         <button
@@ -11488,7 +12249,7 @@ watch(
                             </p>
                         </header>
 
-                        <section class="mt-3 bg-white px-4 py-3.5">
+                        <section data-public-demo-gate-summary class="mt-3 bg-white px-4 py-3.5">
                             <h3 class="text-base font-semibold text-[#1f2937]">Aktualne ustawienia</h3>
                             <div class="mt-3 grid gap-x-8 gap-y-3 text-[0.9rem] sm:grid-cols-2 sm:text-[0.92rem]">
                                 <div class="space-y-3 sm:pr-7">
@@ -11528,6 +12289,7 @@ watch(
                             </div>
                         </section>
 
+                        <div v-if="!isPhoneViewport" data-public-demo-gate-details>
                         <section class="mt-2.5 grid gap-2.5 sm:grid-cols-2">
                             <article class="flex gap-3 bg-white px-4 py-3">
                                 <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-none bg-[#f3f6fa] text-[#17233b]">
@@ -11614,6 +12376,7 @@ watch(
                                 </Link>
                             </div>
                         </div>
+                        </div>
                     </div>
                 </section>
             </Transition>
@@ -11648,6 +12411,98 @@ watch(
 
 <style scoped>
 @import url('https://fonts.bunny.net/css?family=inter:400,500,600&display=swap');
+
+@media (max-width: 1023px) {
+    [data-session-header-row] {
+        flex-wrap: wrap;
+    }
+
+    [data-session-header-metrics] {
+        min-width: 108px;
+        grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+        column-gap: 8px;
+    }
+
+    [data-session-header-metric] {
+        display: flex;
+        min-width: 0;
+        min-height: 38px;
+        flex-direction: column;
+        justify-content: center;
+        border: 1px solid #d1d5db;
+        padding: 1px 6px;
+        background: white;
+    }
+
+    [data-session-header-metric] p:first-child {
+        line-height: 12px;
+    }
+
+    [data-public-demo-gate-panel] {
+        max-width: 28rem;
+        padding: 16px;
+    }
+
+    [data-public-demo-gate-panel] header h2 {
+        font-size: 20px;
+        line-height: 28px;
+    }
+
+    [data-public-demo-gate-panel] header svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    [data-public-demo-gate-panel] header p {
+        font-size: 12px;
+        line-height: 20px;
+    }
+
+    [data-public-demo-gate-summary] {
+        padding: 12px 0 0;
+    }
+
+    [data-public-demo-gate-summary] h3 {
+        font-size: 14px;
+        line-height: 20px;
+    }
+
+    [data-public-demo-gate-summary] > div {
+        grid-template-columns: minmax(0, 1fr);
+        font-size: 12px;
+    }
+
+    [data-public-demo-gate-summary] > div > div {
+        padding: 0;
+    }
+
+    [data-public-demo-gate-summary] > div > div > div {
+        grid-template-columns: 16px minmax(0, 1fr) auto;
+        gap: 8px;
+    }
+
+    [data-public-demo-gate-summary] svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    [data-public-demo-gate-summary] strong {
+        min-width: 0;
+        max-width: 9rem;
+        text-align: right;
+    }
+}
+
+[data-completion-reveal] {
+    animation: completion-result-reveal 160ms ease-out both;
+}
+@keyframes completion-result-reveal {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+    [data-completion-reveal] { animation: none; }
+}
 
 .course-session-shell { height: calc(100dvh - 1.25rem); min-height: 0; }
 .course-session-inner { display: grid; height: 100%; min-width: 0; min-height: 0; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }

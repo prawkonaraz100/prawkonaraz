@@ -3,7 +3,7 @@ import SessionExpiredNotice from '@/Components/SessionExpiredNotice.vue';
 import { useSessionExpiry } from '@/composables/useSessionExpiry';
 import questionSourceEmblem from '../../../images/session/question-source-emblem-crop.png';
 import SessionExamLayout from '@/Layouts/SessionExamLayout.vue';
-import { apiClient } from '@/lib/apiClient';
+import { apiClient, isApiClientError } from '@/lib/apiClient';
 import { renderExamPromptHtml } from '@/utils/explanationFormatting';
 import { Head, useForm } from '@inertiajs/vue3';
 import { Clock3 } from '@lucide/vue';
@@ -110,6 +110,19 @@ interface ExamStateResponse {
     currentQuestion: CurrentQuestion | null;
     completed: boolean;
     redirect: string;
+}
+
+const examWriteOptions = computed(() => ({
+    headers: { 'X-Study-Session-Id': String(props.session.id) },
+}));
+
+function examWriteError(error: unknown, fallback: string): string {
+    if (isApiClientError(error) && error.status === 422) {
+        const payload = error.data as { errors?: { course_progress?: string[] } } | null;
+        return payload?.errors?.course_progress?.[0] ?? fallback;
+    }
+
+    return fallback;
 }
 
 const sessionState = ref<SessionSummary>(props.session);
@@ -382,7 +395,7 @@ const mobileAnswerDockInnerStyle = computed<Record<string, string>>(() => {
 
 const mobileAnswerOptionsClass = computed(() =>
     activeQuestion.value?.question_type === 'boolean'
-        ? 'grid grid-cols-2 gap-2'
+        ? 'grid grid-cols-1 gap-2'
         : 'space-y-2',
 );
 const examSessionShellClass = computed(() =>
@@ -658,6 +671,7 @@ const submitSelectedAnswer = async () => {
                 selected_answer: answerForm.selected_answer,
                 response_time_ms: answerForm.response_time_ms,
             },
+            examWriteOptions.value,
         );
 
         if (payload?.completed || payload?.session?.status === 'completed') {
@@ -671,7 +685,7 @@ const submitSelectedAnswer = async () => {
         await syncExamState('sync');
     } catch (error) {
         if (!handleSessionExpiryError(error)) {
-            examRequestError.value = 'Nie udało się zapisać odpowiedzi. Spróbuj ponownie.';
+            examRequestError.value = examWriteError(error, 'Nie udało się zapisać odpowiedzi. Spróbuj ponownie.');
         }
     } finally {
         answerSubmitInFlight.value = false;
@@ -689,14 +703,14 @@ const finishExam = async () => {
     try {
         const payload = await apiClient.post<{
             redirect?: string | null;
-        }>(route('study-sessions.current.complete'), {});
+        }>(route('study-sessions.current.complete'), {}, examWriteOptions.value);
 
         if (typeof window !== 'undefined') {
             window.location.assign(payload?.redirect ?? route('study-sessions.show', sessionState.value.id));
         }
     } catch (error) {
         if (!handleSessionExpiryError(error)) {
-            examRequestError.value = 'Nie udało się zakończyć egzaminu. Spróbuj ponownie.';
+            examRequestError.value = examWriteError(error, 'Nie udało się zakończyć egzaminu. Spróbuj ponownie.');
         }
     } finally {
         finishExamInFlight.value = false;
