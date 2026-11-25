@@ -24,7 +24,8 @@ const darkHome = computed(() =>
     || route().current('profile.edit')
     || route().current('analytics.categories.*')
     || route().current('session.ranking*')
-    || /^\/nauka\/(?:kursy\/[^/]+\/)?bledne-pytania\/?$/.test(pageUrl.value.pathname),
+    || /^\/nauka\/(?:kursy\/[^/]+\/)?bledne-pytania\/?$/.test(pageUrl.value.pathname)
+    || /^\/nauka\/(?:teraz|wynik\/\d+)\/?$/.test(pageUrl.value.pathname),
 );
 const isExamSession = computed(() => {
     const session = (page.props as PageProps & { session?: { mode?: string } }).session;
@@ -55,6 +56,7 @@ const items = computed<NavItem[]>(() => [
         icon: 'training',
         featured: true,
         active: (route().current('session.index') && dashboardView.value === 'trening')
+            || route().current('session.ranking*')
             || (route().current('study-sessions.*') && !isExamSession.value),
     },
     {

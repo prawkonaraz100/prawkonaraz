@@ -2,6 +2,7 @@
 @import './question-database.css';
 @import './question-detail.css';
 @import './status-notices.css';
+@import './dark-mobile-generated.css';
 
 @tailwind base;
 @tailwind components;
@@ -7638,6 +7639,7 @@ body:has([data-auth-dialog-open='true'], [data-auth-login-open='true'], [data-au
     .pk-dark-scope .bg-gray-800,
     .pk-dark-scope .bg-\[\#f58220\],
     .pk-dark-scope .bg-\[\#344054\],
+    .pk-dark-scope :is(a, button).bg-\[\#efc54f\],
     .pk-dark-scope .bg-\[\#11161f\] {
         background-color: #81b64c;
         background-image: linear-gradient(#81b64c, #5d9948);
@@ -7653,6 +7655,7 @@ body:has([data-auth-dialog-open='true'], [data-auth-login-open='true'], [data-au
     .pk-dark-scope :is(a, button).bg-gray-800,
     .pk-dark-scope :is(a, button).bg-\[\#f58220\],
     .pk-dark-scope :is(a, button).bg-\[\#344054\],
+    .pk-dark-scope :is(a, button).bg-\[\#efc54f\],
     .pk-dark-scope :is(a, button).bg-\[\#11161f\] {
         border-color: transparent;
         border-radius: 10px;
@@ -7674,6 +7677,7 @@ body:has([data-auth-dialog-open='true'], [data-auth-login-open='true'], [data-au
     .pk-dark-scope :is(a, button).bg-gray-800:disabled,
     .pk-dark-scope :is(a, button).bg-\[\#f58220\]:disabled,
     .pk-dark-scope :is(a, button).bg-\[\#344054\]:disabled,
+    .pk-dark-scope :is(a, button).bg-\[\#efc54f\]:disabled,
     .pk-dark-scope :is(a, button).bg-\[\#11161f\]:disabled,
     .pk-dark-scope :is(a, button).bg-\[\#105356\][aria-disabled='true'],
     .pk-dark-scope :is(a, button).bg-\[\#101820\][aria-disabled='true'],
@@ -7709,6 +7713,7 @@ body:has([data-auth-dialog-open='true'], [data-auth-login-open='true'], [data-au
     }
 
     .pk-dark-scope .bg-emerald-50,
+    .pk-dark-scope .bg-\[\#f3fbf5\],
     .pk-dark-scope .bg-\[\#edf4ef\],
     .pk-dark-scope .bg-\[\#ecfdf3\] {
         background-color: rgb(129 182 76 / 15%);
@@ -7731,6 +7736,7 @@ body:has([data-auth-dialog-open='true'], [data-auth-login-open='true'], [data-au
     }
 
     .pk-dark-scope .bg-red-50,
+    .pk-dark-scope .bg-\[\#fff7f6\],
     .pk-dark-scope .bg-\[\#fff6f7\],
     .pk-dark-scope .bg-\[\#fff4f1\],
     .pk-dark-scope .bg-\[\#fcf5f1\] {
@@ -7917,6 +7923,19 @@ body:has([data-auth-dialog-open='true'], [data-auth-login-open='true'], [data-au
         box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%), 0 1px 2px rgb(0 0 0 / 14%), 0 2px 4px rgb(0 0 0 / 10%);
     }
 
+    /* Whole-page scope (study sessions): page colour and opaque sheets over the page. */
+    html:has(> body.pk-dark-scope),
+    body.pk-dark-scope {
+        background-color: #302e2b;
+        color: rgb(255 255 255 / 85%);
+        color-scheme: dark;
+    }
+
+    .pk-dark-scope .session-layout-root {
+        background-color: transparent;
+        color: rgb(255 255 255 / 85%);
+    }
+
     .pk-dark-sheet {
         background-color: #302e2b;
         color: rgb(255 255 255 / 85%);
@@ -7924,6 +7943,152 @@ body:has([data-auth-dialog-open='true'], [data-auth-login-open='true'], [data-au
 
     .bg-white:has(> .pk-dark-modal) {
         background-color: #302e2b;
+    }
+
+    /* Docks, sticky bars and sheets sit above the page, so they need an opaque surface. */
+    .pk-dark-scope :is(.fixed, .sticky):is([class*='bg-white'], [class*='bg-[#f'], [class*='bg-[#e'], [class*='bg-[#fbfcfd]']) {
+        background-color: #302e2b;
+        background-image: none;
+        border-color: rgb(255 255 255 / 10%);
+        box-shadow: none;
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+
+    /* Translucent light buttons (bg-white/NN) become secondary buttons like bg-white. */
+    .pk-dark-scope :is(a, button):is(.bg-white\/56, .bg-white\/64, .bg-white\/72, .bg-white\/84, .bg-white\/86, .bg-white\/90, .bg-white\/92):not(.rounded-full) {
+        border-color: transparent;
+        background-color: transparent;
+        background-image: linear-gradient(rgb(255 255 255 / 10%), rgb(255 255 255 / 5%));
+        color: rgb(255 255 255 / 85%);
+        box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%), 0 1px 2px rgb(0 0 0 / 14%), 0 2px 4px rgb(0 0 0 / 10%);
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+
+    /* Study session: the question sits directly on the page like the ranking match screen. */
+    .pk-dark-scope :is([data-study-header], [data-study-workspace], [data-study-prompt]) {
+        background-color: transparent;
+        background-image: none;
+        box-shadow: none;
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+
+    .pk-dark-scope :is([data-study-header], [data-study-prompt]) {
+        border-color: rgb(255 255 255 / 10%);
+    }
+
+    /* Answer tiles and their feedback states (same tile as the ranking answer dock). */
+    .pk-dark-scope button[data-answer-state] {
+        border-color: transparent;
+        border-radius: 5px;
+        background-color: transparent;
+        background-image: linear-gradient(rgb(255 255 255 / 10%), rgb(255 255 255 / 5%));
+        color: rgb(255 255 255 / 85%);
+        box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%), 0 1px 2px rgb(0 0 0 / 14%), 0 2px 4px rgb(0 0 0 / 10%);
+        --tw-ring-shadow: 0 0 #0000;
+    }
+
+    .pk-dark-scope button[data-answer-state='selected'] {
+        outline: 2px solid #81b64c;
+        outline-offset: 0;
+    }
+
+    .pk-dark-scope button[data-answer-state='correct'] {
+        background-color: rgb(129 182 76 / 28%);
+        background-image: none;
+        color: #fff;
+        outline: 2px solid #81b64c;
+        outline-offset: 0;
+    }
+
+    .pk-dark-scope button[data-answer-state='incorrect'] {
+        background-color: rgb(224 40 40 / 26%);
+        background-image: none;
+        color: #fff;
+        outline: 2px solid #e05d52;
+        outline-offset: 0;
+    }
+
+    .pk-dark-scope button[data-answer-state] > span:first-child:not(:last-child) {
+        border-color: transparent;
+        border-radius: 5px 0 0 5px;
+    }
+
+    /* Letter badges stay neutral until feedback colours them (green = correct only). */
+    .pk-dark-scope button:is([data-answer-state='idle'], [data-answer-state='selected']) > span:first-child:not(:last-child) {
+        background-color: rgb(255 255 255 / 10%);
+        background-image: none;
+    }
+
+    .pk-dark-scope button[data-answer-state] [data-answer-badge] {
+        border-color: transparent;
+        border-radius: 3px;
+        background-color: rgb(255 255 255 / 10%);
+        background-image: none;
+        box-shadow: none;
+    }
+
+    .pk-dark-scope button[data-answer-state='selected'] [data-answer-badge] {
+        background-color: #81b64c;
+    }
+
+    /* Full explanation dialog (FullStudyExplanationPanel.vue keeps light scoped styles for desktop). */
+    body.pk-dark-scope .full-explanation-overlay { background:rgb(0 0 0 / .6); }
+    body.pk-dark-scope .full-explanation-panel { color:rgb(255 255 255 / .85); background:#302e2b; border-color:rgb(255 255 255 / .1); box-shadow:0 20px 60px rgb(0 0 0 / .5); }
+    body.pk-dark-scope .full-explanation-header,
+    body.pk-dark-scope .full-explanation-footer { border-color:rgb(255 255 255 / .1); }
+    body.pk-dark-scope .full-explanation-clock,
+    body.pk-dark-scope .full-explanation-actions button,
+    body.pk-dark-scope .full-explanation-notice { color:rgb(255 255 255 / .5); }
+    body.pk-dark-scope .full-explanation-actions button:hover { background:rgb(255 255 255 / .06); color:rgb(255 255 255 / .85); }
+    body.pk-dark-scope .full-explanation-correct { background:rgb(129 182 76 / .15); }
+    body.pk-dark-scope .full-explanation-correct span,
+    body.pk-dark-scope .full-explanation-saved { color:#81b64c; }
+    body.pk-dark-scope .full-explanation-prose .full-explanation-takeaway { background:rgb(255 201 74 / .12); border-left-color:#ffc94a; }
+    body.pk-dark-scope .full-explanation-retry { color:#81b64c; }
+    body.pk-dark-scope .full-explanation-action-error { color:#ff8a8a; }
+    body.pk-dark-scope .full-explanation-footer button:not(.full-explanation-next) { background-image:linear-gradient(rgb(255 255 255 / .1), rgb(255 255 255 / .05)); color:rgb(255 255 255 / .85); }
+    body.pk-dark-scope .full-explanation-footer .full-explanation-next { background:linear-gradient(#81b64c, #5d9948); box-shadow:inset 0 1px 0 rgb(178 224 104 / .4), inset 0 -1px 0 #45753c; }
+
+    /* Header metrics of the exam-like session (scoped light boxes in Show.vue). */
+    body.pk-dark-scope [data-session-header-metric] {
+        border-color: transparent;
+        border-radius: 5px;
+        background: rgb(0 0 0 / 20%);
+    }
+
+    /* Finish buttons in the session header are secondary, like "Poddaj" in a ranking match. */
+    .pk-dark-scope [data-study-header] :is(a, button).bg-\[\#efc54f\] {
+        border-color: transparent;
+        background-color: transparent;
+        background-image: linear-gradient(rgb(255 255 255 / 10%), rgb(255 255 255 / 5%));
+        color: rgb(255 255 255 / 85%);
+        box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%), 0 1px 2px rgb(0 0 0 / 14%), 0 2px 4px rgb(0 0 0 / 10%);
+    }
+
+    /* Explanation timing slider (scoped warm colours in Show.vue). */
+    body.pk-dark-scope .hint-timing-slider,
+    body.pk-dark-scope .hint-timing-slider::-webkit-slider-runnable-track {
+        background: rgb(255 255 255 / 10%);
+    }
+
+    /* Separate rules: a selector list mixing -webkit- and -moz- pseudo-elements is dropped whole. */
+    body.pk-dark-scope .hint-timing-slider::-moz-range-track {
+        background: rgb(255 255 255 / 10%);
+    }
+
+    body.pk-dark-scope .hint-timing-slider::-webkit-slider-thumb {
+        border-color: transparent;
+        background: #81b64c;
+        box-shadow: 0 1px 3px rgb(0 0 0 / 40%);
+    }
+
+    body.pk-dark-scope .hint-timing-slider::-moz-range-thumb {
+        border-color: transparent;
+        background: #81b64c;
+        box-shadow: 0 1px 3px rgb(0 0 0 / 40%);
     }
 }
 

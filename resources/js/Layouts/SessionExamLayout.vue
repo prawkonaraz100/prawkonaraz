@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { useMobileDarkScope } from '@/composables/useMobileDarkScope';
+
+useMobileDarkScope();
+
 withDefaults(
     defineProps<{
         lockViewport?: boolean;
@@ -13,7 +17,7 @@ withDefaults(
 
 <template>
     <div
-        class="min-h-screen bg-white text-[#111827]"
+        class="session-layout-root min-h-screen bg-white text-[#111827]"
         :class="lockViewport ? 'overflow-x-hidden xl:h-screen xl:overflow-y-hidden' : ''"
     >
         <main
