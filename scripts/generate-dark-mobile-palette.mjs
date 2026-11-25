@@ -23,13 +23,27 @@ const ENTRY_FILES = [
     'Pages/StudySessions/ExamResult.vue',
     'Layouts/SessionZenLayout.vue',
     'Layouts/SessionExamLayout.vue',
+    'Layouts/GuestLayout.vue',
+    'Pages/Auth/Login.vue',
+    'Pages/Auth/Register.vue',
+    'Pages/Auth/ForgotPassword.vue',
+    'Pages/Auth/ResetPassword.vue',
+    'Pages/Auth/VerifyEmail.vue',
+    'Pages/Auth/VerificationLinkProblem.vue',
+    'Pages/Auth/ConfirmPassword.vue',
+    'Pages/Auth/ForcePasswordChange.vue',
+    'Pages/Auth/ClaimTemporaryAccount.vue',
+    'Pages/Auth/LogoutConfirm.vue',
+    'Pages/FriendInvitations/Code.vue',
+    'Pages/FriendInvitations/Show.vue',
+    'Pages/Access/Activate.vue',
+    'Pages/Checkout/Show.vue',
+    'Pages/Checkout/Result.vue',
+    'Pages/App/AuthFullScreen.vue',
 ];
 
-// Components that keep their own design on dark (brand art, media frames) or are not part of the app shell.
+// Components that already have their own dark mobile design.
 const SKIP_COMPONENTS = new Set([
-    'Components/Auth/AuthTopNavigation.vue',
-    'Components/Auth/LoginDrawer.vue',
-    'Components/Auth/RegisterDrawer.vue',
     'Components/MobileBottomNavigation.vue',
 ]);
 
@@ -149,7 +163,8 @@ function mapDeclarations(utility, color, alpha) {
         if (fam === 'blue' && c.s > 0.6) {
             return `background-color: ${T.primary}; background-image: ${T.primaryGradient}; color: #fff;`;
         }
-        return null; // saturated accents (yellow, green, red) read fine on dark
+        if (fam === 'green' && c.s > 0.4) return `background-color: ${T.primary};`; // one green accent across the app
+        return null; // saturated accents (yellow, red) read fine on dark
     }
 
     if (utility === 'text') {
@@ -163,7 +178,7 @@ function mapDeclarations(utility, color, alpha) {
     // border*, ring, divide, outline, decoration
     let value;
     if (c.l >= 0.78 && fam === 'neutral') value = T.line;
-    else if (c.l >= 0.78) value = T.tint[fam].line;
+    else if (c.l >= 0.78) value = fam !== 'blue' && c.chroma >= 0.12 ? T.tint[fam].line : T.line; // pale tinted borders are just dividers
     else if (fam !== 'neutral') value = fam === 'blue' && c.s > 0.6 ? T.primary : T.tint[fam].line;
     else if (c.l >= 0.45) value = T.lineStrong;
     else value = T.primary; // dark outlines mark the selected item

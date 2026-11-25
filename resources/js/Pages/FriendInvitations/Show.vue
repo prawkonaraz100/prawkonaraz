@@ -5,6 +5,9 @@ import type { PageProps } from '@/types';
 import friendInvitationHero from '../../../images/invitations/friend-invitation-hero.png';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import { useMobileDarkScope } from '@/composables/useMobileDarkScope';
+
+useMobileDarkScope();
 
 const props = defineProps<{
     invitation: {

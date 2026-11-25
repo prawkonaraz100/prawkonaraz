@@ -2,6 +2,9 @@
 import SiteFooter from '@/Components/SiteFooter.vue';
 import PublicTopNavigation from '@/Components/PublicTopNavigation.vue';
 import { Head, useForm } from '@inertiajs/vue3';
+import { useMobileDarkScope } from '@/composables/useMobileDarkScope';
+
+useMobileDarkScope();
 
 const props = defineProps<{
     order: {

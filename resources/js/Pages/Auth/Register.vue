@@ -4,6 +4,9 @@ import RegisterDrawer from '@/Components/Auth/RegisterDrawer.vue';
 import type { PageProps, StudyContextCategory } from '@/types';
 import { Head, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
+import { useMobileDarkScope } from '@/composables/useMobileDarkScope';
+
+useMobileDarkScope();
 
 const props = defineProps<{
     categories: StudyContextCategory[];

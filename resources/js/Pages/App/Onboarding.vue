@@ -24,8 +24,8 @@ const finishOnboarding = (destination: 'login' | 'register') => {
         <meta name="robots" content="noindex,nofollow">
     </Head>
 
-    <main class="min-h-[100svh] bg-[#071b33] text-white">
-        <div class="onboarding-panel relative mx-auto min-h-[100svh] w-full max-w-[34rem] overflow-hidden bg-[#071b33] shadow-[0_0_50px_rgba(0,0,0,0.22)]">
+    <main class="min-h-[100svh] bg-[#071b33] text-white max-md:bg-[#302e2b]">
+        <div class="onboarding-panel relative mx-auto min-h-[100svh] w-full max-w-[34rem] overflow-hidden bg-[#071b33] shadow-[0_0_50px_rgba(0,0,0,0.22)] max-md:bg-[#302e2b]">
             <img
                 :src="roadSunset"
                 alt=""
@@ -33,7 +33,7 @@ const finishOnboarding = (destination: 'login' | 'register') => {
                 class="absolute inset-0 h-full w-full object-cover object-center"
                 fetchpriority="high"
             >
-            <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(3,15,31,0.8)_0%,rgba(3,15,31,0.45)_35%,rgba(3,15,31,0.02)_58%,rgba(3,15,31,0.22)_77%,rgba(3,15,31,0.9)_100%)]" />
+            <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(3,15,31,0.8)_0%,rgba(3,15,31,0.45)_35%,rgba(3,15,31,0.02)_58%,rgba(3,15,31,0.22)_77%,rgba(3,15,31,0.9)_100%)] max-md:bg-[linear-gradient(180deg,rgba(38,36,33,0.85)_0%,rgba(38,36,33,0.5)_35%,rgba(38,36,33,0.04)_58%,rgba(38,36,33,0.3)_77%,rgba(38,36,33,0.94)_100%)]" />
 
             <div class="onboarding-content relative z-10 flex min-h-[100svh] flex-col px-6 pb-[max(env(safe-area-inset-bottom),1.5rem)] pt-[max(env(safe-area-inset-top),1.5rem)]">
                 <header class="onboarding-header flex min-h-11 items-center justify-between gap-4">
@@ -84,7 +84,7 @@ const finishOnboarding = (destination: 'login' | 'register') => {
                 <div class="onboarding-actions mt-auto pt-12">
                     <button
                         type="button"
-                        class="flex min-h-14 w-full items-center justify-center gap-3 rounded-xl bg-[#ffd84d] px-5 text-base font-bold text-[#071b33] shadow-[0_10px_25px_rgba(0,0,0,0.24)] transition hover:bg-[#ffe57a] disabled:cursor-wait disabled:opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b33]"
+                        class="flex min-h-14 w-full items-center justify-center gap-3 rounded-xl bg-[#ffd84d] px-5 text-base font-bold text-[#071b33] shadow-[0_10px_25px_rgba(0,0,0,0.24)] transition hover:bg-[#ffe57a] max-md:rounded-[10px] max-md:bg-[#81b64c] max-md:bg-[linear-gradient(#81b64c,#5d9948)] max-md:text-white max-md:shadow-[inset_0_1px_0_rgba(178,224,104,0.4),inset_0_-1px_0_#45753c,0_2px_4px_rgba(0,0,0,0.2)] disabled:cursor-wait disabled:opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b33]"
                         :disabled="processing"
                         @click="finishOnboarding('register')"
                     >

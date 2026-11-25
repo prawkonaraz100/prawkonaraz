@@ -7640,6 +7640,7 @@ body:has([data-auth-dialog-open='true'], [data-auth-login-open='true'], [data-au
     .pk-dark-scope .bg-\[\#f58220\],
     .pk-dark-scope .bg-\[\#344054\],
     .pk-dark-scope :is(a, button).bg-\[\#efc54f\],
+    .pk-dark-scope :is(a, button).bg-\[\#e11d2e\],
     .pk-dark-scope .bg-\[\#11161f\] {
         background-color: #81b64c;
         background-image: linear-gradient(#81b64c, #5d9948);
@@ -7656,6 +7657,7 @@ body:has([data-auth-dialog-open='true'], [data-auth-login-open='true'], [data-au
     .pk-dark-scope :is(a, button).bg-\[\#f58220\],
     .pk-dark-scope :is(a, button).bg-\[\#344054\],
     .pk-dark-scope :is(a, button).bg-\[\#efc54f\],
+    .pk-dark-scope :is(a, button).bg-\[\#e11d2e\],
     .pk-dark-scope :is(a, button).bg-\[\#11161f\] {
         border-color: transparent;
         border-radius: 10px;
@@ -7990,25 +7992,27 @@ body:has([data-auth-dialog-open='true'], [data-auth-login-open='true'], [data-au
         --tw-ring-shadow: 0 0 #0000;
     }
 
+    /* A chosen answer before feedback gets a white frame, so green and red always mean right and wrong. */
     .pk-dark-scope button[data-answer-state='selected'] {
-        outline: 2px solid #81b64c;
-        outline-offset: 0;
+        outline: none;
+        box-shadow: inset 0 0 0 2px rgb(255 255 255 / 75%), 0 1px 2px rgb(0 0 0 / 14%);
     }
 
+    /* Feedback is a calm tint with a hairline edge; the letter badge carries the strong colour. */
     .pk-dark-scope button[data-answer-state='correct'] {
-        background-color: rgb(129 182 76 / 28%);
+        background-color: rgb(129 182 76 / 16%);
         background-image: none;
-        color: #fff;
-        outline: 2px solid #81b64c;
-        outline-offset: 0;
+        color: rgb(255 255 255 / 92%);
+        outline: none;
+        box-shadow: inset 0 0 0 1px rgb(129 182 76 / 30%);
     }
 
     .pk-dark-scope button[data-answer-state='incorrect'] {
-        background-color: rgb(224 40 40 / 26%);
+        background-color: rgb(224 40 40 / 14%);
         background-image: none;
-        color: #fff;
-        outline: 2px solid #e05d52;
-        outline-offset: 0;
+        color: rgb(255 255 255 / 92%);
+        outline: none;
+        box-shadow: inset 0 0 0 1px rgb(255 138 138 / 26%);
     }
 
     .pk-dark-scope button[data-answer-state] > span:first-child:not(:last-child) {
@@ -8022,6 +8026,16 @@ body:has([data-auth-dialog-open='true'], [data-auth-login-open='true'], [data-au
         background-image: none;
     }
 
+    .pk-dark-scope button[data-answer-state='correct'] > span:first-child:not(:last-child) {
+        background-color: #5d9948;
+        background-image: none;
+    }
+
+    .pk-dark-scope button[data-answer-state='incorrect'] > span:first-child:not(:last-child) {
+        background-color: #b0423a;
+        background-image: none;
+    }
+
     .pk-dark-scope button[data-answer-state] [data-answer-badge] {
         border-color: transparent;
         border-radius: 3px;
@@ -8031,7 +8045,8 @@ body:has([data-auth-dialog-open='true'], [data-auth-login-open='true'], [data-au
     }
 
     .pk-dark-scope button[data-answer-state='selected'] [data-answer-badge] {
-        background-color: #81b64c;
+        background-color: rgb(255 255 255 / 85%);
+        color: #302e2b;
     }
 
     /* Full explanation dialog (FullStudyExplanationPanel.vue keeps light scoped styles for desktop). */
@@ -8051,6 +8066,50 @@ body:has([data-auth-dialog-open='true'], [data-auth-login-open='true'], [data-au
     body.pk-dark-scope .full-explanation-action-error { color:#ff8a8a; }
     body.pk-dark-scope .full-explanation-footer button:not(.full-explanation-next) { background-image:linear-gradient(rgb(255 255 255 / .1), rgb(255 255 255 / .05)); color:rgb(255 255 255 / .85); }
     body.pk-dark-scope .full-explanation-footer .full-explanation-next { background:linear-gradient(#81b64c, #5d9948); box-shadow:inset 0 1px 0 rgb(178 224 104 / .4), inset 0 -1px 0 #45753c; }
+
+    /* Course flashcard settings (CourseFlashcardSettings.vue scoped light styles). */
+    body.pk-dark-scope .course-settings { color: rgb(255 255 255 / 85%); }
+    body.pk-dark-scope .course-settings :is(.course-settings__intro, small, .course-settings__ticks) { color: rgb(255 255 255 / 50%); }
+    body.pk-dark-scope .course-settings__ticks .active { color: rgb(255 255 255 / 85%); }
+    body.pk-dark-scope .course-settings fieldset > label { border-color: transparent; border-radius: 5px; background: rgb(0 0 0 / 20%); }
+    body.pk-dark-scope .course-settings fieldset > label.selected { background: rgb(255 255 255 / 6%); outline: 2px solid #81b64c; outline-offset: -2px; }
+    body.pk-dark-scope .course-settings :is(.course-settings__timing, .course-settings__hint) { border-color: transparent; border-radius: 5px; background: rgb(0 0 0 / 20%); }
+    body.pk-dark-scope .course-settings input[type=range] { accent-color: #81b64c; }
+    body.pk-dark-scope .course-settings kbd { border-color: rgb(255 255 255 / 20%); background: rgb(255 255 255 / 10%); }
+
+    /* Course explanation flashcard (CourseExplanationFlashcard.vue). */
+    body.pk-dark-scope .course-flashcard__back { border-color: rgb(255 255 255 / 10%); border-radius: 5px; background: #302e2b; color: rgb(255 255 255 / 85%); }
+    body.pk-dark-scope .course-flashcard__header { border-color: rgb(255 255 255 / 10%); }
+    body.pk-dark-scope .course-flashcard__eyebrow { color: rgb(255 255 255 / 50%); }
+    body.pk-dark-scope .course-flashcard__header button { border-radius: 10px; background: linear-gradient(rgb(255 255 255 / 10%), rgb(255 255 255 / 5%)); color: rgb(255 255 255 / 85%); }
+    body.pk-dark-scope .course-flashcard__explanation .order-2 > :is(div, p) { color: rgb(255 255 255 / 72%); }
+    body.pk-dark-scope .course-flashcard__answer { background: rgb(129 182 76 / 15%); }
+    body.pk-dark-scope .course-flashcard__answer span { color: rgb(255 255 255 / 72%); }
+    body.pk-dark-scope .course-flashcard__answer strong { color: #81b64c; }
+
+    /* Preliminary learning (QualificationPreliminaryLearning.vue). */
+    body.pk-dark-scope .preliminary { border-color: rgb(255 255 255 / 10%); border-radius: 5px; background: #302e2b; color: rgb(255 255 255 / 85%); }
+    body.pk-dark-scope :is(.preliminary__header, .preliminary__controls) { border-color: rgb(255 255 255 / 10%); background: #302e2b; }
+    body.pk-dark-scope :is(.preliminary__eyebrow, .preliminary__rate, .preliminary__complete p) { color: rgb(255 255 255 / 50%); }
+    body.pk-dark-scope .preliminary__text h3 { color: rgb(255 255 255 / 72%); }
+    body.pk-dark-scope .preliminary__answer { border-color: transparent; background: rgb(129 182 76 / 15%); }
+    body.pk-dark-scope .preliminary__quiet { border-color: transparent; border-radius: 10px; background: linear-gradient(rgb(255 255 255 / 10%), rgb(255 255 255 / 5%)); color: rgb(255 255 255 / 85%); }
+    body.pk-dark-scope .preliminary__primary { border-color: transparent; border-radius: 10px; background: linear-gradient(#81b64c, #5d9948); color: #fff; }
+    body.pk-dark-scope .preliminary__rate select { border-color: rgb(255 255 255 / 10%); background-color: rgb(0 0 0 / 20%); color: rgb(255 255 255 / 85%); }
+    body.pk-dark-scope .preliminary__error { border-color: rgb(255 201 74 / 30%); background: rgb(255 201 74 / 12%); }
+
+    /* ADR learning settings sheet (AdrLearningSettings.vue). */
+    body.pk-dark-scope .adr-settings { background: #302e2b; color: rgb(255 255 255 / 85%); box-shadow: none; }
+    body.pk-dark-scope .adr-settings::backdrop { background: rgb(0 0 0 / 60%); }
+    body.pk-dark-scope .adr-settings-section { border-color: rgb(255 255 255 / 10%); }
+    body.pk-dark-scope .adr-settings-radio { accent-color: #81b64c; color: #81b64c; }
+    body.pk-dark-scope .adr-settings-switch { background: rgb(255 255 255 / 20%); }
+    body.pk-dark-scope :is(.adr-settings-switch:checked, .adr-settings-switch:checked:hover, .adr-settings-switch:checked:focus) { background: #81b64c; }
+
+    /* "Przygotowujemy wynik" overlay (SessionCompletionPending.vue). */
+    body.pk-dark-scope .completion-pending { color: rgb(255 255 255 / 85%); }
+    body.pk-dark-scope .completion-pending::backdrop { background: rgb(48 46 43 / 85%); }
+    body.pk-dark-scope .completion-pending-ring { border-color: rgb(255 255 255 / 10%); border-top-color: #81b64c; }
 
     /* Header metrics of the exam-like session (scoped light boxes in Show.vue). */
     body.pk-dark-scope [data-session-header-metric] {
@@ -14003,4 +14062,242 @@ html.home-page-scaled .home-site-header.home-site-header--sitewide {
     .home-site-header--public .home-site-header__catalog--dropdown[open] > .home-site-header__dropdown {
         animation: home-menu-reveal 150ms ease-out;
     }
+}
+
+/*
+ * Dark mobile theme for the auth and purchase flow (login, registration, recovery, invitations,
+ * access activation, checkout, logout, app entry). These screens use their own CSS classes
+ * (auth-dialog, auth-recovery, home-site-header, site-footer), several with !important, so the
+ * overrides below come last and repeat !important where the originals use it.
+ */
+@media (max-width: 767px) {
+    body.pk-dark-scope {
+        --pk-page: #302e2b;
+        --pk-surface: rgb(0 0 0 / 20%);
+        --pk-line: rgb(255 255 255 / 10%);
+        --pk-text: rgb(255 255 255 / 85%);
+        --pk-text-2: rgb(255 255 255 / 72%);
+        --pk-text-3: rgb(255 255 255 / 50%);
+    }
+
+    /* Auth dialogs used as standalone login and registration pages. */
+    body.pk-dark-scope .auth-dialog {
+        --auth-accent: #81b64c;
+        --auth-accent-hover: #6fa13f;
+        --auth-accent-ring: rgb(129 182 76 / 35%);
+        --auth-accent-shadow: rgb(0 0 0 / 30%);
+        color: var(--pk-text);
+    }
+
+    body.pk-dark-scope :is(.auth-page--standalone, .auth-dialog-overlay, .auth-dialog-overlay--standalone, .auth-dialog-overlay--form-layer, .auth-dialog__panel, .auth-dialog-overlay--form-layer .auth-dialog__panel, .auth-dialog__trust, .auth-recovery-page) {
+        border-color: transparent !important;
+        background: var(--pk-page) !important;
+        box-shadow: none !important;
+    }
+
+    body.pk-dark-scope :is(.auth-dialog__visual, .auth-dialog > .auth-dialog__trust--illustration, .auth-recovery-shell__visual) {
+        background: var(--pk-surface) !important;
+        box-shadow: none !important;
+    }
+
+    body.pk-dark-scope :is(.auth-dialog__brand, .auth-dialog__brand-name, .auth-dialog__welcome h2, .auth-dialog__title, .auth-dialog .auth-dialog__title, .auth-recovery-shell__title, .auth-recovery-help__title) {
+        color: var(--pk-text) !important;
+    }
+
+    body.pk-dark-scope :is(.auth-dialog__welcome p, .auth-dialog__lead, .auth-dialog__footer p, .auth-dialog__footer .auth-dialog__legal-consent, .auth-dialog__legal-consent, .auth-dialog__divider, .auth-register-social > .flex, .auth-recovery-shell__lead, .auth-recovery-help__text, .auth-recovery-shell__footer p, .auth-recovery-shell__back) {
+        color: var(--pk-text-3) !important;
+    }
+
+    body.pk-dark-scope :is(.auth-dialog label, .auth-dialog .auth-register-section-label, .auth-dialog .auth-register-field-label, .auth-recovery-field-label) {
+        color: var(--pk-text-2) !important;
+    }
+
+    body.pk-dark-scope .auth-dialog__mode { color: var(--pk-text-3); }
+    body.pk-dark-scope .auth-dialog__mode.is-active { color: var(--pk-text) !important; }
+    body.pk-dark-scope .auth-dialog__modes { border-color: var(--pk-line); }
+
+    body.pk-dark-scope :is(.auth-dialog__divider::before, .auth-dialog__divider::after, .auth-recovery-shell__footer::before) {
+        background: var(--pk-line);
+    }
+
+    body.pk-dark-scope :is(.auth-dialog .auth-login-field, .auth-dialog .auth-register-field, .auth-dialog .auth-register-category-trigger, .auth-recovery-field) {
+        border: 1px solid var(--pk-line) !important;
+        background: var(--pk-surface) !important;
+        color: var(--pk-text) !important;
+        box-shadow: none !important;
+    }
+
+    body.pk-dark-scope :is(.auth-dialog .auth-login-field:focus, .auth-dialog .auth-register-field:focus, .auth-dialog .auth-register-category-trigger:focus, .auth-recovery-field:focus) {
+        border-color: #81b64c !important;
+        background: var(--pk-surface) !important;
+        box-shadow: 0 0 0 3px rgb(129 182 76 / 25%) !important;
+    }
+
+    body.pk-dark-scope :is(.auth-dialog .auth-login-field, .auth-dialog .auth-register-field, .auth-recovery-field)::placeholder {
+        color: var(--pk-text-3) !important;
+    }
+
+    body.pk-dark-scope .auth-dialog :is(.auth-login-field, .auth-register-field):autofill {
+        -webkit-text-fill-color: var(--pk-text);
+        box-shadow: 0 0 0 1000px #262421 inset !important;
+    }
+
+    body.pk-dark-scope :is(.auth-login-field-icon, .auth-recovery-field-icon, .auth-recovery-field-action) {
+        color: var(--pk-text-3);
+    }
+
+    body.pk-dark-scope .auth-dialog .auth-register-category-trigger + div {
+        border-color: var(--pk-line) !important;
+        background: #262421 !important;
+        color: var(--pk-text);
+    }
+
+    body.pk-dark-scope :is(.auth-dialog .auth-login-drawer-submit, .auth-dialog .auth-register-submit, .auth-recovery-submit) {
+        border-color: transparent !important;
+        border-radius: 10px !important;
+        background: linear-gradient(#81b64c, #5d9948) !important;
+        color: #fff !important;
+        box-shadow: inset 0 1px 0 rgb(178 224 104 / 40%), inset 0 -1px 0 #45753c, 0 2px 4px rgb(0 0 0 / 20%) !important;
+    }
+
+    body.pk-dark-scope :is(.auth-dialog .auth-google-login-button, .auth-dialog .auth-login-drawer-social-button, .auth-dialog .auth-register-social-button) {
+        border-color: transparent !important;
+        border-radius: 10px;
+        background: linear-gradient(rgb(255 255 255 / 10%), rgb(255 255 255 / 5%)) !important;
+        color: var(--pk-text) !important;
+        box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%), 0 1px 2px rgb(0 0 0 / 14%) !important;
+    }
+
+    body.pk-dark-scope .auth-dialog__close {
+        border-color: transparent;
+        background: rgb(255 255 255 / 10%);
+        color: var(--pk-text);
+        box-shadow: none;
+    }
+
+    body.pk-dark-scope :is(.auth-dialog a, .auth-dialog__footer a, .auth-dialog__footer button, .auth-dialog__legal-consent a, .auth-recovery-shell__footer a, .auth-recovery-shell__eyebrow) {
+        color: #81b64c !important;
+        text-decoration-color: rgb(129 182 76 / 40%) !important;
+    }
+
+    /* Recovery, reset, invitation code and verification shells. */
+    body.pk-dark-scope .auth-recovery-shell__panel {
+        border-color: transparent !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    body.pk-dark-scope .auth-recovery-help {
+        border-color: transparent;
+        border-radius: 5px;
+        background: var(--pk-surface);
+    }
+
+    body.pk-dark-scope .auth-recovery-notice {
+        border-color: rgb(129 182 76 / 35%);
+        background: rgb(129 182 76 / 15%);
+        color: #81b64c;
+    }
+
+    /* Public header on these screens. */
+    body.pk-dark-scope :is(.home-site-header, .home-site-header--public-page, .home-site-header.auth-page-header, .home-site-header.is-compact, .home-site-header.home-site-header--sitewide) {
+        border-color: var(--pk-line) !important;
+        background: var(--pk-page) !important;
+        color: var(--pk-text);
+        box-shadow: none !important;
+    }
+
+    body.pk-dark-scope .home-site-header.home-site-header--sitewide .home-site-header__shell {
+        border-color: var(--pk-line) !important;
+        background: #262421 !important;
+        box-shadow: none !important;
+    }
+
+    body.pk-dark-scope :is(.home-site-header__brand, .home-site-header__brand strong, .home-site-header__back, .home-site-header__back-label, .home-site-header__account, .home-site-header--sitewide .home-site-header__account, .home-site-header__launcher > summary, .home-site-header__mobile-menu > summary, .home-site-header--sitewide .home-site-header__launcher > summary, .home-site-header__launcher-icon) {
+        color: var(--pk-text) !important;
+    }
+
+    body.pk-dark-scope :is(.home-site-header__launcher > summary, .home-site-header__mobile-menu > summary):is(:hover, :focus-visible) {
+        background: rgb(255 255 255 / 10%);
+    }
+
+    body.pk-dark-scope :is(.home-site-header__mobile-panel, .home-site-header__launcher-panel) {
+        border-color: var(--pk-line) !important;
+        background: #262421 !important;
+        box-shadow: 0 18px 35px rgb(0 0 0 / 45%) !important;
+    }
+
+    body.pk-dark-scope :is(.home-site-header__mobile-panel nav a, .home-site-header__mobile-catalog > summary, .home-site-header__launcher-panel a, .home-site-header__launcher-panel button, .home-site-header__launcher-panel a svg, .home-site-header__launcher-panel button svg, .home-site-header__dropdown a[aria-current='page'], .home-site-header__mobile-panel nav a[aria-current='page']) {
+        color: var(--pk-text) !important;
+    }
+
+    body.pk-dark-scope .home-site-header__mobile-panel > div :is(a, button) {
+        border-color: transparent !important;
+        border-radius: 10px;
+        background: linear-gradient(rgb(255 255 255 / 10%), rgb(255 255 255 / 5%)) !important;
+        color: var(--pk-text) !important;
+    }
+
+    body.pk-dark-scope .home-site-header__mobile-panel > div a:last-child {
+        background: linear-gradient(#81b64c, #5d9948) !important;
+        color: #fff !important;
+    }
+
+    body.pk-dark-scope .home-site-header .home-site-header__shell,
+    body.pk-dark-scope .public-status-page__navigation.home-site-header .home-site-header__shell {
+        border-color: var(--pk-line) !important;
+        background: #262421 !important;
+        box-shadow: none !important;
+    }
+
+    /* Status pages (access activation, e-mail verification) and notices. */
+    body.pk-dark-scope :is(.public-status-page, .public-status-page__navigation.home-site-header) {
+        border-color: var(--pk-line);
+        background: var(--pk-page);
+        color: var(--pk-text);
+    }
+
+    body.pk-dark-scope .public-status-page__icon { border-color: transparent; background: rgb(129 182 76 / 15%); color: #81b64c; }
+    body.pk-dark-scope .public-status-page__icon--warning { background: rgb(255 201 74 / 12%); color: #ffc94a; }
+    body.pk-dark-scope .public-status-page__title { color: var(--pk-text); }
+    body.pk-dark-scope .public-status-page__lead { color: var(--pk-text-3); }
+
+    body.pk-dark-scope .site-status-action {
+        border-color: transparent;
+        border-radius: 10px;
+        background: linear-gradient(#81b64c, #5d9948);
+        color: #fff;
+        box-shadow: inset 0 1px 0 rgb(178 224 104 / 40%), inset 0 -1px 0 #45753c, 0 2px 4px rgb(0 0 0 / 20%);
+    }
+
+    body.pk-dark-scope .site-status-action--secondary {
+        background: linear-gradient(rgb(255 255 255 / 10%), rgb(255 255 255 / 5%));
+        color: var(--pk-text);
+        box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%), 0 1px 2px rgb(0 0 0 / 14%);
+    }
+
+    body.pk-dark-scope .site-notice { border-color: var(--pk-line); background: var(--pk-surface); color: var(--pk-text-2); }
+    body.pk-dark-scope .site-notice strong { color: var(--pk-text); }
+    body.pk-dark-scope .site-notice--success { --notice-accent: #81b64c; }
+    body.pk-dark-scope .site-notice--warning { --notice-accent: #ffc94a; }
+    body.pk-dark-scope .site-notice--error { --notice-accent: #ff8a8a; }
+
+    /* Public footer on these screens. */
+    body.pk-dark-scope :is(.site-footer, .site-footer__network-row, .site-footer__legal-row) {
+        border-color: var(--pk-line) !important;
+        background: var(--pk-page) !important;
+        color: var(--pk-text-2) !important;
+    }
+
+    body.pk-dark-scope :is(.site-footer__brand-lockup, .site-footer__brand-lockup strong, .site-footer__brand-name, .site-footer__email a, .site-footer__group h2, .site-footer__join > strong, .site-footer__apps > strong, .site-footer .site-footer__socials a, .site-footer__compact-brand) {
+        color: var(--pk-text) !important;
+    }
+
+    body.pk-dark-scope :is(.site-footer__description, .site-footer__email, .site-footer__group a, .site-footer__brand-lockup small, .site-footer .site-footer__bottom-bar, .site-footer__bottom-bar a, .site-footer__toggle-icon, .site-footer__compact-copy, .site-footer__compact-nav a, .site-footer__row--secondary, .site-footer__language, .site-footer__store-badge small) {
+        color: var(--pk-text-3) !important;
+    }
+
+    body.pk-dark-scope .site-footer__network-divider { background: var(--pk-line); }
+    body.pk-dark-scope .site-footer__store-badge { border-color: rgb(255 255 255 / 30%); color: var(--pk-text); }
+    body.pk-dark-scope .site-footer :is(details, section, div, nav, .site-footer__group) { border-color: var(--pk-line); }
 }

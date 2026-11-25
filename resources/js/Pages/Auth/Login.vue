@@ -4,6 +4,9 @@ import RegisterDrawer from '@/Components/Auth/RegisterDrawer.vue';
 import type { PageProps } from '@/types';
 import { Head, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
+import { useMobileDarkScope } from '@/composables/useMobileDarkScope';
+
+useMobileDarkScope();
 
 defineProps<{
     canResetPassword?: boolean;

@@ -2,6 +2,9 @@
 import SiteFooter from '@/Components/SiteFooter.vue';
 import PublicTopNavigation from '@/Components/PublicTopNavigation.vue';
 import ScrollToTop from '@/Components/ScrollToTop.vue';
+import { useMobileDarkScope } from '@/composables/useMobileDarkScope';
+
+useMobileDarkScope();
 
 withDefaults(
     defineProps<{
