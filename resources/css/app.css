@@ -8049,6 +8049,17 @@ body:has([data-auth-dialog-open='true'], [data-auth-login-open='true'], [data-au
         color: #302e2b;
     }
 
+    /* Green and red hints inside questions and explanations ([green]/[red] markup, inline colour). */
+    .pk-dark-scope [data-inline-color='success'],
+    .pk-dark-scope .full-explanation-prose span[style='color:#163222;'] {
+        color: #81b64c !important;
+    }
+
+    .pk-dark-scope [data-inline-color='danger'],
+    .pk-dark-scope .full-explanation-prose span[style='color:#612d2d;'] {
+        color: #ff8a8a !important;
+    }
+
     /* Full explanation dialog (FullStudyExplanationPanel.vue keeps light scoped styles for desktop). */
     body.pk-dark-scope .full-explanation-overlay { background:rgb(0 0 0 / .6); }
     body.pk-dark-scope .full-explanation-panel { color:rgb(255 255 255 / .85); background:#302e2b; border-color:rgb(255 255 255 / .1); box-shadow:0 20px 60px rgb(0 0 0 / .5); }

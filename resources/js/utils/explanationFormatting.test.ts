@@ -22,7 +22,7 @@ describe('explanationFormatting', () => {
             enableColors: true,
         });
 
-        expect(rendered).toBe('<span style="color:#163222;"><strong>tekst</strong></span>');
+        expect(rendered).toBe('<span data-inline-color="success" style="color:#163222;"><strong>tekst</strong></span>');
     });
 
     it('renders a training question without leaking markers or applying their colors and bold text', () => {
@@ -47,7 +47,7 @@ describe('explanationFormatting', () => {
             enableColors: true,
         });
 
-        expect(rendered).toBe('<span style="color:#163222;">tekst</span>');
+        expect(rendered).toBe('<span data-inline-color="success" style="color:#163222;">tekst</span>');
     });
 
     it('strips both marker types when both toggles are disabled', () => {
@@ -68,8 +68,8 @@ describe('explanationFormatting', () => {
             palette: 'zen',
         });
 
-        expect(classic).toBe('<span style="color:#612d2d;">blad</span>');
-        expect(zen).toBe('<span style="color:#4e2727;">blad</span>');
+        expect(classic).toBe('<span data-inline-color="danger" style="color:#612d2d;">blad</span>');
+        expect(zen).toBe('<span data-inline-color="danger" style="color:#4e2727;">blad</span>');
     });
 
     it('keeps paragraph rendering while respecting formatting toggles', () => {
@@ -168,5 +168,54 @@ describe('explanationFormatting', () => {
         );
 
         expect(rendered.match(/explanation-inline-sign/g)).toHaveLength(1);
+    });
+});
+
+describe('repeated sign thumbnails in full study explanations', () => {
+    it('adds an image to every code while preserving the code in paragraphs and bold text', () => {
+        const html = '<p>C-12 oraz C-12.</p><p><strong>C-12</strong> i c-12.</p>';
+        const rendered = injectExplanationSignImages(html, [
+            { code: 'C-12', image_url: '/signs/c12.svg', placement: 'after_each' },
+        ]);
+        expect(rendered.match(/<img /g)).toHaveLength(4);
+        expect(rendered.replace(/<[^>]+>/g, '')).toBe('C-12 oraz C-12.C-12 i c-12.');
+        expect(rendered).toContain('<strong>C-12<img ');
+    });
+
+    it('handles every provided sign and overlapping codes without matching larger codes or words', () => {
+        const html = '<p>A-1 A-1 A-10 A-10 B-20 B-20 D-9 D-9 C-12 C-12 C-120 XC-12 C-12a.</p>';
+        const rendered = injectExplanationSignImages(html, ['A-1', 'A-10', 'B-20', 'D-9', 'C-12'].map(code => ({
+            code, image_url: '/signs/' + code + '.svg', placement: 'after_each' as const,
+        })));
+        expect(rendered.match(/<img /g)).toHaveLength(10);
+        expect(rendered).toContain('C-120 XC-12 C-12a.');
+    });
+
+    it('does not modify attributes or recursively decorate inserted image metadata', () => {
+        const rendered = injectExplanationSignImages('<p title="C-12">C-12 C-12</p>', [
+            { code: 'C-12', image_url: '/C-12.svg', alt_text: 'Znak C-12', placement: 'after_each' },
+        ]);
+        expect(rendered).toContain('title="C-12"');
+        expect(rendered.match(/<img /g)).toHaveLength(2);
+        expect(rendered.match(/alt="Znak C-12"/g)).toHaveLength(2);
+    });
+
+    it('keeps missing graphics as text and escapes image attributes', () => {
+        const rendered = injectExplanationSignImages('<p>D-9 C-12 C-12</p>', [
+            { code: 'D-9', image_url: '', placement: 'after_each' },
+            { code: 'C-12', image_url: '/sign.svg?label="C-12"', alt_text: 'C-12 "znak"', placement: 'after_each' },
+        ]);
+        expect(rendered).toContain('<p>D-9 C-12<img ');
+        expect(rendered).toContain('src="/sign.svg?label=&quot;C-12&quot;"');
+        expect(rendered.match(/<img /g)).toHaveLength(2);
+    });
+
+    it('keeps manual single-anchor additions unchanged alongside repeated sign codes', () => {
+        const rendered = injectExplanationSignImages('<p>Uwaga. C-12. Uwaga. C-12.</p>', [
+            { code: 'B-20', match_text: 'Uwaga', image_url: '/stop.svg', placement: 'after' },
+            { code: 'C-12', image_url: '/roundabout.svg', placement: 'after_each' },
+        ]);
+        expect(rendered.split('src="/stop.svg"')).toHaveLength(2);
+        expect(rendered.split('src="/roundabout.svg"')).toHaveLength(3);
     });
 });

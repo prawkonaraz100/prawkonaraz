@@ -62,6 +62,7 @@ const resolveInlineFormattingColorPalette = (
     INLINE_FORMATTING_COLOR_PALETTES[palette ?? 'classic']
     ?? INLINE_FORMATTING_COLOR_PALETTES.classic;
 
+// data-inline-color lets the dark mobile theme (app.css) recolour hints to its own green and red.
 const applyColorMarkup = (
     value: string,
     palette: InlineFormattingPalette | undefined,
@@ -71,11 +72,11 @@ const applyColorMarkup = (
     return value
         .replace(
             colorSuccessMarkupPattern,
-            `<span style="color:${colors.successText};">$1</span>`,
+            `<span data-inline-color="success" style="color:${colors.successText};">$1</span>`,
         )
         .replace(
             colorDangerMarkupPattern,
-            `<span style="color:${colors.dangerText};">$1</span>`,
+            `<span data-inline-color="danger" style="color:${colors.dangerText};">$1</span>`,
         );
 };
 
