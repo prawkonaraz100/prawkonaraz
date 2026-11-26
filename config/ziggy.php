@@ -63,6 +63,7 @@ return [
             'streak-challenge.state',
             'streak-challenge.start',
             'streak-challenge.answer',
+            'streak-challenge.leave',
             'questions.index',
             'study-sessions.store',
             'study-sessions.full-explanation',

@@ -60,6 +60,7 @@ class HandleInertiaRequests extends Middleware
             'streak-challenge.state',
             'streak-challenge.start',
             'streak-challenge.answer',
+            'streak-challenge.leave',
             'study-sessions.current.questions.index',
             'study-sessions.current.questions.show',
             'study-sessions.current.answers.store',

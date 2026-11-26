@@ -176,6 +176,12 @@ const request = async <T>(
 };
 
 export const apiClient = {
+    postOnPageExit: (url: string) => fetch(url, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: buildJsonHeaders(false),
+        keepalive: true,
+    }),
     get: <T>(url: string, options: RequestOptions = {}) =>
         request<T>(url, 'GET', options),
     post: <T>(url: string, body?: unknown, options: RequestOptions = {}) =>

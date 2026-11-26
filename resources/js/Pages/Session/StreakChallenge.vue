@@ -116,6 +116,8 @@ const initials = computed(() => user.value?.avatar_initials || firstName.value.c
 const overview = ref<Overview>(props.initialStreak);
 const recordBeforeRun = ref(props.initialStreak.personal_best);
 const screen = ref<'landing' | 'play' | 'result'>('landing');
+let openedRunId: number | null = null;
+let exitVersion = 0;
 const lastResult = ref<AnswerResult | null>(null);
 const mobileResultExplanation = computed(() => streakResultExplanationBody(lastResult.value?.explanation));
 const submitting = ref(false);
@@ -163,9 +165,12 @@ onMounted(() => {
     try { audioPreferences.value = readStreakAudioPreferences(window.localStorage.getItem(audioStorageKey.value)); } catch { /* Storage may be unavailable. */ }
     try { videoPreferences.value = readStreakVideoPreferences(window.localStorage.getItem(videoStorageKey.value)); } catch { /* Storage may be unavailable. */ }
     document.addEventListener('visibilitychange', stopAudioWhenHidden);
+    window.addEventListener('pagehide', leaveRun);
 });
 const stopAudioWhenHidden = () => { if (document.hidden) { stopQuestionAudio(); pauseMobileVideos(); pauseDesktopVideos(); } };
 onBeforeUnmount(() => {
+    leaveRun();
+    window.removeEventListener('pagehide', leaveRun);
     stopQuestionAudio();
     pauseMobileVideos();
     pauseDesktopVideos();
@@ -184,7 +189,6 @@ watch([screen, () => currentQuestion.value?.id, mobileViewport], () => {
 }, { flush: 'sync' });
 
 const currentQuestionPromptHtml = computed(() => renderExamPromptHtml(currentQuestion.value?.prompt));
-const canResume = computed(() => activeRun.value?.status === 'in_progress' && Boolean(currentQuestion.value));
 const recordDelta = computed(() => lastResult.value ? Math.max(lastResult.value.score - recordBeforeRun.value, 0) : 0);
 // The player's own row pinned under the leaderboard when the record is outside the top 20.
 const myStreakStanding = computed<StreakLeader | null>(() => {
@@ -358,13 +362,24 @@ const describeError = (error: unknown): string => {
     return 'Nie udało się połączyć z serwerem. Sprawdź połączenie i spróbuj ponownie.';
 };
 
+const closeRun = (runId: number) => {
+    void apiClient.postOnPageExit(route('streak-challenge.leave', { streakRun: runId })).catch(() => {});
+};
+
+const leaveRun = () => {
+    exitVersion++;
+    if (openedRunId === null) return;
+    const runId = openedRunId;
+    openedRunId = null;
+    pendingAnswer.value = null;
+    errorMessage.value = null;
+    overview.value = { ...overview.value, active_run: null };
+    screen.value = 'landing';
+    closeRun(runId);
+};
+
 const startRun = async () => {
     if (submitting.value || pendingAnswer.value) {
-        return;
-    }
-
-    if (canResume.value && !lastResult.value) {
-        screen.value = 'play';
         return;
     }
 
@@ -375,9 +390,17 @@ const startRun = async () => {
     recordBeforeRun.value = overview.value.personal_best;
 
     try {
-        overview.value = await apiClient.post<Overview>(route('streak-challenge.start'), {
+        const startedAtExitVersion = exitVersion;
+        const started = await apiClient.post<Overview>(route('streak-challenge.start'), {
             category_id: props.category.id,
         });
+        if (!started.active_run) return;
+        if (exitVersion !== startedAtExitVersion) {
+            closeRun(started.active_run.id);
+            return;
+        }
+        overview.value = started;
+        openedRunId = started.active_run.id;
         lastResult.value = null;
         screen.value = 'play';
     } catch (error) {
@@ -414,6 +437,7 @@ const submitPendingAnswer = async () => {
             route('streak-challenge.answer', { streakRun: request.runId }),
             request.body,
         );
+        if (openedRunId !== request.runId) return;
         pendingAnswer.value = null;
 
         answerFeedback.value = result.is_correct ? 'correct' : 'incorrect';
@@ -421,7 +445,9 @@ const submitPendingAnswer = async () => {
         const feedbackDuration = result.is_correct ? 200 : 400;
         await new Promise<void>((resolve) => window.setTimeout(resolve, feedbackDuration));
 
+        if (openedRunId !== request.runId) return;
         if (result.finished) {
+            openedRunId = null;
             lastResult.value = result;
             overview.value = result.overview ?? {
                 ...overview.value,
@@ -434,18 +460,10 @@ const submitPendingAnswer = async () => {
             overview.value = { ...overview.value, active_run: result.run };
         }
     } catch (error) {
+        if (openedRunId !== request.runId) return;
         if (isApiClientError(error) && error.status === 409) {
-            // Another tab may have advanced/replaced this run. Do not guess its
-            // outcome or start another run: reconcile with the user's live state.
-            try {
-                overview.value = await apiClient.get<Overview>(route('streak-challenge.state', { category_id: props.category.id }), { timeoutMs: 15_000 });
-                pendingAnswer.value = null;
-                lastResult.value = null;
-                screen.value = 'landing';
-                errorMessage.value = 'Stan serii zmienił się. Możesz kontynuować aktualną serię lub rozpocząć nową.';
-            } catch {
-                errorMessage.value = 'Nie udało się potwierdzić stanu serii. Sprawdź połączenie i ponów zapis.';
-            }
+            leaveRun();
+            errorMessage.value = 'Ta seria już się skończyła. Rozpocznij nową próbę.';
         } else {
             if (!isUncertainStreakAnswerFailure(error)) pendingAnswer.value = null;
             errorMessage.value = pendingAnswer.value
@@ -499,11 +517,10 @@ const submitPendingAnswer = async () => {
                                 <div><p class="text-sm text-[#71809b]">Twój rekord</p><p class="mt-0.5 text-sm text-[#53698b]"><strong class="mr-1 text-2xl font-bold leading-none text-[#071b45]">{{ overview.personal_best }}</strong> poprawnych z rzędu</p></div>
                             </div>
                             <button type="button" :disabled="submitting || overview.question_count === 0" class="group mt-7 inline-flex min-h-14 w-full max-w-[20rem] items-center justify-between gap-4 rounded-xl bg-[linear-gradient(135deg,#ffdb77,#ffc644)] py-2 pl-5 pr-2 text-base font-bold text-[#071b45] transition hover:brightness-[1.025] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#a87412] disabled:cursor-not-allowed disabled:opacity-60" @click="startRun">
-                                <span>{{ submitting ? 'Uruchamianie...' : canResume ? 'Kontynuuj serię' : 'Zaczynamy' }}</span>
+                                <span>{{ submitting ? 'Uruchamianie...' : 'Zaczynamy' }}</span>
                                 <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#fff7e7]" aria-hidden="true"><ArrowRight :size="20" :stroke-width="2" /></span>
                             </button>
-                            <p v-if="canResume" class="mt-3 text-xs text-[#71809b]">Masz rozpoczętą serię. Wrócisz do bieżącego pytania.</p>
-                            <p v-else-if="overview.question_count === 0" class="mt-3 text-sm text-[#71809b]">W tej kategorii nie ma teraz pytań do treningu.</p>
+                            <p v-if="overview.question_count === 0" class="mt-3 text-sm text-[#71809b]">W tej kategorii nie ma teraz pytań do treningu.</p>
                         </div>
                     </section>
                     <section class="rounded-2xl border border-[#dfe5ec] bg-white p-5" aria-labelledby="streak-desktop-progress-title">
@@ -557,10 +574,9 @@ const submitPendingAnswer = async () => {
                     @click="startRun"
                 >
                     <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z" /></svg>
-                    {{ submitting ? 'Uruchamianie...' : canResume ? 'Kontynuuj serię' : 'Zaczynamy' }}
+                    {{ submitting ? 'Uruchamianie...' : 'Zaczynamy' }}
                 </button>
-                <p v-if="canResume" class="mt-2.5 text-center text-xs text-[#ffffffb8]">Masz rozpoczętą serię. Wrócisz do bieżącego pytania.</p>
-                <p v-else-if="overview.question_count === 0" class="mt-2.5 text-center text-sm text-[#ffffffb8]">W tej kategorii nie ma teraz pytań do treningu.</p>
+                <p v-if="overview.question_count === 0" class="mt-2.5 text-center text-sm text-[#ffffffb8]">W tej kategorii nie ma teraz pytań do treningu.</p>
 
                 <section class="mt-6" aria-labelledby="streak-mobile-ranking-title">
                     <MobileStreakLeaderboard
@@ -600,7 +616,7 @@ const submitPendingAnswer = async () => {
                                 <span class="truncate text-xs text-[#ffffff80]">z rzędu · rekord {{ overview.personal_best }}</span>
                             </p>
                             <button type="button" class="pk-btn-secondary grid h-10 w-10 shrink-0 place-items-center" aria-label="Ustawienia treningu" aria-haspopup="dialog" :aria-expanded="audioSettingsOpen" @click="openAudioSettings"><Settings :size="18" aria-hidden="true" /></button>
-                            <button type="button" class="pk-btn-secondary min-h-10 shrink-0 px-3.5 text-sm font-semibold" @click="screen = 'landing'">Wyjdź</button>
+                            <button type="button" class="pk-btn-secondary min-h-10 shrink-0 px-3.5 text-sm font-semibold" @click="leaveRun">Wyjdź</button>
                         </div>
                         <div class="mt-2.5 h-1 overflow-hidden rounded-full bg-[#ffffff1a]" role="progressbar" :aria-valuenow="Math.min(activeRun?.score ?? 0, streakProgressGoal)" aria-valuemin="0" :aria-valuemax="streakProgressGoal" aria-label="Postęp serii względem rekordu">
                             <span class="block h-full rounded-full bg-[#81b64c] transition-all" :style="{ width: `${streakProgressPercent}%` }" />
@@ -684,7 +700,7 @@ const submitPendingAnswer = async () => {
                         <p class="text-xs font-semibold uppercase tracking-[0.12em] text-[#71809b]">Seria bez błędu · Kategoria {{ category.code }}</p>
                         <h1 class="mt-1 text-2xl font-bold tracking-tight">Trening bez błędu</h1>
                     </div>
-                    <button type="button" class="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl border border-[#dfe5ec] bg-white px-4 text-sm font-semibold text-[#53698b] transition hover:bg-[#f7f9fc] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0876f8]" @click="screen = 'landing'"><ArrowLeft :size="17" aria-hidden="true" /> Wróć do treningu</button>
+                    <button type="button" class="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl border border-[#dfe5ec] bg-white px-4 text-sm font-semibold text-[#53698b] transition hover:bg-[#f7f9fc] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0876f8]" @click="leaveRun"><ArrowLeft :size="17" aria-hidden="true" /> Wróć do treningu</button>
                 </div>
                 <div class="mt-5 grid grid-cols-3 gap-3" aria-label="Wynik bieżącej serii">
                     <div class="rounded-xl border border-[#dfe5ec] bg-white px-4 py-3"><p class="text-xs text-[#71809b]">Pytanie</p><strong class="mt-1 block text-xl tabular-nums">{{ (activeRun?.score ?? 0) + 1 }}</strong></div>

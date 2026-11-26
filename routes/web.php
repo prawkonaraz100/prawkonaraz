@@ -488,6 +488,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/nauka/seria/{streakRun}/odpowiedz', [StreakChallengeController::class, 'answer'])
             ->middleware('throttle:180,1')
             ->name('streak-challenge.answer');
+        Route::post('/nauka/seria/{streakRun}/wyjdz', [StreakChallengeController::class, 'leave'])
+            ->middleware('throttle:30,1')
+            ->name('streak-challenge.leave');
         Route::get('/nauka/ranking/oczekiwanie', [RankedSessionPageController::class, 'waiting'])
             ->name('session.ranking.waiting');
         Route::get('/nauka/ranking/mecz', [RankedSessionPageController::class, 'match'])

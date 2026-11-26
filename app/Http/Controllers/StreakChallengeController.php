@@ -8,6 +8,7 @@ use App\Support\StreakChallengeService;
 use App\Support\StudyContextService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 
 class StreakChallengeController extends Controller
@@ -51,6 +52,13 @@ class StreakChallengeController extends Controller
             (string) $validated['selected_answer'],
             $request->header('X-Streak-Answer-Response') === 'recoverable',
         ));
+    }
+
+    public function leave(Request $request, StreakRun $streakRun, StreakChallengeService $streakChallengeService): Response
+    {
+        $streakChallengeService->leave($request->user(), $streakRun);
+
+        return response()->noContent();
     }
 
     protected function category(Request $request, StudyContextService $studyContextService): LicenseCategory

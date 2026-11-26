@@ -15,6 +15,8 @@ use Illuminate\Validation\ValidationException;
 
 class StreakChallengeService
 {
+    private const INACTIVITY_SECONDS = 300;
+
     public function __construct(
         protected QuestionMediaPayloadBuilder $questionMediaPayloadBuilder,
         protected UserAvatarService $userAvatarService,
@@ -36,6 +38,7 @@ class StreakChallengeService
             ->where('user_id', $user->getKey())
             ->where('license_category_id', $category->getKey())
             ->where('status', StreakRun::STATUS_IN_PROGRESS)
+            ->where('updated_at', '>', now()->subSeconds(self::INACTIVITY_SECONDS))
             ->latest('id')
             ->first();
         $leaders = StreakRecord::query()
@@ -141,17 +144,37 @@ class StreakChallengeService
         return $this->overview($user, $category);
     }
 
+    public function leave(User $user, StreakRun $run): void
+    {
+        abort_unless($run->user_id === $user->getKey(), 404);
+        StreakRun::query()->whereKey($run->getKey())
+            ->where('status', StreakRun::STATUS_IN_PROGRESS)
+            ->update([
+                'status' => StreakRun::STATUS_ABANDONED,
+                'current_question_id' => null,
+                'finished_at' => now(),
+            ]);
+    }
+
     /**
      * @return array<string, mixed>
      */
     public function answer(User $user, StreakRun $run, int $questionId, string $selectedAnswer, bool $recoverable = false): array
     {
-        $result = DB::transaction(function () use ($user, $run, $questionId, $selectedAnswer, $recoverable): array {
+        $result = DB::transaction(function () use ($user, $run, $questionId, $selectedAnswer, $recoverable): ?array {
             User::query()->whereKey($user->getKey())->lockForUpdate()->firstOrFail();
             $lockedRun = StreakRun::query()
                 ->where('user_id', $user->getKey())
                 ->lockForUpdate()
                 ->findOrFail($run->getKey());
+
+            $answeredAt = now();
+            if ($lockedRun->status === StreakRun::STATUS_IN_PROGRESS
+                && $lockedRun->updated_at->lte($answeredAt->copy()->subSeconds(self::INACTIVITY_SECONDS))) {
+                $this->leave($user, $lockedRun);
+
+                return null;
+            }
 
             $selectedAnswer = Str::lower($selectedAnswer);
             if ($recoverable && $lockedRun->status !== StreakRun::STATUS_ABANDONED) {
@@ -192,7 +215,7 @@ class StreakChallengeService
                 'sequence' => $lockedRun->score + 1,
                 'selected_answer' => $selectedAnswer,
                 'is_correct' => $isCorrect,
-                'answered_at' => now(),
+                'answered_at' => $answeredAt,
             ]);
 
             $nextQuestion = null;
@@ -217,13 +240,15 @@ class StreakChallengeService
 
             $lockedRun->save();
 
-            if ($lockedRun->status !== StreakRun::STATUS_IN_PROGRESS) {
-                $this->saveBestResult($lockedRun);
+            $result = $this->answerResult($lockedRun, $question, $isCorrect, $nextQuestion);
+            if ($result['finished']) {
+                $this->saveBestResult($lockedRun, $result['run']['duration_seconds']);
             }
 
-            return $this->answerResult($lockedRun, $question, $isCorrect, $nextQuestion);
+            return $result;
         }, 3);
 
+        abort_if($result === null, 409, 'Seria wygasła po przerwie. Rozpocznij nową próbę.');
         if ($result['finished']) {
             $result['overview'] = $this->overview($user, $run->licenseCategory);
         }
@@ -238,7 +263,7 @@ class StreakChallengeService
             'is_correct' => $isCorrect,
             'finished' => $run->status !== StreakRun::STATUS_IN_PROGRESS,
             'score' => $run->score,
-            'run' => $this->runPayload($run, $nextQuestion),
+            'run' => $this->runPayload($run, $nextQuestion, $this->runDuration($run)),
             'correct_answer' => $isCorrect ? null : Str::upper((string) $question->correct_answer),
             'explanation' => $isCorrect ? null : $question->explanation,
             'explanation_sign_references' => $isCorrect
@@ -281,7 +306,7 @@ class StreakChallengeService
             ->first();
     }
 
-    protected function saveBestResult(StreakRun $run): void
+    protected function saveBestResult(StreakRun $run, ?int $duration): void
     {
         $record = StreakRecord::query()
             ->where('user_id', $run->user_id)
@@ -289,7 +314,6 @@ class StreakChallengeService
             ->lockForUpdate()
             ->firstOrFail();
 
-        $duration = $this->runDuration($run);
         if ($run->score > $record->best_score || ($run->score > 0 && $run->score === $record->best_score
             && $duration !== null && ($record->best_duration_seconds === null || $duration < $record->best_duration_seconds))) {
             $record->update([
@@ -341,13 +365,13 @@ class StreakChallengeService
     /**
      * @return array<string, mixed>
      */
-    protected function runPayload(StreakRun $run, ?Question $question): array
+    protected function runPayload(StreakRun $run, ?Question $question, ?int $duration = null): array
     {
         return [
             'id' => $run->getKey(),
             'status' => $run->status,
             'score' => $run->score,
-            'duration_seconds' => $this->runDuration($run),
+            'duration_seconds' => $duration,
             'question' => $question ? $this->questionPayload($question) : null,
         ];
     }
