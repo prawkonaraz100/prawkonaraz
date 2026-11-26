@@ -69,7 +69,7 @@ defineExpose({ selectCourseByCode });
     >
         <template v-if="!selected">
             <p class="text-xs font-semibold uppercase tracking-wider" :class="dark ? 'text-[#ffc94a]' : 'text-[#946115]'">Kursy zawodowe</p>
-            <button v-for="course in courses" :key="course.id" type="button" class="mt-2 flex min-h-12 w-full items-center justify-between gap-3 rounded-xl p-3 text-left text-sm font-bold" :class="dark ? 'pk-tile' : 'bg-[#fff4d9] text-[#071b45]'" @click="selectCourse(course)"><span>{{ course.name }}</span><span aria-hidden="true">→</span></button>
+            <button v-for="course in courses" :key="course.id" type="button" class="mt-2 flex min-h-12 w-full items-center justify-between gap-3 rounded-xl p-3 text-left text-sm font-bold" :class="dark ? 'pk-tile' : 'bg-[#fff4d9] text-[#071b45]'" @click="selectCourse(course)"><span>{{ course.name }}</span></button>
         </template>
         <template v-else>
             <ProfessionalCourseOverview :course="selected" :dark="dark">
@@ -77,7 +77,7 @@ defineExpose({ selectCourseByCode });
                     <MobileBackButton v-if="dark" label="Wróć do działów" @click="selectCourse(null)" />
                     <button v-else type="button" class="mb-2 min-h-11 text-sm font-semibold text-[#53698b]" @click="selectCourse(null)">← Wróć do panelu</button>
                 </template>
-                <a v-if="activeSession?.resume_url && activeSession.collection_code === selected.code" :href="activeSession.resume_url" class="mt-3 inline-flex min-h-11 items-center text-sm font-semibold underline" :class="dark ? 'text-[#81b64c]' : 'text-[#071b45]'">Wznów bieżącą sesję →</a>
+                <a v-if="activeSession?.resume_url && activeSession.collection_code === selected.code" :href="activeSession.resume_url" class="mt-3 inline-flex min-h-11 items-center text-sm font-semibold underline" :class="dark ? 'text-[#81b64c]' : 'text-[#071b45]'">Wznów bieżącą sesję</a>
             </ProfessionalCourseOverview>
             <CourseModules :key="selected.id" compact :dark="dark" :modules="selected.modules" :chapters="selected.learning_parts_enabled" :active-session="activeSession ?? adrSessionToReplace" :review-count="selected.incorrect_questions.count" :review-url="selected.incorrect_questions.url">
                 <template #actions><QualificationProgressReset :key="selected.id" :reset="selected.progress_reset ?? null" :answered="selected.progress.answered_count" /></template>

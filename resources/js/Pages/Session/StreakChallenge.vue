@@ -746,7 +746,8 @@ const submitPendingAnswer = async () => {
                     </template>
                 </div>
                 <button type="button" class="mt-6 min-h-12 w-full rounded-xl bg-[#ffc644] px-5 font-bold disabled:opacity-60 max-md:rounded-[10px] max-md:bg-[linear-gradient(#81b64c,#5d9948)] max-md:text-white max-md:shadow-[inset_0_1px_0_rgba(178,224,104,0.4),inset_0_-1px_0_#45753c,0_2px_4px_rgba(0,0,0,0.2)] md:max-w-[22rem] md:bg-[linear-gradient(135deg,#ffdb77,#ffc644)] md:focus-visible:outline md:focus-visible:outline-2 md:focus-visible:outline-offset-4 md:focus-visible:outline-[#a87412]" :disabled="submitting" @click="startRun">
-                    {{ submitting ? 'Uruchamianie...' : 'Spróbuj ponownie →' }}
+                    {{ submitting ? 'Uruchamianie...' : 'Spróbuj ponownie' }}
+                    <span v-if="!submitting" class="hidden md:inline" aria-hidden="true"> →</span>
                 </button>
                 <button type="button" class="mt-2 min-h-11 w-full text-sm font-semibold text-[#5f6876] max-md:text-[#ffffffb8]" @click="screen = 'landing'">Zobacz ranking</button>
             </section>

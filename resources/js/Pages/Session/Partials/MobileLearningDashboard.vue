@@ -801,7 +801,7 @@ onUnmounted(() => {
                 <div class="flex items-center justify-between gap-3">
                     <h2 id="mobile-popular-title" class="text-[1.0625rem] font-bold text-[#ffffffd9]">Kontynuuj działy</h2>
                     <button type="button" class="inline-flex min-h-11 items-center text-sm font-semibold text-[#ffffffb8] hover:text-[#ffffffd9] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffffffd9]" @click="openTopicsShortcut">
-                        Wszystkie {{ carouselTopics.length }} <span class="ml-1" aria-hidden="true">›</span>
+                        Wszystkie {{ carouselTopics.length }}
                     </button>
                 </div>
                 <MobileTopicCarousel
@@ -854,7 +854,7 @@ onUnmounted(() => {
                     label="Najlepsze serie"
                 />
                 <Link :href="trainingHref" class="pk-btn-secondary mt-2.5 flex min-h-11 items-center justify-center text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffffffd9]">
-                    Pełny ranking <span class="ml-1" aria-hidden="true">›</span>
+                    Pełny ranking
                 </Link>
             </section>
 
@@ -1153,7 +1153,6 @@ onUnmounted(() => {
                                     <span class="whitespace-nowrap text-center text-[1.02rem] font-bold leading-none tracking-[-0.02em]">
                                         Zobacz pełny ranking
                                     </span>
-                                    <span class="text-2xl font-light leading-none" aria-hidden="true">›</span>
                                 </Link>
                             </div>
 
@@ -1189,7 +1188,6 @@ onUnmounted(() => {
                                 :disabled="setupStartDisabled"
                             >
                                 <span>{{ setupStartLabel }}</span>
-                                <span class="text-lg font-light leading-none" aria-hidden="true">→</span>
                             </button>
                         </div>
 
@@ -1311,7 +1309,7 @@ onUnmounted(() => {
                                     class="mt-2 inline-flex min-h-11 items-center text-sm font-semibold text-[#0b5cff] underline-offset-4 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff]"
                                     @click="closeTopicPathPicker"
                                 >
-                                    Zmień ustawienia serii →
+                                    Zmień ustawienia serii
                                 </button>
                             </footer>
                             </section>

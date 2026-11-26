@@ -173,12 +173,12 @@ const startExam = () => {
                 </div>
             </section>
 
-            <Link v-if="activeExam" :href="activeExam.resume_url" class="exam-start__secondary mt-3 flex min-h-11 items-center justify-center rounded-xl bg-white px-4 text-sm font-semibold text-[#515d72] shadow-[0_8px_20px_rgba(30,40,55,0.04)] max-md:min-h-12 max-md:text-[0.9375rem]">Kontynuuj rozpoczęty egzamin →</Link>
+            <Link v-if="activeExam" :href="activeExam.resume_url" class="exam-start__secondary mt-3 flex min-h-11 items-center justify-center rounded-xl bg-white px-4 text-sm font-semibold text-[#515d72] shadow-[0_8px_20px_rgba(30,40,55,0.04)] max-md:min-h-12 max-md:text-[0.9375rem]">Kontynuuj rozpoczęty egzamin <span class="hidden md:inline md:ml-1" aria-hidden="true">→</span></Link>
 
             <p v-if="formError" role="alert" class="mt-4 rounded-xl bg-[#fff0ee] px-4 py-3 text-sm text-[#ab382c] max-md:bg-[#3a1f22] max-md:text-[#ffb4b4]">{{ formError }}</p>
-            <button type="button" class="exam-start__cta mt-1.5 flex min-h-[4.25rem] w-full items-center justify-center gap-3 rounded-[1.05rem] bg-gradient-to-r from-[#ffc13d] to-[#ffbd37] px-5 text-base font-bold text-[#101827] shadow-[0_10px_25px_rgba(224,158,32,0.14)] transition hover:brightness-[1.04] disabled:cursor-wait disabled:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#aa7114] focus-visible:ring-offset-2 max-md:mt-4 max-md:min-h-12 max-md:text-[1.0625rem] max-md:font-semibold max-md:text-white max-md:focus-visible:ring-white max-md:focus-visible:ring-offset-[#302e2b]" :disabled="form.processing" @click="startExam">
+            <button type="button" class="exam-start__cta mt-1.5 flex min-h-[4.25rem] w-full items-center justify-center gap-3 rounded-[1.05rem] bg-gradient-to-r from-[#ffc13d] to-[#ffbd37] px-5 text-base font-bold text-[#101827] shadow-[0_10px_25px_rgba(224,158,32,0.14)] transition hover:brightness-[1.04] disabled:cursor-wait disabled:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#aa7114] focus-visible:ring-offset-2 max-md:mt-4 max-md:min-h-14 max-md:text-[1.125rem] max-md:font-bold max-md:text-white max-md:focus-visible:ring-white max-md:focus-visible:ring-offset-[#302e2b]" :disabled="form.processing" @click="startExam">
                 {{ form.processing ? 'Uruchamianie egzaminu...' : 'Rozpocznij egzamin' }}
-                <span class="text-2xl font-normal leading-none" aria-hidden="true">→</span>
+                <span class="hidden md:inline text-2xl font-normal leading-none" aria-hidden="true">→</span>
             </button>
         </section>
     </AuthenticatedLayout>

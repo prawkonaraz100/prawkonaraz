@@ -173,7 +173,7 @@ const primaryMedia = (question: CourseQuestion) => question.media[0] ?? null;
                         :disabled="!hasQuestions || startForm.processing || removalProcessing"
                         @click="requestStart"
                     >
-                        {{ startForm.processing ? 'Uruchamianie...' : 'Powtórz pytania' }} <span v-if="!startForm.processing" aria-hidden="true">→</span>
+                        {{ startForm.processing ? 'Uruchamianie...' : 'Powtórz pytania' }} <span v-if="!startForm.processing" class="hidden md:inline" aria-hidden="true">→</span>
                     </button>
                 </header>
 
@@ -279,7 +279,8 @@ const primaryMedia = (question: CourseQuestion) => question.media[0] ?? null;
                                 Błędnie rozwiązane pytanie z modułu kursu pojawi się tutaj automatycznie.
                             </p>
                             <Link :href="collection.url" class="mt-5 inline-flex min-h-10 items-center font-semibold text-[#0b5cff] hover:text-[#0646bf]">
-                                Wróć do modułów →
+                                Wróć do modułów <span class="hidden md:inline md:ml-1" aria-hidden="true">→</span>
+
                             </Link>
                         </div>
 
