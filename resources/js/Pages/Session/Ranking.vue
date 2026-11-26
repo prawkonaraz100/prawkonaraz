@@ -2775,19 +2775,19 @@ const navigateToRankingScreen = (
     });
 };
 
-const primaryRankingActionLabel = computed(() => {
+const resolvePrimaryRankingActionLabel = (mobile: boolean) => {
     if (queueLeavePending.value) {
         return 'Wracamy do startu...';
     }
 
-    if (backendOverviewLoading.value) {
+    if (mobile && backendOverviewLoading.value) {
         return 'Wczytywanie...';
     }
 
     if (backendBusy.value) {
         return rankedOverview.value?.queue
             ? 'Anulowanie...'
-            : 'Szukamy przeciwnika...';
+            : (mobile ? 'Szukamy przeciwnika...' : 'Uruchamianie rankingu...');
     }
 
     if (rankedOverview.value?.queue?.status === 'server_full') {
@@ -2817,7 +2817,9 @@ const primaryRankingActionLabel = computed(() => {
     }
 
     return 'Szukaj przeciwnika';
-});
+};
+const primaryRankingActionLabel = computed(() => resolvePrimaryRankingActionLabel(false));
+const mobilePrimaryRankingActionLabel = computed(() => resolvePrimaryRankingActionLabel(true));
 
 const primaryRankingActionShowsSpinner = computed(() =>
     queueLeavePending.value
@@ -3858,7 +3860,7 @@ const backendTransportChipClass = computed(() => {
                     :disabled="backendBusy || !selectedCategory"
                     @click="handlePrimaryRankingAction"
                 >
-                    {{ primaryRankingActionLabel }}
+                    {{ mobilePrimaryRankingActionLabel }}
                 </button>
                 <button
                     v-if="replayLobbyActionVisible"
