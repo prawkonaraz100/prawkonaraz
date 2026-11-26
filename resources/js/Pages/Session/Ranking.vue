@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import MobileAppBar from '@/Components/MobileAppBar.vue';
 import MobileBackButton from '@/Components/MobileBackButton.vue';
+import MobileStreakLeaderboard from '@/Pages/Session/Partials/MobileStreakLeaderboard.vue';
+import type { StreakLeader } from '@/utils/streakDuration';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import SessionExpiredNotice from '@/Components/SessionExpiredNotice.vue';
 import { useSessionExpiry } from '@/composables/useSessionExpiry';
@@ -483,6 +485,40 @@ const leaderboardEntries = computed<LeaderboardEntry[]>(() => props.leaderboard 
 
 // Własne miejsce pokazujemy pod listą, bo „Najlepsi gracze” nie zawierają bieżącego gracza.
 const currentUserRankingEntry = computed<CurrentUserRanking | null>(() => props.currentUserRanking ?? null);
+
+// Telefon: ta sama tabela co w „Najlepszych w serii” (baner, odznaki #1-#3, podium, Twój wiersz pod listą).
+const toLeagueRow = (entry: LeaderboardEntry, isMe: boolean): StreakLeader => ({
+    position: entry.position,
+    name: entry.username,
+    score: entry.rating,
+    duration_seconds: null,
+    avatar_url: null,
+    initials: leaderboardAvatarLabel(entry.username),
+    is_me: isMe,
+});
+const mobileLeagueRows = computed<StreakLeader[]>(() => {
+    const me = currentUserRankingEntry.value;
+    const entries = leaderboardEntries.value;
+    // Older servers number opponents after removing the current player from the list.
+    const ranksOmitCurrentPlayer = me !== null && entries.some((entry) => entry.position === me.position);
+    const rows = entries.map((entry) => {
+        const row = toLeagueRow(entry, false);
+        if (ranksOmitCurrentPlayer && me && row.position >= me.position) row.position++;
+        return row;
+    });
+
+    if (me && me.position <= rows.length + 1) {
+        rows.push(toLeagueRow(me, true));
+    }
+
+    return rows.sort((first, second) => first.position - second.position).slice(0, 10);
+});
+const mobileLeagueMe = computed<StreakLeader | null>(() => {
+    const me = currentUserRankingEntry.value;
+
+    return me && !mobileLeagueRows.value.some((row) => row.is_me) ? toLeagueRow(me, true) : null;
+});
+
 const leaderboardUpdatedLabel = computed(() =>
     new Intl.DateTimeFormat('pl-PL', {
         day: 'numeric',
@@ -639,6 +675,7 @@ const waitingScreenExitPending = ref(false);
 const queueLeavePending = ref(false);
 const backendPongBusy = ref(false);
 const backendNowMs = ref(Date.now());
+const backendOverviewLoading = ref(false);
 const backendStreamState = ref<'unsupported' | 'connecting' | 'open' | 'error'>('unsupported');
 const backendLiveTransportKind = ref<RankedRealtimeTransportKind | 'polling' | 'none'>('none');
 let backendClockIntervalId: number | null = null;
@@ -963,6 +1000,7 @@ const fetchRankedOverview = async (
     if (sessionExpired.value) return;
     if (!options.silent) {
         backendBusy.value = true;
+        backendOverviewLoading.value = true;
     }
 
     backendError.value = null;
@@ -979,6 +1017,7 @@ const fetchRankedOverview = async (
     } finally {
         if (!options.silent) {
             backendBusy.value = false;
+            backendOverviewLoading.value = false;
         }
     }
 };
@@ -2741,10 +2780,14 @@ const primaryRankingActionLabel = computed(() => {
         return 'Wracamy do startu...';
     }
 
+    if (backendOverviewLoading.value) {
+        return 'Wczytywanie...';
+    }
+
     if (backendBusy.value) {
         return rankedOverview.value?.queue
             ? 'Anulowanie...'
-            : 'Uruchamianie rankingu...';
+            : 'Szukamy przeciwnika...';
     }
 
     if (rankedOverview.value?.queue?.status === 'server_full') {
@@ -3786,40 +3829,32 @@ const backendTransportChipClass = computed(() => {
         </template>
 
         <template v-else>
-        <section class="min-h-screen bg-[#302e2b] pb-[calc(5.5rem+env(safe-area-inset-bottom))] text-[#ffffffd9] md:hidden">
-            <header class="flex items-center gap-3 px-4 pb-5 pt-[max(env(safe-area-inset-top),1rem)]">
+        <section class="min-h-screen bg-[#302e2b] px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] text-[#ffffffd9] md:hidden">
+            <header class="flex items-center gap-3 pb-4 pt-[max(env(safe-area-inset-top),1rem)]">
                 <MobileBackButton :href="route('session.index')" label="Wróć do strony głównej" />
                 <div class="min-w-0">
-                    <p class="text-[0.78rem] font-semibold text-[#667085]">Pojedynek 1 na 1</p>
-                    <h1 class="mt-1 text-[1.72rem] font-bold leading-8 text-[#17191d]">Ranking</h1>
+                    <h1 class="text-[1.75rem] font-bold leading-[1.1] tracking-[-0.015em]">Ranking 1 na 1</h1>
+                    <p class="mt-0.5 truncate text-sm text-[#ffffffb8]">Kategoria {{ selectedCategory?.short_name ?? selectedCategory?.code ?? '—' }} · gra o punkty ELO</p>
                 </div>
             </header>
 
-            <section class="border-y border-[#dfe3e8] bg-white px-4 py-5" aria-labelledby="ranking-play-heading">
-                <p class="text-[0.76rem] font-semibold text-[#667085]">Następny mecz</p>
-                <h2 id="ranking-play-heading" class="mt-1 text-[1.25rem] font-bold leading-6 text-[#17191d]">
-                    Kategoria {{ selectedCategory?.short_name ?? selectedCategory?.code ?? '—' }} · {{ specSummary.total_questions }} pytań
-                </h2>
-                <p class="mt-2 text-[0.88rem] leading-5 text-[#667085]">
-                    Zagrasz z pierwszym wolnym graczem z kategorii {{ selectedCategory?.short_name ?? selectedCategory?.code ?? '—' }}.
-                </p>
-
-                <div class="mt-5 divide-x divide-[#e3e7eb] border-y border-[#e3e7eb]">
-                    <div class="grid grid-cols-2">
-                        <div class="px-0 py-3">
-                            <p class="text-[0.72rem] font-semibold text-[#667085]">Twoje ELO</p>
-                            <p class="mt-1 text-[1.35rem] font-bold tabular-nums text-[#17191d]">{{ mobilePlayerRatingLabel }}</p>
-                        </div>
-                        <div class="px-4 py-3">
-                            <p class="text-[0.72rem] font-semibold text-[#667085]">Czas meczu</p>
-                            <p class="mt-1 text-[1.35rem] font-bold tabular-nums text-[#17191d]">{{ formatRankedClock(specSummary.match_duration_seconds) }}</p>
-                        </div>
+            <section class="pk-panel p-3" aria-labelledby="ranking-play-heading">
+                <div class="flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                        <h2 id="ranking-play-heading" class="text-[1.0625rem] font-bold leading-6">Następny mecz</h2>
+                        <p class="mt-0.5 text-xs text-[#ffffffb8]">
+                            {{ specSummary.total_questions }} pytań · {{ formatRankedClock(specSummary.match_duration_seconds) }}
+                        </p>
+                    </div>
+                    <div class="shrink-0 text-right">
+                        <p class="text-xs text-[#ffffffb8]">Twoje ELO</p>
+                        <p class="text-[1.75rem] font-bold leading-none tabular-nums text-white">{{ mobilePlayerRatingLabel }}</p>
                     </div>
                 </div>
 
                 <button
                     type="button"
-                    class="mt-5 flex min-h-12 w-full items-center justify-center rounded-[8px] bg-[#0b63ce] px-4 text-[0.96rem] font-semibold text-white transition hover:bg-[#084fa8] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b63ce] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-55"
+                    class="pk-btn-primary mt-4 flex min-h-14 w-full items-center justify-center px-4 text-[1.125rem] font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80 disabled:cursor-not-allowed disabled:opacity-55"
                     :disabled="backendBusy || !selectedCategory"
                     @click="handlePrimaryRankingAction"
                 >
@@ -3828,68 +3863,51 @@ const backendTransportChipClass = computed(() => {
                 <button
                     v-if="replayLobbyActionVisible"
                     type="button"
-                    class="mt-2 flex min-h-12 w-full items-center justify-center rounded-[8px] border border-[#dfe3e8] bg-white px-4 text-[0.92rem] font-semibold text-[#17191d] transition disabled:cursor-not-allowed disabled:opacity-55"
+                    class="pk-btn-secondary mt-2 flex min-h-12 w-full items-center justify-center px-4 text-[0.95rem] font-semibold disabled:cursor-not-allowed disabled:opacity-55"
                     :disabled="backendBusy || !selectedCategory"
                     @click="startReplayMatch"
                 >
                     Zagraj z nagraniem
                 </button>
-                <p v-if="replayLobbyActionVisible" class="mt-2 text-[0.78rem] leading-5 text-[#667085]">
-                    Ścigasz się z zapisanym meczem innego gracza z kategorii {{ selectedCategory?.short_name ?? selectedCategory?.code }}. Wynik liczy się do ELO.
+                <p v-if="replayLobbyActionVisible" class="mt-2 text-center text-xs leading-5 text-[#ffffffb8]">
+                    Zapisany mecz innego gracza z tej kategorii. Wynik liczy się do ELO.
                 </p>
-                <p v-if="inlineLobbyError" class="mt-3 text-[0.82rem] font-semibold leading-5 text-[#b42318]">{{ inlineLobbyError }}</p>
+                <p v-if="inlineLobbyError" class="mt-3 rounded-[5px] bg-[#3a1f22] px-3 py-2 text-[0.82rem] font-semibold leading-5 text-[#ff8a8a]">{{ inlineLobbyError }}</p>
             </section>
 
-            <section class="mt-5 px-4" aria-labelledby="ranking-account-heading">
-                <h2 id="ranking-account-heading" class="text-[0.82rem] font-semibold text-[#667085]">Twoje konto</h2>
-                <div class="mt-2 divide-y divide-[#e3e7eb] rounded-[8px] border border-[#dfe3e8] bg-white">
-                    <div class="flex min-h-14 items-center justify-between px-4 py-3">
-                        <span class="text-[0.92rem] font-medium text-[#17191d]">Mecze</span>
-                        <span class="text-[0.92rem] font-semibold tabular-nums text-[#17191d]">{{ rankedOverview?.rating.matches_played ?? 0 }}</span>
-                    </div>
-                    <div class="flex min-h-14 items-center justify-between px-4 py-3">
-                        <span class="text-[0.92rem] font-medium text-[#17191d]">Zwycięstwa</span>
-                        <span class="text-[0.92rem] font-semibold tabular-nums text-[#157347]">{{ rankedOverview?.rating.wins ?? 0 }}</span>
-                    </div>
-                    <div class="flex min-h-14 items-center justify-between px-4 py-3">
-                        <span class="text-[0.92rem] font-medium text-[#17191d]">Najlepsze ELO</span>
-                        <span class="text-[0.92rem] font-semibold tabular-nums text-[#17191d]">{{ rankedOverview?.rating.peak_rating ?? '—' }}</span>
-                    </div>
+            <section class="mt-4 grid grid-cols-3 gap-2" aria-label="Twoje statystyki">
+                <div class="pk-panel px-3 py-2.5">
+                    <p class="text-xs text-[#ffffffb8]">Mecze</p>
+                    <p class="mt-1 text-xl font-bold tabular-nums text-white">{{ rankedOverview?.rating.matches_played ?? 0 }}</p>
+                </div>
+                <div class="pk-panel px-3 py-2.5">
+                    <p class="text-xs text-[#ffffffb8]">Wygrane</p>
+                    <p class="mt-1 text-xl font-bold tabular-nums text-[#81b64c]">{{ rankedOverview?.rating.wins ?? 0 }}</p>
+                </div>
+                <div class="pk-panel px-3 py-2.5">
+                    <p class="text-xs text-[#ffffffb8]">Rekord ELO</p>
+                    <p class="mt-1 text-xl font-bold tabular-nums text-white">{{ rankedOverview?.rating.peak_rating ?? '—' }}</p>
                 </div>
             </section>
 
-            <section class="mt-5 px-4" aria-labelledby="ranking-table-heading">
-                <div class="flex items-center justify-between gap-4">
-                    <h2 id="ranking-table-heading" class="text-[0.82rem] font-semibold text-[#667085]">Najlepsi gracze</h2>
-                    <span class="text-[0.76rem] text-[#98a2b3]">{{ leaderboardUpdatedMobileLabel }}</span>
-                </div>
-                <div v-if="leaderboardEntries.length > 0" class="mt-2 divide-y divide-[#e3e7eb] rounded-[8px] border border-[#dfe3e8] bg-white">
-                    <article v-for="entry in leaderboardEntries.slice(0, 5)" :key="entry.user_id" class="flex min-h-[4.25rem] items-center gap-3 px-4 py-2">
-                        <span class="w-5 text-[0.86rem] font-semibold tabular-nums text-[#667085]">{{ entry.position }}</span>
-                        <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#eef2f6] text-[0.74rem] font-semibold text-[#475467]">
-                            {{ leaderboardAvatarLabel(entry.username) }}
-                        </span>
-                        <p class="min-w-0 flex-1 truncate text-[0.9rem] font-semibold text-[#17191d]">{{ entry.username }}</p>
-                        <span class="text-[0.88rem] font-semibold tabular-nums text-[#17191d]">{{ entry.rating }}</span>
-                    </article>
-                </div>
-                <article
-                    v-if="currentUserRankingEntry"
-                    class="mt-2 flex min-h-[4.25rem] items-center gap-3 rounded-[8px] border border-[#dfe3e8] bg-white px-4 py-2"
-                    aria-label="Twoje miejsce w rankingu"
-                >
-                    <span class="min-w-5 text-[0.86rem] font-semibold tabular-nums text-[#667085]">{{ currentUserRankingEntry.position }}</span>
-                    <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#eef2f6] text-[0.74rem] font-semibold text-[#475467]">
-                        {{ leaderboardAvatarLabel(currentUserRankingEntry.username) }}
-                    </span>
-                    <p class="min-w-0 flex-1 truncate text-[0.9rem] font-semibold text-[#17191d]">
-                        Ty <span class="font-normal text-[#667085]">· miejsce {{ currentUserRankingEntry.position }} z {{ currentUserRankingEntry.total_players }}</span>
-                    </p>
-                    <span class="text-[0.88rem] font-semibold tabular-nums text-[#17191d]">{{ currentUserRankingEntry.rating }}</span>
-                </article>
-                <p v-else class="mt-2 rounded-[8px] border border-dashed border-[#cbd5e1] bg-white px-4 py-5 text-[0.86rem] leading-5 text-[#667085]">
-                    Ranking pojawi się tutaj po pierwszych rozegranych meczach.
-                </p>
+            <section class="mt-5" aria-labelledby="ranking-table-heading">
+                <MobileStreakLeaderboard
+                    v-if="mobileLeagueRows.length > 0"
+                    title="Najlepsi gracze"
+                    title-id="ranking-table-heading"
+                    :leaders="mobileLeagueRows"
+                    :me="mobileLeagueMe"
+                    :caption="`Kategoria ${selectedCategory?.short_name ?? selectedCategory?.code ?? '—'}`"
+                    caption-suffix="ranking ELO"
+                    :note="`Aktualizacja: ${leaderboardUpdatedMobileLabel}`"
+                    score-label="ELO"
+                    :show-duration="false"
+                    label="Najlepsi gracze w rankingu 1 na 1"
+                />
+                <template v-else>
+                    <h2 id="ranking-table-heading" class="text-[1.0625rem] font-bold">Najlepsi gracze</h2>
+                    <p class="pk-panel mt-2.5 px-5 py-8 text-center text-sm leading-6 text-[#ffffffb8]">Ranking pojawi się tutaj po pierwszych rozegranych meczach.</p>
+                </template>
             </section>
         </section>
 

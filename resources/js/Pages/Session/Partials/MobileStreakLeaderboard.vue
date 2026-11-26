@@ -17,6 +17,12 @@ const props = withDefaults(defineProps<{
     label?: string;
     /** The player's own standing when it is outside `leaders`. */
     me?: StreakLeader | null;
+    /** Column header for the score ("Seria" for streaks, "ELO" for 1v1 ranking). */
+    scoreLabel?: string;
+    /** Word after the caption in the banner ("rekordy", "ranking ELO"). */
+    captionSuffix?: string;
+    /** Extra line under the banner title (e.g. last update time). */
+    note?: string;
 }>(), {
     title: 'Najlepsi w serii',
     titleId: undefined,
@@ -24,6 +30,9 @@ const props = withDefaults(defineProps<{
     showDuration: true,
     label: 'Ranking najlepszych serii',
     me: null,
+    scoreLabel: 'Seria',
+    captionSuffix: 'rekordy',
+    note: '',
 });
 
 const pinnedMe = computed(() => (props.me && !props.leaders.some((leader) => leader.is_me) ? props.me : null));
@@ -45,7 +54,8 @@ const rankClass = (position: number): string => (
             <img :src="trophyArt" alt="" width="104" height="57" class="h-auto w-[6.5rem] shrink-0" aria-hidden="true">
             <div class="min-w-0 flex-1">
                 <h2 :id="titleId" class="text-[1.375rem] font-extrabold leading-tight tracking-[-0.01em] text-white">{{ title }}</h2>
-                <p v-if="caption" class="mt-1 truncate text-sm text-white">{{ caption }} · rekordy</p>
+                <p v-if="caption" class="mt-1 truncate text-sm text-white">{{ caption }}<template v-if="captionSuffix"> · {{ captionSuffix }}</template></p>
+                <p v-if="note" class="mt-0.5 truncate text-xs text-[#ffffffb8]">{{ note }}</p>
             </div>
             <slot name="action" />
         </div>
@@ -58,7 +68,7 @@ const rankClass = (position: number): string => (
             >
                 <span class="pl-0.5">Miejsce</span>
                 <span>Gracz</span>
-                <span class="text-right">Seria</span>
+                <span class="text-right">{{ scoreLabel }}</span>
                 <span v-if="showDuration" class="text-right">Czas</span>
             </div>
 
