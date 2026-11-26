@@ -27,6 +27,17 @@ class RankedApiErrorResponseFactory
                 ],
                 $errors,
             ),
+            array_key_exists('question_not_available', $errors) => $this->make(
+                $request,
+                'QUESTION_NOT_AVAILABLE',
+                (string) $message,
+                422,
+                $this->matchDetails($request) + [
+                    'question_id' => $request->input('question_id'),
+                    'suggestion' => 'Poczekaj, aż pytanie się odsłoni, i odpowiedz ponownie.',
+                ],
+                $errors,
+            ),
             array_key_exists('match', $errors) => $this->make(
                 $request,
                 'MATCH_FINISHED',

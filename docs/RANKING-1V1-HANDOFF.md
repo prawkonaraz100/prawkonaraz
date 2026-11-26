@@ -1,3 +1,5 @@
+> **ARCHIWALNE (stan z kwietnia 2026).** Ten dokument nie opisuje obecnego trybu rankingowego i nie jest już źródłem prawdy. Aktualny stan, plan i decyzje: `docs/RANKED-1V1-ROADMAP.md`.
+
 # Ranking 1v1 Handoff
 
 ## Status

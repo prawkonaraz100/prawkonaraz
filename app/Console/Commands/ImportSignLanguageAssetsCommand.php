@@ -36,7 +36,7 @@ class ImportSignLanguageAssetsCommand extends Command
             return self::FAILURE;
         }
 
-        $source = $this->argument('source') ?: env('PJM_SIGN_LANGUAGE_SOURCE_PATH');
+        $source = $this->argument('source') ?: config('services.pjm.sign_language_source_path');
 
         if (! is_string($source) || trim($source) === '') {
             $this->error('Provide the source folder or set PJM_SIGN_LANGUAGE_SOURCE_PATH.');

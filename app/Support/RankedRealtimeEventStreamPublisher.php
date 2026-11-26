@@ -116,6 +116,16 @@ class RankedRealtimeEventStreamPublisher
             ? $overview['active_match']
             : null;
 
+        // Otwarty strumień oznacza obecność gracza: przeglądarka nie wysyła wtedy pongów,
+        // więc bez tego gracz, który przez 30 s nic nie kliknie, zostałby uznany za rozłączonego.
+        if ($activeMatch instanceof RankedMatch
+            && in_array($activeMatch->status, ['matched', 'in_progress'], true)
+            && ($state->lastPresenceTouchAt === null
+                || now()->getTimestamp() - $state->lastPresenceTouchAt->getTimestamp() >= RankedMatchService::HEARTBEAT_SECONDS)) {
+            $this->rankedMatchService->touchPresenceFromStream($activeMatch, $user);
+            $state->lastPresenceTouchAt = now();
+        }
+
         if (! $activeMatch instanceof RankedMatch) {
             $state->streamQueueMatchPublicId = null;
             $state->previousQueueMatchedId = null;
@@ -349,8 +359,8 @@ class RankedRealtimeEventStreamPublisher
             return null;
         }
 
-        $currentCapacity = (int) data_get($queueEntry->payload, 'current_capacity', RankedMatchService::MAX_CONCURRENT_PLAYERS);
-        $maxConcurrentPlayers = (int) data_get($queueEntry->payload, 'max_concurrent_players', RankedMatchService::MAX_CONCURRENT_PLAYERS);
+        $currentCapacity = (int) data_get($queueEntry->payload, 'current_capacity', RankedMatchService::maxConcurrentPlayers());
+        $maxConcurrentPlayers = (int) data_get($queueEntry->payload, 'max_concurrent_players', RankedMatchService::maxConcurrentPlayers());
         $positionInQueue = data_get($queueEntry->payload, 'position_in_queue');
         $estimatedWaitMinutes = data_get($queueEntry->payload, 'estimated_wait_minutes');
         $timestamp = data_get($queueEntry->payload, 'recorded_at')

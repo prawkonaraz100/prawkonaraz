@@ -68,6 +68,10 @@ fi
 php artisan up
 trap - EXIT
 
+# Zegar rankingu (etap 1e) trzyma stary kod w pamięci: prosimy go o restart po bieżącym ticku,
+# systemd uruchamia go ponownie z nowym wydaniem. Bez usługi to tylko zapis w Redis.
+php artisan ranked:clock-restart || true
+
 if [[ "$SEO_RELEASE" == "1" ]]; then
   echo "SEO release: validate active Nginx syntax and public crawler delivery."
   nginx -t

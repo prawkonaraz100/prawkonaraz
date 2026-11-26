@@ -2382,34 +2382,41 @@ Schedule::command('ranked:sweep')
     ->withoutOverlapping();
 
 Schedule::command('ops:prune-user-ip-history')
-    ->dailyAt((string) env('USER_IP_HISTORY_PRUNE_AT', '03:05'))
+    ->dailyAt((string) config('schedule_times.user_ip_history_prune_at', '03:05'))
     ->environments(['production'])
     ->withoutOverlapping();
 
 Schedule::command('ops:aggregate-question-daily-stats')
-    ->dailyAt((string) env('QUESTION_DAILY_STATS_AGGREGATE_AT', '02:55'))
+    ->dailyAt((string) config('schedule_times.question_daily_stats_aggregate_at', '02:55'))
     ->environments(['production'])
     ->withoutOverlapping();
 
 Schedule::command('ops:aggregate-question-answer-daily-stats')
-    ->dailyAt((string) env('QUESTION_ANSWER_DAILY_STATS_AGGREGATE_AT', '02:57'))
+    ->dailyAt((string) config('schedule_times.question_answer_daily_stats_aggregate_at', '02:57'))
     ->environments(['production'])
     ->withoutOverlapping();
 
 Schedule::command('ops:capture-monitoring-snapshot')
-    ->dailyAt((string) env('MONITORING_SNAPSHOT_AT', '03:00'))
+    ->dailyAt((string) config('schedule_times.monitoring_snapshot_at', '03:00'))
     ->environments(['production'])
     ->withoutOverlapping();
 
 Schedule::command('ops:rollup-question-monthly-stats')
-    ->dailyAt((string) env('QUESTION_MONTHLY_STATS_ROLLUP_AT', '03:10'))
+    ->dailyAt((string) config('schedule_times.question_monthly_stats_rollup_at', '03:10'))
     ->environments(['production'])
     ->withoutOverlapping();
 
 Schedule::command('ops:prune-study-history')
-    ->dailyAt((string) env('STUDY_HISTORY_PRUNE_AT', '03:20'))
+    ->dailyAt((string) config('schedule_times.study_history_prune_at', '03:20'))
     ->environments(['production'])
     ->withoutOverlapping();
+
+Schedule::command('queue:work database --queue=support-replies --stop-when-empty --max-jobs=15 --max-time=45 --timeout=20')
+    ->everyMinute()
+    ->environments(['production'])
+    ->onOneServer()
+    ->withoutOverlapping(5)
+    ->runInBackground();
 
 Schedule::command('newsroom:refresh-seo-artifacts-if-dirty')
     ->everyMinute()
@@ -2418,7 +2425,7 @@ Schedule::command('newsroom:refresh-seo-artifacts-if-dirty')
     ->withoutOverlapping();
 
 Schedule::command('seo:refresh-sitemaps')
-    ->dailyAt((string) env('SEO_SITEMAP_REFRESH_AT', '03:30'))
+    ->dailyAt((string) config('schedule_times.seo_sitemap_refresh_at', '03:30'))
     ->environments(['production'])
     ->withoutOverlapping();
 
@@ -2448,11 +2455,11 @@ Schedule::command('ops:expire-friend-invitations')
     ->withoutOverlapping();
 
 Schedule::command('ops:sqlite-maintenance')
-    ->dailyAt((string) env('SQLITE_OPTIMIZE_AT', '03:35'))
+    ->dailyAt((string) config('schedule_times.sqlite_optimize_at', '03:35'))
     ->environments(['production'])
     ->withoutOverlapping();
 
 Schedule::command('ops:sqlite-maintenance --vacuum')
-    ->weeklyOn(0, (string) env('SQLITE_VACUUM_AT', '04:10'))
+    ->weeklyOn(0, (string) config('schedule_times.sqlite_vacuum_at', '04:10'))
     ->environments(['production'])
     ->withoutOverlapping();

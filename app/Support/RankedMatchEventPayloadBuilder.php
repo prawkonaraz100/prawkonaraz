@@ -327,12 +327,14 @@ class RankedMatchEventPayloadBuilder
             ->keyBy('id');
 
         $startedAt = $match->started_at ?? $match->matched_at ?? now();
+        // Mecz z tempem: odsłanianie z formatu meczu; dawny tryb: harmonogram informacyjny co 2 s.
+        $interval = RankedMatchService::matchQuestionIntervalSeconds($match) ?: self::QUESTION_REVEAL_INTERVAL_SECONDS;
 
         return $questionIds
-            ->map(function (int $questionId, int $index) use ($questionsById, $startedAt): array {
+            ->map(function (int $questionId, int $index) use ($questionsById, $startedAt, $interval): array {
                 $question = $questionsById->get($questionId);
                 $revealedAt = $startedAt->copy()
-                    ->addSeconds($index * self::QUESTION_REVEAL_INTERVAL_SECONDS)
+                    ->addSeconds($index * $interval)
                     ->toIso8601String();
 
                 return [

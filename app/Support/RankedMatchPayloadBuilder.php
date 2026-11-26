@@ -156,6 +156,8 @@ class RankedMatchPayloadBuilder
             'api_version' => $match->api_version,
             'duration_seconds' => $match->duration_seconds,
             'total_questions' => $match->total_questions,
+            // Tempo meczu: 0 = we własnym tempie, inaczej nowe pytanie co tyle sekund.
+            'question_interval_seconds' => RankedMatchService::matchQuestionIntervalSeconds($match),
             'reason' => $match->reason,
             'matched_at' => $match->matched_at?->toIso8601String(),
             'countdown_started_at' => $match->countdown_started_at?->toIso8601String(),
@@ -254,9 +256,11 @@ class RankedMatchPayloadBuilder
 
         return [
             'match' => $this->matchSummary($match, $currentUser),
+            // Zegar serwera, żeby klient odsłaniał pytania w tym samym momencie co serwer.
+            'server_now' => self::serverNow(),
             'progress' => $this->playerProgress($match, $currentUser),
             'questions' => $orderedQuestions
-                ->map(function ($question, int $index) use ($answerMap, $isCompleted): array {
+                ->map(function ($question, int $index) use ($answerMap, $isCompleted, $match): array {
                     /** @var RankedMatchAnswer|null $answer */
                     $answer = $answerMap->get($question->getKey());
 
@@ -264,6 +268,7 @@ class RankedMatchPayloadBuilder
                         // Wyjaśnienia (także obrazkowe) dopiero po meczu, żeby nie podpowiadały odpowiedzi w trakcie.
                         ...$this->studySessionApiPayloadBuilder->question($question, null, $isCompleted, $isCompleted),
                         'question_number' => $index + 1,
+                        'available_at' => RankedMatchService::questionAvailableAt($match, $index)?->toIso8601String(),
                         'selected_answer' => $answer?->selected_answer ? Str::upper($answer->selected_answer) : null,
                         'is_answered' => $answer !== null,
                         'is_correct' => $isCompleted ? $answer?->is_correct : null,
@@ -274,6 +279,11 @@ class RankedMatchPayloadBuilder
                 ->all(),
             'answer_breakdown' => $this->answerBreakdown($match),
         ];
+    }
+
+    public static function serverNow(): string
+    {
+        return now()->format('Y-m-d\\TH:i:s.vP');
     }
 
     public function playerProgress(RankedMatch $match, User $currentUser): array

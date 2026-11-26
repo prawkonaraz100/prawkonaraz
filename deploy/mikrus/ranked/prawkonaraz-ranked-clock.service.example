@@ -1,0 +1,28 @@
+# Etap 1e rankingu: wspólny zegar meczów (docs/RANKED-1V1-ROADMAP.md, sekcja 1.6).
+# Instalacja (root): cp do /etc/systemd/system/prawkonaraz-ranked-clock.service,
+# systemctl daemon-reload && systemctl enable --now prawkonaraz-ranked-clock
+# Działa tylko przy RANKED_CLOCK_ENABLED=true w .env (inaczej czeka 30 s i kończy się bez pracy).
+# Wyłączenie awaryjne: RANKED_CLOCK_ENABLED=false + config:cache (strumienie po ≤5 s wracają
+# do dawnego trybu), potem systemctl disable --now prawkonaraz-ranked-clock.
+[Unit]
+Description=PrawkoNaRaz ranked 1v1 match clock
+After=network.target postgresql.service redis-server.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/prawkobit/current
+ExecStart=/usr/bin/php artisan ranked:clock --max-seconds=3600 --memory=128
+Restart=always
+RestartSec=2
+TimeoutStopSec=10
+KillSignal=SIGTERM
+CPUQuota=25%
+MemoryMax=192M
+NoNewPrivileges=true
+PrivateTmp=true
+UMask=0027
+
+[Install]
+WantedBy=multi-user.target

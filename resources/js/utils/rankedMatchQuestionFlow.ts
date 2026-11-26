@@ -63,3 +63,56 @@ export const getRankedQuestionResponseTimeMs = (
 
     return Math.max(nowMs - questionStartedAtMs, 250);
 };
+
+export interface RankedPacedQuestionLike {
+    is_answered: boolean;
+    available_at?: string | null;
+}
+
+/**
+ * Ile ms zostało do odsłonięcia pytania w meczu z tempem (0 = można odpowiadać).
+ * serverClockOffsetMs = zegar serwera minus zegar przeglądarki.
+ */
+export const getRankedQuestionLockRemainingMs = (
+    question: RankedPacedQuestionLike | null | undefined,
+    nowMs: number,
+    serverClockOffsetMs = 0,
+): number => {
+    if (!question || question.is_answered || !question.available_at) {
+        return 0;
+    }
+
+    const availableAtMs = Date.parse(question.available_at);
+
+    if (!Number.isFinite(availableAtMs)) {
+        return 0;
+    }
+
+    return Math.max(availableAtMs - (nowMs + serverClockOffsetMs), 0);
+};
+
+/**
+ * Czas odsłonięcia pytania: z serwera (available_at) albo wyliczony ze startu meczu i tempa,
+ * gdy szczegóły pobrano jeszcze w trakcie odliczania (wtedy available_at jest puste).
+ */
+export const resolveRankedQuestionAvailableAt = (
+    question: { available_at?: string | null; question_number: number } | null | undefined,
+    matchStartedAt: string | null | undefined,
+    questionIntervalSeconds: number,
+): string | null => {
+    if (!question) {
+        return null;
+    }
+
+    if (question.available_at) {
+        return question.available_at;
+    }
+
+    const startedAtMs = matchStartedAt ? Date.parse(matchStartedAt) : Number.NaN;
+
+    if (questionIntervalSeconds <= 0 || !Number.isFinite(startedAtMs)) {
+        return null;
+    }
+
+    return new Date(startedAtMs + (question.question_number - 1) * questionIntervalSeconds * 1000).toISOString();
+};
