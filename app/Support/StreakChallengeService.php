@@ -7,6 +7,7 @@ use App\Models\Question;
 use App\Models\StreakRecord;
 use App\Models\StreakRun;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -17,6 +18,8 @@ class StreakChallengeService
     public function __construct(
         protected QuestionMediaPayloadBuilder $questionMediaPayloadBuilder,
         protected UserAvatarService $userAvatarService,
+        protected QuestionAudioPayloadBuilder $questionAudioPayloadBuilder,
+        protected QuestionExplanationSignReferencePayloadBuilder $questionExplanationSignReferencePayloadBuilder,
     ) {}
 
     /**
@@ -35,31 +38,28 @@ class StreakChallengeService
             ->where('status', StreakRun::STATUS_IN_PROGRESS)
             ->latest('id')
             ->first();
-        $lastScore = null;
-        $rank = 0;
         $leaders = StreakRecord::query()
             ->with('user')
             ->where('license_category_id', $category->getKey())
             ->where('best_score', '>', 0)
             ->orderByDesc('best_score')
+            ->orderByRaw('CASE WHEN best_duration_seconds IS NULL THEN 1 ELSE 0 END')
+            ->orderBy('best_duration_seconds')
+            ->orderByRaw('CASE WHEN best_achieved_at IS NULL THEN 1 ELSE 0 END')
             ->orderBy('best_achieved_at')
             ->orderBy('id')
             ->limit(20)
             ->get()
             ->values()
-            ->map(function (StreakRecord $leader, int $index) use ($user, &$lastScore, &$rank): array {
-                if ($leader->best_score !== $lastScore) {
-                    $rank = $index + 1;
-                    $lastScore = $leader->best_score;
-                }
-
+            ->map(function (StreakRecord $leader, int $index) use ($user): array {
                 $leaderUser = $leader->user;
                 $avatar = $leaderUser ? $this->userAvatarService->payload($leaderUser) : null;
 
                 return [
-                    'position' => $rank,
+                    'position' => $index + 1,
                     'name' => $this->publicName($leaderUser?->name),
                     'score' => $leader->best_score,
+                    'duration_seconds' => $leader->best_duration_seconds,
                     'avatar_url' => $avatar['url'] ?? null,
                     'initials' => $avatar['initials'] ?? 'K',
                     'is_me' => $leader->user_id === $user->getKey(),
@@ -76,10 +76,17 @@ class StreakChallengeService
             ],
             'question_count' => $this->eligibleQuestions($category)->count(),
             'personal_best' => $bestScore,
+            'personal_best_duration_seconds' => $record?->best_duration_seconds,
             'personal_rank' => $bestScore > 0
                 ? StreakRecord::query()
                     ->where('license_category_id', $category->getKey())
-                    ->where('best_score', '>', $bestScore)
+                    ->where(function (Builder $query) use ($bestScore, $record): void {
+                        $query->where('best_score', '>', $bestScore)
+                            ->orWhere(function (Builder $query) use ($bestScore, $record): void {
+                                $query->where('best_score', $bestScore);
+                                $this->whereBeforeRecord($query, $record);
+                            });
+                    })
                     ->count() + 1
                 : null,
             'attempts_count' => (int) ($record?->attempts_count ?? 0),
@@ -137,19 +144,35 @@ class StreakChallengeService
     /**
      * @return array<string, mixed>
      */
-    public function answer(User $user, StreakRun $run, int $questionId, string $selectedAnswer): array
+    public function answer(User $user, StreakRun $run, int $questionId, string $selectedAnswer, bool $recoverable = false): array
     {
-        $result = DB::transaction(function () use ($user, $run, $questionId, $selectedAnswer): array {
+        $result = DB::transaction(function () use ($user, $run, $questionId, $selectedAnswer, $recoverable): array {
+            User::query()->whereKey($user->getKey())->lockForUpdate()->firstOrFail();
             $lockedRun = StreakRun::query()
                 ->where('user_id', $user->getKey())
                 ->lockForUpdate()
                 ->findOrFail($run->getKey());
 
+            $selectedAnswer = Str::lower($selectedAnswer);
+            if ($recoverable && $lockedRun->status !== StreakRun::STATUS_ABANDONED) {
+                // Replay only the most recent identical answer. Older answers or a
+                // different choice remain conflicts, never a second scoring write.
+                $latestAnswer = $lockedRun->answers()->orderByDesc('sequence')->first();
+                if ($latestAnswer && (int) $latestAnswer->question_id === $questionId
+                    && $latestAnswer->selected_answer === $selectedAnswer) {
+                    return $this->answerResult(
+                        $lockedRun,
+                        Question::query()->findOrFail($questionId),
+                        (bool) $latestAnswer->is_correct,
+                        $lockedRun->currentQuestion,
+                    );
+                }
+            }
+
             abort_unless($lockedRun->status === StreakRun::STATUS_IN_PROGRESS, 409, 'Ta seria została już zakończona.');
             abort_unless($lockedRun->current_question_id === $questionId, 409, 'To pytanie nie jest już aktywne.');
 
             $question = Question::query()->findOrFail($questionId);
-            $selectedAnswer = Str::lower($selectedAnswer);
             $option = match ($selectedAnswer) {
                 'a' => $question->option_a,
                 'b' => $question->option_b,
@@ -198,21 +221,30 @@ class StreakChallengeService
                 $this->saveBestResult($lockedRun);
             }
 
-            return [
-                'is_correct' => $isCorrect,
-                'finished' => $lockedRun->status !== StreakRun::STATUS_IN_PROGRESS,
-                'score' => $lockedRun->score,
-                'run' => $this->runPayload($lockedRun, $nextQuestion),
-                'correct_answer' => $isCorrect ? null : Str::upper((string) $question->correct_answer),
-                'explanation' => $isCorrect ? null : $question->explanation,
-            ];
-        });
+            return $this->answerResult($lockedRun, $question, $isCorrect, $nextQuestion);
+        }, 3);
 
         if ($result['finished']) {
             $result['overview'] = $this->overview($user, $run->licenseCategory);
         }
 
         return $result;
+    }
+
+    /** @return array<string, mixed> */
+    protected function answerResult(StreakRun $run, Question $question, bool $isCorrect, ?Question $nextQuestion): array
+    {
+        return [
+            'is_correct' => $isCorrect,
+            'finished' => $run->status !== StreakRun::STATUS_IN_PROGRESS,
+            'score' => $run->score,
+            'run' => $this->runPayload($run, $nextQuestion),
+            'correct_answer' => $isCorrect ? null : Str::upper((string) $question->correct_answer),
+            'explanation' => $isCorrect ? null : $question->explanation,
+            'explanation_sign_references' => $isCorrect
+                ? []
+                : $this->questionExplanationSignReferencePayloadBuilder->forQuestion($question),
+        ];
     }
 
     /**
@@ -257,13 +289,53 @@ class StreakChallengeService
             ->lockForUpdate()
             ->firstOrFail();
 
-        if ($run->score > $record->best_score) {
+        $duration = $this->runDuration($run);
+        if ($run->score > $record->best_score || ($run->score > 0 && $run->score === $record->best_score
+            && $duration !== null && ($record->best_duration_seconds === null || $duration < $record->best_duration_seconds))) {
             $record->update([
                 'best_score' => $run->score,
+                'best_duration_seconds' => $duration,
                 'best_run_id' => $run->getKey(),
                 'best_achieved_at' => $run->finished_at,
             ]);
         }
+    }
+
+    protected function runDuration(StreakRun $run): ?int
+    {
+        if (! $run->finished_at || $run->status === StreakRun::STATUS_ABANDONED) {
+            return null;
+        }
+        $lastCorrectAt = $run->answers()->where('is_correct', true)->max('answered_at');
+        if ($run->score > 0 && ! $lastCorrectAt) {
+            return null;
+        }
+        $end = $lastCorrectAt ? Carbon::parse($lastCorrectAt) : $run->finished_at;
+
+        return (int) max(0, $run->started_at->diffInSeconds($end, false));
+    }
+
+    // Same NULL-last, ascending tie-breakers as the leaderboard, including outside its top 20.
+    protected function whereBeforeRecord(Builder $query, StreakRecord $record, int $index = 0): void
+    {
+        $column = ['best_duration_seconds', 'best_achieved_at', 'id'][$index];
+        $value = $record->getAttribute($column);
+        if ($column === 'id') {
+            $query->where('id', '<', $value);
+
+            return;
+        }
+        $query->where(function (Builder $query) use ($column, $value, $record, $index): void {
+            if ($value === null) {
+                $query->whereNotNull($column);
+            } else {
+                $query->where($column, '<', $value);
+            }
+            $query->orWhere(function (Builder $query) use ($column, $value, $record, $index): void {
+                $value === null ? $query->whereNull($column) : $query->where($column, $value);
+                $this->whereBeforeRecord($query, $record, $index + 1);
+            });
+        });
     }
 
     /**
@@ -275,6 +347,7 @@ class StreakChallengeService
             'id' => $run->getKey(),
             'status' => $run->status,
             'score' => $run->score,
+            'duration_seconds' => $this->runDuration($run),
             'question' => $question ? $this->questionPayload($question) : null,
         ];
     }
@@ -305,6 +378,8 @@ class StreakChallengeService
                 ->values()
                 ->all(),
             'media' => $this->questionMediaPayloadBuilder->forQuestion($question->media),
+            // Never expose correct-answer audio/transcripts before scoring.
+            'audio' => ['question' => $this->questionAudioPayloadBuilder->forQuestionPrompt($question)],
         ];
     }
 

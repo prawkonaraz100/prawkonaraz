@@ -49,6 +49,7 @@ class StreakChallengeController extends Controller
             $streakRun,
             (int) $validated['question_id'],
             (string) $validated['selected_answer'],
+            $request->header('X-Streak-Answer-Response') === 'recoverable',
         ));
     }
 

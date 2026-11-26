@@ -1,9 +1,11 @@
 import { refreshCsrfSessionIfRequired } from '@/lib/csrfSession';
+import { RequestTimeoutError, withRequestTimeout } from '@/lib/requestTimeout';
 
 type RequestHeaders = Record<string, string>;
 
 interface RequestOptions {
     headers?: RequestHeaders;
+    timeoutMs?: number;
 }
 
 interface RequestWithBodyOptions extends RequestOptions {
@@ -147,24 +149,30 @@ const request = async <T>(
 ) => {
     const hasBody = options.body !== undefined;
 
-    if (!['GET', 'HEAD', 'OPTIONS'].includes(method.toUpperCase())) {
-        await refreshCsrfSessionIfRequired();
-    }
+    return withRequestTimeout(async (signal) => {
+        if (!['GET', 'HEAD', 'OPTIONS'].includes(method.toUpperCase())) {
+            await refreshCsrfSessionIfRequired();
+        }
 
-    const response = await fetch(url, {
-        method,
-        credentials: 'same-origin',
-        headers: buildJsonHeaders(hasBody, options.headers),
-        ...(hasBody ? { body: JSON.stringify(options.body) } : {}),
-    });
+        // A delayed CSRF refresh must not start a POST after the UI timed out.
+        if (signal?.aborted) throw new RequestTimeoutError();
 
-    const data = await parseResponseBody(response);
+        const response = await fetch(url, {
+            method,
+            credentials: 'same-origin',
+            headers: buildJsonHeaders(hasBody, options.headers),
+            ...(signal ? { signal } : {}),
+            ...(hasBody ? { body: JSON.stringify(options.body) } : {}),
+        });
 
-    if (!response.ok) {
-        throw new ApiClientError(response, data);
-    }
+        const data = await parseResponseBody(response);
 
-    return data as T;
+        if (!response.ok) {
+            throw new ApiClientError(response, data);
+        }
+
+        return data as T;
+    }, options.timeoutMs);
 };
 
 export const apiClient = {

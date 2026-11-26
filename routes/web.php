@@ -2,8 +2,6 @@
 
 use App\Http\Controllers\AboutOrganizationController;
 use App\Http\Controllers\AccessActivationController;
-use App\Http\Controllers\AppEntryController;
-use App\Http\Controllers\AppAuthController;
 use App\Http\Controllers\AdminBackupFileController;
 use App\Http\Controllers\AdminContentArticlePreviewController;
 use App\Http\Controllers\AdminLegalContentQuestionReferenceController;
@@ -24,6 +22,8 @@ use App\Http\Controllers\ApiRankedQueueController;
 use App\Http\Controllers\ApiRankedStreamController;
 use App\Http\Controllers\ApiStudySessionAnswerController;
 use App\Http\Controllers\ApiStudySessionController;
+use App\Http\Controllers\AppAuthController;
+use App\Http\Controllers\AppEntryController;
 use App\Http\Controllers\Auth\CsrfTokenController;
 use App\Http\Controllers\Auth\ForcedPasswordChangeController;
 use App\Http\Controllers\Auth\GoogleIdentityLoginController;
@@ -33,8 +33,11 @@ use App\Http\Controllers\Auth\TemporaryAccountClaimController;
 use App\Http\Controllers\CategoryAnalyticsController;
 use App\Http\Controllers\CategoryAnalyticsPageController;
 use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\ContactPageController;
+use App\Http\Controllers\SupportChatController;
+use App\Http\Middleware\LimitSupportChatBody;
 use App\Http\Controllers\ContentArticleController;
+use App\Http\Controllers\ContentArticleLikeController;
+use App\Http\Controllers\ContentArticleReactionController;
 use App\Http\Controllers\ContentAuthorController;
 use App\Http\Controllers\DashboardApiController;
 use App\Http\Controllers\FriendInvitationClaimController;
@@ -58,10 +61,12 @@ use App\Http\Controllers\ProfileAvatarController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfileSocialAccountController;
 use App\Http\Controllers\PublicDemoStudyController;
+use App\Http\Controllers\PublicLearningCatalogController;
 use App\Http\Controllers\PublicQuestionDatabaseController;
 use App\Http\Controllers\PublicQuestionDifficultyController;
 use App\Http\Controllers\PublicQuestionTopicController;
 use App\Http\Controllers\PublicTestCategoryController;
+use App\Http\Controllers\QualificationPreliminaryLearningController;
 use App\Http\Controllers\QuestionCollectionLearningController;
 use App\Http\Controllers\RankedSessionPageController;
 use App\Http\Controllers\ReviewPageController;
@@ -74,6 +79,7 @@ use App\Http\Controllers\SitemapQuestionsController;
 use App\Http\Controllers\StreakChallengeController;
 use App\Http\Controllers\StudySessionAnswerController;
 use App\Http\Controllers\StudySessionController;
+use App\Http\Controllers\TachographSimulatorController;
 use App\Http\Controllers\TrafficSignCategoryController;
 use App\Http\Controllers\TrafficSignHubController;
 use App\Http\Controllers\TrafficSignLearningController;
@@ -84,10 +90,13 @@ use App\Http\Controllers\UserReviewPhotoController;
 use App\Http\Middleware\EnsureUserIsNotBanned;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\MarkReturningUser;
+use App\Http\Middleware\PreventSearchIndexing;
 use App\Http\Middleware\TrackUserIpActivity;
 use App\Models\Question;
 use App\Models\StudySession;
 use App\Support\NewsroomRouteContract;
+use App\Support\PublicTestCategoryCatalog;
+use App\Support\QualificationLearningParts;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Http\Request;
 use Illuminate\Session\Middleware\StartSession;
@@ -96,6 +105,9 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Inertia\Inertia;
 
 Route::get('/', HomePageController::class)->name('home');
+Route::get('/nauka/symulator-tachografu', TachographSimulatorController::class)
+    ->middleware(PreventSearchIndexing::class)
+    ->name('session.tachograph');
 Route::get('/app', [AppEntryController::class, 'show'])->name('app.entry');
 Route::middleware('guest')->group(function () {
     Route::get('/app/login', [AppAuthController::class, 'login'])->name('app.login');
@@ -145,7 +157,10 @@ Route::get('/profile/delete-confirmation/{user}/{hash}', [ProfileController::cla
     ->name('profile.deletion.confirm');
 Route::post('/profile/delete-confirmation/{user}/{hash}', [ProfileController::class, 'destroyViaSignedLink'])
     ->middleware(['signed', 'throttle:6,1'])
+    ->withoutMiddleware(TrackUserIpActivity::class)
     ->name('profile.deletion.destroy');
+Route::get('/konto/usuniete', [ProfileController::class, 'deletionComplete'])
+    ->name('profile.deletion.complete');
 Route::get('/profile/email-change-confirmation/{user}/{hash}', [ProfileController::class, 'confirmEmailChange'])
     ->middleware(['signed', 'throttle:6,1'])
     ->name('profile.email-change.confirm');
@@ -172,7 +187,7 @@ Route::get('/zaproszenie/{token}', [FriendInvitationClaimController::class, 'sho
 Route::get('/testy-na-prawo-jazdy', [PublicDemoStudyController::class, 'landing'])
     ->name('public.tests');
 Route::get('/testy-na-prawo-jazdy/kategoria-{categorySlug}', PublicTestCategoryController::class)
-    ->whereIn('categorySlug', ['a', 'b', 'c', 'd', 't', 'a1', 'am'])
+    ->whereIn('categorySlug', PublicTestCategoryCatalog::SLUGS)
     ->name('public.tests.category');
 Route::get('/testy-na-prawo-jazdy/demo', [PublicDemoStudyController::class, 'show'])
     ->name('public.tests.demo.show');
@@ -185,27 +200,47 @@ Route::post('/testy-na-prawo-jazdy/demo/complete', [PublicDemoStudyController::c
 Route::post('/testy-na-prawo-jazdy/demo/restart', [PublicDemoStudyController::class, 'restart'])
     ->middleware('throttle:20,1')
     ->name('public.tests.demo.restart');
-Route::get('/kurs', fn () => Inertia::render('Public/MarketingPlaceholder', [
-    'title' => 'Kurs teorii Online',
-    'eyebrow' => 'Oferta',
-    'description' => 'Ta sekcja została przygotowana jako pusta strona kursu, żebyśmy mogli podpiąć tu właściwy układ i treści w kolejnym kroku.',
-]))->name('public.course');
-Route::get('/wyklady', fn () => Inertia::render('Public/MarketingPlaceholder', [
-    'title' => 'Wykłady z instruktorem Online',
-    'eyebrow' => 'Materiały',
-    'description' => 'Wykłady mają już własną trasę i pusty ekran startowy, gotowy do dalszego wypełnienia treścią.',
-]))->name('public.lectures');
-Route::get('/kurs-kod-95', fn () => Inertia::render('Public/Code95'))->name('public.code95');
+Route::get('/kursy', [PublicLearningCatalogController::class, 'courses'])->name('public.courses');
+Route::get('/kursy/{courseSlug}', [PublicLearningCatalogController::class, 'course'])
+    ->middleware(PreventSearchIndexing::class)->name('public.courses.show');
+Route::get('/kurs-adr', [PublicLearningCatalogController::class, 'adrCourses'])->name('public.adr-courses');
+Route::get('/kurs-adr-{adrScope}', [PublicLearningCatalogController::class, 'adrCourses'])
+    ->where('adrScope', '[a-z0-9-]+')->name('public.adr-courses.scope');
+Route::get('/kurs-teoretyczny-na-prawo-jazdy', [PublicLearningCatalogController::class, 'lectures'])
+    ->name('public.course');
+Route::get('/kurs', fn (Request $request) => redirect()->route('public.course', $request->query(), 301));
+Route::get('/wyklady', fn (Request $request) => redirect()->route('public.course', $request->query(), 301))
+    ->name('public.lectures');
+Route::get('/kurs-kod-95', fn (QualificationLearningParts $parts) => Inertia::render('Public/Code95', [
+    'chapters' => $parts->publicOutline(),
+    'lectureStylesUrl' => asset('css/public-lectures.css').'?v='.filemtime(public_path('css/public-lectures.css')),
+    'learningUrl' => route('session.index', ['kurs' => QualificationLearningParts::SLUG], absolute: false),
+    'tachographUrl' => route('session.tachograph', ['model' => 'stoneridge-se5000-8.1'], absolute: false),
+]))->name('public.code95');
+Route::get('/testy', fn (Request $request) => redirect()->route('public.tests', $request->query(), 301))
+    ->name('public.test-catalog');
+Route::view('/testy/tramwaj', 'tests.tram')->name('public.test-catalog.tram');
+Route::get('/testy/adr', [PublicLearningCatalogController::class, 'adr'])->name('public.adr');
+Route::get('/testy/adr-{adrScope}', [PublicLearningCatalogController::class, 'adrScope'])
+    ->where('adrScope', '[a-z0-9-]+')
+    ->name('public.adr.scope');
+Route::get('/testy/kod-95-c', [PublicLearningCatalogController::class, 'test'])
+    ->defaults('testSlug', 'kod-95-c')->name('public.test-catalog.code95-c');
+Route::get('/testy/kod-95-d', [PublicLearningCatalogController::class, 'test'])
+    ->defaults('testSlug', 'kod-95-d')->name('public.test-catalog.code95-d');
+Route::get('/testy/{testSlug}', [PublicLearningCatalogController::class, 'test'])
+    ->middleware(PreventSearchIndexing::class)->name('public.test-catalog.show');
+Route::permanentRedirect('/kurs/testy-adr', '/testy/adr');
 Route::get('/strefa-osk', fn () => Inertia::render('Public/MarketingPlaceholder', [
     'title' => 'Strefa OSK',
     'eyebrow' => 'Dla szkół jazdy — w przygotowaniu',
     'description' => 'Przygotowujemy miejsce dla ośrodków szkolenia kierowców i instruktorów. Tutaj przedstawimy możliwości współpracy z PrawkoNaRaz oraz narzędzia wspierające naukę kursantów. To strona przykładowa — oferta nie jest jeszcze dostępna.',
-]))->name('public.osk');
+]))->middleware(PreventSearchIndexing::class)->name('public.osk');
 Route::get('/szkolenia-z-instruktorem', fn () => Inertia::render('Public/MarketingPlaceholder', [
     'title' => 'Szkolenia z instruktorem',
     'eyebrow' => 'Wsparcie',
     'description' => 'To miejsce jest przygotowane pod ofertę szkoleń z instruktorem i dalszą prezentację szczegółów współpracy.',
-]))->name('public.instructor-training');
+]))->middleware(PreventSearchIndexing::class)->name('public.instructor-training');
 Route::get('/aktualnosci', [NewsroomPlaceholderController::class, 'news'])
     ->name('public.news');
 Route::get('/aktualnosci/feed.xml', NewsroomFeedController::class)
@@ -228,11 +263,19 @@ Route::get('/aktualnosci/temat/{topicSlug}', NewsroomTopicController::class)
 Route::get('/aktualnosci/{articleSlug}', [ContentArticleController::class, 'news'])
     ->where('articleSlug', NewsroomRouteContract::NEWSROOM_ARTICLE_SLUG_PATTERN)
     ->name('public.news.show');
+Route::put('/artykuly/{article}/polubienie', ContentArticleLikeController::class)
+    ->whereNumber('article')
+    ->middleware(['auth', 'throttle:30,1'])
+    ->name('public.articles.like.update');
+Route::put('/artykuly/{article}/reakcja', ContentArticleReactionController::class)
+    ->whereNumber('article')
+    ->middleware(['auth', 'throttle:30,1'])
+    ->name('public.articles.reaction.update');
 Route::get('/reklama', fn () => Inertia::render('Public/MarketingPlaceholder', [
     'title' => 'Reklama',
     'eyebrow' => 'Współpraca',
     'description' => 'To miejsce jest przygotowane pod informacje o reklamie i współpracy partnerskiej.',
-]))->name('public.advertising');
+]))->middleware(PreventSearchIndexing::class)->name('public.advertising');
 Route::get('/partnerzy', PartnersPageController::class)
     ->name('public.partners');
 Route::get('/przepisy', [LegalContentController::class, 'index'])
@@ -251,12 +294,12 @@ Route::get('/spolecznosc', fn () => Inertia::render('Public/MarketingPlaceholder
     'title' => 'Społeczność',
     'eyebrow' => 'Użytkownicy',
     'description' => 'Sekcja społeczności jest przygotowana pod przyszłe funkcje dla kursantów i instruktorów.',
-]))->name('public.community');
+]))->middleware(PreventSearchIndexing::class)->name('public.community');
 Route::get('/statystyki', fn () => Inertia::render('Public/MarketingPlaceholder', [
     'title' => 'Statystyki',
     'eyebrow' => 'Analityka',
     'description' => 'Publiczna strona statystyk została przygotowana jako pusty ekran startowy, niezależny od zalogowanej analityki kategorii.',
-]))->name('public.statistics');
+]))->middleware(PreventSearchIndexing::class)->name('public.statistics');
 Route::get('/cennik', PricingPageController::class)
     ->name('public.pricing');
 Route::get('/regulamin', [ServiceLegalDocumentController::class, 'terms'])
@@ -328,11 +371,20 @@ Route::get('/o-nas', AboutOrganizationController::class)
     ->name('about.organization');
 Route::redirect('/jak-to-dziala', '/testy-na-prawo-jazdy', 301)
     ->name('about.how-it-works');
-Route::redirect('/kontakt', '/#kontakt', 301)
+Route::get('/kontakt', fn () => redirect('/#kontakt', 301))
     ->name('about.contact');
-Route::post('/kontakt', [ContactPageController::class, 'store'])
-    ->middleware('throttle:contact')
-    ->name('about.contact.store');
+Route::middleware('auth')->group(function (): void {
+    Route::get('/kontakt/otworz', fn () => redirect()->route('home')->withFragment('kontakt'))
+        ->name('support.chat.open');
+    Route::get('/kontakt/rozmowa', [SupportChatController::class, 'index'])
+        ->middleware('throttle:support-chat-read')->name('support.chat.index');
+    Route::get('/kontakt/rozmowa/nieprzeczytane', [SupportChatController::class, 'unread'])
+        ->middleware('throttle:support-chat-read')->name('support.chat.unread');
+    Route::post('/kontakt', [SupportChatController::class, 'store'])
+        ->middleware([LimitSupportChatBody::class, 'verified', 'throttle:contact'])->name('about.contact.store');
+    Route::post('/kontakt/rozmowa/odczyt', [SupportChatController::class, 'read'])
+        ->middleware([LimitSupportChatBody::class, 'throttle:support-chat-read'])->name('support.chat.read');
+});
 Route::redirect('/metodologia', '/o-nas', 301)
     ->name('about.methodology');
 Route::redirect('/zasady-redakcyjne', '/o-nas', 301)
@@ -408,12 +460,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('traffic-sign-learning.results.show');
         Route::get('/nauka/kursy/{questionCollection:slug}', [QuestionCollectionLearningController::class, 'show'])
             ->name('learning.question-collections.show');
+        Route::post('/nauka/kursy/{questionCollection:slug}/postep/wyzeruj', [QuestionCollectionLearningController::class, 'resetProgress'])
+            ->middleware('throttle:10,1')->name('learning.question-collections.progress.reset');
         Route::post('/nauka/kursy/{questionCollection:slug}/moduly/{module:slug}/uruchom', [QuestionCollectionLearningController::class, 'start'])
             ->name('learning.question-collections.modules.start');
+        Route::post('/nauka/kursy/{questionCollection:slug}/rozdzialy/{part}/uruchom', [QuestionCollectionLearningController::class, 'startPart'])
+            ->whereNumber('part')->middleware('throttle:30,1')
+            ->name('learning.question-collections.parts.start');
         Route::get('/nauka/kursy/{questionCollection:slug}/bledne-pytania', [QuestionCollectionLearningController::class, 'incorrectQuestions'])
             ->name('learning.question-collections.incorrect-questions.index');
         Route::post('/nauka/kursy/{questionCollection:slug}/bledne-pytania/powtorz', [QuestionCollectionLearningController::class, 'startIncorrectQuestions'])
             ->name('learning.question-collections.incorrect-questions.start');
+        Route::delete('/nauka/kursy/{questionCollection:slug}/bledne-pytania', [QuestionCollectionLearningController::class, 'destroySelectedIncorrectQuestions'])
+            ->middleware('throttle:30,1')
+            ->name('learning.question-collections.incorrect-questions.bulk-destroy');
         Route::delete('/nauka/kursy/{questionCollection:slug}/bledne-pytania/{courseIncorrect}', [QuestionCollectionLearningController::class, 'destroyIncorrectQuestion'])
             ->name('learning.question-collections.incorrect-questions.destroy');
         Route::patch('/nauka/kursy/{questionCollection:slug}/bledne-pytania/ustawienia/automatyczne-usuwanie', [QuestionCollectionLearningController::class, 'updateIncorrectQuestionPreference'])
@@ -444,6 +504,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('review-queue.index');
         Route::get('/nauka/bledne-pytania', [IncorrectQuestionController::class, 'index'])
             ->name('incorrect-questions.index');
+        Route::delete('/nauka/bledne-pytania', [IncorrectQuestionController::class, 'destroySelected'])
+            ->middleware('throttle:30,1')
+            ->name('incorrect-questions.bulk-destroy');
         Route::delete('/nauka/bledne-pytania/{userIncorrectQuestion}', [IncorrectQuestionController::class, 'destroy'])
             ->name('incorrect-questions.destroy');
         Route::patch('/nauka/bledne-pytania/ustawienia/automatyczne-usuwanie', [IncorrectQuestionController::class, 'updatePreference'])
@@ -453,6 +516,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::middleware('study.session.access')->group(function () {
+        Route::get('/nauka/sesje/{studySession}/pytania/{question}/pelne-wyjasnienie', \App\Http\Controllers\StudySessionFullExplanationController::class)
+            ->middleware('throttle:120,1')->name('study-sessions.full-explanation');
+        Route::get('/nauka/sesje/{studySession}/nauka-wstepna', [QualificationPreliminaryLearningController::class, 'show'])
+            ->name('study-sessions.preliminary.show');
+        Route::patch('/nauka/sesje/{studySession}/nauka-wstepna', [QualificationPreliminaryLearningController::class, 'update'])
+            ->middleware('throttle:120,1')->name('study-sessions.preliminary.update');
         Route::get('/session/current', fn () => to_route('study-sessions.current'));
         Route::get('/session/current/questions', fn (Request $request) => to_route(
             'study-sessions.current.questions.index',
@@ -567,6 +636,10 @@ Route::middleware(['auth', 'verified'])->prefix('/api/v1')->group(function () {
     Route::patch('/admin/questions/{question}/explanation', [AdminQuestionExplanationController::class, 'update'])
         ->middleware('throttle:30,1')
         ->name('api.v1.admin.questions.explanation.update');
+    Route::get('/admin/questions/{question}/public-explanation', [AdminQuestionPublicExplanationController::class, 'show'])
+        ->middleware('throttle:60,1')->name('api.v1.admin.questions.public-explanation.show');
+    Route::post('/admin/questions/{question}/public-explanation/preview', [AdminQuestionPublicExplanationController::class, 'preview'])
+        ->middleware('throttle:30,1')->name('api.v1.admin.questions.public-explanation.preview');
     Route::patch('/admin/questions/{question}/public-explanation', [AdminQuestionPublicExplanationController::class, 'update'])
         ->middleware('throttle:30,1')
         ->name('api.v1.admin.questions.public-explanation.update');
