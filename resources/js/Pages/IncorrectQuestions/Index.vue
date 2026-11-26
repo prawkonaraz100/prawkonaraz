@@ -202,7 +202,7 @@ const primaryMedia = (question: IncorrectQuestion) => question.media[0] ?? null;
                         @click="startSession"
                     >
                         {{ sessionForm.processing ? 'Uruchamianie...' : 'Powtórz pytania' }}
-                        <span v-if="!sessionForm.processing" aria-hidden="true">→</span>
+                        <span v-if="!sessionForm.processing" class="hidden md:inline" aria-hidden="true">→</span>
                     </button>
                 </header>
 
@@ -321,7 +321,8 @@ const primaryMedia = (question: IncorrectQuestion) => question.media[0] ?? null;
                                 Błędnie rozwiązane pytania pojawią się na tej liście automatycznie.
                             </p>
                             <Link :href="actions.study_home_url" class="mt-5 inline-flex min-h-10 items-center font-semibold text-[#0b5cff] hover:text-[#0646bf]">
-                                Wróć do nauki →
+                                Wróć do nauki <span class="hidden md:inline md:ml-1" aria-hidden="true">→</span>
+
                             </Link>
                         </div>
 

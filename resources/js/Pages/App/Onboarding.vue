@@ -88,7 +88,7 @@ const finishOnboarding = (destination: 'login' | 'register') => {
                         :disabled="processing"
                         @click="finishOnboarding('register')"
                     >
-                        Rozpocznij naukę <span aria-hidden="true">→</span>
+                        Rozpocznij naukę <span class="hidden md:inline" aria-hidden="true">→</span>
                     </button>
                     <p class="mt-4 text-center text-sm text-white/90">
                         Masz już konto?

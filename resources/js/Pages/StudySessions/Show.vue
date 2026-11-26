@@ -8075,7 +8075,7 @@ watch(
     <SessionCompletionPending :show="showCompletionBusy" />
     <div v-if="courseProgressConflict" role="alert" class="fixed inset-x-3 top-3 z-[90] mx-auto max-w-xl rounded-xl border border-amber-200 bg-[#fff8e9] p-4 text-sm text-[#071b45] shadow-lg">
         <p>{{ syncError }}</p>
-        <Link :href="sessionState.context?.course_url ?? '/nauka'" class="mt-2 inline-flex min-h-11 items-center font-semibold underline">Wróć do panelu nauki →</Link>
+        <Link :href="sessionState.context?.course_url ?? '/nauka'" class="mt-2 inline-flex min-h-11 items-center font-semibold underline">Wróć do panelu nauki <span class="hidden md:inline md:ml-1" aria-hidden="true">→</span></Link>
     </div>
 
     <component :is="activeSessionLayout" :lock-viewport="Boolean(activeQuestion)">
@@ -11255,7 +11255,7 @@ watch(
                             :title="`Przejdź do następnego działu: ${nextSessionTopic.label}`"
                             @click="startNextTopicSession()"
                         >
-                            <span aria-hidden="true" class="text-[1.05rem]">→</span>
+                            <span class="hidden md:inline text-[1.05rem]" aria-hidden="true">→</span>
                             Przejdź do następnego działu
                         </button>
 

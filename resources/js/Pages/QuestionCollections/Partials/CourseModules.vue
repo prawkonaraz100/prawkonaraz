@@ -159,7 +159,8 @@ const learningListActionLabel = (module: CourseModule) =>
                     :href="reviewUrl"
                     class="ml-auto shrink-0 text-sm font-semibold text-[#202a33] underline decoration-[#d3a7a1] underline-offset-4 transition hover:text-[#b42318] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff]"
                 >
-                    Otwórz <span aria-hidden="true">→</span>
+                    Otwórz <span class="hidden md:inline" aria-hidden="true">→</span>
+
                 </Link>
             </div>
             <slot name="actions" />
@@ -211,7 +212,7 @@ const learningListActionLabel = (module: CourseModule) =>
                         </span>
                         <span class="w-9 shrink-0 text-xs font-semibold text-[#00bd78]">{{ module.progress.percent }}%</span>
                     </span>
-                    <span :class="[learningListActionClass, 'col-start-3 row-start-2 min-[1150px]:col-auto min-[1150px]:row-auto']">{{ learningListActionLabel(module) }} <span aria-hidden="true">→</span></span>
+                    <span :class="[learningListActionClass, 'col-start-3 row-start-2 min-[1150px]:col-auto min-[1150px]:row-auto']">{{ learningListActionLabel(module) }} <span class="hidden md:inline" aria-hidden="true">→</span></span>
                 </button>
             </li>
         </ol>
@@ -243,7 +244,7 @@ const learningListActionLabel = (module: CourseModule) =>
                     :disabled="startForm.processing"
                     @click="startModule(module)"
                 >
-                    {{ moduleActionLabel(module) }} <span aria-hidden="true">→</span>
+                    {{ moduleActionLabel(module) }} <span class="hidden md:inline" aria-hidden="true">→</span>
                 </button>
             </li>
         </ol>

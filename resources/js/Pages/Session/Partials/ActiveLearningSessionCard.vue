@@ -26,6 +26,6 @@ defineProps<{
             <p class="mb-1 text-right text-xs font-semibold text-[#53698b]">{{ session.progress.percent }}%</p>
             <div class="h-1.5 overflow-hidden rounded-full bg-[#e7edf2]"><span class="block h-full rounded-full bg-[#00cf85]" :style="{ width: `${session.progress.percent}%` }" /></div>
         </div>
-        <Link :href="session.resume_url" class="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#071b45] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#12346e] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0876f8] focus-visible:ring-offset-2">Wróć do sesji <span aria-hidden="true">→</span></Link>
+        <Link :href="session.resume_url" class="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#071b45] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#12346e] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0876f8] focus-visible:ring-offset-2">Wróć do sesji <span class="hidden md:inline" aria-hidden="true">→</span></Link>
     </section>
 </template>
