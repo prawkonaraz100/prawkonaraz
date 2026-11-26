@@ -678,7 +678,7 @@ const submitPendingAnswer = async () => {
                                 type="button"
                                 class="w-full overflow-hidden border font-semibold transition disabled:cursor-wait focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80 [-webkit-tap-highlight-color:transparent]"
                                 :class="[
-                                    currentQuestion.question_type === 'boolean' ? 'min-h-[3.5rem] text-center text-[0.96rem] uppercase tracking-[0.05em]' : 'flex min-h-14 items-stretch text-left text-[0.95rem]',
+                                    currentQuestion.question_type === 'boolean' ? 'min-h-[3.5rem] text-center text-[0.96rem] uppercase tracking-[0.05em]' : 'flex min-h-14 items-center gap-3 px-3 py-3 text-left text-[0.95rem]',
                                     mobileAnswerClass(option.key),
                                 ]"
                                 :disabled="submitting || !!pendingAnswer"
@@ -686,8 +686,8 @@ const submitPendingAnswer = async () => {
                             >
                                 <template v-if="currentQuestion.question_type === 'boolean'">{{ normalizeExplanationPlainText(option.text) }}</template>
                                 <template v-else>
-                                    <span class="grid min-w-10 place-items-center px-2 text-xs font-semibold" :class="mobileAnswerLabelClass(option.key)">{{ option.label }}</span>
-                                    <span class="self-center px-3 py-3 font-normal leading-6">{{ normalizeExplanationPlainText(option.text) }}</span>
+                                    <span class="grid h-6 w-6 shrink-0 place-items-center rounded-[3px] text-xs font-semibold" :class="mobileAnswerLabelClass(option.key)">{{ option.label }}</span>
+                                    <span class="min-w-0 font-semibold leading-6">{{ normalizeExplanationPlainText(option.text) }}</span>
                                 </template>
                             </button>
                         </div>
