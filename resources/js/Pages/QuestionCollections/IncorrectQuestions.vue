@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import MobileBackButton from '@/Components/MobileBackButton.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import IncorrectQuestionRemovalControls from '@/Components/IncorrectQuestionRemovalControls.vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 interface MediaItem {
     kind: 'image' | 'video';
@@ -37,34 +39,84 @@ interface PaginatedQuestions {
 const props = defineProps<{
     collection: { code: string; name: string; url: string };
     questions: PaginatedQuestions;
+    selection: { ids: number[] };
     stats: { active_count: number };
     preferences: { auto_remove_on_correct: boolean };
-    actions: { start_url: string; preference_url: string };
+    actions: { start_url: string; preference_url: string; bulk_remove_url: string };
     active_session: { id: number; title: string } | null;
 }>();
 
-const startForm = useForm({ replace_active_session: false });
+const startForm = useForm({ replace_active_session: false, replace_active_session_id: null as number | null });
 const preferenceForm = useForm({
     auto_remove_incorrect_questions_on_correct: props.preferences.auto_remove_on_correct,
 });
 const showReplaceConfirmation = ref(false);
+let pendingSessionId: number | null = null;
 const hasQuestions = computed(() => props.stats.active_count > 0);
+const selectedIds = ref<number[]>([]);
+const confirmationOpen = ref(false);
+
+const singleRemovalProcessing = ref(false);
+const bulkNotice = ref('');
+const bulkForm = useForm({ ids: [] as number[], page: props.questions.current_page });
+const removalProcessing = computed(() => bulkForm.processing || singleRemovalProcessing.value);
+const selectedIdSet = computed(() => new Set(selectedIds.value));
+const allPageSelected = computed(() => props.questions.data.length > 0 && props.questions.data.every(question => selectedIdSet.value.has(question.id)));
+const partlySelected = computed(() => props.questions.data.some(question => selectedIdSet.value.has(question.id)) && !allPageSelected.value);
+const allListSelected = computed(() => props.selection.ids.length > 0 && props.selection.ids.every(id => selectedIdSet.value.has(id)));
+const bulkError = computed(() => Object.values(bulkForm.errors)[0] ?? null);
+
+watch(() => [props.collection.code, props.questions.current_page, props.questions.data.map(question => question.id).join(','), props.selection.ids.join(',')].join('|'), () => {
+    selectedIds.value = [];
+    confirmationOpen.value = false;
+    bulkForm.clearErrors();
+});
+const togglePageSelection = (event: Event) => {
+    const pageIds = props.questions.data.map(question => question.id);
+    selectedIds.value = (event.target as HTMLInputElement).checked
+        ? [...new Set([...selectedIds.value, ...pageIds])]
+        : selectedIds.value.filter(id => !pageIds.includes(id));
+    bulkForm.clearErrors();
+    bulkNotice.value = '';
+};
+const toggleListSelection = () => {
+    selectedIds.value = allListSelected.value ? [] : [...props.selection.ids];
+    bulkForm.clearErrors();
+    bulkNotice.value = '';
+};
+const removeSelected = () => {
+    if (!selectedIds.value.length || removalProcessing.value || startForm.processing) return;
+    bulkForm.ids = [...selectedIds.value];
+    bulkForm.page = props.questions.current_page;
+    bulkForm.delete(props.actions.bulk_remove_url, {
+        preserveScroll: true,
+        onSuccess: page => {
+            selectedIds.value = [];
+            confirmationOpen.value = false;
+            bulkNotice.value = (page.props.flash as { status?: string } | undefined)?.status ?? 'Zaznaczone pytania usunięto z listy kursu. Historia i postęp pozostają bez zmian.';
+        },
+        onError: () => { confirmationOpen.value = false; },
+    });
+};
 
 const startReview = (replaceActiveSession = false) => {
     startForm.replace_active_session = replaceActiveSession;
+    startForm.replace_active_session_id = replaceActiveSession ? pendingSessionId : null;
     startForm.post(props.actions.start_url, {
         onFinish: () => {
             startForm.replace_active_session = false;
+            startForm.replace_active_session_id = null;
         },
     });
 };
 
 const requestStart = () => {
-    if (!hasQuestions.value) {
+    if (!hasQuestions.value || removalProcessing.value || startForm.processing) {
         return;
     }
 
     if (props.active_session) {
+        pendingSessionId = props.active_session.id;
         showReplaceConfirmation.value = true;
 
         return;
@@ -74,7 +126,13 @@ const requestStart = () => {
 };
 
 const removeQuestion = (question: CourseQuestion) => {
-    router.delete(question.remove_url, { preserveScroll: true });
+    if (removalProcessing.value || startForm.processing) return;
+    singleRemovalProcessing.value = true;
+    bulkNotice.value = '';
+    router.delete(question.remove_url, {
+        preserveScroll: true,
+        onFinish: () => { singleRemovalProcessing.value = false; },
+    });
 };
 
 const savePreference = () => {
@@ -88,28 +146,31 @@ const primaryMedia = (question: CourseQuestion) => question.media[0] ?? null;
     <Head :title="`Pytania do poprawy - ${collection.name}`" />
 
     <AuthenticatedLayout>
-        <main class="min-h-screen bg-[#fbfcfd] px-4 py-5 sm:px-6 xl:py-6">
+        <main class="min-h-screen bg-[#fbfcfd] px-4 py-5 max-md:pt-[max(env(safe-area-inset-top),1rem)] sm:px-6 xl:py-6">
             <div class="mx-auto max-w-[72rem]">
                 <Link
                     :href="collection.url"
-                    class="inline-flex items-center gap-2 text-sm font-semibold text-[#596671] transition hover:text-[#101820] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff]"
+                    class="inline-flex items-center gap-2 text-sm font-semibold text-[#596671] transition hover:text-[#101820] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] max-md:hidden"
                 >
                     <span aria-hidden="true">←</span>
                     Wróć do kursu
                 </Link>
 
-                <header class="mt-4 flex flex-wrap items-end justify-between gap-4 border-b border-[#d7dde1] pb-4">
+                <header class="mt-4 flex flex-wrap items-end justify-between gap-4 border-b border-[#d7dde1] pb-4 max-md:mt-0">
+                    <div class="flex min-w-0 items-center gap-3">
+                    <MobileBackButton :href="collection.url" label="Wróć do kursu" />
                     <div class="min-w-0">
                         <p class="text-xs font-medium text-[#667085]">{{ collection.name }}</p>
                         <div class="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                            <h1 class="text-2xl font-semibold leading-tight text-[#101820]">Pytania do poprawy</h1>
+                            <h1 class="text-2xl font-semibold leading-tight text-[#101820] max-md:text-[1.75rem] max-md:font-bold max-md:leading-[1.1] max-md:tracking-[-0.015em]">Pytania do poprawy</h1>
                             <span class="text-sm font-medium text-[#667085]">{{ stats.active_count }} {{ stats.active_count === 1 ? 'pytanie' : 'pytań' }}</span>
                         </div>
+                    </div>
                     </div>
                     <button
                         type="button"
                         class="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-[5px] bg-[#101820] px-4 text-sm font-semibold text-white transition hover:bg-[#26323d] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] disabled:cursor-not-allowed disabled:bg-[#98a2b3]"
-                        :disabled="!hasQuestions || startForm.processing"
+                        :disabled="!hasQuestions || startForm.processing || removalProcessing"
                         @click="requestStart"
                     >
                         {{ startForm.processing ? 'Uruchamianie...' : 'Powtórz pytania' }} <span v-if="!startForm.processing" aria-hidden="true">→</span>
@@ -126,6 +187,7 @@ const primaryMedia = (question: CourseQuestion) => question.media[0] ?? null;
                                         v-model="preferenceForm.auto_remove_incorrect_questions_on_correct"
                                         type="checkbox"
                                         class="peer sr-only"
+                                        :disabled="removalProcessing || preferenceForm.processing"
                                         @change="savePreference"
                                     >
                                     <span class="relative h-5 w-9 shrink-0 rounded-full bg-[#cbd3d9] transition peer-checked:bg-[#344054] peer-focus-visible:ring-2 peer-focus-visible:ring-[#0b5cff] peer-focus-visible:ring-offset-2 after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:shadow-sm after:transition peer-checked:after:translate-x-4" aria-hidden="true" />
@@ -137,12 +199,36 @@ const primaryMedia = (question: CourseQuestion) => question.media[0] ?? null;
                             </div>
                         </div>
 
+                        <IncorrectQuestionRemovalControls
+                            :page-count="questions.data.length"
+                            :total="questions.total"
+                            :selection-count="selection.ids.length"
+                            :selected-count="selectedIds.length"
+                            :all-page-selected="allPageSelected"
+                            :partly-selected="partlySelected"
+                            :all-list-selected="allListSelected"
+                            :disabled="removalProcessing || startForm.processing"
+                            :processing="bulkForm.processing"
+                            :confirmation-open="confirmationOpen"
+                            :context-label="collection.name"
+                            :notice="bulkNotice"
+                            :error="bulkError"
+                            @toggle-page="togglePageSelection"
+                            @toggle-list="toggleListSelection"
+                            @open="confirmationOpen = true; bulkForm.clearErrors()"
+                            @close="confirmationOpen = false"
+                            @confirm="removeSelected"
+                        />
+
                         <div v-if="questions.data.length" class="space-y-2">
                             <article
                                 v-for="question in questions.data"
                                 :key="question.id"
-                                class="group grid grid-cols-[4.5rem_minmax(0,1fr)] items-center gap-x-3 gap-y-2 bg-white px-3 py-2.5 transition-colors hover:bg-[#f8fbfd] sm:grid-cols-[6rem_minmax(0,1fr)_auto] sm:gap-x-4"
+                                class="group grid grid-cols-[2.75rem_4.5rem_minmax(0,1fr)] items-center gap-x-2 gap-y-2 bg-white px-3 py-2.5 transition-colors hover:bg-[#f8fbfd] sm:grid-cols-[2.75rem_6rem_minmax(0,1fr)_auto] sm:gap-x-4"
                             >
+                                <label class="row-span-2 grid min-h-11 w-11 cursor-pointer place-items-center sm:row-span-1">
+                                    <input v-model="selectedIds" type="checkbox" :value="question.id" :disabled="removalProcessing || startForm.processing" :aria-label="`Zaznacz pytanie: ${question.prompt}`" class="h-4 w-4 rounded border-[#98a2b3] text-[#344054] focus:ring-[#0b5cff]">
+                                </label>
                                 <div class="h-[3.375rem] w-[4.5rem] overflow-hidden bg-[#eef2f6] sm:h-[4.5rem] sm:w-[6rem]">
                                     <img
                                         v-if="primaryMedia(question)?.kind === 'image'"
@@ -177,7 +263,8 @@ const primaryMedia = (question: CourseQuestion) => question.media[0] ?? null;
 
                                 <button
                                     type="button"
-                                    class="col-start-2 justify-self-start text-xs font-semibold text-[#b42318] underline decoration-[#f0b8b2] underline-offset-4 transition hover:text-[#8e1d15] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] sm:col-start-auto sm:justify-self-auto"
+                                    class="col-start-3 min-h-11 justify-self-start text-xs font-semibold text-[#b42318] underline decoration-[#f0b8b2] underline-offset-4 transition hover:text-[#8e1d15] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] disabled:opacity-50 sm:col-start-auto sm:justify-self-auto"
+                                    :disabled="removalProcessing || startForm.processing"
                                     :aria-label="`Usuń z listy: ${question.prompt}`"
                                     @click="removeQuestion(question)"
                                 >
@@ -204,8 +291,10 @@ const primaryMedia = (question: CourseQuestion) => question.media[0] ?? null;
                                 class="inline-flex min-h-10 min-w-10 items-center justify-center rounded-[5px] border px-3 text-sm font-semibold"
                                 :class="[
                                     link.active ? 'border-[#101820] bg-[#101820] text-white' : 'border-[#d0d5dd] bg-white text-[#475467]',
-                                    !link.url ? 'pointer-events-none opacity-40' : 'hover:border-[#98a2b3]',
+                                    !link.url || removalProcessing || startForm.processing ? 'pointer-events-none opacity-40' : 'hover:border-[#98a2b3]',
                                 ]"
+                                :aria-disabled="!link.url || removalProcessing || startForm.processing"
+                                @click="($event) => { if (removalProcessing || startForm.processing) $event.preventDefault(); }"
                                 preserve-scroll
                             >
                                 <span v-html="link.label" />
