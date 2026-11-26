@@ -228,6 +228,7 @@ interface RankedApiMatchQuestion {
     id: number;
     question_number: number;
     question_text: string;
+    question_type?: string;
     media?: QuestionMediaSourceLike[];
     answers: Record<string, string>;
     selected_answer: string | null;
@@ -3282,14 +3283,26 @@ const backendTransportChipClass = computed(() => {
                             v-for="(label, key) in backendSelectedQuestion.answers"
                             :key="key"
                             type="button"
-                            class="min-h-[3.9rem] px-4 py-3 text-center text-[1.05rem] font-semibold leading-6 tracking-tight transition-[background-color,box-shadow,color] duration-200 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] disabled:cursor-not-allowed"
-                            :class="backendSelectedQuestion.selected_answer === key
+                            class="font-semibold leading-6 tracking-tight transition-[background-color,box-shadow,color] duration-200 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] disabled:cursor-not-allowed"
+                            :class="[backendSelectedQuestion.question_type === 'boolean'
+                                ? 'min-h-[3.9rem] px-4 py-3 text-center text-[1.05rem] uppercase'
+                                : 'flex min-h-14 items-center gap-3 px-3 py-3 text-left text-[0.95rem]',
+                                backendSelectedQuestion.selected_answer === key
                                 ? 'pk-selected bg-[#eaf3ff] text-[#0b5cff]'
-                                : 'bg-white text-[#101828] shadow-[0_6px_16px_rgba(36,33,28,0.04)] hover:bg-[#f2f4f7]'"
+                                : 'bg-white text-[#101828] shadow-[0_6px_16px_rgba(36,33,28,0.04)] hover:bg-[#f2f4f7]']"
                             :disabled="backendMatchBusy || backendSelectedQuestion.is_answered || backendMatchInteractionLocked"
                             @click="submitBackendAnswer(backendSelectedQuestion.id, key)"
                         >
-                            {{ key }}. {{ label }}
+                            <template v-if="backendSelectedQuestion.question_type === 'boolean'">{{ label }}</template>
+                            <template v-else>
+                                <span
+                                    data-answer-badge
+                                    class="grid h-6 w-6 shrink-0 place-items-center rounded-[3px] text-xs font-semibold"
+                                    :class="backendSelectedQuestion.selected_answer === key ? 'bg-[#0b5cff] text-white' : 'bg-[#f2f4f7] text-[#101828]'"
+                                    aria-hidden="true"
+                                >{{ key }}</span>
+                                <span class="min-w-0"><span class="sr-only">{{ key }}. </span>{{ label }}</span>
+                            </template>
                         </button>
                     </div>
                     <p v-if="backendMatchInteractionLocked" class="mx-auto mt-2 max-w-[30rem] text-center text-[0.78rem] text-[#7f6327]">

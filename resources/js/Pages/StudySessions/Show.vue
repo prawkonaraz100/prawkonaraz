@@ -9794,15 +9794,17 @@ watch(
                                         :class="[
                                             answerButtonClass,
                                             answerOptionStateClass(option.key),
+                                            activeQuestion.question_type !== 'boolean' ? 'max-md:flex max-md:min-h-14 max-md:items-center max-md:gap-3 max-md:px-3 max-md:py-3 max-md:text-left max-md:text-[0.95rem]' : '',
                                         ]"
                                         :disabled="!canSelectAnswer"
                                         @click="selectAnswer(option.key)"
                                     >
-                                        {{
-                                            activeQuestion.question_type === 'boolean'
-                                                ? option.text.toUpperCase()
-                                                : `${option.label}. ${option.text}`
-                                        }}
+                                        <template v-if="activeQuestion.question_type === 'boolean'">{{ option.text.toUpperCase() }}</template>
+                                        <template v-else>
+                                            <!-- Phones: the shared answer tile (letter badge, text from the left); desktop keeps "A. text". -->
+                                            <span data-answer-badge class="hidden h-6 w-6 shrink-0 place-items-center rounded-[3px] bg-[#f2f4f7] text-xs font-semibold max-md:grid" aria-hidden="true">{{ option.label }}</span>
+                                            <span class="min-w-0"><span class="max-md:sr-only">{{ option.label }}. </span>{{ option.text }}</span>
+                                        </template>
                                     </button>
                                 </div>
                             </div>
