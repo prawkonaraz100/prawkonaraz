@@ -7957,6 +7957,14 @@ body:has([data-auth-dialog-open='true'], [data-auth-login-open='true'], [data-au
         backdrop-filter: none;
     }
 
+    /* Bottom sheets and dialogs drawn as a light box inside a fixed backdrop (e.g. exam "Opcje"). */
+    .pk-dark-scope .fixed > :not(a, button):is([class*='bg-white'], [class*='bg-[#f']):is([class*='rounded-t'], [class*='overflow-y-auto'], [role='dialog']) {
+        background-color: #302e2b;
+        background-image: none;
+        border-color: rgb(255 255 255 / 10%);
+        box-shadow: 0 -12px 32px rgb(0 0 0 / 45%);
+    }
+
     /* Translucent light buttons (bg-white/NN) become secondary buttons like bg-white. */
     .pk-dark-scope :is(a, button):is(.bg-white\/56, .bg-white\/64, .bg-white\/72, .bg-white\/84, .bg-white\/86, .bg-white\/90, .bg-white\/92):not(.rounded-full) {
         border-color: transparent;
