@@ -77,9 +77,18 @@ class RankedMatchService
         return $match->started_at->copy()->addSeconds($questionIndex * $interval);
     }
 
+    /**
+     * Harmonogram odpowiedzi nagrania (ms od startu) dla meczu z nagraniem, pamiętany w procesie.
+     * W długo działającym `ranked:clock` oszczędza czytanie odpowiedzi źródłowych co sekundę.
+     *
+     * @var array<int, list<int>>
+     */
+    protected array $replayScheduleCache = [];
+
     public function __construct(
         protected StudyContextService $studyContextService,
         protected RankedMatchPresenceStore $presenceStore,
+        protected RankedRealtimeSignal $realtimeSignal,
     ) {}
 
     /**
@@ -141,6 +150,145 @@ class RankedMatchService
             'checked' => $matchIds->count(),
             'resolved' => $resolved,
         ];
+    }
+
+    /**
+     * Jeden tick wspólnego zegara (etap 1e, `ranked:clock`): przejścia czasowe wszystkich
+     * aktywnych meczów (start po odliczaniu, odpowiedzi nagrań, koniec czasu, rozłączenie, walkower)
+     * oraz łączenie graczy, którzy minęli się w kolejce. Dzięki temu strumień SSE nie musi
+     * liczyć tych przejść co sekundę dla każdego gracza osobno.
+     *
+     * @return array{checked:int, resolved:int, paired:int}
+     */
+    public function clockTick(bool $expireQueue = true, int $limit = 200): array
+    {
+        if ($expireQueue) {
+            $this->runWithSqliteBusyRetry(fn () => $this->expireTimedOutQueuedEntries());
+        }
+
+        $paired = $this->pairWaitingQueueEntries();
+
+        // Jedno zapytanie o mecze i jedno o graczy dla wszystkich aktywnych meczów.
+        $matches = RankedMatch::query()
+            ->with($this->defaultMatchRelations())
+            ->whereIn('status', ['matched', 'in_progress'])
+            ->orderBy('id')
+            ->limit($limit)
+            ->get();
+
+        $resolved = 0;
+        $now = now();
+
+        foreach ($matches as $match) {
+            if (! $this->hasDueTransition($match, $now)) {
+                continue;
+            }
+
+            // Coś wypada: wczytujemy mecz ponownie w transakcji i liczymy przejścia jak przy odczycie.
+            $match = $this->syncMatchPresence($match);
+
+            if (! $this->isActiveMatch($match)) {
+                $resolved++;
+                unset($this->replayScheduleCache[$match->getKey()]);
+            }
+        }
+
+        if (count($this->replayScheduleCache) > 500) {
+            $this->replayScheduleCache = [];
+        }
+
+        return [
+            'checked' => $matches->count(),
+            'resolved' => $resolved,
+            'paired' => $paired,
+        ];
+    }
+
+    /**
+     * Czy w meczu może być coś do zrobienia teraz. Bez zapisów i bez blokad: sprawdza tylko czasy
+     * w pamięci i obecność w Redis. Prawdziwe przejście i tak liczy applyPresenceTransitions.
+     */
+    protected function hasDueTransition(RankedMatch $match, Carbon $now): bool
+    {
+        if ($match->status === 'matched') {
+            if ($match->countdown_started_at
+                && $now->greaterThanOrEqualTo($match->countdown_started_at->copy()->addSeconds(max((int) $match->countdown_seconds, 1)))) {
+                return true;
+            }
+        }
+
+        $finishAt = $this->scheduledMatchFinishAt($match);
+
+        if ($finishAt && $now->greaterThanOrEqualTo($finishAt)) {
+            return true;
+        }
+
+        if ($this->replayAnswersDue($match, $now)) {
+            return true;
+        }
+
+        foreach ($match->players as $player) {
+            if ($player->is_replay) {
+                continue;
+            }
+
+            if ($player->presence_state === 'disconnected') {
+                if ($player->reconnect_deadline_at && $now->greaterThan($player->reconnect_deadline_at)) {
+                    return true;
+                }
+
+                continue;
+            }
+
+            if ($now->greaterThan($this->presenceReferenceTime($match, $player)->copy()->addSeconds(self::DISCONNECT_TIMEOUT_SECONDS))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Łączy graczy z tej samej kategorii, którzy czekają w kolejce, a minęli się przy dołączaniu
+     * (wcześniej robiło to dopiero odświeżenie stanu w strumieniu jednego z nich).
+     */
+    protected function pairWaitingQueueEntries(int $limit = 50): int
+    {
+        $categoryIds = RankedQueueEntry::query()
+            ->where('status', 'queued')
+            ->groupBy('license_category_id')
+            ->havingRaw('COUNT(*) >= 2')
+            ->pluck('license_category_id');
+
+        if ($categoryIds->isEmpty()) {
+            return 0;
+        }
+
+        $paired = 0;
+
+        $entryIds = RankedQueueEntry::query()
+            ->where('status', 'queued')
+            ->whereIn('license_category_id', $categoryIds)
+            ->orderBy('joined_at')
+            ->orderBy('id')
+            ->limit($limit)
+            ->pluck('id');
+
+        foreach ($entryIds as $entryId) {
+            $entry = RankedQueueEntry::query()->find($entryId);
+
+            if (! $entry || $entry->status !== 'queued') {
+                continue;
+            }
+
+            $result = $this->runWithSqliteBusyRetry(fn () => $this->matchQueueEntryIfPossible($entry));
+
+            if ($result->status === 'matched') {
+                $paired++;
+            }
+        }
+
+        return $paired;
     }
 
     /**
@@ -274,6 +422,8 @@ class RankedMatchService
             $result = $this->runWithSqliteBusyRetry($attemptJoin);
         }
 
+        $this->realtimeSignal->bumpUsers([$user->getKey()]);
+
         return [
             ...$result,
             'state' => $state,
@@ -324,6 +474,8 @@ class RankedMatchService
                 'capacity' => $this->capacitySnapshot(),
             ];
         });
+
+        $this->realtimeSignal->bumpUsers([$user->getKey()]);
 
         return [
             ...$result,
@@ -1641,7 +1793,7 @@ class RankedMatchService
             $fingerprint ?? Str::uuid()->toString(),
         );
 
-        RankedMatchEvent::query()->firstOrCreate(
+        $event = RankedMatchEvent::query()->firstOrCreate(
             ['event_id' => $eventId],
             [
                 'ranked_match_id' => $match->getKey(),
@@ -1651,6 +1803,28 @@ class RankedMatchService
                 'occurred_at' => $occurredAt,
             ],
         );
+
+        if ($event->wasRecentlyCreated) {
+            // Strumienie obu graczy zobaczą zmianę przy najbliższym sprawdzeniu (co ~250 ms).
+            $this->realtimeSignal->bumpUsersAfterCommit($this->liveUserIdsForMatch($match));
+        }
+    }
+
+    /**
+     * @return list<int>
+     */
+    protected function liveUserIdsForMatch(RankedMatch $match): array
+    {
+        $players = $match->relationLoaded('players')
+            ? $match->players
+            : RankedMatchPlayer::query()->where('ranked_match_id', $match->getKey())->get(['user_id', 'is_replay']);
+
+        return $players
+            ->reject(fn (RankedMatchPlayer $player) => (bool) $player->is_replay)
+            ->pluck('user_id')
+            ->map(fn ($userId) => (int) $userId)
+            ->values()
+            ->all();
     }
 
     protected function clearMatchPresence(RankedMatch $match): void
@@ -1953,6 +2127,11 @@ class RankedMatchService
             max((int) $match->duration_seconds, 1) * 1000,
         );
 
+        // Szybka ścieżka bez blokady i bez czytania odpowiedzi: nic nowego jeszcze nie wypada.
+        if (! $this->replayAnswersDue($match, $now)) {
+            return $match;
+        }
+
         // Blokada wiersza meczu: dwa równoległe odświeżenia nie odtworzą tej samej odpowiedzi dwa razy.
         RankedMatch::query()->whereKey($match->getKey())->lockForUpdate()->first();
 
@@ -2032,6 +2211,77 @@ class RankedMatchService
         $this->maybeFinishMatch($match);
 
         return $this->freshMatch($match) ?? $match;
+    }
+
+    /**
+     * Czy według harmonogramu nagrania wypada już więcej odpowiedzi, niż odtworzono.
+     * Odtworzone liczymy z licznika gracza-nagrania (total_answered), więc bez zapytań do odpowiedzi.
+     */
+    protected function replayAnswersDue(RankedMatch $match, Carbon $now): bool
+    {
+        if (! $match->isReplay() || $match->status !== 'in_progress' || ! $match->started_at) {
+            return false;
+        }
+
+        $match->loadMissing('players');
+        $replayPlayer = $match->players->firstWhere('is_replay', true);
+
+        if (! $replayPlayer) {
+            return false;
+        }
+
+        $limitMs = min(
+            $this->elapsedMsSinceMatchStart($match, $now),
+            max((int) $match->duration_seconds, 1) * 1000,
+        );
+
+        $dueCount = 0;
+
+        foreach ($this->replaySchedule($match) as $elapsedMs) {
+            if ($elapsedMs > $limitMs) {
+                break;
+            }
+
+            $dueCount++;
+        }
+
+        return $dueCount > (int) $replayPlayer->total_answered;
+    }
+
+    /**
+     * Posortowane momenty (ms od startu) odpowiedzi nagranego gracza na pytania tego meczu.
+     *
+     * @return list<int>
+     */
+    protected function replaySchedule(RankedMatch $match): array
+    {
+        $matchId = (int) $match->getKey();
+
+        if (isset($this->replayScheduleCache[$matchId])) {
+            return $this->replayScheduleCache[$matchId];
+        }
+
+        $sourceMatch = RankedMatch::query()->find($match->replay_source_match_id);
+
+        if (! $sourceMatch) {
+            return $this->replayScheduleCache[$matchId] = [];
+        }
+
+        $questionIds = collect($match->payload['question_ids'] ?? [])
+            ->map(fn ($questionId) => (int) $questionId)
+            ->flip();
+
+        $schedule = RankedMatchAnswer::query()
+            ->where('ranked_match_id', $sourceMatch->getKey())
+            ->where('user_id', $match->replay_source_user_id)
+            ->get()
+            ->filter(fn (RankedMatchAnswer $answer) => $questionIds->has((int) $answer->question_id))
+            ->map(fn (RankedMatchAnswer $answer) => $this->replayAnswerElapsedMs($sourceMatch, $answer))
+            ->sort()
+            ->values()
+            ->all();
+
+        return $this->replayScheduleCache[$matchId] = $schedule;
     }
 
     protected function replayAnswerElapsedMs(RankedMatch $sourceMatch, RankedMatchAnswer $answer): int

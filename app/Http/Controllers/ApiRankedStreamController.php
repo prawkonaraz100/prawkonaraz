@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\RankedQueueEntry;
-use App\Support\RankedRealtimeConnectionState;
 use App\Support\RankedRealtimeEventStreamPublisher;
+use App\Support\RankedRealtimeStreamLoop;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -13,12 +13,18 @@ class ApiRankedStreamController extends Controller
     public function __invoke(
         Request $request,
         RankedRealtimeEventStreamPublisher $publisher,
+        RankedRealtimeStreamLoop $loop,
     ): StreamedResponse {
         $user = $request->user();
         $maxTicks = max(1, min($request->integer('max_ticks', 25), 60));
         $sleepMs = max(0, min($request->integer('sleep_ms', 1000), 5000));
+        $lightweightLifetime = $request->has('max_ticks')
+            ? null
+            : (float) config('ranked.sse_lightweight_lifetime_seconds', 55);
 
         return response()->stream(function () use (
+            $lightweightLifetime,
+            $loop,
             $maxTicks,
             $publisher,
             $sleepMs,
@@ -30,17 +36,6 @@ class ApiRankedStreamController extends Controller
                 @set_time_limit(0);
             }
 
-            $previousOverviewHash = null;
-            $previousQueueSnapshot = null;
-            $previousQueueQueuedHash = null;
-            $previousQueueServerFullHash = null;
-            $previousQueueMatchedId = null;
-            $streamMatchPublicId = null;
-            $streamQueueMatchPublicId = null;
-            $streamHeartbeatMatchPublicId = null;
-            $afterEventId = null;
-            $lastHeartbeatAt = null;
-
             $emit = function (string $eventName, array $payload): void {
                 echo "event: {$eventName}\n";
                 echo 'data: '.json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)."\n\n";
@@ -49,33 +44,20 @@ class ApiRankedStreamController extends Controller
                 @flush();
             };
 
+            $keepalive = function (): void {
+                echo ": keepalive\n\n";
+                @ob_flush();
+                @flush();
+            };
+
             echo "retry: 2000\n\n";
             @ob_flush();
             @flush();
 
-            $state = new RankedRealtimeConnectionState;
-
             $emit('stream.ready', $publisher->streamReadyPayload());
 
-            for ($tick = 0; $tick < $maxTicks; $tick++) {
-                if (connection_aborted()) {
-                    break;
-                }
-
-                foreach ($publisher->publish($user, $state) as $message) {
-                    $emit($message['event'], $message['payload']);
-                }
-
-                if ($tick < $maxTicks - 1) {
-                    echo ": keepalive\n\n";
-                    @ob_flush();
-                    @flush();
-
-                    if ($sleepMs > 0) {
-                        usleep($sleepMs * 1000);
-                    }
-                }
-            }
+            // Tryb lekki, gdy działa wspólny zegar (etap 1e); inaczej dawne liczenie stanu co sleep_ms.
+            $loop->run($user, $emit, $keepalive, $maxTicks, $sleepMs, $lightweightLifetime);
         }, 200, [
             'Content-Type' => 'text/event-stream',
             'Cache-Control' => 'no-cache, no-transform',
