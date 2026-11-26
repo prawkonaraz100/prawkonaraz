@@ -8,7 +8,9 @@ use App\Support\PublicFooter;
 use App\Support\PublicNavigation;
 use App\Support\StudyContextService;
 use App\Support\UserAvatarService;
+use Closure;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -19,6 +21,18 @@ class HandleInertiaRequests extends Middleware
      * @var string
      */
     protected $rootView = 'app';
+
+    public function handle(Request $request, Closure $next): Response
+    {
+        $response = parent::handle($request, $next);
+
+        // Inertia sets Vary after the controller; preserve the category HTML variant.
+        if ($request->routeIs('public.news.categories.show')) {
+            $response->setVary('X-Newsroom-Append', false);
+        }
+
+        return $response;
+    }
 
     /**
      * Determine the current asset version.
@@ -35,21 +49,47 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        if (! $request->header('X-Inertia') && $request->routeIs('api.v1.ranked.*')) {
+            return parent::share($request);
+        }
+
+        // These named endpoints return JSON or redirects, never an Inertia page.
+        // Do not prepare page-only navigation/category queries for every answer.
+        // Keep Inertia visits and the parent's validation-error contract intact.
+        if (! $request->header('X-Inertia') && $request->routeIs(
+            'streak-challenge.state',
+            'streak-challenge.start',
+            'streak-challenge.answer',
+            'study-sessions.current.questions.index',
+            'study-sessions.current.questions.show',
+            'study-sessions.current.answers.store',
+            'study-sessions.current.complete',
+            'study-sessions.questions.index',
+            'study-sessions.questions.show',
+            'study-sessions.answers.store',
+            'study-sessions.complete',
+            'study-sessions.preliminary.show',
+            'study-sessions.preliminary.update',
+            'support.chat.index',
+            'support.chat.unread',
+            'support.chat.read',
+            'about.contact.store',
+        )) {
+            return parent::share($request);
+        }
+
+        if (! $request->header('X-Inertia') && $request->routeIs('public.news.categories.show')
+            && $request->header('X-Newsroom-Append') === '1') {
+            return parent::share($request);
+        }
+
         $studyContext = app(StudyContextService::class);
         $navigation = app(PublicNavigation::class);
         $footer = app(PublicFooter::class);
         $user = $request->user();
         $userAvatar = $user ? app(UserAvatarService::class)->payload($user) : null;
         $navigationData = $navigation->data($user);
-        $registrationCategories = $user ? [] : fn () => $studyContext->activeCategories()
-            ->map(fn ($category) => [
-                'id' => $category->getKey(),
-                'code' => $category->code,
-                'name' => $category->name,
-                'short_name' => $studyContext->shortCategoryName($category),
-            ])
-            ->values()
-            ->all();
+        $registrationCategories = $user ? [] : fn () => $studyContext->registrationOptions();
 
         return [
             ...parent::share($request),
@@ -78,6 +118,13 @@ class HandleInertiaRequests extends Middleware
                 'paymentRequired' => app(PaymentRequirementService::class)->requiresPayment(),
             ],
             'googleIdentity' => $this->googleIdentityConfig(),
+            'supportChatVisible' => ! $request->routeIs(
+                'study-sessions.current',
+                'study-sessions.preliminary.show',
+                'public.tests.demo.show',
+                'traffic-sign-learning.current',
+                'session.ranking.match',
+            ) && ! ($request->routeIs('session.index') && $request->query('widok') === 'trening'),
             'navigation' => $navigationData,
             'footer' => $footer->data($user, $navigationData),
             'studyContext' => $user ? [
