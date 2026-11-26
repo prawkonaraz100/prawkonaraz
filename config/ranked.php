@@ -15,4 +15,18 @@ return [
     'websocket_ticket_ttl_seconds' => (int) env('RANKED_WEBSOCKET_TICKET_TTL_SECONDS', 180),
     'sse_enabled' => filter_var(env('RANKED_SSE_ENABLED', true), FILTER_VALIDATE_BOOL),
     'sse_retry_ms' => (int) env('RANKED_SSE_RETRY_MS', 2000),
+
+    // Format meczu. Pytanie nr i (od 0) odblokowuje się po starcie + i × question_interval_seconds,
+    // więc gracz odpowiada najwyżej raz na odstęp. 0 = dawny tryb „we własnym tempie”.
+    // 15 × 6 s: ostatnie pytanie w 84. s, czas meczu 90 s.
+    'match_questions' => max(1, (int) env('RANKED_MATCH_QUESTIONS', 15)),
+    'question_interval_seconds' => max(0, (int) env('RANKED_QUESTION_INTERVAL_SECONDS', 6)),
+    'match_duration_seconds' => max(10, (int) env('RANKED_MATCH_DURATION_SECONDS', 90)),
+
+    // Ile osób naraz może być w kolejce i w meczach (kolejni dostają „Brak wolnych miejsc”).
+    // Pula SSE w PHP-FPM i limit nginx muszą mieć zapas ponad tę wartość (ok. +4).
+    'max_concurrent_players' => max(2, (int) env('RANKED_MAX_CONCURRENT_PLAYERS', 100)),
+
+    // Jak długo pamiętać pozytywną decyzję dostępu do produktu dla API rankingu (0 = bez cache).
+    'access_cache_seconds' => max(0, (int) env('RANKED_ACCESS_CACHE_SECONDS', 60)),
 ];

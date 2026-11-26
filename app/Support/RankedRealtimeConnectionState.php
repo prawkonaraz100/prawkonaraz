@@ -28,4 +28,6 @@ class RankedRealtimeConnectionState
     public ?string $afterEventId = null;
 
     public ?Carbon $lastHeartbeatAt = null;
+
+    public ?Carbon $lastPresenceTouchAt = null;
 }

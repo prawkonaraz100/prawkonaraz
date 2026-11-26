@@ -110,6 +110,7 @@ class ApiRankedMatchController extends Controller
                     'answered_at' => $answer->answered_at?->toIso8601String(),
                 ],
                 'match' => $payloadBuilder->matchSummary($match, $request->user()),
+                'server_now' => RankedMatchPayloadBuilder::serverNow(),
                 'progress' => $payloadBuilder->playerProgress($match, $request->user()),
             ],
         ]);

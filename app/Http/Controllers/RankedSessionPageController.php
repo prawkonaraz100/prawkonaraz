@@ -77,6 +77,18 @@ class RankedSessionPageController extends Controller
             ->all();
         $currentUserRanking = $this->currentUserRanking($request);
 
+        // Lista pomija bieżącego gracza, więc gracze za nim przesuwają się o jedno miejsce
+        // (inaczej np. dwie osoby miałyby miejsce 5).
+        if ($currentUserRanking !== null) {
+            $leaderboard = array_map(function (array $entry) use ($currentUserRanking): array {
+                if ($entry['position'] >= $currentUserRanking['position']) {
+                    $entry['position']++;
+                }
+
+                return $entry;
+            }, $leaderboard);
+        }
+
         return Inertia::render('Session/Ranking', [
             'selectedCategory' => $selectedCategory ? [
                 'id' => $selectedCategory->getKey(),
@@ -101,9 +113,10 @@ class RankedSessionPageController extends Controller
                 'disconnect_timeout_seconds' => 30,
                 'reconnect_grace_seconds' => 25,
                 'matchmaking_timeout_seconds' => RankedMatchService::MATCHMAKING_TIMEOUT_SECONDS,
-                'match_duration_seconds' => 90,
-                'total_questions' => 40,
-                'max_concurrent_players' => RankedMatchService::MAX_CONCURRENT_PLAYERS,
+                'match_duration_seconds' => RankedMatchService::matchDurationSeconds(),
+                'total_questions' => RankedMatchService::matchQuestions(),
+                'question_interval_seconds' => RankedMatchService::questionIntervalSeconds(),
+                'max_concurrent_players' => RankedMatchService::maxConcurrentPlayers(),
                 'replay_offer_after_seconds' => RankedMatchService::REPLAY_OFFER_AFTER_SECONDS,
                 'implementation_status' => 'transport_negotiation_with_websocket_ready_client',
             ],
@@ -135,7 +148,13 @@ class RankedSessionPageController extends Controller
     private function resolveRankedCategory(Request $request, StudyContextService $studyContextService): ?LicenseCategory
     {
         $user = $request->user();
-        $candidates = $studyContextService->activeCategories($user);
+        $candidates = $studyContextService->activeCategories($user)
+            ->reject(fn (LicenseCategory $category): bool => in_array(
+                $category->code,
+                StudyContextService::STANDALONE_COURSE_CODES,
+                true,
+            ))
+            ->values();
 
         if ($candidates->isEmpty()) {
             return null;

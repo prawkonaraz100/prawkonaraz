@@ -36,6 +36,47 @@ class RankedMatchService
 
     public const REPLAY_MIN_ANSWERS = 5;
 
+    /** Tolerancja na różnicę zegarów przy odblokowaniu pytania (ms). */
+    public const QUESTION_UNLOCK_TOLERANCE_MS = 500;
+
+    public static function maxConcurrentPlayers(): int
+    {
+        return max(2, (int) config('ranked.max_concurrent_players', self::MAX_CONCURRENT_PLAYERS));
+    }
+
+    public static function matchQuestions(): int
+    {
+        return max(1, (int) config('ranked.match_questions', 15));
+    }
+
+    public static function questionIntervalSeconds(): int
+    {
+        return max(0, (int) config('ranked.question_interval_seconds', 6));
+    }
+
+    public static function matchDurationSeconds(): int
+    {
+        return max(10, (int) config('ranked.match_duration_seconds', 90));
+    }
+
+    /** Odstęp między pytaniami zapisany w meczu (0 = dawny tryb we własnym tempie). */
+    public static function matchQuestionIntervalSeconds(RankedMatch $match): int
+    {
+        return max(0, (int) data_get($match->payload, 'format.question_interval_seconds', 0));
+    }
+
+    /** Moment odblokowania pytania o danym indeksie (od 0); null = dostępne od startu. */
+    public static function questionAvailableAt(RankedMatch $match, int $questionIndex): ?Carbon
+    {
+        $interval = self::matchQuestionIntervalSeconds($match);
+
+        if ($interval === 0 || ! $match->started_at) {
+            return null;
+        }
+
+        return $match->started_at->copy()->addSeconds($questionIndex * $interval);
+    }
+
     public function __construct(
         protected StudyContextService $studyContextService,
         protected RankedMatchPresenceStore $presenceStore,
@@ -323,7 +364,7 @@ class RankedMatchService
     public function capacitySnapshot(): array
     {
         $currentPlayers = $this->activeConcurrentUsersCount();
-        $maxPlayers = self::MAX_CONCURRENT_PLAYERS;
+        $maxPlayers = self::maxConcurrentPlayers();
 
         return [
             'current_players' => $currentPlayers,
@@ -384,6 +425,48 @@ class RankedMatchService
             }
 
             return $this->freshMatch($match) ?? $match;
+        });
+    }
+
+    /**
+     * Odświeża obecność gracza z otwartego strumienia SSE. Zwykle to tylko zapis w Redis
+     * (bez transakcji); pełne oznaczenie z blokadą meczu dopiero, gdy gracz był rozłączony.
+     */
+    public function touchPresenceFromStream(RankedMatch $match, User $user): void
+    {
+        $match->loadMissing('players');
+        $player = $match->players->first(
+            fn (RankedMatchPlayer $candidate) => (int) $candidate->user_id === (int) $user->getKey() && ! $candidate->is_replay,
+        );
+
+        if (! $player) {
+            return;
+        }
+
+        if ($player->presence_state !== 'disconnected') {
+            $this->presenceStore->touch($match, $player->user_id, now(), $this->presenceTtlSeconds());
+
+            return;
+        }
+
+        $this->runWithSqliteBusyRetry(function () use ($match, $user): void {
+            $locked = RankedMatch::query()
+                ->with('players')
+                ->whereKey($match->getKey())
+                ->lockForUpdate()
+                ->first();
+
+            if (! $locked || ! $this->isActiveMatch($locked)) {
+                return;
+            }
+
+            $lockedPlayer = $locked->players->first(
+                fn (RankedMatchPlayer $candidate) => (int) $candidate->user_id === (int) $user->getKey() && ! $candidate->is_replay,
+            );
+
+            if ($lockedPlayer) {
+                $this->markPlayerOnline($locked, $lockedPlayer, now());
+            }
         });
     }
 
@@ -567,11 +650,26 @@ class RankedMatchService
             }
 
             $answeredAt = now();
+            $availableAt = self::questionAvailableAt($match, (int) $questionIndex);
+
+            // Tempo meczu: pytanie i odblokowuje się po starcie + i × odstęp (z małą tolerancją zegara).
+            if ($availableAt !== null
+                && $answeredAt->lt($availableAt->copy()->subMilliseconds(self::QUESTION_UNLOCK_TOLERANCE_MS))) {
+                throw ValidationException::withMessages([
+                    'question_not_available' => 'To pytanie jeszcze się nie odsłoniło. Poczekaj chwilę.',
+                ]);
+            }
+
             $elapsedMs = $this->elapsedMsSinceMatchStart($match, $answeredAt);
             $previousElapsedMs = (int) (RankedMatchAnswer::query()
                 ->where('ranked_match_id', $match->getKey())
                 ->where('user_id', $user->getKey())
                 ->max('elapsed_ms') ?? 0);
+            // Czas reakcji liczony od odsłonięcia pytania albo od poprzedniej odpowiedzi, jeśli była później.
+            $previousElapsedMs = max(
+                $previousElapsedMs,
+                (int) $questionIndex * self::matchQuestionIntervalSeconds($match) * 1000,
+            );
 
             $answer = RankedMatchAnswer::create([
                 'ranked_match_id' => $match->getKey(),
@@ -616,6 +714,15 @@ class RankedMatchService
     /**
      * Moment zdobycia ostatniego punktu (ms od startu meczu). Null, gdy gracz nie ma poprawnych odpowiedzi.
      */
+    protected function correctReactionTotalMs(RankedMatch $match, RankedMatchPlayer $player): ?int
+    {
+        $correct = $match->answers
+            ->where('user_id', $player->user_id)
+            ->where('is_correct', true);
+
+        return $correct->isEmpty() ? null : (int) $correct->sum(fn (RankedMatchAnswer $answer) => (int) ($answer->response_time_ms ?? 0));
+    }
+
     protected function lastCorrectAnswerElapsedMs(RankedMatch $match, RankedMatchPlayer $player): ?int
     {
         $value = $match->answers
@@ -639,7 +746,7 @@ class RankedMatchService
             ->where('is_active', true)
             ->readyForDelivery()
             ->inRandomOrder()
-            ->limit(40)
+            ->limit(self::matchQuestions())
             ->pluck('id')
             ->map(fn ($questionId) => (int) $questionId)
             ->values()
@@ -745,9 +852,16 @@ class RankedMatchService
             $scoreOne = $winner->is($playerOne) ? 1.0 : 0.0;
             $scoreTwo = $winner->is($playerTwo) ? 1.0 : 0.0;
         } else {
-            // Remis punktowy: wygrywa ten, kto zdobył ostatni punkt wcześniej (czas mierzony na serwerze).
-            $lastPointOne = $this->lastCorrectAnswerElapsedMs($match, $playerOne);
-            $lastPointTwo = $this->lastCorrectAnswerElapsedMs($match, $playerTwo);
+            // Remis punktowy, czasy mierzone na serwerze:
+            // - mecz z tempem: wygrywa mniejsza suma czasów reakcji na poprawnych odpowiedziach,
+            // - dawny tryb we własnym tempie: wygrywa ten, kto zdobył ostatni punkt wcześniej.
+            $paced = self::matchQuestionIntervalSeconds($match) > 0;
+            $lastPointOne = $paced
+                ? $this->correctReactionTotalMs($match, $playerOne)
+                : $this->lastCorrectAnswerElapsedMs($match, $playerOne);
+            $lastPointTwo = $paced
+                ? $this->correctReactionTotalMs($match, $playerTwo)
+                : $this->lastCorrectAnswerElapsedMs($match, $playerTwo);
 
             if ($lastPointOne !== null && $lastPointTwo !== null && $lastPointOne !== $lastPointTwo) {
                 $reason = 'faster_time';
@@ -890,7 +1004,7 @@ class RankedMatchService
 
         $currentCapacity = $this->activeConcurrentUsersCount();
 
-        if ($currentCapacity >= self::MAX_CONCURRENT_PLAYERS) {
+        if ($currentCapacity >= self::maxConcurrentPlayers()) {
             $this->updateServerFullQueuePayload($queueEntry, $currentCapacity);
 
             return $queueEntry->fresh(['licenseCategory', 'match']) ?? $queueEntry;
@@ -927,7 +1041,7 @@ class RankedMatchService
     protected function updateServerFullQueuePayload(RankedQueueEntry $queueEntry, int $currentCapacity): void
     {
         $positionInQueue = $this->serverFullPositionForQueueEntry($queueEntry);
-        $normalizedCapacity = min(max($currentCapacity, self::MAX_CONCURRENT_PLAYERS), self::MAX_CONCURRENT_PLAYERS);
+        $normalizedCapacity = min(max($currentCapacity, self::maxConcurrentPlayers()), self::maxConcurrentPlayers());
 
         $queueEntry->forceFill([
             'payload' => [
@@ -936,10 +1050,10 @@ class RankedMatchService
                 'message' => sprintf(
                     'Brak wolnych miejsc (%d/%d). Czekasz na wolne miejsce…',
                     $normalizedCapacity,
-                    self::MAX_CONCURRENT_PLAYERS,
+                    self::maxConcurrentPlayers(),
                 ),
                 'current_capacity' => $normalizedCapacity,
-                'max_concurrent_players' => self::MAX_CONCURRENT_PLAYERS,
+                'max_concurrent_players' => self::maxConcurrentPlayers(),
                 'position_in_queue' => $positionInQueue,
                 'estimated_wait_minutes' => $this->estimatedWaitMinutesForServerFull($positionInQueue),
                 'recorded_at' => now()->toIso8601String(),
@@ -962,12 +1076,12 @@ class RankedMatchService
             })
             ->count();
 
-        return self::MAX_CONCURRENT_PLAYERS + $olderServerFullUsers + 1;
+        return self::maxConcurrentPlayers() + $olderServerFullUsers + 1;
     }
 
     protected function estimatedWaitMinutesForServerFull(int $positionInQueue): int
     {
-        $overflowPlayers = max($positionInQueue - self::MAX_CONCURRENT_PLAYERS, 1);
+        $overflowPlayers = max($positionInQueue - self::maxConcurrentPlayers(), 1);
 
         return max((int) ceil($overflowPlayers / 2), 1);
     }
@@ -988,12 +1102,14 @@ class RankedMatchService
         }
 
         $queueEntry = $lockedEntry;
+        $currentUser = User::query()->findOrFail($queueEntry->user_id);
 
-        // Separacja kategorii: przeciwnik zawsze z tej samej kategorii prawa jazdy.
+        // Konta testowe mogą grać na produkcji wyłącznie z innymi kontami testowymi.
         $opponentQueueEntry = RankedQueueEntry::query()
             ->where('license_category_id', $queueEntry->license_category_id)
             ->where('status', 'queued')
             ->where('user_id', '!=', $queueEntry->user_id)
+            ->whereHas('user', fn ($query) => $query->where('is_test_account', $currentUser->isTestAccount()))
             ->orderBy('joined_at')
             ->orderBy('id')
             ->lock($this->skipLockedClause())
@@ -1003,7 +1119,7 @@ class RankedMatchService
             return $queueEntry->fresh(['licenseCategory', 'match']) ?? $queueEntry;
         }
 
-        $match = $this->createMatchFromQueueEntries($queueEntry, $opponentQueueEntry);
+        $this->createMatchFromQueueEntries($queueEntry, $opponentQueueEntry, $currentUser);
 
         return $queueEntry->fresh(['licenseCategory', 'match']) ?? $queueEntry;
     }
@@ -1011,8 +1127,8 @@ class RankedMatchService
     protected function createMatchFromQueueEntries(
         RankedQueueEntry $queueEntry,
         RankedQueueEntry $opponentQueueEntry,
+        User $currentUser,
     ): RankedMatch {
-        $currentUser = User::query()->findOrFail($queueEntry->user_id);
         $opponent = User::query()->findOrFail($opponentQueueEntry->user_id);
         $currentRating = $this->ensureRating($currentUser);
         $opponentRating = $this->ensureRating($opponent);
@@ -1024,8 +1140,8 @@ class RankedMatchService
             'license_category_id' => $category->getKey(),
             'status' => 'matched',
             'api_version' => '1.0',
-            'duration_seconds' => 90,
-            'total_questions' => 40,
+            'duration_seconds' => self::matchDurationSeconds(),
+            'total_questions' => self::matchQuestions(),
             'matched_at' => $matchedAt,
             'countdown_seconds' => self::MATCH_READY_COUNTDOWN_SECONDS,
             'payload' => [
@@ -1036,6 +1152,9 @@ class RankedMatchService
                 'disconnect_timeout_seconds' => self::DISCONNECT_TIMEOUT_SECONDS,
                 'reconnect_grace_seconds' => self::RECONNECT_GRACE_SECONDS,
                 'ready_countdown_seconds' => self::MATCH_READY_COUNTDOWN_SECONDS,
+                'format' => [
+                    'question_interval_seconds' => self::questionIntervalSeconds(),
+                ],
             ],
         ]);
 
@@ -1498,7 +1617,7 @@ class RankedMatchService
 
     protected function isConcurrentCapacityFull(): bool
     {
-        return $this->activeConcurrentUsersCount() >= self::MAX_CONCURRENT_PLAYERS;
+        return $this->activeConcurrentUsersCount() >= self::maxConcurrentPlayers();
     }
 
     protected function freshMatch(RankedMatch $match): ?RankedMatch
@@ -1675,11 +1794,24 @@ class RankedMatchService
             ->where('user_id', '!=', $user->getKey())
             ->where('total_answered', '>=', self::REPLAY_MIN_ANSWERS)
             ->whereHas('user', fn ($query) => $query->where('is_test_account', false))
-            ->whereHas('match', fn ($query) => $query
-                ->where('status', 'finished')
-                ->whereNull('replay_source_match_id')
-                ->where('license_category_id', $category->getKey())
-                ->whereNotNull('started_at'))
+            ->whereHas('match', function ($query) use ($category): void {
+                $query
+                    ->where('status', 'finished')
+                    ->whereNull('replay_source_match_id')
+                    ->where('license_category_id', $category->getKey())
+                    ->whereNotNull('started_at');
+
+                // Tylko nagrania z tym samym tempem co bieżący format meczu.
+                $interval = self::questionIntervalSeconds();
+
+                if ($interval > 0) {
+                    $query->where('payload->format->question_interval_seconds', $interval);
+                } else {
+                    $query->where(fn ($legacy) => $legacy
+                        ->whereNull('payload->format->question_interval_seconds')
+                        ->orWhere('payload->format->question_interval_seconds', 0));
+                }
+            })
             ->whereNotExists(function ($query) use ($user): void {
                 $query->selectRaw('1')
                     ->from('ranked_matches as played_replays')
@@ -1744,6 +1876,9 @@ class RankedMatchService
                 'disconnect_timeout_seconds' => self::DISCONNECT_TIMEOUT_SECONDS,
                 'reconnect_grace_seconds' => self::RECONNECT_GRACE_SECONDS,
                 'ready_countdown_seconds' => self::MATCH_READY_COUNTDOWN_SECONDS,
+                'format' => [
+                    'question_interval_seconds' => self::matchQuestionIntervalSeconds($sourceMatch),
+                ],
                 'replay' => [
                     'source_match_public_id' => $sourceMatch->public_id,
                     'source_username' => $source->username_snapshot,

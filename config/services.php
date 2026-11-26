@@ -59,9 +59,14 @@ return [
 
     'ip_geolocation' => [
         'enabled' => env('IP_GEOLOCATION_ENABLED', true),
+        'queue_enabled' => (bool) env('IP_GEOLOCATION_QUEUE_ENABLED', false),
         'base_url' => env('IP_GEOLOCATION_BASE_URL', 'https://ipapi.co'),
         'connect_timeout' => env('IP_GEOLOCATION_CONNECT_TIMEOUT', 0.75),
         'timeout' => env('IP_GEOLOCATION_TIMEOUT', 1.5),
+    ],
+
+    'pjm' => [
+        'sign_language_source_path' => env('PJM_SIGN_LANGUAGE_SOURCE_PATH'),
     ],
 
 ];

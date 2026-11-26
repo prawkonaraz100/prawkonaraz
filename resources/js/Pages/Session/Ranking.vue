@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import MobileAppBar from '@/Components/MobileAppBar.vue';
+import MobileBackButton from '@/Components/MobileBackButton.vue';
+import MobileStreakLeaderboard from '@/Pages/Session/Partials/MobileStreakLeaderboard.vue';
+import type { StreakLeader } from '@/utils/streakDuration';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import SessionExpiredNotice from '@/Components/SessionExpiredNotice.vue';
 import { useSessionExpiry } from '@/composables/useSessionExpiry';
@@ -15,11 +19,15 @@ import {
     reduceRankedRealtimeEvents,
     sortRankedRealtimeEvents,
 } from '@/utils/rankedRealtimeEventReducer';
+import { renderExamPromptHtml } from '@/utils/explanationFormatting';
+import { resolveStudyQuestionImageUrl, type QuestionMediaSourceLike } from '@/utils/questionMediaSources';
 import { shouldAppendRankedOverviewSyncEvent } from '@/utils/rankedRealtimeOverviewSync';
 import {
     findNextUnansweredRankedQuestionId,
+    getRankedQuestionLockRemainingMs,
     getRankedQuestionResponseTimeMs,
     resolveActiveRankedQuestionId,
+    resolveRankedQuestionAvailableAt,
 } from '@/utils/rankedMatchQuestionFlow';
 import {
     formatRankedClock,
@@ -65,6 +73,7 @@ interface SpecSummary {
     matchmaking_timeout_seconds: number;
     match_duration_seconds: number;
     total_questions: number;
+    question_interval_seconds?: number;
     max_concurrent_players: number;
     replay_offer_after_seconds?: number;
     implementation_status: string;
@@ -190,6 +199,7 @@ interface RankedApiMatch {
     api_version: string;
     duration_seconds: number;
     total_questions: number;
+    question_interval_seconds?: number;
     reason: string | null;
     matched_at: string | null;
     countdown_started_at: string | null;
@@ -224,16 +234,20 @@ interface RankedApiMatchQuestion {
     id: number;
     question_number: number;
     question_text: string;
+    question_type?: string;
+    media?: QuestionMediaSourceLike[];
     answers: Record<string, string>;
     selected_answer: string | null;
     is_answered: boolean;
     is_correct: boolean | null;
     correct_answer?: string;
     response_time_ms: number | null;
+    available_at?: string | null;
 }
 
 interface RankedApiMatchDetails {
     match: RankedApiMatch;
+    server_now?: string;
     progress: {
         answered: number;
         remaining: number;
@@ -341,6 +355,7 @@ interface RankedMatchAnswerResponse {
             answered_at: string | null;
         };
         match: RankedApiMatch;
+        server_now?: string;
         progress: RankedApiMatchDetails['progress'];
     };
 }
@@ -477,6 +492,40 @@ const leaderboardEntries = computed<LeaderboardEntry[]>(() => props.leaderboard 
 
 // Własne miejsce pokazujemy pod listą, bo „Najlepsi gracze” nie zawierają bieżącego gracza.
 const currentUserRankingEntry = computed<CurrentUserRanking | null>(() => props.currentUserRanking ?? null);
+
+// Telefon: ta sama tabela co w „Najlepszych w serii” (baner, odznaki #1-#3, podium, Twój wiersz pod listą).
+const toLeagueRow = (entry: LeaderboardEntry, isMe: boolean): StreakLeader => ({
+    position: entry.position,
+    name: entry.username,
+    score: entry.rating,
+    duration_seconds: null,
+    avatar_url: null,
+    initials: leaderboardAvatarLabel(entry.username),
+    is_me: isMe,
+});
+const mobileLeagueRows = computed<StreakLeader[]>(() => {
+    const me = currentUserRankingEntry.value;
+    const entries = leaderboardEntries.value;
+    // Older servers number opponents after removing the current player from the list.
+    const ranksOmitCurrentPlayer = me !== null && entries.some((entry) => entry.position === me.position);
+    const rows = entries.map((entry) => {
+        const row = toLeagueRow(entry, false);
+        if (ranksOmitCurrentPlayer && me && row.position >= me.position) row.position++;
+        return row;
+    });
+
+    if (me && me.position <= rows.length + 1) {
+        rows.push(toLeagueRow(me, true));
+    }
+
+    return rows.sort((first, second) => first.position - second.position).slice(0, 10);
+});
+const mobileLeagueMe = computed<StreakLeader | null>(() => {
+    const me = currentUserRankingEntry.value;
+
+    return me && !mobileLeagueRows.value.some((row) => row.is_me) ? toLeagueRow(me, true) : null;
+});
+
 const leaderboardUpdatedLabel = computed(() =>
     new Intl.DateTimeFormat('pl-PL', {
         day: 'numeric',
@@ -633,6 +682,27 @@ const waitingScreenExitPending = ref(false);
 const queueLeavePending = ref(false);
 const backendPongBusy = ref(false);
 const backendNowMs = ref(Date.now());
+// Pierwsze wczytanie stanu rankingu (bez akcji gracza) — przycisk pokazuje „Wczytywanie…”, a nie „Uruchamianie”.
+const backendOverviewLoading = ref(false);
+// Różnica zegara serwera i przeglądarki: pytania odsłaniają się według czasu serwera.
+const backendServerClockOffsetMs = ref(0);
+let backendQuestionUnlockTimeoutId: number | null = null;
+
+const syncBackendServerClock = (serverNow: string | null | undefined, requestStartedAtMs?: number) => {
+    const serverNowMs = serverNow ? Date.parse(serverNow) : Number.NaN;
+
+    if (!Number.isFinite(serverNowMs)) {
+        return;
+    }
+
+    const receivedAtMs = Date.now();
+    // Połowa czasu żądania przybliża moment, w którym serwer odczytał zegar.
+    const localMidpointMs = typeof requestStartedAtMs === 'number'
+        ? requestStartedAtMs + (receivedAtMs - requestStartedAtMs) / 2
+        : receivedAtMs;
+
+    backendServerClockOffsetMs.value = serverNowMs - localMidpointMs;
+};
 const backendStreamState = ref<'unsupported' | 'connecting' | 'open' | 'error'>('unsupported');
 const backendLiveTransportKind = ref<RankedRealtimeTransportKind | 'polling' | 'none'>('none');
 let backendClockIntervalId: number | null = null;
@@ -809,10 +879,12 @@ const fetchActiveMatchDetails = async (
     backendMatchError.value = null;
 
     try {
+        const requestStartedAtMs = Date.now();
         const response = await apiClient.get<RankedMatchDetailsResponse>(
             route('api.v1.ranked.matches.show', matchPublicId),
         );
 
+        syncBackendServerClock(response.data.server_now, requestStartedAtMs);
         backendMatchDetails.value = response.data;
         await fetchActiveMatchEvents(matchPublicId);
 
@@ -837,6 +909,7 @@ const fetchActiveMatchEvents = async (
         incremental?: boolean;
     } = {},
 ) => {
+    if (sessionExpired.value) return;
     const matchPublicId = publicId
         ?? backendMatchDetails.value?.match.public_id
         ?? rankedOverview.value?.active_match?.public_id
@@ -953,8 +1026,10 @@ const fetchRankedOverview = async (
         skipHistory?: boolean;
     } = {},
 ) => {
+    if (sessionExpired.value) return;
     if (!options.silent) {
         backendBusy.value = true;
+        backendOverviewLoading.value = true;
     }
 
     backendError.value = null;
@@ -971,6 +1046,7 @@ const fetchRankedOverview = async (
     } finally {
         if (!options.silent) {
             backendBusy.value = false;
+            backendOverviewLoading.value = false;
         }
     }
 };
@@ -1232,6 +1308,7 @@ const submitBackendAnswer = async (questionId: number, userAnswer: string) => {
     try {
         const nextQuestionId = findNextUnansweredRankedQuestionId(backendQuestions.value, questionId);
 
+        const answerRequestStartedAtMs = Date.now();
         const response = await apiClient.post<RankedMatchAnswerResponse>(
             route('api.v1.ranked.matches.answers.store', matchPublicId),
             {
@@ -1244,15 +1321,26 @@ const submitBackendAnswer = async (questionId: number, userAnswer: string) => {
             },
         );
 
+        syncBackendServerClock(response.data.server_now, answerRequestStartedAtMs);
         applyBackendAnswerResponse(response.data);
         delete backendQuestionTimers[questionId];
-        await fetchRankedOverview({
-            silent: true,
-            skipHistory: true,
-        });
-        await fetchActiveMatchDetails(matchPublicId, {
-            silent: true,
-        });
+
+        // Odpowiedź API już aktualizuje lokalny stan meczu, a otwarty strumień dostarcza
+        // overview i zdarzenia co sekundę. Pełne odświeżenie (overview + szczegóły + zdarzenia)
+        // robimy tylko bez strumienia, po zmianie statusu meczu albo bez wczytanych szczegółów.
+        const streamKeepsMatchFresh = backendStreamState.value === 'open'
+            && response.data.match.status === 'in_progress'
+            && backendMatchDetails.value?.match.public_id === matchPublicId;
+
+        if (!streamKeepsMatchFresh) {
+            await fetchRankedOverview({
+                silent: true,
+                skipHistory: true,
+            });
+            await fetchActiveMatchDetails(matchPublicId, {
+                silent: true,
+            });
+        }
 
         if (nextQuestionId !== null && nextQuestionId !== questionId) {
             selectBackendQuestion(nextQuestionId);
@@ -1494,6 +1582,7 @@ const handleBackendStreamMatchEvents = (payload: unknown) => {
 };
 
 const connectBackendRealtimeStream = () => {
+    if (sessionExpired.value) return;
     backendStreamState.value = 'connecting';
     backendLiveTransportKind.value = 'none';
     backendStreamClient = new RankedRealtimeTransportClient({
@@ -1598,6 +1687,7 @@ watch(
 onUnmounted(() => {
     clearTimers();
     clearBackendUiClock();
+    clearBackendQuestionUnlockTimeout();
     destroyBackendRealtimeStream();
     backendRealtimeTransport.destroy();
 });
@@ -2058,6 +2148,45 @@ const backendResultParticipants = computed<{
     };
 });
 
+// Mobilny wynik w stylu wyniku sesji nauki: kolor sekcji, ikona, nagłówek i liczby odpowiedzi.
+const backendMobileResult = computed(() => {
+    const participants = backendResultParticipants.value;
+
+    if (!participants) {
+        return null;
+    }
+
+    const { current, opponent } = participants;
+    const tone = current.outcome === 'win' || current.outcome === 'loss' ? current.outcome : 'neutral';
+    const headlines: Record<string, string> = {
+        win: `Wygrywasz z ${opponent.username}`,
+        loss: `${opponent.username} wygrywa`,
+        draw: `Remis z ${opponent.username}`,
+        abandoned: 'Mecz przerwany',
+    };
+
+    return {
+        tone,
+        headline: headlines[current.outcome] ?? 'Mecz zakończony',
+        reason: backendLastResultCard.value?.reason && backendLastResultCard.value.reason !== 'draw'
+            ? backendReasonLabel(backendLastResultCard.value.reason)
+            : null,
+        // Tylko kolory mapowane przez ciemny motyw mobilny (.pk-dark-scope w app.css).
+        surfaceClass: tone === 'win'
+            ? 'border-[#eaecf0] bg-[#ecfdf3]'
+            : tone === 'loss'
+                ? 'border-[#eaecf0] bg-[#fff6f7]'
+                : 'border-[#eaecf0] bg-[#f9fafb]',
+        iconClass: tone === 'win'
+            ? 'bg-[#ecfdf3] text-[#0f7b43]'
+            : tone === 'loss'
+                ? 'bg-[#fff6f7] text-[#d92d20]'
+                : 'bg-[#eaecf0] text-[#475467]',
+        incorrect: Math.max(current.totalAnswered - current.correctAnswers, 0),
+        unanswered: Math.max(current.totalQuestions - current.totalAnswered, 0),
+    };
+});
+
 const backendQuestions = computed(() => backendMatchDetails.value?.questions ?? []);
 
 const backendResolvedQuestionId = computed(() =>
@@ -2067,6 +2196,115 @@ const backendResolvedQuestionId = computed(() =>
 const backendSelectedQuestion = computed(() =>
     backendQuestions.value.find((question) => question.id === backendResolvedQuestionId.value)
     ?? null,
+);
+
+const backendMatchStartedAt = computed(() =>
+    backendActiveMatch.value?.started_at
+    ?? backendMatchDetails.value?.match.started_at
+    ?? null,
+);
+
+const backendQuestionAvailableAt = (question: RankedApiMatchQuestion | null): string | null =>
+    resolveRankedQuestionAvailableAt(question, backendMatchStartedAt.value, backendQuestionIntervalSeconds.value);
+
+const backendQuestionAvailableAtMs = (question: RankedApiMatchQuestion | null): number | null => {
+    const availableAt = backendQuestionAvailableAt(question);
+    const availableAtMs = availableAt ? Date.parse(availableAt) : Number.NaN;
+
+    return Number.isFinite(availableAtMs) ? availableAtMs : null;
+};
+
+// Mecz z tempem: pytanie jest zablokowane (bez treści i odpowiedzi) do chwili odsłonięcia.
+const backendSelectedQuestionLockedMs = computed(() => getRankedQuestionLockRemainingMs(
+    backendSelectedQuestion.value
+        ? { ...backendSelectedQuestion.value, available_at: backendQuestionAvailableAt(backendSelectedQuestion.value) }
+        : null,
+    backendNowMs.value,
+    backendServerClockOffsetMs.value,
+));
+
+const backendSelectedQuestionLocked = computed(() => backendSelectedQuestionLockedMs.value > 0);
+
+// Pasek odliczania do odsłonięcia pytania (0–100%), w tym samym rytmie co zegar UI.
+const backendSelectedQuestionUnlockProgress = computed(() => {
+    const intervalMs = backendQuestionIntervalSeconds.value * 1000;
+
+    if (intervalMs <= 0 || !backendSelectedQuestionLocked.value) {
+        return 100;
+    }
+
+    return Math.min(Math.max(100 - (backendSelectedQuestionLockedMs.value / intervalMs) * 100, 0), 100);
+});
+
+// Wynik na żywo: strumień aktualizuje active_match, odpowiedź API — szczegóły meczu.
+const backendLiveScore = computed(() => {
+    const players = backendActiveMatch.value?.players?.length
+        ? backendActiveMatch.value.players
+        : backendMatchDetails.value?.match.players ?? [];
+    const current = players.find((player) => player.is_current_user) ?? null;
+    const opponent = players.find((player) => !player.is_current_user) ?? null;
+
+    return {
+        current: current?.correct_answers ?? 0,
+        opponent: opponent?.correct_answers ?? 0,
+        opponentAnswered: opponent?.total_answered ?? 0,
+        opponentName: opponent?.username ?? backendOpponent.value?.username ?? 'Przeciwnik',
+    };
+});
+
+const backendSelectedQuestionMedia = computed(() => {
+    for (const media of backendSelectedQuestion.value?.media ?? []) {
+        const url = media.kind === 'video' ? media.url ?? media.full_url : resolveStudyQuestionImageUrl(media);
+        if (url) return { ...media, url };
+    }
+
+    return null;
+});
+
+const backendSelectedQuestionUnlockSeconds = computed(() =>
+    Math.max(Math.ceil(backendSelectedQuestionLockedMs.value / 1000), 1),
+);
+
+const backendQuestionIntervalSeconds = computed(() =>
+    backendMatchDetails.value?.match.question_interval_seconds
+    ?? props.specSummary.question_interval_seconds
+    ?? 0,
+);
+
+const clearBackendQuestionUnlockTimeout = () => {
+    if (backendQuestionUnlockTimeoutId !== null) {
+        window.clearTimeout(backendQuestionUnlockTimeoutId);
+        backendQuestionUnlockTimeoutId = null;
+    }
+};
+
+// Zegar UI tyka co sekundę; odsłonięcie planujemy dokładnie na czas serwera.
+watch(
+    () => [backendSelectedQuestion.value?.id ?? null, backendQuestionAvailableAt(backendSelectedQuestion.value), backendServerClockOffsetMs.value] as const,
+    () => {
+        clearBackendQuestionUnlockTimeout();
+
+        const availableAtMs = backendQuestionAvailableAtMs(backendSelectedQuestion.value);
+
+        if (availableAtMs === null || backendSelectedQuestion.value?.is_answered) {
+            return;
+        }
+
+        const delayMs = availableAtMs - (Date.now() + backendServerClockOffsetMs.value);
+
+        if (delayMs <= 0) {
+            return;
+        }
+
+        const questionId = backendSelectedQuestion.value?.id ?? null;
+
+        backendQuestionUnlockTimeoutId = window.setTimeout(() => {
+            backendQuestionUnlockTimeoutId = null;
+            backendNowMs.value = Date.now();
+            ensureBackendQuestionTimer(questionId);
+        }, delayMs + 20);
+    },
+    { immediate: true },
 );
 
 const backendQuestionProgress = computed(() => {
@@ -2656,15 +2894,19 @@ const navigateToRankingScreen = (
     });
 };
 
-const primaryRankingActionLabel = computed(() => {
+const resolvePrimaryRankingActionLabel = (mobile: boolean) => {
     if (queueLeavePending.value) {
         return 'Wracamy do startu...';
+    }
+
+    if (mobile && backendOverviewLoading.value) {
+        return 'Wczytywanie...';
     }
 
     if (backendBusy.value) {
         return rankedOverview.value?.queue
             ? 'Anulowanie...'
-            : 'Uruchamianie rankingu...';
+            : (mobile ? 'Szukamy przeciwnika...' : 'Uruchamianie rankingu...');
     }
 
     if (rankedOverview.value?.queue?.status === 'server_full') {
@@ -2694,7 +2936,9 @@ const primaryRankingActionLabel = computed(() => {
     }
 
     return 'Szukaj przeciwnika';
-});
+};
+const primaryRankingActionLabel = computed(() => resolvePrimaryRankingActionLabel(false));
+const mobilePrimaryRankingActionLabel = computed(() => resolvePrimaryRankingActionLabel(true));
 
 const primaryRankingActionShowsSpinner = computed(() =>
     queueLeavePending.value
@@ -2930,7 +3174,7 @@ const backendTransportChipClass = computed(() => {
 
     <AuthenticatedLayout>
         <template v-if="currentScreen === 'waiting'">
-            <section class="flex min-h-[100svh] flex-col bg-[#f7f8fa] px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-[calc(1.25rem+env(safe-area-inset-top))] text-[#17191d] md:hidden">
+            <section class="flex min-h-[100svh] flex-col bg-[#302e2b] px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-[calc(1.25rem+env(safe-area-inset-top))] text-[#ffffffd9] md:hidden">
                 <header>
                     <p class="text-[0.78rem] font-semibold text-[#667085]">Ranking 1 na 1</p>
                     <h1 class="mt-1 text-[1.72rem] font-bold leading-8">{{ waitingScreenBadge }}</h1>
@@ -3087,79 +3331,154 @@ const backendTransportChipClass = computed(() => {
         </template>
 
         <template v-else-if="currentScreen === 'match'">
-            <section class="min-h-[100svh] bg-[#f7f8fa] text-[#17191d] md:hidden">
-                <header class="border-b border-[#dfe3e8] bg-white px-4 pb-4 pt-[calc(1rem+env(safe-area-inset-top))]">
-                    <div class="flex items-center justify-between gap-4">
-                        <div class="min-w-0">
-                            <p class="text-[0.76rem] font-semibold text-[#667085]">Mecz rankingowy</p>
-                            <p class="mt-1 truncate text-[1rem] font-semibold text-[#17191d]">{{ backendOpponent?.username ?? 'Łączenie z przeciwnikiem' }}</p>
+            <section class="ranking-mobile-screen min-h-[100svh] text-[#101828] md:hidden" data-testid="ranking-mobile-match">
+                <!-- Pasek jak w sesji nauki: licznik, przeciwnik i zegar, akcja po prawej. -->
+                <header class="sticky top-0 z-30 border-b border-[#e4e7ec] bg-white/95 px-4 pt-[env(safe-area-inset-top)] backdrop-blur">
+                    <div class="flex h-14 items-center gap-3">
+                        <span class="shrink-0 text-[0.86rem] font-semibold tabular-nums text-[#101828]">
+                            {{ backendSelectedQuestion?.question_number ?? 1 }} / {{ backendQuestionProgress.total }}
+                        </span>
+                        <div class="min-w-0 flex-1">
+                            <p class="truncate text-[0.86rem] font-semibold leading-5 text-[#101828]">
+                                Mecz z {{ backendLiveScore.opponentName }}
+                            </p>
+                            <p class="truncate text-[0.7rem] leading-4 text-[#667085]">
+                                {{ backendMatchDetails?.match.category?.name ?? backendActiveMatch?.category?.name ?? 'Ranking 1 na 1' }}
+                            </p>
                         </div>
+                        <span
+                            v-if="backendMatchClock"
+                            class="shrink-0 text-[0.96rem] font-semibold tabular-nums"
+                            :class="backendMatchClock.tone"
+                        >
+                            {{ backendMatchClock.primary }}
+                        </span>
                         <button
                             type="button"
-                            class="min-h-10 shrink-0 px-2 text-[0.82rem] font-semibold text-[#b42318] disabled:cursor-not-allowed disabled:opacity-55"
+                            class="inline-flex h-9 shrink-0 items-center rounded-[0.5rem] bg-[#f2f4f7] px-3 text-[0.72rem] font-semibold text-[#b42318] transition-colors hover:bg-[#eaecf0] disabled:cursor-not-allowed disabled:opacity-55"
                             :disabled="backendBusy"
                             @click="abandonActiveMatch"
                         >
                             Poddaj
                         </button>
                     </div>
-                    <div class="mt-4 flex items-end justify-between gap-4">
-                        <p class="text-[0.82rem] font-semibold tabular-nums text-[#475467]">
-                            {{ backendQuestionProgress.answered }}/{{ backendQuestionProgress.total }}
-                        </p>
-                        <p v-if="backendMatchClock" class="text-[1.15rem] font-bold tabular-nums" :class="backendMatchClock.tone">
-                            {{ backendMatchClock.primary }}
-                        </p>
-                    </div>
-                    <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-[#e8edf3]">
+                    <div class="-mx-4 h-1 bg-[#eaecf0]" aria-hidden="true">
                         <div
-                            class="h-full rounded-full bg-[#0b63ce] transition-[width] duration-300"
+                            class="h-full bg-[#0b5cff] transition-[width] duration-300"
                             :style="{ width: `${backendQuestionProgress.total > 0 ? (backendQuestionProgress.answered / backendQuestionProgress.total) * 100 : 0}%` }"
                         />
                     </div>
                 </header>
 
-                <main class="mx-auto w-full max-w-xl px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-6">
-                    <div v-if="backendPresenceBanner" class="mb-4 border-y border-[#f7dca8] bg-[#fff9e9] px-4 py-3 text-[0.84rem] leading-5 text-[#7f6327]">
-                        <p class="font-semibold text-[#9b6a00]">{{ backendPresenceBanner.title }}</p>
+                <!-- Wynik na żywo. -->
+                <section class="border-b border-[#eaecf0] px-5 py-3" aria-label="Wynik meczu">
+                    <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+                        <div class="min-w-0">
+                            <p class="text-[0.7rem] font-medium text-[#667085]">Ty</p>
+                            <p class="text-[1.35rem] font-semibold leading-7 tabular-nums text-[#101828]">{{ backendLiveScore.current }}</p>
+                        </div>
+                        <span class="text-[0.72rem] font-semibold uppercase text-[#98a2b3]">pkt</span>
+                        <div class="min-w-0 text-right">
+                            <p class="truncate text-[0.7rem] font-medium text-[#667085]">{{ backendLiveScore.opponentName }}</p>
+                            <p class="text-[1.35rem] font-semibold leading-7 tabular-nums text-[#101828]">{{ backendLiveScore.opponent }}</p>
+                        </div>
+                    </div>
+                </section>
+
+                <main class="mx-auto w-full max-w-[30rem] px-5 pb-[calc(16rem+env(safe-area-inset-bottom))] pt-5">
+                    <div v-if="backendPresenceBanner" class="mb-4 border-y border-[#f7dca8] bg-[#fffaeb] px-4 py-3 text-[0.84rem] leading-5 text-[#7f6327]">
+                        <p class="font-semibold">{{ backendPresenceBanner.title }}</p>
                         <p class="mt-1">{{ backendPresenceBanner.body }}</p>
                     </div>
-                    <p v-if="backendMatchError" class="mb-4 border-y border-[#f5c2c7] bg-[#fff6f7] px-4 py-3 text-[0.84rem] leading-5 text-[#b42318]">
+                    <p v-if="backendMatchError" class="mb-4 border-y border-[#f5c2c7] bg-[#fff6f7] px-4 py-3 text-[0.84rem] leading-5 text-[#b42318]" role="alert">
                         {{ backendMatchError }}
                     </p>
 
-                    <section v-if="backendSelectedQuestion" :key="backendSelectedQuestion.id">
-                        <p class="text-[0.78rem] font-semibold text-[#667085]">Pytanie {{ backendSelectedQuestion.question_number }}</p>
-                        <h1 class="mt-2 text-[1.25rem] font-bold leading-7 text-[#17191d]">{{ backendSelectedQuestion.question_text }}</h1>
+                    <section v-if="backendSelectedQuestion" :key="backendSelectedQuestion.id" aria-live="polite">
+                        <p class="text-[0.7rem] font-semibold uppercase text-[#667085]">
+                            Pytanie {{ backendSelectedQuestion.question_number }} z {{ backendQuestionProgress.total }}
+                        </p>
 
-                        <div class="mt-6 grid gap-3">
-                            <button
-                                v-for="(label, key) in backendSelectedQuestion.answers"
-                                :key="key"
-                                type="button"
-                                class="flex min-h-[4.25rem] items-center gap-3 rounded-[8px] border px-4 py-3 text-left text-[0.92rem] font-medium leading-5 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b63ce] focus-visible:ring-offset-2 disabled:cursor-default"
-                                :class="backendSelectedQuestion.selected_answer === key ? 'border-[#0b63ce] bg-[#eaf3ff] text-[#074b9f]' : 'border-[#dfe3e8] bg-white text-[#17191d]'"
-                                :disabled="backendMatchBusy || backendSelectedQuestion.is_answered || backendMatchInteractionLocked"
-                                @click="submitBackendAnswer(backendSelectedQuestion.id, key)"
-                            >
-                                <span class="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-current/20 text-[0.74rem] font-semibold">{{ key }}</span>
-                                <span class="min-w-0 flex-1">{{ label }}</span>
-                            </button>
+                        <div v-if="backendSelectedQuestionLocked" class="py-10 text-center" role="status">
+                            <p class="text-[0.84rem] font-medium text-[#667085]">Następne pytanie za</p>
+                            <p class="mt-2 text-[2.85rem] font-semibold leading-none tabular-nums text-[#101828]">{{ backendSelectedQuestionUnlockSeconds }} s</p>
+                            <div class="mx-auto mt-5 h-2 max-w-[16rem] overflow-hidden rounded-full bg-[#eaecf0]" aria-hidden="true">
+                                <div class="h-full rounded-full bg-[#0b5cff] transition-[width] duration-1000 ease-linear" :style="{ width: `${backendSelectedQuestionUnlockProgress}%` }" />
+                            </div>
+                            <p class="mx-auto mt-4 max-w-[18rem] text-[0.8rem] leading-5 text-[#667085]">
+                                Obaj gracze dostają pytanie w tej samej chwili<template v-if="backendQuestionIntervalSeconds > 0">, nowe co {{ backendQuestionIntervalSeconds }} s</template>.
+                            </p>
                         </div>
 
-                        <p v-if="backendSelectedQuestion.is_answered" class="mt-5 border-y border-[#dfe3e8] bg-white px-4 py-3 text-[0.84rem] leading-5 text-[#475467]">
-                            Twoja odpowiedź: {{ backendSelectedQuestion.selected_answer }}
-                        </p>
-                        <p v-else-if="backendMatchInteractionLocked" class="mt-5 border-y border-[#f7dca8] bg-[#fff9e9] px-4 py-3 text-[0.84rem] leading-5 text-[#7f6327]">
-                            Odpowiedzi są chwilowo zablokowane.
-                        </p>
+                        <template v-else>
+                            <h1
+                                class="mt-2 break-words text-[1.125rem] font-medium leading-[1.4] tracking-tight text-[#101828] [overflow-wrap:anywhere]"
+                                v-html="renderExamPromptHtml(backendSelectedQuestion.question_text)"
+                            />
+                            <template v-if="backendSelectedQuestionMedia">
+                                <video
+                                    v-if="backendSelectedQuestionMedia.kind === 'video'"
+                                    :src="backendSelectedQuestionMedia.url"
+                                    :poster="backendSelectedQuestionMedia.poster_url ?? undefined"
+                                    aria-label="Nagranie do pytania"
+                                    class="mt-4 aspect-video w-full bg-slate-950 object-contain"
+                                    autoplay
+                                    muted
+                                    playsinline
+                                    controls
+                                />
+                                <img
+                                    v-else
+                                    :src="backendSelectedQuestionMedia.url"
+                                    alt="Ilustracja do pytania"
+                                    class="mt-4 max-h-[50svh] w-full object-contain"
+                                />
+                            </template>
+                        </template>
                     </section>
 
                     <div v-else class="flex min-h-[45svh] flex-col items-center justify-center text-center">
-                        <span class="h-3 w-3 rounded-full bg-[#0b63ce] animate-pulse" aria-hidden="true" />
-                        <p class="mt-4 text-[0.92rem] text-[#667085]">Ładujemy pytanie meczu.</p>
+                        <span class="h-3 w-3 animate-pulse rounded-full bg-[#0b5cff]" aria-hidden="true" />
+                        <p class="mt-4 text-[0.9rem] text-[#667085]">Ładujemy pytanie meczu.</p>
                     </div>
                 </main>
+
+                <!-- Odpowiedzi w dolnym doku, jak w sesji nauki (w zasięgu kciuka). -->
+                <div
+                    v-if="backendSelectedQuestion && !backendSelectedQuestionLocked"
+                    class="fixed inset-x-0 bottom-0 z-40 border-t border-[#e4e7ec] bg-white/95 px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-2 shadow-[0_-12px_28px_rgba(15,23,42,0.06)] backdrop-blur-[10px]"
+                >
+                    <div class="mx-auto grid max-w-[30rem] gap-2.5">
+                        <button
+                            v-for="(label, key) in backendSelectedQuestion.answers"
+                            :key="key"
+                            type="button"
+                            class="font-semibold leading-6 tracking-tight transition-[background-color,box-shadow,color] duration-200 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] disabled:cursor-not-allowed"
+                            :class="[backendSelectedQuestion.question_type === 'boolean'
+                                ? 'min-h-[3.9rem] px-4 py-3 text-center text-[1.05rem] uppercase'
+                                : 'flex min-h-14 items-center gap-3 px-3 py-3 text-left text-[0.95rem]',
+                                backendSelectedQuestion.selected_answer === key
+                                ? 'pk-selected bg-[#eaf3ff] text-[#0b5cff]'
+                                : 'bg-white text-[#101828] shadow-[0_6px_16px_rgba(36,33,28,0.04)] hover:bg-[#f2f4f7]']"
+                            :disabled="backendMatchBusy || backendSelectedQuestion.is_answered || backendMatchInteractionLocked"
+                            @click="submitBackendAnswer(backendSelectedQuestion.id, key)"
+                        >
+                            <template v-if="backendSelectedQuestion.question_type === 'boolean'">{{ label }}</template>
+                            <template v-else>
+                                <span
+                                    data-answer-badge
+                                    class="grid h-6 w-6 shrink-0 place-items-center rounded-[3px] text-xs font-semibold"
+                                    :class="backendSelectedQuestion.selected_answer === key ? 'bg-[#0b5cff] text-white' : 'bg-[#f2f4f7] text-[#101828]'"
+                                    aria-hidden="true"
+                                >{{ key }}</span>
+                                <span class="min-w-0"><span class="sr-only">{{ key }}. </span>{{ label }}</span>
+                            </template>
+                        </button>
+                    </div>
+                    <p v-if="backendMatchInteractionLocked" class="mx-auto mt-2 max-w-[30rem] text-center text-[0.78rem] text-[#7f6327]">
+                        Odpowiedzi są chwilowo zablokowane.
+                    </p>
+                </div>
             </section>
 
             <div class="hidden space-y-6 md:block">
@@ -3291,7 +3610,7 @@ const backendTransportChipClass = computed(() => {
                                     <p class="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#8c7a67]">
                                         Pytanie {{ backendSelectedQuestion.question_number }}
                                     </p>
-                                    <p class="mt-2 text-[1rem] leading-7 text-[#201d1a]">
+                                    <p v-if="!backendSelectedQuestionLocked" class="mt-2 text-[1rem] leading-7 text-[#201d1a]">
                                         {{ backendSelectedQuestion.question_text }}
                                     </p>
                                 </div>
@@ -3299,11 +3618,24 @@ const backendTransportChipClass = computed(() => {
                                     class="rounded-full px-3 py-1 text-[0.74rem] font-semibold"
                                     :class="backendSelectedQuestion.is_answered ? 'bg-[#ecfdf3] text-[#0f7b43]' : 'bg-[#f3f4f6] text-[#4b5563]'"
                                 >
-                                    {{ backendSelectedQuestion.is_answered ? 'odpowiedziane' : 'otwarte' }}
+                                    {{ backendSelectedQuestion.is_answered ? 'odpowiedziane' : backendSelectedQuestionLocked ? 'za chwilę' : 'otwarte' }}
                                 </span>
                             </div>
 
-                            <div class="mt-5 grid gap-2.5 sm:grid-cols-2">
+                            <div
+                                v-if="backendSelectedQuestionLocked"
+                                class="mt-5 rounded-[0.95rem] border border-[#ece3d7] bg-[#faf8f4] px-4 py-6 text-center"
+                                role="status"
+                                aria-live="polite"
+                            >
+                                <p class="text-[0.84rem] font-semibold text-[#6f665c]">Następne pytanie za</p>
+                                <p class="mt-1 text-[2.25rem] font-bold leading-none tabular-nums text-[#201d1a]">{{ backendSelectedQuestionUnlockSeconds }} s</p>
+                                <p class="mt-3 text-[0.84rem] leading-6 text-[#6f665c]">
+                                    Obaj gracze dostają pytanie w tej samej chwili<template v-if="backendQuestionIntervalSeconds > 0">, nowe co {{ backendQuestionIntervalSeconds }} s</template>.
+                                </p>
+                            </div>
+
+                            <div v-else class="mt-5 grid gap-2.5 sm:grid-cols-2">
                                 <button
                                     v-for="(label, key) in backendSelectedQuestion.answers"
                                     :key="key"
@@ -3324,8 +3656,13 @@ const backendTransportChipClass = computed(() => {
                                 </button>
                             </div>
 
-                            <p class="mt-5 rounded-[0.95rem] border border-[#ece3d7] bg-[#faf8f4] px-4 py-3 text-[0.84rem] leading-7 text-[#6f665c]">
-                                Odpowiadasz pytanie po pytaniu. Po jednym kliknięciu system sam przejdzie do następnego.
+                            <p v-if="!backendSelectedQuestionLocked" class="mt-5 rounded-[0.95rem] border border-[#ece3d7] bg-[#faf8f4] px-4 py-3 text-[0.84rem] leading-7 text-[#6f665c]">
+                                <template v-if="backendQuestionIntervalSeconds > 0">
+                                    Nowe pytanie co {{ backendQuestionIntervalSeconds }} s, u obu graczy w tej samej chwili. Liczy się poprawność, a przy remisie szybkość reakcji.
+                                </template>
+                                <template v-else>
+                                    Odpowiadasz pytanie po pytaniu. Po jednym kliknięciu system sam przejdzie do następnego.
+                                </template>
                             </p>
 
                             <p
@@ -3372,55 +3709,126 @@ const backendTransportChipClass = computed(() => {
         </template>
 
         <template v-else-if="currentScreen === 'result'">
-            <section class="min-h-screen bg-[#f7f8fa] pb-[calc(5.5rem+env(safe-area-inset-bottom))] text-[#17191d] md:hidden">
-                <header class="border-b border-[#dfe3e8] bg-white px-4 pb-5 pt-[calc(1.25rem+env(safe-area-inset-top))]">
-                    <p class="text-[0.78rem] font-semibold text-[#667085]">Ranking 1 na 1</p>
-                    <h1 class="mt-1 text-[1.72rem] font-bold leading-8">{{ backendLastResultCard?.resultLabel ?? 'Mecz zakończony' }}</h1>
-                </header>
+            <section class="ranking-mobile-screen min-h-screen pb-[calc(6rem+env(safe-area-inset-bottom))] text-[#101828] md:hidden" data-testid="ranking-mobile-result">
+                <MobileAppBar
+                    title="Wynik meczu"
+                    :subtitle="`Ranking 1 na 1 · ${backendLastResultCard?.categoryName ?? 'Kategoria'}`"
+                    :back-href="route('session.ranking', buildRankingScreenRouteParams())"
+                    back-label="Wróć do rankingu"
+                >
+                    <template v-if="backendResultParticipants" #action>
+                        <span class="inline-flex h-9 items-center rounded-[0.5rem] bg-[#f2f4f7] px-3 text-[0.72rem] font-semibold tabular-nums text-[#475467]">
+                            {{ backendResultParticipants.current.correctAnswers }}/{{ backendResultParticipants.current.totalQuestions }}
+                        </span>
+                    </template>
+                </MobileAppBar>
 
-                <section v-if="backendResultParticipants" class="px-4 py-5">
-                    <div class="border-y border-[#dfe3e8] bg-white">
-                        <article class="flex items-center justify-between gap-4 px-4 py-4">
-                            <div class="min-w-0">
-                                <p class="truncate text-[1rem] font-semibold text-[#17191d]">{{ backendResultParticipants.current.username }}</p>
-                                <p class="mt-1 text-[0.8rem] font-medium" :class="backendResultParticipants.current.outcomeClass">{{ backendResultParticipants.current.outcomeLabel }}</p>
-                            </div>
-                            <p class="text-[2rem] font-bold tabular-nums text-[#17191d]">{{ backendResultParticipants.current.points }}</p>
-                        </article>
-                        <article class="flex items-center justify-between gap-4 border-t border-[#e3e7eb] px-4 py-4">
-                            <div class="min-w-0">
-                                <p class="truncate text-[1rem] font-semibold text-[#17191d]">{{ backendResultParticipants.opponent.username }}</p>
-                                <p class="mt-1 text-[0.8rem] font-medium" :class="backendResultParticipants.opponent.outcomeClass">{{ backendResultParticipants.opponent.outcomeLabel }}</p>
-                            </div>
-                            <p class="text-[2rem] font-bold tabular-nums text-[#17191d]">{{ backendResultParticipants.opponent.points }}</p>
-                        </article>
-                    </div>
+                <main v-if="backendResultParticipants && backendMobileResult">
+                    <section
+                        class="border-b px-5 pb-6 pt-7 text-center"
+                        :class="backendMobileResult.surfaceClass"
+                        aria-labelledby="ranking-mobile-result-title"
+                    >
+                        <span
+                            class="mx-auto grid h-14 w-14 place-items-center rounded-full"
+                            :class="backendMobileResult.iconClass"
+                            aria-hidden="true"
+                        >
+                            <svg v-if="backendMobileResult.tone === 'win'" class="h-7 w-7" viewBox="0 0 24 24" fill="none">
+                                <path d="m5.5 12.5 4.1 4.1L18.8 7.4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <svg v-else-if="backendMobileResult.tone === 'loss'" class="h-7 w-7" viewBox="0 0 24 24" fill="none">
+                                <path d="m7 7 10 10M17 7 7 17" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+                            </svg>
+                            <svg v-else class="h-7 w-7" viewBox="0 0 24 24" fill="none">
+                                <path d="M6 9.5h12M6 14.5h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+                            </svg>
+                        </span>
 
-                    <section class="mt-5" aria-labelledby="ranking-result-details-heading">
-                        <h2 id="ranking-result-details-heading" class="text-[0.82rem] font-semibold text-[#667085]">Twój wynik</h2>
-                        <div class="mt-2 divide-y divide-[#e3e7eb] rounded-[8px] border border-[#dfe3e8] bg-white">
-                            <div class="flex min-h-14 items-center justify-between px-4 py-3">
-                                <span class="text-[0.92rem] font-medium">Poprawne odpowiedzi</span>
-                                <span class="text-[0.92rem] font-semibold tabular-nums">{{ backendResultParticipants.current.correctAnswers }}/{{ backendResultParticipants.current.totalQuestions }}</span>
+                        <p class="mt-4 text-[0.7rem] font-semibold uppercase text-[#667085]">
+                            {{ backendResultParticipants.current.outcomeLabel }}
+                        </p>
+                        <h1 id="ranking-mobile-result-title" class="mt-1 text-[1.45rem] font-semibold leading-7 text-[#101828]">
+                            {{ backendMobileResult.headline }}
+                        </h1>
+                        <p v-if="backendMobileResult.reason" class="mx-auto mt-2 max-w-[21rem] text-[0.88rem] leading-5 text-[#667085]">
+                            Rozstrzygnęło: {{ backendMobileResult.reason }}
+                        </p>
+
+                        <div class="mx-auto mt-5 grid max-w-[21rem] grid-cols-[1fr_auto_1fr] items-end gap-3">
+                            <div class="min-w-0">
+                                <p class="text-[2.85rem] font-semibold leading-none tabular-nums text-[#101828]">{{ backendResultParticipants.current.points }}</p>
+                                <p class="mt-1 truncate text-[0.72rem] font-medium text-[#667085]">Ty</p>
                             </div>
-                            <div class="flex min-h-14 items-center justify-between px-4 py-3">
-                                <span class="text-[0.92rem] font-medium">Zmiana ELO</span>
-                                <span class="text-[0.92rem] font-semibold tabular-nums" :class="(backendResultParticipants.current.eloChange ?? 0) >= 0 ? 'text-[#157347]' : 'text-[#b42318]'">{{ formatRankedResultSignedValue(backendResultParticipants.current.eloChange) }}</span>
+                            <span class="pb-6 text-[1.5rem] font-semibold leading-none text-[#98a2b3]">:</span>
+                            <div class="min-w-0">
+                                <p class="text-[2.85rem] font-semibold leading-none tabular-nums text-[#101828]">{{ backendResultParticipants.opponent.points }}</p>
+                                <p class="mt-1 truncate text-[0.72rem] font-medium text-[#667085]">{{ backendResultParticipants.opponent.username }}</p>
                             </div>
+                        </div>
+                        <p
+                            v-if="backendResultParticipants.current.eloChange !== null"
+                            class="mt-4 text-[0.84rem] font-semibold tabular-nums"
+                            :class="(backendResultParticipants.current.eloChange ?? 0) > 0 ? 'text-[#0f7b43]' : (backendResultParticipants.current.eloChange ?? 0) < 0 ? 'text-[#d92d20]' : 'text-[#475467]'"
+                        >
+                            {{ formatRankedResultSignedValue(backendResultParticipants.current.eloChange) }} ELO
+                        </p>
+
+                        <div class="mx-auto mt-6 grid max-w-[21rem] gap-2.5">
+                            <button
+                                type="button"
+                                class="inline-flex min-h-12 items-center justify-center rounded-[0.5rem] bg-[#0b5cff] px-5 py-3 text-[0.9rem] font-semibold text-white transition-colors hover:bg-[#0646c8] disabled:cursor-not-allowed disabled:bg-[#d0d5dd]"
+                                :disabled="backendBusy || sessionExpired"
+                                @click="joinRealQueue"
+                            >
+                                {{ backendBusy ? 'Szukamy przeciwnika…' : 'Zagraj ponownie' }}
+                            </button>
+                            <Link
+                                :href="route('session.ranking', buildRankingScreenRouteParams())"
+                                class="inline-flex min-h-12 items-center justify-center rounded-[0.5rem] border border-[#d0d5dd] bg-white px-5 py-3 text-[0.9rem] font-semibold text-[#344054] transition-colors hover:bg-[#f9fafb]"
+                            >
+                                Wróć do rankingu
+                            </Link>
                         </div>
                     </section>
 
-                    <Link
-                        :href="route('session.ranking', buildRankingScreenRouteParams())"
-                        class="mt-5 flex min-h-12 w-full items-center justify-center rounded-[8px] bg-[#0b63ce] px-4 text-[0.96rem] font-semibold text-white"
-                    >
-                        Wróć do rankingu
-                    </Link>
-                </section>
+                    <section class="border-b border-[#eaecf0] px-5 py-5" aria-labelledby="ranking-mobile-answers-title">
+                        <h2 id="ranking-mobile-answers-title" class="text-[1rem] font-semibold text-[#101828]">
+                            Twoje odpowiedzi
+                        </h2>
+                        <div class="mt-4 grid grid-cols-3 divide-x divide-[#eaecf0] text-center">
+                            <div class="px-2">
+                                <p class="text-[1.35rem] font-semibold tabular-nums text-[#0f7b43]">{{ backendResultParticipants.current.correctAnswers }}</p>
+                                <p class="mt-1 text-[0.68rem] text-[#667085]">Dobrze</p>
+                            </div>
+                            <div class="px-2">
+                                <p class="text-[1.35rem] font-semibold tabular-nums text-[#d92d20]">{{ backendMobileResult.incorrect }}</p>
+                                <p class="mt-1 text-[0.68rem] text-[#667085]">Błędne</p>
+                            </div>
+                            <div class="px-2">
+                                <p class="text-[1.35rem] font-semibold tabular-nums text-[#475467]">{{ backendMobileResult.unanswered }}</p>
+                                <p class="mt-1 text-[0.68rem] text-[#667085]">Bez odpowiedzi</p>
+                            </div>
+                        </div>
 
-                <div v-else class="flex min-h-[60svh] flex-col items-center justify-center px-4 text-center">
-                    <span class="h-3 w-3 rounded-full bg-[#0b63ce] animate-pulse" aria-hidden="true" />
-                    <p class="mt-4 text-[0.92rem] text-[#667085]">Ładujemy wynik meczu.</p>
+                        <dl class="mt-5 divide-y divide-[#eaecf0] border-y border-[#eaecf0]">
+                            <div class="flex min-h-11 items-center justify-between gap-4 py-2 text-[0.82rem]">
+                                <dt class="text-[#667085]">Czas reakcji (suma)</dt>
+                                <dd class="font-semibold tabular-nums text-[#344054]">{{ formatRankedResultTime(backendResultParticipants.current.responseTimeMs) }}</dd>
+                            </div>
+                            <div class="flex min-h-11 items-center justify-between gap-4 py-2 text-[0.82rem]">
+                                <dt class="min-w-0 truncate text-[#667085]">{{ backendResultParticipants.opponent.username }}</dt>
+                                <dd class="font-semibold tabular-nums text-[#344054]">
+                                    {{ backendResultParticipants.opponent.correctAnswers }}/{{ backendResultParticipants.opponent.totalQuestions }} dobrze
+                                </dd>
+                            </div>
+                        </dl>
+                    </section>
+                </main>
+
+                <div v-else class="flex min-h-[60svh] flex-col items-center justify-center px-5 text-center">
+                    <span class="h-3 w-3 animate-pulse rounded-full bg-[#0b5cff]" aria-hidden="true" />
+                    <p class="mt-4 text-[0.9rem] text-[#667085]">Ładujemy wynik meczu.</p>
                 </div>
             </section>
 
@@ -3566,107 +3974,86 @@ const backendTransportChipClass = computed(() => {
         </template>
 
         <template v-else>
-        <section class="min-h-screen bg-[#f7f8fa] pb-[calc(5.5rem+env(safe-area-inset-bottom))] text-[#17191d] md:hidden">
-            <header class="px-4 pb-5 pt-[calc(1.25rem+env(safe-area-inset-top))]">
-                <p class="text-[0.78rem] font-semibold text-[#667085]">Pojedynek 1 na 1</p>
-                <h1 class="mt-1 text-[1.72rem] font-bold leading-8 text-[#17191d]">Ranking</h1>
+        <!-- Telefon: lobby w stylu lig chess.com (karta gry, statystyki, tabela z banerem i podium). -->
+        <section class="min-h-screen bg-[#302e2b] px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] text-[#ffffffd9] md:hidden">
+            <header class="flex items-center gap-3 pb-4 pt-[max(env(safe-area-inset-top),1rem)]">
+                <MobileBackButton :href="route('session.index')" label="Wróć do strony głównej" />
+                <div class="min-w-0">
+                    <h1 class="text-[1.75rem] font-bold leading-[1.1] tracking-[-0.015em]">Ranking 1 na 1</h1>
+                    <p class="mt-0.5 truncate text-sm text-[#ffffffb8]">Kategoria {{ selectedCategory?.short_name ?? selectedCategory?.code ?? '—' }} · gra o punkty ELO</p>
+                </div>
             </header>
 
-            <section class="border-y border-[#dfe3e8] bg-white px-4 py-5" aria-labelledby="ranking-play-heading">
-                <p class="text-[0.76rem] font-semibold text-[#667085]">Następny mecz</p>
-                <h2 id="ranking-play-heading" class="mt-1 text-[1.25rem] font-bold leading-6 text-[#17191d]">
-                    Kategoria {{ selectedCategory?.short_name ?? selectedCategory?.code ?? '—' }} · {{ specSummary.total_questions }} pytań
-                </h2>
-                <p class="mt-2 text-[0.88rem] leading-5 text-[#667085]">
-                    Zagrasz z pierwszym wolnym graczem z kategorii {{ selectedCategory?.short_name ?? selectedCategory?.code ?? '—' }}.
-                </p>
-
-                <div class="mt-5 divide-x divide-[#e3e7eb] border-y border-[#e3e7eb]">
-                    <div class="grid grid-cols-2">
-                        <div class="px-0 py-3">
-                            <p class="text-[0.72rem] font-semibold text-[#667085]">Twoje ELO</p>
-                            <p class="mt-1 text-[1.35rem] font-bold tabular-nums text-[#17191d]">{{ mobilePlayerRatingLabel }}</p>
-                        </div>
-                        <div class="px-4 py-3">
-                            <p class="text-[0.72rem] font-semibold text-[#667085]">Czas meczu</p>
-                            <p class="mt-1 text-[1.35rem] font-bold tabular-nums text-[#17191d]">{{ formatRankedClock(specSummary.match_duration_seconds) }}</p>
-                        </div>
+            <section class="pk-panel p-3" aria-labelledby="ranking-play-heading">
+                <div class="flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                        <h2 id="ranking-play-heading" class="text-[1.0625rem] font-bold leading-6">Następny mecz</h2>
+                        <p class="mt-0.5 text-xs text-[#ffffffb8]">
+                            {{ specSummary.total_questions }} pytań · {{ formatRankedClock(specSummary.match_duration_seconds) }}<template v-if="(specSummary.question_interval_seconds ?? 0) > 0"> · nowe co {{ specSummary.question_interval_seconds }} s</template>
+                        </p>
+                    </div>
+                    <div class="shrink-0 text-right">
+                        <p class="text-xs text-[#ffffffb8]">Twoje ELO</p>
+                        <p class="text-[1.75rem] font-bold leading-none tabular-nums text-white">{{ mobilePlayerRatingLabel }}</p>
                     </div>
                 </div>
 
                 <button
                     type="button"
-                    class="mt-5 flex min-h-12 w-full items-center justify-center rounded-[8px] bg-[#0b63ce] px-4 text-[0.96rem] font-semibold text-white transition hover:bg-[#084fa8] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b63ce] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-55"
+                    class="pk-btn-primary mt-4 flex min-h-14 w-full items-center justify-center px-4 text-[1.125rem] font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80 disabled:cursor-not-allowed disabled:opacity-55"
                     :disabled="backendBusy || !selectedCategory"
                     @click="handlePrimaryRankingAction"
                 >
-                    {{ primaryRankingActionLabel }}
+                    {{ mobilePrimaryRankingActionLabel }}
                 </button>
                 <button
                     v-if="replayLobbyActionVisible"
                     type="button"
-                    class="mt-2 flex min-h-12 w-full items-center justify-center rounded-[8px] border border-[#dfe3e8] bg-white px-4 text-[0.92rem] font-semibold text-[#17191d] transition disabled:cursor-not-allowed disabled:opacity-55"
+                    class="pk-btn-secondary mt-2 flex min-h-12 w-full items-center justify-center px-4 text-[0.95rem] font-semibold disabled:cursor-not-allowed disabled:opacity-55"
                     :disabled="backendBusy || !selectedCategory"
                     @click="startReplayMatch"
                 >
                     Zagraj z nagraniem
                 </button>
-                <p v-if="replayLobbyActionVisible" class="mt-2 text-[0.78rem] leading-5 text-[#667085]">
-                    Ścigasz się z zapisanym meczem innego gracza z kategorii {{ selectedCategory?.short_name ?? selectedCategory?.code }}. Wynik liczy się do ELO.
+                <p v-if="replayLobbyActionVisible" class="mt-2 text-center text-xs leading-5 text-[#ffffffb8]">
+                    Zapisany mecz innego gracza z tej kategorii. Wynik liczy się do ELO.
                 </p>
-                <p v-if="inlineLobbyError" class="mt-3 text-[0.82rem] font-semibold leading-5 text-[#b42318]">{{ inlineLobbyError }}</p>
+                <p v-if="inlineLobbyError" class="mt-3 rounded-[5px] bg-[#3a1f22] px-3 py-2 text-[0.82rem] font-semibold leading-5 text-[#ff8a8a]">{{ inlineLobbyError }}</p>
             </section>
 
-            <section class="mt-5 px-4" aria-labelledby="ranking-account-heading">
-                <h2 id="ranking-account-heading" class="text-[0.82rem] font-semibold text-[#667085]">Twoje konto</h2>
-                <div class="mt-2 divide-y divide-[#e3e7eb] rounded-[8px] border border-[#dfe3e8] bg-white">
-                    <div class="flex min-h-14 items-center justify-between px-4 py-3">
-                        <span class="text-[0.92rem] font-medium text-[#17191d]">Mecze</span>
-                        <span class="text-[0.92rem] font-semibold tabular-nums text-[#17191d]">{{ rankedOverview?.rating.matches_played ?? 0 }}</span>
-                    </div>
-                    <div class="flex min-h-14 items-center justify-between px-4 py-3">
-                        <span class="text-[0.92rem] font-medium text-[#17191d]">Zwycięstwa</span>
-                        <span class="text-[0.92rem] font-semibold tabular-nums text-[#157347]">{{ rankedOverview?.rating.wins ?? 0 }}</span>
-                    </div>
-                    <div class="flex min-h-14 items-center justify-between px-4 py-3">
-                        <span class="text-[0.92rem] font-medium text-[#17191d]">Najlepsze ELO</span>
-                        <span class="text-[0.92rem] font-semibold tabular-nums text-[#17191d]">{{ rankedOverview?.rating.peak_rating ?? '—' }}</span>
-                    </div>
+            <section class="mt-4 grid grid-cols-3 gap-2" aria-label="Twoje statystyki">
+                <div class="pk-panel px-3 py-2.5">
+                    <p class="text-xs text-[#ffffffb8]">Mecze</p>
+                    <p class="mt-1 text-xl font-bold tabular-nums text-white">{{ rankedOverview?.rating.matches_played ?? 0 }}</p>
+                </div>
+                <div class="pk-panel px-3 py-2.5">
+                    <p class="text-xs text-[#ffffffb8]">Wygrane</p>
+                    <p class="mt-1 text-xl font-bold tabular-nums text-[#81b64c]">{{ rankedOverview?.rating.wins ?? 0 }}</p>
+                </div>
+                <div class="pk-panel px-3 py-2.5">
+                    <p class="text-xs text-[#ffffffb8]">Rekord ELO</p>
+                    <p class="mt-1 text-xl font-bold tabular-nums text-white">{{ rankedOverview?.rating.peak_rating ?? '—' }}</p>
                 </div>
             </section>
 
-            <section class="mt-5 px-4" aria-labelledby="ranking-table-heading">
-                <div class="flex items-center justify-between gap-4">
-                    <h2 id="ranking-table-heading" class="text-[0.82rem] font-semibold text-[#667085]">Najlepsi gracze</h2>
-                    <span class="text-[0.76rem] text-[#98a2b3]">{{ leaderboardUpdatedMobileLabel }}</span>
-                </div>
-                <div v-if="leaderboardEntries.length > 0" class="mt-2 divide-y divide-[#e3e7eb] rounded-[8px] border border-[#dfe3e8] bg-white">
-                    <article v-for="entry in leaderboardEntries.slice(0, 5)" :key="entry.user_id" class="flex min-h-[4.25rem] items-center gap-3 px-4 py-2">
-                        <span class="w-5 text-[0.86rem] font-semibold tabular-nums text-[#667085]">{{ entry.position }}</span>
-                        <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#eef2f6] text-[0.74rem] font-semibold text-[#475467]">
-                            {{ leaderboardAvatarLabel(entry.username) }}
-                        </span>
-                        <p class="min-w-0 flex-1 truncate text-[0.9rem] font-semibold text-[#17191d]">{{ entry.username }}</p>
-                        <span class="text-[0.88rem] font-semibold tabular-nums text-[#17191d]">{{ entry.rating }}</span>
-                    </article>
-                </div>
-                <article
-                    v-if="currentUserRankingEntry"
-                    class="mt-2 flex min-h-[4.25rem] items-center gap-3 rounded-[8px] border border-[#dfe3e8] bg-white px-4 py-2"
-                    aria-label="Twoje miejsce w rankingu"
-                >
-                    <span class="min-w-5 text-[0.86rem] font-semibold tabular-nums text-[#667085]">{{ currentUserRankingEntry.position }}</span>
-                    <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#eef2f6] text-[0.74rem] font-semibold text-[#475467]">
-                        {{ leaderboardAvatarLabel(currentUserRankingEntry.username) }}
-                    </span>
-                    <p class="min-w-0 flex-1 truncate text-[0.9rem] font-semibold text-[#17191d]">
-                        Ty <span class="font-normal text-[#667085]">· miejsce {{ currentUserRankingEntry.position }} z {{ currentUserRankingEntry.total_players }}</span>
-                    </p>
-                    <span class="text-[0.88rem] font-semibold tabular-nums text-[#17191d]">{{ currentUserRankingEntry.rating }}</span>
-                </article>
-                <p v-else class="mt-2 rounded-[8px] border border-dashed border-[#cbd5e1] bg-white px-4 py-5 text-[0.86rem] leading-5 text-[#667085]">
-                    Ranking pojawi się tutaj po pierwszych rozegranych meczach.
-                </p>
+            <section class="mt-5" aria-labelledby="ranking-table-heading">
+                <MobileStreakLeaderboard
+                    v-if="mobileLeagueRows.length > 0"
+                    title="Najlepsi gracze"
+                    title-id="ranking-table-heading"
+                    :leaders="mobileLeagueRows"
+                    :me="mobileLeagueMe"
+                    :caption="`Kategoria ${selectedCategory?.short_name ?? selectedCategory?.code ?? '—'}`"
+                    caption-suffix="ranking ELO"
+                    :note="`Aktualizacja: ${leaderboardUpdatedMobileLabel}`"
+                    score-label="ELO"
+                    :show-duration="false"
+                    label="Najlepsi gracze w rankingu 1 na 1"
+                />
+                <template v-else>
+                    <h2 id="ranking-table-heading" class="text-[1.0625rem] font-bold">Najlepsi gracze</h2>
+                    <p class="pk-panel mt-2.5 px-5 py-8 text-center text-sm leading-6 text-[#ffffffb8]">Ranking pojawi się tutaj po pierwszych rozegranych meczach.</p>
+                </template>
             </section>
         </section>
 
