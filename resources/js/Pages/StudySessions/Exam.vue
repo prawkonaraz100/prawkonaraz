@@ -962,14 +962,10 @@ onBeforeUnmount(() => {
                 <section :class="examQuestionPaneClass">
                     <div v-if="isMobileExamLayout" :class="examScopeHeaderClass">
                         <div class="flex flex-wrap items-center justify-between gap-3">
-                            <div>
-                                <p class="text-[0.64rem] font-medium uppercase tracking-[0.08em] text-[#5f6f82]">
-                                    {{ currentScopeLabel }}
-                                </p>
-                                <p class="exam-mobile-topic mt-1 text-sm font-medium text-[#374151]">
-                                    {{ activeQuestion?.topic?.name ?? 'Zakres egzaminacyjny' }}
-                                </p>
-                            </div>
+                            <!-- Only the exam part (basic/specialist); the question's topic would just distract during the exam. -->
+                            <p class="text-xs font-semibold uppercase tracking-[0.08em] text-[#5f6f82]">
+                                {{ currentScopeLabel }}
+                            </p>
                         </div>
                     </div>
 
@@ -1339,14 +1335,3 @@ onBeforeUnmount(() => {
         </section>
     </SessionExamLayout>
 </template>
-
-<style scoped>
-@media (max-width: 639px) {
-    .exam-mobile-topic {
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-        overflow: hidden;
-    }
-}
-</style>
